@@ -1,0 +1,95 @@
+{
+  "name": "Pagination",
+  "description": "Page navigation with prev/next buttons and numbered page buttons",
+  "props": {
+    "page": {
+      "type": "number",
+      "required": false,
+      "description": "Current page number (1-indexed).",
+      "default": 1
+    },
+    "defaultPage": {
+      "type": "number",
+      "required": false,
+      "description": "Uncontrolled initial page number (1-indexed)."
+    },
+    "total": {
+      "type": "number",
+      "required": true,
+      "description": "Total number of items.",
+      "default": 100
+    },
+    "pageSize": {
+      "type": "number",
+      "required": false,
+      "description": "Number of items per page.",
+      "default": 10
+    },
+    "siblingCount": {
+      "type": "number",
+      "required": false,
+      "description": "Number of sibling pages shown around the current page.",
+      "default": 1
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire pagination.",
+      "default": false
+    },
+    "onPageChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when the page changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper (+1px outside each pagination button).",
+      "default": true
+    },
+    "surfaceTitle": {
+      "type": "string",
+      "required": false,
+      "description": "Title used for the page picker sheet on compact viewports.",
+      "default": "Choose page"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "total": 100,
+        "page": 1
+      }
+    },
+    {
+      "name": "Middle Page",
+      "props": {
+        "total": 100,
+        "page": 5
+      }
+    },
+    {
+      "name": "Large Dataset",
+      "props": {
+        "total": 500,
+        "page": 1,
+        "pageSize": 20
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "total": 100,
+        "page": 1,
+        "disabled": true
+      }
+    }
+  ]
+}

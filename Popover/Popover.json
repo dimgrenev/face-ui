@@ -1,0 +1,21 @@
+{
+  "name": "Popover",
+  "props": {
+    "interactive": {
+      "type": "boolean",
+      "required": false,
+      "description": "interactive prop",
+      "default": true
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "children": "Open popover",
+        "content": "Popover content"
+      }
+    }
+  ],
+  "description": "Popover component"
+}

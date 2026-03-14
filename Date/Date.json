@@ -1,0 +1,365 @@
+{
+  "name": "Date",
+  "description": "Unified date/time picker with multi-view and range support",
+  "props": {
+    "mode": {
+      "type": "enum",
+      "required": false,
+      "description": "Picker mode: date, datetime, time, week, month or year",
+      "options": [
+        "date",
+        "datetime",
+        "time",
+        "week",
+        "month",
+        "year"
+      ],
+      "default": "date"
+    },
+    "selection": {
+      "type": "enum",
+      "required": false,
+      "description": "Selection model: single or range",
+      "options": [
+        "single",
+        "range"
+      ],
+      "default": "single"
+    },
+    "views": {
+      "type": "array",
+      "required": false,
+      "description": "Allowed views order",
+      "default": [
+        "day"
+      ]
+    },
+    "openTo": {
+      "type": "enum",
+      "required": false,
+      "description": "Initial opened view",
+      "options": [
+        "month",
+        "year",
+        "day",
+        "hours",
+        "minutes"
+      ],
+      "default": "day"
+    },
+    "value": {
+      "type": "any",
+      "required": false,
+      "description": "Controlled value (iso/date/range)",
+      "default": null
+    },
+    "defaultValue": {
+      "type": "any",
+      "required": false,
+      "description": "defaultValue prop",
+      "default": null
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "onValueChange prop"
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "onOpenChange prop"
+    },
+    "valueFormat": {
+      "type": "enum",
+      "required": false,
+      "description": "Value emission format: iso or date",
+      "options": [
+        "date",
+        "iso"
+      ],
+      "default": "iso"
+    },
+    "locale": {
+      "type": "string",
+      "required": false,
+      "description": "Formatting locale",
+      "default": "en-US"
+    },
+    "timezone": {
+      "type": "string",
+      "required": false,
+      "description": "Formatting timezone",
+      "default": "UTC"
+    },
+    "weekStartsOn": {
+      "type": "enum",
+      "required": false,
+      "description": "Week start day index",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "default": 1
+    },
+    "format": {
+      "type": "string",
+      "required": false,
+      "description": "format prop"
+    },
+    "min": {
+      "type": "any",
+      "required": false,
+      "description": "min prop",
+      "default": null
+    },
+    "max": {
+      "type": "any",
+      "required": false,
+      "description": "max prop",
+      "default": null
+    },
+    "disabledDates": {
+      "type": "array",
+      "required": false,
+      "description": "disabledDates prop"
+    },
+    "disabledTime": {
+      "type": "object",
+      "required": false,
+      "description": "disabledTime prop"
+    },
+    "minutes": {
+      "type": "number",
+      "required": false,
+      "description": "minutes prop"
+    },
+    "closeOnSelect": {
+      "type": "boolean",
+      "required": false,
+      "description": "Close panel after completing selection",
+      "default": true
+    },
+    "showNow": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show Now action in footer",
+      "default": true
+    },
+    "showClear": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show Clear action in footer",
+      "default": true
+    },
+    "showPresets": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show preset quick actions",
+      "default": false
+    },
+    "presets": {
+      "type": "array",
+      "required": false,
+      "description": "presets prop"
+    },
+    "surface": {
+      "type": "enum",
+      "required": false,
+      "description": "surface prop",
+      "options": [
+        "auto",
+        "popover",
+        "sheet"
+      ],
+      "default": "auto"
+    },
+    "surfaceBreakpoint": {
+      "type": "number",
+      "required": false,
+      "description": "surfaceBreakpoint prop"
+    },
+    "surfaceTitle": {
+      "type": "string",
+      "required": false,
+      "description": "surfaceTitle prop"
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Control label",
+      "default": "Date"
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "description": "Helper text below control",
+      "default": null
+    },
+    "error": {
+      "type": "string",
+      "required": false,
+      "description": "Error message below control",
+      "default": null
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "required prop",
+      "default": false
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disable interactions",
+      "default": false
+    },
+    "readOnly": {
+      "type": "boolean",
+      "required": false,
+      "description": "Read-only mode",
+      "default": false
+    },
+    "placeholder": {
+      "type": "string",
+      "required": false,
+      "description": "Trigger placeholder text",
+      "default": "Pick date"
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Enable membrane wrapper around trigger",
+      "default": true
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch control to container width",
+      "default": true
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "mode": "date",
+        "label": "Date",
+        "placeholder": "Pick date",
+        "showNow": true,
+        "showClear": true
+      }
+    },
+    {
+      "name": "DateTime",
+      "props": {
+        "mode": "datetime",
+        "views": [
+          "day",
+          "hours",
+          "minutes"
+        ],
+        "openTo": "day",
+        "label": "Date & Time",
+        "value": "2026-03-03T12:30"
+      }
+    },
+    {
+      "name": "Time",
+      "props": {
+        "mode": "time",
+        "views": [
+          "hours",
+          "minutes"
+        ],
+        "openTo": "hours",
+        "label": "Time",
+        "value": "2026-03-03T08:15"
+      }
+    },
+    {
+      "name": "Range",
+      "props": {
+        "mode": "date",
+        "selection": "range",
+        "label": "Date range",
+        "showPresets": true,
+        "value": {
+          "start": "2026-03-03",
+          "end": "2026-03-09"
+        }
+      }
+    },
+    {
+      "name": "Week",
+      "props": {
+        "mode": "week",
+        "selection": "range",
+        "label": "Week",
+        "value": {
+          "start": "2026-03-02",
+          "end": "2026-03-08"
+        }
+      }
+    },
+    {
+      "name": "Month",
+      "props": {
+        "mode": "month",
+        "views": [
+          "month",
+          "year"
+        ],
+        "openTo": "month",
+        "label": "Month",
+        "value": "2026-06-01"
+      }
+    },
+    {
+      "name": "Year",
+      "props": {
+        "mode": "year",
+        "views": [
+          "year"
+        ],
+        "openTo": "year",
+        "label": "Year",
+        "value": "2028-01-01"
+      }
+    },
+    {
+      "name": "With Validation",
+      "props": {
+        "mode": "date",
+        "label": "Limited date",
+        "min": "2026-03-01",
+        "max": "2026-03-31",
+        "disabledDates": [
+          "2026-03-08",
+          "2026-03-15",
+          "2026-03-22"
+        ],
+        "description": "Only March 2026 is selectable",
+        "error": null
+      }
+    },
+    {
+      "name": "Read Only",
+      "props": {
+        "mode": "date",
+        "label": "Read only date",
+        "readOnly": true,
+        "value": "2026-03-03"
+      }
+    }
+  ]
+}

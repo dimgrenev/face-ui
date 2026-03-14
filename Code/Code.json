@@ -1,0 +1,110 @@
+{
+  "name": "Code",
+  "description": "Source code display with optional line numbers and highlighting",
+  "props": {
+    "code": {
+      "type": "string",
+      "required": true,
+      "description": "Source code string.",
+      "default": "const greeting = 'Hello, world!';\nconsole.log(greeting);"
+    },
+    "language": {
+      "type": "string",
+      "required": false,
+      "description": "Language hint (used as a data attribute for syntax highlighter integration).",
+      "default": "tsx"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "description": "Title shown in the header bar.",
+      "default": "example.tsx"
+    },
+    "showLineNumbers": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether to display line numbers.",
+      "default": false
+    },
+    "highlight": {
+      "type": "array",
+      "required": false,
+      "description": "Line numbers to visually highlight (1-based).",
+      "default": []
+    },
+    "defaultCollapsed": {
+      "type": "boolean",
+      "required": false,
+      "description": "Start collapsed (auto-disables if content is short).",
+      "default": false
+    },
+    "collapsedHeight": {
+      "type": "number",
+      "required": false,
+      "description": "Maximum height when collapsed (px).",
+      "default": 160
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    "role": {
+      "type": "string",
+      "required": false,
+      "description": "role prop"
+    },
+    "titleAttr": {
+      "type": "string",
+      "required": false,
+      "description": "titleAttr prop"
+    },
+    "style": {
+      "type": "object",
+      "required": false,
+      "description": "style prop"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "title": "example.tsx",
+        "code": "const x = 1;\nconsole.log(x);"
+      }
+    },
+    {
+      "name": "With Language",
+      "props": {
+        "code": "function hello() {\n  return 'world';\n}",
+        "language": "tsx"
+      }
+    },
+    {
+      "name": "Line Numbers",
+      "props": {
+        "code": "const a = 1;\nconst b = 2;\nconst c = a + b;",
+        "showLineNumbers": true
+      }
+    },
+    {
+      "name": "Highlighted",
+      "props": {
+        "code": "line 1\nline 2\nline 3",
+        "showLineNumbers": true,
+        "highlight": [
+          2
+        ]
+      }
+    },
+    {
+      "name": "Collapsible",
+      "props": {
+        "title": "long-snippet.ts",
+        "defaultCollapsed": true,
+        "showLineNumbers": true,
+        "code": "const v1 = 1;\nconst v2 = 2;\nconst v3 = 3;\nconst v4 = 4;\nconst v5 = 5;\nconst v6 = 6;\nconst v7 = 7;\nconst v8 = 8;\nconst v9 = 9;\nconsole.log(v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9);"
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Sheet",
+  "props": {
+    "side": {
+      "type": "enum",
+      "required": false,
+      "description": "side prop",
+      "options": [
+        "bottom",
+        "top"
+      ],
+      "default": "bottom"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "trigger": "Open sheet",
+        "title": "Bottom sheet",
+        "description": "Compact actions and selections.",
+        "children": "Sheet content"
+      }
+    }
+  ],
+  "description": "Sheet component"
+}

@@ -1,0 +1,93 @@
+{
+  "name": "Checkbox",
+  "description": "Form control for boolean or indeterminate selection",
+  "props": {
+    "checked": {
+      "type": "enum",
+      "required": false,
+      "description": "Checked state (boolean or 'indeterminate').",
+      "options": [
+        "indeterminate"
+      ],
+      "default": false
+    },
+    "defaultChecked": {
+      "type": "enum",
+      "required": false,
+      "description": "Uncontrolled initial checked state.",
+      "options": [
+        "indeterminate"
+      ],
+      "default": false
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "default": false
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Mark as required.",
+      "default": false
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Form field name.",
+      "default": ""
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Label content.",
+      "default": null
+    },
+    "onCheckedChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when checked state changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper (+1px outside control geometry).",
+      "default": true
+    }
+  },
+  "states": [
+    {
+      "name": "Default (Unchecked)",
+      "props": {
+        "label": "Accept terms"
+      }
+    },
+    {
+      "name": "Checked",
+      "props": {
+        "checked": true,
+        "label": "Accept terms"
+      }
+    },
+    {
+      "name": "Indeterminate",
+      "props": {
+        "checked": "indeterminate",
+        "label": "Select all"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true,
+        "label": "Unavailable"
+      }
+    }
+  ]
+}

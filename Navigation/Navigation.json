@@ -1,0 +1,117 @@
+{
+  "name": "Navigation",
+  "description": "Horizontal or vertical navigation bar with hover dropdowns",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": true,
+      "description": "Navigation item definitions (supports nested dropdowns).",
+      "default": [
+        {
+          "id": "home",
+          "label": "Home"
+        },
+        {
+          "id": "products",
+          "label": "Products"
+        },
+        {
+          "id": "about",
+          "label": "About"
+        },
+        {
+          "id": "contact",
+          "label": "Contact"
+        }
+      ]
+    },
+    "activeId": {
+      "type": "string",
+      "required": false,
+      "description": "Currently active item ID.",
+      "default": null
+    },
+    "defaultActiveId": {
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial active item ID.",
+      "default": null
+    },
+    "onActiveChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when active item changes."
+    },
+    "orientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Orientation of the navigation bar.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    "surface": {
+      "type": "enum",
+      "required": false,
+      "description": "Surface behavior on compact viewports.",
+      "options": [
+        "auto",
+        "inline",
+        "sheet"
+      ],
+      "default": "auto"
+    },
+    "surfaceBreakpoint": {
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch to sheet mode."
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled sheet state for compact mode."
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Uncontrolled initial sheet state for compact mode.",
+      "default": false
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when sheet state changes."
+    },
+    "trigger": {
+      "type": "string",
+      "required": false,
+      "description": "Optional trigger for compact mode."
+    },
+    "surfaceTitle": {
+      "type": "string",
+      "required": false,
+      "description": "Optional title used in compact sheet header."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "name": "Vertical",
+      "props": {
+        "orientation": "vertical"
+      }
+    }
+  ]
+}

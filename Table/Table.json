@@ -1,0 +1,176 @@
+{
+  "name": "Table",
+  "description": "Data table with sorting and row selection",
+  "props": {
+    "columns": {
+      "type": "array",
+      "required": false,
+      "description": "Column definitions.",
+      "default": [
+        {
+          "id": "name",
+          "header": "Name",
+          "accessor": "name",
+          "sortable": true
+        },
+        {
+          "id": "email",
+          "header": "Email",
+          "accessor": "email"
+        },
+        {
+          "id": "role",
+          "header": "Role",
+          "accessor": "role"
+        }
+      ]
+    },
+    "rows": {
+      "type": "array",
+      "required": false,
+      "description": "Row data.",
+      "default": [
+        {
+          "id": "1",
+          "name": "Alice Johnson",
+          "email": "alice@example.com",
+          "role": "Admin"
+        },
+        {
+          "id": "2",
+          "name": "Bob Smith",
+          "email": "bob@example.com",
+          "role": "Editor"
+        },
+        {
+          "id": "3",
+          "name": "Carol Williams",
+          "email": "carol@example.com",
+          "role": "Viewer"
+        }
+      ]
+    },
+    "rowKey": {
+      "type": "string",
+      "required": false,
+      "description": "Key field on each row, or a function returning a unique key.",
+      "default": "id"
+    },
+    "sortColumn": {
+      "type": "string",
+      "required": false,
+      "description": "Controlled sort column.",
+      "default": null
+    },
+    "sortDirection": {
+      "type": "enum",
+      "required": false,
+      "description": "Controlled sort direction.",
+      "options": [
+        "asc",
+        "desc"
+      ],
+      "default": "asc"
+    },
+    "onSortChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when sort changes."
+    },
+    "direction": {
+      "type": "function",
+      "required": true,
+      "description": "direction prop"
+    },
+    "selectedRows": {
+      "type": "array",
+      "required": false,
+      "description": "Controlled selected row IDs.",
+      "default": []
+    },
+    "onSelectedRowsChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when selection changes."
+    },
+    "selectable": {
+      "type": "boolean",
+      "required": false,
+      "description": "Enable row selection.",
+      "default": false
+    },
+    "showRowNumbers": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show row number column.",
+      "default": false
+    },
+    "stickyHeader": {
+      "type": "boolean",
+      "required": false,
+      "description": "Make header sticky on scroll.",
+      "default": true
+    },
+    "showDividers": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show divider lines between rows.",
+      "default": true
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    },
+    "getRowId": {
+      "type": "function",
+      "required": false,
+      "description": "components API alias."
+    },
+    "onColumnResize": {
+      "type": "function",
+      "required": false,
+      "description": "components API compatibility: expose resize callback even for simple table machine mode."
+    },
+    "resizable": {
+      "type": "boolean",
+      "required": false,
+      "description": "components API compatibility: included for parity, no-op for table machine mode.",
+      "default": false
+    },
+    "stickyLastColumn": {
+      "type": "boolean",
+      "required": false,
+      "description": "components API compatibility: included for parity, handled via CSS sticky class.",
+      "default": false
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "resizable": true
+      }
+    },
+    {
+      "name": "Selectable",
+      "props": {
+        "selectable": true
+      }
+    },
+    {
+      "name": "Sorted Ascending",
+      "props": {
+        "sortColumn": "name",
+        "sortDirection": "asc"
+      }
+    },
+    {
+      "name": "Sorted Descending",
+      "props": {
+        "sortColumn": "name",
+        "sortDirection": "desc"
+      }
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "name": "Select",
+  "description": "Option picker with single and multi-select support",
+  "props": {
+    "options": {
+      "type": "array",
+      "required": true,
+      "description": "Available options.",
+      "default": [
+        {
+          "value": "react",
+          "label": "React"
+        },
+        {
+          "value": "vue",
+          "label": "Vue"
+        },
+        {
+          "value": "angular",
+          "label": "Angular"
+        },
+        {
+          "value": "svelte",
+          "label": "Svelte"
+        }
+      ]
+    },
+    "value": {
+      "type": "array",
+      "required": false,
+      "description": "Current selected value. String for single, string[] for multiselect.",
+      "default": null
+    },
+    "defaultValue": {
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial selected value."
+    },
+    "placeholder": {
+      "type": "string",
+      "required": false,
+      "description": "Placeholder text when no value is selected.",
+      "default": "Select…"
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the select.",
+      "default": false
+    },
+    "type": {
+      "type": "enum",
+      "required": false,
+      "description": "Selection mode.",
+      "options": [
+        "select",
+        "multiselect"
+      ],
+      "default": "select"
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Label rendered above/beside the select."
+    },
+    "labelOrientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Label placement relative to the control.",
+      "options": [
+        "vertical",
+        "horizontal"
+      ],
+      "default": "vertical"
+    },
+    "ariaLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible label (aria-label)."
+    },
+    "displayValue": {
+      "type": "string",
+      "required": false,
+      "description": "Optional override for the text shown in the trigger."
+    },
+    "stretchText": {
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch the value area so the arrow pins to the right edge.",
+      "default": false
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when value changes."
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when open state changes."
+    },
+    "surface": {
+      "type": "enum",
+      "required": false,
+      "description": "Preferred content surface. Auto switches to bottom sheet on compact viewports.",
+      "options": [
+        "auto",
+        "popover",
+        "sheet"
+      ],
+      "default": "auto"
+    },
+    "surfaceBreakpoint": {
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch from popover to sheet."
+    },
+    "surfaceTitle": {
+      "type": "string",
+      "required": false,
+      "description": "Optional title used for the mobile sheet header."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper (+1px outside trigger/option geometry).",
+      "default": true
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "placeholder": "Choose..."
+      }
+    },
+    {
+      "name": "Multiselect",
+      "props": {
+        "type": "multiselect",
+        "placeholder": "Select items..."
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true,
+        "placeholder": "Disabled"
+      }
+    }
+  ]
+}

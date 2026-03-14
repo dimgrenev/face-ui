@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "allowImportingTsExtensions": false,
+    "baseUrl": ".",
+    "composite": false,
+    "incremental": false,
+    "jsx": "react-jsx",
+    "noEmit": false,
+    "rootDir": ".",
+    "sourceMap": false
+  },
+  "include": [
+    "./**/*.ts",
+    "./**/*.tsx",
+    "./package-types.d.ts"
+  ],
+  "exclude": [
+    "./dist",
+    "./node_modules",
+    "./assets/__tests__",
+    "./assets/contracts",
+    "./scripts",
+    "./vitest.config.ts"
+  ]
+}

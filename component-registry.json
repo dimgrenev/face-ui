@@ -1,0 +1,552 @@
+{
+  "version": 1,
+  "governance": {
+    "qualityGates": [
+      "contracts",
+      "interaction-tests",
+      "responsive-review",
+      "a11y-review",
+      "preview-parity"
+    ],
+    "maturityLevels": [
+      "stable",
+      "beta",
+      "deprecated"
+    ],
+    "changePolicy": {
+      "stable": "breaking API changes require alias or documented migration path",
+      "beta": "API may change, but preview parity and responsive behavior still required",
+      "deprecated": "kept for compatibility, hidden from new guidance and replaced by canonical primitive"
+    },
+    "responsiveBreakpoints": {
+      "overlaySheet": 900
+    },
+    "ownership": [
+      "tokens",
+      "component APIs",
+      "responsive surfaces",
+      "preview parity"
+    ]
+  },
+  "components": {
+    "Button": {
+      "category": "primitive",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Text",
+        "Icon",
+        "Bar"
+      ]
+    },
+    "Text": {
+      "category": "primitive",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Button",
+        "Separator"
+      ]
+    },
+    "Icon": {
+      "category": "primitive",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Button",
+        "Text"
+      ]
+    },
+    "Separator": {
+      "category": "primitive",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Bar",
+        "Panel"
+      ]
+    },
+    "Badge": {
+      "category": "display",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Text"
+      ]
+    },
+    "Card": {
+      "category": "display",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Text",
+        "Media"
+      ]
+    },
+    "Skeleton": {
+      "category": "display",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Card"
+      ]
+    },
+    "Avatar": {
+      "category": "display",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Badge",
+        "Media"
+      ]
+    },
+    "Media": {
+      "category": "display",
+      "status": "beta",
+      "a11yReviewed": false,
+      "mobileReviewed": true,
+      "related": [
+        "Card",
+        "Avatar"
+      ]
+    },
+    "Markdown": {
+      "category": "content",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Text",
+        "Code"
+      ]
+    },
+    "Code": {
+      "category": "content",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Text",
+        "Button"
+      ]
+    },
+    "Input": {
+      "category": "form",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Text",
+        "Select",
+        "Date"
+      ]
+    },
+    "Checkbox": {
+      "category": "form",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Radio",
+        "Switcher"
+      ]
+    },
+    "Radio": {
+      "category": "form",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Checkbox",
+        "Select"
+      ]
+    },
+    "Switcher": {
+      "category": "form",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Checkbox",
+        "SegmentedControl"
+      ]
+    },
+    "Toggle": {
+      "category": "form",
+      "status": "deprecated",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "SegmentedControl"
+      ],
+      "replacedBy": [
+        "SegmentedControl"
+      ]
+    },
+    "SegmentedControl": {
+      "category": "form",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "aliases": [
+        "Toggle"
+      ],
+      "related": [
+        "Switcher",
+        "Tabs"
+      ]
+    },
+    "Slider": {
+      "category": "form",
+      "status": "beta",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Rating",
+        "Progress"
+      ]
+    },
+    "Rating": {
+      "category": "form",
+      "status": "beta",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Slider"
+      ]
+    },
+    "Select": {
+      "category": "overlay-form",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "responsiveSurface": "auto->sheet",
+      "related": [
+        "Menu",
+        "Command",
+        "Date",
+        "Popover"
+      ]
+    },
+    "Date": {
+      "category": "overlay-form",
+      "status": "deprecated",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "responsiveSurface": "auto->sheet",
+      "related": [
+        "Calendar",
+        "DatePicker",
+        "Select"
+      ],
+      "replacedBy": [
+        "DatePicker"
+      ]
+    },
+    "DatePicker": {
+      "category": "overlay-form",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "aliases": [
+        "Date"
+      ],
+      "responsiveSurface": "auto->sheet",
+      "related": [
+        "Calendar",
+        "Select"
+      ]
+    },
+    "Calendar": {
+      "category": "form",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Date",
+        "DatePicker"
+      ]
+    },
+    "Tooltip": {
+      "category": "overlay",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": false,
+      "related": [
+        "Popover",
+        "Overlay"
+      ]
+    },
+    "Popover": {
+      "category": "overlay",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "responsiveSurface": "auto->sheet",
+      "related": [
+        "Tooltip",
+        "Menu",
+        "Select"
+      ]
+    },
+    "Overlay": {
+      "category": "overlay-primitive",
+      "status": "deprecated",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "replacedBy": [
+        "Tooltip",
+        "Popover"
+      ],
+      "related": [
+        "Tooltip",
+        "Popover"
+      ]
+    },
+    "Menu": {
+      "category": "overlay",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "responsiveSurface": "auto->sheet",
+      "related": [
+        "Popover",
+        "Command",
+        "Select"
+      ]
+    },
+    "Modal": {
+      "category": "overlay",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "responsiveSurface": "auto->sheet",
+      "related": [
+        "Drawer",
+        "Command"
+      ]
+    },
+    "Sheet": {
+      "category": "overlay",
+      "status": "deprecated",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Modal",
+        "Drawer"
+      ],
+      "replacedBy": [
+        "Drawer"
+      ]
+    },
+    "Drawer": {
+      "category": "overlay",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "aliases": [
+        "Sheet"
+      ],
+      "related": [
+        "Modal",
+        "Panel"
+      ]
+    },
+    "Toast": {
+      "category": "feedback",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Bar",
+        "Text"
+      ]
+    },
+    "Progress": {
+      "category": "feedback",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Steps",
+        "Slider"
+      ]
+    },
+    "Tabs": {
+      "category": "navigation",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Accordion",
+        "SegmentedControl"
+      ]
+    },
+    "Accordion": {
+      "category": "navigation",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Tabs"
+      ]
+    },
+    "Breadcrumb": {
+      "category": "navigation",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Panel",
+        "Tree"
+      ]
+    },
+    "Pagination": {
+      "category": "navigation",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Table",
+        "Menu"
+      ]
+    },
+    "Steps": {
+      "category": "navigation",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Progress"
+      ]
+    },
+    "Navigation": {
+      "category": "navigation",
+      "status": "beta",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "responsiveSurface": "auto->sheet",
+      "related": [
+        "Panel",
+        "Menu"
+      ]
+    },
+    "Panel": {
+      "category": "navigation",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "aliases": [
+        "Sidebar"
+      ],
+      "responsiveSurface": "auto->drawer",
+      "related": [
+        "Navigation",
+        "Tree",
+        "Drawer"
+      ]
+    },
+    "Tree": {
+      "category": "navigation",
+      "status": "beta",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Panel",
+        "Breadcrumb"
+      ]
+    },
+    "Toc": {
+      "category": "navigation",
+      "status": "beta",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Tree",
+        "Breadcrumb"
+      ]
+    },
+    "Bar": {
+      "category": "layout",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Panel",
+        "Modal",
+        "Toast"
+      ]
+    },
+    "Scroll": {
+      "category": "layout",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Panel",
+        "Table"
+      ]
+    },
+    "Carousel": {
+      "category": "pattern",
+      "status": "beta",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Media",
+        "Tabs"
+      ]
+    },
+    "Table": {
+      "category": "pattern",
+      "status": "beta",
+      "a11yReviewed": true,
+      "mobileReviewed": false,
+      "related": [
+        "Pagination",
+        "Badge",
+        "Button"
+      ]
+    },
+    "Upload": {
+      "category": "pattern",
+      "status": "beta",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Button",
+        "Text"
+      ]
+    }
+  },
+  "plannedComponents": {
+    "Alert": {
+      "priority": "high",
+      "reason": "missing in-flow feedback surface"
+    },
+    "Combobox": {
+      "priority": "high",
+      "reason": "separate search+select input from Select/Menu/Command"
+    },
+    "Textarea": {
+      "priority": "high",
+      "reason": "forms need multiline primitive"
+    },
+    "EmptyState": {
+      "priority": "medium",
+      "reason": "repeated pattern across app surfaces"
+    },
+    "DateInput": {
+      "priority": "medium",
+      "reason": "split typed date entry from picker surface"
+    }
+  }
+}

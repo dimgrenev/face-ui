@@ -1,0 +1,225 @@
+{
+  "name": "Input",
+  "description": "Text input control with focus management and clear button",
+  "props": {
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Current input value.",
+      "default": null
+    },
+    "defaultValue": {
+      "type": "string",
+      "required": false,
+      "description": "components API compatibility: uncontrolled initial value.",
+      "default": ""
+    },
+    "type": {
+      "type": "enum",
+      "required": false,
+      "description": "Input type. 'default' renders a textarea-like free text. Others render <input type=\"...\">.",
+      "options": [
+        "number",
+        "default",
+        "text",
+        "email",
+        "date",
+        "password"
+      ],
+      "default": "default"
+    },
+    "textLayout": {
+      "type": "enum",
+      "required": false,
+      "description": "Text layout for type=\"default\": 'scroll' (single-line) or 'wrap' (multi-line auto-grow).",
+      "options": [
+        "scroll",
+        "wrap"
+      ],
+      "default": "scroll"
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the input.",
+      "default": false
+    },
+    "readOnly": {
+      "type": "boolean",
+      "required": false,
+      "description": "Make the input read-only.",
+      "default": false
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Label rendered above/beside the input.",
+      "default": "Label"
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "description": "Description/help text shown below the input.",
+      "default": null
+    },
+    "error": {
+      "type": "string",
+      "required": false,
+      "description": "Error message shown below the input.",
+      "default": ""
+    },
+    "labelOrientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Label placement relative to the control.",
+      "options": [
+        "vertical",
+        "horizontal"
+      ],
+      "default": "vertical"
+    },
+    "placeholder": {
+      "type": "string",
+      "required": false,
+      "description": "Placeholder text.",
+      "default": "Type here..."
+    },
+    "spellCheck": {
+      "type": "boolean",
+      "required": false,
+      "description": "Enable/disable spellcheck."
+    },
+    "icon": {
+      "type": "string",
+      "required": false,
+      "description": "Optional icon inside the control."
+    },
+    "iconPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Icon side inside the control. Default: left.",
+      "options": [
+        "left",
+        "right"
+      ],
+      "default": "left"
+    },
+    "stretchText": {
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch the input text area so right-side icons pin to the edge.",
+      "default": false
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show required indicator (*).",
+      "default": false
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Auto-focus on mount."
+    },
+    "min": {
+      "type": "any",
+      "required": false,
+      "description": "Min value (for type=\"number\")."
+    },
+    "max": {
+      "type": "any",
+      "required": false,
+      "description": "Max value (for type=\"number\")."
+    },
+    "step": {
+      "type": "any",
+      "required": false,
+      "description": "Step value (for type=\"number\")."
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when the value changes (machine-based)."
+    },
+    "onChange": {
+      "type": "function",
+      "required": false,
+      "description": "Native onChange handler."
+    },
+    "onBlur": {
+      "type": "function",
+      "required": false,
+      "description": "Native onBlur handler."
+    },
+    "onFocus": {
+      "type": "function",
+      "required": false,
+      "description": "Native onFocus handler."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper (+1px outside control geometry).",
+      "default": false
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "label": "Label",
+        "placeholder": "Type here..."
+      }
+    },
+    {
+      "name": "With Label",
+      "props": {
+        "label": "Email",
+        "placeholder": "you@example.com"
+      }
+    },
+    {
+      "name": "With Description",
+      "props": {
+        "label": "Email",
+        "placeholder": "you@example.com",
+        "description": "We'll never share your email."
+      }
+    },
+    {
+      "name": "With Error",
+      "props": {
+        "label": "Email",
+        "placeholder": "you@example.com",
+        "error": "This field is required."
+      }
+    },
+    {
+      "name": "Password",
+      "props": {
+        "type": "password",
+        "label": "Password",
+        "placeholder": "Enter password"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true,
+        "placeholder": "Disabled input"
+      }
+    },
+    {
+      "name": "Read Only",
+      "props": {
+        "readOnly": true,
+        "value": "Read only value"
+      }
+    }
+  ]
+}

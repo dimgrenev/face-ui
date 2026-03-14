@@ -1,0 +1,114 @@
+{
+  "name": "Switcher",
+  "description": "Binary toggle control with thumb animation",
+  "props": {
+    "checked": {
+      "type": "boolean",
+      "required": false,
+      "description": "Checked state (controlled).",
+      "default": false
+    },
+    "defaultChecked": {
+      "type": "boolean",
+      "required": false,
+      "description": "Initial checked state (uncontrolled)."
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "default": false
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Mark as required.",
+      "default": false
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Form field name.",
+      "default": ""
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Hidden input value when checked.",
+      "default": "on"
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Label content (ReactNode).",
+      "default": null
+    },
+    "text": {
+      "type": "string",
+      "required": false,
+      "description": "Text content (string shorthand, used when `withText` is true)."
+    },
+    "withText": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show text label alongside the switch.",
+      "default": true
+    },
+    "textWrap": {
+      "type": "enum",
+      "required": false,
+      "description": "Label text overflow: 'truncate' clips with ellipsis, 'wrap' wraps full text.",
+      "options": [
+        "truncate",
+        "wrap"
+      ],
+      "default": "truncate"
+    },
+    "onCheckedChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when checked state changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper (+1px outside control geometry).",
+      "default": true
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "label": "Dark mode"
+      }
+    },
+    {
+      "name": "Checked",
+      "props": {
+        "checked": true,
+        "label": "Enabled"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true,
+        "label": "Unavailable"
+      }
+    },
+    {
+      "name": "Disabled Checked",
+      "props": {
+        "checked": true,
+        "disabled": true,
+        "label": "Locked on"
+      }
+    }
+  ]
+}

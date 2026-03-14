@@ -1,0 +1,210 @@
+{
+  "name": "Text",
+  "description": "Typography component unifying body, heading, label, kbd, and code",
+  "props": {
+    "text": {
+      "type": "string",
+      "required": false,
+      "description": "Text content.",
+      "default": null
+    },
+    "variant": {
+      "type": "enum",
+      "required": false,
+      "description": "Visual variant.",
+      "options": [
+        "default",
+        "body",
+        "heading",
+        "label",
+        "caption",
+        "kbd",
+        "code",
+        "muted"
+      ],
+      "default": "default"
+    },
+    "size": {
+      "type": "enum",
+      "required": false,
+      "description": "Text size.",
+      "options": [
+        "xs",
+        "sm",
+        "md",
+        "lg",
+        "xl"
+      ],
+      "default": null
+    },
+    "as": {
+      "type": "enum",
+      "required": false,
+      "description": "HTML element to render. Auto-detected from variant if not specified.",
+      "options": [
+        "label",
+        "kbd",
+        "code",
+        "p",
+        "span",
+        "div",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "strong",
+        "em",
+        "small"
+      ],
+      "default": null
+    },
+    "icon": {
+      "type": "string",
+      "required": false,
+      "description": "Icon element (ReactNode).",
+      "default": null
+    },
+    "iconPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Icon position relative to text.",
+      "options": [
+        "left",
+        "right"
+      ],
+      "default": "left"
+    },
+    "inset": {
+      "type": "enum",
+      "required": false,
+      "description": "Padding/height behavior. `control` matches buttons; `none` is flush (no inner padding).",
+      "options": [
+        "control",
+        "none"
+      ],
+      "default": "control"
+    },
+    "stretchText": {
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch text area (flex:1).",
+      "default": false
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "Full width.",
+      "default": false
+    },
+    "align": {
+      "type": "enum",
+      "required": false,
+      "description": "Text alignment.",
+      "options": [
+        "left",
+        "right",
+        "center"
+      ],
+      "default": "left"
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing.",
+      "default": true
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Custom children (overrides text).",
+      "default": null
+    },
+    "htmlFor": {
+      "type": "string",
+      "required": false,
+      "description": "For label variant: htmlFor attribute."
+    }
+  },
+  "states": [
+    {
+      "name": "Default (Body)",
+      "props": {
+        "text": "Body text content.",
+        "align": "left",
+        "inset": "control"
+      }
+    },
+    {
+      "name": "Heading",
+      "props": {
+        "text": "Heading Text",
+        "variant": "heading",
+        "inset": "control"
+      }
+    },
+    {
+      "name": "Label",
+      "props": {
+        "text": "Label Text",
+        "variant": "label",
+        "inset": "control"
+      }
+    },
+    {
+      "name": "Caption",
+      "props": {
+        "text": "Caption text",
+        "variant": "caption"
+      }
+    },
+    {
+      "name": "Kbd",
+      "props": {
+        "text": "⌘K",
+        "variant": "kbd"
+      }
+    },
+    {
+      "name": "Code",
+      "props": {
+        "text": "const x = 1",
+        "variant": "code"
+      }
+    },
+    {
+      "name": "Muted",
+      "props": {
+        "text": "Muted text",
+        "variant": "muted"
+      }
+    },
+    {
+      "name": "With Icon",
+      "props": {
+        "text": "With left icon",
+        "icon": "search",
+        "iconPosition": "left"
+      }
+    },
+    {
+      "name": "Stretch + Full Width",
+      "props": {
+        "text": "Pinned right icon",
+        "icon": "right",
+        "iconPosition": "right",
+        "stretchText": true,
+        "fullWidth": true
+      }
+    },
+    {
+      "name": "Inset None",
+      "props": {
+        "text": "Flush text",
+        "inset": "none",
+        "membrane": false
+      }
+    }
+  ]
+}

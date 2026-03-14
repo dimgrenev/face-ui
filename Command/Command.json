@@ -1,0 +1,135 @@
+{
+  "name": "Command",
+  "description": "Command palette and search component with filtering and keyboard navigation",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": true,
+      "description": "Command item definitions.",
+      "default": [
+        {
+          "id": "copy",
+          "label": "Copy",
+          "keywords": [
+            "clipboard"
+          ]
+        },
+        {
+          "id": "paste",
+          "label": "Paste",
+          "keywords": [
+            "clipboard"
+          ]
+        },
+        {
+          "id": "cut",
+          "label": "Cut"
+        },
+        {
+          "id": "undo",
+          "label": "Undo"
+        },
+        {
+          "id": "redo",
+          "label": "Redo"
+        }
+      ]
+    },
+    "groups": {
+      "type": "array",
+      "required": false,
+      "description": "Group definitions for organizing items.",
+      "default": []
+    },
+    "placeholder": {
+      "type": "string",
+      "required": false,
+      "description": "Placeholder text for the search input.",
+      "default": "Search..."
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Search input value (controlled).",
+      "default": ""
+    },
+    "defaultValue": {
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial search input value.",
+      "default": ""
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when search value changes."
+    },
+    "onSelect": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when an item is selected."
+    },
+    "surface": {
+      "type": "enum",
+      "required": false,
+      "description": "Shell presentation mode. Auto switches to dialog on compact viewports.",
+      "options": [
+        "auto",
+        "inline",
+        "dialog"
+      ],
+      "default": "auto"
+    },
+    "surfaceBreakpoint": {
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch from inline to dialog."
+    },
+    "surfaceTitle": {
+      "type": "string",
+      "required": false,
+      "description": "Optional title used for the mobile dialog header."
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled dialog open state (used in dialog surface)."
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Uncontrolled initial dialog open state (used in dialog surface).",
+      "default": false
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when dialog open state changes."
+    },
+    "emptyContent": {
+      "type": "string",
+      "required": false,
+      "description": "Content to display when no results match.",
+      "default": "No results found."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "placeholder": "Type a command..."
+      }
+    },
+    {
+      "name": "Custom Placeholder",
+      "props": {
+        "placeholder": "Search actions..."
+      }
+    }
+  ]
+}

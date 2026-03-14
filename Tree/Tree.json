@@ -1,0 +1,97 @@
+{
+  "name": "Tree",
+  "description": "Hierarchical tree view with expand/collapse and selection",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": true,
+      "description": "Tree node definitions (recursive).",
+      "default": [
+        {
+          "id": "src",
+          "label": "src",
+          "children": [
+            {
+              "id": "components",
+              "label": "components",
+              "children": [
+                {
+                  "id": "button",
+                  "label": "Button.tsx"
+                },
+                {
+                  "id": "input",
+                  "label": "Input.tsx"
+                }
+              ]
+            },
+            {
+              "id": "index",
+              "label": "index.ts"
+            }
+          ]
+        },
+        {
+          "id": "package",
+          "label": "package.json"
+        },
+        {
+          "id": "readme",
+          "label": "README.md"
+        }
+      ]
+    },
+    "expandedIds": {
+      "type": "array",
+      "required": false,
+      "description": "Currently expanded node IDs.",
+      "default": [
+        "src",
+        "components"
+      ]
+    },
+    "defaultExpandedIds": {
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial expanded node IDs."
+    },
+    "selectedId": {
+      "type": "string",
+      "required": false,
+      "description": "Currently selected node ID.",
+      "default": null
+    },
+    "defaultSelectedId": {
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial selected node ID."
+    },
+    "onExpandedChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when expanded nodes change."
+    },
+    "onSelectedChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when selected node changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "With Selection",
+      "props": {
+        "selectedId": "button"
+      }
+    }
+  ]
+}

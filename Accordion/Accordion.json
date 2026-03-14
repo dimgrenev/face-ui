@@ -1,0 +1,73 @@
+{
+  "name": "Accordion",
+  "description": "Expandable panel navigation with single or multiple open items",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": false,
+      "description": "Accordion item definitions."
+    },
+    "expandedIds": {
+      "type": "array",
+      "required": false,
+      "description": "Currently expanded item IDs (controlled)."
+    },
+    "defaultExpandedIds": {
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial expanded item IDs."
+    },
+    "multiple": {
+      "type": "boolean",
+      "required": false,
+      "description": "Allow multiple items to be expanded simultaneously.",
+      "default": false
+    },
+    "collapsible": {
+      "type": "boolean",
+      "required": false,
+      "description": "Allow collapsing the last open item.",
+      "default": true
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire accordion.",
+      "default": false
+    },
+    "onExpandedChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when expanded items change."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Multiple",
+      "props": {
+        "multiple": true
+      }
+    },
+    {
+      "name": "Non-Collapsible",
+      "props": {
+        "collapsible": false
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true
+      }
+    }
+  ]
+}

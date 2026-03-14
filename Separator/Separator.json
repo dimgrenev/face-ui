@@ -1,0 +1,46 @@
+{
+  "name": "Separator",
+  "description": "Visual divider for separating content",
+  "props": {
+    "orientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Separator direction",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    },
+    "decorative": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the separator is purely decorative",
+      "default": true
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing",
+      "default": true
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Vertical",
+      "props": {
+        "orientation": "vertical"
+      }
+    },
+    {
+      "name": "Semantic",
+      "props": {
+        "decorative": false
+      }
+    }
+  ]
+}

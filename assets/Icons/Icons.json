@@ -1,0 +1,100 @@
+{
+  "name": "Icon",
+  "description": "Auto-generated face.json for Icon",
+  "props": {
+    "name": {
+      "type": "select",
+      "required": true,
+      "description": "name prop",
+      "options": [
+        "align-horizontal-center",
+        "align-horizontal-left",
+        "align-horizontal-right",
+        "align-vertical-bottom",
+        "align-vertical-center",
+        "align-vertical-top",
+        "alphabet",
+        "animation",
+        "arrow-down",
+        "arrow-left",
+        "arrow-right",
+        "arrow-up",
+        "cart",
+        "check",
+        "check-off",
+        "check-on",
+        "clean",
+        "close",
+        "cloud-done",
+        "component",
+        "cookie",
+        "copy",
+        "crop",
+        "date",
+        "delete",
+        "down",
+        "download",
+        "drag",
+        "edit",
+        "face",
+        "file",
+        "folder",
+        "full",
+        "info",
+        "left",
+        "legend",
+        "letter-spacing",
+        "line-height",
+        "link",
+        "minus",
+        "more",
+        "notification",
+        "panel",
+        "pause",
+        "play",
+        "plus",
+        "props",
+        "radio-off",
+        "radio-on",
+        "random",
+        "render",
+        "restart",
+        "right",
+        "scroll",
+        "search",
+        "settings",
+        "size",
+        "sound",
+        "stat",
+        "store",
+        "switch",
+        "theme",
+        "type",
+        "up",
+        "user",
+        "userface"
+      ]
+    },
+    "size": {
+      "type": "number",
+      "required": false,
+      "description": "size prop"
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    },
+    "style": {
+      "type": "any",
+      "required": false,
+      "description": "style prop"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    }
+  ]
+}

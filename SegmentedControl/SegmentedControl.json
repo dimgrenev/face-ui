@@ -1,0 +1,40 @@
+{
+  "name": "SegmentedControl",
+  "props": {
+    "selectionMode": {
+      "type": "enum",
+      "required": false,
+      "description": "selectionMode prop",
+      "options": [
+        "single",
+        "multiple"
+      ],
+      "default": "single"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "items": [
+          {
+            "value": "grid",
+            "label": "Grid"
+          },
+          {
+            "value": "list",
+            "label": "List"
+          },
+          {
+            "value": "kanban",
+            "label": "Board"
+          }
+        ],
+        "defaultValue": [
+          "grid"
+        ]
+      }
+    }
+  ],
+  "description": "SegmentedControl component"
+}

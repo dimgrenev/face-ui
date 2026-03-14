@@ -1,0 +1,103 @@
+{
+  "name": "Upload",
+  "description": "File upload with drag-and-drop support",
+  "props": {
+    "accept": {
+      "type": "string",
+      "required": false,
+      "description": "Accepted file types (e.g. \"image/*\", \".pdf,.doc\").",
+      "default": ""
+    },
+    "multiple": {
+      "type": "boolean",
+      "required": false,
+      "description": "Allow multiple file selection.",
+      "default": false
+    },
+    "maxSize": {
+      "type": "number",
+      "required": false,
+      "description": "Maximum file size in bytes. 0 = unlimited.",
+      "default": 0
+    },
+    "maxFiles": {
+      "type": "number",
+      "required": false,
+      "description": "Maximum number of files. 0 = unlimited.",
+      "default": 0
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "default": false
+    },
+    "files": {
+      "type": "array",
+      "required": false,
+      "description": "Controlled file list."
+    },
+    "onFilesChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when files change."
+    },
+    "onReject": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when files are rejected."
+    },
+    "size": {
+      "type": "number",
+      "required": true,
+      "description": "size prop"
+    },
+    "type": {
+      "type": "string",
+      "required": true,
+      "description": "type prop"
+    },
+    "reason": {
+      "type": "string",
+      "required": true,
+      "description": "reason prop"
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Images Only",
+      "props": {
+        "accept": "image/*"
+      }
+    },
+    {
+      "name": "Multiple",
+      "props": {
+        "multiple": true
+      }
+    },
+    {
+      "name": "Limited",
+      "props": {
+        "multiple": true,
+        "maxFiles": 3,
+        "maxSize": 5242880
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true
+      }
+    }
+  ]
+}

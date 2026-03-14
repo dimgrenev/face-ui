@@ -1,0 +1,87 @@
+{
+  "name": "Toc",
+  "description": "Table of contents navigation with active-item tracking",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": true,
+      "description": "Section items to render.",
+      "default": [
+        {
+          "id": "intro",
+          "label": "Introduction",
+          "level": 1
+        },
+        {
+          "id": "getting-started",
+          "label": "Getting Started",
+          "level": 1
+        },
+        {
+          "id": "installation",
+          "label": "Installation",
+          "level": 2
+        },
+        {
+          "id": "configuration",
+          "label": "Configuration",
+          "level": 2
+        },
+        {
+          "id": "api",
+          "label": "API Reference",
+          "level": 1
+        }
+      ]
+    },
+    "activeId": {
+      "type": "string",
+      "required": false,
+      "description": "Currently active section id (controlled).",
+      "default": ""
+    },
+    "defaultActiveId": {
+      "type": "string",
+      "required": false,
+      "description": "Initial active section id (uncontrolled). Falls back to first item."
+    },
+    "withLine": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show the active indicator line + baseline rail.",
+      "default": true
+    },
+    "lineSide": {
+      "type": "enum",
+      "required": false,
+      "description": "Side of the indicator/rail.",
+      "options": [
+        "left",
+        "right"
+      ],
+      "default": "left"
+    },
+    "onActiveChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when the active section changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "With Active",
+      "props": {
+        "activeId": "intro"
+      }
+    }
+  ]
+}

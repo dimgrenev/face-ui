@@ -1,0 +1,87 @@
+{
+  "name": "Steps",
+  "description": "Step-by-step wizard navigation",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": true,
+      "description": "Step definitions.",
+      "default": [
+        {
+          "label": "Account",
+          "content": "Create your account credentials."
+        },
+        {
+          "label": "Profile",
+          "content": "Fill in your profile details."
+        },
+        {
+          "label": "Review",
+          "content": "Review and confirm your information."
+        }
+      ]
+    },
+    "step": {
+      "type": "number",
+      "required": false,
+      "description": "Current step index (0-based).",
+      "default": 0
+    },
+    "defaultStep": {
+      "type": "number",
+      "required": false,
+      "description": "Uncontrolled initial step index.",
+      "default": 0
+    },
+    "linear": {
+      "type": "boolean",
+      "required": false,
+      "description": "Linear mode: prevents skipping steps.",
+      "default": true
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire steps navigation.",
+      "default": false
+    },
+    "onStepChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when the active step changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "step": 0
+      }
+    },
+    {
+      "name": "Second Step",
+      "props": {
+        "step": 1
+      }
+    },
+    {
+      "name": "Non-Linear",
+      "props": {
+        "step": 0,
+        "linear": false
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "step": 0,
+        "disabled": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "name": "Tabs",
+  "description": "Tabbed navigation with content panels",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": false,
+      "description": "Tab definitions.",
+      "default": [
+        {
+          "value": "overview",
+          "label": "Overview",
+          "content": "This is the overview panel."
+        },
+        {
+          "value": "features",
+          "label": "Features",
+          "content": "Explore the key features."
+        },
+        {
+          "value": "pricing",
+          "label": "Pricing",
+          "content": "Choose a plan that works for you."
+        }
+      ]
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Currently selected tab value.",
+      "default": null
+    },
+    "defaultValue": {
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial tab value."
+    },
+    "orientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Orientation of the tab list.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    },
+    "activationMode": {
+      "type": "enum",
+      "required": false,
+      "description": "Activation mode: automatic selects on focus, manual requires click/Enter.",
+      "options": [
+        "automatic",
+        "manual"
+      ],
+      "default": "automatic"
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire tab group.",
+      "default": false
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when the selected tab changes."
+    },
+    "withLine": {
+      "type": "boolean",
+      "required": false,
+      "description": "components API compatibility (visual variants are styled via classes).",
+      "default": false
+    },
+    "wrap": {
+      "type": "boolean",
+      "required": false,
+      "description": "Allow tabs list wrapping",
+      "default": false
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper (+1px outside each tab trigger).",
+      "default": true
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Vertical",
+      "props": {
+        "orientation": "vertical"
+      }
+    },
+    {
+      "name": "Manual Activation",
+      "props": {
+        "activationMode": "manual"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true
+      }
+    }
+  ]
+}

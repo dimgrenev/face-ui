@@ -1,0 +1,192 @@
+{
+  "name": "Slider",
+  "description": "Range input with single or multiple thumbs",
+  "props": {
+    "variant": {
+      "type": "enum",
+      "required": false,
+      "description": "Simple machine-driven slider or the advanced legacy slider.",
+      "options": [
+        "simple",
+        "advanced"
+      ],
+      "default": "simple"
+    },
+    "value": {
+      "type": "array",
+      "required": false,
+      "description": "Current value(s). Single thumb = [n], range = [min, max]."
+    },
+    "defaultValue": {
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial value(s)."
+    },
+    "scalarValue": {
+      "type": "number",
+      "required": false,
+      "description": "Legacy scalar value for the advanced slider."
+    },
+    "min": {
+      "type": "number",
+      "required": false,
+      "description": "Minimum value.",
+      "default": 0
+    },
+    "max": {
+      "type": "number",
+      "required": false,
+      "description": "Maximum value.",
+      "default": 100
+    },
+    "step": {
+      "type": "number",
+      "required": false,
+      "description": "Step increment.",
+      "default": 1
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "default": false
+    },
+    "orientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Orientation.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Label content.",
+      "default": null
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when value changes."
+    },
+    "onChange": {
+      "type": "function",
+      "required": false,
+      "description": "Legacy scalar callback for the advanced slider."
+    },
+    "leading": {
+      "type": "enum",
+      "required": false,
+      "description": "Leading content mode for the advanced slider.",
+      "options": [
+        "none",
+        "icon",
+        "text",
+        "iconText"
+      ],
+      "default": "none"
+    },
+    "leadingIcon": {
+      "type": "string",
+      "required": false,
+      "description": "Leading icon name for the advanced slider."
+    },
+    "leadingText": {
+      "type": "string",
+      "required": false,
+      "description": "Leading text for the advanced slider."
+    },
+    "crop": {
+      "type": "boolean",
+      "required": false,
+      "description": "Enable crop handles in the advanced slider.",
+      "default": false
+    },
+    "defaultCropRange": {
+      "type": "object",
+      "required": false,
+      "description": "Uncontrolled initial crop range for the advanced slider."
+    },
+    "cropRange": {
+      "type": "object",
+      "required": false,
+      "description": "Controlled crop range for the advanced slider."
+    },
+    "cropLocksValue": {
+      "type": "boolean",
+      "required": false,
+      "description": "Clamp the value to the crop range.",
+      "default": true
+    },
+    "onCropChange": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the crop range changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "defaultValue": [
+          50
+        ]
+      }
+    },
+    {
+      "name": "Range",
+      "props": {
+        "defaultValue": [
+          20,
+          80
+        ],
+        "label": "Price range"
+      }
+    },
+    {
+      "name": "Advanced",
+      "props": {
+        "variant": "advanced",
+        "defaultValue": [
+          42
+        ],
+        "leading": "text",
+        "leadingText": "Zoom"
+      }
+    },
+    {
+      "name": "Crop",
+      "props": {
+        "variant": "advanced",
+        "defaultValue": [
+          40
+        ],
+        "crop": true,
+        "defaultCropRange": {
+          "min": 20,
+          "max": 80
+        },
+        "cropLocksValue": true,
+        "leading": "text",
+        "leadingText": "Crop"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "defaultValue": [
+          30
+        ],
+        "disabled": true
+      }
+    }
+  ]
+}

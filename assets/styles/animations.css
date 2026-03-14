@@ -1,0 +1,193 @@
+/**
+ * Face UI — Opt-in Animations
+ *
+ * All animations are OFF by default (instant transitions).
+ * Activate via `.uf-animated` class on any ancestor or the component itself.
+ * Respects prefers-reduced-motion.
+ * No @layer — top-level for isolation from external CSS.
+ */
+
+/* ---------------------------------------------------------------
+ * Animation keyframes
+ * --------------------------------------------------------------- */
+
+@keyframes uf-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes uf-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes uf-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes uf-scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes uf-slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes uf-slide-out-right {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+@keyframes uf-slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes uf-slide-out-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes uf-slide-in-top {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes uf-slide-in-bottom {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes uf-slide-out-top {
+  from { transform: translateY(0); }
+  to { transform: translateY(-100%); }
+}
+
+@keyframes uf-slide-out-bottom {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+
+@keyframes uf-slide-up-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes uf-collapse-down {
+  from { height: 0; opacity: 0; }
+  to { height: var(--uf-content-height, auto); opacity: 1; }
+}
+
+@keyframes uf-collapse-up {
+  from { height: var(--uf-content-height, auto); opacity: 1; }
+  to { height: 0; opacity: 0; }
+}
+
+/* ---------------------------------------------------------------
+ * Modal animations
+ * --------------------------------------------------------------- */
+
+/* Backdrop */
+.uf-animated .uf-modal-backdrop[data-state="open"] {
+  animation: uf-fade-in var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+/* Center dialog */
+.uf-animated .uf-modal[data-variant="center"][data-state="open"] {
+  animation: uf-scale-in var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+/* Drawer variants */
+.uf-animated .uf-modal[data-variant="right"][data-state="open"] {
+  animation: uf-slide-in-right var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+.uf-animated .uf-modal[data-variant="left"][data-state="open"] {
+  animation: uf-slide-in-left var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+.uf-animated .uf-modal[data-variant="top"][data-state="open"] {
+  animation: uf-slide-in-top var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+.uf-animated .uf-modal[data-variant="bottom"][data-state="open"] {
+  animation: uf-slide-in-bottom var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+/* ---------------------------------------------------------------
+ * Overlay (Tooltip / Popover) animations
+ * --------------------------------------------------------------- */
+
+.uf-animated .uf-overlay-content[data-state="open"] {
+  animation: uf-scale-in var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+/* ---------------------------------------------------------------
+ * Menu animations
+ * --------------------------------------------------------------- */
+
+.uf-animated .uf-menu-content[data-state="open"] {
+  animation: uf-scale-in var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+/* ---------------------------------------------------------------
+ * Toast animations
+ * --------------------------------------------------------------- */
+
+.uf-animated .uf-toast {
+  animation: uf-slide-up-fade var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+/* ---------------------------------------------------------------
+ * Accordion / Collapsible animations
+ * --------------------------------------------------------------- */
+
+.uf-animated .uf-accordion [data-part="content"]:not([hidden]) {
+  animation: uf-collapse-down var(--uf-duration-enter) var(--uf-ease-enter);
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------
+ * Tabs content fade
+ * --------------------------------------------------------------- */
+
+.uf-animated .uf-tabs [data-part="content"]:not([hidden]) {
+  animation: uf-fade-in var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+/* ---------------------------------------------------------------
+ * Select / Command dropdown
+ * --------------------------------------------------------------- */
+
+.uf-animated .uf-select [data-part="content"][data-state="open"] {
+  animation: uf-slide-up-fade var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+.uf-animated .uf-command [data-part="list"] {
+  animation: uf-fade-in var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+/* ---------------------------------------------------------------
+ * Navigation dropdown
+ * --------------------------------------------------------------- */
+
+.uf-animated .uf-navigation [data-part="content"][data-state="open"] {
+  animation: uf-scale-in var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+/* ---------------------------------------------------------------
+ * Reduced motion — disable ALL animations
+ * --------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .uf-animated *,
+  .uf-animated *::before,
+  .uf-animated *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
+  }
+}

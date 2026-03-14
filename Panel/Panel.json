@@ -1,0 +1,153 @@
+{
+  "name": "Panel",
+  "description": "Collapsible panel navigation with nested groups",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": true,
+      "description": "Panel item definitions (supports nested groups).",
+      "default": [
+        {
+          "id": "dashboard",
+          "label": "Dashboard"
+        },
+        {
+          "id": "projects",
+          "label": "Projects",
+          "items": [
+            {
+              "id": "active",
+              "label": "Active"
+            },
+            {
+              "id": "archived",
+              "label": "Archived"
+            }
+          ]
+        },
+        {
+          "id": "settings",
+          "label": "Settings"
+        }
+      ]
+    },
+    "collapsed": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the panel is collapsed.",
+      "default": false
+    },
+    "defaultCollapsed": {
+      "type": "boolean",
+      "required": false,
+      "description": "Uncontrolled initial collapsed state.",
+      "default": false
+    },
+    "onCollapsedChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when collapsed state changes."
+    },
+    "selectedId": {
+      "type": "string",
+      "required": false,
+      "description": "Currently selected item ID.",
+      "default": null
+    },
+    "defaultSelectedId": {
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial selected item ID."
+    },
+    "onSelectedChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when selected item changes."
+    },
+    "width": {
+      "type": "number",
+      "required": false,
+      "description": "Width when expanded.",
+      "default": 260
+    },
+    "collapsedWidth": {
+      "type": "number",
+      "required": false,
+      "description": "Width when collapsed.",
+      "default": 60
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    "previewPreset": {
+      "type": "enum",
+      "required": false,
+      "description": "Showcase-only built-in layout preset.",
+      "options": [
+        "workspace"
+      ]
+    },
+    "surface": {
+      "type": "enum",
+      "required": false,
+      "description": "Surface behavior on compact viewports.",
+      "options": [
+        "auto",
+        "inline",
+        "sheet"
+      ],
+      "default": "auto"
+    },
+    "surfaceBreakpoint": {
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch to sheet mode."
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled drawer state for sheet mode."
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Uncontrolled initial drawer state for sheet mode.",
+      "default": false
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when drawer state changes."
+    },
+    "trigger": {
+      "type": "string",
+      "required": false,
+      "description": "Optional trigger for sheet mode."
+    },
+    "surfaceTitle": {
+      "type": "string",
+      "required": false,
+      "description": "Optional title used in compact sheet header."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Collapsed",
+      "props": {
+        "collapsed": true
+      }
+    },
+    {
+      "name": "Custom Width",
+      "props": {
+        "width": 300
+      }
+    }
+  ]
+}

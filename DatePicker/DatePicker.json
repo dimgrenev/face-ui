@@ -1,0 +1,227 @@
+{
+  "name": "DatePicker",
+  "props": {
+    "mode": {
+      "type": "enum",
+      "required": false,
+      "description": "mode prop",
+      "options": [
+        "date",
+        "datetime",
+        "time",
+        "week",
+        "month",
+        "year"
+      ]
+    },
+    "selection": {
+      "type": "enum",
+      "required": false,
+      "description": "selection prop",
+      "options": [
+        "single",
+        "range"
+      ]
+    },
+    "views": {
+      "type": "array",
+      "required": false,
+      "description": "views prop"
+    },
+    "openTo": {
+      "type": "enum",
+      "required": false,
+      "description": "openTo prop",
+      "options": [
+        "month",
+        "year",
+        "day",
+        "hours",
+        "minutes"
+      ]
+    },
+    "value": {
+      "type": "any",
+      "required": false,
+      "description": "value prop"
+    },
+    "defaultValue": {
+      "type": "any",
+      "required": false,
+      "description": "defaultValue prop"
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "onValueChange prop"
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "onOpenChange prop"
+    },
+    "valueFormat": {
+      "type": "enum",
+      "required": false,
+      "description": "valueFormat prop",
+      "options": [
+        "date",
+        "iso"
+      ]
+    },
+    "locale": {
+      "type": "string",
+      "required": false,
+      "description": "locale prop"
+    },
+    "timezone": {
+      "type": "string",
+      "required": false,
+      "description": "timezone prop"
+    },
+    "weekStartsOn": {
+      "type": "enum",
+      "required": false,
+      "description": "weekStartsOn prop",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    },
+    "format": {
+      "type": "string",
+      "required": false,
+      "description": "format prop"
+    },
+    "min": {
+      "type": "any",
+      "required": false,
+      "description": "min prop"
+    },
+    "max": {
+      "type": "any",
+      "required": false,
+      "description": "max prop"
+    },
+    "disabledDates": {
+      "type": "array",
+      "required": false,
+      "description": "disabledDates prop"
+    },
+    "disabledTime": {
+      "type": "object",
+      "required": false,
+      "description": "disabledTime prop"
+    },
+    "closeOnSelect": {
+      "type": "boolean",
+      "required": false,
+      "description": "closeOnSelect prop"
+    },
+    "showNow": {
+      "type": "boolean",
+      "required": false,
+      "description": "showNow prop"
+    },
+    "showClear": {
+      "type": "boolean",
+      "required": false,
+      "description": "showClear prop"
+    },
+    "showPresets": {
+      "type": "boolean",
+      "required": false,
+      "description": "showPresets prop"
+    },
+    "presets": {
+      "type": "array",
+      "required": false,
+      "description": "presets prop"
+    },
+    "surface": {
+      "type": "enum",
+      "required": false,
+      "description": "surface prop",
+      "options": [
+        "auto",
+        "popover",
+        "sheet"
+      ]
+    },
+    "surfaceBreakpoint": {
+      "type": "number",
+      "required": false,
+      "description": "surfaceBreakpoint prop"
+    },
+    "surfaceTitle": {
+      "type": "string",
+      "required": false,
+      "description": "surfaceTitle prop"
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "label prop"
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "description": "description prop"
+    },
+    "error": {
+      "type": "string",
+      "required": false,
+      "description": "error prop"
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "required prop"
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "disabled prop"
+    },
+    "readOnly": {
+      "type": "boolean",
+      "required": false,
+      "description": "readOnly prop"
+    },
+    "placeholder": {
+      "type": "string",
+      "required": false,
+      "description": "placeholder prop"
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "membrane prop"
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "fullWidth prop"
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "label": "Date",
+        "placeholder": "Pick date"
+      }
+    }
+  ],
+  "description": "DatePicker component"
+}

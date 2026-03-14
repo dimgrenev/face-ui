@@ -1,0 +1,75 @@
+{
+  "name": "Progress",
+  "description": "Loading progress indicator bar",
+  "props": {
+    "value": {
+      "type": "number",
+      "required": true,
+      "description": "Current value. Pass -1 for indeterminate.",
+      "default": 0
+    },
+    "max": {
+      "type": "number",
+      "required": false,
+      "description": "Maximum value (default 100).",
+      "default": 100
+    },
+    "variant": {
+      "type": "enum",
+      "required": false,
+      "description": "Color variant.",
+      "options": [
+        "default",
+        "success",
+        "warning",
+        "error"
+      ],
+      "default": "default"
+    },
+    "showLabel": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show percentage label beside the track.",
+      "default": false
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Optional label rendered beside the track.",
+      "default": null
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "value": 50
+      }
+    },
+    {
+      "name": "Complete",
+      "props": {
+        "value": 100
+      }
+    },
+    {
+      "name": "With Label",
+      "props": {
+        "value": 75,
+        "label": "Uploading..."
+      }
+    },
+    {
+      "name": "Indeterminate",
+      "props": {
+        "value": -1,
+        "label": "Loading..."
+      }
+    }
+  ]
+}

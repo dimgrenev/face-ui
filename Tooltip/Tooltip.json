@@ -1,0 +1,76 @@
+{
+  "name": "Tooltip",
+  "props": {
+    "content": {
+      "type": "string",
+      "required": false,
+      "description": "Content rendered inside the floating surface."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Trigger element (the anchor)."
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state."
+    },
+    "openDelay": {
+      "type": "number",
+      "required": false,
+      "description": "Delay before opening (ms)."
+    },
+    "closeDelay": {
+      "type": "number",
+      "required": false,
+      "description": "Delay before closing (ms)."
+    },
+    "side": {
+      "type": "enum",
+      "required": false,
+      "description": "Preferred side placement.",
+      "options": [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ]
+    },
+    "align": {
+      "type": "enum",
+      "required": false,
+      "description": "Alignment along the side.",
+      "options": [
+        "start",
+        "center",
+        "end"
+      ]
+    },
+    "sideOffset": {
+      "type": "number",
+      "required": false,
+      "description": "Offset from the trigger along the side axis (px)."
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "children": "Hover me",
+        "content": "Tooltip text"
+      }
+    }
+  ],
+  "description": "Tooltip component"
+}

@@ -1,0 +1,336 @@
+/**
+ * Face UI — Base Styles
+ *
+ * Reset, membrane, control geometry, focus rings, disabled states.
+ * No @layer — top-level for isolation from external (reference library) CSS.
+ */
+
+/* ---------------------------------------------------------------
+ * BLANKET RESET — counter Tailwind Preflight (border-style: solid
+ * on *) and any reference library borders that leak onto wrapper
+ * elements without data-scope/data-part (e.g. .uf-input__control).
+ *
+ * NO !important — components.css can override for intentional
+ * borders (spinner, separators, etc.).
+ * --------------------------------------------------------------- */
+[data-scope] *,
+[data-scope] *::before,
+[data-scope] *::after {
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+/* ---------------------------------------------------------------
+ * NUCLEAR RESET — kill all borders, shadows, outlines on form/table
+ * elements inside any data-scope container.
+ * Uses !important to guarantee override of ANY reference library CSS
+ * (which loads before Face UI CSS but may have higher specificity
+ * via chained class selectors like .uf-option.uf-button--outline).
+ * --------------------------------------------------------------- */
+[data-scope] button,
+[data-scope] input,
+[data-scope] textarea,
+[data-scope] select,
+[data-scope] table,
+[data-scope] th,
+[data-scope] td,
+[data-scope] tr,
+[data-scope] thead,
+[data-scope] tbody,
+[data-scope] [data-part],
+[data-scope] label,
+button[data-scope],
+input[data-scope],
+textarea[data-scope],
+select[data-scope],
+table[data-scope],
+label[data-scope] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Also kill borders on elements with shared class names inside [data-scope] */
+[data-scope] .uf-option,
+[data-scope] .uf-control,
+[data-scope] .uf-button,
+.uf-option[data-scope],
+.uf-control[data-scope],
+.uf-button[data-scope] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Restore table collapse for Calendar grid */
+[data-scope] table {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+}
+
+/* ---------------------------------------------------------------
+ * Membrane — 1px padding on component roots only (data-part="root")
+ * --------------------------------------------------------------- */
+[data-scope][data-part="root"] {
+  padding: var(--uf-membrane, 1px);
+  box-sizing: border-box;
+}
+
+/* Container components disable their own membrane */
+[data-scope="card"][data-part="root"],
+[data-scope="button"][data-part="root"],
+[data-scope="text"][data-part="root"],
+[data-scope="bar"][data-part="root"],
+[data-scope="sidebar"][data-part="root"],
+[data-scope="resizable"][data-part="root"] {
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------
+ * Typography baseline
+ * --------------------------------------------------------------- */
+[data-scope][data-part="root"] {
+  font-family: var(--uf-font-family);
+  font-size: var(--uf-control-font-size);
+  line-height: var(--uf-control-line-height);
+  letter-spacing: var(--uf-control-letter-spacing);
+  font-weight: var(--uf-font-weight);
+  color: var(--uf-color-fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Unified typography pass:
+   use one body typography across controls/labels/placeholders for all components,
+   excluding Code where monospace rules are intentional. */
+[data-scope]:not([data-scope="code"]) :where(
+  [data-part="label"],
+  [data-part="description"],
+  [data-part="error"],
+  [data-part="trigger"],
+  [data-part="item"],
+  [data-part="option"],
+  [data-part="title"],
+  [data-part="value"],
+  [data-part="input"],
+  [data-part="textarea"],
+  button,
+  input,
+  textarea,
+  select,
+  .uf-text-body
+) {
+  font-size: var(--uf-control-font-size) !important;
+  line-height: var(--uf-control-line-height) !important;
+  letter-spacing: var(--uf-control-letter-spacing) !important;
+  font-weight: var(--uf-font-weight) !important;
+}
+
+[data-scope]:not([data-scope="code"]) :where(input, textarea)::placeholder {
+  font-size: var(--uf-control-font-size);
+  line-height: var(--uf-control-line-height);
+  letter-spacing: var(--uf-control-letter-spacing);
+  font-weight: var(--uf-font-weight);
+}
+
+/* ---------------------------------------------------------------
+ * .uf-option — full-width row baseline (32px)
+ * Scoped to [data-scope] so it cannot be overridden by external
+ * `.uf-option` rules from the reference library.
+ * --------------------------------------------------------------- */
+[data-scope] .uf-option,
+.uf-option[data-scope] {
+  display: flex;
+  align-items: center;
+  min-height: var(--uf-control-height);
+  height: auto;
+  width: 100%;
+  gap: var(--uf-control-gap);
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+  border-radius: var(--uf-radius);
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+  cursor: pointer;
+  user-select: none;
+  transition: none;
+}
+
+[data-scope] .uf-option:hover,
+.uf-option[data-scope]:hover {
+  background: var(--uf-color-hover-bg);
+}
+
+[data-scope] .uf-option[data-disabled],
+[data-scope] .uf-option[disabled],
+[data-scope] .uf-option:disabled,
+.uf-option[data-scope][data-disabled],
+.uf-option[data-scope]:disabled {
+  opacity: var(--uf-color-disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+[data-scope] .uf-option[data-highlighted],
+.uf-option[data-scope][data-highlighted] {
+  background: var(--uf-color-hover-bg);
+}
+
+/* ---------------------------------------------------------------
+ * .uf-control — shared control baseline
+ * Scoped to [data-scope] for isolation.
+ * --------------------------------------------------------------- */
+[data-scope] .uf-control,
+.uf-control[data-scope] {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--uf-control-height);
+  height: auto;
+  gap: var(--uf-control-gap);
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+  border-radius: var(--uf-radius);
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+  cursor: pointer;
+  user-select: none;
+  transition: none;
+}
+
+[data-scope] .uf-control:hover,
+.uf-control[data-scope]:hover {
+}
+
+[data-scope] .uf-control[aria-current="true"],
+[data-scope] .uf-control[aria-selected="true"],
+[data-scope] .uf-control[data-active="true"],
+[data-scope] .uf-control.is-active,
+.uf-control[data-scope][aria-current="true"],
+.uf-control[data-scope][aria-selected="true"],
+.uf-control[data-scope][data-active="true"],
+.uf-control[data-scope].is-active {
+  font-weight: 400;
+}
+
+@supports (font-variation-settings: "wght" 400) {
+  [data-scope][data-part="root"] {
+    font-variation-settings: "wght" var(--uf-font-weight);
+  }
+
+  [data-scope]:not([data-scope="code"]) :where(
+    [data-part="label"],
+    [data-part="description"],
+    [data-part="error"],
+    [data-part="trigger"],
+    [data-part="item"],
+    [data-part="option"],
+    [data-part="title"],
+    [data-part="value"],
+    [data-part="input"],
+    [data-part="textarea"],
+    button,
+    input,
+    textarea,
+    select,
+    .uf-text-body
+  ) {
+    font-variation-settings: "wght" var(--uf-font-weight) !important;
+  }
+
+  [data-scope]:not([data-scope="code"]) :where(input, textarea)::placeholder {
+    font-variation-settings: "wght" var(--uf-font-weight);
+  }
+
+  [data-scope] .uf-control[aria-current="true"],
+  [data-scope] .uf-control[aria-selected="true"],
+  [data-scope] .uf-control[data-active="true"],
+  [data-scope] .uf-control.is-active,
+  .uf-control[data-scope][aria-current="true"],
+  .uf-control[data-scope][aria-selected="true"],
+  .uf-control[data-scope][data-active="true"],
+  .uf-control[data-scope].is-active {
+    font-variation-settings: "wght" var(--uf-font-weight);
+  }
+}
+
+[data-scope] .uf-control[data-disabled],
+[data-scope] .uf-control[disabled],
+[data-scope] .uf-control:disabled,
+.uf-control[data-scope][data-disabled],
+.uf-control[data-scope]:disabled {
+  opacity: var(--uf-color-disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+[data-scope] .uf-control[data-icon-only],
+.uf-control[data-scope][data-icon-only] {
+  --uf-icon-only-size: var(--uf-control-height);
+  inline-size: var(--uf-icon-only-size);
+  block-size: var(--uf-icon-only-size);
+  min-inline-size: var(--uf-icon-only-size);
+  min-block-size: var(--uf-icon-only-size);
+  padding: 0;
+  justify-content: center;
+}
+
+[data-scope] .uf-control[data-stretch-text] > .uf-control-text {
+  flex: 1;
+}
+
+/* ---------------------------------------------------------------
+ * Focus-visible baseline
+ * Global ring is intentionally disabled: components opt in locally.
+ * --------------------------------------------------------------- */
+[data-scope] :focus-visible,
+[data-scope]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Remove default focus outline */
+[data-scope] :focus:not(:focus-visible),
+[data-scope]:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------------------------------------------------------------
+ * Disabled universal
+ * --------------------------------------------------------------- */
+[data-scope] [data-disabled],
+[data-scope][data-disabled] {
+  opacity: var(--uf-color-disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------
+ * Hidden (machine-controlled)
+ * --------------------------------------------------------------- */
+[data-scope] [hidden] {
+  display: none;
+}
+
+/* ---------------------------------------------------------------
+ * Scrollbar styling (for Scroll component)
+ * --------------------------------------------------------------- */
+[data-scope="scroll"] [data-part="viewport"] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--black-20) transparent;
+}
+
+[data-scope="scroll"][data-type="hover"] [data-part="viewport"] {
+  scrollbar-width: none;
+}
+
+[data-scope="scroll"][data-type="hover"]:hover [data-part="viewport"] {
+  scrollbar-width: thin;
+}

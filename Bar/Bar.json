@@ -1,0 +1,40 @@
+{
+  "name": "Bar",
+  "description": "Toolbar layout component with start/end sections",
+  "props": {
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Bar content (typically BarSection elements).",
+      "default": null
+    },
+    "orientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Layout direction.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Horizontal",
+      "props": {
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "name": "Vertical",
+      "props": {
+        "orientation": "vertical"
+      }
+    }
+  ]
+}

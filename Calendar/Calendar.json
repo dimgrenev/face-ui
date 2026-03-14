@@ -1,0 +1,77 @@
+{
+  "name": "Calendar",
+  "description": "Standalone date picker grid",
+  "props": {
+    "value": {
+      "type": "object",
+      "required": false,
+      "description": "Selected date.",
+      "default": null
+    },
+    "defaultValue": {
+      "type": "object",
+      "required": false,
+      "description": "Default selected date (uncontrolled)."
+    },
+    "min": {
+      "type": "object",
+      "required": false,
+      "description": "Minimum selectable date.",
+      "default": null
+    },
+    "max": {
+      "type": "object",
+      "required": false,
+      "description": "Maximum selectable date.",
+      "default": null
+    },
+    "disabledDates": {
+      "type": "array",
+      "required": false,
+      "description": "Array of dates that cannot be selected."
+    },
+    "locale": {
+      "type": "string",
+      "required": false,
+      "description": "Locale for month and weekday names.",
+      "default": "en-US"
+    },
+    "weekStartsOn": {
+      "type": "enum",
+      "required": false,
+      "description": "First day of the week: 0=Sunday, 1=Monday, etc.",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "default": 0
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when the selected date changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Monday Start",
+      "props": {
+        "weekStartsOn": 1
+      }
+    }
+  ]
+}

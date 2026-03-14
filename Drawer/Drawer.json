@@ -1,0 +1,29 @@
+{
+  "name": "Drawer",
+  "props": {
+    "side": {
+      "type": "enum",
+      "required": false,
+      "description": "side prop",
+      "options": [
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
+      "default": "right"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "trigger": "Open drawer",
+        "title": "Right drawer",
+        "description": "Persistent side workflow surface.",
+        "children": "Drawer content"
+      }
+    }
+  ],
+  "description": "Drawer component"
+}

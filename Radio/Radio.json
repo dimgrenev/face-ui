@@ -1,0 +1,97 @@
+{
+  "name": "Radio",
+  "description": "Radio group for single-option selection",
+  "props": {
+    "options": {
+      "type": "array",
+      "required": true,
+      "description": "Radio options to render.",
+      "default": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Currently selected value.",
+      "default": null
+    },
+    "defaultValue": {
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial selected value."
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Form field name."
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state for the entire group.",
+      "default": false
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Mark as required.",
+      "default": false
+    },
+    "orientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Layout orientation.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "vertical"
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when value changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper (+1px outside each option geometry).",
+      "default": true
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Horizontal",
+      "props": {
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true
+      }
+    }
+  ]
+}

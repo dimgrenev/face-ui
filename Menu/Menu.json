@@ -1,0 +1,110 @@
+{
+  "name": "Menu",
+  "description": "Contextual action list (dropdown or context menu)",
+  "props": {
+    "trigger": {
+      "type": "enum",
+      "required": false,
+      "description": "How the menu is triggered.",
+      "options": [
+        "click",
+        "context"
+      ],
+      "default": "click"
+    },
+    "items": {
+      "type": "array",
+      "required": false,
+      "description": "Menu item definitions.",
+      "default": [
+        {
+          "value": "edit",
+          "label": "Edit"
+        },
+        {
+          "value": "duplicate",
+          "label": "Duplicate"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "value": "archive",
+          "label": "Archive"
+        },
+        {
+          "value": "delete",
+          "label": "Delete"
+        }
+      ]
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Trigger element (the anchor).",
+      "default": "Options"
+    },
+    "onSelect": {
+      "type": "function",
+      "required": false,
+      "description": "Called when a menu item is selected."
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire menu.",
+      "default": false
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    },
+    "surface": {
+      "type": "enum",
+      "required": false,
+      "description": "Preferred content surface. Auto switches to bottom sheet on compact viewports.",
+      "options": [
+        "auto",
+        "popover",
+        "sheet"
+      ],
+      "default": "auto"
+    },
+    "surfaceBreakpoint": {
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch from popover to sheet."
+    },
+    "surfaceTitle": {
+      "type": "string",
+      "required": false,
+      "description": "Optional title used for the mobile sheet header."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "trigger": "click"
+      }
+    },
+    {
+      "name": "Context Menu",
+      "props": {
+        "trigger": "context"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true
+      }
+    }
+  ]
+}

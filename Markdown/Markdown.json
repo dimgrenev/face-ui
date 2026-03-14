@@ -1,0 +1,186 @@
+{
+  "name": "Markdown",
+  "description": "Safe GFM markdown renderer with strict sanitization by default",
+  "props": {
+    "content": {
+      "type": "string",
+      "required": false,
+      "description": "Markdown source text.",
+      "default": ""
+    },
+    "gfm": {
+      "type": "boolean",
+      "required": false,
+      "description": "Enable GitHub Flavored Markdown extensions.",
+      "default": true
+    },
+    "safeMode": {
+      "type": "boolean",
+      "required": false,
+      "description": "Strict sanitization mode for product-safe rendering.",
+      "default": true
+    },
+    "allowRawHtml": {
+      "type": "boolean",
+      "required": false,
+      "description": "Allow raw HTML blocks from markdown source (still sanitized).",
+      "default": false
+    },
+    "linkTarget": {
+      "type": "enum",
+      "required": false,
+      "description": "Link target behavior for rendered anchors.",
+      "options": [
+        "_self",
+        "_blank"
+      ],
+      "default": "_self"
+    },
+    "linkRel": {
+      "type": "string",
+      "required": false,
+      "description": "Link rel value for rendered anchors.",
+      "default": "noopener noreferrer"
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper (+1px outside component geometry).",
+      "default": true
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "Expand component to full width.",
+      "default": true
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "content": "# Markdown Capability Demo\n\nThis single document shows core **Markdown + GFM** features.\n\n## Headings\n### H3\n#### H4\n##### H5\n###### H6\n\n## Emphasis\n- *Italic text*\n- **Bold text**\n- ***Bold italic text***\n- ~~Strikethrough text~~\n- Inline code: `const mode = \"strict\"`\n\n## Links\n- Inline link: [Userface](https://userface.dev)\n- Relative link: [Docs](/docs)\n- Autolink: https://example.com/docs?tab=markdown\n\n## Blockquote\n> Design systems fail when visual rules are optional.\n>\n> Keep primitives consistent and contracts explicit.\n\n## Lists\n- Item A\n- Item B\n  - Item B.1\n  - Item B.2\n\n1. Plan\n2. Implement\n3. Validate\n\n- [x] Parse markdown\n- [x] Sanitize output\n- [ ] Ship release\n\n## Table (GFM)\n| Token | Meaning | Example |\n| :---- | :------ | ------: |\n| `--uf-space-1` | Base micro spacing | 2px |\n| `--uf-control-height` | Control height baseline | 32px |\n\n---\n\n## Code blocks\n```ts\nexport function clamp(value: number, min: number, max: number): number {\n  return Math.min(max, Math.max(min, value))\n}\n```\n\n```bash\npnpm install\npnpm run dev\npnpm run lint\n```\n\n## Image\n![Markdown preview image](https://picsum.photos/800/240 \"Markdown demo image\")\n\n## Escaping\nUse a literal asterisk: \\*not italic\\*",
+        "gfm": true,
+        "safeMode": true,
+        "allowRawHtml": false
+      }
+    },
+    {
+      "name": "Paragraphs and Breaks",
+      "props": {
+        "content": "First paragraph with a soft break.\\nStill first paragraph.\\n\\nSecond paragraph with a [link](/docs)."
+      }
+    },
+    {
+      "name": "Headings h1-h6",
+      "props": {
+        "content": "# Heading 1\\n## Heading 2\\n### Heading 3\\n#### Heading 4\\n##### Heading 5\\n###### Heading 6"
+      }
+    },
+    {
+      "name": "Emphasis Strong Strike",
+      "props": {
+        "content": "Normal text with *italic*, **bold**, ***bold italic***, and ~~strikethrough~~."
+      }
+    },
+    {
+      "name": "Blockquote",
+      "props": {
+        "content": "> This is a blockquote.\\n>\\n> It can span multiple lines and paragraphs."
+      }
+    },
+    {
+      "name": "Unordered and Ordered Lists",
+      "props": {
+        "content": "- Apple\\n- Banana\\n- Cherry\\n\\n1. First\\n2. Second\\n3. Third"
+      }
+    },
+    {
+      "name": "Nested Lists",
+      "props": {
+        "content": "- Parent A\\n  - Child A1\\n  - Child A2\\n    - Grandchild A2.1\\n- Parent B\\n\\n1. Step one\\n   1. Detail one\\n   2. Detail two\\n2. Step two"
+      }
+    },
+    {
+      "name": "Task List",
+      "props": {
+        "content": "- [x] Build parser\\n- [x] Add sanitizer\\n- [ ] Write tests\\n- [ ] Ship release",
+        "gfm": true
+      }
+    },
+    {
+      "name": "Links and Autolinks",
+      "props": {
+        "content": "Inline link to [Userface](https://userface.dev).\\n\\nAutolink: https://example.com/path?query=1"
+      }
+    },
+    {
+      "name": "Image",
+      "props": {
+        "content": "![Sample image](https://picsum.photos/640/180 \"Sample\")\\n\\nCaption-like paragraph after image."
+      }
+    },
+    {
+      "name": "Inline Code",
+      "props": {
+        "content": "Use `pnpm run dev` to start local development.\\n\\nSet `safeMode=true` for strict mode."
+      }
+    },
+    {
+      "name": "Code Block",
+      "props": {
+        "content": "```ts\\nfunction sum(a: number, b: number): number {\\n  return a + b\\n}\\n\\nconsole.log(sum(2, 3))\\n```"
+      }
+    },
+    {
+      "name": "Horizontal Rule",
+      "props": {
+        "content": "Section A\\n\\n---\\n\\nSection B"
+      }
+    },
+    {
+      "name": "Table Left Center Right",
+      "props": {
+        "content": "| Name | Role | Score |\\n| :--- | :---: | ---: |\\n| Alice | Admin | 98 |\\n| Bob | Editor | 87 |\\n| Carol | Viewer | 75 |",
+        "gfm": true
+      }
+    },
+    {
+      "name": "Mixed Document",
+      "props": {
+        "content": "# Product Notes\\n\\n> Weekly summary for the release train.\\n\\n## Checklist\\n- [x] API contract\\n- [x] UI parity\\n- [ ] QA pass\\n\\n## Metrics\\n| Metric | Value |\\n| :-- | --: |\\n| Build time | 2m 31s |\\n| Bundle delta | +14kb |\\n\\nRun `pnpm run lint` before opening PR."
+      }
+    },
+    {
+      "name": "Raw HTML (Safe Mode ON)",
+      "props": {
+        "content": "<div style='color:red'>Styled raw HTML block</div>\\n\\n<script>alert('xss')</script>\\n\\nParagraph after raw HTML.",
+        "safeMode": true,
+        "allowRawHtml": true
+      }
+    },
+    {
+      "name": "Raw HTML (Safe Mode OFF)",
+      "props": {
+        "content": "<div class='note'><strong>Raw HTML allowed</strong> with relaxed sanitization.</div>\\n\\n<details><summary>More</summary>Extra info.</details>",
+        "safeMode": false,
+        "allowRawHtml": true
+      }
+    },
+    {
+      "name": "Links in New Tab",
+      "props": {
+        "content": "Open [external docs](https://example.com) in a new tab.",
+        "linkTarget": "_blank",
+        "linkRel": "noopener noreferrer"
+      }
+    },
+    {
+      "name": "No Membrane",
+      "props": {
+        "content": "Markdown without membrane wrapper.",
+        "membrane": false
+      }
+    }
+  ]
+}

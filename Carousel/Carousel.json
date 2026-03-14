@@ -1,0 +1,97 @@
+{
+  "name": "Carousel",
+  "description": "Multi-slide content display with navigation and indicators",
+  "props": {
+    "children": {
+      "type": "array",
+      "required": false,
+      "description": "Slide elements. Each child becomes one slide.",
+      "default": [
+        "Slide 1",
+        "Slide 2",
+        "Slide 3"
+      ]
+    },
+    "loop": {
+      "type": "boolean",
+      "required": false,
+      "description": "Enable infinite looping.",
+      "default": false
+    },
+    "autoPlay": {
+      "type": "boolean",
+      "required": false,
+      "description": "Enable automatic slide advancement.",
+      "default": false
+    },
+    "autoPlayInterval": {
+      "type": "number",
+      "required": false,
+      "description": "Interval in ms between auto-play transitions.",
+      "default": 3000
+    },
+    "orientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Slide orientation.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    },
+    "slidesPerView": {
+      "type": "number",
+      "required": false,
+      "description": "Number of slides visible at once.",
+      "default": 1
+    },
+    "index": {
+      "type": "number",
+      "required": false,
+      "description": "Controlled current slide index.",
+      "default": 0
+    },
+    "defaultIndex": {
+      "type": "number",
+      "required": false,
+      "description": "Uncontrolled initial slide index.",
+      "default": 0
+    },
+    "onIndexChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when the active slide changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Loop",
+      "props": {
+        "loop": true
+      }
+    },
+    {
+      "name": "Auto Play",
+      "props": {
+        "autoPlay": true,
+        "autoPlayInterval": 3000
+      }
+    },
+    {
+      "name": "Vertical",
+      "props": {
+        "orientation": "vertical"
+      }
+    }
+  ]
+}

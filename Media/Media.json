@@ -1,0 +1,188 @@
+{
+  "name": "Media",
+  "description": "Unified image, video, and audio renderer",
+  "props": {
+    "type": {
+      "type": "enum",
+      "required": false,
+      "description": "Media type. Defaults to \"image\".",
+      "options": [
+        "image",
+        "video",
+        "audio"
+      ],
+      "default": "image"
+    },
+    "src": {
+      "type": "string",
+      "required": true,
+      "description": "Source URL.",
+      "default": "https://picsum.photos/300/200"
+    },
+    "alt": {
+      "type": "string",
+      "required": false,
+      "description": "Alt text (for images).",
+      "default": ""
+    },
+    "variant": {
+      "type": "enum",
+      "required": false,
+      "description": "components API compatibility: image variant.",
+      "options": [
+        "default",
+        "rounded",
+        "circle",
+        "thumbnail"
+      ],
+      "default": "default"
+    },
+    "lazy": {
+      "type": "boolean",
+      "required": false,
+      "description": "components API compatibility aliases for image loading hints.",
+      "default": false
+    },
+    "loading": {
+      "type": "enum",
+      "required": false,
+      "description": "Image loading hint",
+      "options": [
+        "lazy",
+        "eager"
+      ],
+      "default": null
+    },
+    "decoding": {
+      "type": "enum",
+      "required": false,
+      "description": "Image decoding hint",
+      "options": [
+        "async",
+        "sync",
+        "auto"
+      ],
+      "default": "async"
+    },
+    "poster": {
+      "type": "string",
+      "required": false,
+      "description": "Poster image (for video)."
+    },
+    "controls": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show native controls (for video/audio).",
+      "default": false
+    },
+    "autoPlay": {
+      "type": "boolean",
+      "required": false,
+      "description": "Auto-play media.",
+      "default": false
+    },
+    "loop": {
+      "type": "boolean",
+      "required": false,
+      "description": "Loop playback.",
+      "default": false
+    },
+    "muted": {
+      "type": "boolean",
+      "required": false,
+      "description": "Start muted.",
+      "default": false
+    },
+    "width": {
+      "type": "string",
+      "required": false,
+      "description": "Explicit width.",
+      "default": null
+    },
+    "height": {
+      "type": "string",
+      "required": false,
+      "description": "Explicit height.",
+      "default": null
+    },
+    "objectFit": {
+      "type": "enum",
+      "required": false,
+      "description": "CSS object-fit for images/video.",
+      "options": [
+        "cover",
+        "contain",
+        "fill",
+        "none"
+      ],
+      "default": null
+    },
+    "fallback": {
+      "type": "string",
+      "required": false,
+      "description": "Fallback content shown on error."
+    },
+    "onError": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the media fails to load."
+    },
+    "onLoad": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the media finishes loading."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    "role": {
+      "type": "string",
+      "required": false,
+      "description": "role prop"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "description": "title prop"
+    },
+    "tabIndex": {
+      "type": "number",
+      "required": false,
+      "description": "tabIndex prop"
+    },
+    "style": {
+      "type": "object",
+      "required": false,
+      "description": "style prop"
+    }
+  },
+  "states": [
+    {
+      "name": "Default Image",
+      "props": {
+        "src": "https://picsum.photos/300/200",
+        "alt": "Sample image"
+      }
+    },
+    {
+      "name": "Cover Fit",
+      "props": {
+        "src": "https://picsum.photos/300/200",
+        "objectFit": "cover",
+        "width": "200",
+        "height": "200"
+      }
+    },
+    {
+      "name": "Contain Fit",
+      "props": {
+        "src": "https://picsum.photos/300/200",
+        "objectFit": "contain",
+        "width": "200",
+        "height": "200"
+      }
+    }
+  ]
+}

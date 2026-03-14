@@ -1,0 +1,148 @@
+{
+  "name": "Modal",
+  "description": "Overlay surface component unifying dialog, drawer, and alert dialog",
+  "props": {
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state.",
+      "default": true
+    },
+    "variant": {
+      "type": "enum",
+      "required": false,
+      "description": "Visual placement variant.",
+      "options": [
+        "center",
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
+      "default": "right"
+    },
+    "closeOnOverlayClick": {
+      "type": "boolean",
+      "required": false,
+      "description": "components API compatibility: overlay click behavior.",
+      "default": true
+    },
+    "closable": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the modal can be closed via Escape / backdrop click.",
+      "default": true
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "description": "Title content rendered inside the modal.",
+      "default": "Dialog Title"
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "description": "Description content rendered below the title.",
+      "default": "This is a dialog."
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Body content.",
+      "default": "Modal content body"
+    },
+    "actions": {
+      "type": "array",
+      "required": false,
+      "description": "Optional footer actions."
+    },
+    "trigger": {
+      "type": "string",
+      "required": false,
+      "description": "Trigger element that toggles the modal open.",
+      "default": "Open"
+    },
+    "width": {
+      "type": "number",
+      "required": false,
+      "description": "Width in px for left/right variants.",
+      "default": 400
+    },
+    "height": {
+      "type": "number",
+      "required": false,
+      "description": "Height in px for top/bottom variants.",
+      "default": 420
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    },
+    "surface": {
+      "type": "enum",
+      "required": false,
+      "description": "Surface behavior on compact viewports.",
+      "options": [
+        "auto",
+        "dialog",
+        "sheet"
+      ],
+      "default": "auto"
+    },
+    "surfaceBreakpoint": {
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch to sheet mode."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
+    }
+  },
+  "states": [
+    {
+      "name": "Default (Center)",
+      "props": {
+        "open": true,
+        "variant": "center",
+        "title": "Dialog Title",
+        "description": "This is a dialog.",
+        "children": "Modal content body"
+      }
+    },
+    {
+      "name": "Drawer Left",
+      "props": {
+        "open": true,
+        "variant": "left",
+        "title": "Left Drawer"
+      }
+    },
+    {
+      "name": "Drawer Right",
+      "props": {
+        "open": true,
+        "variant": "right",
+        "title": "Right Drawer"
+      }
+    },
+    {
+      "name": "Sheet Bottom",
+      "props": {
+        "open": true,
+        "variant": "bottom",
+        "title": "Bottom Sheet"
+      }
+    },
+    {
+      "name": "Alert (Non-Closable)",
+      "props": {
+        "open": true,
+        "closable": false,
+        "title": "Are you sure?"
+      }
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "name": "Avatar",
+  "description": "User identity display with image and fallback initials",
+  "props": {
+    "src": {
+      "type": "string",
+      "required": false,
+      "description": "Image source URL.",
+      "default": ""
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "User name (used for initials fallback and alt text).",
+      "default": ""
+    },
+    "fallback": {
+      "type": "string",
+      "required": false,
+      "description": "Custom fallback content when image is unavailable.",
+      "default": null
+    },
+    "fallbackDelayMs": {
+      "type": "number",
+      "required": false,
+      "description": "Delay in ms before showing fallback (gives image time to load).",
+      "default": 0
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "name": "John Doe"
+      }
+    },
+    {
+      "name": "With Image",
+      "props": {
+        "src": "https://i.pravatar.cc/150?u=avatar",
+        "name": "Jane Smith"
+      }
+    },
+    {
+      "name": "Initials Only",
+      "props": {
+        "name": "AB"
+      }
+    },
+    {
+      "name": "Custom Fallback",
+      "props": {
+        "fallback": "?"
+      }
+    }
+  ]
+}

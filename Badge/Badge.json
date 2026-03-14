@@ -1,0 +1,85 @@
+{
+  "name": "Badge",
+  "description": "Status indicator label",
+  "props": {
+    "text": {
+      "type": "string",
+      "required": false,
+      "description": "Badge text content",
+      "default": null
+    },
+    "variant": {
+      "type": "enum",
+      "required": false,
+      "description": "Visual style variant",
+      "options": [
+        "default",
+        "primary",
+        "secondary",
+        "accent",
+        "destructive"
+      ],
+      "default": "default"
+    },
+    "appearance": {
+      "type": "enum",
+      "required": false,
+      "description": "Fill or outline appearance",
+      "options": [
+        "fill",
+        "outline"
+      ],
+      "default": "fill"
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Custom children content (overrides text)",
+      "default": null
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "text": "Badge"
+      }
+    },
+    {
+      "name": "Primary",
+      "props": {
+        "text": "Primary",
+        "variant": "primary"
+      }
+    },
+    {
+      "name": "Secondary",
+      "props": {
+        "text": "Secondary",
+        "variant": "secondary"
+      }
+    },
+    {
+      "name": "Accent",
+      "props": {
+        "text": "Accent",
+        "variant": "accent"
+      }
+    },
+    {
+      "name": "Outline",
+      "props": {
+        "text": "Outline",
+        "variant": "default",
+        "appearance": "outline"
+      }
+    },
+    {
+      "name": "Destructive",
+      "props": {
+        "text": "Destructive",
+        "variant": "destructive"
+      }
+    }
+  ]
+}

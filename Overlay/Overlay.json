@@ -1,0 +1,127 @@
+{
+  "name": "Overlay",
+  "description": "Floating content surface unifying tooltip, popover, and hover card",
+  "props": {
+    "trigger": {
+      "type": "enum",
+      "required": false,
+      "description": "How the overlay is triggered.",
+      "options": [
+        "hover",
+        "click"
+      ],
+      "default": "hover"
+    },
+    "interactive": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether content is interactive (keeps open on hover).",
+      "default": false
+    },
+    "content": {
+      "type": "string",
+      "required": false,
+      "description": "Content rendered inside the floating surface.",
+      "default": "Tooltip text"
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Trigger element (the anchor).",
+      "default": "Hover me"
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state.",
+      "default": false
+    },
+    "openDelay": {
+      "type": "number",
+      "required": false,
+      "description": "Delay before opening (ms).",
+      "default": 200
+    },
+    "closeDelay": {
+      "type": "number",
+      "required": false,
+      "description": "Delay before closing (ms).",
+      "default": 0
+    },
+    "side": {
+      "type": "enum",
+      "required": false,
+      "description": "Preferred side placement.",
+      "options": [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ],
+      "default": "top"
+    },
+    "align": {
+      "type": "enum",
+      "required": false,
+      "description": "Alignment along the side.",
+      "options": [
+        "start",
+        "center",
+        "end"
+      ],
+      "default": "center"
+    },
+    "sideOffset": {
+      "type": "number",
+      "required": false,
+      "description": "Offset from the trigger along the side axis (px).",
+      "default": 8
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
+    }
+  },
+  "states": [
+    {
+      "name": "Default (Tooltip)",
+      "props": {
+        "trigger": "hover",
+        "content": "Tooltip text",
+        "side": "top"
+      }
+    },
+    {
+      "name": "Popover (Click)",
+      "props": {
+        "trigger": "click",
+        "interactive": true,
+        "content": "Popover content",
+        "side": "bottom"
+      }
+    },
+    {
+      "name": "Hover Card",
+      "props": {
+        "trigger": "hover",
+        "interactive": true,
+        "content": "Interactive hover card",
+        "side": "bottom"
+      }
+    },
+    {
+      "name": "Right Side",
+      "props": {
+        "trigger": "hover",
+        "content": "Right tooltip",
+        "side": "right"
+      }
+    }
+  ]
+}

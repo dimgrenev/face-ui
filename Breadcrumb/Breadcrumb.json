@@ -1,0 +1,83 @@
+{
+  "name": "Breadcrumb",
+  "description": "Navigation trail showing current location in a hierarchy",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": true,
+      "description": "Breadcrumb entries, from root to current page.",
+      "default": [
+        {
+          "label": "Home",
+          "href": "/"
+        },
+        {
+          "label": "Products",
+          "href": "/products"
+        },
+        {
+          "label": "Headphones"
+        }
+      ]
+    },
+    "separator": {
+      "type": "string",
+      "required": false,
+      "description": "Custom separator between items. Defaults to \"/\".",
+      "default": "/"
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Wrap breadcrumb options (link/current) with membrane spacing.",
+      "default": true
+    },
+    "allowNavigation": {
+      "type": "boolean",
+      "required": false,
+      "description": "Allow real browser navigation on link click. Defaults to false for sandbox/demo safety.",
+      "default": false
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    "collapseAfter": {
+      "type": "number",
+      "required": false,
+      "description": "Collapse middle crumbs after this many visible entries.",
+      "default": 4
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Without Membrane",
+      "props": {
+        "membrane": false
+      }
+    },
+    {
+      "name": "Custom Separator",
+      "props": {
+        "separator": ">"
+      }
+    },
+    {
+      "name": "Arrow Separator",
+      "props": {
+        "separator": "→"
+      }
+    },
+    {
+      "name": "Navigation Enabled",
+      "props": {
+        "allowNavigation": true
+      }
+    }
+  ]
+}

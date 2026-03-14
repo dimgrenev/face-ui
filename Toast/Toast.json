@@ -1,0 +1,37 @@
+{
+  "name": "Toast",
+  "description": "Notification system with toaster singleton and factory",
+  "props": {
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the toast group container",
+      "default": null
+    },
+    "showTrigger": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show explicit trigger button in preview/demo wrapper.",
+      "default": true
+    },
+    "autoShow": {
+      "type": "boolean",
+      "required": false,
+      "description": "Automatically show one sample toast after mount.",
+      "default": false
+    }
+  },
+  "states": [
+    {
+      "name": "Default (Trigger Button)",
+      "props": {}
+    },
+    {
+      "name": "Auto Show",
+      "props": {
+        "showTrigger": false,
+        "autoShow": true
+      }
+    }
+  ]
+}

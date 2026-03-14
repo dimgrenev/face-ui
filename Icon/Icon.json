@@ -1,0 +1,92 @@
+{
+  "name": "Icon",
+  "description": "Universal icon renderer with provider defaults and multi-source inputs",
+  "props": {
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Registry icon name (backward-compatible).",
+      "default": "settings"
+    },
+    "icon": {
+      "type": "any",
+      "required": false,
+      "description": "Universal icon input: name/component/svg element/url/registry entry."
+    },
+    "src": {
+      "type": "string",
+      "required": false,
+      "description": "Explicit source URL for external SVG/bitmap icon."
+    },
+    "size": {
+      "type": "number",
+      "required": false,
+      "description": "Target icon size in px",
+      "default": 20
+    },
+    "square": {
+      "type": "boolean",
+      "required": false,
+      "description": "By default icon is rendered in a square box.",
+      "default": true
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    },
+    "style": {
+      "type": "object",
+      "required": false,
+      "description": "style prop"
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible label. If omitted, icon is decorative.",
+      "default": null
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "description": "Optional title element for inline SVG."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "name": "settings",
+        "size": 20
+      }
+    },
+    {
+      "name": "Large",
+      "props": {
+        "name": "settings",
+        "size": 28
+      }
+    },
+    {
+      "name": "Direction Left",
+      "props": {
+        "name": "left",
+        "size": 20
+      }
+    },
+    {
+      "name": "Direction Right",
+      "props": {
+        "name": "right",
+        "size": 20
+      }
+    },
+    {
+      "name": "Decorative Dot",
+      "props": {
+        "name": "legend",
+        "size": 10
+      }
+    }
+  ]
+}

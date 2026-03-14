@@ -1,0 +1,87 @@
+{
+  "name": "Rating",
+  "description": "Star rating control with optional half-star support",
+  "props": {
+    "value": {
+      "type": "number",
+      "required": false,
+      "description": "Current rating value.",
+      "default": 0
+    },
+    "defaultValue": {
+      "type": "number",
+      "required": false,
+      "description": "Uncontrolled initial rating value.",
+      "default": 0
+    },
+    "max": {
+      "type": "number",
+      "required": false,
+      "description": "Maximum number of stars.",
+      "default": 5
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "default": false
+    },
+    "allowHalf": {
+      "type": "boolean",
+      "required": false,
+      "description": "Allow half-star increments.",
+      "default": false
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Label content.",
+      "default": null
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when value changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "value": 3
+      }
+    },
+    {
+      "name": "Half Stars",
+      "props": {
+        "value": 2.5,
+        "allowHalf": true
+      }
+    },
+    {
+      "name": "Full Rating",
+      "props": {
+        "value": 5
+      }
+    },
+    {
+      "name": "Ten Stars",
+      "props": {
+        "value": 7,
+        "max": 10
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "value": 4,
+        "disabled": true
+      }
+    }
+  ]
+}

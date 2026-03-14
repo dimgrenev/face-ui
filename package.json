@@ -1,0 +1,72 @@
+{
+  "name": "@userface/face-ui-react",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Userface Face UI React component library.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimgrenev/userface.git"
+  },
+  "homepage": "https://userface.dev",
+  "bugs": {
+    "url": "https://github.com/dimgrenev/userface/issues"
+  },
+  "keywords": [
+    "userface",
+    "react",
+    "component-library",
+    "design-system",
+    "ui"
+  ],
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "sideEffects": [
+    "./dist/esm/**/*.css",
+    "./dist/cjs/**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./uf.runtime": {
+      "types": "./dist/types/uf.runtime.d.ts",
+      "import": "./dist/esm/uf.runtime.js",
+      "require": "./dist/cjs/uf.runtime.js"
+    },
+    "./assets/*": "./dist/esm/assets/*",
+    "./*.json": "./dist/esm/*.json",
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/esm/*.js",
+      "require": "./dist/cjs/*.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "dist/types",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "marked": "^17.0.3",
+    "sanitize-html": "^2.17.1"
+  },
+  "scripts": {
+    "build": "node ./scripts/build-npm.cjs",
+    "pack:dry": "npm pack --dry-run",
+    "prepublishOnly": "npm run build"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "name": "Card",
+  "description": "Content container with title, description, content, and footer",
+  "props": {
+    "title": {
+      "type": "string",
+      "required": false,
+      "description": "Card title",
+      "default": "Card Title"
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "description": "Card description below title",
+      "default": "Card description text."
+    },
+    "content": {
+      "type": "string",
+      "required": false,
+      "description": "Card body content",
+      "default": null
+    },
+    "footer": {
+      "type": "string",
+      "required": false,
+      "description": "Card footer content",
+      "default": null
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing",
+      "default": true
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Custom children (escape hatch)",
+      "default": null
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "title": "Card Title",
+        "description": "Card description text."
+      }
+    },
+    {
+      "name": "With Content",
+      "props": {
+        "title": "Settings",
+        "content": "Card body content goes here."
+      }
+    },
+    {
+      "name": "Full",
+      "props": {
+        "title": "Card Title",
+        "description": "A description.",
+        "content": "Main content.",
+        "footer": "Footer area"
+      }
+    },
+    {
+      "name": "No Membrane",
+      "props": {
+        "title": "Card",
+        "membrane": false
+      }
+    }
+  ]
+}

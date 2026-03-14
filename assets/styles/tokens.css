@@ -1,0 +1,226 @@
+/**
+ * Face UI — Design Tokens
+ *
+ * Opacity scales (--black-N, --white-N) inherited from components library.
+ * data-theme="dark" inverts black ↔ white.
+ * No @layer — top-level for isolation from external CSS.
+ */
+
+:root {
+  /* ---------------------------------------------------------------
+   * Opacity scales — black (for light theme)
+   * --black-N = rgba(0,0,0, N/100)
+   * --------------------------------------------------------------- */
+  --black-2: rgba(0, 0, 0, 0.02);
+  --black-4: rgba(0, 0, 0, 0.04);
+  --black-6: rgba(0, 0, 0, 0.06);
+  --black-8: rgba(0, 0, 0, 0.08);
+  --black-10: rgba(0, 0, 0, 0.1);
+  --black-12: rgba(0, 0, 0, 0.12);
+  --black-16: rgba(0, 0, 0, 0.16);
+  --black-20: rgba(0, 0, 0, 0.2);
+  --black-24: rgba(0, 0, 0, 0.24);
+  --black-32: rgba(0, 0, 0, 0.32);
+  --black-40: rgba(0, 0, 0, 0.4);
+  --black-48: rgba(0, 0, 0, 0.48);
+  --black-56: rgba(0, 0, 0, 0.56);
+  --black-64: rgba(0, 0, 0, 0.64);
+  --black-72: rgba(0, 0, 0, 0.72);
+  --black-80: rgba(0, 0, 0, 0.8);
+  --black-88: rgba(0, 0, 0, 0.88);
+  --black-100: rgba(0, 0, 0, 1);
+
+  /* Opacity scales — white */
+  --white-2: rgba(255, 255, 255, 0.02);
+  --white-4: rgba(255, 255, 255, 0.04);
+  --white-6: rgba(255, 255, 255, 0.06);
+  --white-8: rgba(255, 255, 255, 0.08);
+  --white-10: rgba(255, 255, 255, 0.1);
+  --white-12: rgba(255, 255, 255, 0.12);
+  --white-16: rgba(255, 255, 255, 0.16);
+  --white-20: rgba(255, 255, 255, 0.2);
+  --white-24: rgba(255, 255, 255, 0.24);
+  --white-32: rgba(255, 255, 255, 0.32);
+  --white-40: rgba(255, 255, 255, 0.4);
+  --white-48: rgba(255, 255, 255, 0.48);
+  --white-56: rgba(255, 255, 255, 0.56);
+  --white-64: rgba(255, 255, 255, 0.64);
+  --white-72: rgba(255, 255, 255, 0.72);
+  --white-80: rgba(255, 255, 255, 0.8);
+  --white-88: rgba(255, 255, 255, 0.88);
+  --white-100: rgba(255, 255, 255, 1);
+
+  /* ---------------------------------------------------------------
+   * Semantic colors
+   * --------------------------------------------------------------- */
+  --uf-color-bg: #ffffff;
+  --uf-color-background: #ffffff;
+  --uf-color-panel: #ffffff;
+  --uf-color-fg: var(--black-88);
+  --uf-color-foreground: var(--black-88);
+  --uf-color-fg-muted: var(--black-48);
+  --uf-color-primary: #171717;
+  --uf-color-primary-fg: #ffffff;
+  --uf-color-accent: #3b82f6;
+  --uf-color-accent-fg: #ffffff;
+  --uf-color-success: #22c55e;
+  --uf-color-warning: #f59e0b;
+  --uf-color-destructive: #ef4444;
+  --uf-color-destructive-fg: #ffffff;
+  --uf-color-destructive-soft: color-mix(in srgb, var(--uf-color-destructive) 12%, transparent);
+  --uf-color-border: var(--black-12);
+  --uf-color-border-hover: var(--black-24);
+  --uf-color-ring: var(--black-88);
+  --uf-color-hover-bg: var(--black-6);
+  --uf-color-active-bg: var(--black-12);
+  --uf-color-disabled-opacity: 0.6;
+
+  /* ---------------------------------------------------------------
+   * Component tokens
+   * --------------------------------------------------------------- */
+  --uf-button-bg: transparent;
+  --uf-button-fg: var(--uf-color-fg);
+  --uf-button-hover-bg: var(--uf-color-hover-bg);
+  --uf-button-hover-fg: var(--uf-color-fg);
+  --uf-button-ring-color: var(--uf-color-border);
+  --uf-progress-track-bg: var(--uf-color-hover-bg);
+  --uf-progress-indicator-bg: var(--uf-color-fg);
+  --uf-progress-indicator-success-bg: var(--uf-color-success);
+  --uf-progress-indicator-warning-bg: var(--uf-color-warning);
+  --uf-progress-indicator-error-bg: var(--uf-color-destructive);
+  --uf-overlay-backdrop-bg: transparent;
+  --uf-overlay-backdrop-blur: 28px;
+  --uf-overlay-surface-bg: var(--uf-color-panel);
+  --uf-overlay-surface-border: color-mix(in srgb, var(--uf-color-border) 88%, transparent);
+  --uf-overlay-surface-blur: 24px;
+  --uf-overlay-surface-shadow: none;
+  --uf-overlay-enter-y: 10px;
+  --uf-overlay-enter-scale: 0.985;
+
+  /* ---------------------------------------------------------------
+   * Control geometry
+   * --------------------------------------------------------------- */
+  --uf-control-height: 32px;
+  --uf-control-font-size: 14px;
+  --uf-control-line-height: 20px;
+  --uf-control-letter-spacing: 0.02em;
+  --uf-control-pad-y: 6px;
+  --uf-control-pad-text: 12px;
+  --uf-control-pad-icon: 6px;
+  --uf-control-gap: 10px;
+  --uf-option-indent: 28px;
+  --uf-content-inset: 12px;
+
+  /* ---------------------------------------------------------------
+   * Membrane
+   * --------------------------------------------------------------- */
+  --uf-membrane: 1px;
+
+  /* ---------------------------------------------------------------
+   * Border radius
+   * --------------------------------------------------------------- */
+  --uf-radius-sm: 4px;
+  --uf-radius: 6px;
+  --uf-radius-md: 8px;
+  --uf-radius-lg: 12px;
+  --uf-radius-full: 9999px;
+
+  /* ---------------------------------------------------------------
+   * Shadows (only black, low opacity, 4 levels)
+   * --------------------------------------------------------------- */
+  --uf-shadow-sm: 0 1px 2px var(--black-6);
+  --uf-shadow: 0 2px 4px var(--black-8);
+  --uf-shadow-md: 0 4px 8px var(--black-10);
+  --uf-shadow-lg: 0 8px 24px var(--black-12);
+
+  /* ---------------------------------------------------------------
+   * Typography
+   * --------------------------------------------------------------- */
+  --uf-font-family: inherit;
+  --uf-font-weight: 400;
+  --uf-font-weight-bold: 700;
+  --uf-font-size-xs: 12px;
+  --uf-font-size-sm: 13px;
+  --uf-font-size: 14px;
+  --uf-font-size-md: 16px;
+  --uf-font-size-lg: 18px;
+  --uf-font-size-xl: 20px;
+
+  /* ---------------------------------------------------------------
+   * Spacing (multiples of 4px)
+   * --------------------------------------------------------------- */
+  --uf-space-1: 4px;
+  --uf-space-2: 8px;
+  --uf-space-3: 12px;
+  --uf-space-4: 16px;
+  --uf-space-5: 20px;
+  --uf-space-6: 24px;
+  --uf-space-8: 32px;
+  --uf-space-10: 40px;
+  --uf-space-12: 48px;
+
+  /* ---------------------------------------------------------------
+   * Z-index layers
+   * --------------------------------------------------------------- */
+  --uf-z-dropdown: 50;
+  --uf-z-overlay: 100;
+  --uf-z-modal: 200;
+  --uf-z-toast: 300;
+
+  /* ---------------------------------------------------------------
+   * Transitions (opt-in via .uf-animated)
+   * --------------------------------------------------------------- */
+  --uf-duration-enter: 300ms;
+  --uf-duration-exit: 200ms;
+  --uf-ease-enter: cubic-bezier(0.32, 0.72, 0, 1);
+  --uf-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ---------------------------------------------------------------
+ * Dark theme — invert black ↔ white semantics
+ * --------------------------------------------------------------- */
+[data-theme="dark"] {
+  --uf-color-bg: #0a0a0a;
+  --uf-color-background: #0a0a0a;
+  --uf-color-panel: #0a0a0a;
+  --uf-color-fg: var(--white-88);
+  --uf-color-foreground: var(--white-88);
+  --uf-color-fg-muted: var(--white-48);
+  --uf-color-primary: #fafafa;
+  --uf-color-primary-fg: #0a0a0a;
+  --uf-color-border: var(--white-12);
+  --uf-color-border-hover: var(--white-24);
+  --uf-color-ring: var(--white-88);
+  --uf-color-hover-bg: var(--white-8);
+  --uf-color-active-bg: var(--white-12);
+  --uf-progress-track-bg: var(--white-16);
+  --uf-overlay-backdrop-bg: transparent;
+  --uf-overlay-surface-bg: var(--uf-color-panel);
+  --uf-overlay-surface-border: color-mix(in srgb, var(--uf-color-border) 92%, transparent);
+  --uf-overlay-surface-shadow: none;
+}
+
+/* ---------------------------------------------------------------
+ * Size containers (compact / large)
+ * --------------------------------------------------------------- */
+.uf-compact {
+  --uf-control-height: 28px;
+  --uf-control-font-size: 13px;
+  --uf-control-line-height: 18px;
+  --uf-control-pad-y: 5px;
+  --uf-control-pad-text: 10px;
+  --uf-control-pad-icon: 5px;
+  --uf-control-gap: 8px;
+  --uf-content-inset: 10px;
+}
+
+.uf-large {
+  --uf-control-height: 40px;
+  --uf-control-font-size: 16px;
+  --uf-control-line-height: 24px;
+  --uf-control-pad-y: 8px;
+  --uf-control-pad-text: 16px;
+  --uf-control-pad-icon: 8px;
+  --uf-control-gap: 12px;
+  --uf-content-inset: 16px;
+}

@@ -1,0 +1,104 @@
+{
+  "name": "Toggle",
+  "description": "Unified toggle and toggle group with single or multiple selection",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": true,
+      "description": "Toggle items to render.",
+      "default": [
+        {
+          "value": "bold",
+          "label": "Bold"
+        },
+        {
+          "value": "italic",
+          "label": "Italic"
+        },
+        {
+          "value": "underline",
+          "label": "Underline"
+        }
+      ]
+    },
+    "value": {
+      "type": "array",
+      "required": false,
+      "description": "Currently selected values.",
+      "default": []
+    },
+    "defaultValue": {
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial selected values."
+    },
+    "type": {
+      "type": "enum",
+      "required": false,
+      "description": "Selection mode: single or multiple.",
+      "options": [
+        "single",
+        "multiple"
+      ],
+      "default": "multiple"
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state for the entire group.",
+      "default": false
+    },
+    "orientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Layout orientation.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when value changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper (+1px outside each toggle item).",
+      "default": true
+    }
+  },
+  "states": [
+    {
+      "name": "Default (Multiple)",
+      "props": {
+        "type": "multiple"
+      }
+    },
+    {
+      "name": "Single",
+      "props": {
+        "type": "single"
+      }
+    },
+    {
+      "name": "Vertical",
+      "props": {
+        "orientation": "vertical"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true
+      }
+    }
+  ]
+}

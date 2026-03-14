@@ -1,0 +1,179 @@
+{
+  "name": "Button",
+  "description": "Action component with variants, icons, and clipboard support",
+  "props": {
+    "text": {
+      "type": "string",
+      "required": false,
+      "description": "Button label text.",
+      "default": "Button"
+    },
+    "rightText": {
+      "type": "string",
+      "required": false,
+      "description": "Optional secondary text, rendered at the far right inside the text area."
+    },
+    "variant": {
+      "type": "enum",
+      "required": false,
+      "description": "Visual style variant",
+      "options": [
+        "default",
+        "primary",
+        "secondary",
+        "accent",
+        "outline",
+        "ghost",
+        "destructive",
+        "suggestion"
+      ],
+      "default": "default"
+    },
+    "icon": {
+      "type": "string",
+      "required": false,
+      "description": "Icon (string from registry, ReactNode, or SVG element)."
+    },
+    "iconPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Icon position relative to text.",
+      "options": [
+        "left",
+        "right"
+      ],
+      "default": "left"
+    },
+    "iconOnly": {
+      "type": "boolean",
+      "required": false,
+      "description": "Icon-only mode (no text, square button).",
+      "default": false
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "default": false
+    },
+    "loading": {
+      "type": "boolean",
+      "required": false,
+      "description": "Loading state (shows spinner, dims text)."
+    },
+    "stretchText": {
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch text area (flex:1)."
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "Full width button.",
+      "default": true
+    },
+    "align": {
+      "type": "enum",
+      "required": false,
+      "description": "Text alignment.",
+      "options": [
+        "left",
+        "right",
+        "center"
+      ],
+      "default": null
+    },
+    "level": {
+      "type": "number",
+      "required": false,
+      "description": "Nesting level for option-like rows: 0..9"
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing (1px padding).",
+      "default": true
+    },
+    "copyText": {
+      "type": "string",
+      "required": false,
+      "description": "Copy text to clipboard on click (Clipboard integration).",
+      "default": null
+    },
+    "onCopied": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when copy succeeds."
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Custom children (overrides text/icon rendering).",
+      "default": null
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "text": "Button"
+      }
+    },
+    {
+      "name": "Primary",
+      "props": {
+        "text": "Primary",
+        "variant": "primary"
+      }
+    },
+    {
+      "name": "Secondary",
+      "props": {
+        "text": "Secondary",
+        "variant": "secondary"
+      }
+    },
+    {
+      "name": "Accent",
+      "props": {
+        "text": "Accent",
+        "variant": "accent"
+      }
+    },
+    {
+      "name": "Outline",
+      "props": {
+        "text": "Outline",
+        "variant": "outline"
+      }
+    },
+    {
+      "name": "Ghost",
+      "props": {
+        "text": "Ghost",
+        "variant": "ghost"
+      }
+    },
+    {
+      "name": "Destructive",
+      "props": {
+        "text": "Delete",
+        "variant": "destructive"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "text": "Disabled",
+        "disabled": true
+      }
+    },
+    {
+      "name": "Full Width",
+      "props": {
+        "text": "Full Width",
+        "fullWidth": true
+      }
+    }
+  ]
+}
