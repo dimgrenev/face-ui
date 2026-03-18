@@ -93,5 +93,81 @@
         "disabled": true
       }
     }
-  ]
+  ],
+  "behavior": {
+    "rovingFocus": true
+  },
+  "keyboard": {
+    "ArrowDown": {
+      "action": "focusNext"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious"
+    },
+    "ArrowRight": {
+      "action": "focusNext"
+    },
+    "ArrowLeft": {
+      "action": "focusPrevious"
+    }
+  },
+  "aria": {
+    "role": "radiogroup",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "item",
+      "control",
+      "indicator"
+    ],
+    "recommended": [
+      "label"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "root",
+        "multiple": true
+      },
+      "control": {
+        "slot": "control",
+        "parent": "item"
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "control"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "item"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Mutually exclusive single selection",
+      "Settings with few visible options",
+      "Survey single-choice questions"
+    ],
+    "whenNotToUse": [
+      "Multiple selections (use Checkbox)",
+      "Many options (use Select)",
+      "Binary toggle (use Switcher)"
+    ],
+    "alternatives": [
+      "Select",
+      "Checkbox",
+      "Switcher",
+      "SegmentedControl"
+    ],
+    "context": "both"
+  }
 }

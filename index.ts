@@ -4,6 +4,9 @@
 export { Button, ButtonGroup, buttonAnatomy } from './Button/Button'
 export type { ButtonProps, ButtonVariant, ButtonGroupProps } from './Button/Button'
 
+export { Tile, tileAnatomy } from './Tile/Tile'
+export type { TileProps, TileVariant } from './Tile/Tile'
+
 export { Text, textAnatomy } from './Text/Text'
 export type { TextProps, TextVariant } from './Text/Text'
 

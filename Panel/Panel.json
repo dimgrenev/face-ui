@@ -149,5 +149,63 @@
         "width": 300
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "complementary",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "recommended": [
+      "header",
+      "content",
+      "footer",
+      "collapseButton"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "header": {
+        "slot": "header",
+        "parent": "root"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "root"
+      },
+      "footer": {
+        "slot": "footer",
+        "parent": "root"
+      },
+      "collapseButton": {
+        "slot": "collapseButton",
+        "parent": "header"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Sidebar content area",
+      "Split-view detail pane",
+      "Collapsible side section"
+    ],
+    "whenNotToUse": [
+      "Overlay content (use Modal/Drawer)",
+      "Simple content block (use Card)"
+    ],
+    "alternatives": [
+      "Card",
+      "Drawer",
+      "Modal"
+    ],
+    "context": "app"
+  }
 }

@@ -153,7 +153,9 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                 {...api.getTriggerProps({ value: item.value, disabled: item.disabled })}
                 className={cn('uf-tabs-tab')}
               >
-                {item.label}
+                {typeof item.label === 'string'
+                  ? <Text as="span" inset="none" membrane={false}>{item.label}</Text>
+                  : item.label}
               </button>
             )
             if (!membrane) return tabNode

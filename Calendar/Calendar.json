@@ -73,5 +73,105 @@
         "weekStartsOn": 1
       }
     }
-  ]
+  ],
+  "behavior": {
+    "rovingFocus": true
+  },
+  "keyboard": {
+    "ArrowRight": {
+      "action": "nextDay"
+    },
+    "ArrowLeft": {
+      "action": "previousDay"
+    },
+    "ArrowDown": {
+      "action": "nextWeek"
+    },
+    "ArrowUp": {
+      "action": "previousWeek"
+    },
+    "Home": {
+      "action": "startOfWeek"
+    },
+    "End": {
+      "action": "endOfWeek"
+    },
+    "PageUp": {
+      "action": "previousMonth"
+    },
+    "PageDown": {
+      "action": "nextMonth"
+    },
+    "Enter": {
+      "action": "select"
+    },
+    "Space": {
+      "action": "select"
+    }
+  },
+  "aria": {
+    "role": "grid",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "header",
+      "grid",
+      "cell"
+    ],
+    "recommended": [
+      "prevButton",
+      "nextButton",
+      "title"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "header": {
+        "slot": "header",
+        "parent": "root"
+      },
+      "prevButton": {
+        "slot": "prevButton",
+        "parent": "header"
+      },
+      "nextButton": {
+        "slot": "nextButton",
+        "parent": "header"
+      },
+      "title": {
+        "slot": "title",
+        "parent": "header"
+      },
+      "grid": {
+        "slot": "grid",
+        "parent": "root"
+      },
+      "cell": {
+        "slot": "cell",
+        "parent": "grid",
+        "multiple": true
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Standalone calendar view",
+      "Date display in dashboard",
+      "Event scheduling grid"
+    ],
+    "whenNotToUse": [
+      "Date input in forms (use DatePicker)",
+      "Simple date display (use Text)"
+    ],
+    "alternatives": [
+      "DatePicker"
+    ],
+    "context": "app"
+  }
 }

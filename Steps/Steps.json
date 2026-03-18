@@ -83,5 +83,75 @@
         "disabled": true
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {
+    "ArrowRight": {
+      "action": "focusNextStep"
+    },
+    "ArrowLeft": {
+      "action": "focusPreviousStep"
+    }
+  },
+  "aria": {
+    "role": "list",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "item",
+      "trigger",
+      "content"
+    ],
+    "recommended": [
+      "indicator",
+      "separator"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "root",
+        "multiple": true
+      },
+      "trigger": {
+        "slot": "trigger",
+        "parent": "item"
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "trigger"
+      },
+      "separator": {
+        "slot": "separator",
+        "parent": "root"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "item"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Multi-step wizard progress",
+      "Onboarding flow indicator",
+      "Process status display"
+    ],
+    "whenNotToUse": [
+      "Tab-like content switching (use Tabs)",
+      "Simple progress bar (use Progress)"
+    ],
+    "alternatives": [
+      "Tabs",
+      "Progress"
+    ],
+    "context": "both"
+  }
 }

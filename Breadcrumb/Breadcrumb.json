@@ -79,5 +79,60 @@
         "allowNavigation": true
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "navigation",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "list",
+      "item",
+      "link",
+      "separator"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "list": {
+        "slot": "list",
+        "parent": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "list",
+        "multiple": true
+      },
+      "link": {
+        "slot": "link",
+        "parent": "item"
+      },
+      "separator": {
+        "slot": "separator",
+        "parent": "item"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Deep page hierarchy navigation",
+      "Multi-level content structure"
+    ],
+    "whenNotToUse": [
+      "Flat navigation (use Tabs)",
+      "Single-level nav (use Navigation)"
+    ],
+    "alternatives": [
+      "Navigation",
+      "Tabs"
+    ],
+    "context": "both"
+  }
 }

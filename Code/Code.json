@@ -106,5 +106,54 @@
         "code": "const v1 = 1;\nconst v2 = 2;\nconst v3 = 3;\nconst v4 = 4;\nconst v5 = 5;\nconst v6 = 6;\nconst v7 = 7;\nconst v8 = 8;\nconst v9 = 9;\nconsole.log(v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9);"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "code"
+  },
+  "composition": {
+    "required": [
+      "root",
+      "pre"
+    ],
+    "recommended": [
+      "header",
+      "lineNumbers"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "header": {
+        "slot": "header",
+        "parent": "root"
+      },
+      "pre": {
+        "slot": "pre",
+        "parent": "root"
+      },
+      "lineNumbers": {
+        "slot": "lineNumbers",
+        "parent": "pre"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Code snippet display",
+      "Terminal output",
+      "Configuration examples"
+    ],
+    "whenNotToUse": [
+      "Inline code mention (use Text variant='code')",
+      "Rich text content (use Markdown)"
+    ],
+    "alternatives": [
+      "Text",
+      "Markdown"
+    ],
+    "context": "both"
+  }
 }

@@ -54,5 +54,39 @@
         "height": "20px"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "progressbar",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Loading placeholder for content",
+      "Shimmer effect while fetching",
+      "Layout preview before data loads"
+    ],
+    "whenNotToUse": [
+      "Known progress percentage (use Progress)",
+      "Simple spinner"
+    ],
+    "alternatives": [
+      "Progress"
+    ],
+    "context": "both"
+  }
 }

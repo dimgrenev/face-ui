@@ -30,11 +30,18 @@ export type TextVariant =
   | 'default'
   | 'body'
   | 'heading'
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
   | 'label'
   | 'caption'
   | 'kbd'
   | 'code'
   | 'muted'
+  | 'blockquote'
 
 export type TextSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -76,10 +83,17 @@ export interface TextProps extends Omit<HTMLAttributes<HTMLElement>, 'children'>
 function defaultElement(variant: TextVariant): TextElement {
   switch (variant) {
     case 'heading': return 'h2'
+    case 'h1': return 'h1'
+    case 'h2': return 'h2'
+    case 'h3': return 'h3'
+    case 'h4': return 'h4'
+    case 'h5': return 'h5'
+    case 'h6': return 'h6'
     case 'label': return 'label'
     case 'kbd': return 'kbd'
     case 'code': return 'code'
     case 'caption': return 'small'
+    case 'blockquote': return 'div'
     case 'default': return 'div'
     default: return 'p'
   }
@@ -122,7 +136,9 @@ export const Text = forwardRef<HTMLElement, TextProps>(
     const textClasses = cn(
       'uf-text',
       // Components-compat class contract (keep while also exposing data-* attrs).
-      variant === 'label' ? 'uf-text-section' : 'uf-text-body',
+      variant === 'label' ? 'uf-text-section'
+        : (variant === 'h1' || variant === 'h2' || variant === 'h3' || variant === 'h4' || variant === 'h5' || variant === 'h6') ? 'uf-text-heading'
+        : 'uf-text-body',
       `uf-text--${variant}`,
       `uf-text--align-${align}`,
       effectiveInset === 'none' ? 'uf-text--inset-none' : 'uf-text--inset-control',

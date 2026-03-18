@@ -10,6 +10,7 @@ import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { checkboxMachine, connectCheckbox } from '../assets/machines/checkbox.machine'
 import { cn } from '../assets/utils'
+import { Text } from '../Text/Text'
 import { CheckOnIcon, CheckOffIcon, MinusIcon } from '../assets/icons'
 
 // ---------------------------------------------------------------------------
@@ -115,9 +116,9 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
           }}
         />
         {hasLabel && (
-          <span {...labelVisualProps} className={cn('uf-text-body', (labelVisualProps as any).className)}>
+          <Text as="span" inset="none" membrane={false} {...labelVisualProps}>
             {label}
-          </span>
+          </Text>
         )}
       </label>
     )

@@ -71,5 +71,60 @@
         "label": "Loading..."
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "progressbar",
+    "required": [
+      "aria-valuenow",
+      "aria-valuemin",
+      "aria-valuemax",
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "track",
+      "range"
+    ],
+    "recommended": [
+      "label"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "root"
+      },
+      "track": {
+        "slot": "track",
+        "parent": "root"
+      },
+      "range": {
+        "slot": "range",
+        "parent": "track"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Upload progress indicator",
+      "Step completion percentage",
+      "Loading state with known duration"
+    ],
+    "whenNotToUse": [
+      "Indeterminate loading (use Skeleton)",
+      "Step-by-step wizard (use Steps)"
+    ],
+    "alternatives": [
+      "Skeleton",
+      "Steps"
+    ],
+    "context": "both"
+  }
 }

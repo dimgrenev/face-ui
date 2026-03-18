@@ -186,20 +186,20 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
               <button
                 {...api.getTriggerProps({ value: item.value, disabled: item.disabled })}
               >
-                <span className="uf-accordion-label uf-text-body">
+                <Text as="span" inset="none" membrane={false} className="uf-accordion-label">
                   {item.label}
-                </span>
-                <span className="uf-accordion-arrow" aria-hidden="true"><RightIcon /></span>
+                </Text>
+                <Text as="span" inset="none" membrane={false} className="uf-accordion-arrow" aria-hidden="true"><RightIcon /></Text>
               </button>
             </span>
             <div {...api.getContentProps({ value: item.value })}>
-              <div className="uf-accordion-content-inner uf-text-body">
+              <Text as="div" inset="none" membrane={false} className="uf-accordion-content-inner">
                 {flattenAccordionContent(item.content).map((node, idx) => (
                   <div className="uf-accordion-slot" key={`${item.value}:slot:${idx}`}>
                     {renderAccordionContentNode(node)}
                   </div>
                 ))}
-              </div>
+              </Text>
             </div>
           </div>
         ))}

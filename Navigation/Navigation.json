@@ -113,5 +113,93 @@
         "orientation": "vertical"
       }
     }
-  ]
+  ],
+  "behavior": {
+    "rovingFocus": true
+  },
+  "keyboard": {
+    "ArrowRight": {
+      "action": "focusNext",
+      "condition": "horizontal"
+    },
+    "ArrowLeft": {
+      "action": "focusPrevious",
+      "condition": "horizontal"
+    },
+    "ArrowDown": {
+      "action": "focusNext",
+      "condition": "vertical"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious",
+      "condition": "vertical"
+    },
+    "Home": {
+      "action": "focusFirst"
+    },
+    "End": {
+      "action": "focusLast"
+    }
+  },
+  "aria": {
+    "role": "navigation",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "list",
+      "item",
+      "link"
+    ],
+    "recommended": [
+      "trigger",
+      "content"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "list": {
+        "slot": "list",
+        "parent": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "list",
+        "multiple": true
+      },
+      "link": {
+        "slot": "link",
+        "parent": "item"
+      },
+      "trigger": {
+        "slot": "trigger",
+        "parent": "item"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "item"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Primary app navigation",
+      "Sidebar menu links",
+      "Header nav links"
+    ],
+    "whenNotToUse": [
+      "Content switching within page (use Tabs)",
+      "Breadcrumb trail (use Breadcrumb)"
+    ],
+    "alternatives": [
+      "Tabs",
+      "Breadcrumb"
+    ],
+    "context": "app"
+  }
 }

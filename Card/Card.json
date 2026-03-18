@@ -70,5 +70,66 @@
         "membrane": false
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "region"
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "recommended": [
+      "header",
+      "title",
+      "description",
+      "content",
+      "footer"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "header": {
+        "slot": "header",
+        "parent": "root"
+      },
+      "title": {
+        "slot": "title",
+        "parent": "header"
+      },
+      "description": {
+        "slot": "description",
+        "parent": "header"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "root"
+      },
+      "footer": {
+        "slot": "footer",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Grouping related content visually",
+      "Dashboard widget container",
+      "Settings section wrapper",
+      "Content preview block"
+    ],
+    "whenNotToUse": [
+      "Full-page layout container (use page structure)",
+      "Interactive list item (use Button with variant)",
+      "Modal content (use Modal)"
+    ],
+    "alternatives": [
+      "Accordion",
+      "Modal"
+    ],
+    "context": "both"
+  }
 }

@@ -100,5 +100,57 @@
         "disabled": true
       }
     }
-  ]
+  ],
+  "behavior": {
+    "rovingFocus": true
+  },
+  "keyboard": {
+    "ArrowRight": {
+      "action": "focusNext"
+    },
+    "ArrowLeft": {
+      "action": "focusPrevious"
+    },
+    "Enter": {
+      "action": "toggle"
+    },
+    "Space": {
+      "action": "toggle"
+    }
+  },
+  "aria": {
+    "role": "group",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "item"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "root",
+        "multiple": true
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Deprecated — use SegmentedControl instead"
+    ],
+    "whenNotToUse": [
+      "Any new code (use SegmentedControl)"
+    ],
+    "alternatives": [
+      "SegmentedControl"
+    ],
+    "context": "both"
+  }
 }

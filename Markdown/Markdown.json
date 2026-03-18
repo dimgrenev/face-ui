@@ -182,5 +182,37 @@
         "membrane": false
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "document"
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Rendering user-generated markdown",
+      "Documentation display",
+      "Rich text from API"
+    ],
+    "whenNotToUse": [
+      "Simple text display (use Text)",
+      "Code-only content (use Code)"
+    ],
+    "alternatives": [
+      "Text",
+      "Code"
+    ],
+    "context": "both"
+  }
 }

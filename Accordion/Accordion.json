@@ -69,5 +69,49 @@
         "disabled": true
       }
     }
-  ]
+  ],
+  "behavior": {
+    "rovingFocus": true,
+    "autoFocusOnOpen": "none"
+  },
+  "keyboard": {
+    "ArrowDown": { "action": "focusNextTrigger" },
+    "ArrowUp": { "action": "focusPreviousTrigger" },
+    "Home": { "action": "focusFirstTrigger" },
+    "End": { "action": "focusLastTrigger" },
+    "Enter": { "action": "toggleItem" },
+    "Space": { "action": "toggleItem" }
+  },
+  "aria": {
+    "role": "region",
+    "required": ["aria-labelledby"]
+  },
+  "composition": {
+    "required": ["root", "item", "trigger", "content"],
+    "recommended": ["icon"],
+    "parts": {
+      "root": { "slot": "root" },
+      "item": { "slot": "item", "parent": "root", "multiple": true },
+      "trigger": { "slot": "trigger", "parent": "item" },
+      "content": { "slot": "content", "parent": "item" },
+      "icon": { "slot": "icon", "parent": "trigger" }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Collapsible FAQ sections",
+      "Grouped settings panels",
+      "Long content that needs progressive disclosure"
+    ],
+    "whenNotToUse": [
+      "Tab-like navigation (use Tabs)",
+      "Simple show/hide toggle (use details/summary)"
+    ],
+    "alternatives": [
+      "Tabs",
+      "Card"
+    ],
+    "context": "both"
+  }
 }

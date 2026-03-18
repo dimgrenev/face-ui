@@ -91,5 +91,69 @@
         "disabled": true
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {
+    "ArrowRight": {
+      "action": "nextPage"
+    },
+    "ArrowLeft": {
+      "action": "previousPage"
+    }
+  },
+  "aria": {
+    "role": "navigation",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "prevButton",
+      "nextButton",
+      "item"
+    ],
+    "recommended": [
+      "ellipsis"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "prevButton": {
+        "slot": "prevButton",
+        "parent": "root"
+      },
+      "nextButton": {
+        "slot": "nextButton",
+        "parent": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "root",
+        "multiple": true
+      },
+      "ellipsis": {
+        "slot": "ellipsis",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Table page navigation",
+      "Search results paging",
+      "Content list navigation"
+    ],
+    "whenNotToUse": [
+      "Infinite scroll content",
+      "Few items that fit on one page"
+    ],
+    "alternatives": [
+      "Table"
+    ],
+    "context": "both"
+  }
 }

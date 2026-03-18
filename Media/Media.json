@@ -184,5 +184,47 @@
         "height": "200"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "img",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "recommended": [
+      "fallback"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "fallback": {
+        "slot": "fallback",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Image display with alt text",
+      "Video embedding",
+      "Responsive media containers"
+    ],
+    "whenNotToUse": [
+      "User avatars (use Avatar)",
+      "Decorative icons (use Icon)"
+    ],
+    "alternatives": [
+      "Avatar",
+      "Icon"
+    ],
+    "context": "both"
+  }
 }

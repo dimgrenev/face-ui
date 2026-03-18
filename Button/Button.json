@@ -105,6 +105,17 @@
       "required": false,
       "description": "Callback when copy succeeds."
     },
+    "type": {
+      "type": "enum",
+      "options": [
+        "button",
+        "submit",
+        "reset"
+      ],
+      "default": "button",
+      "required": false,
+      "description": "HTML button type attribute. Defaults to 'button' to prevent accidental form submissions."
+    },
     "children": {
       "type": "string",
       "required": false,
@@ -175,5 +186,61 @@
         "fullWidth": true
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {
+    "Enter": {
+      "action": "activate"
+    },
+    "Space": {
+      "action": "activate"
+    }
+  },
+  "aria": {
+    "role": "button"
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "recommended": [
+      "icon",
+      "text"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "icon": {
+        "slot": "icon",
+        "parent": "root"
+      },
+      "text": {
+        "slot": "text",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Explicit user action trigger",
+      "Form submission",
+      "Navigation trigger",
+      "Destructive action confirmation"
+    ],
+    "whenNotToUse": [
+      "Pure text display (use Text)",
+      "Binary toggle (use Switcher)",
+      "Selection among peers (use Radio/Tabs)",
+      "Navigation link (use anchor or Navigation)"
+    ],
+    "alternatives": [
+      "Text",
+      "Switcher",
+      "Radio",
+      "Tabs"
+    ],
+    "context": "both"
+  }
 }

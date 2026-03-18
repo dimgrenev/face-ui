@@ -66,5 +66,54 @@
         "orientation": "both"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "region",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "viewport"
+    ],
+    "recommended": [
+      "scrollbar",
+      "thumb"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "viewport": {
+        "slot": "viewport",
+        "parent": "root"
+      },
+      "scrollbar": {
+        "slot": "scrollbar",
+        "parent": "root"
+      },
+      "thumb": {
+        "slot": "thumb",
+        "parent": "scrollbar"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Custom scrollable areas",
+      "Virtualized long lists",
+      "Horizontal scroll containers"
+    ],
+    "whenNotToUse": [
+      "Standard page scroll",
+      "Full-page layout"
+    ],
+    "alternatives": [],
+    "context": "app"
+  }
 }

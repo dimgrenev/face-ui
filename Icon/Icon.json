@@ -88,5 +88,37 @@
         "size": 10
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "img"
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Visual indicators in buttons/menus",
+      "Status icons",
+      "Navigation icons"
+    ],
+    "whenNotToUse": [
+      "Decorative images (use Media)",
+      "User avatars (use Avatar)"
+    ],
+    "alternatives": [
+      "Media",
+      "Avatar"
+    ],
+    "context": "both"
+  }
 }

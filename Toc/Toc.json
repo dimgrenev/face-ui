@@ -83,5 +83,60 @@
         "activeId": "intro"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {
+    "ArrowDown": {
+      "action": "focusNext"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious"
+    }
+  },
+  "aria": {
+    "role": "navigation",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "item"
+    ],
+    "recommended": [
+      "indicator"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "root",
+        "multiple": true
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Documentation page navigation",
+      "Long article section links",
+      "Page outline sidebar"
+    ],
+    "whenNotToUse": [
+      "App navigation (use Navigation)",
+      "Breadcrumb trail (use Breadcrumb)"
+    ],
+    "alternatives": [
+      "Navigation",
+      "Breadcrumb"
+    ],
+    "context": "both"
+  }
 }

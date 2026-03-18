@@ -42,5 +42,33 @@
         "decorative": false
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "separator"
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Visual divider between content sections",
+      "Menu item group divider"
+    ],
+    "whenNotToUse": [
+      "Spacing only (use CSS gap)",
+      "Decorative borders (use CSS border)"
+    ],
+    "alternatives": [],
+    "context": "both"
+  }
 }

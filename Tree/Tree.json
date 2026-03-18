@@ -15,40 +15,22 @@
               "id": "components",
               "label": "components",
               "children": [
-                {
-                  "id": "button",
-                  "label": "Button.tsx"
-                },
-                {
-                  "id": "input",
-                  "label": "Input.tsx"
-                }
+                { "id": "button", "label": "Button.tsx" },
+                { "id": "input", "label": "Input.tsx" }
               ]
             },
-            {
-              "id": "index",
-              "label": "index.ts"
-            }
+            { "id": "index", "label": "index.ts" }
           ]
         },
-        {
-          "id": "package",
-          "label": "package.json"
-        },
-        {
-          "id": "readme",
-          "label": "README.md"
-        }
+        { "id": "package", "label": "package.json" },
+        { "id": "readme", "label": "README.md" }
       ]
     },
     "expandedIds": {
       "type": "array",
       "required": false,
       "description": "Currently expanded node IDs.",
-      "default": [
-        "src",
-        "components"
-      ]
+      "default": ["src", "components"]
     },
     "defaultExpandedIds": {
       "type": "array",
@@ -93,5 +75,54 @@
         "selectedId": "button"
       }
     }
-  ]
+  ],
+  "behavior": {
+    "rovingFocus": true,
+    "typeahead": true,
+    "autoFocusOnOpen": "none"
+  },
+  "keyboard": {
+    "ArrowDown": { "action": "focusNextVisible" },
+    "ArrowUp": { "action": "focusPreviousVisible" },
+    "ArrowRight": { "action": "expandOrFocusChild" },
+    "ArrowLeft": { "action": "collapseOrFocusParent" },
+    "Home": { "action": "focusFirst" },
+    "End": { "action": "focusLast" },
+    "Enter": { "action": "select" },
+    "Space": { "action": "select" },
+    "*": { "action": "expandAllSiblings" }
+  },
+  "aria": {
+    "role": "tree",
+    "required": ["aria-label"]
+  },
+  "composition": {
+    "required": ["root", "branch", "item"],
+    "recommended": ["itemIndicator", "itemText"],
+    "parts": {
+      "root": { "slot": "root" },
+      "branch": { "slot": "branch", "parent": "root", "multiple": true },
+      "item": { "slot": "item", "parent": "branch", "multiple": true },
+      "itemIndicator": { "slot": "itemIndicator", "parent": "item" },
+      "itemText": { "slot": "itemText", "parent": "item" }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "File system browser",
+      "Hierarchical data display",
+      "Nested category navigation"
+    ],
+    "whenNotToUse": [
+      "Flat list (use Table)",
+      "Simple nav (use Navigation)"
+    ],
+    "alternatives": [
+      "Table",
+      "Navigation",
+      "Accordion"
+    ],
+    "context": "app"
+  }
 }

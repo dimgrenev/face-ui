@@ -9,6 +9,7 @@ import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { radioMachine, connectRadio } from '../assets/machines/radio.machine'
 import { cn } from '../assets/utils'
+import { Text } from '../Text/Text'
 import { RadioOnIcon, RadioOffIcon } from '../assets/icons'
 
 // ---------------------------------------------------------------------------
@@ -153,9 +154,9 @@ export const Radio = forwardRef<HTMLDivElement, RadioProps>(
               <span className="uf-radio-indicator" {...api.getIndicatorProps()}>
                 {state.context.value === option.value ? <RadioOnIcon /> : <RadioOffIcon />}
               </span>
-              <span className="uf-radio-text uf-text-body">
+              <Text as="span" inset="none" membrane={false} className="uf-radio-text">
                 {option.label}
-              </span>
+              </Text>
             </label>
           )
           if (!membrane) return optionNode

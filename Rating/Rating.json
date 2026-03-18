@@ -83,5 +83,71 @@
         "disabled": true
       }
     }
-  ]
+  ],
+  "behavior": {
+    "rovingFocus": true
+  },
+  "keyboard": {
+    "ArrowRight": {
+      "action": "increment"
+    },
+    "ArrowLeft": {
+      "action": "decrement"
+    },
+    "Home": {
+      "action": "setMin"
+    },
+    "End": {
+      "action": "setMax"
+    }
+  },
+  "aria": {
+    "role": "radiogroup",
+    "required": [
+      "aria-label",
+      "aria-valuenow",
+      "aria-valuemin",
+      "aria-valuemax"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "item"
+    ],
+    "recommended": [
+      "label"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "root",
+        "multiple": true
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "User review rating input",
+      "Product rating display",
+      "Satisfaction score"
+    ],
+    "whenNotToUse": [
+      "Progress indication (use Progress)",
+      "Numeric input (use Slider or Input)"
+    ],
+    "alternatives": [
+      "Slider",
+      "Input"
+    ],
+    "context": "both"
+  }
 }

@@ -144,5 +144,45 @@
         "title": "Are you sure?"
       }
     }
-  ]
+  ],
+  "behavior": {
+    "focusTrap": true,
+    "scrollLock": true,
+    "dismissOnEscape": true,
+    "dismissOnClickOutside": true,
+    "returnFocusOnClose": true,
+    "autoFocusOnOpen": "first-focusable"
+  },
+  "keyboard": {
+    "Escape": { "action": "close" },
+    "Tab": { "action": "focusTrap", "scope": "modal" }
+  },
+  "aria": {
+    "role": "dialog",
+    "modal": true,
+    "labelledBy": "modal-title",
+    "describedBy": "modal-description"
+  },
+  "composition": {
+    "required": ["root", "overlay", "content"],
+    "recommended": ["title", "description", "close"],
+    "parts": {
+      "root": { "slot": "root" },
+      "overlay": { "slot": "overlay", "parent": "root" },
+      "content": { "slot": "content", "parent": "root" },
+      "title": { "slot": "title", "parent": "content" },
+      "description": { "slot": "description", "parent": "content" },
+      "close": { "slot": "close", "parent": "content" }
+    }
+  },
+  "platform": {
+    "dialog": true,
+    "inert": true
+  },
+  "usage": {
+    "whenToUse": ["Focused dialog requiring user decision", "Confirmation before destructive action", "Content that needs full attention"],
+    "whenNotToUse": ["Displaying additional info (use Popover)", "Side panel content (use Drawer)", "Non-blocking notification (use Toaster)"],
+    "alternatives": ["Drawer", "Popover", "Toaster"],
+    "context": "app"
+  }
 }

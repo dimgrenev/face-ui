@@ -206,5 +206,45 @@
         "membrane": false
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "text"
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "recommended": [
+      "icon"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "icon": {
+        "slot": "icon",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "All visible text content",
+      "Headings and paragraphs",
+      "Labels and captions",
+      "Inline code and keyboard shortcuts"
+    ],
+    "whenNotToUse": [
+      "Rich markdown content (use Markdown)",
+      "Code blocks (use Code)"
+    ],
+    "alternatives": [
+      "Markdown",
+      "Code"
+    ],
+    "context": "both"
+  }
 }

@@ -1,217 +1,187 @@
 {
   "name": "DatePicker",
+  "description": "Date and time picker with calendar, range selection, and multiple view modes",
   "props": {
     "mode": {
       "type": "enum",
       "required": false,
-      "description": "mode prop",
-      "options": [
-        "date",
-        "datetime",
-        "time",
-        "week",
-        "month",
-        "year"
-      ]
+      "description": "Picker mode: date-only, datetime, time-only, week, month, or year selection.",
+      "options": ["date", "datetime", "time", "week", "month", "year"]
     },
     "selection": {
       "type": "enum",
       "required": false,
-      "description": "selection prop",
-      "options": [
-        "single",
-        "range"
-      ]
+      "description": "Selection mode: single date or date range.",
+      "options": ["single", "range"]
     },
     "views": {
       "type": "array",
       "required": false,
-      "description": "views prop"
+      "description": "Available calendar views the user can navigate between."
     },
     "openTo": {
       "type": "enum",
       "required": false,
-      "description": "openTo prop",
-      "options": [
-        "month",
-        "year",
-        "day",
-        "hours",
-        "minutes"
-      ]
+      "description": "Initial calendar view when opened.",
+      "options": ["month", "year", "day", "hours", "minutes"]
     },
     "value": {
       "type": "any",
       "required": false,
-      "description": "value prop"
+      "description": "Controlled selected date value. Date object or ISO string depending on valueFormat."
     },
     "defaultValue": {
       "type": "any",
       "required": false,
-      "description": "defaultValue prop"
+      "description": "Uncontrolled initial date value."
     },
     "onValueChange": {
       "type": "function",
       "required": false,
-      "description": "onValueChange prop"
+      "description": "Callback when the selected date changes."
     },
     "onOpenChange": {
       "type": "function",
       "required": false,
-      "description": "onOpenChange prop"
+      "description": "Callback when the picker open state changes."
     },
     "valueFormat": {
       "type": "enum",
       "required": false,
-      "description": "valueFormat prop",
-      "options": [
-        "date",
-        "iso"
-      ]
+      "description": "Format of the value: native Date object or ISO string.",
+      "options": ["date", "iso"]
     },
     "locale": {
       "type": "string",
       "required": false,
-      "description": "locale prop"
+      "description": "BCP 47 locale for date formatting and calendar layout (e.g. 'en-US', 'ru-RU')."
     },
     "timezone": {
       "type": "string",
       "required": false,
-      "description": "timezone prop"
+      "description": "IANA timezone for date calculations (e.g. 'America/New_York')."
     },
     "weekStartsOn": {
       "type": "enum",
       "required": false,
-      "description": "weekStartsOn prop",
-      "options": [
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6"
-      ]
+      "description": "First day of the week: 0=Sunday, 1=Monday, etc.",
+      "options": ["0", "1", "2", "3", "4", "5", "6"]
     },
     "format": {
       "type": "string",
       "required": false,
-      "description": "format prop"
+      "description": "Display format string for the trigger (e.g. 'MMM dd, yyyy')."
     },
     "min": {
       "type": "any",
       "required": false,
-      "description": "min prop"
+      "description": "Minimum selectable date. Dates before this are disabled."
     },
     "max": {
       "type": "any",
       "required": false,
-      "description": "max prop"
+      "description": "Maximum selectable date. Dates after this are disabled."
     },
     "disabledDates": {
       "type": "array",
       "required": false,
-      "description": "disabledDates prop"
+      "description": "Array of specific dates or date ranges to disable."
     },
     "disabledTime": {
       "type": "object",
       "required": false,
-      "description": "disabledTime prop"
+      "description": "Time constraints: disabled hours, minutes, or seconds."
     },
     "closeOnSelect": {
       "type": "boolean",
       "required": false,
-      "description": "closeOnSelect prop"
+      "description": "Automatically close the picker after selection."
     },
     "showNow": {
       "type": "boolean",
       "required": false,
-      "description": "showNow prop"
+      "description": "Show a 'Now' button for quick selection of current date/time."
     },
     "showClear": {
       "type": "boolean",
       "required": false,
-      "description": "showClear prop"
+      "description": "Show a clear button to reset the selected value."
     },
     "showPresets": {
       "type": "boolean",
       "required": false,
-      "description": "showPresets prop"
+      "description": "Show preset date shortcuts (Today, Yesterday, Last 7 days, etc.)."
     },
     "presets": {
       "type": "array",
       "required": false,
-      "description": "presets prop"
+      "description": "Custom preset definitions: { label, value } pairs."
     },
     "surface": {
       "type": "enum",
       "required": false,
-      "description": "surface prop",
-      "options": [
-        "auto",
-        "popover",
-        "sheet"
-      ]
+      "description": "Content surface. Auto switches to bottom sheet on compact viewports.",
+      "options": ["auto", "popover", "sheet"]
     },
     "surfaceBreakpoint": {
       "type": "number",
       "required": false,
-      "description": "surfaceBreakpoint prop"
+      "description": "Breakpoint where auto surfaces switch from popover to sheet."
     },
     "surfaceTitle": {
       "type": "string",
       "required": false,
-      "description": "surfaceTitle prop"
+      "description": "Title for the mobile sheet header."
     },
     "label": {
       "type": "string",
       "required": false,
-      "description": "label prop"
+      "description": "Label rendered above/beside the trigger."
     },
     "description": {
       "type": "string",
       "required": false,
-      "description": "description prop"
+      "description": "Help text shown below the trigger."
     },
     "error": {
       "type": "string",
       "required": false,
-      "description": "error prop"
+      "description": "Error message shown below the trigger."
     },
     "required": {
       "type": "boolean",
       "required": false,
-      "description": "required prop"
+      "description": "Show required indicator (*)."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "disabled prop"
+      "description": "Disable the date picker."
     },
     "readOnly": {
       "type": "boolean",
       "required": false,
-      "description": "readOnly prop"
+      "description": "Make the date picker read-only (shows value but can't change)."
     },
     "placeholder": {
       "type": "string",
       "required": false,
-      "description": "placeholder prop"
+      "description": "Placeholder text when no date is selected."
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "membrane prop"
+      "description": "Outer membrane wrapper (+1px outside trigger geometry)."
     },
     "fullWidth": {
       "type": "boolean",
       "required": false,
-      "description": "fullWidth prop"
+      "description": "Stretch to full container width."
     },
     "className": {
       "type": "string",
       "required": false,
-      "description": "className prop"
+      "description": "Additional class name on the root element."
     }
   },
   "states": [
@@ -221,7 +191,72 @@
         "label": "Date",
         "placeholder": "Pick date"
       }
+    },
+    {
+      "name": "Date Range",
+      "props": {
+        "label": "Date Range",
+        "selection": "range",
+        "placeholder": "Select range"
+      }
+    },
+    {
+      "name": "DateTime",
+      "props": {
+        "label": "Date & Time",
+        "mode": "datetime",
+        "placeholder": "Pick date and time"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "label": "Date",
+        "disabled": true,
+        "placeholder": "Disabled"
+      }
     }
   ],
-  "description": "DatePicker component"
+  "behavior": {
+    "dismissOnEscape": true,
+    "dismissOnClickOutside": true,
+    "autoFocusOnOpen": "first-focusable"
+  },
+  "keyboard": {
+    "ArrowLeft": { "action": "previousDay", "scope": "calendar" },
+    "ArrowRight": { "action": "nextDay", "scope": "calendar" },
+    "ArrowUp": { "action": "previousWeek", "scope": "calendar" },
+    "ArrowDown": { "action": "nextWeek", "scope": "calendar" },
+    "Enter": { "action": "select" },
+    "Space": { "action": "select" },
+    "Escape": { "action": "close" },
+    "PageUp": { "action": "previousMonth", "scope": "calendar" },
+    "PageDown": { "action": "nextMonth", "scope": "calendar" }
+  },
+  "aria": {
+    "role": "combobox",
+    "labelledBy": "datepicker-label"
+  },
+  "composition": {
+    "required": ["root", "trigger", "calendar"],
+    "recommended": ["header", "day", "monthNav", "presets"],
+    "parts": {
+      "root": { "slot": "root" },
+      "trigger": { "slot": "trigger", "parent": "root" },
+      "calendar": { "slot": "calendar", "parent": "root" },
+      "header": { "slot": "header", "parent": "calendar" },
+      "monthNav": { "slot": "monthNav", "parent": "header" },
+      "day": { "slot": "day", "parent": "calendar", "multiple": true },
+      "presets": { "slot": "presets", "parent": "root" }
+    }
+  },
+  "platform": {
+    "popover": true
+  },
+  "usage": {
+    "whenToUse": ["Date input in forms", "Date range selection for filters", "Scheduling and booking interfaces"],
+    "whenNotToUse": ["Selecting from recent/known dates (use Select with date options)", "Time-only input without calendar (use Input type=time)"],
+    "alternatives": ["Input", "Select"],
+    "context": "both"
+  }
 }

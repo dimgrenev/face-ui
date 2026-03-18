@@ -8,14 +8,14 @@
 
 ## Как добавить новую иконку
 
-1. Добавь SVG файл в эту папку: `userface/face-ui-react/assets/Icons/your-icon.svg`
+1. Добавь SVG файл в эту папку: `packages/face-ui-react/assets/Icons/your-icon.svg`
 2. Запусти: `npm run generate:icons`
 3. Иконка автоматически появится в `Icon.tsx`
 4. Используй: `<Icon name="your-icon" />` (без `size`, чтобы иконка вставлялась “как есть”).
 
 ## Как изменить существующую иконку
 
-1. Отредактируй SVG файл: `userface/face-ui-react/assets/Icons/existing-icon.svg`
+1. Отредактируй SVG файл: `packages/face-ui-react/assets/Icons/existing-icon.svg`
 2. Запусти: `npm run generate:icons`
 3. Изменения автоматически применятся в `Icon.tsx`
 

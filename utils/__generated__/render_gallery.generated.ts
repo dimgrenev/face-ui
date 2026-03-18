@@ -40,6 +40,7 @@ import { Switcher } from '../../Switcher/Switcher';
 import { Table } from '../../Table/Table';
 import { Tabs } from '../../Tabs/Tabs';
 import { Text } from '../../Text/Text';
+import { Tile } from '../../Tile/Tile';
 import { Toast } from '../../Toast/Toast';
 import { Toc } from '../../Toc/Toc';
 import { Tooltip } from '../../Tooltip/Tooltip';
@@ -91,6 +92,7 @@ export const FELD_GALLERY_ENTRIES: FeldGalleryEntry[] = [
   { name: "Table", Component: Table, sampleProps: {"columns":[{"id":"name","header":"Name","accessor":"name","truncate":true},{"id":"status","header":"Status","accessor":"status"},{"id":"price","header":"Price","accessor":"price","align":"right"}],"rows":[{"id":"r1","name":"Akt Typeface 1.0","status":"Published","price":"₽ 2 990"},{"id":"r2","name":"Werkzeug","status":"Draft","price":"₽ 1 990"},{"id":"r3","name":"A very long row name to test truncation","status":"Archived","price":"—"}],"rowKey":"id","selectable":false,"showRowNumbers":true,"stickyHeader":true,"showDividers":true,"resizable":true,"stickyLastColumn":false} },
   { name: "Tabs", Component: Tabs, sampleProps: {"items":[{"value":"a","label":"Tab A","content":"Content A"},{"value":"b","label":"Tab B","content":"Content B"}],"orientation":"horizontal","activationMode":"automatic","disabled":false,"withLine":false,"wrap":false,"membrane":true,"defaultValue":"a"} },
   { name: "Text", Component: Text, sampleProps: {"text":"Text","variant":"default","size":null,"as":null,"icon":null,"iconPosition":"left","inset":"control","stretchText":false,"fullWidth":false,"align":"left","membrane":true,"children":null} },
+  { name: "Tile", Component: Tile, sampleProps: {"text":"Page title","rightText":null,"variant":"default","icon":"file","iconPosition":"left","disabled":false,"active":false,"stretchText":true,"fullWidth":true,"align":"left","level":null,"membrane":true,"actions":null} },
   { name: "Toast", Component: Toast, sampleProps: {"className":null,"showTrigger":true,"autoShow":false} },
   { name: "Toc", Component: Toc, sampleProps: {"items":[{"id":"intro","label":"Introduction","level":1},{"id":"setup","label":"Setup","level":1},{"id":"tokens","label":"Design tokens","level":2},{"id":"themes","label":"Themes","level":3},{"id":"usage","label":"Usage","level":1}],"withLine":true,"lineSide":"left","defaultActiveId":"tokens"} },
   { name: "Tooltip", Component: Tooltip, sampleProps: {"children":"Hover me","content":"Tooltip text"} },

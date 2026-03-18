@@ -89,5 +89,62 @@
         "label": "Unavailable"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {
+    "Space": {
+      "action": "toggle"
+    }
+  },
+  "aria": {
+    "role": "checkbox",
+    "required": [
+      "aria-checked",
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "control",
+      "indicator"
+    ],
+    "recommended": [
+      "label"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "control": {
+        "slot": "control",
+        "parent": "root"
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "control"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Multiple selection from options",
+      "Opt-in/consent toggles",
+      "Task completion checkmarks"
+    ],
+    "whenNotToUse": [
+      "Single on/off toggle (use Switcher)",
+      "Mutually exclusive options (use Radio)"
+    ],
+    "alternatives": [
+      "Switcher",
+      "Radio"
+    ],
+    "context": "both"
+  }
 }

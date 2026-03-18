@@ -172,5 +172,85 @@
         "sortDirection": "desc"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {
+    "ArrowDown": {
+      "action": "focusNextRow"
+    },
+    "ArrowUp": {
+      "action": "focusPreviousRow"
+    },
+    "Space": {
+      "action": "toggleRowSelection",
+      "condition": "selectable"
+    }
+  },
+  "aria": {
+    "role": "table",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "header",
+      "body",
+      "row",
+      "cell"
+    ],
+    "recommended": [
+      "headerCell",
+      "sortIndicator"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "header": {
+        "slot": "header",
+        "parent": "root"
+      },
+      "headerCell": {
+        "slot": "headerCell",
+        "parent": "header",
+        "multiple": true
+      },
+      "sortIndicator": {
+        "slot": "sortIndicator",
+        "parent": "headerCell"
+      },
+      "body": {
+        "slot": "body",
+        "parent": "root"
+      },
+      "row": {
+        "slot": "row",
+        "parent": "body",
+        "multiple": true
+      },
+      "cell": {
+        "slot": "cell",
+        "parent": "row",
+        "multiple": true
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Structured data display",
+      "Sortable/filterable data lists",
+      "CRUD data management"
+    ],
+    "whenNotToUse": [
+      "Simple key-value pairs (use Text)",
+      "Card-based layouts (use Card grid)"
+    ],
+    "alternatives": [
+      "Card"
+    ],
+    "context": "both"
+  }
 }

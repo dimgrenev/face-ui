@@ -95,7 +95,7 @@ export const Steps = forwardRef<HTMLDivElement, StepsProps>(
                   <span {...api.getIndicatorProps(index)} className="uf-steps-indicator">
                     {getCircledStepSymbol(index + 1)}
                   </span>
-                  <span className="uf-steps-label">{item.label}</span>
+                  <Text as="span" inset="none" membrane={false} className="uf-steps-label">{item.label}</Text>
                 </button>
               </span>
             </div>

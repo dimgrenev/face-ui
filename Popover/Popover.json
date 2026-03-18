@@ -1,11 +1,65 @@
 {
   "name": "Popover",
+  "description": "Floating interactive surface anchored to a trigger element",
   "props": {
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state."
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Uncontrolled initial open state.",
+      "default": false
+    },
     "interactive": {
       "type": "boolean",
       "required": false,
-      "description": "interactive prop",
+      "description": "Whether the popover content is interactive (focusable).",
       "default": true
+    },
+    "side": {
+      "type": "enum",
+      "required": false,
+      "description": "Preferred side placement.",
+      "options": ["top", "right", "bottom", "left"],
+      "default": "bottom"
+    },
+    "align": {
+      "type": "enum",
+      "required": false,
+      "description": "Alignment along the side.",
+      "options": ["start", "center", "end"],
+      "default": "center"
+    },
+    "sideOffset": {
+      "type": "number",
+      "required": false,
+      "description": "Offset from the trigger along the side axis (px).",
+      "default": 4
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Trigger element.",
+      "default": "Open popover"
+    },
+    "content": {
+      "type": "string",
+      "required": false,
+      "description": "Content rendered inside the floating surface.",
+      "default": "Popover content"
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
     }
   },
   "states": [
@@ -15,7 +69,61 @@
         "children": "Open popover",
         "content": "Popover content"
       }
+    },
+    {
+      "name": "Non-Interactive",
+      "props": {
+        "interactive": false,
+        "children": "Hover me",
+        "content": "Info tooltip-like"
+      }
     }
   ],
-  "description": "Popover component"
+  "behavior": {
+    "dismissOnEscape": true,
+    "dismissOnClickOutside": true,
+    "returnFocusOnClose": true,
+    "autoFocusOnOpen": "first-focusable"
+  },
+  "keyboard": {
+    "Escape": { "action": "close" },
+    "Tab": { "action": "focusTrap", "scope": "popover", "condition": "interactive" }
+  },
+  "aria": {
+    "role": "dialog",
+    "labelledBy": "popover-title"
+  },
+  "composition": {
+    "required": ["root", "trigger", "content"],
+    "recommended": ["arrow", "close"],
+    "parts": {
+      "root": { "slot": "root" },
+      "trigger": { "slot": "trigger", "parent": "root" },
+      "content": { "slot": "content", "parent": "root" },
+      "arrow": { "slot": "arrow", "parent": "content" },
+      "close": { "slot": "close", "parent": "content" }
+    }
+  },
+  "platform": {
+    "popover": true,
+    "anchorPositioning": true
+  },
+  "usage": {
+    "whenToUse": [
+      "Additional info on hover/click",
+      "Mini forms or filters",
+      "Rich tooltip content"
+    ],
+    "whenNotToUse": [
+      "Full dialog (use Modal)",
+      "Simple text hint (use Tooltip)",
+      "Side panel (use Drawer)"
+    ],
+    "alternatives": [
+      "Tooltip",
+      "Modal",
+      "Drawer"
+    ],
+    "context": "app"
+  }
 }

@@ -47,21 +47,6 @@
       "required": false,
       "description": "Callback when files are rejected."
     },
-    "size": {
-      "type": "number",
-      "required": true,
-      "description": "size prop"
-    },
-    "type": {
-      "type": "string",
-      "required": true,
-      "description": "type prop"
-    },
-    "reason": {
-      "type": "string",
-      "required": true,
-      "description": "reason prop"
-    },
     "className": {
       "type": "string",
       "required": false,
@@ -99,5 +84,63 @@
         "disabled": true
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {
+    "Enter": {
+      "action": "openFilePicker"
+    },
+    "Space": {
+      "action": "openFilePicker"
+    }
+  },
+  "aria": {
+    "role": "button",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "dropzone"
+    ],
+    "recommended": [
+      "label",
+      "fileList"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "dropzone": {
+        "slot": "dropzone",
+        "parent": "root"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "dropzone"
+      },
+      "fileList": {
+        "slot": "fileList",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "File upload with drag-and-drop",
+      "Image upload with preview",
+      "Document attachment"
+    ],
+    "whenNotToUse": [
+      "Text input (use Input)",
+      "URL input (use Input)"
+    ],
+    "alternatives": [
+      "Input"
+    ],
+    "context": "both"
+  }
 }

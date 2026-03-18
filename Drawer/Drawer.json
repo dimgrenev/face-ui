@@ -1,17 +1,52 @@
 {
   "name": "Drawer",
+  "description": "Side-anchored overlay panel for persistent workflows",
   "props": {
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state."
+    },
     "side": {
       "type": "enum",
       "required": false,
-      "description": "side prop",
-      "options": [
-        "left",
-        "right",
-        "top",
-        "bottom"
-      ],
+      "description": "Side from which the drawer slides in.",
+      "options": ["left", "right", "top", "bottom"],
       "default": "right"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "description": "Title content rendered in the drawer header.",
+      "default": "Right drawer"
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "description": "Description content rendered below the title.",
+      "default": "Persistent side workflow surface."
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Body content.",
+      "default": "Drawer content"
+    },
+    "trigger": {
+      "type": "string",
+      "required": false,
+      "description": "Trigger element that opens the drawer.",
+      "default": "Open drawer"
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
     }
   },
   "states": [
@@ -23,7 +58,74 @@
         "description": "Persistent side workflow surface.",
         "children": "Drawer content"
       }
+    },
+    {
+      "name": "Left Side",
+      "props": {
+        "side": "left",
+        "trigger": "Open left drawer",
+        "title": "Left drawer"
+      }
+    },
+    {
+      "name": "Bottom Sheet",
+      "props": {
+        "side": "bottom",
+        "trigger": "Open bottom sheet",
+        "title": "Bottom sheet"
+      }
     }
   ],
-  "description": "Drawer component"
+  "behavior": {
+    "focusTrap": true,
+    "scrollLock": true,
+    "dismissOnEscape": true,
+    "dismissOnClickOutside": true,
+    "returnFocusOnClose": true,
+    "autoFocusOnOpen": "first-focusable"
+  },
+  "keyboard": {
+    "Escape": { "action": "close" },
+    "Tab": { "action": "focusTrap", "scope": "drawer" }
+  },
+  "aria": {
+    "role": "dialog",
+    "modal": true,
+    "labelledBy": "drawer-title",
+    "describedBy": "drawer-description"
+  },
+  "composition": {
+    "required": ["root", "overlay", "content"],
+    "recommended": ["title", "description", "close"],
+    "parts": {
+      "root": { "slot": "root" },
+      "overlay": { "slot": "overlay", "parent": "root" },
+      "content": { "slot": "content", "parent": "root" },
+      "title": { "slot": "title", "parent": "content" },
+      "description": { "slot": "description", "parent": "content" },
+      "close": { "slot": "close", "parent": "content" }
+    }
+  },
+  "platform": {
+    "dialog": true,
+    "inert": true
+  },
+  "usage": {
+    "whenToUse": [
+      "Side panel with detailed content",
+      "Mobile navigation menu",
+      "Filters panel"
+    ],
+    "whenNotToUse": [
+      "Centered dialog (use Modal)",
+      "Inline expandable (use Accordion)",
+      "Quick tooltip info (use Popover)"
+    ],
+    "alternatives": [
+      "Modal",
+      "Panel",
+      "Popover"
+    ],
+    "context": "app"
+  }
 }

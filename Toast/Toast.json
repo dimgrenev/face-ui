@@ -5,7 +5,7 @@
     "className": {
       "type": "string",
       "required": false,
-      "description": "Additional class name for the toast group container",
+      "description": "Additional class name for the toast group container.",
       "default": null
     },
     "showTrigger": {
@@ -33,5 +33,43 @@
         "autoShow": true
       }
     }
-  ]
+  ],
+  "behavior": {
+    "dismissOnEscape": true,
+    "autoFocusOnOpen": "none"
+  },
+  "keyboard": {
+    "Escape": { "action": "dismissAll" }
+  },
+  "aria": {
+    "role": "status",
+    "live": "polite"
+  },
+  "composition": {
+    "required": ["root", "group", "item"],
+    "recommended": ["title", "description", "action", "close"],
+    "parts": {
+      "root": { "slot": "root" },
+      "group": { "slot": "group", "parent": "root" },
+      "item": { "slot": "item", "parent": "group", "multiple": true },
+      "title": { "slot": "title", "parent": "item" },
+      "description": { "slot": "description", "parent": "item" },
+      "action": { "slot": "action", "parent": "item" },
+      "close": { "slot": "close", "parent": "item" }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Success/error notifications",
+      "Non-blocking status messages",
+      "Action confirmations"
+    ],
+    "whenNotToUse": [
+      "Blocking alerts (use Modal)",
+      "Inline validation (use Input error prop)"
+    ],
+    "alternatives": ["Modal"],
+    "context": "app"
+  }
 }

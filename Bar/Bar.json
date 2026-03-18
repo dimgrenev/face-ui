@@ -36,5 +36,49 @@
         "orientation": "vertical"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "toolbar"
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "recommended": [
+      "start",
+      "end"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "start": {
+        "slot": "start",
+        "parent": "root"
+      },
+      "end": {
+        "slot": "end",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Top navigation bar",
+      "Bottom action bar",
+      "Toolbar with actions"
+    ],
+    "whenNotToUse": [
+      "Side navigation (use Panel)",
+      "Tab navigation (use Tabs)"
+    ],
+    "alternatives": [
+      "Navigation",
+      "Panel"
+    ],
+    "context": "app"
+  }
 }

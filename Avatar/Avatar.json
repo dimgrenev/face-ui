@@ -58,5 +58,52 @@
         "fallback": "?"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "img",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "recommended": [
+      "image",
+      "fallback"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "image": {
+        "slot": "image",
+        "parent": "root"
+      },
+      "fallback": {
+        "slot": "fallback",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "User profile image display",
+      "Author attribution",
+      "Participant list in chat/comments"
+    ],
+    "whenNotToUse": [
+      "Decorative images (use Media)",
+      "Logo display (use Media)"
+    ],
+    "alternatives": [
+      "Media",
+      "Icon"
+    ],
+    "context": "both"
+  }
 }

@@ -23,5 +23,89 @@
       }
     }
   ],
-  "description": "Sheet component"
+  "description": "Mobile-first bottom/top sheet overlay with drag-to-dismiss and focus trap",
+  "behavior": {
+    "focusTrap": true,
+    "scrollLock": true,
+    "dismissOnEscape": true,
+    "dismissOnClickOutside": true,
+    "returnFocusOnClose": true,
+    "autoFocusOnOpen": "first-focusable",
+    "dragToDismiss": true
+  },
+  "keyboard": {
+    "Escape": {
+      "action": "close"
+    },
+    "Tab": {
+      "action": "focusTrap",
+      "scope": "sheet"
+    }
+  },
+  "aria": {
+    "role": "dialog",
+    "modal": true,
+    "labelledBy": "sheet-title"
+  },
+  "composition": {
+    "required": [
+      "root",
+      "overlay",
+      "content"
+    ],
+    "recommended": [
+      "title",
+      "description",
+      "close",
+      "handle"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "overlay": {
+        "slot": "overlay",
+        "parent": "root"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "root"
+      },
+      "handle": {
+        "slot": "handle",
+        "parent": "content"
+      },
+      "title": {
+        "slot": "title",
+        "parent": "content"
+      },
+      "description": {
+        "slot": "description",
+        "parent": "content"
+      },
+      "close": {
+        "slot": "close",
+        "parent": "content"
+      }
+    }
+  },
+  "platform": {
+    "dialog": true,
+    "inert": true
+  },
+  "usage": {
+    "whenToUse": [
+      "Mobile bottom sheet",
+      "Compact viewport overlay content"
+    ],
+    "whenNotToUse": [
+      "Desktop dialog (use Modal)",
+      "Side panel (use Drawer)"
+    ],
+    "alternatives": [
+      "Modal",
+      "Drawer"
+    ],
+    "context": "app"
+  }
 }

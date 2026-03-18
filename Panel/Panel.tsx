@@ -116,9 +116,9 @@ function PanelItemRenderer(props: PanelItemRendererProps) {
         >
           {item.icon && <span data-scope="sidebar" data-part="itemIcon">{item.icon}</span>}
           {!collapsed && (
-            <span data-scope="sidebar" data-part="itemLabel" className="uf-text-body">
+            <Text as="span" inset="none" membrane={false} data-scope="sidebar" data-part="itemLabel">
               {item.label}
-            </span>
+            </Text>
           )}
         </a>
       )

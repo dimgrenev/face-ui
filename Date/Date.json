@@ -361,5 +361,101 @@
         "value": "2026-03-03"
       }
     }
-  ]
+  ],
+  "behavior": {
+    "dismissOnEscape": true,
+    "dismissOnClickOutside": true,
+    "returnFocusOnClose": true,
+    "rovingFocus": true
+  },
+  "keyboard": {
+    "Escape": {
+      "action": "close"
+    },
+    "ArrowRight": {
+      "action": "nextDay"
+    },
+    "ArrowLeft": {
+      "action": "previousDay"
+    },
+    "ArrowDown": {
+      "action": "nextWeek"
+    },
+    "ArrowUp": {
+      "action": "previousWeek"
+    },
+    "Enter": {
+      "action": "select"
+    },
+    "Space": {
+      "action": "select"
+    }
+  },
+  "aria": {
+    "role": "combobox",
+    "required": [
+      "aria-label",
+      "aria-expanded"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "trigger",
+      "content",
+      "calendar"
+    ],
+    "recommended": [
+      "label",
+      "description",
+      "error"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "root"
+      },
+      "trigger": {
+        "slot": "trigger",
+        "parent": "root"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "root"
+      },
+      "calendar": {
+        "slot": "calendar",
+        "parent": "content"
+      },
+      "description": {
+        "slot": "description",
+        "parent": "root"
+      },
+      "error": {
+        "slot": "error",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {
+    "popover": true
+  },
+  "usage": {
+    "whenToUse": [
+      "Formatted date display",
+      "Relative time display"
+    ],
+    "whenNotToUse": [
+      "Date input (use DatePicker)",
+      "Calendar view (use Calendar)"
+    ],
+    "alternatives": [
+      "DatePicker",
+      "Text"
+    ],
+    "context": "both"
+  }
 }

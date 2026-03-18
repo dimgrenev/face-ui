@@ -106,5 +106,47 @@
         "disabled": true
       }
     }
-  ]
+  ],
+  "behavior": {
+    "rovingFocus": true,
+    "typeahead": true,
+    "dismissOnEscape": true,
+    "dismissOnClickOutside": true,
+    "autoFocusOnOpen": "first-focusable"
+  },
+  "keyboard": {
+    "ArrowDown": { "action": "focusNext", "scope": "menu" },
+    "ArrowUp": { "action": "focusPrevious", "scope": "menu" },
+    "ArrowRight": { "action": "openSubmenu", "condition": "hasSubmenu" },
+    "ArrowLeft": { "action": "closeSubmenu", "condition": "inSubmenu" },
+    "Enter": { "action": "select" },
+    "Space": { "action": "select" },
+    "Escape": { "action": "close" },
+    "Home": { "action": "focusFirst", "scope": "menu" },
+    "End": { "action": "focusLast", "scope": "menu" }
+  },
+  "aria": {
+    "role": "menu"
+  },
+  "composition": {
+    "required": ["root", "trigger", "content"],
+    "recommended": ["item", "separator", "group"],
+    "parts": {
+      "root": { "slot": "root" },
+      "trigger": { "slot": "trigger", "parent": "root" },
+      "content": { "slot": "content", "parent": "root" },
+      "item": { "slot": "item", "parent": "content", "multiple": true },
+      "separator": { "slot": "separator", "parent": "content", "multiple": true },
+      "group": { "slot": "group", "parent": "content", "multiple": true }
+    }
+  },
+  "platform": {
+    "popover": true
+  },
+  "usage": {
+    "whenToUse": ["Contextual actions on an element", "Dropdown with action items", "Right-click context menu"],
+    "whenNotToUse": ["Choosing a value for a form field (use Select)", "Navigation between pages (use Navigation)", "Command search with filtering (use Command)"],
+    "alternatives": ["Select", "Command", "Navigation"],
+    "context": "app"
+  }
 }

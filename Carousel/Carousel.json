@@ -6,11 +6,7 @@
       "type": "array",
       "required": false,
       "description": "Slide elements. Each child becomes one slide.",
-      "default": [
-        "Slide 1",
-        "Slide 2",
-        "Slide 3"
-      ]
+      "default": ["Slide 1", "Slide 2", "Slide 3"]
     },
     "loop": {
       "type": "boolean",
@@ -34,10 +30,7 @@
       "type": "enum",
       "required": false,
       "description": "Slide orientation.",
-      "options": [
-        "horizontal",
-        "vertical"
-      ],
+      "options": ["horizontal", "vertical"],
       "default": "horizontal"
     },
     "slidesPerView": {
@@ -66,7 +59,7 @@
     "className": {
       "type": "string",
       "required": false,
-      "description": "className prop"
+      "description": "Additional CSS class."
     }
   },
   "states": [
@@ -76,22 +69,57 @@
     },
     {
       "name": "Loop",
-      "props": {
-        "loop": true
-      }
+      "props": { "loop": true }
     },
     {
       "name": "Auto Play",
-      "props": {
-        "autoPlay": true,
-        "autoPlayInterval": 3000
-      }
+      "props": { "autoPlay": true, "autoPlayInterval": 3000 }
     },
     {
       "name": "Vertical",
-      "props": {
-        "orientation": "vertical"
-      }
+      "props": { "orientation": "vertical" }
     }
-  ]
+  ],
+  "behavior": {
+    "rovingFocus": true,
+    "autoFocusOnOpen": "none"
+  },
+  "keyboard": {
+    "ArrowRight": { "action": "nextSlide", "condition": "horizontal" },
+    "ArrowLeft": { "action": "previousSlide", "condition": "horizontal" },
+    "ArrowDown": { "action": "nextSlide", "condition": "vertical" },
+    "ArrowUp": { "action": "previousSlide", "condition": "vertical" },
+    "Home": { "action": "firstSlide" },
+    "End": { "action": "lastSlide" }
+  },
+  "aria": {
+    "role": "region",
+    "required": ["aria-roledescription", "aria-label"]
+  },
+  "composition": {
+    "required": ["root", "viewport", "slide"],
+    "recommended": ["prevButton", "nextButton", "indicators"],
+    "parts": {
+      "root": { "slot": "root" },
+      "viewport": { "slot": "viewport", "parent": "root" },
+      "slide": { "slot": "slide", "parent": "viewport", "multiple": true },
+      "prevButton": { "slot": "prevButton", "parent": "root" },
+      "nextButton": { "slot": "nextButton", "parent": "root" },
+      "indicators": { "slot": "indicators", "parent": "root" }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Image gallery with navigation",
+      "Testimonial slider",
+      "Feature showcase"
+    ],
+    "whenNotToUse": [
+      "Single image (use Media)",
+      "Content tabs (use Tabs)"
+    ],
+    "alternatives": ["Tabs", "Media"],
+    "context": "both"
+  }
 }

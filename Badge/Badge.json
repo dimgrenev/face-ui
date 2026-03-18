@@ -81,5 +81,37 @@
         "variant": "destructive"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "status"
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Status indicators",
+      "Count notifications",
+      "Category labels/tags"
+    ],
+    "whenNotToUse": [
+      "Action buttons (use Button)",
+      "Large informational blocks (use Card)"
+    ],
+    "alternatives": [
+      "Text",
+      "Button"
+    ],
+    "context": "both"
+  }
 }

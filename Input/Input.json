@@ -221,5 +221,79 @@
         "value": "Read only value"
       }
     }
-  ]
+  ],
+  "behavior": {
+    "autoFocusOnOpen": "none"
+  },
+  "keyboard": {
+    "Escape": {
+      "action": "clear",
+      "condition": "hasClearButton"
+    }
+  },
+  "aria": {
+    "role": "textbox",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "control"
+    ],
+    "recommended": [
+      "label",
+      "description",
+      "error",
+      "icon"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "root"
+      },
+      "control": {
+        "slot": "control",
+        "parent": "root"
+      },
+      "icon": {
+        "slot": "icon",
+        "parent": "control"
+      },
+      "description": {
+        "slot": "description",
+        "parent": "root"
+      },
+      "error": {
+        "slot": "error",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Free text entry in forms",
+      "Search input",
+      "Password field",
+      "Numeric input",
+      "Multi-line text area"
+    ],
+    "whenNotToUse": [
+      "Choosing from predefined options (use Select)",
+      "Binary yes/no (use Switcher or Checkbox)",
+      "Date entry (use DatePicker)"
+    ],
+    "alternatives": [
+      "Select",
+      "Switcher",
+      "Checkbox",
+      "DatePicker"
+    ],
+    "context": "both"
+  }
 }

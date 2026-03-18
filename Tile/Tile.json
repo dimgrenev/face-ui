@@ -1,0 +1,203 @@
+{
+  "name": "Tile",
+  "description": "Interactive row with nested action buttons. Acts as a single clickable surface while allowing independent nested Button actions (like Notion sidebar tabs). Uses div[role=button] to allow valid HTML nesting of child buttons.",
+  "props": {
+    "text": {
+      "type": "string",
+      "required": false,
+      "description": "Primary label text.",
+      "default": null
+    },
+    "rightText": {
+      "type": "string",
+      "required": false,
+      "description": "Secondary text rendered at the far right of the label area.",
+      "default": null
+    },
+    "variant": {
+      "type": "enum",
+      "required": false,
+      "description": "Visual variant.",
+      "default": "default",
+      "options": [
+        "default",
+        "ghost",
+        "accent"
+      ]
+    },
+    "icon": {
+      "type": "string",
+      "required": false,
+      "description": "Icon name from registry or ReactNode.",
+      "default": null
+    },
+    "iconPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Icon position relative to text.",
+      "default": "left",
+      "options": [
+        "left",
+        "right"
+      ]
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "default": false
+    },
+    "active": {
+      "type": "boolean",
+      "required": false,
+      "description": "Active / selected state.",
+      "default": false
+    },
+    "stretchText": {
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch text area to fill available space.",
+      "default": true
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "Full width tile.",
+      "default": true
+    },
+    "align": {
+      "type": "enum",
+      "required": false,
+      "description": "Text alignment.",
+      "default": "left",
+      "options": [
+        "left",
+        "center",
+        "right"
+      ]
+    },
+    "level": {
+      "type": "number",
+      "required": false,
+      "description": "Nesting level for indented rows (0–9).",
+      "default": null
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing (1px padding around tile).",
+      "default": true
+    },
+    "actions": {
+      "type": "string",
+      "required": false,
+      "description": "Nested action buttons rendered at the far right. Their clicks do not propagate to the tile.",
+      "default": null
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "text": "Page title",
+        "icon": "file"
+      }
+    },
+    {
+      "name": "With actions",
+      "props": {
+        "text": "Page title",
+        "icon": "file",
+        "actions": "[Button icon=more] [Button icon=close]"
+      }
+    },
+    {
+      "name": "Active",
+      "props": {
+        "text": "Current page",
+        "icon": "file",
+        "active": true
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "text": "Archived",
+        "icon": "file",
+        "disabled": true
+      }
+    },
+    {
+      "name": "Ghost",
+      "props": {
+        "text": "Settings",
+        "icon": "settings",
+        "variant": "ghost"
+      }
+    },
+    {
+      "name": "Nested level",
+      "props": {
+        "text": "Sub-page",
+        "icon": "file",
+        "level": 1
+      }
+    }
+  ],
+  "behavior": {},
+  "keyboard": {
+    "Enter": {
+      "action": "activate"
+    },
+    "Space": {
+      "action": "activate"
+    }
+  },
+  "aria": {
+    "role": "button"
+  },
+  "composition": {
+    "required": [
+      "root"
+    ],
+    "recommended": [
+      "icon",
+      "text",
+      "actions"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "icon": {
+        "slot": "icon",
+        "parent": "root"
+      },
+      "text": {
+        "slot": "text",
+        "parent": "root"
+      },
+      "actions": {
+        "slot": "actions",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Grid item in dashboard",
+      "Clickable card-like block",
+      "Feature selection grid"
+    ],
+    "whenNotToUse": [
+      "Standard content container (use Card)",
+      "Navigation item (use Button)"
+    ],
+    "alternatives": [
+      "Card",
+      "Button"
+    ],
+    "context": "both"
+  }
+}

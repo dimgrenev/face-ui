@@ -110,5 +110,67 @@
         "label": "Locked on"
       }
     }
-  ]
+  ],
+  "behavior": {},
+  "keyboard": {
+    "Space": {
+      "action": "toggle"
+    },
+    "Enter": {
+      "action": "toggle"
+    }
+  },
+  "aria": {
+    "role": "switch",
+    "required": [
+      "aria-checked",
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "control",
+      "thumb"
+    ],
+    "recommended": [
+      "label"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "control": {
+        "slot": "control",
+        "parent": "root"
+      },
+      "thumb": {
+        "slot": "thumb",
+        "parent": "control"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Binary on/off toggle",
+      "Feature enable/disable",
+      "Preference toggle"
+    ],
+    "whenNotToUse": [
+      "Multiple choices (use Checkbox)",
+      "Mutually exclusive options (use Radio)",
+      "Action trigger (use Button)"
+    ],
+    "alternatives": [
+      "Checkbox",
+      "Radio",
+      "Button"
+    ],
+    "context": "both"
+  }
 }

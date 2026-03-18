@@ -3,7 +3,7 @@
  *
  * Import this file to get all Face UI styles:
  *   import '@face-ui/styles'
- *   or: import 'userface/face-ui-react/assets/styles/index.css'
+ *   or: import '@userface/face-ui-react/assets/styles/index.css'
  *
  * No @layer — all styles are top-level. Isolation is achieved via
  * [data-scope] attribute selectors which guarantee higher specificity

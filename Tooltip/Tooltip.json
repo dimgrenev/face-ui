@@ -1,5 +1,6 @@
 {
   "name": "Tooltip",
+  "description": "Non-interactive floating text hint anchored to a trigger element",
   "props": {
     "content": {
       "type": "string",
@@ -24,38 +25,34 @@
     "openDelay": {
       "type": "number",
       "required": false,
-      "description": "Delay before opening (ms)."
+      "description": "Delay before opening (ms).",
+      "default": 300
     },
     "closeDelay": {
       "type": "number",
       "required": false,
-      "description": "Delay before closing (ms)."
+      "description": "Delay before closing (ms).",
+      "default": 0
     },
     "side": {
       "type": "enum",
       "required": false,
       "description": "Preferred side placement.",
-      "options": [
-        "top",
-        "right",
-        "bottom",
-        "left"
-      ]
+      "options": ["top", "right", "bottom", "left"],
+      "default": "top"
     },
     "align": {
       "type": "enum",
       "required": false,
       "description": "Alignment along the side.",
-      "options": [
-        "start",
-        "center",
-        "end"
-      ]
+      "options": ["start", "center", "end"],
+      "default": "center"
     },
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Offset from the trigger along the side axis (px)."
+      "description": "Offset from the trigger along the side axis (px).",
+      "default": 4
     },
     "onOpenChange": {
       "type": "function",
@@ -70,7 +67,54 @@
         "children": "Hover me",
         "content": "Tooltip text"
       }
+    },
+    {
+      "name": "Bottom Placement",
+      "props": {
+        "children": "Hover me",
+        "content": "Tooltip below",
+        "side": "bottom"
+      }
     }
   ],
-  "description": "Tooltip component"
+  "behavior": {
+    "dismissOnEscape": true,
+    "autoFocusOnOpen": "none"
+  },
+  "keyboard": {
+    "Escape": { "action": "close" }
+  },
+  "aria": {
+    "role": "tooltip"
+  },
+  "composition": {
+    "required": ["root", "trigger", "content"],
+    "recommended": ["arrow"],
+    "parts": {
+      "root": { "slot": "root" },
+      "trigger": { "slot": "trigger", "parent": "root" },
+      "content": { "slot": "content", "parent": "root" },
+      "arrow": { "slot": "arrow", "parent": "content" }
+    }
+  },
+  "platform": {
+    "popover": true,
+    "anchorPositioning": true
+  },
+  "usage": {
+    "whenToUse": [
+      "Brief text hints on hover",
+      "Icon button labels",
+      "Abbreviated content expansion"
+    ],
+    "whenNotToUse": [
+      "Rich content (use Popover)",
+      "Interactive content (use Popover)",
+      "Mobile-primary UI (tooltips need hover)"
+    ],
+    "alternatives": [
+      "Popover"
+    ],
+    "context": "app"
+  }
 }

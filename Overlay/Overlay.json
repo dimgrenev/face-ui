@@ -123,5 +123,64 @@
         "side": "right"
       }
     }
-  ]
+  ],
+  "behavior": {
+    "dismissOnEscape": true,
+    "dismissOnClickOutside": true,
+    "autoFocusOnOpen": "none"
+  },
+  "keyboard": {
+    "Escape": {
+      "action": "close"
+    }
+  },
+  "aria": {
+    "role": "tooltip"
+  },
+  "composition": {
+    "required": [
+      "root",
+      "trigger",
+      "content"
+    ],
+    "recommended": [
+      "arrow"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "trigger": {
+        "slot": "trigger",
+        "parent": "root"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "root"
+      },
+      "arrow": {
+        "slot": "arrow",
+        "parent": "content"
+      }
+    }
+  },
+  "platform": {
+    "popover": true,
+    "anchorPositioning": true
+  },
+  "usage": {
+    "whenToUse": [
+      "Background dimming for modals",
+      "Click-outside dismiss layer"
+    ],
+    "whenNotToUse": [
+      "Content display (use Modal or Drawer)",
+      "Tooltip (use Tooltip)"
+    ],
+    "alternatives": [
+      "Modal",
+      "Drawer"
+    ],
+    "context": "app"
+  }
 }

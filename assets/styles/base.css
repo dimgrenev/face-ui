@@ -334,3 +334,21 @@ label[data-scope] {
 [data-scope="scroll"][data-type="hover"]:hover [data-part="viewport"] {
   scrollbar-width: thin;
 }
+
+/* Chromium / Electron: full scrollbar control via ::-webkit-scrollbar */
+[data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar {
+  width: 4px;
+}
+[data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar-thumb {
+  background: var(--black-20);
+  border-radius: 2px;
+}
+[data-scope="scroll"][data-type="hover"] [data-part="viewport"]::-webkit-scrollbar {
+  width: 0;
+}
+[data-scope="scroll"][data-type="hover"]:hover [data-part="viewport"]::-webkit-scrollbar {
+  width: 4px;
+}

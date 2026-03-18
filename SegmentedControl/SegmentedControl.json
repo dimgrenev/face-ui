@@ -36,5 +36,68 @@
       }
     }
   ],
-  "description": "SegmentedControl component"
+  "description": "Horizontal toggle group for switching between 2–4 mutually exclusive views or filters",
+  "behavior": {
+    "rovingFocus": true
+  },
+  "keyboard": {
+    "ArrowRight": {
+      "action": "focusNext"
+    },
+    "ArrowLeft": {
+      "action": "focusPrevious"
+    },
+    "Enter": {
+      "action": "select"
+    },
+    "Space": {
+      "action": "select"
+    }
+  },
+  "aria": {
+    "role": "radiogroup",
+    "required": [
+      "aria-label"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "item",
+      "indicator"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "root",
+        "multiple": true
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "root"
+      }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Toggle between 2-4 views",
+      "View mode switching",
+      "Filter presets"
+    ],
+    "whenNotToUse": [
+      "Many options (use Tabs or Select)",
+      "Form value selection (use Radio)",
+      "Binary on/off (use Switcher)"
+    ],
+    "alternatives": [
+      "Tabs",
+      "Radio",
+      "Switcher"
+    ],
+    "context": "both"
+  }
 }

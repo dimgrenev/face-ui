@@ -40,6 +40,17 @@
         "Bar"
       ]
     },
+    "Tile": {
+      "category": "primitive",
+      "status": "beta",
+      "a11yReviewed": false,
+      "mobileReviewed": false,
+      "related": [
+        "Button",
+        "Icon",
+        "Bar"
+      ]
+    },
     "Text": {
       "category": "primitive",
       "status": "stable",

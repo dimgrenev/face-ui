@@ -51,7 +51,8 @@
     "dist/esm",
     "dist/cjs",
     "dist/types",
-    "README.md"
+    "README.md",
+    "docs.md"
   ],
   "publishConfig": {
     "access": "public"

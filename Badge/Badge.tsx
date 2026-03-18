@@ -8,6 +8,7 @@
 import { forwardRef, type ReactNode, type HTMLAttributes } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
+import { Text } from '../Text/Text'
 
 export const badgeAnatomy = createAnatomy('badge').parts('root')
 
@@ -35,8 +36,11 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
     const appearance = variantProp === 'outline' ? 'outline' : appearanceProp
     const variant = variantProp === 'outline' ? 'default' : variantProp
     return (
-      <span
+      <Text
         ref={ref}
+        as="span"
+        inset="none"
+        membrane={false}
         {...badgeAnatomy.getPartAttrs('root')}
         data-variant={variant}
         data-appearance={appearance}
@@ -44,7 +48,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
         {...rest}
       >
         {children ?? text}
-      </span>
+      </Text>
     )
   },
 )
