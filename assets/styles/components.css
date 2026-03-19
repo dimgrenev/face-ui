@@ -400,6 +400,12 @@
 [data-scope="tile"][data-stretch-text] [data-part="text"] {
   flex: 1;
 }
+/* Make uf-text__content transparent so custom children become direct flex items
+   of the inline-flex [data-part="text"] container — prevents block-level children
+   (e.g. display:flex spans) from stacking vertically. */
+[data-scope="tile"] .uf-text__content {
+  display: contents;
+}
 .uf-tile__rightText {
   margin-left: auto;
   flex-shrink: 0;
