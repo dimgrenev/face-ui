@@ -29,11 +29,24 @@ export const codeAnatomy = createAnatomy('code').parts(
 // Types
 // ---------------------------------------------------------------------------
 
+/** A single token within a highlighted line. */
+export interface CodeToken {
+  content: string
+  /** CSS color value (e.g. "#e06c75"). Omit for default text color. */
+  color?: string
+}
+
 export interface CodeProps {
   /** Source code string. */
   code: string
   /** Language hint (used as a data attribute for syntax highlighter integration). */
   language?: string
+  /**
+   * Pre-tokenized lines from a syntax highlighter (e.g. Shiki).
+   * When provided, renders colored tokens instead of plain text.
+   * Each entry is an array of tokens for that line.
+   */
+  tokenizedLines?: CodeToken[][]
   /** Title shown in the header bar. */
   title?: string
   /** Whether to display line numbers. */
@@ -62,6 +75,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
     const {
       code,
       language,
+      tokenizedLines: tokenLines,
       title,
       showLineNumbers = false,
       highlight = [],
@@ -84,7 +98,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
     )
 
     const hasTitle = title != null
-    const hasHeader = true
+    const hasHeader = hasTitle || canToggle
 
     const onCopy = useCallback(async () => {
       const text = String(code ?? '')
@@ -168,18 +182,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
                   onClick={onToggle}
                 />
               )}
-              {!canToggle && (
-                <Button
-                  icon={<Icon name="up" size={16} />}
-                  iconOnly
-                  fullWidth={false}
-                  variant="default"
-                  className="uf-code-action"
-                  aria-label="Collapse unavailable"
-                  title="Not enough content to collapse"
-                  disabled
-                />
-              )}
+              {/* Copy button is always available via header; no disabled button for collapse */}
             </div>
           </div>
         )}
@@ -195,6 +198,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
             {lines.map((line, index) => {
               const lineNum = index + 1
               const isHighlighted = highlightSet.has(lineNum)
+              const tokens = tokenLines?.[index]
 
               return (
                 <span
@@ -211,7 +215,17 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
                       {lineNum}
                     </span>
                   )}
-                  {line}
+                  {tokens
+                    ? tokens.map((tok, ti) =>
+                        tok.color ? (
+                          <span key={ti} style={{ color: tok.color }}>
+                            {tok.content}
+                          </span>
+                        ) : (
+                          <span key={ti}>{tok.content}</span>
+                        ),
+                      )
+                    : line}
                   {'\n'}
                 </span>
               )

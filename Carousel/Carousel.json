@@ -6,7 +6,11 @@
       "type": "array",
       "required": false,
       "description": "Slide elements. Each child becomes one slide.",
-      "default": ["Slide 1", "Slide 2", "Slide 3"]
+      "default": [
+        "Slide 1",
+        "Slide 2",
+        "Slide 3"
+      ]
     },
     "loop": {
       "type": "boolean",
@@ -30,7 +34,10 @@
       "type": "enum",
       "required": false,
       "description": "Slide orientation.",
-      "options": ["horizontal", "vertical"],
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
       "default": "horizontal"
     },
     "slidesPerView": {
@@ -42,8 +49,7 @@
     "index": {
       "type": "number",
       "required": false,
-      "description": "Controlled current slide index.",
-      "default": 0
+      "description": "Controlled current slide index."
     },
     "defaultIndex": {
       "type": "number",
@@ -69,15 +75,22 @@
     },
     {
       "name": "Loop",
-      "props": { "loop": true }
+      "props": {
+        "loop": true
+      }
     },
     {
       "name": "Auto Play",
-      "props": { "autoPlay": true, "autoPlayInterval": 3000 }
+      "props": {
+        "autoPlay": true,
+        "autoPlayInterval": 3000
+      }
     },
     {
       "name": "Vertical",
-      "props": { "orientation": "vertical" }
+      "props": {
+        "orientation": "vertical"
+      }
     }
   ],
   "behavior": {
@@ -85,27 +98,72 @@
     "autoFocusOnOpen": "none"
   },
   "keyboard": {
-    "ArrowRight": { "action": "nextSlide", "condition": "horizontal" },
-    "ArrowLeft": { "action": "previousSlide", "condition": "horizontal" },
-    "ArrowDown": { "action": "nextSlide", "condition": "vertical" },
-    "ArrowUp": { "action": "previousSlide", "condition": "vertical" },
-    "Home": { "action": "firstSlide" },
-    "End": { "action": "lastSlide" }
+    "ArrowRight": {
+      "action": "nextSlide",
+      "condition": "horizontal"
+    },
+    "ArrowLeft": {
+      "action": "previousSlide",
+      "condition": "horizontal"
+    },
+    "ArrowDown": {
+      "action": "nextSlide",
+      "condition": "vertical"
+    },
+    "ArrowUp": {
+      "action": "previousSlide",
+      "condition": "vertical"
+    },
+    "Home": {
+      "action": "firstSlide"
+    },
+    "End": {
+      "action": "lastSlide"
+    }
   },
   "aria": {
     "role": "region",
-    "required": ["aria-roledescription", "aria-label"]
+    "required": [
+      "aria-roledescription",
+      "aria-label"
+    ]
   },
   "composition": {
-    "required": ["root", "viewport", "slide"],
-    "recommended": ["prevButton", "nextButton", "indicators"],
+    "required": [
+      "root",
+      "viewport",
+      "slide"
+    ],
+    "recommended": [
+      "prevButton",
+      "nextButton",
+      "indicators"
+    ],
     "parts": {
-      "root": { "slot": "root" },
-      "viewport": { "slot": "viewport", "parent": "root" },
-      "slide": { "slot": "slide", "parent": "viewport", "multiple": true },
-      "prevButton": { "slot": "prevButton", "parent": "root" },
-      "nextButton": { "slot": "nextButton", "parent": "root" },
-      "indicators": { "slot": "indicators", "parent": "root" }
+      "root": {
+        "slot": "root"
+      },
+      "viewport": {
+        "slot": "viewport",
+        "parent": "root"
+      },
+      "slide": {
+        "slot": "slide",
+        "parent": "viewport",
+        "multiple": true
+      },
+      "prevButton": {
+        "slot": "prevButton",
+        "parent": "root"
+      },
+      "nextButton": {
+        "slot": "nextButton",
+        "parent": "root"
+      },
+      "indicators": {
+        "slot": "indicators",
+        "parent": "root"
+      }
     }
   },
   "platform": {},
@@ -119,7 +177,10 @@
       "Single image (use Media)",
       "Content tabs (use Tabs)"
     ],
-    "alternatives": ["Tabs", "Media"],
+    "alternatives": [
+      "Tabs",
+      "Media"
+    ],
     "context": "both"
   }
 }

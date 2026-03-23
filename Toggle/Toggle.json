@@ -24,8 +24,7 @@
     "value": {
       "type": "array",
       "required": false,
-      "description": "Currently selected values.",
-      "default": []
+      "description": "Currently selected values."
     },
     "defaultValue": {
       "type": "array",

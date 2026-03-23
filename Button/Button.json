@@ -105,17 +105,6 @@
       "required": false,
       "description": "Callback when copy succeeds."
     },
-    "type": {
-      "type": "enum",
-      "options": [
-        "button",
-        "submit",
-        "reset"
-      ],
-      "default": "button",
-      "required": false,
-      "description": "HTML button type attribute. Defaults to 'button' to prevent accidental form submissions."
-    },
     "children": {
       "type": "string",
       "required": false,

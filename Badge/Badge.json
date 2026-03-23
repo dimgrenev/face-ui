@@ -17,7 +17,8 @@
         "primary",
         "secondary",
         "accent",
-        "destructive"
+        "destructive",
+        "outline"
       ],
       "default": "default"
     },

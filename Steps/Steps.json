@@ -24,8 +24,7 @@
     "step": {
       "type": "number",
       "required": false,
-      "description": "Current step index (0-based).",
-      "default": 0
+      "description": "Current step index (0-based)."
     },
     "defaultStep": {
       "type": "number",

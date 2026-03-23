@@ -5,8 +5,7 @@
     "value": {
       "type": "number",
       "required": false,
-      "description": "Current rating value.",
-      "default": 0
+      "description": "Current rating value."
     },
     "defaultValue": {
       "type": "number",

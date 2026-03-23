@@ -5,8 +5,7 @@
     "value": {
       "type": "object",
       "required": false,
-      "description": "Selected date.",
-      "default": null
+      "description": "Selected date."
     },
     "defaultValue": {
       "type": "object",

@@ -27,8 +27,7 @@
     "value": {
       "type": "string",
       "required": false,
-      "description": "Currently selected tab value.",
-      "default": null
+      "description": "Currently selected tab value."
     },
     "defaultValue": {
       "type": "string",
@@ -119,35 +118,95 @@
     "autoFocusOnOpen": "none"
   },
   "keyboard": {
-    "ArrowRight": { "action": "focusNext", "condition": "horizontal" },
-    "ArrowLeft": { "action": "focusPrevious", "condition": "horizontal" },
-    "ArrowDown": { "action": "focusNext", "condition": "vertical" },
-    "ArrowUp": { "action": "focusPrevious", "condition": "vertical" },
-    "Home": { "action": "focusFirst" },
-    "End": { "action": "focusLast" },
-    "Enter": { "action": "activate", "condition": "manual" },
-    "Space": { "action": "activate", "condition": "manual" }
+    "ArrowRight": {
+      "action": "focusNext",
+      "condition": "horizontal"
+    },
+    "ArrowLeft": {
+      "action": "focusPrevious",
+      "condition": "horizontal"
+    },
+    "ArrowDown": {
+      "action": "focusNext",
+      "condition": "vertical"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious",
+      "condition": "vertical"
+    },
+    "Home": {
+      "action": "focusFirst"
+    },
+    "End": {
+      "action": "focusLast"
+    },
+    "Enter": {
+      "action": "activate",
+      "condition": "manual"
+    },
+    "Space": {
+      "action": "activate",
+      "condition": "manual"
+    }
   },
   "aria": {
     "role": "tablist",
-    "required": ["aria-label", "aria-orientation"]
+    "required": [
+      "aria-label",
+      "aria-orientation"
+    ]
   },
   "composition": {
-    "required": ["root", "list", "trigger", "content"],
-    "recommended": ["indicator"],
+    "required": [
+      "root",
+      "list",
+      "trigger",
+      "content"
+    ],
+    "recommended": [
+      "indicator"
+    ],
     "parts": {
-      "root": { "slot": "root" },
-      "list": { "slot": "list", "parent": "root" },
-      "trigger": { "slot": "trigger", "parent": "list", "multiple": true },
-      "content": { "slot": "content", "parent": "root", "multiple": true },
-      "indicator": { "slot": "indicator", "parent": "list" }
+      "root": {
+        "slot": "root"
+      },
+      "list": {
+        "slot": "list",
+        "parent": "root"
+      },
+      "trigger": {
+        "slot": "trigger",
+        "parent": "list",
+        "multiple": true
+      },
+      "content": {
+        "slot": "content",
+        "parent": "root",
+        "multiple": true
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "list"
+      }
     }
   },
   "platform": {},
   "usage": {
-    "whenToUse": ["Switching between content panels in same view", "Organizing settings into categories", "Tabbed navigation within a section"],
-    "whenNotToUse": ["Single toggle between two states (use SegmentedControl)", "Selecting a value for a form (use Select or Radio)", "Top-level page navigation (use Navigation)"],
-    "alternatives": ["SegmentedControl", "Accordion", "Navigation"],
+    "whenToUse": [
+      "Switching between content panels in same view",
+      "Organizing settings into categories",
+      "Tabbed navigation within a section"
+    ],
+    "whenNotToUse": [
+      "Single toggle between two states (use SegmentedControl)",
+      "Selecting a value for a form (use Select or Radio)",
+      "Top-level page navigation (use Navigation)"
+    ],
+    "alternatives": [
+      "SegmentedControl",
+      "Accordion",
+      "Navigation"
+    ],
     "context": "both"
   }
 }

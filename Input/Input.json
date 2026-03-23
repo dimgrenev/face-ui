@@ -5,8 +5,7 @@
     "value": {
       "type": "string",
       "required": false,
-      "description": "Current input value.",
-      "default": null
+      "description": "Current input value."
     },
     "defaultValue": {
       "type": "string",
@@ -155,6 +154,11 @@
       "type": "function",
       "required": false,
       "description": "Native onFocus handler."
+    },
+    "onKeyDown": {
+      "type": "any",
+      "required": false,
+      "description": "Native onKeyDown handler."
     },
     "membrane": {
       "type": "boolean",

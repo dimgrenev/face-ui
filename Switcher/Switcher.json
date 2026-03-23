@@ -5,8 +5,7 @@
     "checked": {
       "type": "boolean",
       "required": false,
-      "description": "Checked state (controlled).",
-      "default": false
+      "description": "Checked state (controlled)."
     },
     "defaultChecked": {
       "type": "boolean",

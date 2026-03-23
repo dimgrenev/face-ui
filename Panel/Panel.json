@@ -34,8 +34,7 @@
     "collapsed": {
       "type": "boolean",
       "required": false,
-      "description": "Whether the panel is collapsed.",
-      "default": false
+      "description": "Whether the panel is collapsed."
     },
     "defaultCollapsed": {
       "type": "boolean",
@@ -51,8 +50,7 @@
     "selectedId": {
       "type": "string",
       "required": false,
-      "description": "Currently selected item ID.",
-      "default": null
+      "description": "Currently selected item ID."
     },
     "defaultSelectedId": {
       "type": "string",

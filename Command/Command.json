@@ -50,8 +50,7 @@
     "value": {
       "type": "string",
       "required": false,
-      "description": "Search input value (controlled).",
-      "default": ""
+      "description": "Search input value (controlled)."
     },
     "defaultValue": {
       "type": "string",
@@ -139,27 +138,70 @@
     "autoFocusOnOpen": "first-focusable"
   },
   "keyboard": {
-    "ArrowDown": { "action": "focusNext", "scope": "list" },
-    "ArrowUp": { "action": "focusPrevious", "scope": "list" },
-    "Enter": { "action": "select" },
-    "Escape": { "action": "close" },
-    "Home": { "action": "focusFirst", "scope": "list" },
-    "End": { "action": "focusLast", "scope": "list" }
+    "ArrowDown": {
+      "action": "focusNext",
+      "scope": "list"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious",
+      "scope": "list"
+    },
+    "Enter": {
+      "action": "select"
+    },
+    "Escape": {
+      "action": "close"
+    },
+    "Home": {
+      "action": "focusFirst",
+      "scope": "list"
+    },
+    "End": {
+      "action": "focusLast",
+      "scope": "list"
+    }
   },
   "aria": {
     "role": "combobox",
     "labelledBy": "command-label"
   },
   "composition": {
-    "required": ["root", "input", "list"],
-    "recommended": ["item", "group", "empty"],
+    "required": [
+      "root",
+      "input",
+      "list"
+    ],
+    "recommended": [
+      "item",
+      "group",
+      "empty"
+    ],
     "parts": {
-      "root": { "slot": "root" },
-      "input": { "slot": "input", "parent": "root" },
-      "list": { "slot": "list", "parent": "root" },
-      "item": { "slot": "item", "parent": "list", "multiple": true },
-      "group": { "slot": "group", "parent": "list", "multiple": true },
-      "empty": { "slot": "empty", "parent": "root" }
+      "root": {
+        "slot": "root"
+      },
+      "input": {
+        "slot": "input",
+        "parent": "root"
+      },
+      "list": {
+        "slot": "list",
+        "parent": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "list",
+        "multiple": true
+      },
+      "group": {
+        "slot": "group",
+        "parent": "list",
+        "multiple": true
+      },
+      "empty": {
+        "slot": "empty",
+        "parent": "root"
+      }
     }
   },
   "platform": {
@@ -167,9 +209,21 @@
     "popover": true
   },
   "usage": {
-    "whenToUse": ["Quick action search with keyboard", "Command palette (Cmd+K)", "Searchable action list"],
-    "whenNotToUse": ["Simple value selection (use Select)", "Contextual actions on element (use Menu)", "Navigation between pages (use Navigation)"],
-    "alternatives": ["Select", "Menu", "Navigation"],
+    "whenToUse": [
+      "Quick action search with keyboard",
+      "Command palette (Cmd+K)",
+      "Searchable action list"
+    ],
+    "whenNotToUse": [
+      "Simple value selection (use Select)",
+      "Contextual actions on element (use Menu)",
+      "Navigation between pages (use Navigation)"
+    ],
+    "alternatives": [
+      "Select",
+      "Menu",
+      "Navigation"
+    ],
     "context": "app"
   }
 }

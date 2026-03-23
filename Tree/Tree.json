@@ -15,22 +15,36 @@
               "id": "components",
               "label": "components",
               "children": [
-                { "id": "button", "label": "Button.tsx" },
-                { "id": "input", "label": "Input.tsx" }
+                {
+                  "id": "button",
+                  "label": "Button.tsx"
+                },
+                {
+                  "id": "input",
+                  "label": "Input.tsx"
+                }
               ]
             },
-            { "id": "index", "label": "index.ts" }
+            {
+              "id": "index",
+              "label": "index.ts"
+            }
           ]
         },
-        { "id": "package", "label": "package.json" },
-        { "id": "readme", "label": "README.md" }
+        {
+          "id": "package",
+          "label": "package.json"
+        },
+        {
+          "id": "readme",
+          "label": "README.md"
+        }
       ]
     },
     "expandedIds": {
       "type": "array",
       "required": false,
-      "description": "Currently expanded node IDs.",
-      "default": ["src", "components"]
+      "description": "Currently expanded node IDs."
     },
     "defaultExpandedIds": {
       "type": "array",
@@ -40,8 +54,7 @@
     "selectedId": {
       "type": "string",
       "required": false,
-      "description": "Currently selected node ID.",
-      "default": null
+      "description": "Currently selected node ID."
     },
     "defaultSelectedId": {
       "type": "string",
@@ -82,29 +95,72 @@
     "autoFocusOnOpen": "none"
   },
   "keyboard": {
-    "ArrowDown": { "action": "focusNextVisible" },
-    "ArrowUp": { "action": "focusPreviousVisible" },
-    "ArrowRight": { "action": "expandOrFocusChild" },
-    "ArrowLeft": { "action": "collapseOrFocusParent" },
-    "Home": { "action": "focusFirst" },
-    "End": { "action": "focusLast" },
-    "Enter": { "action": "select" },
-    "Space": { "action": "select" },
-    "*": { "action": "expandAllSiblings" }
+    "ArrowDown": {
+      "action": "focusNextVisible"
+    },
+    "ArrowUp": {
+      "action": "focusPreviousVisible"
+    },
+    "ArrowRight": {
+      "action": "expandOrFocusChild"
+    },
+    "ArrowLeft": {
+      "action": "collapseOrFocusParent"
+    },
+    "Home": {
+      "action": "focusFirst"
+    },
+    "End": {
+      "action": "focusLast"
+    },
+    "Enter": {
+      "action": "select"
+    },
+    "Space": {
+      "action": "select"
+    },
+    "*": {
+      "action": "expandAllSiblings"
+    }
   },
   "aria": {
     "role": "tree",
-    "required": ["aria-label"]
+    "required": [
+      "aria-label"
+    ]
   },
   "composition": {
-    "required": ["root", "branch", "item"],
-    "recommended": ["itemIndicator", "itemText"],
+    "required": [
+      "root",
+      "branch",
+      "item"
+    ],
+    "recommended": [
+      "itemIndicator",
+      "itemText"
+    ],
     "parts": {
-      "root": { "slot": "root" },
-      "branch": { "slot": "branch", "parent": "root", "multiple": true },
-      "item": { "slot": "item", "parent": "branch", "multiple": true },
-      "itemIndicator": { "slot": "itemIndicator", "parent": "item" },
-      "itemText": { "slot": "itemText", "parent": "item" }
+      "root": {
+        "slot": "root"
+      },
+      "branch": {
+        "slot": "branch",
+        "parent": "root",
+        "multiple": true
+      },
+      "item": {
+        "slot": "item",
+        "parent": "branch",
+        "multiple": true
+      },
+      "itemIndicator": {
+        "slot": "itemIndicator",
+        "parent": "item"
+      },
+      "itemText": {
+        "slot": "itemText",
+        "parent": "item"
+      }
     }
   },
   "platform": {},

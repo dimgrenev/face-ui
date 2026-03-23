@@ -50,8 +50,7 @@
     "value": {
       "type": "any",
       "required": false,
-      "description": "Controlled value (iso/date/range)",
-      "default": null
+      "description": "Controlled value (iso/date/range)"
     },
     "defaultValue": {
       "type": "any",

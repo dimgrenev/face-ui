@@ -28,8 +28,7 @@
     "activeId": {
       "type": "string",
       "required": false,
-      "description": "Currently active item ID.",
-      "default": null
+      "description": "Currently active item ID."
     },
     "defaultActiveId": {
       "type": "string",

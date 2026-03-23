@@ -8,8 +8,7 @@
       "description": "Checked state (boolean or 'indeterminate').",
       "options": [
         "indeterminate"
-      ],
-      "default": false
+      ]
     },
     "defaultChecked": {
       "type": "enum",

@@ -47,6 +47,21 @@
       "required": false,
       "description": "Callback when files are rejected."
     },
+    "size": {
+      "type": "number",
+      "required": true,
+      "description": "size prop"
+    },
+    "type": {
+      "type": "string",
+      "required": true,
+      "description": "type prop"
+    },
+    "reason": {
+      "type": "string",
+      "required": true,
+      "description": "reason prop"
+    },
     "className": {
       "type": "string",
       "required": false,

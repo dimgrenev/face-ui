@@ -2,51 +2,17 @@
   "name": "Drawer",
   "description": "Side-anchored overlay panel for persistent workflows",
   "props": {
-    "open": {
-      "type": "boolean",
-      "required": false,
-      "description": "Controlled open state."
-    },
     "side": {
       "type": "enum",
       "required": false,
       "description": "Side from which the drawer slides in.",
-      "options": ["left", "right", "top", "bottom"],
+      "options": [
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
       "default": "right"
-    },
-    "title": {
-      "type": "string",
-      "required": false,
-      "description": "Title content rendered in the drawer header.",
-      "default": "Right drawer"
-    },
-    "description": {
-      "type": "string",
-      "required": false,
-      "description": "Description content rendered below the title.",
-      "default": "Persistent side workflow surface."
-    },
-    "children": {
-      "type": "string",
-      "required": false,
-      "description": "Body content.",
-      "default": "Drawer content"
-    },
-    "trigger": {
-      "type": "string",
-      "required": false,
-      "description": "Trigger element that opens the drawer.",
-      "default": "Open drawer"
-    },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "Called when the open state changes."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the content element."
     }
   },
   "states": [
@@ -85,8 +51,13 @@
     "autoFocusOnOpen": "first-focusable"
   },
   "keyboard": {
-    "Escape": { "action": "close" },
-    "Tab": { "action": "focusTrap", "scope": "drawer" }
+    "Escape": {
+      "action": "close"
+    },
+    "Tab": {
+      "action": "focusTrap",
+      "scope": "drawer"
+    }
   },
   "aria": {
     "role": "dialog",
@@ -95,15 +66,40 @@
     "describedBy": "drawer-description"
   },
   "composition": {
-    "required": ["root", "overlay", "content"],
-    "recommended": ["title", "description", "close"],
+    "required": [
+      "root",
+      "overlay",
+      "content"
+    ],
+    "recommended": [
+      "title",
+      "description",
+      "close"
+    ],
     "parts": {
-      "root": { "slot": "root" },
-      "overlay": { "slot": "overlay", "parent": "root" },
-      "content": { "slot": "content", "parent": "root" },
-      "title": { "slot": "title", "parent": "content" },
-      "description": { "slot": "description", "parent": "content" },
-      "close": { "slot": "close", "parent": "content" }
+      "root": {
+        "slot": "root"
+      },
+      "overlay": {
+        "slot": "overlay",
+        "parent": "root"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "root"
+      },
+      "title": {
+        "slot": "title",
+        "parent": "content"
+      },
+      "description": {
+        "slot": "description",
+        "parent": "content"
+      },
+      "close": {
+        "slot": "close",
+        "parent": "content"
+      }
     }
   },
   "platform": {

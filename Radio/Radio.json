@@ -24,8 +24,7 @@
     "value": {
       "type": "string",
       "required": false,
-      "description": "Currently selected value.",
-      "default": null
+      "description": "Currently selected value."
     },
     "defaultValue": {
       "type": "string",

@@ -69,13 +69,14 @@ describe('taxonomy and governance', () => {
     await act(async () => {
       root.render(
         <div>
-          <Tooltip content="Tooltip content">Hover me</Tooltip>
-          <Popover content="Popover content">Open me</Popover>
+          <Tooltip open content="Tooltip content">Hover me</Tooltip>
+          <Popover open content="Popover content">Open me</Popover>
         </div>,
       )
     })
 
-    const contents = Array.from(container.querySelectorAll<HTMLElement>('.uf-overlay-content'))
+    // Overlay portals content to document.body, so query there instead of the render container
+    const contents = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'))
     expect(contents).toHaveLength(2)
     expect(contents[0]?.getAttribute('data-trigger')).toBe('hover')
     expect(contents[1]?.getAttribute('data-trigger')).toBe('click')

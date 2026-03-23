@@ -37,8 +37,7 @@
     "activeId": {
       "type": "string",
       "required": false,
-      "description": "Currently active section id (controlled).",
-      "default": ""
+      "description": "Currently active section id (controlled)."
     },
     "defaultActiveId": {
       "type": "string",

@@ -28,8 +28,7 @@
     "value": {
       "type": "array",
       "required": false,
-      "description": "Current selected value. String for single, string[] for multiselect.",
-      "default": null
+      "description": "Current selected value. String for single, string[] for multiselect."
     },
     "defaultValue": {
       "type": "array",
@@ -162,37 +161,95 @@
     "autoFocusOnOpen": "first-focusable"
   },
   "keyboard": {
-    "ArrowDown": { "action": "focusNext", "scope": "listbox" },
-    "ArrowUp": { "action": "focusPrevious", "scope": "listbox" },
-    "Enter": { "action": "select" },
-    "Space": { "action": "select" },
-    "Escape": { "action": "close" },
-    "Home": { "action": "focusFirst", "scope": "listbox" },
-    "End": { "action": "focusLast", "scope": "listbox" }
+    "ArrowDown": {
+      "action": "focusNext",
+      "scope": "listbox"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious",
+      "scope": "listbox"
+    },
+    "Enter": {
+      "action": "select"
+    },
+    "Space": {
+      "action": "select"
+    },
+    "Escape": {
+      "action": "close"
+    },
+    "Home": {
+      "action": "focusFirst",
+      "scope": "listbox"
+    },
+    "End": {
+      "action": "focusLast",
+      "scope": "listbox"
+    }
   },
   "aria": {
     "role": "combobox",
     "labelledBy": "select-label"
   },
   "composition": {
-    "required": ["root", "trigger", "content"],
-    "recommended": ["item", "group", "label"],
+    "required": [
+      "root",
+      "trigger",
+      "content"
+    ],
+    "recommended": [
+      "item",
+      "group",
+      "label"
+    ],
     "parts": {
-      "root": { "slot": "root" },
-      "trigger": { "slot": "trigger", "parent": "root" },
-      "content": { "slot": "content", "parent": "root" },
-      "item": { "slot": "item", "parent": "content", "multiple": true },
-      "group": { "slot": "group", "parent": "content", "multiple": true },
-      "label": { "slot": "label", "parent": "root" }
+      "root": {
+        "slot": "root"
+      },
+      "trigger": {
+        "slot": "trigger",
+        "parent": "root"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "content",
+        "multiple": true
+      },
+      "group": {
+        "slot": "group",
+        "parent": "content",
+        "multiple": true
+      },
+      "label": {
+        "slot": "label",
+        "parent": "root"
+      }
     }
   },
   "platform": {
     "popover": true
   },
   "usage": {
-    "whenToUse": ["Choosing one option from a predefined list", "Form field with enumerated values", "Multi-select for tags or categories"],
-    "whenNotToUse": ["Binary choice (use Switcher)", "2-3 visible options (use Radio or SegmentedControl)", "Free text input (use Input)"],
-    "alternatives": ["Radio", "SegmentedControl", "Switcher", "Command"],
+    "whenToUse": [
+      "Choosing one option from a predefined list",
+      "Form field with enumerated values",
+      "Multi-select for tags or categories"
+    ],
+    "whenNotToUse": [
+      "Binary choice (use Switcher)",
+      "2-3 visible options (use Radio or SegmentedControl)",
+      "Free text input (use Input)"
+    ],
+    "alternatives": [
+      "Radio",
+      "SegmentedControl",
+      "Switcher",
+      "Command"
+    ],
     "context": "both"
   }
 }
