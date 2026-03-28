@@ -1,0 +1,117 @@
+{
+  "name": "Accordion",
+  "description": "Expandable panel navigation with single or multiple open items",
+  "props": {
+    "items": {
+      "type": "array",
+      "required": false,
+      "description": "Accordion item definitions."
+    },
+    "expandedIds": {
+      "type": "array",
+      "required": false,
+      "description": "Currently expanded item IDs (controlled)."
+    },
+    "defaultExpandedIds": {
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial expanded item IDs."
+    },
+    "multiple": {
+      "type": "boolean",
+      "required": false,
+      "description": "Allow multiple items to be expanded simultaneously.",
+      "default": false
+    },
+    "collapsible": {
+      "type": "boolean",
+      "required": false,
+      "description": "Allow collapsing the last open item.",
+      "default": true
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire accordion.",
+      "default": false
+    },
+    "onExpandedChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when expanded items change."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Multiple",
+      "props": {
+        "multiple": true
+      }
+    },
+    {
+      "name": "Non-Collapsible",
+      "props": {
+        "collapsible": false
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true
+      }
+    }
+  ],
+  "behavior": {
+    "rovingFocus": true,
+    "autoFocusOnOpen": "none"
+  },
+  "keyboard": {
+    "ArrowDown": { "action": "focusNextTrigger" },
+    "ArrowUp": { "action": "focusPreviousTrigger" },
+    "Home": { "action": "focusFirstTrigger" },
+    "End": { "action": "focusLastTrigger" },
+    "Enter": { "action": "toggleItem" },
+    "Space": { "action": "toggleItem" }
+  },
+  "aria": {
+    "role": "region",
+    "required": ["aria-labelledby"]
+  },
+  "composition": {
+    "required": ["root", "item", "trigger", "content"],
+    "recommended": ["icon"],
+    "parts": {
+      "root": { "slot": "root" },
+      "item": { "slot": "item", "parent": "root", "multiple": true },
+      "trigger": { "slot": "trigger", "parent": "item" },
+      "content": { "slot": "content", "parent": "item" },
+      "icon": { "slot": "icon", "parent": "trigger" }
+    }
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Collapsible FAQ sections",
+      "Grouped settings panels",
+      "Long content that needs progressive disclosure"
+    ],
+    "whenNotToUse": [
+      "Tab-like navigation (use Tabs)",
+      "Simple show/hide toggle (use details/summary)"
+    ],
+    "alternatives": [
+      "Tabs",
+      "Card"
+    ],
+    "context": "both"
+  }
+}

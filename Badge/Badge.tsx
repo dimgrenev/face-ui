@@ -39,8 +39,8 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
       <Text
         ref={ref}
         as="span"
-        inset="none"
-        membrane={false}
+        inset="control"
+        membrane
         {...badgeAnatomy.getPartAttrs('root')}
         data-variant={variant}
         data-appearance={appearance}

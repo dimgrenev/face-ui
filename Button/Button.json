@@ -6,7 +6,7 @@
       "type": "string",
       "required": false,
       "description": "Button label text.",
-      "default": "Button"
+      "default": "Button1"
     },
     "rightText": {
       "type": "string",

@@ -44,7 +44,27 @@ export interface CalendarProps {
 // Date <-> ISO helpers
 // ---------------------------------------------------------------------------
 
-function dateToISO(d: Date): string {
+function dateToISO(d: Date | string | unknown): string {
+  // Accept Date objects, ISO strings, or anything parseable
+  if (typeof d === 'string') {
+    // Already an ISO-like string — validate and return
+    const parsed = new Date(d)
+    if (!isNaN(parsed.getTime())) {
+      const y = String(parsed.getFullYear()).padStart(4, '0')
+      const m = String(parsed.getMonth() + 1).padStart(2, '0')
+      const day = String(parsed.getDate()).padStart(2, '0')
+      return `${y}-${m}-${day}`
+    }
+    return d // return as-is if unparseable
+  }
+  if (!(d instanceof Date) || isNaN((d as Date).getTime())) {
+    // Fallback: try to create a Date from whatever we got
+    const fallback = new Date()
+    const y = String(fallback.getFullYear()).padStart(4, '0')
+    const m = String(fallback.getMonth() + 1).padStart(2, '0')
+    const day = String(fallback.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
   const y = String(d.getFullYear()).padStart(4, '0')
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')

@@ -79,6 +79,14 @@ export interface TableProps<T = any> {
   resizable?: boolean
   /** components API compatibility: included for parity, handled via CSS sticky class. */
   stickyLastColumn?: boolean
+  /** Callback when a row is clicked. */
+  onRowClick?: (row: T, index: number) => void
+  /** Callback when mouse enters a row. */
+  onRowMouseEnter?: (row: T, index: number) => void
+  /** Callback when mouse leaves a row. */
+  onRowMouseLeave?: (row: T, index: number) => void
+  /** Row ID to highlight as active (applies `data-active` attribute). */
+  activeRowId?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -168,6 +176,10 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
       onColumnResize,
       resizable = false,
       className,
+      onRowClick,
+      onRowMouseEnter,
+      onRowMouseLeave,
+      activeRowId,
     } = props
 
     const columns = (Array.isArray(rawColumns) ? rawColumns : []).map((col) => {
@@ -354,7 +366,15 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
             const isLastColumnSticky = stickyLastColumn
             const lastColumnId = columns.length > 0 ? String(columns[columns.length - 1]?.id || '') : ''
             return (
-              <tr key={rowId} {...api.getRowProps(rowId)}>
+              <tr
+                key={rowId}
+                {...api.getRowProps(rowId)}
+                data-active={activeRowId === rowId || undefined}
+                onClick={onRowClick ? () => onRowClick(row, rowIndex) : undefined}
+                onMouseEnter={onRowMouseEnter ? () => onRowMouseEnter(row, rowIndex) : undefined}
+                onMouseLeave={onRowMouseLeave ? () => onRowMouseLeave(row, rowIndex) : undefined}
+                style={onRowClick ? { cursor: 'pointer' } : undefined}
+              >
                 {selectable && (
                   <td role="cell">
                     <input {...api.getRowSelectProps(rowId)} />
