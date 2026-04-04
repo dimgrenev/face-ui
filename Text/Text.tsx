@@ -70,6 +70,8 @@ export interface TextProps extends Omit<HTMLAttributes<HTMLElement>, 'children'>
   align?: 'left' | 'center' | 'right'
   /** Membrane spacing. */
   membrane?: boolean
+  /** Truncate text with ellipsis when it overflows. */
+  truncate?: boolean
   /** Custom children (overrides text). */
   children?: ReactNode
   /** For label variant: htmlFor attribute. */
@@ -117,6 +119,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(
       fullWidth = false,
       align = 'left',
       membrane = true,
+      truncate = false,
       children,
       className,
       htmlFor,
@@ -158,6 +161,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(
         data-icon-position={hasIcon ? iconPosition : undefined}
         data-stretch-text={stretchText ? '' : undefined}
         data-full-width={fullWidth ? '' : undefined}
+        data-truncate={truncate ? '' : undefined}
         data-align={align}
         data-membrane={effectiveMembrane ? '' : undefined}
         className={textClasses}
@@ -179,7 +183,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(
     if (!effectiveMembrane) return textNode
 
     return (
-      <span className={cn('uf-membrane', fullWidth && 'uf-membrane--full')}>
+      <span className={cn('uf-membrane', fullWidth && 'uf-membrane--full', truncate && 'uf-membrane--truncate')}>
         {textNode}
       </span>
     )

@@ -456,6 +456,26 @@
   color: var(--uf-color-fg);
   margin: 0;
 }
+/* Truncate — ellipsis overflow.
+   Membrane is inline-flex and grows to intrinsic size, ignoring parent overflow.
+   --truncate switches it to a shrinkable flex item so the parent can constrain it.
+   The Text element inside clips the text with ellipsis. */
+.uf-membrane.uf-membrane--truncate {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+}
+.uf-text[data-scope][data-truncate] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.uf-text[data-scope][data-truncate] .uf-text__content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 /* Inset: none — flush, no padding */
 .uf-text[data-scope][data-inset="none"] {
   min-height: 0;
@@ -2937,6 +2957,47 @@
 .uf-table[data-scope][data-show-dividers] th {
   border-bottom: 1px solid var(--uf-color-border) !important;
 }
+/* Membrane (tile-like) row styles — mirrors .uf-tile[data-scope="tile"] */
+.uf-table[data-scope][data-membrane] {
+  border-spacing: 0;
+  border-collapse: separate;
+}
+.uf-table[data-scope][data-membrane] tbody tr {
+  height: var(--uf-control-height);
+  cursor: pointer;
+  user-select: none;
+  transition: font-weight 400ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.uf-table[data-scope][data-membrane] tbody tr:hover td {
+  background: var(--uf-color-hover-bg);
+  font-weight: var(--uf-font-weight-bold);
+}
+.uf-table[data-scope][data-membrane] tbody tr td:first-child {
+  border-radius: var(--uf-radius) 0 0 var(--uf-radius);
+  padding-left: 3px;
+}
+.uf-table[data-scope][data-membrane] tbody tr td:last-child {
+  border-radius: 0 var(--uf-radius) var(--uf-radius) 0;
+  padding-right: 3px;
+}
+.uf-table[data-scope][data-membrane] tbody tr[data-active] td {
+  background: var(--uf-color-hover-bg);
+  font-weight: var(--uf-font-weight-bold);
+}
+.uf-table[data-scope][data-membrane] td {
+  padding: 0 3px;
+  height: var(--uf-control-height);
+  font-size: var(--uf-control-font-size);
+  line-height: var(--uf-control-line-height);
+  vertical-align: middle;
+}
+.uf-table[data-scope][data-membrane] th {
+  padding: 0 3px;
+  height: var(--uf-control-height);
+  font-size: var(--uf-control-font-size);
+  line-height: var(--uf-control-line-height);
+  vertical-align: middle;
+}
 /* Row number header */
 .uf-table__row-number-header {
   width: 48px;
@@ -2970,6 +3031,10 @@
 .uf-table__cellSlot > * {
   min-width: 0;
   max-width: 100%;
+}
+.uf-table__cellSlot > svg {
+  flex-shrink: 0;
+  max-width: none;
 }
 .uf-table__cellSlot[data-truncate] > * {
   width: 100%;

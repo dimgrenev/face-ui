@@ -1,10 +1,10 @@
 import React from 'react';
 import styles from './Icon.module.css';
 
-export type IconName = 'align-horizontal-center' | 'align-horizontal-left' | 'align-horizontal-right' | 'align-vertical-bottom' | 'align-vertical-center' | 'align-vertical-top' | 'alphabet' | 'animation' | 'arrow-down' | 'arrow-left' | 'arrow-right' | 'arrow-up' | 'cart' | 'check' | 'check-off' | 'check-on' | 'clean' | 'close' | 'cloud-done' | 'component' | 'cookie' | 'copy' | 'crop' | 'date' | 'delete' | 'down' | 'download' | 'drag' | 'edit' | 'face' | 'file' | 'folder' | 'full' | 'info' | 'left' | 'legend' | 'letter-spacing' | 'line-height' | 'link' | 'minus' | 'more' | 'notification' | 'panel' | 'panel-right' | 'pause' | 'play' | 'plus' | 'props' | 'radio-off' | 'radio-on' | 'random' | 'render' | 'restart' | 'right' | 'scroll' | 'search' | 'settings' | 'size' | 'sound' | 'stat' | 'store' | 'switch' | 'theme' | 'type' | 'up' | 'user' | 'userface';
+export type IconName = 'align-horizontal-center' | 'align-horizontal-left' | 'align-horizontal-right' | 'align-vertical-bottom' | 'align-vertical-center' | 'align-vertical-top' | 'alphabet' | 'animation' | 'arrow-down' | 'arrow-left' | 'arrow-right' | 'arrow-up' | 'cart' | 'check' | 'check-off' | 'check-on' | 'clean' | 'close' | 'cloud-done' | 'component' | 'cookie' | 'copy' | 'crop' | 'date' | 'delete' | 'dev-tools' | 'down' | 'download' | 'drag' | 'ds' | 'edit' | 'face' | 'file' | 'folder' | 'folder-go' | 'full' | 'info' | 'left' | 'legend' | 'letter-spacing' | 'line-height' | 'link' | 'minus' | 'more' | 'notification' | 'panel' | 'panel-right' | 'pause' | 'play' | 'plus' | 'project' | 'props' | 'radio-off' | 'radio-on' | 'random' | 'render' | 'restart' | 'right' | 'scroll' | 'search' | 'settings' | 'size' | 'sound' | 'stat' | 'store' | 'switch' | 'theme' | 'type' | 'up' | 'user' | 'userface';
 
 // Runtime list of available icon names (single source of truth alongside IconName union).
-export const ICON_NAMES = ['align-horizontal-center', 'align-horizontal-left', 'align-horizontal-right', 'align-vertical-bottom', 'align-vertical-center', 'align-vertical-top', 'alphabet', 'animation', 'arrow-down', 'arrow-left', 'arrow-right', 'arrow-up', 'cart', 'check', 'check-off', 'check-on', 'clean', 'close', 'cloud-done', 'component', 'cookie', 'copy', 'crop', 'date', 'delete', 'down', 'download', 'drag', 'edit', 'face', 'file', 'folder', 'full', 'info', 'left', 'legend', 'letter-spacing', 'line-height', 'link', 'minus', 'more', 'notification', 'panel', 'panel-right', 'pause', 'play', 'plus', 'props', 'radio-off', 'radio-on', 'random', 'render', 'restart', 'right', 'scroll', 'search', 'settings', 'size', 'sound', 'stat', 'store', 'switch', 'theme', 'type', 'up', 'user', 'userface'] as const;
+export const ICON_NAMES = ['align-horizontal-center', 'align-horizontal-left', 'align-horizontal-right', 'align-vertical-bottom', 'align-vertical-center', 'align-vertical-top', 'alphabet', 'animation', 'arrow-down', 'arrow-left', 'arrow-right', 'arrow-up', 'cart', 'check', 'check-off', 'check-on', 'clean', 'close', 'cloud-done', 'component', 'cookie', 'copy', 'crop', 'date', 'delete', 'dev-tools', 'down', 'download', 'drag', 'ds', 'edit', 'face', 'file', 'folder', 'folder-go', 'full', 'info', 'left', 'legend', 'letter-spacing', 'line-height', 'link', 'minus', 'more', 'notification', 'panel', 'panel-right', 'pause', 'play', 'plus', 'project', 'props', 'radio-off', 'radio-on', 'random', 'render', 'restart', 'right', 'scroll', 'search', 'settings', 'size', 'sound', 'stat', 'store', 'switch', 'theme', 'type', 'up', 'user', 'userface'] as const;
 
 export interface IconProps {
   name: IconName;
@@ -125,6 +125,13 @@ const icons: Record<IconName, React.ReactNode> = {
   'delete': (
     <path d="M3 6.5H17M14.5 9V11L13.5 16.5H10H6.5L5.5 11V9M10 9V15M11.5 3.5V4.5H8.5V3.5H11.5Z" stroke="currentColor"/>
   ),
+  'dev-tools': (
+    <>
+      <path d="M3.50067 5.49993L3.50007 14.4999C3.50003 15.0522 3.94776 15.5 4.50007 15.5H15.4993C16.0516 15.5 16.4993 15.0523 16.4993 14.5001L16.4999 5.50007C16.5 4.94776 16.0522 4.5 15.4999 4.5H4.50067C3.94842 4.5 3.50071 4.94767 3.50067 5.49993Z" stroke="currentColor"/>
+      <path d="M10 12.5H13" stroke="currentColor"/>
+      <path d="M7 12L9.5 9.5L7 7" stroke="currentColor"/>
+    </>
+  ),
   'down': (
     <path d="M5 8L10 13L15 8" stroke="currentColor"/>
   ),
@@ -142,6 +149,14 @@ const icons: Record<IconName, React.ReactNode> = {
       <circle cx="13" cy="10" r="1" fill="currentColor"/>
       <circle cx="7" cy="5" r="1" fill="currentColor"/>
       <circle cx="13" cy="5" r="1" fill="currentColor"/>
+    </>
+  ),
+  'ds': (
+    <>
+      <path d="M10 10C8.25 10 6.5 8.72727 6.5 6.5C6.5 4.27273 8.25 3 10 3C11.75 3 13.5 4.27273 13.5 6.5" stroke="currentColor"/>
+      <path d="M10 10C11.75 10 13.5 11.2727 13.5 13.5C13.5 15.7273 11.75 17 10 17C8.25 17 6.5 15.7273 6.5 13.5" stroke="currentColor"/>
+      <path d="M10 10C10 11.75 8.72727 13.5 6.5 13.5C4.27273 13.5 3 11.75 3 10C3 8.25 4.27273 6.5 6.5 6.5" stroke="currentColor"/>
+      <path d="M10 10C10 8.25 11.2727 6.5 13.5 6.5C15.7273 6.5 17 8.25 17 10C17 11.75 15.7273 13.5 13.5 13.5" stroke="currentColor"/>
     </>
   ),
   'edit': (
@@ -166,7 +181,13 @@ const icons: Record<IconName, React.ReactNode> = {
     </>
   ),
   'folder': (
-    <path d="M16.5 6.5H10.5L9 4.5H3.5V15.5H9.2H16.5L16.5 6.5Z" stroke="currentColor"/>
+    <path d="M15.5 6.5H10.5L9 4.5H4.5V15.5H9.2H15.5L15.5 6.5Z" stroke="currentColor"/>
+  ),
+  'folder-go': (
+    <>
+      <path d="M4.5 9V4.5H9L10.5 6.5H15.5L15.5 15.5H9.2H4.5V13" stroke="currentColor"/>
+      <path d="M10 11L6.92308 8M10 11L6.92308 14M10 11L2 11" stroke="currentColor"/>
+    </>
   ),
   'full': (
     <path d="M13.5 6.5L6.5 13.5M9 3.75L16.25 3.75V11M11 16.25L3.75 16.25V9" stroke="currentColor"/>
@@ -240,6 +261,12 @@ const icons: Record<IconName, React.ReactNode> = {
   ),
   'plus': (
     <path d="M10 3V9M10 17V11M3 10H9M17 10H11" stroke="currentColor"/>
+  ),
+  'project': (
+    <>
+      <path d="M10.0009 1.51472L10.0009 8.93934M11.0616 10H18.4862M1.51562 10H8.94025M10.0009 11.0607L10.0009 18.4853" stroke="currentColor"/>
+      <path d="M6 6L9.25 9.25M10.75 9.25L14 6M6 14L9.25 10.75M10.75 10.75L14 14" stroke="currentColor"/>
+    </>
   ),
   'props': (
     <>
@@ -382,13 +409,16 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'crop': "0 0 10 20",
   'date': "0 0 20 20",
   'delete': "0 0 20 20",
+  'dev-tools': "0 0 20 20",
   'down': "0 0 20 20",
   'download': "0 0 20 20",
   'drag': "0 0 20 20",
+  'ds': "0 0 20 20",
   'edit': "0 0 20 20",
   'face': "0 0 20 20",
   'file': "0 0 20 20",
   'folder': "0 0 20 20",
+  'folder-go': "0 0 20 20",
   'full': "0 0 20 20",
   'info': "0 0 20 20",
   'left': "0 0 20 20",
@@ -404,6 +434,7 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'pause': "0 0 20 20",
   'play': "0 0 20 20",
   'plus': "0 0 20 20",
+  'project': "0 0 20 20",
   'props': "0 0 20 20",
   'radio-off': "0 0 20 20",
   'radio-on': "0 0 20 20",
@@ -452,13 +483,16 @@ const ICON_NATIVE_SIZE: Partial<Record<IconName, number>> = {
   'copy': 20,
   'date': 20,
   'delete': 20,
+  'dev-tools': 20,
   'down': 20,
   'download': 20,
   'drag': 20,
+  'ds': 20,
   'edit': 20,
   'face': 20,
   'file': 20,
   'folder': 20,
+  'folder-go': 20,
   'full': 20,
   'info': 20,
   'left': 20,
@@ -474,6 +508,7 @@ const ICON_NATIVE_SIZE: Partial<Record<IconName, number>> = {
   'pause': 20,
   'play': 20,
   'plus': 20,
+  'project': 20,
   'props': 20,
   'radio-off': 20,
   'radio-on': 20,

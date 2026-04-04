@@ -87,6 +87,8 @@ export interface TableProps<T = any> {
   onRowMouseLeave?: (row: T, index: number) => void
   /** Row ID to highlight as active (applies `data-active` attribute). */
   activeRowId?: string
+  /** Enable membrane (tile-like) row styles: rounded corners, hover bg, padding. */
+  membrane?: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -180,6 +182,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
       onRowMouseEnter,
       onRowMouseLeave,
       activeRowId,
+      membrane = false,
     } = props
 
     const columns = (Array.isArray(rawColumns) ? rawColumns : []).map((col) => {
@@ -289,6 +292,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
         {...api.getRootProps()}
         data-sticky-header={stickyHeader || undefined}
         data-show-dividers={showDividers || undefined}
+        data-membrane={membrane || undefined}
         className={cn('uf-table', className)}
         style={resizable ? { tableLayout: 'fixed' } : undefined}
       >
