@@ -2,7 +2,7 @@ import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-run
 import React from 'react';
 import styles from './Icon.module.css';
 // Runtime list of available icon names (single source of truth alongside IconName union).
-export const ICON_NAMES = ['align-horizontal-center', 'align-horizontal-left', 'align-horizontal-right', 'align-vertical-bottom', 'align-vertical-center', 'align-vertical-top', 'alphabet', 'animation', 'arrow-down', 'arrow-left', 'arrow-right', 'arrow-up', 'cart', 'check', 'check-off', 'check-on', 'clean', 'close', 'cloud-done', 'component', 'cookie', 'copy', 'crop', 'date', 'delete', 'down', 'download', 'drag', 'edit', 'face', 'file', 'folder', 'full', 'info', 'left', 'legend', 'letter-spacing', 'line-height', 'link', 'minus', 'more', 'notification', 'panel', 'pause', 'play', 'plus', 'props', 'radio-off', 'radio-on', 'random', 'render', 'restart', 'right', 'scroll', 'search', 'settings', 'size', 'sound', 'stat', 'store', 'switch', 'theme', 'type', 'up', 'user', 'userface'];
+export const ICON_NAMES = ['align-horizontal-center', 'align-horizontal-left', 'align-horizontal-right', 'align-vertical-bottom', 'align-vertical-center', 'align-vertical-top', 'alphabet', 'animation', 'arrow-down', 'arrow-left', 'arrow-right', 'arrow-up', 'cart', 'check', 'check-off', 'check-on', 'clean', 'close', 'cloud-done', 'component', 'cookie', 'copy', 'crop', 'date', 'delete', 'down', 'download', 'drag', 'edit', 'face', 'file', 'folder', 'full', 'info', 'left', 'legend', 'letter-spacing', 'line-height', 'link', 'minus', 'more', 'notification', 'panel', 'panel-right', 'pause', 'play', 'plus', 'props', 'radio-off', 'radio-on', 'random', 'render', 'restart', 'right', 'scroll', 'search', 'settings', 'size', 'sound', 'stat', 'store', 'switch', 'theme', 'type', 'up', 'user', 'userface'];
 /**
  * Icon definitions - auto-generated from SVG files
  * DO NOT EDIT MANUALLY - run 'npm run generate:icons' to regenerate
@@ -51,6 +51,7 @@ const icons = {
     'more': (_jsxs(_Fragment, { children: [_jsx("path", { d: "M10.0008 8.30117C10.9397 8.30117 11.7008 9.06229 11.7008 10.0012C11.7008 10.9401 10.9397 11.7012 10.0008 11.7012C9.0619 11.7012 8.30078 10.9401 8.30078 10.0012C8.30078 9.06229 9.0619 8.30117 10.0008 8.30117Z", fill: "currentColor" }), _jsx("path", { d: "M15.5008 8.30117C16.4397 8.30117 17.2008 9.06229 17.2008 10.0012C17.2008 10.9401 16.4397 11.7012 15.5008 11.7012C14.5619 11.7012 13.8008 10.9401 13.8008 10.0012C13.8008 9.06229 14.5619 8.30117 15.5008 8.30117Z", fill: "currentColor" }), _jsx("path", { d: "M4.50078 8.30117C5.43967 8.30117 6.20078 9.06229 6.20078 10.0012C6.20078 10.9401 5.43967 11.7012 4.50078 11.7012C3.5619 11.7012 2.80078 10.9401 2.80078 10.0012C2.80078 9.06229 3.5619 8.30117 4.50078 8.30117Z", fill: "currentColor" })] })),
     'notification': (_jsxs(_Fragment, { children: [_jsx("circle", { cx: "10.0008", cy: "16.9998", r: "1.7", fill: "currentColor" }), _jsx("path", { d: "M10 4.5C6 4.5 4.5 7.5 4.5 10.5V12.25H1.5M10 4.5C14 4.5 15.5 7.5 15.5 10.5V12.25H18.5M10 4.5V1M13 12.25H10H7", stroke: "currentColor", strokeMiterlimit: "10" })] })),
     'panel': (_jsxs(_Fragment, { children: [_jsx("path", { d: "M8.50074 4.5H15.4999C16.0522 4.5 16.5 4.94776 16.4999 5.50007L16.4993 14.5001C16.4993 15.0523 16.0516 15.5 15.4993 15.5H8.5M8.00074 4.5H4.50067C3.94842 4.5 3.50071 4.94767 3.50067 5.49993L3.50007 14.4999C3.50003 15.0522 3.94776 15.5 4.50007 15.5H8", stroke: "currentColor" }), _jsx("path", { d: "M8.5 4L8.5 16", stroke: "currentColor" })] })),
+    'panel-right': (_jsxs(_Fragment, { children: [_jsx("path", { d: "M3.50067 5.49993L3.50007 14.4999C3.50003 15.0522 3.94776 15.5 4.50007 15.5H15.4993C16.0515 15.5 16.4992 15.0523 16.4993 14.5001L16.4999 5.50007C16.5 4.94776 16.0522 4.5 15.4999 4.5H4.50067C3.94842 4.5 3.50071 4.94767 3.50067 5.49993Z", stroke: "currentColor" }), _jsx("path", { d: "M11.5 4L11.5 16", stroke: "currentColor" })] })),
     'pause': (_jsxs(_Fragment, { children: [_jsx("path", { d: "M7 5L7 15", stroke: "currentColor" }), _jsx("path", { d: "M13 5V15", stroke: "currentColor" })] })),
     'play': (_jsx("path", { d: "M14 10L8 6V14L14 10Z", stroke: "currentColor" })),
     'plus': (_jsx("path", { d: "M10 3V9M10 17V11M3 10H9M17 10H11", stroke: "currentColor" })),
@@ -120,6 +121,7 @@ const ICON_VIEWBOX = {
     'more': "0 0 20 20",
     'notification': "0 0 20 20",
     'panel': "0 0 20 20",
+    'panel-right': "0 0 20 20",
     'pause': "0 0 20 20",
     'play': "0 0 20 20",
     'plus': "0 0 20 20",
@@ -188,6 +190,7 @@ const ICON_NATIVE_SIZE = {
     'more': 20,
     'notification': 20,
     'panel': 20,
+    'panel-right': 20,
     'pause': 20,
     'play': 20,
     'plus': 20,
