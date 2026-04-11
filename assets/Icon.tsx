@@ -1,10 +1,10 @@
 import React from 'react';
 import styles from './Icon.module.css';
 
-export type IconName = 'align-horizontal-center' | 'align-horizontal-left' | 'align-horizontal-right' | 'align-vertical-bottom' | 'align-vertical-center' | 'align-vertical-top' | 'alphabet' | 'animation' | 'arrow-down' | 'arrow-left' | 'arrow-right' | 'arrow-up' | 'cart' | 'check' | 'check-off' | 'check-on' | 'clean' | 'close' | 'cloud-done' | 'component' | 'cookie' | 'copy' | 'crop' | 'cursor' | 'date' | 'delete' | 'design-tool' | 'dev-tools' | 'down' | 'download' | 'drag' | 'ds' | 'edit' | 'face' | 'file' | 'folder' | 'folder-go' | 'full' | 'info' | 'left' | 'legend' | 'letter-spacing' | 'line-height' | 'link' | 'minus' | 'more' | 'notification' | 'panel' | 'panel-right' | 'pause' | 'play' | 'plus' | 'project' | 'props' | 'radio-off' | 'radio-on' | 'random' | 'render' | 'restart' | 'right' | 'scroll' | 'search' | 'settings' | 'size' | 'sound' | 'stat' | 'store' | 'switch' | 'theme' | 'type' | 'up' | 'user' | 'userface';
+export type IconName = 'align-horizontal-center' | 'align-horizontal-left' | 'align-horizontal-right' | 'align-vertical-bottom' | 'align-vertical-center' | 'align-vertical-top' | 'alphabet' | 'animation' | 'arrow-down' | 'arrow-left' | 'arrow-right' | 'arrow-up' | 'cart' | 'check' | 'check-off' | 'check-on' | 'clean' | 'close' | 'cloud-done' | 'component' | 'cookie' | 'copy' | 'crop' | 'cursor' | 'date' | 'delete' | 'design-tool' | 'dev-tools' | 'down' | 'download' | 'drag' | 'ds' | 'edit' | 'face' | 'file' | 'folder' | 'folder-go' | 'full' | 'git' | 'info' | 'left' | 'legend' | 'letter-spacing' | 'line-height' | 'link' | 'minus' | 'more' | 'notification' | 'panel' | 'panel-right' | 'pause' | 'play' | 'plus' | 'project' | 'props' | 'radio-off' | 'radio-on' | 'random' | 'render' | 'restart' | 'right' | 'scroll' | 'search' | 'settings' | 'size' | 'sound' | 'stat' | 'store' | 'switch' | 'terminal' | 'theme' | 'type' | 'up' | 'user' | 'userface';
 
 // Runtime list of available icon names (single source of truth alongside IconName union).
-export const ICON_NAMES = ['align-horizontal-center', 'align-horizontal-left', 'align-horizontal-right', 'align-vertical-bottom', 'align-vertical-center', 'align-vertical-top', 'alphabet', 'animation', 'arrow-down', 'arrow-left', 'arrow-right', 'arrow-up', 'cart', 'check', 'check-off', 'check-on', 'clean', 'close', 'cloud-done', 'component', 'cookie', 'copy', 'crop', 'cursor', 'date', 'delete', 'design-tool', 'dev-tools', 'down', 'download', 'drag', 'ds', 'edit', 'face', 'file', 'folder', 'folder-go', 'full', 'info', 'left', 'legend', 'letter-spacing', 'line-height', 'link', 'minus', 'more', 'notification', 'panel', 'panel-right', 'pause', 'play', 'plus', 'project', 'props', 'radio-off', 'radio-on', 'random', 'render', 'restart', 'right', 'scroll', 'search', 'settings', 'size', 'sound', 'stat', 'store', 'switch', 'theme', 'type', 'up', 'user', 'userface'] as const;
+export const ICON_NAMES = ['align-horizontal-center', 'align-horizontal-left', 'align-horizontal-right', 'align-vertical-bottom', 'align-vertical-center', 'align-vertical-top', 'alphabet', 'animation', 'arrow-down', 'arrow-left', 'arrow-right', 'arrow-up', 'cart', 'check', 'check-off', 'check-on', 'clean', 'close', 'cloud-done', 'component', 'cookie', 'copy', 'crop', 'cursor', 'date', 'delete', 'design-tool', 'dev-tools', 'down', 'download', 'drag', 'ds', 'edit', 'face', 'file', 'folder', 'folder-go', 'full', 'git', 'info', 'left', 'legend', 'letter-spacing', 'line-height', 'link', 'minus', 'more', 'notification', 'panel', 'panel-right', 'pause', 'play', 'plus', 'project', 'props', 'radio-off', 'radio-on', 'random', 'render', 'restart', 'right', 'scroll', 'search', 'settings', 'size', 'sound', 'stat', 'store', 'switch', 'terminal', 'theme', 'type', 'up', 'user', 'userface'] as const;
 
 export type IconSource =
   | string
@@ -230,6 +230,15 @@ const icons: Record<IconName, React.ReactNode> = {
   'full': (
     <path d="M13.5 6.5L6.5 13.5M9 3.75L16.25 3.75V11M11 16.25L3.75 16.25V9" stroke="currentColor"/>
   ),
+  'git': (
+    <>
+      <circle cx="10" cy="4.5" r="2" stroke="currentColor"/>
+      <circle cx="10" cy="15.5" r="2" stroke="currentColor"/>
+      <circle cx="15" cy="10" r="2" stroke="currentColor"/>
+      <path d="M10 6.5V13.5" stroke="currentColor"/>
+      <path d="M13 10H10V6.5" stroke="currentColor"/>
+    </>
+  ),
   'info': (
     <>
       <path d="M10 10V13.5" stroke="currentColor"/>
@@ -377,6 +386,13 @@ const icons: Record<IconName, React.ReactNode> = {
       <circle cx="7" cy="10" r="4.5" fill="var(--uf-color-background)"/>
     </>
   ),
+  'terminal': (
+    <>
+      <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor"/>
+      <path d="M6 9L8.5 11.5L6 14" stroke="currentColor"/>
+      <path d="M10 14H14" stroke="currentColor"/>
+    </>
+  ),
   'theme': (
     <>
       <path d="M7.10502 12.8949C5.50616 11.2961 5.50616 8.7038 7.10502 7.10495C8.70387 5.50609 11.2961 5.50609 12.895 7.10495L7.10502 12.8949Z" fill="currentColor"/>
@@ -452,6 +468,7 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'folder': "0 0 20 20",
   'folder-go': "0 0 20 20",
   'full': "0 0 20 20",
+  'git': "0 0 20 20",
   'info': "0 0 20 20",
   'left': "0 0 20 20",
   'legend': "0 0 20 20",
@@ -482,6 +499,7 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'stat': "0 0 20 20",
   'store': "0 0 20 20",
   'switch': "0 0 20 20",
+  'terminal': "0 0 20 20",
   'theme': "0 0 20 20",
   'type': "0 0 20 20",
   'up': "0 0 20 20",
@@ -528,6 +546,7 @@ const ICON_NATIVE_SIZE: Partial<Record<IconName, number>> = {
   'folder': 20,
   'folder-go': 20,
   'full': 20,
+  'git': 20,
   'info': 20,
   'left': 20,
   'legend': 20,
@@ -558,6 +577,7 @@ const ICON_NATIVE_SIZE: Partial<Record<IconName, number>> = {
   'stat': 20,
   'store': 20,
   'switch': 20,
+  'terminal': 20,
   'theme': 20,
   'type': 20,
   'up': 20,
