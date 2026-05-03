@@ -13,6 +13,16 @@
       "description": "components API compatibility: uncontrolled initial value.",
       "default": ""
     },
+    "id": {
+      "type": "string",
+      "required": false,
+      "description": "Native input id. When omitted, a stable React id is generated."
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Native input name."
+    },
     "type": {
       "type": "enum",
       "required": false,
@@ -120,6 +130,11 @@
       "required": false,
       "description": "Auto-focus on mount."
     },
+    "autoComplete": {
+      "type": "string",
+      "required": false,
+      "description": "Native browser autocomplete hint."
+    },
     "min": {
       "type": "any",
       "required": false,
@@ -134,6 +149,21 @@
       "type": "any",
       "required": false,
       "description": "Step value (for type=\"number\")."
+    },
+    "minLength": {
+      "type": "number",
+      "required": false,
+      "description": "Minimum text length for native validation."
+    },
+    "maxLength": {
+      "type": "number",
+      "required": false,
+      "description": "Maximum text length for native validation."
+    },
+    "pattern": {
+      "type": "string",
+      "required": false,
+      "description": "Native validation pattern for single-line inputs."
     },
     "onValueChange": {
       "type": "function",

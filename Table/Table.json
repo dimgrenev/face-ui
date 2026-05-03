@@ -143,6 +143,12 @@
       "required": false,
       "description": "components API compatibility: included for parity, handled via CSS sticky class.",
       "default": false
+    },
+    "ariaLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the table when there is no visible caption.",
+      "default": "Data table"
     }
   },
   "states": [

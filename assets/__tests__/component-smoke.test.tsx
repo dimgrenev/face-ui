@@ -351,6 +351,7 @@ describe('component smoke', () => {
     await act(async () => {
       root.render(
         <Table
+          ariaLabel="Price list"
           showRowNumbers
           columns={[
             { id: 'name', header: 'Name', accessor: 'name' },
@@ -365,6 +366,8 @@ describe('component smoke', () => {
 
     const rowNumberHeader = container.querySelector('.uf-table__row-number-header [data-scope="text"][data-align="left"]') as HTMLElement | null
     expect(rowNumberHeader?.textContent).toContain('#')
+    const table = container.querySelector('.uf-table[data-scope="table"]') as HTMLTableElement | null
+    expect(table?.getAttribute('aria-label')).toBe('Price list')
 
     const rowNumberCell = container.querySelector('td[data-row-number] [data-scope="text"][data-align="left"]') as HTMLElement | null
     expect(rowNumberCell?.textContent).toContain('1')

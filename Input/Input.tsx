@@ -9,7 +9,7 @@
  * `<Input textLayout="wrap" />`
  */
 
-import { forwardRef, useRef, useCallback, useEffect, useLayoutEffect, useId, type ReactNode, type KeyboardEventHandler } from 'react'
+import { forwardRef, useRef, useCallback, useEffect, useId, type ReactNode, type KeyboardEventHandler } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { inputMachine, connectInput } from '../assets/machines/input.machine'
 import { cn } from '../assets/utils'
@@ -30,6 +30,10 @@ export interface InputProps {
   value?: string
   /** components API compatibility: uncontrolled initial value. */
   defaultValue?: string
+  /** Native input id. When omitted, a stable React id is generated. */
+  id?: string
+  /** Native input name. */
+  name?: string
   /** Input type. 'default' renders a textarea-like free text. Others render <input type="...">. */
   type?: InputType
   /** Text layout for type="default": 'scroll' (single-line) or 'wrap' (multi-line auto-grow). */
@@ -60,12 +64,20 @@ export interface InputProps {
   required?: boolean
   /** Auto-focus on mount. */
   autoFocus?: boolean
+  /** Native browser autocomplete hint. */
+  autoComplete?: string
   /** Min value (for type="number"). */
   min?: number | string
   /** Max value (for type="number"). */
   max?: number | string
   /** Step value (for type="number"). */
   step?: number | string
+  /** Minimum text length for native validation. */
+  minLength?: number
+  /** Maximum text length for native validation. */
+  maxLength?: number
+  /** Native validation pattern for single-line inputs. */
+  pattern?: string
   /** Callback when the value changes (machine-based). */
   onValueChange?: (details: { value: string }) => void
   /** Native onChange handler. */
@@ -90,6 +102,8 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
     const {
       value,
       defaultValue,
+      id,
+      name,
       type = 'default',
       textLayout = 'scroll',
       disabled = false,
@@ -105,9 +119,13 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
       stretchText = false,
       required = false,
       autoFocus,
+      autoComplete,
       min,
       max,
       step,
+      minLength,
+      maxLength,
+      pattern,
       onValueChange,
       onChange,
       onBlur,
@@ -145,7 +163,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
       } catch {}
     }, [type, textLayout])
 
-    useLayoutEffect(() => {
+    useEffect(() => {
       if (type !== 'default') return
       const el = inputRef.current
       if (!el || !(el instanceof HTMLTextAreaElement)) return
@@ -166,7 +184,8 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
 
     const isTextarea = type === 'default'
     const htmlType = type === 'default' ? undefined : type
-    const inputId = useId()
+    const generatedInputId = useId()
+    const inputId = id ?? generatedInputId
     const descriptionId = description != null ? `${inputId}-description` : undefined
     const errorId = error ? `${inputId}-error` : undefined
     const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined
@@ -191,10 +210,14 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
         placeholder={placeholder}
         spellCheck={spellCheck}
         required={required}
+        name={name}
         id={inputId}
+        autoComplete={autoComplete}
         aria-describedby={describedBy}
         aria-invalid={isInvalid || undefined}
         autoFocus={autoFocus}
+        minLength={minLength}
+        maxLength={maxLength}
         rows={1}
         wrap="soft"
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -223,13 +246,18 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
         placeholder={placeholder}
         spellCheck={spellCheck}
         required={required}
+        name={name}
         id={inputId}
+        autoComplete={autoComplete}
         aria-describedby={describedBy}
         aria-invalid={isInvalid || undefined}
         autoFocus={autoFocus}
         min={min as any}
         max={max as any}
         step={step as any}
+        minLength={minLength}
+        maxLength={maxLength}
+        pattern={pattern}
         data-text-layout={isTextarea ? 'scroll' : undefined}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           inputProps.onChange(e)

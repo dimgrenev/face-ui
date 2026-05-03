@@ -80,7 +80,7 @@ function renderHeaderContent(content, align = 'left') {
 // Component
 // ---------------------------------------------------------------------------
 export const Table = forwardRef(function Table(props, ref) {
-    const { columns: rawColumns, rows: rawRows, rowKey, getRowId: getRowIdProp, sortColumn = null, sortDirection = 'asc', onSortChange, selectedRows = [], onSelectedRowsChange, selectable = false, showRowNumbers = false, stickyHeader = true, showDividers = true, stickyLastColumn = false, onColumnResize, resizable = false, className, } = props;
+    const { columns: rawColumns, rows: rawRows, rowKey, getRowId: getRowIdProp, sortColumn = null, sortDirection = 'asc', onSortChange, selectedRows = [], onSelectedRowsChange, selectable = false, showRowNumbers = false, stickyHeader = true, showDividers = true, stickyLastColumn = false, onColumnResize, resizable = false, className, ariaLabel, } = props;
     const columns = (Array.isArray(rawColumns) ? rawColumns : []).map((col) => {
         var _a, _b;
         const c = col;
@@ -171,7 +171,7 @@ export const Table = forwardRef(function Table(props, ref) {
             document.removeEventListener('pointerup', onPointerUp);
         };
     }, [onColumnResize]);
-    return (_jsxs("table", Object.assign({ ref: ref }, api.getRootProps(), { "data-sticky-header": stickyHeader || undefined, "data-show-dividers": showDividers || undefined, className: cn('uf-table', className), style: resizable ? { tableLayout: 'fixed' } : undefined, children: [_jsx("thead", Object.assign({}, api.getHeaderProps(), { children: _jsxs("tr", Object.assign({}, api.getHeaderRowProps(), { children: [selectable && (_jsx("th", { role: "columnheader", children: _jsx("input", Object.assign({}, api.getSelectAllProps())) })), showRowNumbers && (_jsx("th", { role: "columnheader", className: "uf-table__row-number-header", children: _jsx("div", { className: "uf-table__cellSlot", "data-align": "left", children: renderHeaderContent('#', 'left') }) })), columns.map((col, index) => {
+    return (_jsxs("table", Object.assign({ ref: ref }, api.getRootProps(), { "data-sticky-header": stickyHeader || undefined, "data-show-dividers": showDividers || undefined, "aria-label": ariaLabel, className: cn('uf-table', className), style: resizable ? { tableLayout: 'fixed' } : undefined, children: [_jsx("thead", Object.assign({}, api.getHeaderProps(), { children: _jsxs("tr", Object.assign({}, api.getHeaderRowProps(), { children: [selectable && (_jsx("th", { role: "columnheader", children: _jsx("input", Object.assign({}, api.getSelectAllProps())) })), showRowNumbers && (_jsx("th", { role: "columnheader", className: "uf-table__row-number-header", children: _jsx("div", { className: "uf-table__cellSlot", "data-align": "left", children: renderHeaderContent('#', 'left') }) })), columns.map((col, index) => {
                             var _a, _b;
                             const style = {};
                             if (resizedWidths[col.id] != null)

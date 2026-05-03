@@ -89,6 +89,8 @@ export interface TableProps<T = any> {
   activeRowId?: string
   /** Enable membrane (tile-like) row styles: rounded corners, hover bg, padding. */
   membrane?: boolean
+  /** Accessible label for the table when there is no visible caption. */
+  ariaLabel?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -183,6 +185,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
       onRowMouseLeave,
       activeRowId,
       membrane = false,
+      ariaLabel,
     } = props
 
     const columns = (Array.isArray(rawColumns) ? rawColumns : []).map((col) => {
@@ -293,6 +296,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
         data-sticky-header={stickyHeader || undefined}
         data-show-dividers={showDividers || undefined}
         data-membrane={membrane || undefined}
+        aria-label={ariaLabel}
         className={cn('uf-table', className)}
         style={resizable ? { tableLayout: 'fixed' } : undefined}
       >

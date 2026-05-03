@@ -9,7 +9,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  * `<Input type="number" min={0} max={100} step={1} />`
  * `<Input textLayout="wrap" />`
  */
-import { forwardRef, useRef, useCallback, useEffect, useLayoutEffect, useId } from 'react';
+import { forwardRef, useRef, useCallback, useEffect, useId } from 'react';
 import { useMachine } from '../assets/adapters/react/use-machine';
 import { inputMachine, connectInput } from '../assets/machines/input.machine';
 import { cn } from '../assets/utils';
@@ -21,7 +21,7 @@ import { Text } from '../Text/Text';
 // ---------------------------------------------------------------------------
 export const Input = forwardRef(function Input(props, ref) {
     var _a, _b;
-    const { value, defaultValue, type = 'default', textLayout = 'scroll', disabled = false, readOnly = false, label, description, error = '', labelOrientation = 'vertical', placeholder, spellCheck, icon, iconPosition = 'left', stretchText = false, required = false, autoFocus, min, max, step, onValueChange, onChange, onBlur, onFocus, onKeyDown, membrane = false, className, } = props;
+    const { value, defaultValue, id, name, type = 'default', textLayout = 'scroll', disabled = false, readOnly = false, label, description, error = '', labelOrientation = 'vertical', placeholder, spellCheck, icon, iconPosition = 'left', stretchText = false, required = false, autoFocus, autoComplete, min, max, step, minLength, maxLength, pattern, onValueChange, onChange, onBlur, onFocus, onKeyDown, membrane = false, className, } = props;
     const resolvedInitial = (_a = value !== null && value !== void 0 ? value : defaultValue) !== null && _a !== void 0 ? _a : '';
     const { state, send } = useMachine(inputMachine, {
         value: resolvedInitial,
@@ -55,7 +55,7 @@ export const Input = forwardRef(function Input(props, ref) {
         }
         catch (_b) { }
     }, [type, textLayout]);
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (type !== 'default')
             return;
         const el = inputRef.current;
@@ -84,7 +84,8 @@ export const Input = forwardRef(function Input(props, ref) {
     }, [autoFocus, type]);
     const isTextarea = type === 'default';
     const htmlType = type === 'default' ? undefined : type;
-    const inputId = useId();
+    const generatedInputId = useId();
+    const inputId = id !== null && id !== void 0 ? id : generatedInputId;
     const descriptionId = description != null ? `${inputId}-description` : undefined;
     const errorId = error ? `${inputId}-error` : undefined;
     const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
@@ -93,7 +94,7 @@ export const Input = forwardRef(function Input(props, ref) {
     const labelProps = api.getLabelProps();
     const inputProps = api.getInputProps();
     const iconNode = icon ? (_jsx("span", { className: "uf-input__icon", "data-position": iconPosition, children: typeof icon === 'string' ? _jsx(Icon, { name: icon }) : icon })) : null;
-    const controlEl = isTextarea && textLayout === 'wrap' ? (_jsx("textarea", Object.assign({ ref: inputRef }, inputProps, { "data-part": (_b = inputProps['data-part']) !== null && _b !== void 0 ? _b : 'textarea', "data-text-layout": "wrap", placeholder: placeholder, spellCheck: spellCheck, required: required, id: inputId, "aria-describedby": describedBy, "aria-invalid": isInvalid || undefined, autoFocus: autoFocus, rows: 1, wrap: "soft", onChange: (e) => {
+    const controlEl = isTextarea && textLayout === 'wrap' ? (_jsx("textarea", Object.assign({ ref: inputRef }, inputProps, { "data-part": (_b = inputProps['data-part']) !== null && _b !== void 0 ? _b : 'textarea', "data-text-layout": "wrap", placeholder: placeholder, spellCheck: spellCheck, required: required, name: name, id: inputId, autoComplete: autoComplete, "aria-describedby": describedBy, "aria-invalid": isInvalid || undefined, autoFocus: autoFocus, minLength: minLength, maxLength: maxLength, rows: 1, wrap: "soft", onChange: (e) => {
             inputProps.onChange(e);
             onChange === null || onChange === void 0 ? void 0 : onChange(e);
             resizeToContent();
@@ -106,7 +107,7 @@ export const Input = forwardRef(function Input(props, ref) {
         }, onKeyDown: (e) => {
             ;
             onKeyDown === null || onKeyDown === void 0 ? void 0 : onKeyDown(e);
-        }, onInput: resizeToContent }))) : (_jsx("input", Object.assign({ ref: inputRef }, inputProps, { type: htmlType, placeholder: placeholder, spellCheck: spellCheck, required: required, id: inputId, "aria-describedby": describedBy, "aria-invalid": isInvalid || undefined, autoFocus: autoFocus, min: min, max: max, step: step, "data-text-layout": isTextarea ? 'scroll' : undefined, onChange: (e) => {
+    }, onInput: resizeToContent }))) : (_jsx("input", Object.assign({ ref: inputRef }, inputProps, { type: htmlType, placeholder: placeholder, spellCheck: spellCheck, required: required, name: name, id: inputId, autoComplete: autoComplete, "aria-describedby": describedBy, "aria-invalid": isInvalid || undefined, autoFocus: autoFocus, min: min, max: max, step: step, minLength: minLength, maxLength: maxLength, pattern: pattern, "data-text-layout": isTextarea ? 'scroll' : undefined, onChange: (e) => {
             inputProps.onChange(e);
             onChange === null || onChange === void 0 ? void 0 : onChange(e);
         }, onBlur: (e) => {
