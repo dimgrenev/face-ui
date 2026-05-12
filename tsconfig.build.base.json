@@ -19,6 +19,9 @@
   "exclude": [
     "./dist",
     "./node_modules",
+    "./**/__tests__/**",
+    "./**/*.test.ts",
+    "./**/*.test.tsx",
     "./assets/__tests__",
     "./assets/contracts",
     "./scripts",

@@ -44,14 +44,20 @@ function fixEsmExtensions(dir) {
 
 function shouldSkipDir(relPath) {
   return relPath === 'dist'
+    || relPath === '.artifacts'
+    || relPath.includes('/.artifacts')
     || relPath === 'node_modules'
     || relPath === 'scripts'
+    || relPath.endsWith('/__tests__')
     || relPath === 'assets/__tests__'
     || relPath === 'assets/contracts';
 }
 
 function shouldCopyAsset(relPath) {
   if (!relPath) return false;
+  if (relPath === '.artifacts' || relPath.startsWith('.artifacts/')) return false;
+  if (relPath.includes('копия')) return false;
+  if (/\.(test|spec)\./.test(relPath)) return false;
   if (relPath === 'package.json') return false;
   if (relPath === 'README.md') return false;
   if (relPath === 'package-types.d.ts') return false;
