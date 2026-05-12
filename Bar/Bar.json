@@ -64,6 +64,18 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text"
+    ],
+    "notes": [
+      "Bar is a layout primitive and intentionally relies on shared control height and spacing.",
+      "String/object slots are normalized through Text, Icon or Button rather than raw toolbar markup."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

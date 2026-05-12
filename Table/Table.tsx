@@ -71,13 +71,13 @@ export interface TableProps<T = any> {
   showDividers?: boolean
   /** Additional CSS class. */
   className?: string
-  /** components API alias. */
+  /** Legacy components API alias. Prefer rowKey for new code. */
   getRowId?: (row: T, index: number) => string
-  /** components API compatibility: expose resize callback even for simple table machine mode. */
+  /** Callback fired while a resizable column is dragged. */
   onColumnResize?: (columnId: string, width: number) => void
-  /** components API compatibility: included for parity, no-op for table machine mode. */
+  /** Enable column resizing and fixed table layout. */
   resizable?: boolean
-  /** components API compatibility: included for parity, handled via CSS sticky class. */
+  /** Keep the last column visually sticky for dense action tables. */
   stickyLastColumn?: boolean
   /** Callback when a row is clicked. */
   onRowClick?: (row: T, index: number) => void
@@ -321,15 +321,33 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
               if (col.minWidth != null) style.minWidth = col.minWidth
               if (col.maxWidth != null) style.maxWidth = col.maxWidth
               if (col.align) style.textAlign = col.align
+              const headerCellProps = api.getHeaderCellProps(col.id, { sortable: col.sortable }) as any
+              const sortButtonProps = col.sortable
+                ? { type: 'button' as const, onClick: headerCellProps.onClick }
+                : null
+              const thProps = { ...headerCellProps }
+              delete thProps.onClick
+              delete thProps.onKeyDown
+              delete thProps.tabIndex
+              delete thProps.style
 
               return (
                 <th
                   key={col.id}
-                  {...api.getHeaderCellProps(col.id, { sortable: col.sortable })}
+                  {...thProps}
                   style={Object.keys(style).length > 0 ? style as CSSProperties : undefined}
                 >
                   <div className="uf-table__cellSlot" data-align={col.align ?? 'left'}>
-                    {renderHeaderContent(col.header, col.align ?? 'left')}
+                    {sortButtonProps ? (
+                      <button
+                        {...sortButtonProps}
+                        className="uf-table__sort-button"
+                      >
+                        {renderHeaderContent(col.header, col.align ?? 'left')}
+                      </button>
+                    ) : (
+                      renderHeaderContent(col.header, col.align ?? 'left')
+                    )}
                     {api.sortColumn === col.id && (
                       <span aria-hidden="true" className="uf-table__sort-icon">
                         <Icon name={api.sortDirection === 'asc' ? 'up' : 'down'} size={14} />

@@ -7,11 +7,12 @@
  * `<Switcher text="Long description..." withText textWrap="wrap" />`
  */
 
-import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useId, type HTMLAttributes, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { switcherMachine, connectSwitcher } from '../assets/machines/switcher.machine'
 import { cn } from '../assets/utils'
+import { Text } from '../Text/Text'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -46,7 +47,7 @@ export interface SwitcherProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onC
   onChange?: (checked: boolean) => void
   /** Additional CSS class. */
   className?: string
-  /** Outer membrane wrapper (+1px outside control geometry). */
+  /** Outer membrane wrapper around control geometry. */
   membrane?: boolean
 }
 
@@ -92,10 +93,12 @@ export const Switcher = forwardRef<HTMLDivElement, SwitcherProps>(
     })
 
     const api = connectSwitcher(state, send)
+    const generatedLabelId = useId()
 
     // Determine label content: explicit `label` prop takes priority, then `text` when `withText`
     const labelContent = label ?? (withText && text ? text : null)
     const hasLabel = labelContent != null
+    const labelId = hasLabel ? `${generatedLabelId}-label` : undefined
     const switchOnly = !hasLabel
 
     const rootNode = (
@@ -108,11 +111,13 @@ export const Switcher = forwardRef<HTMLDivElement, SwitcherProps>(
         className={cn('uf-switcher', className)}
       >
         {hasLabel && (
-          <label {...api.getLabelProps()}>
-            {labelContent}
+          <label {...api.getLabelProps()} id={labelId}>
+            <Text as="span" variant="body" inset="none" membrane={false}>
+              {labelContent}
+            </Text>
           </label>
         )}
-        <div {...api.getControlProps()}>
+        <div {...api.getControlProps()} aria-labelledby={labelId}>
           <span {...api.getThumbProps()} />
         </div>
         <input {...api.getHiddenInputProps()} />

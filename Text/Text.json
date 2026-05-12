@@ -122,6 +122,12 @@
       "description": "Membrane spacing.",
       "default": true
     },
+    "truncate": {
+      "type": "boolean",
+      "required": false,
+      "description": "Truncate text with ellipsis when it overflows.",
+      "default": false
+    },
     "children": {
       "type": "string",
       "required": false,
@@ -217,7 +223,14 @@
   "behavior": {},
   "keyboard": {},
   "aria": {
-    "role": "text"
+    "nativeElement": "Uses the semantic element selected by `as` or by the visual variant default; no ARIA role is applied by default.",
+    "required": [
+      "Use heading variants or `as` for document outline.",
+      "Use as=\"label\" or variant=\"label\" with htmlFor for form labels."
+    ],
+    "notes": [
+      "Do not force role=\"text\" on headings, labels, kbd or code."
+    ]
   },
   "composition": {
     "required": [
@@ -235,6 +248,58 @@
         "parent": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-text-min-height",
+      "--uf-text-pad-y",
+      "--uf-text-pad-x",
+      "--uf-text-inset-none-min-height",
+      "--uf-text-inset-none-padding",
+      "--uf-text-font-family",
+      "--uf-text-size-font-size",
+      "--uf-text-font-size",
+      "--uf-text-line-height",
+      "--uf-text-letter-spacing",
+      "--uf-text-font-weight",
+      "--uf-text-color",
+      "--uf-text-label-font-size",
+      "--uf-text-label-line-height",
+      "--uf-text-heading-font-size",
+      "--uf-text-heading-font-weight",
+      "--uf-text-caption-font-size",
+      "--uf-text-caption-line-height",
+      "--uf-text-caption-color",
+      "--uf-text-kbd-height",
+      "--uf-text-kbd-pad-x",
+      "--uf-text-h1-delta",
+      "--uf-text-h2-delta",
+      "--uf-text-h3-delta",
+      "--uf-text-h4-delta",
+      "--uf-text-h5-delta",
+      "--uf-text-blockquote-border-width"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-font-family-base",
+      "--uf-font-size-xs",
+      "--uf-font-size-sm",
+      "--uf-font-size-md",
+      "--uf-font-size-lg",
+      "--uf-font-size-xl",
+      "--uf-control-font-size",
+      "--uf-control-line-height",
+      "--uf-control-letter-spacing",
+      "--uf-font-weight",
+      "--uf-color-fg",
+      "--uf-color-fg-muted"
+    ],
+    "notes": [
+      "Use component tokens for local typography overrides instead of selector-specific !important rules.",
+      "`size` writes no inline styles; CSS maps data-size through `--uf-font-size-xs`, `--uf-font-size-sm`, `--uf-font-size-md`, `--uf-font-size-lg` and `--uf-font-size-xl`. `--uf-text-font-size` and `--uf-text-line-height` stay higher-priority local overrides."
+    ]
   },
   "platform": {},
   "usage": {

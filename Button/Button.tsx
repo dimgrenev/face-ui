@@ -61,7 +61,7 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   align?: 'left' | 'center' | 'right'
   /** Nesting level for option-like rows: 0..9 */
   level?: number
-  /** Membrane spacing (1px padding). */
+  /** Membrane spacing around the button. */
   membrane?: boolean
   /** Copy text to clipboard on click (Clipboard integration). */
   copyText?: string
@@ -173,7 +173,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               el.value = copyText
               el.setAttribute('readonly', 'true')
               el.style.position = 'fixed'
-              el.style.left = '-9999px'
+              el.style.left = '-9999em'
               el.style.opacity = '0'
               document.body.appendChild(el)
               el.select()
@@ -205,7 +205,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const isIconOnly = iconOnly || (hasIcon && !hasText)
 
     const levelStyle = clampedLevel != null
-      ? { ...style, '--uf-option-level': clampedLevel } as React.CSSProperties
+      ? { ...style, '--face-runtime-option-level': clampedLevel } as React.CSSProperties
       : style
 
     const buttonNode = (
@@ -213,6 +213,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={setRefs}
         type={type}
         disabled={disabled || loading}
+        aria-busy={loading ? true : undefined}
         {...buttonAnatomy.getPartAttrs('root')}
         data-variant={variant}
         data-icon-only={isIconOnly ? '' : undefined}
@@ -273,8 +274,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         onClick={(event) => {
           if (event.target !== event.currentTarget) return
           if (disabled || loading) return
-          buttonRef.current?.focus()
-          buttonRef.current?.click()
+          const button = buttonRef.current
+          button?.focus()
+          button?.click()
         }}
       >
         {buttonNode}

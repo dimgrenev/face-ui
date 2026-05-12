@@ -9,11 +9,12 @@ import { getTypeEnricher, type EnrichedProp } from './lib/typeEnricher'
 type VFSFile = { content: string }
 
 export interface FaceJsonProp {
-  type: 'string' | 'number' | 'boolean' | 'function' | 'enum' | 'array' | 'object' | 'any'
+  type: 'string' | 'number' | 'boolean' | 'function' | 'enum' | 'array' | 'object' | 'union' | 'ReactNode' | 'node' | 'any'
   default?: unknown
   required: boolean
   description?: string
-  options?: string[]
+  options?: Array<string | number | boolean>
+  [key: string]: unknown
 }
 
 export interface FaceJsonContract {
@@ -125,6 +126,44 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   },
   Checkbox: {
     omitProps: ['onChange'],
+    patchProps: {
+      checked: {
+        type: 'union',
+        required: false,
+        description: 'Controlled checked state. Accepts boolean or "indeterminate".',
+        options: [true, false, 'indeterminate'],
+        default: null,
+      },
+      defaultChecked: {
+        type: 'union',
+        required: false,
+        description: 'Uncontrolled initial checked state. Accepts boolean or "indeterminate".',
+        options: [true, false, 'indeterminate'],
+        default: false,
+      },
+      disabled: {
+        description: 'Disable pointer and keyboard interaction.',
+      },
+      required: {
+        description: 'Mark the hidden native input as required.',
+      },
+      name: {
+        description: 'Native form field name for the hidden input.',
+      },
+      label: {
+        type: 'ReactNode',
+        description: 'Visible label content rendered through Face UI Text.',
+      },
+      onCheckedChange: {
+        description: 'Callback fired with { checked } when the machine state changes.',
+      },
+      className: {
+        description: 'Additional className on the root label.',
+      },
+      membrane: {
+        description: 'Wrap the control in the standard one-token membrane.',
+      },
+    },
   },
   Modal: {
     omitProps: ['isOpen', 'onClose', 'disabled', 'label'],
@@ -258,6 +297,9 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   },
   Toc: {
     omitProps: ['onChange'],
+  },
+  Upload: {
+    omitProps: ['size', 'type', 'reason'],
   },
 }
 
@@ -479,6 +521,7 @@ function normalizeType(prop: PropAnalysis, existing?: FaceJsonProp): Pick<FaceJs
 function toFaceProp(prop: PropAnalysis, existing?: FaceJsonProp): FaceJsonProp {
   const normalized = normalizeType(prop, existing)
   const next: FaceJsonProp = {
+    ...(existing ?? {}),
     type: normalized.type,
     required: Boolean(prop.required),
     description: prop.description ?? existing?.description ?? `${prop.name} prop`,
@@ -486,6 +529,8 @@ function toFaceProp(prop: PropAnalysis, existing?: FaceJsonProp): FaceJsonProp {
 
   if (normalized.options && normalized.options.length > 0) {
     next.options = normalized.options
+  } else if (!existing || existing.type !== normalized.type) {
+    delete next.options
   }
 
   if (prop.defaultValue !== undefined) {

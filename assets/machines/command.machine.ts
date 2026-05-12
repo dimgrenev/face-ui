@@ -408,10 +408,12 @@ export function connectCommand(state: MachineSnapshot<CommandSchema>, send: Send
         id: `command:item:${props.id}`,
         role: 'option' as const,
         'aria-selected': isHighlighted,
+        'aria-disabled': isDisabled ? true : undefined,
         'data-highlighted': isHighlighted ? '' : undefined,
         'data-disabled': isDisabled ? '' : undefined,
         'data-value': props.id,
         tabIndex: -1,
+        disabled: isDisabled,
         onPointerDown(event: { preventDefault: () => void }) {
           if (!isDisabled) {
             event.preventDefault()

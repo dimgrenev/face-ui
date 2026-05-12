@@ -88,7 +88,7 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
     const stepPercent = 100 / clampedSlidesPerView
     const trackTransform = `translate${axis}(-${api.index * stepPercent}%)`
     const rootStyle = {
-      '--uf-carousel-slides-per-view': String(clampedSlidesPerView),
+      '--face-runtime-carousel-slides-per-view': String(clampedSlidesPerView),
     } as CSSProperties
 
     const renderSlide = (slide: ReactNode, slideIndex: number) => {

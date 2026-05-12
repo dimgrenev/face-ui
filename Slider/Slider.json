@@ -180,6 +180,47 @@
       "output": { "slot": "output", "parent": "root" }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-slider-track-hit-size",
+      "--uf-slider-line-size",
+      "--uf-slider-thumb-size",
+      "--uf-slider-row-gap",
+      "--uf-slider-leading-gap",
+      "--uf-slider-body-basis",
+      "--uf-slider-edge-gap",
+      "--uf-slider-thumb-w-fallback",
+      "--uf-slider-crop-thumb-pad-fallback",
+      "--uf-slider-crop-marker-w",
+      "--uf-slider-crop-marker-h",
+      "--uf-slider-crop-allowed-expand",
+      "--face-runtime-slider-t",
+      "--face-runtime-slider-crop-left-x",
+      "--face-runtime-slider-crop-right-x",
+      "--face-runtime-slider-crop-thumb-pad",
+      "--face-runtime-slider-thumb-w"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-gap",
+      "--uf-control-line-height",
+      "--uf-membrane",
+      "--uf-radius-full",
+      "--uf-color-fg",
+      "--uf-color-hover-bg",
+      "--uf-color-border",
+      "--uf-motion-duration-short",
+      "--uf-motion-ease-standard"
+    ],
+    "notes": [
+      "Simple slider track, range and thumbs are tokenized through shared control, space, membrane, radius and color fallbacks.",
+      "Simple thumb hover feedback consumes shared Face UI motion tokens.",
+      "Advanced slider exposes private runtime geometry via --face-runtime-slider-* CSS custom properties because thumb width and crop marker positions are measured in React.",
+      "Advanced slider still contains small pixel constants for measurement math; migrate them only with interaction regression coverage."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

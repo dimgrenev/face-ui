@@ -119,6 +119,29 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-breadcrumb-separator-w",
+      "--uf-breadcrumb-separator-h",
+      "--uf-icon-only-size"
+    ],
+    "semanticFallbacks": [
+      "--uf-membrane",
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-radius",
+      "--uf-font-size-sm",
+      "--uf-font-weight-bold",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg"
+    ],
+    "notes": [
+      "Breadcrumb items and overflow controls render through Button/Text-compatible primitives.",
+      "Separator sizing is local to breadcrumb but derived from shared spacing and membrane tokens."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

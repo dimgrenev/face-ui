@@ -73,6 +73,22 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [],
+    "semanticFallbacks": [
+      "--uf-color-hover-bg",
+      "--uf-radius",
+      "--uf-radius-full",
+      "--uf-control-height",
+      "--uf-motion-duration-skeleton",
+      "--uf-motion-iteration-indefinite",
+      "--uf-motion-ease-in-out"
+    ],
+    "notes": [
+      "Width and height are product layout inputs passed through style for placeholder fitting.",
+      "Pulse keyframes stay component-local while animation duration and easing consume shared Face UI motion tokens."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

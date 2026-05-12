@@ -125,23 +125,49 @@
     "getRowId": {
       "type": "function",
       "required": false,
-      "description": "components API alias."
+      "description": "Legacy components API alias. Prefer rowKey for new code."
     },
     "onColumnResize": {
       "type": "function",
       "required": false,
-      "description": "components API compatibility: expose resize callback even for simple table machine mode."
+      "description": "Callback fired while a resizable column is dragged."
     },
     "resizable": {
       "type": "boolean",
       "required": false,
-      "description": "components API compatibility: included for parity, no-op for table machine mode.",
+      "description": "Enable column resizing and fixed table layout.",
       "default": false
     },
     "stickyLastColumn": {
       "type": "boolean",
       "required": false,
-      "description": "components API compatibility: included for parity, handled via CSS sticky class.",
+      "description": "Keep the last column visually sticky for dense action tables.",
+      "default": false
+    },
+    "onRowClick": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when a row is clicked."
+    },
+    "onRowMouseEnter": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when mouse enters a row."
+    },
+    "onRowMouseLeave": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when mouse leaves a row."
+    },
+    "activeRowId": {
+      "type": "string",
+      "required": false,
+      "description": "Row ID to highlight as active (applies `data-active` attribute)."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Enable membrane (tile-like) row styles: rounded corners, hover bg, padding.",
       "default": false
     },
     "ariaLabel": {
@@ -242,6 +268,37 @@
         "multiple": true
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-table-row-number-width",
+      "--uf-table-resize-hit-width",
+      "--uf-table-resize-line-offset-x",
+      "--uf-table-resize-line-inset-y",
+      "--uf-table-divider-width",
+      "--uf-table-membrane-cell-pad-x",
+      "--uf-table-sort-icon-gap"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-font-size",
+      "--uf-control-line-height",
+      "--uf-control-pad-text",
+      "--uf-membrane",
+      "--uf-font-size-xs",
+      "--uf-font-weight-bold",
+      "--uf-radius",
+      "--uf-color-bg",
+      "--uf-color-fg",
+      "--uf-color-border",
+      "--uf-color-hover-bg",
+      "--uf-motion-duration-emphasis",
+      "--uf-motion-ease-emphasized"
+    ],
+    "notes": [
+      "Table cell/header text is rendered through Text wrappers to keep typography centralized.",
+      "Resizable/sticky compatibility props map to table component tokens, and membrane row emphasis uses shared Face UI motion tokens."
+    ]
   },
   "platform": {},
   "usage": {

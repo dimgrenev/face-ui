@@ -1,0 +1,109 @@
+{
+  "name": "face-ui-react",
+  "description": "Root Face UI showcase gallery contract for the Render playground.",
+  "props": {
+    "face": {
+      "type": "object",
+      "required": false,
+      "description": "Optional gallery face document with visible component cards."
+    }
+  },
+  "states": [
+    {
+      "name": "Default Gallery",
+      "props": {}
+    }
+  ],
+  "behavior": {
+    "themeToggle": "Local gallery theme switches between light and dark.",
+    "clear": "Clears local gallery overrides and restores the light theme."
+  },
+  "keyboard": {},
+  "aria": {},
+  "composition": {
+    "required": [
+      "root",
+      "header",
+      "grid",
+      "item",
+      "preview"
+    ],
+    "recommended": [
+      "themeToggle",
+      "clearButton"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "header": {
+        "slot": "header",
+        "parent": "root"
+      },
+      "grid": {
+        "slot": "grid",
+        "parent": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "grid",
+        "multiple": true
+      },
+      "preview": {
+        "slot": "preview",
+        "parent": "item",
+        "multiple": true
+      }
+    }
+  },
+  "tokenMapping": {
+    "component": [
+      "--face-gallery-header-height",
+      "--face-gallery-header-inset",
+      "--face-gallery-header-action-gap",
+      "--face-gallery-header-control-height",
+      "--face-gallery-grid-gap",
+      "--face-gallery-grid-pad-top",
+      "--face-gallery-surface-radius",
+      "--face-gallery-surface-min-height",
+      "--face-gallery-surface-pad",
+      "--face-gallery-date-min-height",
+      "--face-gallery-sidebar-min-height",
+      "--face-gallery-modal-min-height",
+      "--face-gallery-toast-min-height"
+    ],
+    "semanticFallbacks": [
+      "--uf-spacing-1",
+      "--uf-spacing-3",
+      "--uf-spacing-5",
+      "--uf-spacing-12",
+      "--uf-control-height",
+      "--uf-control-pad-text",
+      "--uf-radius",
+      "--uf-radius-md",
+      "--uf-membrane",
+      "--uf-font-weight-bold",
+      "--uf-color-background",
+      "--uf-color-foreground",
+      "--uf-color-hover-bg",
+      "--uf-color-bg"
+    ],
+    "notes": [
+      "Gallery-only tokens belong to the root face-ui-react showcase component, not to the individual previewed components.",
+      "The gallery renders Bar, Text and Icon primitives but owns its preview grid, header sizing and component preview surface geometry."
+    ]
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Render playground gallery for the Face UI package"
+    ],
+    "whenNotToUse": [
+      "Application UI outside the Face UI package preview"
+    ],
+    "alternatives": [
+      "Individual component contracts"
+    ],
+    "context": "development"
+  }
+}

@@ -48,7 +48,7 @@ function defaultElement(variant) {
 // Text
 // ---------------------------------------------------------------------------
 export const Text = forwardRef(function Text(props, ref) {
-    const { text, variant = 'default', size, as, icon, iconPosition = 'left', inset = 'control', stretchText = false, fullWidth = false, align = 'left', membrane = true, children, className, htmlFor } = props, rest = __rest(props, ["text", "variant", "size", "as", "icon", "iconPosition", "inset", "stretchText", "fullWidth", "align", "membrane", "children", "className", "htmlFor"]);
+    const { text, variant = 'default', size, as, icon, iconPosition = 'left', inset = 'control', stretchText = false, fullWidth = false, align = 'left', membrane = true, truncate = false, children, className, htmlFor } = props, rest = __rest(props, ["text", "variant", "size", "as", "icon", "iconPosition", "inset", "stretchText", "fullWidth", "align", "membrane", "truncate", "children", "className", "htmlFor"]);
     const normalizedVariant = variant === 'default' ? 'body' : variant;
     const isLabelVariant = variant === 'label';
     // Label must keep default Text control paddings/membrane for consistent UI rhythm.
@@ -60,9 +60,9 @@ export const Text = forwardRef(function Text(props, ref) {
     const hasContent = content != null && String(content).length > 0;
     const textClasses = cn('uf-text', 
     // Components-compat class contract (keep while also exposing data-* attrs).
-    variant === 'label' ? 'uf-text-section' : 'uf-text-body', `uf-text--${variant}`, `uf-text--align-${align}`, effectiveInset === 'none' ? 'uf-text--inset-none' : 'uf-text--inset-control', hasIcon && 'uf-text--withIcon', hasIcon && `uf-text--icon-${iconPosition}`, stretchText && 'uf-control--stretchText', className);
-    const textNode = (_jsxs(Element, Object.assign({ ref: ref }, textAnatomy.getPartAttrs('root'), { "data-variant": normalizedVariant, "data-size": size, "data-inset": effectiveInset, "data-icon-position": hasIcon ? iconPosition : undefined, "data-stretch-text": stretchText ? '' : undefined, "data-full-width": fullWidth ? '' : undefined, "data-align": align, "data-membrane": effectiveMembrane ? '' : undefined, className: textClasses, htmlFor: variant === 'label' ? htmlFor : undefined }, rest, { children: [hasIcon && iconPosition === 'left' && (_jsx("span", { className: "uf-text__icon", children: typeof icon === 'string' ? _jsx(Icon, { name: icon }) : icon })), hasContent && (_jsx("span", { className: "uf-text__content", children: content })), hasIcon && iconPosition === 'right' && (_jsx("span", { className: "uf-text__icon", children: typeof icon === 'string' ? _jsx(Icon, { name: icon }) : icon }))] })));
+    variant === 'label' ? 'uf-text-section' : 'uf-text-body', `uf-text--${variant}`, `uf-text--align-${align}`, effectiveInset === 'none' ? 'uf-text--inset-none' : 'uf-text--inset-control', hasIcon && 'uf-text--withIcon', hasIcon && `uf-text--icon-${iconPosition}`, className);
+    const textNode = (_jsxs(Element, Object.assign({ ref: ref }, textAnatomy.getPartAttrs('root'), { "data-variant": normalizedVariant, "data-size": size, "data-inset": effectiveInset, "data-icon-position": hasIcon ? iconPosition : undefined, "data-stretch-text": stretchText ? '' : undefined, "data-full-width": fullWidth ? '' : undefined, "data-truncate": truncate ? '' : undefined, "data-align": align, "data-membrane": effectiveMembrane ? '' : undefined, className: textClasses, htmlFor: variant === 'label' ? htmlFor : undefined }, rest, { children: [hasIcon && iconPosition === 'left' && (_jsx("span", { className: "uf-text__icon", children: typeof icon === 'string' ? _jsx(Icon, { name: icon }) : icon })), hasContent && (_jsx("span", { className: "uf-text__content", children: content })), hasIcon && iconPosition === 'right' && (_jsx("span", { className: "uf-text__icon", children: typeof icon === 'string' ? _jsx(Icon, { name: icon }) : icon }))] })));
     if (!effectiveMembrane)
         return textNode;
-    return (_jsx("span", { className: cn('uf-membrane', fullWidth && 'uf-membrane--full'), children: textNode }));
+    return (_jsx("span", { className: cn('uf-membrane', fullWidth && 'uf-membrane--full', truncate && 'uf-membrane--truncate'), children: textNode }));
 });

@@ -10,7 +10,7 @@
  * `<Modal open title="Settings" variant="right" width={400} />`
  */
 
-import { forwardRef, useId, useCallback, type MutableRefObject, type ReactNode, type HTMLAttributes, type CSSProperties } from 'react'
+import { forwardRef, useId, useCallback, useEffect, type MutableRefObject, type ReactNode, type HTMLAttributes, type CSSProperties } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import {
   DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
@@ -126,6 +126,13 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
         }
       }) as any,
     })
+    const controlledOpen = typeof resolvedOpen === 'boolean' ? resolvedOpen : null
+    const isMachineOpen = state.matches('open')
+
+    useEffect(() => {
+      if (controlledOpen === null || controlledOpen === isMachineOpen) return
+      send(controlledOpen ? 'OPEN' : 'CLOSE')
+    }, [controlledOpen, isMachineOpen, send])
 
     const api = connectModal(state, send)
     const triggerProps = api.getTriggerProps()
@@ -150,8 +157,8 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
     const contentStyle: CSSProperties | undefined =
       (isHorizontal && width != null) || (isVertical && height != null)
         ? {
-          ...(isHorizontal && width != null ? { '--uf-modal-w': `${width}px` } as CSSProperties : {}),
-          ...(isVertical && height != null ? { '--uf-modal-h': `${height}px` } as CSSProperties : {}),
+          ...(isHorizontal && width != null ? { '--face-runtime-modal-w': `${width}px` } as CSSProperties : {}),
+          ...(isVertical && height != null ? { '--face-runtime-modal-h': `${height}px` } as CSSProperties : {}),
         }
         : undefined
 
@@ -168,7 +175,6 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
           ) : (
             <span
               {...triggerProps}
-              className={cn('uf-modal-trigger')}
               style={{ display: 'inline-flex' }}
             >
               {trigger}

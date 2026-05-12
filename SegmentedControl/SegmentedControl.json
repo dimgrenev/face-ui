@@ -1,6 +1,35 @@
 {
   "name": "SegmentedControl",
   "props": {
+    "items": {
+      "type": "array",
+      "required": true,
+      "description": "Segment options inherited from Toggle.",
+      "default": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "list",
+          "label": "List"
+        },
+        {
+          "value": "kanban",
+          "label": "Board"
+        }
+      ]
+    },
+    "value": {
+      "type": "array",
+      "required": false,
+      "description": "Currently selected segment values."
+    },
+    "defaultValue": {
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial selected segment values."
+    },
     "selectionMode": {
       "type": "enum",
       "required": false,
@@ -10,6 +39,38 @@
         "multiple"
       ],
       "default": "single"
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state inherited from Toggle.",
+      "default": false
+    },
+    "orientation": {
+      "type": "enum",
+      "required": false,
+      "description": "Layout orientation inherited from Toggle.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    },
+    "onValueChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback when selected segment values change."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper around each segment item.",
+      "default": true
     }
   },
   "states": [
@@ -80,6 +141,26 @@
         "parent": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-toggle-border-width"
+    ],
+    "semanticFallbacks": [
+      "--uf-membrane",
+      "--uf-overlay-surface-border",
+      "--uf-radius",
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-color-fg",
+      "--uf-color-hover-bg",
+      "--uf-font-weight-bold"
+    ],
+    "notes": [
+      "SegmentedControl is a thin wrapper over Toggle; token mapping intentionally mirrors Toggle until dedicated segmented-control slots exist.",
+      "SelectionMode maps to Toggle type and preserves Toggle keyboard/focus behavior."
+    ]
   },
   "platform": {},
   "usage": {

@@ -70,7 +70,7 @@ export const Radio = forwardRef(function Radio(props, ref) {
         } }, api.getRootProps(), { "data-orientation": effectiveOrientation, "data-disabled": disabled ? '' : undefined, className: cn('uf-radio', className), children: options.map((option) => {
             const optionDisabled = disabled || option.disabled;
             const itemVisualProps = Object.assign({}, api.getItemProps({ value: option.value, disabled: option.disabled }));
-            const optionNode = (_jsxs("label", Object.assign({}, itemVisualProps, { "data-value": option.value, "data-icon-left": "", className: cn('uf-radio-option', 'uf-radio-label', 'uf-option', 'uf-control', optionDisabled && 'uf-button--disabled'), children: [_jsx("input", { type: "radio", name: name, value: option.value, checked: state.context.value === option.value, disabled: optionDisabled, tabIndex: -1, required: required, onChange: () => {
+            const optionNode = (_jsxs("label", Object.assign({}, itemVisualProps, { "data-value": option.value, "data-icon-left": "", className: cn('uf-radio-option', 'uf-option', 'uf-control'), children: [_jsx("input", { type: "radio", name: name, value: option.value, checked: state.context.value === option.value, disabled: optionDisabled, tabIndex: -1, required: required, onChange: () => {
                             if (!optionDisabled) {
                                 send({ type: 'SELECT', value: option.value });
                             }

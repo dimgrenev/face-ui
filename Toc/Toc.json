@@ -121,6 +121,28 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-toc-line-inset",
+      "--uf-toc-line-gap",
+      "--uf-toc-rail-w",
+      "--uf-toc-indicator-w"
+    ],
+    "semanticFallbacks": [
+      "--uf-spacing-2",
+      "--uf-membrane",
+      "--uf-font-weight-bold",
+      "--uf-color-fg",
+      "--uf-color-hover-bg",
+      "--uf-color-border",
+      "--uf-motion-duration-control",
+      "--uf-motion-ease-standard"
+    ],
+    "notes": [
+      "Toc items render through Button; active indicator geometry is local to the table-of-contents pattern.",
+      "Indicator transform and height transitions use shared Face UI motion tokens."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

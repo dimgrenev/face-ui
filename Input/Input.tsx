@@ -9,7 +9,7 @@
  * `<Input textLayout="wrap" />`
  */
 
-import { forwardRef, useRef, useCallback, useEffect, useId, type ReactNode, type KeyboardEventHandler } from 'react'
+import { forwardRef, useRef, useCallback, useEffect, useId, useMemo, type AriaAttributes, type AriaRole, type ReactNode, type KeyboardEventHandler, type Ref, type MutableRefObject } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { inputMachine, connectInput } from '../assets/machines/input.machine'
 import { cn } from '../assets/utils'
@@ -38,6 +38,8 @@ export interface InputProps {
   type?: InputType
   /** Text layout for type="default": 'scroll' (single-line) or 'wrap' (multi-line auto-grow). */
   textLayout?: InputTextLayout
+  /** Auto-grow textarea height in wrap mode. */
+  autoGrow?: boolean
   /** Disable the input. */
   disabled?: boolean
   /** Make the input read-only. */
@@ -52,6 +54,20 @@ export interface InputProps {
   labelOrientation?: InputLabelOrientation
   /** Placeholder text. */
   placeholder?: string
+  /** Accessible label when no visible label is provided. */
+  ariaLabel?: string
+  /** Role applied to the native input or textarea control. */
+  controlRole?: AriaRole
+  /** Native control aria-controls relationship. */
+  ariaControls?: string
+  /** Native control aria-activedescendant relationship. */
+  ariaActiveDescendant?: string
+  /** Native control aria-autocomplete mode. */
+  ariaAutoComplete?: AriaAttributes['aria-autocomplete']
+  /** Native control aria-expanded state. */
+  ariaExpanded?: AriaAttributes['aria-expanded']
+  /** Native control aria-haspopup state. */
+  ariaHasPopup?: AriaAttributes['aria-haspopup']
   /** Enable/disable spellcheck. */
   spellCheck?: boolean
   /** Optional icon inside the control. */
@@ -88,7 +104,9 @@ export interface InputProps {
   onFocus?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void
   /** Native onKeyDown handler. */
   onKeyDown?: KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>
-  /** Outer membrane wrapper (+1px outside control geometry). */
+  /** Ref to the native input or textarea control. */
+  controlRef?: Ref<HTMLInputElement | HTMLTextAreaElement>
+  /** Outer membrane wrapper around control geometry. */
   membrane?: boolean
   className?: string
 }
@@ -106,6 +124,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
       name,
       type = 'default',
       textLayout = 'scroll',
+      autoGrow = true,
       disabled = false,
       readOnly = false,
       label,
@@ -113,6 +132,13 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
       error = '',
       labelOrientation = 'vertical',
       placeholder,
+      ariaLabel,
+      controlRole,
+      ariaControls,
+      ariaActiveDescendant,
+      ariaAutoComplete,
+      ariaExpanded,
+      ariaHasPopup,
       spellCheck,
       icon,
       iconPosition = 'left',
@@ -131,14 +157,22 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
       onBlur,
       onFocus,
       onKeyDown,
+      controlRef,
       membrane = false,
       className,
     } = props
 
     const resolvedInitial = value ?? defaultValue ?? ''
+    const initialValueRef = useRef(resolvedInitial)
+    const inputMachineConfig = useMemo(() => ({
+      ...inputMachine,
+      context: {
+        ...inputMachine.context,
+        value: initialValueRef.current,
+      },
+    }), [])
 
-    const { state, send } = useMachine(inputMachine, {
-      value: resolvedInitial,
+    const { state, send } = useMachine(inputMachineConfig, {
       type: type === 'default' ? 'text' : type,
       disabled,
       readOnly,
@@ -147,11 +181,26 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
     const api = connectInput(state, send)
 
     const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
+    const setControlRef = useCallback((node: HTMLInputElement | HTMLTextAreaElement | null) => {
+      inputRef.current = node
+      if (typeof controlRef === 'function') {
+        controlRef(node)
+      } else if (controlRef) {
+        ;(controlRef as MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>).current = node
+      }
+    }, [controlRef])
+
+    useEffect(() => {
+      if (value === undefined) return
+      if (state.context.value === value) return
+      send({ type: 'SYNC_VALUE', value })
+    }, [send, state.context.value, value])
 
     // Auto-grow textarea in wrap mode
     const resizeToContent = useCallback(() => {
       if (type !== 'default') return
       if (textLayout !== 'wrap') return
+      if (!autoGrow) return
       const el = inputRef.current
       if (!el || !(el instanceof HTMLTextAreaElement)) return
       const BASE_H = 32
@@ -161,18 +210,18 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
         if (next <= BASE_H) el.style.height = ''
         else el.style.height = `${next}px`
       } catch {}
-    }, [type, textLayout])
+    }, [autoGrow, type, textLayout])
 
     useEffect(() => {
       if (type !== 'default') return
       const el = inputRef.current
       if (!el || !(el instanceof HTMLTextAreaElement)) return
-      if (textLayout === 'scroll') {
+      if (textLayout === 'scroll' || !autoGrow) {
         try { el.style.height = '' } catch {}
       } else {
         resizeToContent()
       }
-    }, [type, textLayout, resizeToContent])
+    }, [autoGrow, type, textLayout, resizeToContent])
 
     useEffect(() => { resizeToContent() }, [resizeToContent, value])
 
@@ -203,11 +252,18 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
 
     const controlEl = isTextarea && textLayout === 'wrap' ? (
       <textarea
-        ref={inputRef as React.Ref<HTMLTextAreaElement>}
+        ref={setControlRef as React.Ref<HTMLTextAreaElement>}
         {...(inputProps as any)}
         data-part={inputProps['data-part'] ?? 'textarea'}
         data-text-layout="wrap"
         placeholder={placeholder}
+        aria-label={ariaLabel}
+        role={controlRole}
+        aria-controls={ariaControls}
+        aria-activedescendant={ariaActiveDescendant}
+        aria-autocomplete={ariaAutoComplete}
+        aria-expanded={ariaExpanded}
+        aria-haspopup={ariaHasPopup}
         spellCheck={spellCheck}
         required={required}
         name={name}
@@ -240,10 +296,17 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
       />
     ) : (
       <input
-        ref={inputRef as React.Ref<HTMLInputElement>}
+        ref={setControlRef as React.Ref<HTMLInputElement>}
         {...(inputProps as any)}
         type={htmlType}
         placeholder={placeholder}
+        aria-label={ariaLabel}
+        role={controlRole}
+        aria-controls={ariaControls}
+        aria-activedescendant={ariaActiveDescendant}
+        aria-autocomplete={ariaAutoComplete}
+        aria-expanded={ariaExpanded}
+        aria-haspopup={ariaHasPopup}
         spellCheck={spellCheck}
         required={required}
         name={name}
@@ -278,7 +341,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
     )
 
     const controlNode = (
-      <span className={cn('uf-input__control', stretchText && 'uf-control--stretchText')}>
+      <span className="uf-input__control" data-stretch-text={stretchText ? '' : undefined}>
         {iconNode}
         {controlEl}
         <button type="button" className="uf-input__clear" {...api.getClearProps()}>
@@ -307,12 +370,16 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
         ) : controlNode}
         {description != null && (
           <div id={descriptionId} className="uf-input__description uf-text-body">
-            {description}
+            {(typeof description === 'string' || typeof description === 'number') ? (
+              <Text as="span" size="xs" inset="none" membrane={false}>
+                {description}
+              </Text>
+            ) : description}
           </div>
         )}
         {error ? (
           <div id={errorId} className="uf-input__error uf-text-body" role="alert" aria-live="polite">
-            {error}
+            <Text as="span" size="xs" inset="none" membrane={false} text={error} />
           </div>
         ) : null}
       </div>

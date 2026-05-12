@@ -37,7 +37,7 @@ export interface PaginationProps {
   onPageChange?: (details: { page: number }) => void
   /** Additional class name on the root element. */
   className?: string
-  /** Outer membrane wrapper (+1px outside each pagination button). */
+  /** Outer membrane wrapper around each pagination button. */
   membrane?: boolean
   /** Title used for the page picker sheet on compact viewports. */
   surfaceTitle?: string

@@ -225,9 +225,9 @@ export function connectCheckbox(
         tabIndex: -1,
         style: {
           position: 'absolute' as const,
-          width: '1px',
-          height: '1px',
-          margin: '-1px',
+          width: 'var(--uf-membrane)',
+          height: 'var(--uf-membrane)',
+          margin: 'calc(-1 * var(--uf-membrane))',
           padding: '0',
           overflow: 'hidden' as const,
           clip: 'rect(0,0,0,0)',

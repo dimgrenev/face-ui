@@ -175,6 +175,43 @@
       "close": { "slot": "close", "parent": "content" }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-modal-zero-blur",
+      "--uf-modal-sheet-inset",
+      "--uf-modal-sheet-gap",
+      "--uf-modal-pad",
+      "--uf-modal-max-w",
+      "--uf-modal-viewport-gap",
+      "--uf-modal-enter-y",
+      "--uf-modal-side-enter-x",
+      "--uf-modal-side-w-default",
+      "--uf-modal-stack-h-default",
+      "--face-runtime-modal-w",
+      "--face-runtime-modal-h"
+    ],
+    "semanticFallbacks": [
+      "--uf-content-inset",
+      "--uf-control-height",
+      "--uf-radius-lg",
+      "--uf-font-size",
+      "--uf-z-modal",
+      "--uf-duration-enter",
+      "--uf-duration-exit",
+      "--uf-ease-enter",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-overlay-backdrop-bg",
+      "--uf-overlay-backdrop-blur",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-surface-shadow"
+    ],
+    "notes": [
+      "Modal variants control placement; surface color, blur and motion come from overlay semantic tokens.",
+      "Width/height props write private runtime custom properties while default sizing remains in the modal token namespace."
+    ]
+  },
   "platform": {
     "dialog": true,
     "inert": true

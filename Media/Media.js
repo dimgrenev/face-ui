@@ -17,7 +17,7 @@ export const mediaAnatomy = createAnatomy('media').parts('root', 'element', 'fal
 // Component
 // ---------------------------------------------------------------------------
 export const Media = forwardRef(function Media(props, ref) {
-    const { type = 'image', src, alt = '', variant = 'default', lazy = false, loading, decoding, poster, controls, autoPlay, loop, muted, width, height, objectFit, fallback, onError, onLoad, className, id, role, title, tabIndex, style, } = props;
+    const { type = 'image', src, alt = '', variant = 'default', lazy = false, loading, decoding, poster, controls, autoPlay, loop, muted, width, height, objectFit, fallback, onError, onLoad, className, id, role, ariaLabel, 'aria-label': ariaLabelAttribute, title, tabIndex, style, } = props;
     const [hasError, setHasError] = useState(false);
     const handleError = () => {
         setHasError(true);
@@ -46,5 +46,5 @@ export const Media = forwardRef(function Media(props, ref) {
                 return (_jsx("img", Object.assign({}, mediaAnatomy.getPartAttrs('element'), { src: src, alt: alt, style: sizeStyle, onError: handleError, onLoad: onLoad, loading: (_a = loading) !== null && _a !== void 0 ? _a : (lazy ? 'lazy' : undefined), decoding: (_b = decoding) !== null && _b !== void 0 ? _b : 'async', className: cn('uf-image', `uf-image--${variant}`), title: title })));
         }
     };
-    return (_jsx("div", Object.assign({ ref: ref }, mediaAnatomy.getPartAttrs('root'), { "data-type": type, "data-error": hasError || undefined, className: cn('uf-media', className), id: id, role: role, title: title, tabIndex: tabIndex, style: wrapperStyle, children: renderElement() })));
+    return (_jsx("div", Object.assign({ ref: ref }, mediaAnatomy.getPartAttrs('root'), { "data-type": type, "data-error": hasError || undefined, className: cn('uf-media', className), id: id, role: role, "aria-label": ariaLabelAttribute !== null && ariaLabelAttribute !== void 0 ? ariaLabelAttribute : ariaLabel, title: title, tabIndex: tabIndex, style: wrapperStyle, children: renderElement() })));
 });

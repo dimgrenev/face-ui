@@ -9,7 +9,7 @@
  * `<Progress value={75} variant="success" showLabel />`
  */
 
-import { forwardRef, type ReactNode } from 'react'
+import { forwardRef, useId, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { progressMachine, connectProgress } from '../assets/machines/progress.machine'
 import { cn } from '../assets/utils'
@@ -32,6 +32,8 @@ export interface ProgressProps {
   showLabel?: boolean
   /** Optional label rendered beside the track. */
   label?: ReactNode
+  /** Accessible label for the progressbar when no visible label is rendered. */
+  'aria-label'?: string
   className?: string
 }
 
@@ -47,6 +49,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       variant = 'default',
       showLabel = false,
       label,
+      'aria-label': ariaLabel,
       className,
     } = props
 
@@ -55,16 +58,20 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       max,
     })
     const api = connectProgress(state, send)
+    const generatedLabelId = useId()
+    const labelId = label != null ? `${generatedLabelId}-label` : undefined
 
     return (
       <div
         ref={ref}
         {...api.getRootProps()}
+        aria-label={ariaLabel}
+        aria-labelledby={labelId}
         data-variant={variant}
         className={cn('uf-progress', className)}
       >
         {label != null && (
-          <Text as="span" inset="none" membrane={false} {...api.getLabelProps()}>
+          <Text as="span" inset="none" membrane={false} id={labelId} {...api.getLabelProps()}>
             {label}
           </Text>
         )}

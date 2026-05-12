@@ -136,6 +136,25 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-gap",
+      "--uf-control-font-size",
+      "--uf-radius",
+      "--uf-font-weight-bold",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg"
+    ],
+    "notes": [
+      "Steps intentionally uses shared control geometry and Text instead of a dedicated component token namespace.",
+      "Step content strings route through Text; indicators use compact text glyphs."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

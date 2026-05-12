@@ -272,7 +272,7 @@ export function connectCommand(state, send) {
         getItemProps(props) {
             const isHighlighted = ctx.highlightedIndex === props.index;
             const isDisabled = props.disabled;
-            return Object.assign(Object.assign({}, attrs('item')), { id: `command:item:${props.id}`, role: 'option', 'aria-selected': isHighlighted, 'data-highlighted': isHighlighted ? '' : undefined, 'data-disabled': isDisabled ? '' : undefined, 'data-value': props.id, tabIndex: -1, onPointerDown(event) {
+            return Object.assign(Object.assign({}, attrs('item')), { id: `command:item:${props.id}`, role: 'option', 'aria-selected': isHighlighted, 'aria-disabled': isDisabled ? true : undefined, 'data-highlighted': isHighlighted ? '' : undefined, 'data-disabled': isDisabled ? '' : undefined, 'data-value': props.id, tabIndex: -1, disabled: isDisabled, onPointerDown(event) {
                     if (!isDisabled) {
                         event.preventDefault();
                     }

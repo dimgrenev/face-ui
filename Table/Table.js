@@ -184,7 +184,16 @@ export const Table = forwardRef(function Table(props, ref) {
                                 style.maxWidth = col.maxWidth;
                             if (col.align)
                                 style.textAlign = col.align;
-                            return (_jsxs("th", Object.assign({}, api.getHeaderCellProps(col.id, { sortable: col.sortable }), { style: Object.keys(style).length > 0 ? style : undefined, children: [_jsxs("div", { className: "uf-table__cellSlot", "data-align": (_a = col.align) !== null && _a !== void 0 ? _a : 'left', children: [renderHeaderContent(col.header, (_b = col.align) !== null && _b !== void 0 ? _b : 'left'), api.sortColumn === col.id && (_jsx("span", { "aria-hidden": "true", className: "uf-table__sort-icon", children: _jsx(Icon, { name: api.sortDirection === 'asc' ? 'up' : 'down', size: 14 }) }))] }), resizable && index < columns.length - 1 && (_jsx("span", { className: "uf-table__resize-handle", onPointerDown: (event) => {
+                            const headerCellProps = api.getHeaderCellProps(col.id, { sortable: col.sortable });
+                            const sortButtonProps = col.sortable
+                                ? { type: 'button', onClick: headerCellProps.onClick }
+                                : null;
+                            const thProps = Object.assign({}, headerCellProps);
+                            delete thProps.onClick;
+                            delete thProps.onKeyDown;
+                            delete thProps.tabIndex;
+                            delete thProps.style;
+                            return (_jsxs("th", Object.assign({}, thProps, { style: Object.keys(style).length > 0 ? style : undefined, children: [_jsxs("div", { className: "uf-table__cellSlot", "data-align": (_a = col.align) !== null && _a !== void 0 ? _a : 'left', children: [sortButtonProps ? (_jsx("button", Object.assign({}, sortButtonProps, { className: "uf-table__sort-button", children: renderHeaderContent(col.header, (_b = col.align) !== null && _b !== void 0 ? _b : 'left') }))) : (renderHeaderContent(col.header, (_b = col.align) !== null && _b !== void 0 ? _b : 'left')), api.sortColumn === col.id && (_jsx("span", { "aria-hidden": "true", className: "uf-table__sort-icon", children: _jsx(Icon, { name: api.sortDirection === 'asc' ? 'up' : 'down', size: 14 }) }))] }), resizable && index < columns.length - 1 && (_jsx("span", { className: "uf-table__resize-handle", onPointerDown: (event) => {
                                             var _a, _b, _c, _d, _e, _f, _g;
                                             event.preventDefault();
                                             const cell = event.currentTarget.parentElement;

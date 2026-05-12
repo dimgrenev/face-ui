@@ -31,6 +31,7 @@ export interface SliderAdvancedProps {
   step?: number
   disabled?: boolean
   label?: ReactNode
+  'aria-label'?: string
   className?: string
   leading?: SliderLeading
   leadingIcon?: ReactNode
@@ -73,6 +74,7 @@ export function SliderAdvanced({
   step = 1,
   disabled = false,
   label,
+  'aria-label': ariaLabel,
   className,
   leading = 'none',
   leadingIcon,
@@ -493,7 +495,14 @@ export function SliderAdvanced({
   })()
 
   return (
-    <div ref={rootRef} className={sliderClasses}>
+    <div
+      ref={rootRef}
+      className={sliderClasses}
+      data-scope="slider"
+      data-part="root"
+      data-orientation="horizontal"
+      data-disabled={disabled || undefined}
+    >
       {label != null && (
         <Text as="label" variant="label">
           {label}
@@ -503,11 +512,11 @@ export function SliderAdvanced({
       <div
         className="uf-slider-row"
         style={{
-          ['--uf-slider-t' as string]: String(tFromValue(renderValue)),
-          ['--uf-slider-crop-left-px' as string]: `${Number(cropLeftPx).toFixed(2)}px`,
-          ['--uf-slider-crop-right-px' as string]: `${Number(cropRightPx).toFixed(2)}px`,
-          ['--uf-slider-crop-thumb-pad' as string]: `${MARKER_W_PX + BUFFER_PX}px`,
-          ['--uf-slider-thumb-w' as string]: `${thumbW}px`,
+          ['--face-runtime-slider-t' as string]: String(tFromValue(renderValue)),
+          ['--face-runtime-slider-crop-left-x' as string]: `${Number(cropLeftPx).toFixed(2)}px`,
+          ['--face-runtime-slider-crop-right-x' as string]: `${Number(cropRightPx).toFixed(2)}px`,
+          ['--face-runtime-slider-crop-thumb-pad' as string]: `${MARKER_W_PX + BUFFER_PX}px`,
+          ['--face-runtime-slider-thumb-w' as string]: `${thumbW}px`,
         } as CSSProperties}
       >
         {leadingNode ? <div className="uf-slider-leading">{leadingNode}</div> : null}
@@ -564,7 +573,7 @@ export function SliderAdvanced({
             disabled={disabled}
             onChange={handleInputChange}
             className="uf-slider-input"
-            aria-label={typeof label === 'string' ? label : 'Slider'}
+            aria-label={typeof ariaLabel === 'string' && ariaLabel.trim() ? ariaLabel : (typeof label === 'string' ? label : 'Slider')}
           />
 
           {cropEnabled && (

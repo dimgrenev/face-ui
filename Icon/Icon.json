@@ -104,6 +104,19 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-icon-size"
+    ],
+    "semanticFallbacks": [
+      "--uf-color-background"
+    ],
+    "notes": [
+      "Icon inherits color through currentColor and does not own palette semantics.",
+      "Parent component slots may provide --uf-icon-size, but the Icon API still supports numeric size and IconProvider.size for backward compatibility.",
+      "Some built-in glyphs use --uf-color-background for internal knockouts; keep this tied to theme background until icon theming is formalized."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

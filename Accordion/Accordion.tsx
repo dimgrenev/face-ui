@@ -8,7 +8,7 @@
  * `<Accordion items={[{ value: 'solo', label: 'Toggle', content: <p>...</p> }]} collapsible />`
  */
 
-import { Children, Fragment, forwardRef, isValidElement, useMemo, type ReactNode } from 'react'
+import { Children, Fragment, forwardRef, isValidElement, useId, useMemo, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { accordionMachine, connectAccordion } from '../assets/machines/accordion.machine'
@@ -113,6 +113,10 @@ function renderAccordionContentNode(node: ReactNode): ReactNode {
   return node
 }
 
+function getAccordionDomId(instanceId: string, part: 'trigger' | 'content', value: string): string {
+  return `accordion:${instanceId}:${part}:${value}`
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -177,32 +181,43 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
     const { state, send } = useMachine(accordionMachine, machineOptions)
 
     const api = connectAccordion(state, send)
+    const accordionInstanceId = useId().replace(/:/g, '')
 
     return (
       <div ref={ref} {...api.getRootProps()} className={cn('uf-accordion', className)}>
-        {items.map((item) => (
-          <div key={item.value} {...api.getItemProps({ value: item.value, disabled: item.disabled })}>
-            <span className="uf-membrane uf-membrane--full">
-              <button
-                {...api.getTriggerProps({ value: item.value, disabled: item.disabled })}
+        {items.map((item) => {
+          const triggerId = getAccordionDomId(accordionInstanceId, 'trigger', item.value)
+          const contentId = getAccordionDomId(accordionInstanceId, 'content', item.value)
+          return (
+            <div key={item.value} {...api.getItemProps({ value: item.value, disabled: item.disabled })}>
+              <span className="uf-membrane uf-membrane--full">
+                <button
+                  {...api.getTriggerProps({ value: item.value, disabled: item.disabled })}
+                  id={triggerId}
+                  aria-controls={contentId}
+                >
+                  <Text as="span" inset="none" membrane={false} className="uf-accordion-label">
+                    {item.label}
+                  </Text>
+                  <Text as="span" inset="none" membrane={false} className="uf-accordion-arrow" aria-hidden="true"><RightIcon /></Text>
+                </button>
+              </span>
+              <div
+                {...api.getContentProps({ value: item.value })}
+                id={contentId}
+                aria-labelledby={triggerId}
               >
-                <Text as="span" inset="none" membrane={false} className="uf-accordion-label">
-                  {item.label}
+                <Text as="div" inset="none" membrane={false} className="uf-accordion-content-inner">
+                  {flattenAccordionContent(item.content).map((node, idx) => (
+                    <div className="uf-accordion-slot" key={`${item.value}:slot:${idx}`}>
+                      {renderAccordionContentNode(node)}
+                    </div>
+                  ))}
                 </Text>
-                <Text as="span" inset="none" membrane={false} className="uf-accordion-arrow" aria-hidden="true"><RightIcon /></Text>
-              </button>
-            </span>
-            <div {...api.getContentProps({ value: item.value })}>
-              <Text as="div" inset="none" membrane={false} className="uf-accordion-content-inner">
-                {flattenAccordionContent(item.content).map((node, idx) => (
-                  <div className="uf-accordion-slot" key={`${item.value}:slot:${idx}`}>
-                    {renderAccordionContentNode(node)}
-                  </div>
-                ))}
-              </Text>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     )
   },

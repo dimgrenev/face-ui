@@ -32,7 +32,7 @@ export const codeAnatomy = createAnatomy('code').parts(
 /** A single token within a highlighted line. */
 export interface CodeToken {
   content: string
-  /** CSS color value (e.g. "#e06c75"). Omit for default text color. */
+  /** CSS color value or token reference. Omit for default text color. */
   color?: string
 }
 
@@ -125,7 +125,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
         el.value = text
         el.setAttribute('readonly', 'true')
         el.style.position = 'fixed'
-        el.style.left = '-9999px'
+        el.style.left = '-9999em'
         el.style.opacity = '0'
         document.body.appendChild(el)
         el.select()

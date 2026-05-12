@@ -97,6 +97,37 @@
       "arrow": { "slot": "arrow", "parent": "content" }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-overlay-content-max-w",
+      "--uf-overlay-content-border-width"
+    ],
+    "semanticFallbacks": [
+      "--uf-spacing-1",
+      "--uf-spacing-2",
+      "--uf-spacing-3",
+      "--uf-radius",
+      "--uf-membrane",
+      "--uf-z-overlay",
+      "--uf-duration-enter",
+      "--uf-duration-exit",
+      "--uf-ease-enter",
+      "--uf-font-size-xs",
+      "--uf-font-size-sm",
+      "--uf-font-weight",
+      "--uf-color-primary",
+      "--uf-color-primary-fg",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-border",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-enter-y",
+      "--uf-overlay-enter-scale"
+    ],
+    "notes": [
+      "Tooltip is the non-interactive hover variant of Overlay.",
+      "Tooltip copy must stay brief; use Popover for interactive or rich content."
+    ]
+  },
   "platform": {
     "popover": true,
     "anchorPositioning": true

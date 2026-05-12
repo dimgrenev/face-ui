@@ -41,6 +41,8 @@ export interface SliderProps {
   orientation?: 'horizontal' | 'vertical'
   /** Label content. */
   label?: ReactNode
+  /** Accessible label for thumb controls when a visible label is not rendered. */
+  'aria-label'?: string
   /** Callback when value changes. */
   onValueChange?: (details: { value: number[] }) => void
   /** Legacy scalar callback for the advanced slider. */
@@ -92,6 +94,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     disabled = false,
     orientation = 'horizontal',
     label,
+    'aria-label': ariaLabel,
     onValueChange,
     onChange,
     leading = 'none',
@@ -135,6 +138,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           step={step}
           disabled={disabled}
           label={label}
+          aria-label={ariaLabel}
           onValueChange={onValueChange}
           onChange={onChange}
           leading={leading}
@@ -175,6 +179,9 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const trackRef = useRef<HTMLDivElement | null>(null)
     const isDragging = state.matches('dragging')
     const renderedValues = state.context.value.length > 0 ? state.context.value : initialValue
+    const thumbLabelBase = typeof ariaLabel === 'string' && ariaLabel.trim()
+      ? ariaLabel
+      : (typeof label === 'string' && label.trim() ? label : 'Slider')
 
     useEffect(() => {
       if (controlledValue !== undefined) return
@@ -239,9 +246,14 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           className={cn('uf-slider-trackHitArea')}
         >
           <div {...api.getRangeProps()} />
-          {renderedValues.map((_, index) => (
-            <div key={index} {...api.getThumbProps(index)} />
-          ))}
+          {renderedValues.map((_, index) => {
+            const ariaLabel = renderedValues.length > 1
+              ? `${thumbLabelBase} ${index + 1}`
+              : thumbLabelBase
+            return (
+              <div key={index} {...api.getThumbProps(index)} aria-label={ariaLabel} />
+            )
+          })}
         </div>
       </div>
     )

@@ -58,7 +58,7 @@ export interface TabsProps {
   /** components API compatibility (visual variants are styled via classes). */
   withLine?: boolean
   wrap?: boolean
-  /** Outer membrane wrapper (+1px outside each tab trigger). */
+  /** Outer membrane wrapper around each tab trigger. */
   membrane?: boolean
   /** Additional class name on the root element. */
   className?: string

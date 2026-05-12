@@ -98,6 +98,35 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-badge-outline-width",
+      "--uf-badge-bg",
+      "--uf-badge-fg",
+      "--uf-badge-border"
+    ],
+    "semanticFallbacks": [
+      "--uf-membrane",
+      "--uf-control-pad-icon",
+      "--uf-control-line-height",
+      "--uf-font-size-xs",
+      "--uf-font-weight-bold",
+      "--uf-radius-full",
+      "--uf-color-primary",
+      "--uf-color-primary-fg",
+      "--uf-color-hover-bg",
+      "--uf-color-fg",
+      "--uf-color-border",
+      "--uf-color-destructive",
+      "--uf-color-destructive-fg",
+      "--uf-color-accent",
+      "--uf-color-accent-fg"
+    ],
+    "notes": [
+      "Badge content renders through Text with inset=control and membrane enabled.",
+      "Variant tokens are local aliases over semantic intent colors."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

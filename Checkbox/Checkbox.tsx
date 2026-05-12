@@ -5,9 +5,8 @@
  * `<Checkbox checked disabled />`
  */
 
-import { forwardRef, type ReactNode } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { checkboxMachine, connectCheckbox } from '../assets/machines/checkbox.machine'
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
@@ -34,12 +33,17 @@ export interface CheckboxProps {
   onCheckedChange?: (details: { checked: boolean | 'indeterminate' }) => void
   /** Additional CSS class. */
   className?: string
-  /** Outer membrane wrapper (+1px outside control geometry). */
+  /** Outer membrane wrapper around control geometry. */
   membrane?: boolean
 }
 
 interface CheckboxLegacyProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+function initialCheckboxState(checked: boolean | 'indeterminate'): 'unchecked' | 'checked' | 'indeterminate' {
+  if (checked === 'indeterminate') return 'indeterminate'
+  return checked ? 'checked' : 'unchecked'
 }
 
 // ---------------------------------------------------------------------------
@@ -60,13 +64,18 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
       className,
       membrane = true,
     } = props
-    const machineChecked = useControllableMachineProp(
-      checked !== undefined ? checked : undefined,
-      defaultChecked,
-    )
+    const resolvedInitial = checked ?? defaultChecked
+    const initialCheckedRef = useRef(resolvedInitial)
+    const checkboxMachineConfig = useMemo(() => ({
+      ...checkboxMachine,
+      initial: initialCheckboxState(initialCheckedRef.current),
+      context: {
+        ...checkboxMachine.context,
+        checked: initialCheckedRef.current,
+      },
+    }), [])
 
-    const { state, send } = useMachine(checkboxMachine, {
-      checked: machineChecked,
+    const { state, send } = useMachine(checkboxMachineConfig, {
       disabled,
       required,
       name,
@@ -75,14 +84,17 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
       }) as any,
     })
 
+    useEffect(() => {
+      if (checked === undefined) return
+      if (state.context.checked === checked) return
+      send({ type: 'SET', checked })
+    }, [checked, send, state.context.checked])
+
     const api = connectCheckbox(state, send)
 
     const hasLabel = label != null && String(label).trim().length > 0
     const controlVisualProps = { ...(api.getControlProps() as any) }
-    delete controlVisualProps.role
-    delete controlVisualProps.tabIndex
     delete controlVisualProps.onClick
-    delete controlVisualProps.onKeyDown
     const labelVisualProps = { ...(api.getLabelProps() as any) }
     delete labelVisualProps.onClick
 
@@ -97,7 +109,6 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
           'uf-checkbox',
           'uf-option',
           'uf-control',
-          !hasLabel && 'uf-checkbox--iconOnly',
           className,
         )}
       >

@@ -18,11 +18,12 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  * `<Switcher text="Accept terms" withText />`
  * `<Switcher text="Long description..." withText textWrap="wrap" />`
  */
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 import { useMachine } from '../assets/adapters/react/use-machine';
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop';
 import { switcherMachine, connectSwitcher } from '../assets/machines/switcher.machine';
 import { cn } from '../assets/utils';
+import { Text } from '../Text/Text';
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -47,11 +48,13 @@ export const Switcher = forwardRef(function Switcher(props, ref) {
         }),
     });
     const api = connectSwitcher(state, send);
+    const generatedLabelId = useId();
     // Determine label content: explicit `label` prop takes priority, then `text` when `withText`
     const labelContent = label !== null && label !== void 0 ? label : (withText && text ? text : null);
     const hasLabel = labelContent != null;
+    const labelId = hasLabel ? `${generatedLabelId}-label` : undefined;
     const switchOnly = !hasLabel;
-    const rootNode = (_jsxs("div", Object.assign({ ref: ref }, api.getRootProps(), rest, { "data-switch-only": switchOnly || undefined, "data-text-wrap": textWrap === 'wrap' || undefined, className: cn('uf-switcher', className), children: [hasLabel && (_jsx("label", Object.assign({}, api.getLabelProps(), { children: labelContent }))), _jsx("div", Object.assign({}, api.getControlProps(), { children: _jsx("span", Object.assign({}, api.getThumbProps())) })), _jsx("input", Object.assign({}, api.getHiddenInputProps()))] })));
+    const rootNode = (_jsxs("div", Object.assign({ ref: ref }, api.getRootProps(), rest, { "data-switch-only": switchOnly || undefined, "data-text-wrap": textWrap === 'wrap' || undefined, className: cn('uf-switcher', className), children: [hasLabel && (_jsx("label", Object.assign({}, api.getLabelProps(), { id: labelId, children: _jsx(Text, { as: "span", variant: "body", inset: "none", membrane: false, children: labelContent }) }))), _jsx("div", Object.assign({}, api.getControlProps(), { "aria-labelledby": labelId, children: _jsx("span", Object.assign({}, api.getThumbProps())) })), _jsx("input", Object.assign({}, api.getHiddenInputProps()))] })));
     if (!membrane)
         return rootNode;
     return _jsx("span", { className: "uf-membrane uf-membrane--full", children: rootNode });

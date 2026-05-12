@@ -46,7 +46,8 @@
   "behavior": {},
   "keyboard": {},
   "aria": {
-    "role": "separator"
+    "role": "none by default; separator when decorative is false",
+    "orientation": "aria-orientation is set only for semantic separators."
   },
   "composition": {
     "required": [
@@ -57,6 +58,19 @@
         "slot": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-separator-line-width"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-pad-text",
+      "--uf-color-border"
+    ],
+    "notes": [
+      "Separator line width is a component-local alias over membrane thickness.",
+      "Membrane spacing keeps horizontal separators aligned with control/text insets."
+    ]
   },
   "platform": {},
   "usage": {

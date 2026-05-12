@@ -38,6 +38,11 @@
       "description": "Optional label rendered beside the track.",
       "default": null
     },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the progressbar when no visible label is rendered."
+    },
     "className": {
       "type": "string",
       "required": false,
@@ -80,7 +85,7 @@
       "aria-valuenow",
       "aria-valuemin",
       "aria-valuemax",
-      "aria-label"
+      "aria-label or aria-labelledby"
     ]
   },
   "composition": {
@@ -109,6 +114,40 @@
         "parent": "track"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-progress-track-height",
+      "--uf-progress-label-min-width",
+      "--uf-progress-track-bg",
+      "--uf-progress-indicator-bg",
+      "--uf-progress-indicator-success-bg",
+      "--uf-progress-indicator-warning-bg",
+      "--uf-progress-indicator-error-bg"
+    ],
+    "semanticFallbacks": [
+      "--uf-membrane",
+      "--uf-control-height",
+      "--uf-control-gap",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-radius-full",
+      "--uf-font-size-sm",
+      "--uf-color-fg",
+      "--uf-color-hover-bg",
+      "--uf-color-success",
+      "--uf-color-warning",
+      "--uf-color-destructive",
+      "--uf-motion-duration-control",
+      "--uf-motion-duration-loading",
+      "--uf-motion-iteration-indefinite",
+      "--uf-motion-ease-standard",
+      "--uf-motion-ease-in-out"
+    ],
+    "notes": [
+      "Progress labels render through Text.",
+      "Determinate width and indeterminate animation remain behavior/data outputs, with motion driven by shared Face UI motion tokens."
+    ]
   },
   "platform": {},
   "usage": {

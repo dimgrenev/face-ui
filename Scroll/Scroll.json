@@ -41,6 +41,12 @@
       "required": false,
       "description": "Viewport height.",
       "default": 160
+    },
+    "ariaLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the scrollable region.",
+      "default": "Scrollable content"
     }
   },
   "states": [
@@ -101,6 +107,17 @@
         "parent": "scrollbar"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [],
+    "semanticFallbacks": [
+      "--uf-control-pad-y",
+      "--uf-control-pad-text"
+    ],
+    "notes": [
+      "Scroll currently owns viewport padding and clipping only; native scrollbar visuals are browser-owned.",
+      "height is a layout input and remains product data rather than a visual token."
+    ]
   },
   "platform": {},
   "usage": {

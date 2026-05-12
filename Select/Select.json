@@ -122,7 +122,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper (+1px outside trigger/option geometry).",
+      "description": "Outer membrane wrapper around trigger/option geometry.",
       "default": true
     },
     "className": {
@@ -229,6 +229,54 @@
         "parent": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-select-sheet-inset",
+      "--uf-select-sheet-gap",
+      "--uf-select-content-max-height",
+      "--uf-select-panel-pad",
+      "--uf-select-sheet-enter-y"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-font-size",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-pad-icon",
+      "--uf-control-gap",
+      "--uf-font-size-sm",
+      "--uf-font-weight",
+      "--uf-font-weight-bold",
+      "--uf-radius",
+      "--uf-radius-lg",
+      "--uf-membrane",
+      "--uf-spacing-1",
+      "--uf-z-dropdown",
+      "--uf-z-overlay",
+      "--uf-duration-enter",
+      "--uf-duration-exit",
+      "--uf-ease-enter",
+      "--uf-motion-duration-fast",
+      "--uf-motion-ease-out",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-border",
+      "--uf-color-hover-bg",
+      "--uf-overlay-backdrop-bg",
+      "--uf-overlay-backdrop-blur",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-border",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-surface-shadow",
+      "--uf-overlay-enter-y",
+      "--uf-overlay-enter-scale"
+    ],
+    "notes": [
+      "Select shares overlay tokens with responsive sheets and popovers; keep trigger and option geometry on control tokens.",
+      "Trigger arrow rotation and opacity feedback consume shared Face UI motion tokens.",
+      "Option labels should render through Text-compatible label nodes rather than raw typography classes."
+    ]
   },
   "platform": {
     "popover": true

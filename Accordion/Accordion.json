@@ -1,8 +1,11 @@
 {
   "name": "Accordion",
+  "description": "Expandable panel navigation with single or multiple open items",
   "props": {
     "items": {
       "type": "array",
+      "required": false,
+      "description": "Accordion item definitions.",
       "default": [
         {
           "value": "a",
@@ -18,31 +21,174 @@
     },
     "expandedIds": {
       "type": "array",
-      "default": []
+      "required": false,
+      "description": "Currently expanded item IDs (controlled)."
     },
     "defaultExpandedIds": {
       "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial expanded item IDs.",
       "default": []
     },
     "multiple": {
       "type": "boolean",
+      "required": false,
+      "description": "Allow multiple items to be expanded simultaneously.",
       "default": false
     },
     "collapsible": {
       "type": "boolean",
+      "required": false,
+      "description": "Allow collapsing the last open item.",
       "default": true
     },
     "disabled": {
       "type": "boolean",
-      "default": true
+      "required": false,
+      "description": "Disable the entire accordion.",
+      "default": false
     },
     "onExpandedChange": {
       "type": "function",
-      "default": ""
+      "required": false,
+      "description": "Callback when expanded items change."
     },
     "className": {
       "type": "string",
-      "default": ""
+      "required": false,
+      "description": "Additional class name on the root element."
     }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Multiple",
+      "props": {
+        "multiple": true
+      }
+    },
+    {
+      "name": "Non-Collapsible",
+      "props": {
+        "collapsible": false
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true
+      }
+    }
+  ],
+  "behavior": {
+    "stateModel": "Machine stores expandedIds and supports controlled or uncontrolled expansion.",
+    "multiple": "When multiple=false, opening one item closes the others.",
+    "collapsible": "When collapsible=false, the last open item cannot be closed by toggling it.",
+    "autoFocusOnOpen": "none"
+  },
+  "keyboard": {
+    "ArrowDown": {
+      "action": "focusNextTrigger"
+    },
+    "ArrowUp": {
+      "action": "focusPreviousTrigger"
+    },
+    "Home": {
+      "action": "focusFirstTrigger"
+    },
+    "End": {
+      "action": "focusLastTrigger"
+    },
+    "Enter": {
+      "action": "toggleItem"
+    },
+    "Space": {
+      "action": "toggleItem"
+    }
+  },
+  "aria": {
+    "role": "region",
+    "required": [
+      "aria-labelledby"
+    ],
+    "notes": [
+      "Triggers are native buttons; content panels are hidden when collapsed."
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "item",
+      "trigger",
+      "content"
+    ],
+    "recommended": [
+      "icon"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "root",
+        "multiple": true
+      },
+      "trigger": {
+        "slot": "trigger",
+        "parent": "item"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "item"
+      },
+      "icon": {
+        "slot": "icon",
+        "parent": "trigger"
+      }
+    }
+  },
+  "tokenMapping": {
+    "component": [],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-gap",
+      "--uf-control-pad-text",
+      "--uf-control-pad-icon",
+      "--uf-font-size",
+      "--uf-font-weight",
+      "--uf-radius",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg",
+      "--uf-motion-duration-control",
+      "--uf-motion-ease-standard"
+    ],
+    "notes": [
+      "Accordion intentionally uses shared control geometry and motion tokens instead of accordion-local size or timing tokens.",
+      "Trigger labels and content strings route through Text; nested action content should remain Face UI or UF components."
+    ]
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Collapsible FAQ sections",
+      "Grouped settings panels",
+      "Long content that needs progressive disclosure"
+    ],
+    "whenNotToUse": [
+      "Tab-like navigation (use Tabs)",
+      "Simple show/hide toggle without grouped content",
+      "Single binary setting (use Switcher)"
+    ],
+    "alternatives": [
+      "Tabs",
+      "Card",
+      "Switcher"
+    ],
+    "context": "both"
   }
 }

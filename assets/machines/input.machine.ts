@@ -32,12 +32,14 @@ export interface InputSchema extends MachineSchema {
     readOnly: boolean
     type: string
     onValueChange?: (details: { value: string }) => void
+    silentSync: boolean
   }
   state: 'idle' | 'focused'
   event:
     | { type: 'FOCUS' }
     | { type: 'BLUR' }
     | { type: 'SET_VALUE'; value: string }
+    | { type: 'SYNC_VALUE'; value: string }
     | { type: 'CLEAR' }
 }
 
@@ -53,10 +55,15 @@ export const inputMachine = createMachine<InputSchema>({
     disabled: false,
     readOnly: false,
     type: 'text',
+    silentSync: false,
   },
 
   watch: {
     value(ctx) {
+      if (ctx.silentSync) {
+        ctx.silentSync = false
+        return
+      }
       ctx.onValueChange?.({ value: ctx.value })
     },
   },
@@ -80,6 +87,14 @@ export const inputMachine = createMachine<InputSchema>({
             ],
           },
         ],
+        SYNC_VALUE: {
+          actions: [
+            (ctx, e) => {
+              ctx.silentSync = true
+              ctx.value = (e as { type: 'SYNC_VALUE'; value: string }).value
+            },
+          ],
+        },
         CLEAR: [
           {
             guard: (ctx) => !ctx.disabled && !ctx.readOnly,
@@ -108,6 +123,14 @@ export const inputMachine = createMachine<InputSchema>({
             ],
           },
         ],
+        SYNC_VALUE: {
+          actions: [
+            (ctx, e) => {
+              ctx.silentSync = true
+              ctx.value = (e as { type: 'SYNC_VALUE'; value: string }).value
+            },
+          ],
+        },
         CLEAR: [
           {
             guard: (ctx) => !ctx.disabled && !ctx.readOnly,

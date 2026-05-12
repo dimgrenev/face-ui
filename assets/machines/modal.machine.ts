@@ -38,6 +38,7 @@ interface ModalContext {
   variant: ModalVariant
   closable: boolean
   contentEl: HTMLElement | null
+  previousFocusEl: HTMLElement | null
   titleId: string
   descriptionId: string
   onOpenChange: ((details: { open: boolean }) => void) | null
@@ -79,6 +80,94 @@ const syncOpenFalse = (ctx: ModalContext): void => {
 
 const setContentEl = (ctx: ModalContext, event: ModalEvent): void => {
   ctx.contentEl = (event as { type: 'SET_CONTENT'; el: HTMLElement | null }).el
+  if (ctx.open) focusInitialElement(ctx)
+}
+
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'textarea:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
+
+function getFocusableElements(root: HTMLElement | null): HTMLElement[] {
+  if (!root) return []
+  return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+    .filter((element) => !element.hidden && element.getAttribute('aria-hidden') !== 'true')
+}
+
+function focusInitialElement(ctx: ModalContext): void {
+  const el = ctx.contentEl
+  if (!el) return
+  const focusable = getFocusableElements(el)
+  try { (focusable[0] || el).focus() } catch {}
+}
+
+function focusInitialElementWhenVisible(ctx: ModalContext): (() => void) | undefined {
+  focusInitialElement(ctx)
+
+  let cancelled = false
+  const schedule = typeof requestAnimationFrame === 'function'
+    ? requestAnimationFrame
+    : (callback: FrameRequestCallback) => window.setTimeout(callback, 0)
+  const cancel = typeof cancelAnimationFrame === 'function'
+    ? cancelAnimationFrame
+    : window.clearTimeout
+
+  const frame = schedule(() => {
+    if (cancelled || !ctx.open || !ctx.contentEl) return
+    const active = document.activeElement
+    if (active instanceof HTMLElement && ctx.contentEl.contains(active)) return
+    focusInitialElement(ctx)
+  })
+
+  return () => {
+    cancelled = true
+    cancel(frame)
+  }
+}
+
+function capturePreviousFocus(ctx: ModalContext): void {
+  const active = document.activeElement
+  ctx.previousFocusEl = active instanceof HTMLElement ? active : null
+}
+
+function restorePreviousFocus(ctx: ModalContext): void {
+  const previous = ctx.previousFocusEl
+  ctx.previousFocusEl = null
+  if (!previous || !document.contains(previous)) return
+  try { previous.focus() } catch {}
+}
+
+function containTabFocus(ctx: ModalContext, event: { shiftKey?: boolean; preventDefault: () => void }): void {
+  const el = ctx.contentEl
+  if (!el) return
+  const focusable = getFocusableElements(el)
+  if (focusable.length === 0) {
+    event.preventDefault()
+    try { el.focus() } catch {}
+    return
+  }
+
+  const first = focusable[0]
+  const last = focusable[focusable.length - 1]
+  const active = document.activeElement
+  const activeInside = active instanceof HTMLElement && el.contains(active)
+
+  if (event.shiftKey) {
+    if (!activeInside || active === first) {
+      event.preventDefault()
+      try { last.focus() } catch {}
+    }
+    return
+  }
+
+  if (!activeInside || active === last) {
+    event.preventDefault()
+    try { first.focus() } catch {}
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -94,6 +183,7 @@ export const modalMachine = createMachine<ModalSchema>({
     variant: 'center',
     closable: true,
     contentEl: null,
+    previousFocusEl: null,
     titleId: '',
     descriptionId: '',
     onOpenChange: null,
@@ -113,6 +203,7 @@ export const modalMachine = createMachine<ModalSchema>({
   states: {
     closed: {
       entry: [syncOpenFalse],
+      effects: ['restoreFocus'],
       on: {
         OPEN: { target: 'open' },
         TOGGLE: { target: 'open' },
@@ -123,7 +214,7 @@ export const modalMachine = createMachine<ModalSchema>({
     open: {
       tags: ['visible'],
       entry: [syncOpenTrue],
-      effects: ['trackDocumentEscape'],
+      effects: ['trackDocumentEscape', 'focusInitial'],
       on: {
         CLOSE: { target: 'closed' },
         TOGGLE: { target: 'closed' },
@@ -141,6 +232,7 @@ export const modalMachine = createMachine<ModalSchema>({
   implementations: {
     effects: {
       trackDocumentEscape: (ctx, send) => {
+        capturePreviousFocus(ctx)
         const onKeyDown = (event: KeyboardEvent) => {
           if (event.key === 'Escape') {
             send({ type: 'ESCAPE' })
@@ -148,14 +240,15 @@ export const modalMachine = createMachine<ModalSchema>({
         }
         document.addEventListener('keydown', onKeyDown)
 
-        const el = ctx.contentEl
-        if (el) {
-          try { el.focus() } catch {}
-        }
-
         return () => {
           document.removeEventListener('keydown', onKeyDown)
         }
+      },
+      focusInitial: (ctx) => {
+        return focusInitialElementWhenVisible(ctx)
+      },
+      restoreFocus: (ctx) => {
+        restorePreviousFocus(ctx)
       },
     },
   },
@@ -224,7 +317,10 @@ export function connectModal(
         'data-variant': ctx.variant,
         hidden: !isOpen,
         tabIndex: -1,
-        onKeyDown(e: { key: string; preventDefault: () => void }) {
+        onKeyDown(e: { key: string; shiftKey?: boolean; preventDefault: () => void }) {
+          if (e.key === 'Tab') {
+            containTabFocus(ctx, e)
+          }
           if (e.key === 'Escape') {
             send({ type: 'ESCAPE' })
           }

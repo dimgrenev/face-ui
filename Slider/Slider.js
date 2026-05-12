@@ -72,6 +72,7 @@ export const Slider = forwardRef(function Slider({ variant = 'simple', value, de
     const trackRef = useRef(null);
     const isDragging = state.matches('dragging');
     const renderedValues = state.context.value.length > 0 ? state.context.value : initialValue;
+    const thumbLabelBase = typeof label === 'string' && label.trim() ? label : 'Slider';
     useEffect(() => {
         if (controlledValue !== undefined)
             return;
@@ -123,5 +124,10 @@ export const Slider = forwardRef(function Slider({ variant = 'simple', value, de
         send({ type: 'DRAG_START', index: nearestIndex });
         send({ type: 'DRAG', value: nextValue });
     };
-    return (_jsxs("div", Object.assign({ ref: ref }, api.getRootProps(), { className: cn('uf-slider', className), children: [label != null && (_jsx(Text, Object.assign({}, api.getLabelProps(), { as: "label", variant: "label", children: label }))), _jsxs("div", Object.assign({}, api.getTrackProps(), { ref: trackRef, onPointerDown: handleTrackPointerDown, className: cn('uf-slider-trackHitArea'), children: [_jsx("div", Object.assign({}, api.getRangeProps())), renderedValues.map((_, index) => (_jsx("div", Object.assign({}, api.getThumbProps(index)), index)))] }))] })));
+    return (_jsxs("div", Object.assign({ ref: ref }, api.getRootProps(), { className: cn('uf-slider', className), children: [label != null && (_jsx(Text, Object.assign({}, api.getLabelProps(), { as: "label", variant: "label", children: label }))), _jsxs("div", Object.assign({}, api.getTrackProps(), { ref: trackRef, onPointerDown: handleTrackPointerDown, className: cn('uf-slider-trackHitArea'), children: [_jsx("div", Object.assign({}, api.getRangeProps())), renderedValues.map((_, index) => {
+                    const ariaLabel = renderedValues.length > 1
+                        ? `${thumbLabelBase} ${index + 1}`
+                        : thumbLabelBase;
+                    return (_jsx("div", Object.assign({}, api.getThumbProps(index), { "aria-label": ariaLabel }), index));
+                })] }))] })));
 });

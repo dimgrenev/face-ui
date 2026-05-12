@@ -334,6 +334,18 @@
         "Select"
       ]
     },
+    "Command": {
+      "category": "overlay",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "responsiveSurface": "auto->sheet",
+      "related": [
+        "Menu",
+        "Input",
+        "Modal"
+      ]
+    },
     "Modal": {
       "category": "overlay",
       "status": "stable",

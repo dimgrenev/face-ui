@@ -204,6 +204,48 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-command-border-width",
+      "--uf-command-list-max-height",
+      "--uf-command-dialog-list-viewport-gap",
+      "--uf-command-dialog-enter-y",
+      "--uf-command-dialog-inset",
+      "--uf-command-dialog-viewport-gap"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-font-size",
+      "--uf-control-line-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-pad-icon",
+      "--uf-control-gap",
+      "--uf-content-inset",
+      "--uf-membrane",
+      "--uf-font-size",
+      "--uf-font-size-xs",
+      "--uf-font-weight-bold",
+      "--uf-radius",
+      "--uf-radius-md",
+      "--uf-z-overlay",
+      "--uf-duration-enter",
+      "--uf-duration-exit",
+      "--uf-ease-enter",
+      "--uf-color-bg",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-border",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-surface-shadow"
+    ],
+    "notes": [
+      "Command combines input, list and dialog surfaces; keep search input geometry on shared control tokens.",
+      "Use UF product composites for domain-specific command rows instead of expanding this primitive contract."
+    ]
+  },
   "platform": {
     "dialog": true,
     "popover": true

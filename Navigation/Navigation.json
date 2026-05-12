@@ -184,6 +184,38 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-navigation-content-min-width",
+      "--uf-navigation-sheet-viewport-gap",
+      "--uf-navigation-nested-inset"
+    ],
+    "semanticFallbacks": [
+      "--uf-spacing-2",
+      "--uf-spacing-3",
+      "--uf-membrane",
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-radius-md",
+      "--uf-font-weight-bold",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-surface-shadow",
+      "--uf-overlay-enter-y",
+      "--uf-overlay-enter-scale",
+      "--uf-duration-enter",
+      "--uf-duration-exit",
+      "--uf-ease-enter",
+      "--uf-z-dropdown"
+    ],
+    "notes": [
+      "Navigation uses Button/Text for interactive items and sheet groups.",
+      "Dropdown and compact sheet surfaces inherit overlay/sheet tokens; nested item indentation is the only navigation-local geometry token."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

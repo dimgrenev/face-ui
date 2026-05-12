@@ -26,7 +26,7 @@ export interface MarkdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'con
   linkTarget?: '_self' | '_blank'
   /** Link rel value for rendered anchors. */
   linkRel?: string
-  /** Outer membrane wrapper (+1px outside component geometry). */
+  /** Outer membrane wrapper around component geometry. */
   membrane?: boolean
   /** Expand component to full width. */
   fullWidth?: boolean
@@ -226,4 +226,3 @@ export const Markdown = forwardRef<HTMLDivElement, MarkdownProps>(
     )
   },
 )
-

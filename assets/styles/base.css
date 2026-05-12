@@ -10,7 +10,7 @@
  * on *) and any reference library borders that leak onto wrapper
  * elements without data-scope/data-part (e.g. .uf-input__control).
  *
- * NO !important — components.css can override for intentional
+ * No priority escalation — components.css can override for intentional
  * borders (spinner, separators, etc.).
  * --------------------------------------------------------------- */
 [data-scope] *,
@@ -22,11 +22,9 @@
 }
 
 /* ---------------------------------------------------------------
- * NUCLEAR RESET — kill all borders, shadows, outlines on form/table
+ * SCOPED RESET — kill all borders, shadows, outlines on form/table
  * elements inside any data-scope container.
- * Uses !important to guarantee override of ANY reference library CSS
- * (which loads before Face UI CSS but may have higher specificity
- * via chained class selectors like .uf-option.uf-button--outline).
+ * Uses data-scope specificity plus import order instead of escalation.
  * --------------------------------------------------------------- */
 [data-scope] button,
 [data-scope] input,
@@ -46,9 +44,9 @@ textarea[data-scope],
 select[data-scope],
 table[data-scope],
 label[data-scope] {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+  border: none;
+  outline: none;
+  box-shadow: none;
   appearance: none;
   -webkit-appearance: none;
 }
@@ -60,22 +58,22 @@ label[data-scope] {
 .uf-option[data-scope],
 .uf-control[data-scope],
 .uf-button[data-scope] {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 /* Restore table collapse for Calendar grid */
 [data-scope] table {
-  border-collapse: collapse !important;
-  border-spacing: 0 !important;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
 /* ---------------------------------------------------------------
- * Membrane — 1px padding on component roots only (data-part="root")
+ * Membrane — thin token padding on component roots only (data-part="root")
  * --------------------------------------------------------------- */
 [data-scope][data-part="root"] {
-  padding: var(--uf-membrane, 1px);
+  padding: var(--uf-membrane, var(--uf-border-width-thin));
   box-sizing: border-box;
 }
 
@@ -93,7 +91,7 @@ label[data-scope] {
  * Typography baseline
  * --------------------------------------------------------------- */
 [data-scope][data-part="root"] {
-  font-family: var(--uf-font-family);
+  font-family: var(--uf-font-family-base);
   font-size: var(--uf-control-font-size);
   line-height: var(--uf-control-line-height);
   letter-spacing: var(--uf-control-letter-spacing);
@@ -123,10 +121,10 @@ label[data-scope] {
   select,
   .uf-text-body
 ) {
-  font-size: var(--uf-control-font-size) !important;
-  line-height: var(--uf-control-line-height) !important;
-  letter-spacing: var(--uf-control-letter-spacing) !important;
-  font-weight: var(--uf-font-weight) !important;
+  font-size: var(--uf-control-font-size);
+  line-height: var(--uf-control-line-height);
+  letter-spacing: var(--uf-control-letter-spacing);
+  font-weight: var(--uf-font-weight);
 }
 
 [data-scope]:not([data-scope="code"]) :where(input, textarea)::placeholder {
@@ -137,7 +135,7 @@ label[data-scope] {
 }
 
 /* ---------------------------------------------------------------
- * .uf-option — full-width row baseline (32px)
+ * .uf-option — full-width row baseline
  * Scoped to [data-scope] so it cannot be overridden by external
  * `.uf-option` rules from the reference library.
  * --------------------------------------------------------------- */
@@ -155,7 +153,7 @@ label[data-scope] {
   background: transparent;
   color: inherit;
   font: inherit;
-  font-weight: 400;
+  font-weight: var(--uf-font-weight);
   cursor: pointer;
   user-select: none;
   transition: none;
@@ -198,7 +196,7 @@ label[data-scope] {
   background: transparent;
   color: inherit;
   font: inherit;
-  font-weight: 400;
+  font-weight: var(--uf-font-weight);
   cursor: pointer;
   user-select: none;
   transition: none;
@@ -216,7 +214,7 @@ label[data-scope] {
 .uf-control[data-scope][aria-selected="true"],
 .uf-control[data-scope][data-active="true"],
 .uf-control[data-scope].is-active {
-  font-weight: 400;
+  font-weight: var(--uf-font-weight);
 }
 
 @supports (font-variation-settings: "wght" 400) {
@@ -241,7 +239,7 @@ label[data-scope] {
     select,
     .uf-text-body
   ) {
-    font-variation-settings: "wght" var(--uf-font-weight) !important;
+    font-variation-settings: "wght" var(--uf-font-weight);
   }
 
   [data-scope]:not([data-scope="code"]) :where(input, textarea)::placeholder {
@@ -281,10 +279,6 @@ label[data-scope] {
   justify-content: center;
 }
 
-[data-scope] .uf-control[data-stretch-text] > .uf-control-text {
-  flex: 1;
-}
-
 /* ---------------------------------------------------------------
  * Focus-visible baseline
  * Global ring is intentionally disabled: components opt in locally.
@@ -298,8 +292,8 @@ label[data-scope] {
 /* Remove default focus outline */
 [data-scope] :focus:not(:focus-visible),
 [data-scope]:focus:not(:focus-visible) {
-  outline: none !important;
-  box-shadow: none !important;
+  outline: none;
+  box-shadow: none;
 }
 
 /* ---------------------------------------------------------------
@@ -337,18 +331,18 @@ label[data-scope] {
 
 /* Chromium / Electron: full scrollbar control via ::-webkit-scrollbar */
 [data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar {
-  width: 4px;
+  width: var(--uf-border-width-thick);
 }
 [data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar-track {
   background: transparent;
 }
 [data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar-thumb {
   background: var(--black-20);
-  border-radius: 2px;
+  border-radius: calc(var(--uf-border-width-thick) / 2);
 }
 [data-scope="scroll"][data-type="hover"] [data-part="viewport"]::-webkit-scrollbar {
   width: 0;
 }
 [data-scope="scroll"][data-type="hover"]:hover [data-part="viewport"]::-webkit-scrollbar {
-  width: 4px;
+  width: var(--uf-border-width-thick);
 }

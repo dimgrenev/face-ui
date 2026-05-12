@@ -16,7 +16,7 @@ export const scrollAnatomy = createAnatomy('scroll').parts('root', 'viewport', '
 // Component
 // ---------------------------------------------------------------------------
 export const Scroll = forwardRef(function Scroll(props, ref) {
-    const { children, type = 'auto', orientation = 'vertical', className, height = 160, } = props;
+    const { children, type = 'auto', orientation = 'vertical', className, height = 160, ariaLabel = 'Scrollable content', } = props;
     const overflowStyle = (() => {
         switch (orientation) {
             case 'horizontal':
@@ -28,5 +28,5 @@ export const Scroll = forwardRef(function Scroll(props, ref) {
                 return { overflowX: 'hidden', overflowY: 'auto' };
         }
     })();
-    return (_jsx("div", Object.assign({ ref: ref }, scrollAnatomy.getPartAttrs('root'), { "data-type": type, "data-orientation": orientation, className: cn('uf-scroll', className), style: { height }, children: _jsx("div", Object.assign({}, scrollAnatomy.getPartAttrs('viewport'), { style: overflowStyle, tabIndex: 0, role: "region", "aria-label": "Scrollable content", children: children })) })));
+    return (_jsx("div", Object.assign({ ref: ref }, scrollAnatomy.getPartAttrs('root'), { "data-type": type, "data-orientation": orientation, className: cn('uf-scroll', className), style: { height }, children: _jsx("div", Object.assign({}, scrollAnatomy.getPartAttrs('viewport'), { style: overflowStyle, tabIndex: 0, role: "region", "aria-label": ariaLabel, children: children })) })));
 });

@@ -110,9 +110,9 @@ export function connectSwitcher(state, send) {
                 disabled,
                 required, 'aria-hidden': true, tabIndex: -1, style: {
                     position: 'absolute',
-                    width: '1px',
-                    height: '1px',
-                    margin: '-1px',
+                    width: 'var(--uf-membrane)',
+                    height: 'var(--uf-membrane)',
+                    margin: 'calc(-1 * var(--uf-membrane))',
                     padding: '0',
                     overflow: 'hidden',
                     clip: 'rect(0,0,0,0)',

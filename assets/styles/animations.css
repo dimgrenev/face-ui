@@ -72,17 +72,17 @@
 }
 
 @keyframes uf-slide-up-fade {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(var(--uf-spacing-1)); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes uf-collapse-down {
   from { height: 0; opacity: 0; }
-  to { height: var(--uf-content-height, auto); opacity: 1; }
+  to { height: auto; opacity: 1; }
 }
 
 @keyframes uf-collapse-up {
-  from { height: var(--uf-content-height, auto); opacity: 1; }
+  from { height: auto; opacity: 1; }
   to { height: 0; opacity: 0; }
 }
 
@@ -186,8 +186,8 @@
   .uf-animated *,
   .uf-animated *::before,
   .uf-animated *::after {
-    animation-duration: 0.01ms;
+    animation-duration: var(--uf-motion-duration-reduced);
     animation-iteration-count: 1;
-    transition-duration: 0.01ms;
+    transition-duration: var(--uf-motion-duration-reduced);
   }
 }

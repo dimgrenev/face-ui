@@ -132,6 +132,25 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-rating-gap"
+    ],
+    "semanticFallbacks": [
+      "--uf-membrane",
+      "--uf-control-height",
+      "--uf-radius",
+      "--uf-font-size-lg",
+      "--uf-color-fg",
+      "--uf-color-hover-bg",
+      "--uf-motion-duration-fast",
+      "--uf-motion-ease-standard"
+    ],
+    "notes": [
+      "Rating uses compact control geometry and font-size tokens for star hit targets and icon scale.",
+      "Opacity, hover background and color transitions use shared Face UI motion tokens."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

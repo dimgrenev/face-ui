@@ -69,6 +69,10 @@ export interface MediaProps {
   /** Wrapper-level compatibility attrs from components API. */
   id?: string
   role?: string
+  /** Accessible label for the wrapper role. Sets aria-label. */
+  ariaLabel?: string
+  /** DOM aria-label alias for the wrapper role. */
+  'aria-label'?: string
   title?: string
   tabIndex?: number
   style?: React.CSSProperties
@@ -102,6 +106,8 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
       className,
       id,
       role,
+      ariaLabel,
+      'aria-label': ariaLabelAttribute,
       title,
       tabIndex,
       style,
@@ -201,6 +207,7 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
         className={cn('uf-media', className)}
         id={id}
         role={role}
+        aria-label={ariaLabelAttribute ?? ariaLabel}
         title={title}
         tabIndex={tabIndex}
         style={wrapperStyle}

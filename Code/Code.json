@@ -144,6 +144,27 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-code-header-pad",
+      "--uf-code-scroll-max-height",
+      "--uf-code-fade-height",
+      "--uf-code-fade-h",
+      "--uf-code-line-number-width"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-font-size",
+      "--uf-radius-md",
+      "--uf-font-family-mono",
+      "--uf-font-size-sm"
+    ],
+    "notes": [
+      "Code is an approved mono-content exception and intentionally uses mono typography tokens.",
+      "Title and action labels route through Text/Button; tokenizedLines may carry syntax-highlighter colors as source-code data.",
+      "Code backgrounds still reference primitive black alpha variables and collapsedHeight uses a numeric compatibility prop; migrate only with visual regression coverage."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

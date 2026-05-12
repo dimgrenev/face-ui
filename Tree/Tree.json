@@ -163,6 +163,26 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-tree-branch-indicator-size"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-gap",
+      "--uf-radius",
+      "--uf-font-size-sm",
+      "--uf-font-weight-bold",
+      "--uf-color-fg",
+      "--uf-color-hover-bg"
+    ],
+    "notes": [
+      "Tree node rows use Button-compatible geometry; branch indicators use a tree-local size alias.",
+      "Expansion/selection state is machine-owned and should not leak styling outside tree data parts."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

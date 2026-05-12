@@ -113,6 +113,18 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [],
+    "semanticFallbacks": [
+      "--uf-radius-md",
+      "--uf-font-weight-bold",
+      "--uf-font-size-md"
+    ],
+    "notes": [
+      "Card intentionally uses shared content, radius, surface and typography tokens rather than card-local aliases.",
+      "Title, description, string content and footer strings render through Text; arbitrary children remain an explicit escape hatch."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

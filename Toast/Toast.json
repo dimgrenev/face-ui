@@ -43,7 +43,8 @@
   },
   "aria": {
     "role": "status",
-    "live": "polite"
+    "live": "polite",
+    "variantRolePolicy": "All toast variants stay non-blocking polite status messages. Use Modal or alertdialog for blocking alerts."
   },
   "composition": {
     "required": ["root", "group", "item"],
@@ -57,6 +58,30 @@
       "action": { "slot": "action", "parent": "item" },
       "close": { "slot": "close", "parent": "item" }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-toast-container-max-width",
+      "--uf-toast-surface-pad",
+      "--uf-toast-border-width",
+      "--uf-toast-compact-inset"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-radius-md",
+      "--uf-font-size",
+      "--uf-font-size-sm",
+      "--uf-font-weight-bold",
+      "--uf-color-fg-muted",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-border",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-surface-shadow"
+    ],
+    "notes": [
+      "Toast content uses Text and Bar/Button primitives internally; do not create toast-local typography classes for new copy.",
+      "The toaster z-index remains an implementation detail until a global layer token is introduced."
+    ]
   },
   "platform": {},
   "usage": {

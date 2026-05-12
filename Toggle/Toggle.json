@@ -70,7 +70,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper (+1px outside each toggle item).",
+      "description": "Outer membrane wrapper around each toggle item.",
       "default": true
     }
   },
@@ -138,6 +138,28 @@
         "multiple": true
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-toggle-border-width"
+    ],
+    "semanticFallbacks": [
+      "--uf-membrane",
+      "--uf-overlay-surface-border",
+      "--uf-radius",
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-color-fg",
+      "--uf-color-hover-bg",
+      "--uf-font-weight-bold",
+      "--uf-motion-duration-emphasis",
+      "--uf-motion-ease-emphasized"
+    ],
+    "notes": [
+      "Toggle is deprecated in the registry and should stay aligned with SegmentedControl while compatibility remains.",
+      "Item emphasis animation uses shared Face UI motion tokens while compatibility remains."
+    ]
   },
   "platform": {},
   "usage": {

@@ -42,7 +42,7 @@ export const Carousel = forwardRef(function Carousel(props, ref) {
     const stepPercent = 100 / clampedSlidesPerView;
     const trackTransform = `translate${axis}(-${api.index * stepPercent}%)`;
     const rootStyle = {
-        '--uf-carousel-slides-per-view': String(clampedSlidesPerView),
+        '--face-runtime-carousel-slides-per-view': String(clampedSlidesPerView),
     };
     const renderSlide = (slide, slideIndex) => {
         if (isValidElement(slide))

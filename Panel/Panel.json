@@ -188,6 +188,39 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-sidebar-preview-inset",
+      "--uf-sidebar-preview-section-gap",
+      "--uf-sidebar-preview-title-gap",
+      "--face-runtime-sidebar-sheet-w",
+      "--uf-sidebar-sheet-w-default",
+      "--uf-sidebar-sheet-viewport-gap",
+      "--uf-resizable-handle-size"
+    ],
+    "semanticFallbacks": [
+      "--uf-content-inset",
+      "--uf-membrane",
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-gap",
+      "--uf-font-size-sm",
+      "--uf-font-weight",
+      "--uf-font-weight-bold",
+      "--uf-color-bg",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg",
+      "--uf-color-border"
+    ],
+    "notes": [
+      "Panel uses Button, Icon and Text for item rendering and responsive sheet triggers.",
+      "width and collapsedWidth are layout inputs; sheet width is bridged through --face-runtime-sidebar-sheet-w.",
+      "Panel remains a higher-risk navigation primitive; behavior refactors require baseline coverage.",
+      "Resizable panel handles use --uf-resizable-handle-size for the shared resizable machine CSS."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

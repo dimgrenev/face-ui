@@ -439,6 +439,48 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-date-content-max-width",
+      "--uf-date-content-max-height",
+      "--uf-date-content-viewport-gap",
+      "--uf-date-sheet-inset",
+      "--uf-date-sheet-gap",
+      "--uf-date-panel-pad",
+      "--uf-date-sheet-enter-y"
+    ],
+    "semanticFallbacks": [
+      "--uf-spacing-1",
+      "--uf-spacing-8",
+      "--uf-membrane",
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-pad-icon",
+      "--uf-control-gap",
+      "--uf-radius",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg",
+      "--uf-color-destructive",
+      "--uf-color-error",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-shadow",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-enter-y",
+      "--uf-overlay-enter-scale",
+      "--uf-duration-enter",
+      "--uf-duration-exit",
+      "--uf-ease-enter",
+      "--uf-z-dropdown",
+      "--uf-z-overlay"
+    ],
+    "notes": [
+      "Date label, value, description and error text render through Text; actions render through Button.",
+      "Popover and sheet surfaces inherit overlay semantic tokens for surface, blur, shadow and motion.",
+      "Date values, locale and timezone are product data and intentionally outside visual token ownership."
+    ]
+  },
   "platform": {
     "popover": true
   },

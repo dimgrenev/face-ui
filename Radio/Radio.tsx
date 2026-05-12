@@ -43,7 +43,7 @@ export interface RadioProps {
   onChange?: (value: string) => void
   /** Additional CSS class. */
   className?: string
-  /** Outer membrane wrapper (+1px outside each option geometry). */
+  /** Outer membrane wrapper around each option geometry. */
   membrane?: boolean
   /** Legacy orientation alias. */
   flow?: 'horizontal' | 'vertical'
@@ -130,10 +130,8 @@ export const Radio = forwardRef<HTMLDivElement, RadioProps>(
               data-icon-left=""
               className={cn(
                 'uf-radio-option',
-                'uf-radio-label',
                 'uf-option',
                 'uf-control',
-                optionDisabled && 'uf-button--disabled',
               )}
             >
               <input

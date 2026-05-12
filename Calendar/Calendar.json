@@ -157,6 +157,34 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-calendar-nav-size",
+      "--uf-calendar-weekday-height",
+      "--uf-calendar-cell-size",
+      "--uf-icon-only-size"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-font-size",
+      "--uf-spacing-1",
+      "--uf-spacing-2",
+      "--uf-membrane",
+      "--uf-radius",
+      "--uf-font-size",
+      "--uf-font-size-xs",
+      "--uf-font-size-sm",
+      "--uf-font-weight-bold",
+      "--uf-color-fg",
+      "--uf-color-bg",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg"
+    ],
+    "notes": [
+      "Calendar navigation uses Button and Icon; title, weekdays and day labels route through Text/Button surfaces.",
+      "Cell sizing is derived from shared control geometry so calendar density follows enterprise control density."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

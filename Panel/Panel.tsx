@@ -374,7 +374,7 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
             className="uf-responsive-panel uf-sidebar-sheet"
             data-state={sheetOpen ? 'open' : 'closed'}
             data-placement="left"
-            style={{ '--uf-sidebar-sheet-w': typeof width === 'number' ? `${width}px` : String(width) } as any}
+            style={{ '--face-runtime-sidebar-sheet-w': typeof width === 'number' ? `${width}px` : String(width) } as any}
           >
             <ResponsiveSheetHeader
               title={surfaceTitle ?? 'Panel'}

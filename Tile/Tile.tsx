@@ -72,7 +72,7 @@ export interface TileProps extends Omit<HTMLAttributes<HTMLDivElement>, 'childre
   align?: 'left' | 'center' | 'right'
   /** Nesting level for option-like rows: 0..9 */
   level?: number
-  /** Membrane spacing (1px padding). */
+  /** Membrane spacing around the tile. */
   membrane?: boolean
   /** Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile. */
   actions?: ReactNode
@@ -159,7 +159,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
     const hasText = text != null || children != null
 
     const levelStyle = clampedLevel != null
-      ? { ...style, '--uf-option-level': clampedLevel } as React.CSSProperties
+      ? { ...style, '--face-runtime-option-level': clampedLevel } as React.CSSProperties
       : style
 
     const tileNode = (

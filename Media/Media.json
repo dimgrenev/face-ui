@@ -142,6 +142,11 @@
       "required": false,
       "description": "role prop"
     },
+    "ariaLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the wrapper role. Sets aria-label."
+    },
     "title": {
       "type": "string",
       "required": false,
@@ -209,6 +214,26 @@
         "parent": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-media-fallback-size"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-radius",
+      "--uf-radius-md",
+      "--uf-radius-sm",
+      "--uf-radius-full",
+      "--uf-membrane",
+      "--uf-color-hover-bg",
+      "--uf-color-fg-muted",
+      "--uf-color-border"
+    ],
+    "notes": [
+      "Media fallback geometry is tokenized; width, height and objectFit remain product media layout inputs.",
+      "Native audio/video controls are browser-owned and intentionally outside Face UI control styling."
+    ]
   },
   "platform": {},
   "usage": {

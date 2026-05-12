@@ -47,21 +47,6 @@
       "required": false,
       "description": "Callback when files are rejected."
     },
-    "size": {
-      "type": "number",
-      "required": true,
-      "description": "size prop"
-    },
-    "type": {
-      "type": "string",
-      "required": true,
-      "description": "type prop"
-    },
-    "reason": {
-      "type": "string",
-      "required": true,
-      "description": "reason prop"
-    },
     "className": {
       "type": "string",
       "required": false,
@@ -141,6 +126,19 @@
         "parent": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [],
+    "semanticFallbacks": [
+      "--uf-radius",
+      "--uf-radius-md",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg"
+    ],
+    "notes": [
+      "Upload labels, hints, file names and file sizes render through Text; file picker and remove actions render through Button.",
+      "accept, maxSize, maxFiles and file metadata are validation/product data and intentionally outside visual token ownership."
+    ]
   },
   "platform": {},
   "usage": {

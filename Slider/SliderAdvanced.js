@@ -399,11 +399,11 @@ export function SliderAdvanced({ rootRef, value, defaultValue, scalarValue, min 
             return null;
         return (_jsxs("span", { className: "uf-slider-leadingIconText", children: [iconNode, textNode] }));
     })();
-    return (_jsxs("div", { ref: rootRef, className: sliderClasses, children: [label != null && (_jsx(Text, { as: "label", variant: "label", children: label })), _jsxs("div", { className: "uf-slider-row", style: {
-                    ['--uf-slider-t']: String(tFromValue(renderValue)),
-                    ['--uf-slider-crop-left-px']: `${Number(cropLeftPx).toFixed(2)}px`,
-                    ['--uf-slider-crop-right-px']: `${Number(cropRightPx).toFixed(2)}px`,
-                    ['--uf-slider-crop-thumb-pad']: `${MARKER_W_PX + BUFFER_PX}px`,
-                    ['--uf-slider-thumb-w']: `${thumbW}px`,
+    return (_jsxs("div", { ref: rootRef, className: sliderClasses, "data-scope": "slider", "data-part": "root", "data-orientation": "horizontal", "data-disabled": disabled || undefined, children: [label != null && (_jsx(Text, { as: "label", variant: "label", children: label })), _jsxs("div", { className: "uf-slider-row", style: {
+                    ['--face-runtime-slider-t']: String(tFromValue(renderValue)),
+                    ['--face-runtime-slider-crop-left-x']: `${Number(cropLeftPx).toFixed(2)}px`,
+                    ['--face-runtime-slider-crop-right-x']: `${Number(cropRightPx).toFixed(2)}px`,
+                    ['--face-runtime-slider-crop-thumb-pad']: `${MARKER_W_PX + BUFFER_PX}px`,
+                    ['--face-runtime-slider-thumb-w']: `${thumbW}px`,
                 }, children: [leadingNode ? _jsx("div", { className: "uf-slider-leading", children: leadingNode }) : null, _jsxs("div", { ref: bodyRef, className: "uf-slider-body", "aria-disabled": disabled ? 'true' : 'false', onPointerDown: handlePointerDown, children: [_jsx("div", { className: "uf-slider-track", "aria-hidden": "true", children: cropEnabled ? (_jsx("div", { className: "uf-slider-trackAllowed", "aria-hidden": "true", children: _jsx("div", { className: "uf-slider-fill" }) })) : (_jsx("div", { className: "uf-slider-fill" })) }), _jsx("div", { ref: thumbMeasureRef, className: "uf-slider-thumbMeasure", "aria-hidden": "true", children: _jsx(Button, { membrane: false, type: "button", tabIndex: -1, fullWidth: false, align: "center", variant: "outline", text: measureLabel, className: "uf-slider-thumbButton uf-slider-thumbButton--measure" }) }), _jsx("div", { className: "uf-slider-thumbButtonWrap", "aria-hidden": "true", children: _jsx(Button, { membrane: false, type: "button", tabIndex: -1, fullWidth: false, align: "center", variant: "outline", text: formatValue(renderValue), className: "uf-slider-thumbButton" }) }), _jsx("input", { ref: inputRef, type: "range", min: cropLocks ? renderCrop.min : mn, max: cropLocks ? renderCrop.max : mx, value: Number(renderValue), step: safeStep, disabled: disabled, onChange: handleInputChange, className: "uf-slider-input", "aria-label": typeof label === 'string' ? label : 'Slider' }), cropEnabled && (_jsxs(_Fragment, { children: [_jsx("button", { type: "button", className: "uf-slider-cropMarker uf-slider-cropMarker--left", "aria-label": "Crop start", children: _jsx(Icon, { name: "crop" }) }), _jsx("button", { type: "button", className: "uf-slider-cropMarker uf-slider-cropMarker--right", "aria-label": "Crop end", children: _jsx(Icon, { name: "crop", style: { transform: 'scaleX(-1)' } }) })] }))] })] })] }));
 }

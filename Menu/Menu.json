@@ -16,6 +16,69 @@
       "type": "array",
       "required": false,
       "description": "Menu item definitions.",
+      "contract": {
+        "item": {
+          "type": "object",
+          "required": [
+            "value",
+            "label"
+          ],
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "Stable value emitted on selection."
+            },
+            "label": {
+              "type": "node",
+              "description": "Rendered menu item label."
+            },
+            "textValue": {
+              "type": "string",
+              "required": false,
+              "description": "Explicit searchable text for custom React labels used by typeahead."
+            },
+            "disabled": {
+              "type": "boolean",
+              "required": false,
+              "description": "Disable this menu item."
+            }
+          }
+        },
+        "separator": {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "literal",
+              "value": "separator"
+            }
+          }
+        },
+        "group": {
+          "type": "object",
+          "required": [
+            "type",
+            "label",
+            "items"
+          ],
+          "properties": {
+            "type": {
+              "type": "literal",
+              "value": "group"
+            },
+            "label": {
+              "type": "string",
+              "description": "Rendered group label."
+            },
+            "items": {
+              "type": "array",
+              "description": "Menu item or separator definitions. Group items support the same optional textValue field."
+            }
+          }
+        }
+      },
       "default": [
         {
           "value": "edit",
@@ -139,6 +202,42 @@
       "separator": { "slot": "separator", "parent": "content", "multiple": true },
       "group": { "slot": "group", "parent": "content", "multiple": true }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-menu-min-w",
+      "--uf-menu-border-width",
+      "--uf-menu-sheet-inset",
+      "--uf-menu-sheet-gap",
+      "--uf-menu-sheet-enter-y",
+      "--uf-menu-separator-h"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-pad-text",
+      "--uf-membrane",
+      "--uf-spacing-1",
+      "--uf-font-size-xs",
+      "--uf-font-weight-bold",
+      "--uf-radius-md",
+      "--uf-z-dropdown",
+      "--uf-z-overlay",
+      "--uf-duration-enter",
+      "--uf-duration-exit",
+      "--uf-ease-enter",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg",
+      "--uf-color-border",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-border",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-surface-shadow",
+      "--uf-overlay-enter-y",
+      "--uf-overlay-enter-scale"
+    ],
+    "notes": [
+      "Menu items reuse option/control anatomy and should not introduce parallel button typography.",
+      "Sheet and popover presentations share overlay surface tokens with Select and Popover."
+    ]
   },
   "platform": {
     "popover": true

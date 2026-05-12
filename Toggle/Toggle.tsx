@@ -38,7 +38,7 @@ export interface ToggleProps {
   onValueChange?: (details: { value: string[] }) => void
   /** Additional CSS class. */
   className?: string
-  /** Outer membrane wrapper (+1px outside each toggle item). */
+  /** Outer membrane wrapper around each toggle item. */
   membrane?: boolean
 }
 

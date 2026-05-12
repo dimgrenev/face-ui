@@ -13,11 +13,6 @@
       "description": "components API compatibility: uncontrolled initial value.",
       "default": ""
     },
-    "id": {
-      "type": "string",
-      "required": false,
-      "description": "Native input id. When omitted, a stable React id is generated."
-    },
     "name": {
       "type": "string",
       "required": false,
@@ -46,6 +41,12 @@
         "wrap"
       ],
       "default": "scroll"
+    },
+    "autoGrow": {
+      "type": "boolean",
+      "required": false,
+      "description": "Auto-grow textarea height in wrap mode.",
+      "default": true
     },
     "disabled": {
       "type": "boolean",
@@ -92,6 +93,47 @@
       "required": false,
       "description": "Placeholder text.",
       "default": "Type here..."
+    },
+    "ariaLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible label when no visible label is provided."
+    },
+    "controlRole": {
+      "type": "string",
+      "required": false,
+      "description": "Role applied to the native input or textarea control."
+    },
+    "ariaControls": {
+      "type": "string",
+      "required": false,
+      "description": "Native control aria-controls relationship."
+    },
+    "ariaActiveDescendant": {
+      "type": "string",
+      "required": false,
+      "description": "Native control aria-activedescendant relationship."
+    },
+    "ariaAutoComplete": {
+      "type": "enum",
+      "required": false,
+      "description": "Native control aria-autocomplete mode.",
+      "options": [
+        "none",
+        "inline",
+        "list",
+        "both"
+      ]
+    },
+    "ariaExpanded": {
+      "type": "boolean",
+      "required": false,
+      "description": "Native control aria-expanded state."
+    },
+    "ariaHasPopup": {
+      "type": "string",
+      "required": false,
+      "description": "Native control aria-haspopup state."
     },
     "spellCheck": {
       "type": "boolean",
@@ -190,10 +232,15 @@
       "required": false,
       "description": "Native onKeyDown handler."
     },
+    "controlRef": {
+      "type": "ReactRef",
+      "required": false,
+      "description": "Ref to the native input or textarea control."
+    },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper (+1px outside control geometry).",
+      "description": "Outer membrane wrapper around control geometry.",
       "default": false
     },
     "className": {
@@ -257,7 +304,9 @@
     }
   ],
   "behavior": {
-    "autoFocusOnOpen": "none"
+    "autoFocusOnOpen": "none",
+    "controlledValue": "External value prop updates sync into the rendered control without emitting onValueChange.",
+    "autoGrow": "Wrap textareas auto-grow by default; set autoGrow=false for fixed-height editor surfaces."
   },
   "keyboard": {
     "Escape": {
@@ -267,8 +316,19 @@
   },
   "aria": {
     "role": "textbox",
-    "required": [
-      "aria-label"
+    "labeling": [
+      "Visible label renders as a native label whose htmlFor matches the generated or provided control id.",
+      "ariaLabel is passed to the native control when no visible label is provided.",
+      "controlRole and aria* relationship props are passed to the native control so composite search/listbox owners can expose active descendants without imperative DOM mutation."
+    ],
+    "describedBy": [
+      "description id is included in aria-describedby when description is present.",
+      "error id is included in aria-describedby when error is present."
+    ],
+    "states": [
+      "disabled controls expose native disabled plus aria-disabled.",
+      "readOnly controls expose native readOnly plus aria-readonly.",
+      "error controls expose aria-invalid and a polite alert error node."
     ]
   },
   "composition": {
@@ -307,6 +367,38 @@
         "parent": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-input-icon-size",
+      "--uf-input-required-gap"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-font-size",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-pad-icon",
+      "--uf-control-gap",
+      "--uf-radius",
+      "--uf-membrane",
+      "--uf-font-size-xs",
+      "--uf-font-size-sm",
+      "--uf-font-weight",
+      "--uf-font-weight-bold",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg",
+      "--uf-color-destructive",
+      "--uf-color-error",
+      "--uf-motion-duration-short",
+      "--uf-motion-ease-standard"
+    ],
+    "notes": [
+      "Input geometry comes from shared control tokens; label, description and error copy must remain Text-compatible.",
+      "Clear-button reveal motion consumes shared Face UI motion tokens.",
+      "Required indicator still accepts legacy danger/error fallbacks until color aliases are burned down."
+    ]
   },
   "platform": {},
   "usage": {

@@ -7,7 +7,8 @@
  * `<Select options={items} placeholder="Choose..." />`
  * `<Select type="multiselect" options={items} value={['a','b']} />`
  */
-import { forwardRef, useCallback, useEffect, useRef, type ReactNode } from 'react'
+import { forwardRef, useCallback, useEffect, useId, useRef, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import {
@@ -16,6 +17,7 @@ import {
   type ResponsiveOverlaySurface,
 } from '../assets/adapters/react/use-responsive-overlay-surface'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
+import { useFloatingPosition } from '../assets/adapters/react/use-floating-position'
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
 import { selectMachine, connectSelect } from '../assets/machines/select.machine'
 import { cn } from '../assets/utils'
@@ -67,7 +69,7 @@ export interface SelectProps {
   surfaceBreakpoint?: number
   /** Optional title used for the mobile sheet header. */
   surfaceTitle?: ReactNode
-  /** Outer membrane wrapper (+1px outside trigger/option geometry). */
+  /** Outer membrane wrapper around trigger/option geometry. */
   membrane?: boolean
   className?: string
 }
@@ -96,6 +98,16 @@ function getDisplayValue(
   }
   const opt = options.find((o) => o.value === value)
   return opt ? opt.label : value
+}
+
+function selectValuesEqual(
+  left: string | string[] | null | undefined,
+  right: string | string[] | null | undefined,
+): boolean {
+  if (Object.is(left, right)) return true
+  if (!Array.isArray(left) || !Array.isArray(right)) return false
+  if (left.length !== right.length) return false
+  return left.every((item, index) => item === right[index])
 }
 
 function renderSelectLabelNode(node: ReactNode, className?: string) {
@@ -142,7 +154,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     } = props
 
     const options = Array.isArray(rawOptions) ? rawOptions : []
+    const optionOrder = options.map((option) => option.value)
+    const disabledValues = options
+      .filter((option) => option.disabled)
+      .map((option) => option.value)
+    const selectId = useId()
     const rootRef = useRef<HTMLDivElement | null>(null)
+    const triggerElRef = useRef<HTMLElement | null>(null)
+    const contentElRef = useRef<HTMLDivElement | null>(null)
     const machineValue = useControllableMachineProp(
       value !== undefined ? value : undefined,
       defaultValue ?? (type === 'multiselect' ? [] : null),
@@ -150,9 +169,12 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
 
     const { state, send } = useMachine(selectMachine, {
       value: machineValue,
+      optionOrder,
+      disabledValues,
       disabled,
       type,
       onValueChange: ((details: { value: string | string[] | null }) => {
+        if (value !== undefined && selectValuesEqual(details?.value, value)) return
         try { onValueChange?.(details) } catch {}
         if (typeof props.onChange === 'function') {
           try { props.onChange(details?.value ?? null) } catch {}
@@ -163,6 +185,15 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     const api = connectSelect(state, send)
     const isOpen = state.matches('open')
     const resolvedSurface = useResponsiveOverlaySurface(surface, surfaceBreakpoint)
+    const { style: floatingStyle } = useFloatingPosition({
+      open: isOpen && resolvedSurface === 'popover',
+      triggerRef: triggerElRef,
+      contentRef: contentElRef,
+      side: 'bottom',
+      align: 'start',
+      sideOffset: 4,
+      matchTriggerWidth: true,
+    })
     useBodyScrollLock(isOpen && resolvedSurface === 'sheet')
 
     useEffect(() => {
@@ -172,6 +203,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         const target = event.target as Node | null
         if (!target) return
         if (rootRef.current?.contains(target)) return
+        if (contentElRef.current?.contains(target)) return
         send({ type: 'CLOSE' })
       }
 
@@ -190,13 +222,42 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     const computedDisplay = getDisplayValue(state.context.value, options)
     const triggerLabel = displayValueOverride ?? computedDisplay ?? placeholder ?? 'Select…'
     const isPlaceholder = computedDisplay == null && !displayValueOverride
-    const contentProps = api.getContentProps()
+    const triggerId = `uf-select:${selectId}:trigger`
+    const labelId = label != null ? `uf-select:${selectId}:label` : undefined
+    const contentId = `uf-select:${selectId}:listbox`
+    const highlightedOptionIndex = state.context.highlightedValue == null
+      ? -1
+      : options.findIndex((option) => (
+        option.value === state.context.highlightedValue && !option.disabled
+      ))
+    const activeDescendantId = highlightedOptionIndex >= 0
+      ? `${contentId}:option:${highlightedOptionIndex}`
+      : undefined
+    const contentProps = api.getContentProps({
+      id: contentId,
+      labelId,
+      ariaLabel,
+      activeDescendantId,
+    })
+    const triggerProps = api.getTriggerProps({
+      id: triggerId,
+      contentId,
+      labelId,
+      ariaLabel,
+      activeDescendantId,
+    })
     const sheetTitle = surfaceTitle ?? label ?? ariaLabel ?? 'Select option'
+    const handleTriggerRef = useCallback((node: HTMLButtonElement | null) => {
+      triggerElRef.current = node
+    }, [])
+    const handleContentRef = useCallback((node: HTMLDivElement | null) => {
+      contentElRef.current = node
+    }, [])
     const triggerNode = (
       <button
-        {...api.getTriggerProps()}
+        {...triggerProps}
+        ref={handleTriggerRef}
         type="button"
-        aria-label={ariaLabel || (typeof label === 'string' ? label : undefined)}
         data-stretch-text={stretchText ? '' : undefined}
       >
         {renderSelectLabelNode(triggerLabel, cn('uf-select__value', isPlaceholder && 'uf-select__value--placeholder'))}
@@ -213,8 +274,12 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
             onClose={() => send({ type: 'CLOSE' })}
           />
         ) : null}
-        {options.map((option) => {
-          const optionProps = api.getOptionProps({ value: option.value, disabled: option.disabled })
+        {options.map((option, index) => {
+          const optionProps = api.getOptionProps({
+            value: option.value,
+            disabled: option.disabled,
+            id: `${contentId}:option:${index}`,
+          })
           const optionNode = (
             <div
               key={option.value}
@@ -248,6 +313,28 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       </div>
     )
 
+    const contentElement = (
+      <div
+        ref={handleContentRef}
+        {...contentProps}
+        className={cn('uf-select__content', (contentProps as { className?: string }).className)}
+        data-surface={resolvedSurface}
+        style={resolvedSurface === 'popover' ? floatingStyle : undefined}
+      >
+        {membrane ? (
+          <span className="uf-membrane uf-membrane--full uf-select__contentMembrane">
+            {contentNode}
+          </span>
+        ) : contentNode}
+      </div>
+    )
+
+    const renderedContent = !isOpen
+      ? null
+      : resolvedSurface === 'sheet' || typeof document === 'undefined'
+        ? contentElement
+        : createPortal(contentElement, document.body)
+
     return (
       <div
         ref={mergedRef}
@@ -256,7 +343,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         className={cn('uf-select', className)}
       >
         {label != null && (
-          <Text as="label" variant="label" data-part="label">
+          <Text as="label" variant="label" id={labelId} htmlFor={triggerId} data-part="label">
             {label}
           </Text>
         )}
@@ -265,7 +352,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
             <span className="uf-membrane uf-membrane--full">{triggerNode}</span>
           ) : triggerNode}
 
-          {resolvedSurface === 'sheet' ? (
+          {isOpen && resolvedSurface === 'sheet' ? (
             <div
               className="uf-responsive-overlay-backdrop"
               data-state={isOpen ? 'open' : 'closed'}
@@ -273,17 +360,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
             />
           ) : null}
 
-          <div
-            {...contentProps}
-            className={cn('uf-select__content', (contentProps as { className?: string }).className)}
-            data-surface={resolvedSurface}
-          >
-            {membrane ? (
-              <span className="uf-membrane uf-membrane--full uf-select__contentMembrane">
-                {contentNode}
-              </span>
-            ) : contentNode}
-          </div>
+          {renderedContent}
         </div>
       </div>
     )

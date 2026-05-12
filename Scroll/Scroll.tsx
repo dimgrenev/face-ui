@@ -37,6 +37,8 @@ export interface ScrollProps {
   className?: string
   /** Viewport height. */
   height?: number | string
+  /** Accessible label for the scrollable region. */
+  ariaLabel?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -51,6 +53,7 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(
       orientation = 'vertical',
       className,
       height = 160,
+      ariaLabel = 'Scrollable content',
     } = props
 
     const overflowStyle = (() => {
@@ -79,7 +82,7 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(
           style={overflowStyle}
           tabIndex={0}
           role="region"
-          aria-label="Scrollable content"
+          aria-label={ariaLabel}
         >
           {children}
         </div>

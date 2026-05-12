@@ -230,7 +230,9 @@ describe('face-ui-react gallery smoke', () => {
 
     const calendarCard = getGalleryCard(container, 'Calendar')
     const calendarDayButtons = Array.from(calendarCard.querySelectorAll<HTMLButtonElement>('.uf-calendar-dayButton'))
-    const calendarDay = calendarDayButtons.find((button) => button.getAttribute('data-disabled') == null)
+    const calendarDay = calendarDayButtons.find((button) =>
+      button.getAttribute('data-disabled') == null && button.getAttribute('data-outside') == null,
+    )
     expect(calendarDay).toBeTruthy()
 
     await act(async () => {

@@ -80,7 +80,7 @@ export const Button = forwardRef(function Button(rawProps, ref) {
                     el.value = copyText;
                     el.setAttribute('readonly', 'true');
                     el.style.position = 'fixed';
-                    el.style.left = '-9999px';
+                    el.style.left = '-9999em';
                     el.style.opacity = '0';
                     document.body.appendChild(el);
                     el.select();
@@ -107,18 +107,18 @@ export const Button = forwardRef(function Button(rawProps, ref) {
     const hasText = text != null || children != null;
     const isIconOnly = iconOnly || (hasIcon && !hasText);
     const levelStyle = clampedLevel != null
-        ? Object.assign(Object.assign({}, style), { '--uf-option-level': clampedLevel })
+        ? Object.assign(Object.assign({}, style), { '--face-runtime-option-level': clampedLevel })
         : style;
-    const buttonNode = (_jsxs("button", Object.assign({ ref: setRefs, type: type, disabled: disabled || loading }, buttonAnatomy.getPartAttrs('root'), { "data-variant": variant, "data-icon-only": isIconOnly ? '' : undefined, "data-stretch-text": stretchText ? '' : undefined, "data-full-width": fullWidth ? '' : undefined, "data-align": align, "data-icon-left": hasIcon && !isIconOnly && iconPosition === 'left' ? '' : undefined, "data-icon-right": hasIcon && !isIconOnly && iconPosition === 'right' ? '' : undefined, "data-level": clampedLevel != null ? '' : undefined, "data-loading": loading ? '' : undefined, "data-copied": copied ? '' : undefined, "data-membrane": membrane ? '' : undefined, className: cn('uf-button', 'uf-option', 'uf-control', className), style: levelStyle, onClick: handleClick }, rest, { children: [loading && (_jsx("span", { className: "uf-button__spinner", children: _jsx("span", { className: "uf-spinner uf-spinner--small" }) })), hasIcon && !isIconOnly && iconPosition === 'left' && (_jsx("span", Object.assign({}, buttonAnatomy.getPartAttrs('icon'), { "data-position": "left", children: resolvedIcon }))), hasIcon && isIconOnly && (_jsx("span", Object.assign({}, buttonAnatomy.getPartAttrs('icon'), { "data-position": "only", children: resolvedIcon }))), hasText && !isIconOnly && (_jsxs("span", Object.assign({}, buttonAnatomy.getPartAttrs('text'), { children: [children !== null && children !== void 0 ? children : text, rightText != null && (_jsx("span", { className: "uf-button__rightText uf-text-body", children: rightText }))] }))), hasIcon && !isIconOnly && iconPosition === 'right' && (_jsx("span", Object.assign({}, buttonAnatomy.getPartAttrs('icon'), { "data-position": "right", children: resolvedIcon })))] })));
+    const buttonNode = (_jsxs("button", Object.assign({ ref: setRefs, type: type, disabled: disabled || loading, "aria-busy": loading ? true : undefined }, buttonAnatomy.getPartAttrs('root'), { "data-variant": variant, "data-icon-only": isIconOnly ? '' : undefined, "data-stretch-text": stretchText ? '' : undefined, "data-full-width": fullWidth ? '' : undefined, "data-align": align, "data-icon-left": hasIcon && !isIconOnly && iconPosition === 'left' ? '' : undefined, "data-icon-right": hasIcon && !isIconOnly && iconPosition === 'right' ? '' : undefined, "data-level": clampedLevel != null ? '' : undefined, "data-loading": loading ? '' : undefined, "data-copied": copied ? '' : undefined, "data-membrane": membrane ? '' : undefined, className: cn('uf-button', 'uf-option', 'uf-control', className), style: levelStyle, onClick: handleClick }, rest, { children: [loading && (_jsx("span", { className: "uf-button__spinner", children: _jsx("span", { className: "uf-spinner uf-spinner--small" }) })), hasIcon && !isIconOnly && iconPosition === 'left' && (_jsx("span", Object.assign({}, buttonAnatomy.getPartAttrs('icon'), { "data-position": "left", children: resolvedIcon }))), hasIcon && isIconOnly && (_jsx("span", Object.assign({}, buttonAnatomy.getPartAttrs('icon'), { "data-position": "only", children: resolvedIcon }))), hasText && !isIconOnly && (_jsxs("span", Object.assign({}, buttonAnatomy.getPartAttrs('text'), { children: [children !== null && children !== void 0 ? children : text, rightText != null && (_jsx("span", { className: "uf-button__rightText uf-text-body", children: rightText }))] }))), hasIcon && !isIconOnly && iconPosition === 'right' && (_jsx("span", Object.assign({}, buttonAnatomy.getPartAttrs('icon'), { "data-position": "right", children: resolvedIcon })))] })));
     if (!membrane)
         return buttonNode;
     return (_jsx("span", { className: cn('uf-membrane', fullWidth ? 'uf-membrane--full' : undefined), "data-membrane-hover": "", "data-membrane-interactive": disabled || loading ? undefined : '', onClick: (event) => {
-            var _a, _b;
             if (event.target !== event.currentTarget)
                 return;
             if (disabled || loading)
                 return;
-            (_a = buttonRef.current) === null || _a === void 0 ? void 0 : _a.focus();
-            (_b = buttonRef.current) === null || _b === void 0 ? void 0 : _b.click();
+            const button = buttonRef.current;
+            button === null || button === void 0 ? void 0 : button.focus();
+            button === null || button === void 0 ? void 0 : button.click();
         }, children: buttonNode }));
 });

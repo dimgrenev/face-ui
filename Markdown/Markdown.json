@@ -45,7 +45,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper (+1px outside component geometry).",
+      "description": "Outer membrane wrapper around component geometry.",
       "default": true
     },
     "fullWidth": {
@@ -197,6 +197,55 @@
         "slot": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-markdown-block-gap",
+      "--uf-markdown-heading-gap",
+      "--uf-markdown-h1-size",
+      "--uf-markdown-h2-size",
+      "--uf-markdown-h3-size",
+      "--uf-markdown-h4-size",
+      "--uf-markdown-h5-size",
+      "--uf-markdown-list-indent",
+      "--uf-markdown-list-item-gap",
+      "--uf-markdown-task-gap",
+      "--uf-markdown-checkbox-size",
+      "--uf-markdown-underline-offset",
+      "--uf-markdown-blockquote-border-width",
+      "--uf-markdown-code-pad-y",
+      "--uf-markdown-code-pad-x",
+      "--uf-markdown-table-pad-y",
+      "--uf-markdown-table-pad-x",
+      "--uf-markdown-table-border-width"
+    ],
+    "semanticFallbacks": [
+      "--uf-spacing-1",
+      "--uf-spacing-2",
+      "--uf-spacing-3",
+      "--uf-membrane",
+      "--uf-control-pad-text",
+      "--uf-control-font-size",
+      "--uf-font-size",
+      "--uf-font-size-md",
+      "--uf-font-size-lg",
+      "--uf-font-size-xl",
+      "--uf-font-weight",
+      "--uf-font-weight-bold",
+      "--uf-font-family-mono",
+      "--uf-radius",
+      "--uf-radius-sm",
+      "--uf-radius-md",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-border",
+      "--uf-color-hover-bg"
+    ],
+    "notes": [
+      "Markdown is an approved rich-text exception: generated headings, paragraphs, lists and tables cannot route every node through Text.",
+      "Inline code and code blocks use mono typography tokens.",
+      "Code/pre backgrounds still reference primitive black alpha variables; migrate to semantic code-surface tokens in the token alias cleanup slice."
+    ]
   },
   "platform": {},
   "usage": {

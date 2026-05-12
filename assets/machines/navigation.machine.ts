@@ -59,6 +59,8 @@ type NavigationEvent =
   | { type: 'CANCEL_CLOSE' }
   | { type: 'NAVIGATE_NEXT' }
   | { type: 'NAVIGATE_PREV' }
+  | { type: 'NAVIGATE_FIRST' }
+  | { type: 'NAVIGATE_LAST' }
 
 export interface NavigationSchema extends MachineSchema {
   context: NavigationContext
@@ -124,6 +126,16 @@ const focusByOffset = (ctx: NavigationContext, delta: 1 | -1): void => {
   ctx.focusedId = enabledIds[nextIndex]
 }
 
+const focusFirstItem = (ctx: NavigationContext): void => {
+  const enabledIds = getEnabledItemIds(ctx)
+  if (enabledIds.length > 0) ctx.focusedId = enabledIds[0]
+}
+
+const focusLastItem = (ctx: NavigationContext): void => {
+  const enabledIds = getEnabledItemIds(ctx)
+  if (enabledIds.length > 0) ctx.focusedId = enabledIds[enabledIds.length - 1]
+}
+
 const cancelClose = (ctx: NavigationContext): void => {
   if (ctx.closeTimerId != null) {
     clearTimeout(ctx.closeTimerId)
@@ -181,6 +193,12 @@ export const navigationMachine = createMachine<NavigationSchema>({
         NAVIGATE_PREV: {
           actions: [(ctx) => focusByOffset(ctx, -1)],
         },
+        NAVIGATE_FIRST: {
+          actions: [focusFirstItem],
+        },
+        NAVIGATE_LAST: {
+          actions: [focusLastItem],
+        },
       },
     },
 
@@ -216,6 +234,12 @@ export const navigationMachine = createMachine<NavigationSchema>({
         },
         NAVIGATE_PREV: {
           actions: [(ctx) => focusByOffset(ctx, -1)],
+        },
+        NAVIGATE_FIRST: {
+          actions: [focusFirstItem],
+        },
+        NAVIGATE_LAST: {
+          actions: [focusLastItem],
         },
       },
     },
@@ -293,6 +317,14 @@ export function connectNavigation(state: MachineSnapshot<NavigationSchema>, send
             case prevKey:
               event.preventDefault()
               send({ type: 'NAVIGATE_PREV' })
+              break
+            case 'Home':
+              event.preventDefault()
+              send({ type: 'NAVIGATE_FIRST' })
+              break
+            case 'End':
+              event.preventDefault()
+              send({ type: 'NAVIGATE_LAST' })
               break
             case 'Escape':
               event.preventDefault()
@@ -418,6 +450,7 @@ export function connectNavigation(state: MachineSnapshot<NavigationSchema>, send
 
       return {
         ...attrs('link'),
+        role: 'menuitem' as const,
         'aria-current': isActive ? ('page' as const) : undefined,
         'data-active': isActive ? '' : undefined,
         'data-disabled': isDisabled ? '' : undefined,

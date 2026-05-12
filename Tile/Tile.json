@@ -85,7 +85,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing (1px padding).",
+      "description": "Membrane spacing around the tile.",
       "default": true
     },
     "actions": {
@@ -187,6 +187,42 @@
         "parent": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-tile-pad",
+      "--uf-tile-level-compensation",
+      "--uf-tile-action-size",
+      "--uf-tile-focus-ring-width",
+      "--uf-tile-bg",
+      "--uf-tile-fg",
+      "--uf-tile-hover-bg",
+      "--face-runtime-option-level"
+    ],
+    "semanticFallbacks": [
+      "--uf-membrane",
+      "--uf-control-height",
+      "--uf-control-gap",
+      "--uf-control-font-size",
+      "--uf-control-line-height",
+      "--uf-font-weight",
+      "--uf-font-weight-bold",
+      "--uf-radius",
+      "--uf-color-fg",
+      "--uf-color-hover-bg",
+      "--uf-color-primary",
+      "--uf-button-ring-color",
+      "--uf-motion-duration-fast",
+      "--uf-motion-duration-emphasis",
+      "--uf-motion-ease-standard",
+      "--uf-motion-ease-emphasized",
+      "--uf-option-indent"
+    ],
+    "notes": [
+      "Tile text and rightText render through Text; nested actions should remain Button or UF action components.",
+      "Level indentation is driven by --face-runtime-option-level from the level prop and shared option indentation tokens.",
+      "Hover font-weight feedback and action reveal transitions consume shared Face UI motion tokens."
+    ]
   },
   "platform": {},
   "usage": {

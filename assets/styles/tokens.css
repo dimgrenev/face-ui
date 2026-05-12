@@ -168,12 +168,43 @@
   --uf-z-toast: 300;
 
   /* ---------------------------------------------------------------
-   * Transitions (opt-in via .uf-animated)
+   * Motion
    * --------------------------------------------------------------- */
+  --uf-motion-duration-fast: 120ms;
+  --uf-motion-duration-short: 150ms;
+  --uf-motion-duration-control: 200ms;
+  --uf-motion-duration-medium: 250ms;
+  --uf-motion-duration-emphasis: 400ms;
+  --uf-motion-duration-spin: 1000ms;
+  --uf-motion-duration-loading: 1500ms;
+  --uf-motion-duration-skeleton: 2000ms;
+  --uf-motion-duration-reduced: 0.01ms;
+  --uf-motion-iteration-indefinite: infinite;
+  --uf-motion-ease-standard: ease;
+  --uf-motion-ease-out: ease-out;
+  --uf-motion-ease-in-out: ease-in-out;
+  --uf-motion-ease-linear: linear;
+  --uf-motion-ease-emphasized: cubic-bezier(0.25, 0.1, 0.25, 1);
   --uf-duration-enter: 300ms;
   --uf-duration-exit: 200ms;
   --uf-ease-enter: cubic-bezier(0.32, 0.72, 0, 1);
   --uf-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --uf-motion-duration-fast: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-short: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-control: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-medium: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-emphasis: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-spin: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-loading: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-skeleton: var(--uf-motion-duration-reduced);
+    --uf-motion-iteration-indefinite: 1;
+    --uf-duration-enter: var(--uf-motion-duration-reduced);
+    --uf-duration-exit: var(--uf-motion-duration-reduced);
+  }
 }
 
 /* ---------------------------------------------------------------

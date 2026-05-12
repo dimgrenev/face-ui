@@ -8,7 +8,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  * `<Select options={items} placeholder="Choose..." />`
  * `<Select type="multiselect" options={items} value={['a','b']} />`
  */
-import { forwardRef, useCallback, useEffect, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useId, useRef } from 'react';
 import { useMachine } from '../assets/adapters/react/use-machine';
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop';
 import { DEFAULT_OVERLAY_SURFACE_BREAKPOINT, useResponsiveOverlaySurface, } from '../assets/adapters/react/use-responsive-overlay-surface';
@@ -42,6 +42,15 @@ function getDisplayValue(value, options) {
     const opt = options.find((o) => o.value === value);
     return opt ? opt.label : value;
 }
+function selectValuesEqual(left, right) {
+    if (Object.is(left, right))
+        return true;
+    if (!Array.isArray(left) || !Array.isArray(right))
+        return false;
+    if (left.length !== right.length)
+        return false;
+    return left.every((item, index) => item === right[index]);
+}
 function renderSelectLabelNode(node, className) {
     if (node == null)
         return null;
@@ -57,14 +66,23 @@ export const Select = forwardRef(function Select(props, ref) {
     var _a, _b, _c, _d;
     const { options: rawOptions, value, defaultValue, placeholder, disabled = false, type = 'select', label, labelOrientation = 'vertical', ariaLabel, displayValue: displayValueOverride, stretchText = false, onValueChange, onOpenChange, surface = 'auto', surfaceBreakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT, surfaceTitle, membrane = true, className, } = props;
     const options = Array.isArray(rawOptions) ? rawOptions : [];
+    const optionOrder = options.map((option) => option.value);
+    const disabledValues = options
+        .filter((option) => option.disabled)
+        .map((option) => option.value);
+    const selectId = useId();
     const rootRef = useRef(null);
     const machineValue = useControllableMachineProp(value !== undefined ? value : undefined, defaultValue !== null && defaultValue !== void 0 ? defaultValue : (type === 'multiselect' ? [] : null));
     const { state, send } = useMachine(selectMachine, {
         value: machineValue,
+        optionOrder,
+        disabledValues,
         disabled,
         type,
         onValueChange: ((details) => {
             var _a;
+            if (value !== undefined && selectValuesEqual(details === null || details === void 0 ? void 0 : details.value, value))
+                return;
             try {
                 onValueChange === null || onValueChange === void 0 ? void 0 : onValueChange(details);
             }
@@ -109,11 +127,36 @@ export const Select = forwardRef(function Select(props, ref) {
     const computedDisplay = getDisplayValue(state.context.value, options);
     const triggerLabel = (_b = (_a = displayValueOverride !== null && displayValueOverride !== void 0 ? displayValueOverride : computedDisplay) !== null && _a !== void 0 ? _a : placeholder) !== null && _b !== void 0 ? _b : 'Select…';
     const isPlaceholder = computedDisplay == null && !displayValueOverride;
-    const contentProps = api.getContentProps();
+    const triggerId = `uf-select:${selectId}:trigger`;
+    const labelId = label != null ? `uf-select:${selectId}:label` : undefined;
+    const contentId = `uf-select:${selectId}:listbox`;
+    const highlightedOptionIndex = state.context.highlightedValue == null
+        ? -1
+        : options.findIndex((option) => (option.value === state.context.highlightedValue && !option.disabled));
+    const activeDescendantId = highlightedOptionIndex >= 0
+        ? `${contentId}:option:${highlightedOptionIndex}`
+        : undefined;
+    const contentProps = api.getContentProps({
+        id: contentId,
+        labelId,
+        ariaLabel,
+        activeDescendantId,
+    });
+    const triggerProps = api.getTriggerProps({
+        id: triggerId,
+        contentId,
+        labelId,
+        ariaLabel,
+        activeDescendantId,
+    });
     const sheetTitle = (_d = (_c = surfaceTitle !== null && surfaceTitle !== void 0 ? surfaceTitle : label) !== null && _c !== void 0 ? _c : ariaLabel) !== null && _d !== void 0 ? _d : 'Select option';
-    const triggerNode = (_jsxs("button", Object.assign({}, api.getTriggerProps(), { type: "button", "aria-label": ariaLabel || (typeof label === 'string' ? label : undefined), "data-stretch-text": stretchText ? '' : undefined, children: [renderSelectLabelNode(triggerLabel, cn('uf-select__value', isPlaceholder && 'uf-select__value--placeholder')), _jsx("span", { className: "uf-select__arrow", "aria-hidden": "true", children: _jsx(Icon, { name: "down", size: 16 }) })] })));
-    const contentNode = (_jsxs("div", { className: "uf-select__contentPanel", children: [resolvedSurface === 'sheet' ? (_jsx(ResponsiveSheetHeader, { title: sheetTitle, onClose: () => send({ type: 'CLOSE' }) })) : null, options.map((option) => {
-                const optionProps = api.getOptionProps({ value: option.value, disabled: option.disabled });
+    const triggerNode = (_jsxs("button", Object.assign({}, triggerProps, { type: "button", "data-stretch-text": stretchText ? '' : undefined, children: [renderSelectLabelNode(triggerLabel, cn('uf-select__value', isPlaceholder && 'uf-select__value--placeholder')), _jsx("span", { className: "uf-select__arrow", "aria-hidden": "true", children: _jsx(Icon, { name: "down", size: 16 }) })] })));
+    const contentNode = (_jsxs("div", { className: "uf-select__contentPanel", children: [resolvedSurface === 'sheet' ? (_jsx(ResponsiveSheetHeader, { title: sheetTitle, onClose: () => send({ type: 'CLOSE' }) })) : null, options.map((option, index) => {
+                const optionProps = api.getOptionProps({
+                    value: option.value,
+                    disabled: option.disabled,
+                    id: `${contentId}:option:${index}`,
+                });
                 const optionNode = (_jsx("div", Object.assign({}, optionProps, { className: cn('uf-select-option', 'uf-option', 'uf-control', optionProps.className), children: renderSelectLabelNode(option.label, 'uf-select-optionLabel') }), option.value));
                 if (!membrane)
                     return optionNode;
@@ -124,5 +167,5 @@ export const Select = forwardRef(function Select(props, ref) {
                         (_b = (_a = optionProps).onClick) === null || _b === void 0 ? void 0 : _b.call(_a);
                     }, children: optionNode }, `option-membrane:${option.value}`));
             })] }));
-    return (_jsxs("div", Object.assign({ ref: mergedRef }, api.getRootProps(), { "data-label-orientation": labelOrientation, className: cn('uf-select', className), children: [label != null && (_jsx(Text, { as: "label", variant: "label", "data-part": "label", children: label })), _jsxs("div", { className: "uf-select-wrapper", children: [membrane ? (_jsx("span", { className: "uf-membrane uf-membrane--full", children: triggerNode })) : triggerNode, resolvedSurface === 'sheet' ? (_jsx("div", { className: "uf-responsive-overlay-backdrop", "data-state": isOpen ? 'open' : 'closed', onClick: () => send({ type: 'CLOSE' }) })) : null, _jsx("div", Object.assign({}, contentProps, { className: cn('uf-select__content', contentProps.className), "data-surface": resolvedSurface, children: membrane ? (_jsx("span", { className: "uf-membrane uf-membrane--full uf-select__contentMembrane", children: contentNode })) : contentNode }))] })] })));
+    return (_jsxs("div", Object.assign({ ref: mergedRef }, api.getRootProps(), { "data-label-orientation": labelOrientation, className: cn('uf-select', className), children: [label != null && (_jsx(Text, { as: "label", variant: "label", id: labelId, htmlFor: triggerId, "data-part": "label", children: label })), _jsxs("div", { className: "uf-select-wrapper", children: [membrane ? (_jsx("span", { className: "uf-membrane uf-membrane--full", children: triggerNode })) : triggerNode, isOpen && resolvedSurface === 'sheet' ? (_jsx("div", { className: "uf-responsive-overlay-backdrop", "data-state": isOpen ? 'open' : 'closed', onClick: () => send({ type: 'CLOSE' }) })) : null, isOpen ? (_jsx("div", Object.assign({}, contentProps, { className: cn('uf-select__content', contentProps.className), "data-surface": resolvedSurface, children: membrane ? (_jsx("span", { className: "uf-membrane uf-membrane--full uf-select__contentMembrane", children: contentNode })) : contentNode }))) : null] })] })));
 });

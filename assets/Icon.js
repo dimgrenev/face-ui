@@ -2,7 +2,7 @@ import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-run
 import React from 'react';
 import styles from './Icon.module.css';
 // Runtime list of available icon names (single source of truth alongside IconName union).
-export const ICON_NAMES = ['align-horizontal-center', 'align-horizontal-left', 'align-horizontal-right', 'align-vertical-bottom', 'align-vertical-center', 'align-vertical-top', 'alphabet', 'animation', 'arrow-down', 'arrow-left', 'arrow-right', 'arrow-up', 'cart', 'check', 'check-off', 'check-on', 'clean', 'close', 'cloud-done', 'component', 'cookie', 'copy', 'crop', 'date', 'delete', 'down', 'download', 'drag', 'edit', 'face', 'file', 'folder', 'full', 'info', 'left', 'legend', 'letter-spacing', 'line-height', 'link', 'minus', 'more', 'notification', 'panel', 'panel-right', 'pause', 'play', 'plus', 'props', 'radio-off', 'radio-on', 'random', 'render', 'restart', 'right', 'scroll', 'search', 'settings', 'size', 'sound', 'stat', 'store', 'switch', 'theme', 'type', 'up', 'user', 'userface'];
+export const ICON_NAMES = ['align-horizontal-center', 'align-horizontal-left', 'align-horizontal-right', 'align-vertical-bottom', 'align-vertical-center', 'align-vertical-top', 'alphabet', 'animation', 'arrow-down', 'arrow-left', 'arrow-right', 'arrow-up', 'cart', 'check', 'check-off', 'check-on', 'clean', 'close', 'cloud-done', 'component', 'cookie', 'copy', 'crop', 'date', 'delete', 'down', 'download', 'drag', 'edit', 'face', 'file', 'filter', 'folder', 'full', 'git', 'info', 'left', 'legend', 'letter-spacing', 'line-height', 'link', 'minus', 'more', 'notification', 'panel', 'panel-right', 'pause', 'play', 'plus', 'props', 'radio-off', 'radio-on', 'random', 'render', 'restart', 'right', 'scroll', 'search', 'settings', 'size', 'sound', 'stat', 'store', 'switch', 'theme', 'type', 'up', 'user', 'userface'];
 /**
  * Icon definitions - auto-generated from SVG files
  * DO NOT EDIT MANUALLY - run 'npm run generate:icons' to regenerate
@@ -39,8 +39,10 @@ const icons = {
     'edit': (_jsxs(_Fragment, { children: [_jsx("path", { d: "M4 13.9998L6 15.9998M14 9.00046L15.5 7.50046C16.2809 6.71959 16.2806 5.28116 15.5 4.50004C14.719 3.71856 13.2812 3.71889 12.5 4.50012L10.9758 5.99009L14 9.00046ZM8 14.9998L9.5 13.4998L6.5 10.4998L5 11.9998L3 16.5L3.5 17L8 14.9998Z", stroke: "currentColor" }), _jsx("path", { d: "M9.5 13.5L13 10M6.5 10.5L10 7", stroke: "currentColor" })] })),
     'face': (_jsxs(_Fragment, { children: [_jsx("path", { d: "M5 13C5 15 7 17 10 17C12.5 17 13.5 16 14.5 15", stroke: "currentColor" }), _jsx("path", { d: "M11.5 6.50019L15.5 6.5V8.5L12.5 8.50019", stroke: "currentColor" }), _jsx("path", { d: "M4.5 8.50019V6.50019L8.5 6.5V8.5L4.5 8.50019Z", stroke: "currentColor" }), _jsx("path", { d: "M9.5 2L14 12H9.5L10.1699 14.5", stroke: "currentColor" })] })),
     'file': (_jsxs(_Fragment, { children: [_jsx("path", { d: "M15.5 4.50019H9L4.5 4.5V15.5L9 15.5002H15.5V4.50019Z", stroke: "currentColor" }), _jsx("path", { d: "M7 8.5H13", stroke: "currentColor" }), _jsx("path", { d: "M7 11.5H11", stroke: "currentColor" })] })),
+    'filter': (_jsxs(_Fragment, { children: [_jsx("path", { d: "M4 6.5H16", stroke: "currentColor" }), _jsx("path", { d: "M6 10.5H14", stroke: "currentColor" }), _jsx("path", { d: "M8 14.5H12", stroke: "currentColor" })] })),
     'folder': (_jsx("path", { d: "M16.5 6.5H10.5L9 4.5H3.5V15.5H9.2H16.5L16.5 6.5Z", stroke: "currentColor" })),
     'full': (_jsx("path", { d: "M13.5 6.5L6.5 13.5M9 3.75L16.25 3.75V11M11 16.25L3.75 16.25V9", stroke: "currentColor" })),
+    'git': (_jsxs(_Fragment, { children: [_jsx("circle", { cx: "10", cy: "4.5", r: "2", stroke: "currentColor" }), _jsx("circle", { cx: "10", cy: "15.5", r: "2", stroke: "currentColor" }), _jsx("circle", { cx: "15", cy: "10", r: "2", stroke: "currentColor" }), _jsx("path", { d: "M10 6.5V13.5", stroke: "currentColor" }), _jsx("path", { d: "M13 10H10V6.5", stroke: "currentColor" })] })),
     'info': (_jsxs(_Fragment, { children: [_jsx("path", { d: "M10 10V13.5", stroke: "currentColor" }), _jsx("circle", { cx: "10.0008", cy: "7.2", r: "1.2", fill: "currentColor" }), _jsx("path", { d: "M4 10C4 6.18182 7 4 10 4C13 4 16 6.18182 16 10C16 13.8182 13 16 10 16C7 16 4 13.8182 4 10Z", stroke: "currentColor" })] })),
     'left': (_jsx("path", { d: "M12 5L7 10L12 15", stroke: "currentColor" })),
     'legend': (_jsx("path", { d: "M4 10C4 6.18182 7 4 10 4C13 4 16 6.18182 16 10C16 13.8182 13 16 10 16C7 16 4 13.8182 4 10Z", fill: "currentColor" })),
@@ -109,8 +111,10 @@ const ICON_VIEWBOX = {
     'edit': "0 0 20 20",
     'face': "0 0 20 20",
     'file': "0 0 20 20",
+    'filter': "0 0 20 20",
     'folder': "0 0 20 20",
     'full': "0 0 20 20",
+    'git': "0 0 20 20",
     'info': "0 0 20 20",
     'left': "0 0 20 20",
     'legend': "0 0 20 20",
@@ -178,8 +182,10 @@ const ICON_NATIVE_SIZE = {
     'edit': 20,
     'face': 20,
     'file': 20,
+    'filter': 20,
     'folder': 20,
     'full': 20,
+    'git': 20,
     'info': 20,
     'left': 20,
     'legend': 20,

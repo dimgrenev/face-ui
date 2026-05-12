@@ -78,6 +78,33 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-overlay-content-max-w",
+      "--uf-overlay-content-border-width"
+    ],
+    "semanticFallbacks": [
+      "--uf-spacing-2",
+      "--uf-spacing-3",
+      "--uf-radius",
+      "--uf-membrane",
+      "--uf-z-overlay",
+      "--uf-duration-enter",
+      "--uf-duration-exit",
+      "--uf-ease-enter",
+      "--uf-font-size-sm",
+      "--uf-font-weight",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-border",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-enter-y",
+      "--uf-overlay-enter-scale"
+    ],
+    "notes": [
+      "Popover is the interactive click variant of Overlay and inherits Overlay positioning and surface tokens.",
+      "Use Modal for blocking focus-trapped decisions rather than expanding Popover styling."
+    ]
+  },
   "platform": {
     "popover": true,
     "anchorPositioning": true

@@ -68,6 +68,16 @@ const focusByOffset = (ctx, delta) => {
         : (currentIndex + delta + enabledIds.length) % enabledIds.length;
     ctx.focusedId = enabledIds[nextIndex];
 };
+const focusFirstItem = (ctx) => {
+    const enabledIds = getEnabledItemIds(ctx);
+    if (enabledIds.length > 0)
+        ctx.focusedId = enabledIds[0];
+};
+const focusLastItem = (ctx) => {
+    const enabledIds = getEnabledItemIds(ctx);
+    if (enabledIds.length > 0)
+        ctx.focusedId = enabledIds[enabledIds.length - 1];
+};
 const cancelClose = (ctx) => {
     if (ctx.closeTimerId != null) {
         clearTimeout(ctx.closeTimerId);
@@ -122,6 +132,12 @@ export const navigationMachine = createMachine({
                 NAVIGATE_PREV: {
                     actions: [(ctx) => focusByOffset(ctx, -1)],
                 },
+                NAVIGATE_FIRST: {
+                    actions: [focusFirstItem],
+                },
+                NAVIGATE_LAST: {
+                    actions: [focusLastItem],
+                },
             },
         },
         open: {
@@ -156,6 +172,12 @@ export const navigationMachine = createMachine({
                 },
                 NAVIGATE_PREV: {
                     actions: [(ctx) => focusByOffset(ctx, -1)],
+                },
+                NAVIGATE_FIRST: {
+                    actions: [focusFirstItem],
+                },
+                NAVIGATE_LAST: {
+                    actions: [focusLastItem],
                 },
             },
         },
@@ -207,6 +229,14 @@ export function connectNavigation(state, send) {
                         case prevKey:
                             event.preventDefault();
                             send({ type: 'NAVIGATE_PREV' });
+                            break;
+                        case 'Home':
+                            event.preventDefault();
+                            send({ type: 'NAVIGATE_FIRST' });
+                            break;
+                        case 'End':
+                            event.preventDefault();
+                            send({ type: 'NAVIGATE_LAST' });
                             break;
                         case 'Escape':
                             event.preventDefault();
@@ -301,7 +331,7 @@ export function connectNavigation(state, send) {
         getLinkProps(props) {
             const isActive = ctx.activeId === props.id;
             const isDisabled = props.disabled;
-            return Object.assign(Object.assign({}, attrs('link')), { 'aria-current': isActive ? 'page' : undefined, 'data-active': isActive ? '' : undefined, 'data-disabled': isDisabled ? '' : undefined, 'data-value': props.id, tabIndex: isDisabled ? -1 : 0, onClick() {
+            return Object.assign(Object.assign({}, attrs('link')), { role: 'menuitem', 'aria-current': isActive ? 'page' : undefined, 'data-active': isActive ? '' : undefined, 'data-disabled': isDisabled ? '' : undefined, 'data-value': props.id, tabIndex: isDisabled ? -1 : 0, onClick() {
                     if (!isDisabled) {
                         send({ type: 'SET_ACTIVE', id: props.id });
                         send({ type: 'CLOSE' });

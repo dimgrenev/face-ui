@@ -8,7 +8,7 @@ import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-run
  * `<Accordion items={[{ value: 'a', label: 'Section A', content: <p>...</p> }]} />`
  * `<Accordion items={[{ value: 'solo', label: 'Toggle', content: <p>...</p> }]} collapsible />`
  */
-import { Children, Fragment, forwardRef, isValidElement, useMemo } from 'react';
+import { Children, Fragment, forwardRef, isValidElement, useId, useMemo } from 'react';
 import { useMachine } from '../assets/adapters/react/use-machine';
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop';
 import { accordionMachine, connectAccordion } from '../assets/machines/accordion.machine';
@@ -58,6 +58,9 @@ function renderAccordionContentNode(node) {
         return (_jsx(Text, { as: "div", fullWidth: true, children: String(node) }));
     }
     return node;
+}
+function getAccordionDomId(instanceId, part, value) {
+    return `accordion:${instanceId}:${part}:${value}`;
 }
 // ---------------------------------------------------------------------------
 // Component
@@ -112,5 +115,10 @@ export const Accordion = forwardRef(function Accordion(props, ref) {
     };
     const { state, send } = useMachine(accordionMachine, machineOptions);
     const api = connectAccordion(state, send);
-    return (_jsx("div", Object.assign({ ref: ref }, api.getRootProps(), { className: cn('uf-accordion', className), children: items.map((item) => (_jsxs("div", Object.assign({}, api.getItemProps({ value: item.value, disabled: item.disabled }), { children: [_jsx("span", { className: "uf-membrane uf-membrane--full", children: _jsxs("button", Object.assign({}, api.getTriggerProps({ value: item.value, disabled: item.disabled }), { children: [_jsx("span", { className: "uf-accordion-label uf-text-body", children: item.label }), _jsx("span", { className: "uf-accordion-arrow", "aria-hidden": "true", children: _jsx(RightIcon, {}) })] })) }), _jsx("div", Object.assign({}, api.getContentProps({ value: item.value }), { children: _jsx("div", { className: "uf-accordion-content-inner uf-text-body", children: flattenAccordionContent(item.content).map((node, idx) => (_jsx("div", { className: "uf-accordion-slot", children: renderAccordionContentNode(node) }, `${item.value}:slot:${idx}`))) }) }))] }), item.value))) })));
+    const accordionInstanceId = useId().replace(/:/g, '');
+    return (_jsx("div", Object.assign({ ref: ref }, api.getRootProps(), { className: cn('uf-accordion', className), children: items.map((item) => {
+            const triggerId = getAccordionDomId(accordionInstanceId, 'trigger', item.value);
+            const contentId = getAccordionDomId(accordionInstanceId, 'content', item.value);
+            return (_jsxs("div", Object.assign({}, api.getItemProps({ value: item.value, disabled: item.disabled }), { children: [_jsx("span", { className: "uf-membrane uf-membrane--full", children: _jsxs("button", Object.assign({}, api.getTriggerProps({ value: item.value, disabled: item.disabled }), { id: triggerId, "aria-controls": contentId, children: [_jsx("span", { className: "uf-accordion-label uf-text-body", children: item.label }), _jsx("span", { className: "uf-accordion-arrow", "aria-hidden": "true", children: _jsx(RightIcon, {}) })] })) }), _jsx("div", Object.assign({}, api.getContentProps({ value: item.value }), { id: contentId, "aria-labelledby": triggerId, children: _jsx("div", { className: "uf-accordion-content-inner uf-text-body", children: flattenAccordionContent(item.content).map((node, idx) => (_jsx("div", { className: "uf-accordion-slot", children: renderAccordionContentNode(node) }, `${item.value}:slot:${idx}`))) }) }))] }), item.value));
+        }) })));
 });

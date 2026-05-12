@@ -98,13 +98,12 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
           </Text>
           <Button
             {...(api.getTriggerProps() as any)}
+            text="Choose files"
             variant="default"
             align="left"
             className="uf-upload-trigger"
             onClick={handleTriggerClick}
-          >
-            Choose files
-          </Button>
+          />
         </div>
 
         {api.files.length > 0 && (
@@ -117,9 +116,12 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
                 <Text as="span" {...api.getFileSizeProps(file.id)} variant="muted">
                   {formatFileSize(file.size)}
                 </Text>
-                <button {...api.getFileRemoveProps(file.id)}>
-                  Remove
-                </button>
+                <Button
+                  {...(api.getFileRemoveProps(file.id) as any)}
+                  text="Remove"
+                  fullWidth={false}
+                  membrane={false}
+                />
               </li>
             ))}
           </ul>

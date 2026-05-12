@@ -89,6 +89,38 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-modal-sheet-inset",
+      "--uf-modal-sheet-gap",
+      "--face-runtime-modal-h",
+      "--uf-responsive-panel-inset",
+      "--uf-responsive-panel-border-width",
+      "--uf-responsive-panel-pad",
+      "--uf-responsive-panel-enter-y"
+    ],
+    "semanticFallbacks": [
+      "--uf-spacing-1",
+      "--uf-spacing-6",
+      "--uf-membrane",
+      "--uf-radius-lg",
+      "--uf-color-fg",
+      "--uf-overlay-backdrop-bg",
+      "--uf-overlay-backdrop-blur",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-border",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-surface-shadow",
+      "--uf-duration-enter",
+      "--uf-duration-exit",
+      "--uf-ease-enter",
+      "--uf-z-overlay"
+    ],
+    "notes": [
+      "Sheet is a thin Drawer wrapper constrained to top/bottom placements and inherits Modal/Drawer overlay tokens.",
+      "Drag-to-dismiss is a behavioral contract; no separate visual token namespace exists yet."
+    ]
+  },
   "platform": {
     "dialog": true,
     "inert": true

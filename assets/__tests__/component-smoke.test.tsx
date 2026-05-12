@@ -12,20 +12,24 @@ import { Checkbox } from '../../Checkbox/Checkbox'
 import { Code } from '../../Code/Code'
 import { Command } from '../../Command/Command'
 import { Icon } from '../../Icon/Icon'
+import { Input } from '../../Input/Input'
 import { Markdown } from '../../Markdown/Markdown'
-import { Media } from '../../Media/Media'
+import { Media } from '../../Media/Media.tsx'
 import { Modal } from '../../Modal/Modal'
 import { Navigation } from '../../Navigation/Navigation'
 import { Pagination } from '../../Pagination/Pagination'
 import { Panel } from '../../Panel/Panel'
 import { Radio } from '../../Radio/Radio'
 import { Rating } from '../../Rating/Rating'
+import { Scroll } from '../../Scroll/Scroll'
 import { Separator } from '../../Separator/Separator'
+import { Select } from '../../Select/Select'
 import { Slider } from '../../Slider/Slider'
 import { Steps } from '../../Steps/Steps'
 import { Switcher } from '../../Switcher/Switcher'
 import { Table } from '../../Table/Table'
 import { Tabs } from '../../Tabs/Tabs'
+import { Tile } from '../../Tile/Tile'
 import { Toast } from '../../Toast/Toast'
 import { Toc } from '../../Toc/Toc'
 import { Toggle } from '../../Toggle/Toggle'
@@ -114,6 +118,90 @@ describe('component smoke', () => {
     expect(icon).not.toBeNull()
   })
 
+  it('Input syncs controlled value updates from props', async () => {
+    const handleValueChange = vi.fn()
+
+    await act(async () => {
+      root.render(<Input type="text" value="Alpha" onValueChange={handleValueChange} />)
+    })
+
+    const input = container.querySelector('.uf-input input') as HTMLInputElement | null
+    expect(input?.value).toBe('Alpha')
+    expect(handleValueChange).not.toHaveBeenCalled()
+
+    await act(async () => {
+      root.render(<Input type="text" value="Beta" onValueChange={handleValueChange} />)
+    })
+
+    const updatedInput = container.querySelector('.uf-input input') as HTMLInputElement | null
+    expect(updatedInput?.value).toBe('Beta')
+    expect(handleValueChange).not.toHaveBeenCalled()
+  })
+
+  it('Select syncs controlled value updates without echoing onValueChange', async () => {
+    const handleValueChange = vi.fn()
+
+    await act(async () => {
+      root.render(
+        <Select
+          value="alpha"
+          surface="sheet"
+          options={[
+            { value: 'alpha', label: 'Alpha' },
+            { value: 'beta', label: 'Beta' },
+          ]}
+          onValueChange={handleValueChange}
+        />,
+      )
+    })
+
+    const trigger = container.querySelector<HTMLButtonElement>('[data-scope="select"][data-part="trigger"]')
+    expect(trigger?.textContent).toContain('Alpha')
+
+    await act(async () => {
+      trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    const betaOption = Array.from(container.querySelectorAll<HTMLElement>('[role="option"]'))
+      .find((option) => option.dataset.value === 'beta') ?? null
+    expect(betaOption?.textContent).toContain('Beta')
+
+    await act(async () => {
+      betaOption?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(handleValueChange.mock.calls.map(([details]) => details)).toEqual([{ value: 'beta' }])
+    expect(trigger?.textContent).toContain('Alpha')
+
+    await act(async () => {
+      root.render(
+        <Select
+          value="beta"
+          surface="sheet"
+          options={[
+            { value: 'alpha', label: 'Alpha' },
+            { value: 'beta', label: 'Beta' },
+          ]}
+          onValueChange={handleValueChange}
+        />,
+      )
+    })
+
+    expect(handleValueChange).toHaveBeenCalledTimes(1)
+    expect(trigger?.textContent).toContain('Beta')
+  })
+
+  it('Input exposes the native textarea through controlRef', async () => {
+    const controlRef = React.createRef<HTMLInputElement | HTMLTextAreaElement>()
+
+    await act(async () => {
+      root.render(<Input value="Note" textLayout="wrap" controlRef={controlRef} />)
+    })
+
+    expect(controlRef.current).toBeInstanceOf(HTMLTextAreaElement)
+    expect(controlRef.current?.value).toBe('Note')
+  })
+
   it('Icon wrapper renders the exported icon component directly', async () => {
     await act(async () => {
       root.render(<Icon name="settings" size={20} />)
@@ -134,6 +222,25 @@ describe('component smoke', () => {
     expect(img?.style.height).toBe('auto')
   })
 
+  it('Media exposes wrapper aria-label when a role is provided', async () => {
+    await act(async () => {
+      root.render(
+        <Media
+          src="https://example.com/image.jpg"
+          alt="Preview"
+          role="img"
+          aria-label="Architecture preview"
+        />,
+      )
+    })
+
+    const media = container.querySelector('[data-scope="media"][data-part="root"]') as HTMLElement | null
+    const img = container.querySelector('img') as HTMLImageElement | null
+    expect(media?.getAttribute('role')).toBe('img')
+    expect(media?.getAttribute('aria-label')).toBe('Architecture preview')
+    expect(img?.getAttribute('alt')).toBe('Preview')
+  })
+
   it('Checkbox keeps its hidden input out of the focus order and visible to a11y APIs', async () => {
     await act(async () => {
       root.render(<Checkbox label="Checkbox" defaultChecked />)
@@ -145,15 +252,139 @@ describe('component smoke', () => {
     expect(input?.tabIndex).toBe(-1)
   })
 
-  it('Separator uses the dedicated membrane wrapper for 3px geometry', async () => {
+  it('Checkbox toggles correctly from a controlled checked initial state', async () => {
+    const handleCheckedChange = vi.fn()
+
+    function Harness() {
+      const [checked, setChecked] = React.useState<boolean | 'indeterminate'>(true)
+      return (
+        <Checkbox
+          checked={checked}
+          onCheckedChange={({ checked: nextChecked }) => {
+            handleCheckedChange(nextChecked)
+            setChecked(nextChecked)
+          }}
+        />
+      )
+    }
+
     await act(async () => {
-      root.render(<Separator />)
+      root.render(<Harness />)
+    })
+
+    const input = container.querySelector('.uf-checkbox input[type="checkbox"]') as HTMLInputElement | null
+    expect(input?.checked).toBe(true)
+
+    await act(async () => {
+      input?.click()
+    })
+
+    expect(handleCheckedChange).toHaveBeenCalledWith(false)
+    expect(input?.checked).toBe(false)
+  })
+
+  it('Separator keeps decorative dividers hidden from landmarks and exposes semantic separators on demand', async () => {
+    await act(async () => {
+      root.render(
+        <>
+          <Separator />
+          <Separator decorative={false} orientation="vertical" membrane={false} />
+        </>,
+      )
     })
 
     const wrapper = container.querySelector('.uf-separator-membrane') as HTMLElement | null
-    const separator = container.querySelector('.uf-separator[data-scope]') as HTMLElement | null
+    const separators = Array.from(container.querySelectorAll<HTMLElement>('.uf-separator[data-scope]'))
+    const decorative = separators[0]
+    const semantic = separators[1]
+
     expect(wrapper).not.toBeNull()
-    expect(separator).not.toBeNull()
+    expect(decorative?.getAttribute('role')).toBe('none')
+    expect(decorative?.getAttribute('aria-orientation')).toBeNull()
+    expect(semantic?.getAttribute('role')).toBe('separator')
+    expect(semantic?.getAttribute('aria-orientation')).toBe('vertical')
+    expect(semantic?.getAttribute('data-orientation')).toBe('vertical')
+  })
+
+  it('Scroll exposes a focusable labelled region with a contextual aria label', async () => {
+    await act(async () => {
+      root.render(
+        <Scroll orientation="both" height="12rem" ariaLabel="Token audit log">
+          <div>Audit row</div>
+        </Scroll>,
+      )
+    })
+
+    const rootNode = container.querySelector('[data-scope="scroll"][data-part="root"]') as HTMLElement | null
+    const viewport = container.querySelector('[data-scope="scroll"][data-part="viewport"]') as HTMLElement | null
+
+    expect(rootNode?.getAttribute('data-orientation')).toBe('both')
+    expect(rootNode?.style.height).toBe('12rem')
+    expect(viewport?.getAttribute('role')).toBe('region')
+    expect(viewport?.getAttribute('aria-label')).toBe('Token audit log')
+    expect(viewport?.tabIndex).toBe(0)
+    expect(viewport?.style.overflowX).toBe('auto')
+    expect(viewport?.style.overflowY).toBe('auto')
+  })
+
+  it('Tile preserves button-like keyboard semantics and nested action isolation', async () => {
+    const handleTileClick = vi.fn()
+    const handleActionClick = vi.fn()
+
+    await act(async () => {
+      root.render(
+        <Tile
+          text="Project map"
+          rightText="Ready"
+          icon="file"
+          active
+          onClick={handleTileClick}
+          actions={<Button text="More" onClick={handleActionClick} />}
+        />,
+      )
+    })
+
+    const tile = container.querySelector('[data-scope="tile"][data-part="root"]') as HTMLElement | null
+    const action = container.querySelector('[data-scope="tile"][data-part="actions"] button') as HTMLButtonElement | null
+
+    expect(tile?.getAttribute('role')).toBe('button')
+    expect(tile?.tabIndex).toBe(0)
+    expect(tile?.getAttribute('aria-disabled')).toBeNull()
+    expect(tile?.getAttribute('data-active')).toBe('')
+    expect(tile?.querySelector('[data-scope="text"]')).not.toBeNull()
+    expect(tile?.textContent).toContain('Project map')
+    expect(tile?.textContent).toContain('Ready')
+    expect(action?.textContent).toContain('More')
+
+    await act(async () => {
+      tile?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      tile?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+      tile?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }))
+    })
+
+    expect(handleTileClick).toHaveBeenCalledTimes(3)
+
+    await act(async () => {
+      action?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(handleActionClick).toHaveBeenCalledTimes(1)
+    expect(handleTileClick).toHaveBeenCalledTimes(3)
+
+    await act(async () => {
+      root.render(<Tile text="Disabled project" disabled onClick={handleTileClick} />)
+    })
+
+    const disabledTile = container.querySelector('[data-scope="tile"][data-part="root"]') as HTMLElement | null
+    expect(disabledTile?.tabIndex).toBe(-1)
+    expect(disabledTile?.getAttribute('aria-disabled')).toBe('true')
+
+    await act(async () => {
+      disabledTile?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      disabledTile?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    })
+
+    expect(handleTileClick).toHaveBeenCalledTimes(3)
   })
 
   it('Carousel advances in uncontrolled mode', async () => {

@@ -22,10 +22,15 @@ export const inputMachine = createMachine({
         disabled: false,
         readOnly: false,
         type: 'text',
+        silentSync: false,
     },
     watch: {
         value(ctx) {
             var _a;
+            if (ctx.silentSync) {
+                ctx.silentSync = false;
+                return;
+            }
             (_a = ctx.onValueChange) === null || _a === void 0 ? void 0 : _a.call(ctx, { value: ctx.value });
         },
     },
@@ -48,6 +53,14 @@ export const inputMachine = createMachine({
                         ],
                     },
                 ],
+                SYNC_VALUE: {
+                    actions: [
+                        (ctx, e) => {
+                            ctx.silentSync = true;
+                            ctx.value = e.value;
+                        },
+                    ],
+                },
                 CLEAR: [
                     {
                         guard: (ctx) => !ctx.disabled && !ctx.readOnly,
@@ -75,6 +88,14 @@ export const inputMachine = createMachine({
                         ],
                     },
                 ],
+                SYNC_VALUE: {
+                    actions: [
+                        (ctx, e) => {
+                            ctx.silentSync = true;
+                            ctx.value = e.value;
+                        },
+                    ],
+                },
                 CLEAR: [
                     {
                         guard: (ctx) => !ctx.disabled && !ctx.readOnly,

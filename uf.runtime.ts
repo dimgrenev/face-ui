@@ -12,9 +12,9 @@ const runtime = {
     theme: 'light',
     centerCanvas: true,
     align: 'center',
-    padding: '24px',
-    background: '#f5f5f5',
-    maxWidth: 'min(100%, 960px)',
+    padding: 'var(--uf-spacing-6)',
+    background: 'var(--uf-color-panel, Canvas)',
+    maxWidth: 'min(100%, calc(var(--uf-spacing-12) * 20))',
     env: {
       pathname: '/preview/face-ui-react',
       route: '/preview/face-ui-react',

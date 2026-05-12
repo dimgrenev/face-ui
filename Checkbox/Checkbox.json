@@ -1,47 +1,210 @@
 {
   "name": "Checkbox",
+  "description": "Boolean or indeterminate form control with a visible label and hidden native input",
   "props": {
     "checked": {
-      "type": "enum",
+      "type": "union",
+      "required": false,
+      "description": "Controlled checked state. Accepts boolean or \"indeterminate\".",
       "options": [
+        true,
+        false,
         "indeterminate"
       ],
-      "default": ""
+      "default": null
     },
     "defaultChecked": {
-      "type": "enum",
+      "type": "union",
+      "required": false,
+      "description": "Uncontrolled initial checked state. Accepts boolean or \"indeterminate\".",
       "options": [
+        true,
+        false,
         "indeterminate"
       ],
       "default": false
     },
     "disabled": {
       "type": "boolean",
+      "required": false,
+      "description": "Disable pointer and keyboard interaction.",
       "default": false
     },
     "required": {
       "type": "boolean",
+      "required": false,
+      "description": "Mark the hidden native input as required.",
       "default": false
     },
     "name": {
       "type": "string",
+      "required": false,
+      "description": "Native form field name for the hidden input.",
       "default": ""
     },
     "label": {
-      "type": "string",
-      "default": "Checkbox"
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible label content rendered through Face UI Text."
     },
     "onCheckedChange": {
       "type": "function",
-      "default": ""
+      "required": false,
+      "description": "Callback fired with { checked } when the machine state changes."
     },
     "className": {
       "type": "string",
-      "default": ""
+      "required": false,
+      "description": "Additional className on the root label."
     },
     "membrane": {
       "type": "boolean",
+      "required": false,
+      "description": "Wrap the control in the standard one-token membrane.",
       "default": true
     }
+  },
+  "states": [
+    {
+      "name": "Unchecked",
+      "props": {
+        "label": "Checkbox"
+      }
+    },
+    {
+      "name": "Checked",
+      "props": {
+        "checked": true,
+        "label": "Checked"
+      }
+    },
+    {
+      "name": "Indeterminate",
+      "props": {
+        "checked": "indeterminate",
+        "label": "Partially selected"
+      }
+    },
+    {
+      "name": "Disabled",
+      "props": {
+        "disabled": true,
+        "label": "Disabled"
+      }
+    },
+    {
+      "name": "Icon Only",
+      "props": {
+        "checked": true
+      }
+    },
+    {
+      "name": "Required",
+      "props": {
+        "required": true,
+        "label": "Required option"
+      }
+    }
+  ],
+  "behavior": {
+    "stateModel": "Machine states are unchecked, checked and indeterminate.",
+    "controlledValue": "When checked is provided, external checked updates sync into the machine unless disabled.",
+    "uncontrolledValue": "When checked is omitted, defaultChecked seeds the initial machine state.",
+    "disabled": "Disabled checkboxes do not toggle from click, keyboard or controlled SET events."
+  },
+  "keyboard": {
+    "Space": {
+      "action": "toggle",
+      "condition": "not disabled"
+    },
+    "Enter": {
+      "action": "toggle",
+      "condition": "not disabled"
+    }
+  },
+  "aria": {
+    "role": "checkbox",
+    "nativeElement": "A visually hidden native input[type=\"checkbox\"] preserves form participation.",
+    "states": [
+      "aria-checked=true",
+      "aria-checked=false",
+      "aria-checked=mixed",
+      "aria-disabled",
+      "aria-required"
+    ],
+    "required": [
+      "visible label or external accessible name"
+    ],
+    "notes": [
+      "The visible label is rendered with Text as span; the root remains a label element for form association."
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "control",
+      "hiddenInput"
+    ],
+    "recommended": [
+      "label"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "control": {
+        "slot": "control",
+        "parent": "root"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "root"
+      },
+      "hiddenInput": {
+        "slot": "hiddenInput",
+        "parent": "root"
+      }
+    }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-checkbox-control-size",
+      "--uf-hidden-input-size",
+      "--uf-hidden-input-offset"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-line-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-icon",
+      "--uf-control-pad-text",
+      "--uf-control-gap",
+      "--uf-radius",
+      "--uf-color-hover-bg",
+      "--uf-color-fg",
+      "--uf-membrane"
+    ],
+    "notes": [
+      "Keep label typography delegated to Text rather than checkbox-local font classes."
+    ]
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Boolean form option",
+      "Optional setting in a group",
+      "Tri-state parent selection summary"
+    ],
+    "whenNotToUse": [
+      "Immediate binary setting toggle (use Switcher)",
+      "Mutually exclusive choices (use Radio)",
+      "Action trigger (use Button)"
+    ],
+    "alternatives": [
+      "Switcher",
+      "Radio",
+      "Button"
+    ],
+    "context": "both"
   }
 }

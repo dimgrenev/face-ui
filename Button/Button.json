@@ -91,7 +91,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing (1px padding).",
+      "description": "Membrane spacing around the button.",
       "default": true
     },
     "copyText": {
@@ -176,7 +176,9 @@
       }
     }
   ],
-  "behavior": {},
+  "behavior": {
+    "loading": "Loading state shows a spinner and blocks activation with native disabled."
+  },
   "keyboard": {
     "Enter": {
       "action": "activate"
@@ -186,7 +188,10 @@
     }
   },
   "aria": {
-    "role": "button"
+    "role": "button",
+    "states": [
+      "aria-busy=true when loading"
+    ]
   },
   "composition": {
     "required": [
@@ -209,6 +214,61 @@
         "parent": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-control-pad-left",
+      "--uf-control-pad-right",
+      "--uf-button-focus-ring-width",
+      "--uf-button-outline-width",
+      "--uf-button-bg",
+      "--uf-button-fg",
+      "--uf-button-hover-bg",
+      "--uf-button-hover-fg",
+      "--uf-button-ring-color",
+      "--uf-icon-only-size",
+      "--face-runtime-option-level",
+      "--uf-interactive-weight",
+      "--uf-spinner-size",
+      "--uf-spinner-size-sm",
+      "--uf-spinner-border-width",
+      "--uf-spinner-border-width-sm"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-font-size",
+      "--uf-control-line-height",
+      "--uf-control-letter-spacing",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-pad-icon",
+      "--uf-control-gap",
+      "--uf-font-weight",
+      "--uf-radius",
+      "--uf-membrane",
+      "--uf-option-indent",
+      "--uf-color-fg",
+      "--uf-color-bg",
+      "--uf-color-primary",
+      "--uf-color-primary-fg",
+      "--uf-color-accent",
+      "--uf-color-accent-fg",
+      "--uf-color-hover-bg",
+      "--uf-color-active-bg",
+      "--uf-color-destructive",
+      "--uf-color-destructive-soft",
+      "--uf-color-disabled-opacity",
+      "--uf-motion-duration-emphasis",
+      "--uf-motion-duration-spin",
+      "--uf-motion-iteration-indefinite",
+      "--uf-motion-ease-emphasized",
+      "--uf-motion-ease-linear"
+    ],
+    "notes": [
+      "Variants set component foreground/background tokens on the root and consume shared control geometry.",
+      "Hover font-weight feedback uses --uf-interactive-weight and loading spinner geometry/motion consume shared Face UI tokens.",
+      "Use Text for pure typography; Button text is action copy inside an interactive control."
+    ]
   },
   "platform": {},
   "usage": {

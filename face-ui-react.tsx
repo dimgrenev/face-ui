@@ -44,7 +44,9 @@ class PreviewErrorBoundary extends React.Component<{ children: React.ReactNode }
       return (
         <div style={{ padding: 8, opacity: 0.7 }}>
           <Text as="span" style={{ fontSize: 12, opacity: 0.8 }}>Preview error</Text>
-          <div style={{ fontSize: 11, marginTop: 4 }}>{this.state.message}</div>
+          <Text as="div" variant="code" size="xs" inset="none" membrane={false} style={{ marginTop: 4 }}>
+            {this.state.message}
+          </Text>
         </div>
       );
     }

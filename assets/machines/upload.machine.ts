@@ -337,10 +337,10 @@ export function connectUpload(
         tabIndex: -1,
         style: {
           position: 'absolute' as const,
-          width: '1px',
-          height: '1px',
+          width: 'var(--uf-membrane)',
+          height: 'var(--uf-membrane)',
           padding: '0',
-          margin: '-1px',
+          margin: 'calc(-1 * var(--uf-membrane))',
           overflow: 'hidden',
           clip: 'rect(0, 0, 0, 0)',
           whiteSpace: 'nowrap' as const,

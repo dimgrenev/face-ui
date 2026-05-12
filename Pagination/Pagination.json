@@ -1,6 +1,6 @@
 {
   "name": "Pagination",
-  "description": "Page navigation with prev/next buttons and numbered page buttons",
+  "description": "Compact page navigation with previous/next buttons, current page text and a Menu-backed page picker.",
   "props": {
     "page": {
       "type": "number",
@@ -49,7 +49,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper (+1px outside each pagination button).",
+      "description": "Outer membrane wrapper around each pagination button.",
       "default": true
     },
     "surfaceTitle": {
@@ -91,7 +91,10 @@
       }
     }
   ],
-  "behavior": {},
+  "behavior": {
+    "compactNavigation": "Renders Previous/Next Button controls, a Text current-page indicator and an icon-only Menu trigger for page selection.",
+    "disabled": "Disables Previous/Next controls and page picker changes when disabled."
+  },
   "keyboard": {
     "ArrowRight": {
       "action": "nextPage"
@@ -102,19 +105,20 @@
   },
   "aria": {
     "role": "navigation",
-    "required": [
-      "aria-label"
-    ]
+    "label": "Root nav has aria-label=\"Pagination\".",
+    "current": "Current page Text exposes aria-current=\"page\".",
+    "controls": "Previous/Next controls use native button semantics through Button; page picker trigger is icon-only with aria-label=\"Choose page\"."
   },
   "composition": {
     "required": [
       "root",
       "prevButton",
       "nextButton",
-      "item"
+      "currentPage",
+      "pagePicker"
     ],
     "recommended": [
-      "ellipsis"
+      "pagePickerMenuItems"
     ],
     "parts": {
       "root": {
@@ -128,16 +132,42 @@
         "slot": "nextButton",
         "parent": "root"
       },
-      "item": {
-        "slot": "item",
-        "parent": "root",
-        "multiple": true
-      },
-      "ellipsis": {
-        "slot": "ellipsis",
+      "currentPage": {
+        "slot": "currentPage",
         "parent": "root"
+      },
+      "pagePicker": {
+        "slot": "pagePicker",
+        "parent": "root"
+      },
+      "pagePickerMenuItems": {
+        "slot": "pagePickerMenuItems",
+        "parent": "pagePicker",
+        "multiple": true
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-icon-only-size"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-radius",
+      "--uf-font-weight",
+      "--uf-font-weight-bold",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg",
+      "--uf-color-primary",
+      "--uf-color-primary-fg"
+    ],
+    "notes": [
+      "Pagination uses Button for previous/next and page-picker controls and Text for the current-page indicator.",
+      "Compact page-picker sheet behavior inherits Sheet/Modal tokens rather than defining pagination-local overlay tokens."
+    ]
   },
   "platform": {},
   "usage": {

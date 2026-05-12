@@ -166,6 +166,29 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-carousel-viewport-pad",
+      "--uf-carousel-controls-inset",
+      "--uf-carousel-indicator-button-size",
+      "--uf-carousel-indicator-dot-size",
+      "--face-runtime-carousel-slides-per-view"
+    ],
+    "semanticFallbacks": [
+      "--uf-membrane",
+      "--uf-control-height",
+      "--uf-radius-full",
+      "--uf-font-weight-bold",
+      "--uf-color-accent",
+      "--uf-motion-duration-medium",
+      "--uf-motion-ease-standard"
+    ],
+    "notes": [
+      "Carousel uses Button, Card, Text and Icon for controls and fallback slide content.",
+      "slidesPerView and track transform are runtime layout state surfaced through component custom properties/styles.",
+      "Track transition uses shared Face UI motion tokens."
+    ]
+  },
   "platform": {},
   "usage": {
     "whenToUse": [

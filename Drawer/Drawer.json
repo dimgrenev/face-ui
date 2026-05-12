@@ -102,6 +102,36 @@
       }
     }
   },
+  "tokenMapping": {
+    "component": [
+      "--uf-modal-side-w-default",
+      "--uf-modal-stack-h-default",
+      "--uf-modal-side-enter-x",
+      "--uf-modal-sheet-inset",
+      "--uf-modal-sheet-gap",
+      "--face-runtime-modal-w",
+      "--face-runtime-modal-h"
+    ],
+    "semanticFallbacks": [
+      "--uf-content-inset",
+      "--uf-radius-lg",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-overlay-backdrop-bg",
+      "--uf-overlay-backdrop-blur",
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-blur",
+      "--uf-overlay-surface-shadow",
+      "--uf-duration-enter",
+      "--uf-duration-exit",
+      "--uf-ease-enter",
+      "--uf-z-modal"
+    ],
+    "notes": [
+      "Drawer delegates to Modal with side-specific variant and inherits modal overlay tokens.",
+      "Width and height props delegate to Modal private runtime custom properties while default sizing remains in the modal token namespace."
+    ]
+  },
   "platform": {
     "dialog": true,
     "inert": true

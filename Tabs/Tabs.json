@@ -80,7 +80,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper (+1px outside each tab trigger).",
+      "description": "Outer membrane wrapper around each tab trigger.",
       "default": true
     },
     "className": {
@@ -189,6 +189,32 @@
         "parent": "list"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-tabs-rail-h",
+      "--uf-tabs-indicator-h",
+      "--uf-tabs-line-gap"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-radius-full",
+      "--uf-membrane",
+      "--uf-font-weight-bold",
+      "--uf-color-fg",
+      "--uf-color-fg-muted",
+      "--uf-color-hover-bg",
+      "--uf-color-border",
+      "--uf-motion-duration-fast",
+      "--uf-motion-duration-control",
+      "--uf-motion-ease-standard"
+    ],
+    "notes": [
+      "Tab labels render through Text when they are primitive strings; custom labels must preserve tab semantics.",
+      "Line indicator styling stays tokenized through tabs variables, and trigger/indicator motion uses shared Face UI motion tokens."
+    ]
   },
   "platform": {},
   "usage": {

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import React from 'react'
+import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
@@ -11,10 +12,27 @@ import {
   isDeprecatedFaceUiComponent,
   Popover,
   SegmentedControl,
+  Text,
   Tooltip,
 } from '../../index'
 import * as faceUiIndex from '../../index'
 import * as faceUiCompat from '../../compat'
+
+const componentsCss = readFileSync('packages/face-ui-react/assets/styles/components.css', 'utf8')
+const animationsCss = readFileSync('packages/face-ui-react/assets/styles/animations.css', 'utf8')
+const tokensCss = readFileSync('packages/face-ui-react/assets/styles/tokens.css', 'utf8')
+const textMeta = JSON.parse(readFileSync('packages/face-ui-react/Text/Text.json', 'utf8')) as {
+  props?: { size?: { options?: string[] } }
+  tokenMapping?: { component?: string[]; semanticFallbacks?: string[] }
+}
+const textSizeTokenMap = {
+  xs: '--uf-font-size-xs',
+  sm: '--uf-font-size-sm',
+  md: '--uf-font-size-md',
+  lg: '--uf-font-size-lg',
+  xl: '--uf-font-size-xl',
+} as const
+const textSizeOptions = Object.keys(textSizeTokenMap) as Array<keyof typeof textSizeTokenMap>
 
 function queryModal(container: HTMLElement): HTMLElement | null {
   return container.querySelector('.uf-modal[data-scope]') as HTMLElement | null
@@ -63,6 +81,47 @@ describe('taxonomy and governance', () => {
     expect('Sidebar' in faceUiCompat).toBe(true)
     expect('Sheet' in faceUiCompat).toBe(true)
     expect('Date' in faceUiCompat).toBe(true)
+  })
+
+  it('routes component motion through tokens and reduced-motion overrides', () => {
+    expect(tokensCss).toContain('--uf-motion-duration-reduced: 0.01ms;')
+    expect(tokensCss).toContain('--uf-motion-iteration-indefinite: infinite;')
+    expect(tokensCss).toContain('--uf-motion-iteration-indefinite: 1;')
+    expect(componentsCss).toContain('var(--uf-motion-iteration-indefinite)')
+    expect(componentsCss).not.toMatch(/animation:\s*[^;]*\binfinite\b/)
+    expect(animationsCss).toContain('animation-duration: var(--uf-motion-duration-reduced);')
+    expect(animationsCss).toContain('transition-duration: var(--uf-motion-duration-reduced);')
+  })
+
+  it('keeps Text size schema, data attributes, and CSS token mapping aligned', async () => {
+    await act(async () => {
+      root.render(
+        <div>
+          {textSizeOptions.map((size) => (
+            <Text key={size} text={size} size={size} />
+          ))}
+        </div>,
+      )
+    })
+
+    expect(textMeta.props?.size?.options).toEqual(textSizeOptions)
+    expect(textMeta.tokenMapping?.component).toContain('--uf-text-size-font-size')
+    expect(componentsCss).toContain('font-size: var(--uf-text-font-size, var(--uf-text-size-font-size,')
+
+    for (const size of textSizeOptions) {
+      const token = textSizeTokenMap[size]
+      const node = container.querySelector<HTMLElement>(`.uf-text[data-scope="text"][data-size="${size}"]`)
+
+      expect(node).not.toBeNull()
+      expect(node?.style.fontSize).toBe('')
+      expect(textMeta.tokenMapping?.semanticFallbacks).toContain(token)
+      expect(tokensCss).toContain(`${token}:`)
+      expect(componentsCss).toMatch(
+        new RegExp(
+          String.raw`\.uf-text\[data-scope\]\[data-size="${size}"\]\s*{\s*--uf-text-size-font-size:\s*var\(${token}\);\s*}`,
+        ),
+      )
+    }
   })
 
   it('Tooltip and Popover map to the canonical Overlay trigger behaviors', async () => {

@@ -76,7 +76,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper (+1px outside control geometry).",
+      "description": "Outer membrane wrapper around control geometry.",
       "default": true
     }
   },
@@ -152,6 +152,39 @@
         "parent": "root"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-switcher-control-size",
+      "--uf-switcher-track-inset-block",
+      "--uf-switcher-track-inset-inline",
+      "--uf-switcher-track-radius",
+      "--uf-switcher-thumb-size",
+      "--uf-switcher-thumb-top",
+      "--uf-switcher-thumb-left",
+      "--uf-switcher-thumb-translate-x"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-line-height",
+      "--uf-control-height",
+      "--uf-control-gap",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-pad-icon",
+      "--uf-membrane",
+      "--uf-radius",
+      "--uf-radius-full",
+      "--uf-color-fg",
+      "--uf-color-bg",
+      "--uf-color-hover-bg",
+      "--uf-motion-duration-control",
+      "--uf-motion-ease-standard"
+    ],
+    "notes": [
+      "Switcher geometry is expressed through component-local aliases over shared control, space and membrane tokens.",
+      "Thumb transform and control opacity transitions consume shared Face UI motion tokens.",
+      "Visible label copy renders through the Face UI Text primitive while the native label part preserves form-control click semantics."
+    ]
   },
   "platform": {},
   "usage": {

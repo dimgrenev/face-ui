@@ -71,7 +71,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper (+1px outside each option geometry).",
+      "description": "Outer membrane wrapper around each option geometry.",
       "default": true
     }
   },
@@ -148,6 +148,27 @@
         "parent": "item"
       }
     }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-radio-indicator-size"
+    ],
+    "semanticFallbacks": [
+      "--uf-control-line-height",
+      "--uf-control-height",
+      "--uf-control-gap",
+      "--uf-control-pad-y",
+      "--uf-control-pad-icon",
+      "--uf-control-pad-text",
+      "--uf-radius",
+      "--uf-color-fg",
+      "--uf-color-hover-bg",
+      "--uf-color-disabled-opacity"
+    ],
+    "notes": [
+      "Radio indicator size is a component-local alias over the shared control line-height.",
+      "Option labels route through Text; the hidden native input preserves form behavior while the visual shell stays token-driven."
+    ]
   },
   "platform": {},
   "usage": {

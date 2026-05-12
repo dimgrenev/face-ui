@@ -215,7 +215,11 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
         <div {...api.getListProps()}>
           {api.isEmpty && (
             <div {...api.getEmptyProps()}>
-              {emptyContent}
+              {(typeof emptyContent === 'string' || typeof emptyContent === 'number') ? (
+                <Text as="span" inset="none" membrane={false}>
+                  {emptyContent}
+                </Text>
+              ) : emptyContent}
             </div>
           )}
 
@@ -224,7 +228,7 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
               return (
                 <div key={section.group.id} {...api.getGroupProps({ id: section.group.id })}>
                   <div {...api.getGroupLabelProps({ id: section.group.id })}>
-                    {section.group.label}
+                    <Text as="span" size="xs" inset="none" membrane={false} text={section.group.label} />
                   </div>
                   {section.items.map((item) => {
                     const currentIndex = globalIndex++

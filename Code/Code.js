@@ -52,7 +52,7 @@ export const Code = forwardRef(function Code(props, ref) {
             el.value = text;
             el.setAttribute('readonly', 'true');
             el.style.position = 'fixed';
-            el.style.left = '-9999px';
+            el.style.left = '-9999em';
             el.style.opacity = '0';
             document.body.appendChild(el);
             el.select();

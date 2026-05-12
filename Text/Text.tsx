@@ -128,10 +128,11 @@ export const Text = forwardRef<HTMLElement, TextProps>(
 
     const normalizedVariant = variant === 'default' ? 'body' : variant
     const isLabelVariant = variant === 'label'
-    // Label must keep default Text control paddings/membrane for consistent UI rhythm.
+    // Label defaults keep control rhythm, but callers can opt out for full-surface labels.
     const effectiveInset: TextProps['inset'] = isLabelVariant ? 'control' : inset
-    const effectiveMembrane = isLabelVariant ? true : membrane
-    const Element = (as ?? defaultElement(variant)) as ElementType
+    const effectiveMembrane = membrane
+    const selectedElement = as ?? defaultElement(variant)
+    const Element = selectedElement as ElementType
     const hasIcon = icon != null
     const content = children ?? text
     const hasContent = content != null && String(content).length > 0
@@ -147,7 +148,6 @@ export const Text = forwardRef<HTMLElement, TextProps>(
       effectiveInset === 'none' ? 'uf-text--inset-none' : 'uf-text--inset-control',
       hasIcon && 'uf-text--withIcon',
       hasIcon && `uf-text--icon-${iconPosition}`,
-      stretchText && 'uf-control--stretchText',
       className,
     )
 
@@ -165,7 +165,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(
         data-align={align}
         data-membrane={effectiveMembrane ? '' : undefined}
         className={textClasses}
-        htmlFor={variant === 'label' ? htmlFor : undefined}
+        htmlFor={selectedElement === 'label' ? htmlFor : undefined}
         {...rest}
       >
         {hasIcon && iconPosition === 'left' && (
