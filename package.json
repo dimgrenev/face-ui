@@ -7,11 +7,11 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dimgrenev/userface.git"
+    "url": "git+https://github.com/dimgrenev/face-ui.git"
   },
   "homepage": "https://userface.dev",
   "bugs": {
-    "url": "https://github.com/dimgrenev/userface/issues"
+    "url": "https://github.com/dimgrenev/face-ui/issues"
   },
   "keywords": [
     "userface",
@@ -52,7 +52,8 @@
     "dist/cjs",
     "dist/types",
     "README.md",
-    "docs.md"
+    "docs.md",
+    "LICENSE"
   ],
   "publishConfig": {
     "access": "public"
@@ -64,6 +65,13 @@
   "dependencies": {
     "marked": "^17.0.3",
     "sanitize-html": "^2.17.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.25",
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
+    "@types/sanitize-html": "^2.16.0",
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "build": "node ./scripts/build-npm.cjs",

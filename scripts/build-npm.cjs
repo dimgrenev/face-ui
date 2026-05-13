@@ -4,14 +4,25 @@ const fs = require('fs');
 const path = require('path');
 
 const PACKAGE_ROOT = path.resolve(__dirname, '..');
-const REPO_ROOT = path.resolve(PACKAGE_ROOT, '../..');
 
 function runNode(scriptPath, args) {
   const res = spawnSync(process.execPath, [scriptPath, ...args], {
-    cwd: REPO_ROOT,
+    cwd: PACKAGE_ROOT,
     stdio: 'inherit',
   });
   if (res.status !== 0) process.exit(res.status || 1);
+}
+
+function findDependencyFile(startDir, relativePath) {
+  let currentDir = startDir;
+  while (true) {
+    const candidate = path.join(currentDir, 'node_modules', relativePath);
+    if (fs.existsSync(candidate)) return candidate;
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) return null;
+    currentDir = parentDir;
+  }
 }
 
 function writeJson(filePath, data) {
@@ -46,6 +57,8 @@ function shouldSkipDir(relPath) {
   return relPath === 'dist'
     || relPath === '.artifacts'
     || relPath.includes('/.artifacts')
+    || relPath === '.github'
+    || relPath.startsWith('.github/')
     || relPath === 'node_modules'
     || relPath === 'scripts'
     || relPath.endsWith('/__tests__')
@@ -59,6 +72,10 @@ function shouldCopyAsset(relPath) {
   if (relPath.includes('копия')) return false;
   if (/\.(test|spec)\./.test(relPath)) return false;
   if (relPath === 'package.json') return false;
+  if (relPath === '.gitignore') return false;
+  if (relPath === 'pnpm-lock.yaml') return false;
+  if (relPath === 'pnpm-workspace.yaml') return false;
+  if (relPath === 'LICENSE') return false;
   if (relPath === 'README.md') return false;
   if (relPath === 'package-types.d.ts') return false;
   if (relPath === 'vitest.config.ts') return false;
@@ -93,9 +110,9 @@ function main() {
   if (fs.existsSync(distDir)) fs.rmSync(distDir, { recursive: true, force: true });
 
   console.log('[face-ui-react:npm] building (esm/cjs/types)...');
-  const tsc = path.join(REPO_ROOT, 'node_modules', 'typescript', 'bin', 'tsc');
-  if (!fs.existsSync(tsc)) {
-    console.error('[face-ui-react:npm] typescript not found in repo root node_modules. Install deps first.');
+  const tsc = findDependencyFile(PACKAGE_ROOT, path.join('typescript', 'bin', 'tsc'));
+  if (!tsc) {
+    console.error('[face-ui-react:npm] typescript not found. Run pnpm install in this repo first.');
     process.exit(1);
   }
 

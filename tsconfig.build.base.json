@@ -1,15 +1,21 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "allowJs": false,
     "allowImportingTsExtensions": false,
     "baseUrl": ".",
     "composite": false,
+    "esModuleInterop": true,
     "incremental": false,
+    "isolatedModules": true,
     "jsx": "react-jsx",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "noEmit": false,
+    "resolveJsonModule": true,
     "rootDir": ".",
-    "sourceMap": false
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "strict": true,
+    "target": "ES2017"
   },
   "include": [
     "./**/*.ts",
