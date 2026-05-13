@@ -12,6 +12,6 @@
 - Every public component has category, maturity, responsive behavior, and related-component guidance.
 
 ## Scope
-- Library: `/Users/grenev/Documents/uf/userface/face-ui-react`
+- Library: this repository, published as `@userface/face-ui-react`.
 - Host surfaces: gallery, playground, props panel, generated contracts.
 - Current focus: taxonomy cleanup, overlay primitives, governance metadata.

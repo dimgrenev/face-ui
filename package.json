@@ -2,9 +2,10 @@
   "name": "@userface/face-ui-react",
   "version": "0.1.0",
   "private": false,
-  "description": "Userface Face UI React component library.",
+  "description": "React implementation of Face UI: typed components, CSS tokens, and machine-readable component contracts.",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@10.13.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dimgrenev/face-ui.git"
@@ -33,17 +34,314 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
+    "./compat": {
+      "types": "./dist/types/compat.d.ts",
+      "import": "./dist/esm/compat.js",
+      "require": "./dist/cjs/compat.js"
+    },
+    "./face-ui-react": {
+      "types": "./dist/types/face-ui-react.d.ts",
+      "import": "./dist/esm/face-ui-react.js",
+      "require": "./dist/cjs/face-ui-react.js"
+    },
     "./uf.runtime": {
       "types": "./dist/types/uf.runtime.d.ts",
       "import": "./dist/esm/uf.runtime.js",
       "require": "./dist/cjs/uf.runtime.js"
     },
-    "./assets/*": "./dist/esm/assets/*",
-    "./*.json": "./dist/esm/*.json",
-    "./*": {
-      "types": "./dist/types/*.d.ts",
-      "import": "./dist/esm/*.js",
-      "require": "./dist/cjs/*.js"
+    "./component-registry.json": "./dist/esm/component-registry.json",
+    "./face-ui-react.json": "./dist/esm/face-ui-react.json",
+    "./assets/styles/*": "./dist/esm/assets/styles/*",
+    "./assets/Icons/*": "./dist/esm/assets/Icons/*",
+    "./docs.md": "./docs.md",
+    "./docs/*": "./docs/*",
+    "./Accordion/*.json": "./dist/esm/Accordion/*.json",
+    "./Accordion/*": {
+      "types": "./dist/types/Accordion/*.d.ts",
+      "import": "./dist/esm/Accordion/*.js",
+      "require": "./dist/cjs/Accordion/*.js"
+    },
+    "./Avatar/*.json": "./dist/esm/Avatar/*.json",
+    "./Avatar/*": {
+      "types": "./dist/types/Avatar/*.d.ts",
+      "import": "./dist/esm/Avatar/*.js",
+      "require": "./dist/cjs/Avatar/*.js"
+    },
+    "./Badge/*.json": "./dist/esm/Badge/*.json",
+    "./Badge/*": {
+      "types": "./dist/types/Badge/*.d.ts",
+      "import": "./dist/esm/Badge/*.js",
+      "require": "./dist/cjs/Badge/*.js"
+    },
+    "./Bar/*.json": "./dist/esm/Bar/*.json",
+    "./Bar/*": {
+      "types": "./dist/types/Bar/*.d.ts",
+      "import": "./dist/esm/Bar/*.js",
+      "require": "./dist/cjs/Bar/*.js"
+    },
+    "./Breadcrumb/*.json": "./dist/esm/Breadcrumb/*.json",
+    "./Breadcrumb/*": {
+      "types": "./dist/types/Breadcrumb/*.d.ts",
+      "import": "./dist/esm/Breadcrumb/*.js",
+      "require": "./dist/cjs/Breadcrumb/*.js"
+    },
+    "./Button/*.json": "./dist/esm/Button/*.json",
+    "./Button/*": {
+      "types": "./dist/types/Button/*.d.ts",
+      "import": "./dist/esm/Button/*.js",
+      "require": "./dist/cjs/Button/*.js"
+    },
+    "./Calendar/*.json": "./dist/esm/Calendar/*.json",
+    "./Calendar/*": {
+      "types": "./dist/types/Calendar/*.d.ts",
+      "import": "./dist/esm/Calendar/*.js",
+      "require": "./dist/cjs/Calendar/*.js"
+    },
+    "./Card/*.json": "./dist/esm/Card/*.json",
+    "./Card/*": {
+      "types": "./dist/types/Card/*.d.ts",
+      "import": "./dist/esm/Card/*.js",
+      "require": "./dist/cjs/Card/*.js"
+    },
+    "./Carousel/*.json": "./dist/esm/Carousel/*.json",
+    "./Carousel/*": {
+      "types": "./dist/types/Carousel/*.d.ts",
+      "import": "./dist/esm/Carousel/*.js",
+      "require": "./dist/cjs/Carousel/*.js"
+    },
+    "./Checkbox/*.json": "./dist/esm/Checkbox/*.json",
+    "./Checkbox/*": {
+      "types": "./dist/types/Checkbox/*.d.ts",
+      "import": "./dist/esm/Checkbox/*.js",
+      "require": "./dist/cjs/Checkbox/*.js"
+    },
+    "./Code/*.json": "./dist/esm/Code/*.json",
+    "./Code/*": {
+      "types": "./dist/types/Code/*.d.ts",
+      "import": "./dist/esm/Code/*.js",
+      "require": "./dist/cjs/Code/*.js"
+    },
+    "./Command/*.json": "./dist/esm/Command/*.json",
+    "./Command/*": {
+      "types": "./dist/types/Command/*.d.ts",
+      "import": "./dist/esm/Command/*.js",
+      "require": "./dist/cjs/Command/*.js"
+    },
+    "./Date/*.json": "./dist/esm/Date/*.json",
+    "./Date/*": {
+      "types": "./dist/types/Date/*.d.ts",
+      "import": "./dist/esm/Date/*.js",
+      "require": "./dist/cjs/Date/*.js"
+    },
+    "./DatePicker/*.json": "./dist/esm/DatePicker/*.json",
+    "./DatePicker/*": {
+      "types": "./dist/types/DatePicker/*.d.ts",
+      "import": "./dist/esm/DatePicker/*.js",
+      "require": "./dist/cjs/DatePicker/*.js"
+    },
+    "./Drawer/*.json": "./dist/esm/Drawer/*.json",
+    "./Drawer/*": {
+      "types": "./dist/types/Drawer/*.d.ts",
+      "import": "./dist/esm/Drawer/*.js",
+      "require": "./dist/cjs/Drawer/*.js"
+    },
+    "./Icon/*.json": "./dist/esm/Icon/*.json",
+    "./Icon/*": {
+      "types": "./dist/types/Icon/*.d.ts",
+      "import": "./dist/esm/Icon/*.js",
+      "require": "./dist/cjs/Icon/*.js"
+    },
+    "./Input/*.json": "./dist/esm/Input/*.json",
+    "./Input/*": {
+      "types": "./dist/types/Input/*.d.ts",
+      "import": "./dist/esm/Input/*.js",
+      "require": "./dist/cjs/Input/*.js"
+    },
+    "./Markdown/*.json": "./dist/esm/Markdown/*.json",
+    "./Markdown/*": {
+      "types": "./dist/types/Markdown/*.d.ts",
+      "import": "./dist/esm/Markdown/*.js",
+      "require": "./dist/cjs/Markdown/*.js"
+    },
+    "./Media/*.json": "./dist/esm/Media/*.json",
+    "./Media/*": {
+      "types": "./dist/types/Media/*.d.ts",
+      "import": "./dist/esm/Media/*.js",
+      "require": "./dist/cjs/Media/*.js"
+    },
+    "./Menu/*.json": "./dist/esm/Menu/*.json",
+    "./Menu/*": {
+      "types": "./dist/types/Menu/*.d.ts",
+      "import": "./dist/esm/Menu/*.js",
+      "require": "./dist/cjs/Menu/*.js"
+    },
+    "./Modal/*.json": "./dist/esm/Modal/*.json",
+    "./Modal/*": {
+      "types": "./dist/types/Modal/*.d.ts",
+      "import": "./dist/esm/Modal/*.js",
+      "require": "./dist/cjs/Modal/*.js"
+    },
+    "./Navigation/*.json": "./dist/esm/Navigation/*.json",
+    "./Navigation/*": {
+      "types": "./dist/types/Navigation/*.d.ts",
+      "import": "./dist/esm/Navigation/*.js",
+      "require": "./dist/cjs/Navigation/*.js"
+    },
+    "./Overlay/*.json": "./dist/esm/Overlay/*.json",
+    "./Overlay/*": {
+      "types": "./dist/types/Overlay/*.d.ts",
+      "import": "./dist/esm/Overlay/*.js",
+      "require": "./dist/cjs/Overlay/*.js"
+    },
+    "./Pagination/*.json": "./dist/esm/Pagination/*.json",
+    "./Pagination/*": {
+      "types": "./dist/types/Pagination/*.d.ts",
+      "import": "./dist/esm/Pagination/*.js",
+      "require": "./dist/cjs/Pagination/*.js"
+    },
+    "./Panel/*.json": "./dist/esm/Panel/*.json",
+    "./Panel/*": {
+      "types": "./dist/types/Panel/*.d.ts",
+      "import": "./dist/esm/Panel/*.js",
+      "require": "./dist/cjs/Panel/*.js"
+    },
+    "./Popover/*.json": "./dist/esm/Popover/*.json",
+    "./Popover/*": {
+      "types": "./dist/types/Popover/*.d.ts",
+      "import": "./dist/esm/Popover/*.js",
+      "require": "./dist/cjs/Popover/*.js"
+    },
+    "./Progress/*.json": "./dist/esm/Progress/*.json",
+    "./Progress/*": {
+      "types": "./dist/types/Progress/*.d.ts",
+      "import": "./dist/esm/Progress/*.js",
+      "require": "./dist/cjs/Progress/*.js"
+    },
+    "./Radio/*.json": "./dist/esm/Radio/*.json",
+    "./Radio/*": {
+      "types": "./dist/types/Radio/*.d.ts",
+      "import": "./dist/esm/Radio/*.js",
+      "require": "./dist/cjs/Radio/*.js"
+    },
+    "./Rating/*.json": "./dist/esm/Rating/*.json",
+    "./Rating/*": {
+      "types": "./dist/types/Rating/*.d.ts",
+      "import": "./dist/esm/Rating/*.js",
+      "require": "./dist/cjs/Rating/*.js"
+    },
+    "./Scroll/*.json": "./dist/esm/Scroll/*.json",
+    "./Scroll/*": {
+      "types": "./dist/types/Scroll/*.d.ts",
+      "import": "./dist/esm/Scroll/*.js",
+      "require": "./dist/cjs/Scroll/*.js"
+    },
+    "./SegmentedControl/*.json": "./dist/esm/SegmentedControl/*.json",
+    "./SegmentedControl/*": {
+      "types": "./dist/types/SegmentedControl/*.d.ts",
+      "import": "./dist/esm/SegmentedControl/*.js",
+      "require": "./dist/cjs/SegmentedControl/*.js"
+    },
+    "./Select/*.json": "./dist/esm/Select/*.json",
+    "./Select/*": {
+      "types": "./dist/types/Select/*.d.ts",
+      "import": "./dist/esm/Select/*.js",
+      "require": "./dist/cjs/Select/*.js"
+    },
+    "./Separator/*.json": "./dist/esm/Separator/*.json",
+    "./Separator/*": {
+      "types": "./dist/types/Separator/*.d.ts",
+      "import": "./dist/esm/Separator/*.js",
+      "require": "./dist/cjs/Separator/*.js"
+    },
+    "./Sheet/*.json": "./dist/esm/Sheet/*.json",
+    "./Sheet/*": {
+      "types": "./dist/types/Sheet/*.d.ts",
+      "import": "./dist/esm/Sheet/*.js",
+      "require": "./dist/cjs/Sheet/*.js"
+    },
+    "./Skeleton/*.json": "./dist/esm/Skeleton/*.json",
+    "./Skeleton/*": {
+      "types": "./dist/types/Skeleton/*.d.ts",
+      "import": "./dist/esm/Skeleton/*.js",
+      "require": "./dist/cjs/Skeleton/*.js"
+    },
+    "./Slider/*.json": "./dist/esm/Slider/*.json",
+    "./Slider/*": {
+      "types": "./dist/types/Slider/*.d.ts",
+      "import": "./dist/esm/Slider/*.js",
+      "require": "./dist/cjs/Slider/*.js"
+    },
+    "./Steps/*.json": "./dist/esm/Steps/*.json",
+    "./Steps/*": {
+      "types": "./dist/types/Steps/*.d.ts",
+      "import": "./dist/esm/Steps/*.js",
+      "require": "./dist/cjs/Steps/*.js"
+    },
+    "./Switcher/*.json": "./dist/esm/Switcher/*.json",
+    "./Switcher/*": {
+      "types": "./dist/types/Switcher/*.d.ts",
+      "import": "./dist/esm/Switcher/*.js",
+      "require": "./dist/cjs/Switcher/*.js"
+    },
+    "./Table/*.json": "./dist/esm/Table/*.json",
+    "./Table/*": {
+      "types": "./dist/types/Table/*.d.ts",
+      "import": "./dist/esm/Table/*.js",
+      "require": "./dist/cjs/Table/*.js"
+    },
+    "./Tabs/*.json": "./dist/esm/Tabs/*.json",
+    "./Tabs/*": {
+      "types": "./dist/types/Tabs/*.d.ts",
+      "import": "./dist/esm/Tabs/*.js",
+      "require": "./dist/cjs/Tabs/*.js"
+    },
+    "./Text/*.json": "./dist/esm/Text/*.json",
+    "./Text/*": {
+      "types": "./dist/types/Text/*.d.ts",
+      "import": "./dist/esm/Text/*.js",
+      "require": "./dist/cjs/Text/*.js"
+    },
+    "./Tile/*.json": "./dist/esm/Tile/*.json",
+    "./Tile/*": {
+      "types": "./dist/types/Tile/*.d.ts",
+      "import": "./dist/esm/Tile/*.js",
+      "require": "./dist/cjs/Tile/*.js"
+    },
+    "./Toast/*.json": "./dist/esm/Toast/*.json",
+    "./Toast/*": {
+      "types": "./dist/types/Toast/*.d.ts",
+      "import": "./dist/esm/Toast/*.js",
+      "require": "./dist/cjs/Toast/*.js"
+    },
+    "./Toc/*.json": "./dist/esm/Toc/*.json",
+    "./Toc/*": {
+      "types": "./dist/types/Toc/*.d.ts",
+      "import": "./dist/esm/Toc/*.js",
+      "require": "./dist/cjs/Toc/*.js"
+    },
+    "./Toggle/*.json": "./dist/esm/Toggle/*.json",
+    "./Toggle/*": {
+      "types": "./dist/types/Toggle/*.d.ts",
+      "import": "./dist/esm/Toggle/*.js",
+      "require": "./dist/cjs/Toggle/*.js"
+    },
+    "./Tooltip/*.json": "./dist/esm/Tooltip/*.json",
+    "./Tooltip/*": {
+      "types": "./dist/types/Tooltip/*.d.ts",
+      "import": "./dist/esm/Tooltip/*.js",
+      "require": "./dist/cjs/Tooltip/*.js"
+    },
+    "./Tree/*.json": "./dist/esm/Tree/*.json",
+    "./Tree/*": {
+      "types": "./dist/types/Tree/*.d.ts",
+      "import": "./dist/esm/Tree/*.js",
+      "require": "./dist/cjs/Tree/*.js"
+    },
+    "./Upload/*.json": "./dist/esm/Upload/*.json",
+    "./Upload/*": {
+      "types": "./dist/types/Upload/*.d.ts",
+      "import": "./dist/esm/Upload/*.js",
+      "require": "./dist/cjs/Upload/*.js"
     },
     "./package.json": "./package.json"
   },
@@ -53,6 +351,7 @@
     "dist/types",
     "README.md",
     "docs.md",
+    "docs",
     "LICENSE"
   ],
   "publishConfig": {
@@ -71,11 +370,23 @@
     "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",
     "@types/sanitize-html": "^2.16.0",
-    "typescript": "^5.9.3"
+    "@userface/engine": "^0.1.0",
+    "jsdom": "^27.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "ts-morph": "^27.0.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
   },
   "scripts": {
     "build": "node ./scripts/build-npm.cjs",
+    "contracts:check": "tsx ./assets/contracts/sync-face-json.ts",
+    "contracts:sync": "tsx ./assets/contracts/sync-face-json.ts --write",
+    "test": "vitest run",
+    "smoke": "node ./scripts/smoke-npm.cjs",
+    "check": "pnpm run build && pnpm run test && pnpm run smoke && pnpm run pack:dry",
     "pack:dry": "npm pack --dry-run",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "pnpm run check"
   }
 }

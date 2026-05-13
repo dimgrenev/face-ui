@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './Icon.module.css';
 
 export type IconName = 'align-horizontal-center' | 'align-horizontal-left' | 'align-horizontal-right' | 'align-vertical-bottom' | 'align-vertical-center' | 'align-vertical-top' | 'alphabet' | 'animation' | 'arrow-down' | 'arrow-left' | 'arrow-right' | 'arrow-up' | 'cart' | 'check' | 'check-off' | 'check-on' | 'clean' | 'close' | 'cloud-done' | 'component' | 'cookie' | 'copy' | 'crop' | 'cursor' | 'date' | 'delete' | 'design-tool' | 'dev-tools' | 'down' | 'download' | 'drag' | 'ds' | 'edit' | 'face' | 'file' | 'filter' | 'folder' | 'folder-go' | 'full' | 'git' | 'info' | 'left' | 'legend' | 'letter-spacing' | 'line-height' | 'link' | 'minus' | 'more' | 'notification' | 'panel' | 'panel-right' | 'pause' | 'play' | 'plus' | 'project' | 'props' | 'radio-off' | 'radio-on' | 'random' | 'render' | 'restart' | 'right' | 'scroll' | 'search' | 'settings' | 'size' | 'sound' | 'stat' | 'store' | 'switch' | 'terminal' | 'theme' | 'type' | 'up' | 'user' | 'userface';
 
@@ -47,8 +46,8 @@ export interface IconProps {
 }
 
 /**
- * Icon definitions - auto-generated from SVG files
- * DO NOT EDIT MANUALLY - run 'npm run generate:icons' to regenerate
+ * Built-in icon definitions.
+ * Keep this registry in sync with assets/Icons/*.svg.
  */
 const icons: Record<IconName, React.ReactNode> = {
   'align-horizontal-center': (
@@ -707,7 +706,7 @@ export const Icon: React.FC<IconProps> = ({
     ...(squareBox ? { width: resolvedSize, height: resolvedSize } : {}),
   };
 
-  const mergedClassName = `${styles.icon} ${className}`.trim();
+  const mergedClassName = ['uf-icon', className].filter(Boolean).join(' ');
   const ariaProps = label
     ? { role: 'img' as const, 'aria-label': label }
     : { 'aria-hidden': true as const };

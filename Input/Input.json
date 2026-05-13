@@ -119,21 +119,34 @@
       "required": false,
       "description": "Native control aria-autocomplete mode.",
       "options": [
+        "list",
         "none",
         "inline",
-        "list",
         "both"
       ]
     },
     "ariaExpanded": {
-      "type": "boolean",
+      "type": "enum",
       "required": false,
-      "description": "Native control aria-expanded state."
+      "description": "Native control aria-expanded state.",
+      "options": [
+        "true",
+        "false"
+      ]
     },
     "ariaHasPopup": {
-      "type": "string",
+      "type": "enum",
       "required": false,
-      "description": "Native control aria-haspopup state."
+      "description": "Native control aria-haspopup state.",
+      "options": [
+        "dialog",
+        "grid",
+        "listbox",
+        "menu",
+        "tree",
+        "true",
+        "false"
+      ]
     },
     "spellCheck": {
       "type": "boolean",

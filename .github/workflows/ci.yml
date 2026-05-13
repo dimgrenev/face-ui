@@ -12,7 +12,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -31,8 +31,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build package
-        run: pnpm build
-
-      - name: Pack dry run
-        run: pnpm pack:dry
+      - name: Check package
+        run: pnpm check

@@ -49,17 +49,28 @@ function fixEsmExtensions(dir) {
         return prefix + importPath + '.js' + quote;
       }
     );
+    content = content.replace(
+      /(from\s+['"][^'"]+\.json['"])(?!\s+with\s*\{)(;?)/g,
+      (_match, importStatement, suffix) => {
+        changed = true;
+        return `${importStatement} with { type: 'json' }${suffix}`;
+      }
+    );
     if (changed) fs.writeFileSync(full, content, 'utf8');
   }
 }
 
 function shouldSkipDir(relPath) {
   return relPath === 'dist'
+    || relPath === '.git'
+    || relPath.startsWith('.git/')
     || relPath === '.artifacts'
     || relPath.includes('/.artifacts')
     || relPath === '.github'
     || relPath.startsWith('.github/')
     || relPath === 'node_modules'
+    || relPath === 'docs'
+    || relPath.startsWith('docs/')
     || relPath === 'scripts'
     || relPath.endsWith('/__tests__')
     || relPath === 'assets/__tests__'
@@ -77,9 +88,12 @@ function shouldCopyAsset(relPath) {
   if (relPath === 'pnpm-workspace.yaml') return false;
   if (relPath === 'LICENSE') return false;
   if (relPath === 'README.md') return false;
+  if (relPath === 'docs.md') return false;
+  if (relPath.endsWith('.md')) return false;
   if (relPath === 'package-types.d.ts') return false;
   if (relPath === 'vitest.config.ts') return false;
   if (relPath.startsWith('tsconfig.build')) return false;
+  if (/\.(js|jsx|mjs|cjs)$/.test(relPath)) return false;
   if (/\.(ts|tsx|cts|mts)$/.test(relPath)) return false;
   return true;
 }
@@ -127,7 +141,7 @@ function main() {
   writeJson(path.join(PACKAGE_ROOT, 'dist', 'cjs', 'package.json'), { type: 'commonjs' });
 
   fixEsmExtensions(path.join(PACKAGE_ROOT, 'dist', 'esm'));
-  console.log('[face-ui-react:npm] fixed ESM import extensions');
+  console.log('[face-ui-react:npm] fixed ESM import extensions and JSON attributes');
   console.log('[face-ui-react:npm] copied runtime assets');
   console.log('[face-ui-react:npm] done.');
 }

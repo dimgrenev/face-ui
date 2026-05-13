@@ -21,6 +21,6 @@
 - `DatePicker` is public. `Date` is a compatibility alias only.
 
 ## Public Surface Rules
-- The primary barrel is `/Users/grenev/Documents/uf/packages/face-ui-react/index.ts`.
+- The primary barrel is `index.ts`.
 - Deprecated aliases must not appear in the primary barrel, gallery, or component tree.
-- Deprecated aliases may remain in `/Users/grenev/Documents/uf/packages/face-ui-react/compat.ts` only as an explicit migration path.
+- Deprecated aliases may remain in `compat.ts` only as an explicit migration path.

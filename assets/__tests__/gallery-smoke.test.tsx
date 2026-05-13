@@ -267,10 +267,12 @@ describe('face-ui-react gallery smoke', () => {
       selectTrigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const selectContent = selectCard.querySelector('[data-part="content"] .uf-select__contentMembrane') as HTMLElement | null
+    const selectContentId = selectTrigger?.getAttribute('aria-controls') ?? ''
+    const selectContentRoot = document.getElementById(selectContentId)
+    const selectContent = selectContentRoot?.querySelector('.uf-select__contentMembrane') as HTMLElement | null
     expect(selectContent).not.toBeNull()
 
-    const optionTwo = Array.from(selectCard.querySelectorAll<HTMLElement>('[data-part="option"]')).find((node) => node.textContent?.includes('Option 2')) ?? null
+    const optionTwo = Array.from(selectContentRoot?.querySelectorAll<HTMLElement>('[data-part="option"]') ?? []).find((node) => node.textContent?.includes('Option 2')) ?? null
     expect(optionTwo).not.toBeNull()
 
     await act(async () => {

@@ -1,4 +1,4 @@
-// @face-ui/react — main barrel export
+// @userface/face-ui-react - main barrel export
 
 // Primitives
 export { Button, ButtonGroup, buttonAnatomy } from './Button/Button'

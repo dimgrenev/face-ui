@@ -18,10 +18,14 @@ import {
 import * as faceUiIndex from '../../index'
 import * as faceUiCompat from '../../compat'
 
-const componentsCss = readFileSync('packages/face-ui-react/assets/styles/components.css', 'utf8')
-const animationsCss = readFileSync('packages/face-ui-react/assets/styles/animations.css', 'utf8')
-const tokensCss = readFileSync('packages/face-ui-react/assets/styles/tokens.css', 'utf8')
-const textMeta = JSON.parse(readFileSync('packages/face-ui-react/Text/Text.json', 'utf8')) as {
+function readFixture(relativePath: string) {
+  return readFileSync(new URL(relativePath, import.meta.url), 'utf8')
+}
+
+const componentsCss = readFixture('../styles/components.css')
+const animationsCss = readFixture('../styles/animations.css')
+const tokensCss = readFixture('../styles/tokens.css')
+const textMeta = JSON.parse(readFixture('../../Text/Text.json')) as {
   props?: { size?: { options?: string[] } }
   tokenMapping?: { component?: string[]; semanticFallbacks?: string[] }
 }

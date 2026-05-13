@@ -1,9 +1,0 @@
-.icon {
-  display: block;
-  flex-shrink: 0;
-  vertical-align: middle;
-  user-select: none;
-}
-
-/* SVG icons should use their native fill/stroke attributes (already processed by generate-icons.js).
-   Do NOT override them here — CSS overrides break filled shapes (they become stroked). */

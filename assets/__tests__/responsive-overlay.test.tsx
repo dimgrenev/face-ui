@@ -898,7 +898,8 @@ describe('responsive overlay surfaces', () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const content = container.querySelector('[data-part="content"]') as HTMLElement | null
+    const contentId = trigger?.getAttribute('aria-controls') ?? ''
+    const content = document.getElementById(contentId) as HTMLElement | null
     expect(content?.getAttribute('data-surface')).toBe('popover')
     expect(container.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
     expect(document.body.style.overflow).toBe('')

@@ -3,9 +3,9 @@
 > **This document is part of the FaceUI Design Operating System.**
 > - **Principles** — this file (constitution + reference)
 > - **Component Contracts** — `<Component>/<Component>.json` (machine-readable API per component)
-> - **Patterns** — `packages/engine/src/face-ui/patterns/` (composition templates)
-> - **Assembly Policy** — `packages/engine/src/rules/` (quality rules + flow)
-> - **Orchestrator** — MCP Server (`component_validate`, `composition_validate`, `library_guide`, etc.)
+> - **Patterns** — owned by Userface Engine and generated from the same component contracts
+> - **Assembly Policy** — owned by Userface Engine quality rules
+> - **Orchestrator** — external tooling can read this package through the published contracts
 
 This is the canonical usage guide for agents and developers building interfaces with Face UI React.
 It is not marketing copy. It is the source of truth for component selection, composition rules, spacing, typography, and architectural decisions.
