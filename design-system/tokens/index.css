@@ -1,0 +1,20 @@
+/**
+ * Design System Tokens - Main Entry Point
+ *
+ * Импортирует все токены дизайн-системы в правильном порядке
+ *
+ * Порядок импорта важен:
+ * 1. Colors (базовые цвета)
+ * 2. Typography (типографика)
+ * 3. Spacing (отступы)
+ * 4. Shadows (тени)
+ * 5. Borders (границы)
+ */
+
+@import './colors.css';
+@import './typography.css';
+@import './geometry.css';
+@import './motion.css';
+@import './spacing.css';
+@import './shadows.css';
+@import './borders.css';

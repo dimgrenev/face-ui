@@ -2458,14 +2458,18 @@
 }
 /* Tooltip variant (dark bg) */
 .uf-overlay-content[data-scope][data-trigger="hover"] {
-  background: var(--uf-color-primary);
-  color: var(--uf-color-primary-fg);
+  --uf-text-color: var(--uf-tooltip-fg);
+  background: var(--uf-tooltip-bg);
+  color: var(--uf-tooltip-fg);
   font-size: var(--uf-font-size-xs);
   padding: var(--uf-spacing-1) var(--uf-spacing-2);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: none;
-  border-color: transparent;
+  border-color: var(--uf-tooltip-border);
+}
+.uf-overlay-content[data-scope][data-state="open"][data-trigger="hover"] {
+  pointer-events: none;
 }
 
 /* =================================================================
@@ -3236,10 +3240,10 @@
 .uf-calendar[data-scope="calendar"] {
   --uf-calendar-nav-size: calc(var(--uf-control-height) - var(--uf-spacing-1));
   --uf-calendar-weekday-height: var(--uf-control-height);
-  width: 100%;
-  min-width: calc(var(--uf-control-height) * 7);
-  max-width: 100%;
   --uf-calendar-cell-size: calc(var(--uf-control-height) + (var(--uf-membrane) * 2));
+  inline-size: calc(var(--uf-calendar-cell-size) * 7);
+  min-inline-size: calc(var(--uf-calendar-cell-size) * 7);
+  max-inline-size: 100%;
 }
 
 /* Calendar header (nav row) */
@@ -4646,13 +4650,102 @@
   overflow: visible;
 }
 .uf-tabs .uf-tabs-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--uf-spacing-1) + var(--uf-membrane));
   border-radius: var(--uf-radius-full);
   flex: 0 0 auto;
+  min-width: 0;
+  overflow: hidden;
+  --uf-tabs-tab-action-bg: var(--uf-color-background);
 }
 .uf-tabs .uf-tabs-tab[data-state="active"],
 .uf-tabs .uf-tabs-tab[aria-selected="true"] {
   font-weight: var(--uf-font-weight-bold);
   background: var(--uf-color-hover-bg);
+  --uf-tabs-tab-action-bg: var(--uf-color-hover-bg);
+}
+.uf-tabs .uf-tabs-tabSlot {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+.uf-tabs .uf-tabs-tabLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uf-tabs .uf-tabs-tabIcon,
+.uf-tabs .uf-tabs-tabActionIcon {
+  width: var(--uf-icon-size-sm);
+  height: var(--uf-icon-size-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.uf-tabs .uf-tabs-tabIcon svg,
+.uf-tabs .uf-tabs-tabActionIcon svg {
+  width: var(--uf-icon-size-sm);
+  height: var(--uf-icon-size-sm);
+}
+.uf-tabs .uf-tabs-tab[data-action-overlay]::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: calc(var(--uf-control-height) + var(--uf-spacing-2));
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--uf-tabs-tab-action-bg) 0%, transparent),
+    var(--uf-tabs-tab-action-bg) 58%
+  );
+  transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-standard);
+}
+.uf-tabs .uf-tabs-tabAction {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: var(--uf-membrane);
+  width: calc(var(--uf-control-height) - (var(--uf-membrane) * 2));
+  height: calc(var(--uf-control-height) - (var(--uf-membrane) * 2));
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--uf-radius-full);
+  padding: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--uf-color-fg) 68%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  cursor: default;
+  transition:
+    opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-standard),
+    color var(--uf-motion-duration-fast) var(--uf-motion-ease-standard),
+    background-color var(--uf-motion-duration-fast) var(--uf-motion-ease-standard);
+}
+.uf-tabs .uf-tabs-tabAction:is(:hover, :focus-visible) {
+  color: var(--uf-color-fg);
+  background: color-mix(in srgb, var(--uf-color-fg) 8%, transparent);
+}
+.uf-tabs .uf-tabs-tabSlot:is(:hover, :focus-within) > .uf-tabs-tabAction,
+.uf-tabs .uf-tabs-tabSlot[data-action-visibility="always"] > .uf-tabs-tabAction {
+  opacity: 1;
+  pointer-events: auto;
+}
+.uf-tabs .uf-tabs-tabSlot:is(:hover, :focus-within) > .uf-tabs-tab[data-action-overlay]::after,
+.uf-tabs .uf-tabs-tabSlot[data-action-visibility="always"] > .uf-tabs-tab[data-action-overlay]::after {
+  opacity: 1;
 }
 .uf-tabs .uf-tabs-content {
   padding: 0;

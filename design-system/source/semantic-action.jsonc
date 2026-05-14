@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+  "tokens": [
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-active",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "rgba(255, 255, 255, 0.20)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "rgba(0, 0, 0, 0.06)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-hover",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "rgba(255, 255, 255, 0.10)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "rgba(0, 0, 0, 0.04)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-accent",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#007bff"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#007bff"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-accent-hover",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#0056b3"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#0056b3"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-cta-hover",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#ff4000"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#ff4000"
+        }
+      ]
+    }
+  ]
+}

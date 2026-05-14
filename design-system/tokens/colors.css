@@ -1,0 +1,183 @@
+/**
+ * Design Tokens: Colors
+ *
+ * Централизованная система цветов для Userface Design System
+ * Поддерживает светлую и темную темы через CSS переменные
+ */
+
+:root,
+[data-theme='dark'] {
+  /* ============================================
+   * BASE COLORS (основные цвета)
+   * ============================================ */
+
+  /* Background Colors */
+  --uf-color-background: #000000;
+  --uf-color-panel: #000000;
+  /* Props drawer / side dropdown surface (slightly lifted above panel) */
+  --uf-color-props-panel: #151515;
+  --uf-color-header: #000000;
+  --uf-color-input: #000000;
+  --uf-color-bg-code: var(--uf-color-background);
+
+  /* Foreground Colors */
+  --uf-color-foreground: #ededed;
+  --uf-color-text-primary: #ededed;
+  --uf-color-text-secondary: #888888;
+  --uf-color-text-code: var(--uf-color-foreground);
+
+  /* Border Colors */
+  --uf-color-border: #333333;
+  --uf-color-border-hover: rgba(255, 255, 255, 0.24);
+  --uf-color-border-subtle: #1a1a1a;
+  --uf-color-glyph-line: #676767;
+
+  /* Interactive Colors */
+  /* Active/hover must be based on transparency of pure colors (not fixed greys).
+     Dark theme: white overlay on dark surfaces. Percentages chosen to match previous resulting shades:
+     - hover:  #1a1a1a ≈ 10% white on black
+     - active: #333333 ≈ 20% white on black */
+  --uf-color-active: rgba(255, 255, 255, 0.20);
+  --uf-color-active-text: #ffffff;
+  --uf-color-hover: rgba(255, 255, 255, 0.10);
+  --uf-tooltip-bg: #000000;
+  --uf-tooltip-fg: #ffffff;
+  --uf-tooltip-border: transparent;
+
+  /* Semantic Colors */
+  --uf-color-success: #28a745;
+  --uf-color-success-foreground: #000000;
+  --uf-color-on-success: var(--uf-color-success-foreground);
+  --uf-color-error: #dc3545;
+  --uf-color-error-foreground: #000000;
+  --uf-color-on-error: var(--uf-color-error-foreground);
+  --uf-color-warning: #ffc107;
+  --uf-color-warning-foreground: #000000;
+  --uf-color-on-warning: var(--uf-color-warning-foreground);
+  --uf-color-info: #17a2b8;
+  --uf-color-info-foreground: #000000;
+  --uf-color-on-info: var(--uf-color-info-foreground);
+
+  /* Data Visualization Colors */
+  --uf-color-data-amber: #f59e0b;
+  --uf-color-data-blue: #3b82f6;
+  --uf-color-data-blue-soft: #60a5fa;
+  --uf-color-data-cyan: #06b6d4;
+  --uf-color-data-green: #22c55e;
+  --uf-color-data-lime: #84cc16;
+  --uf-color-data-orange: #f97316;
+  --uf-color-data-orange-soft: #fb923c;
+  --uf-color-data-pink: #ec4899;
+  --uf-color-data-purple: #a855f7;
+  --uf-color-data-purple-soft: #c084fc;
+  --uf-color-data-rose: #f43f5e;
+  --uf-color-data-success: #22c55e;
+  --uf-color-data-teal: #14b8a6;
+  --uf-color-data-violet: #8b5cf6;
+
+  /* Accent Colors */
+  --uf-color-accent: #007bff;
+  --uf-color-accent-hover: #0056b3;
+
+  /* CTA / Brand accent (used for purchase actions) */
+  --uf-color-cta: #ff4000;
+  --uf-color-cta-hover: #ff4000;
+  --uf-color-cta-contrast: #ffffff;
+
+  /* Color strip defaults (Hue strip for ColorPicker, 0..1 in HSL space) */
+  --uf-color-strip-s: 0.94;
+  --uf-color-strip-l: 0.68;
+  --uf-color-strip-edge: 0.05;
+}
+
+/* Light Theme */
+:root[data-theme='light'],
+[data-theme='light'] {
+  /* Background Colors */
+  --uf-color-background: #ffffff;
+  --uf-color-panel: #ffffff;
+  /* Props drawer / side dropdown surface (slightly tinted) */
+  --uf-color-props-panel: #fbfbfb;
+  --uf-color-header: #ffffff;
+  --uf-color-input: #ffffff;
+  --uf-color-bg-code: var(--uf-color-foreground);
+
+  /* Foreground Colors */
+  --uf-color-foreground: #000000;
+  --uf-color-text-primary: #000000;
+  --uf-color-text-secondary: #666666;
+  --uf-color-text-code: var(--uf-color-background);
+
+  /* Border Colors */
+  --uf-color-border: #e0e0e0;
+  --uf-color-border-hover: rgba(0, 0, 0, 0.24);
+  --uf-color-border-subtle: #f0f0f0;
+  --uf-color-glyph-line: #949494;
+
+  /* Interactive Colors */
+  /* Light theme: black overlay on light surfaces. Percentages chosen to match previous resulting shades:
+     - hover:  #f5f5f5 ≈ 4% black on white
+     - active: #f0f0f0 ≈ 6% black on white */
+  --uf-color-active: rgba(0, 0, 0, 0.06);
+  --uf-color-active-text: #000000;
+  --uf-color-hover: rgba(0, 0, 0, 0.04);
+
+  /* Semantic Colors (остаются теми же) */
+  --uf-color-success: #28a745;
+  --uf-color-success-foreground: #000000;
+  --uf-color-on-success: var(--uf-color-success-foreground);
+  --uf-color-error: #dc3545;
+  --uf-color-error-foreground: #000000;
+  --uf-color-on-error: var(--uf-color-error-foreground);
+  --uf-color-warning: #ffc107;
+  --uf-color-warning-foreground: #000000;
+  --uf-color-on-warning: var(--uf-color-warning-foreground);
+  --uf-color-info: #17a2b8;
+  --uf-color-info-foreground: #000000;
+  --uf-color-on-info: var(--uf-color-info-foreground);
+
+  /* Data Visualization Colors */
+  --uf-color-data-amber: #f59e0b;
+  --uf-color-data-blue: #3b82f6;
+  --uf-color-data-blue-soft: #60a5fa;
+  --uf-color-data-cyan: #06b6d4;
+  --uf-color-data-green: #22c55e;
+  --uf-color-data-lime: #84cc16;
+  --uf-color-data-orange: #f97316;
+  --uf-color-data-orange-soft: #fb923c;
+  --uf-color-data-pink: #ec4899;
+  --uf-color-data-purple: #a855f7;
+  --uf-color-data-purple-soft: #c084fc;
+  --uf-color-data-rose: #f43f5e;
+  --uf-color-data-success: #22c55e;
+  --uf-color-data-teal: #14b8a6;
+  --uf-color-data-violet: #8b5cf6;
+
+  /* Accent Colors */
+  --uf-color-accent: #007bff;
+  --uf-color-accent-hover: #0056b3;
+
+  /* CTA / Brand accent */
+  --uf-color-cta: #ff4000;
+  --uf-color-cta-hover: #ff4000;
+  --uf-color-cta-contrast: #ffffff;
+
+  /* Color strip in light theme: darker but still vivid */
+  --uf-color-strip-l: 0.48;
+}
+
+/* ============================================
+ * LEGACY COMPATIBILITY (для обратной совместимости)
+ * ============================================ */
+:root {
+  --background: var(--uf-color-background);
+  --foreground: var(--uf-color-foreground);
+  --border: var(--uf-color-border);
+  --panel-bg: var(--uf-color-panel);
+  --header-bg: var(--uf-color-header);
+  --input-bg: var(--uf-color-input);
+  --active-bg: var(--uf-color-active);
+  --active-text: var(--uf-color-active-text);
+  --secondary-text: var(--uf-color-text-secondary);
+  --hover-bg: var(--uf-color-hover);
+}

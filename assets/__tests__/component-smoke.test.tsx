@@ -496,7 +496,7 @@ describe('component smoke', () => {
     })
 
     const trigger = Array.from(container.querySelectorAll('button')).find((button) => button.textContent?.includes('Open modal'))
-    const content = container.querySelector('[data-part="content"]') as HTMLElement | null
+    const content = document.body.querySelector('[data-scope="modal"][data-part="content"]') as HTMLElement | null
 
     expect(trigger).not.toBeNull()
     expect(content?.hidden).toBe(true)
@@ -506,9 +506,9 @@ describe('component smoke', () => {
     })
 
     expect(content?.hidden).toBe(false)
-    expect(container.textContent).toContain('Smoke modal')
+    expect(document.body.textContent).toContain('Smoke modal')
 
-    const closeButton = container.querySelector('[data-part="close"]') as HTMLButtonElement | null
+    const closeButton = document.body.querySelector('[data-scope="modal"][data-part="close"]') as HTMLButtonElement | null
     expect(closeButton).not.toBeNull()
 
     await act(async () => {
@@ -607,6 +607,25 @@ describe('component smoke', () => {
       container.querySelectorAll<HTMLElement>('td [data-scope="text"][data-align="right"]'),
     )
     expect(rightAlignedCells.some((node) => node.textContent?.includes('RUB 2 990'))).toBe(true)
+  })
+
+  it('Table falls back to row indexes when getRowId returns an empty value', async () => {
+    await act(async () => {
+      root.render(
+        <Table
+          ariaLabel="People"
+          columns={[{ id: 'name', header: 'Name', accessor: 'name' }]}
+          rows={[
+            { name: 'Ada' },
+            { name: 'Grace' },
+          ]}
+          getRowId={() => undefined as unknown as string}
+        />,
+      )
+    })
+
+    const rows = Array.from(container.querySelectorAll<HTMLTableRowElement>('tbody tr[data-row-id]'))
+    expect(rows.map((row) => row.getAttribute('data-row-id'))).toEqual(['0', '1'])
   })
 
   it('Tabs switches content in uncontrolled mode', async () => {

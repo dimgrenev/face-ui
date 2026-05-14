@@ -1,0 +1,76 @@
+/**
+ * Design Tokens: Typography
+ *
+ * Централизованная система типографики для Userface Design System
+ * Akt is loaded by product shells from Google Fonts.
+ * Begriffsschrift is the only local monospace font.
+ */
+
+:root {
+  /* ============================================
+   * FONT FAMILIES
+   * ============================================ */
+  --uf-font-family-base: 'Akt', sans-serif;
+  --uf-font-family-mono: 'Begriffsschrift', monospace;
+
+  /* ============================================
+   * FONT SIZES
+   * ============================================ */
+  --uf-font-size-xs: 10px;
+  --uf-font-size-sm: 11px;
+  --uf-font-size-base: 12px;
+  --uf-font-size-md: 14px;
+  --uf-font-size-lg: 16px;
+  --uf-font-size-xl: 18px;
+  --uf-font-size-2xl: 20px;
+  --uf-font-size-3xl: 24px;
+  --uf-font-size-4xl: 32px;
+  --uf-font-size-5xl: 48px;
+
+  /* ============================================
+   * FONT WEIGHTS
+   * ============================================ */
+  --uf-font-weight-normal: 400;
+  --uf-font-weight-medium: 500;
+  --uf-font-weight-semibold: 600;
+  --uf-font-weight-bold: 600;
+
+  /* ============================================
+   * LINE HEIGHTS
+   * ============================================ */
+  --uf-line-height-tight: 1.2;
+  --uf-line-height-normal: 1.5;
+  --uf-line-height-relaxed: 1.6;
+
+  /* ============================================
+   * LETTER SPACING
+   * ============================================ */
+  --uf-letter-spacing-tight: 0;
+  --uf-letter-spacing-normal: 0;
+  --uf-letter-spacing-wide: 0;
+  --uf-letter-spacing-wider: 0;
+
+  /* ============================================
+   * TEXT TRANSFORMS
+   * ============================================ */
+  --uf-text-transform-none: none;
+  --uf-text-transform-uppercase: uppercase;
+  --uf-text-transform-lowercase: lowercase;
+
+  /* ============================================
+   * CONTROL TYPOGRAPHY (32px controls)
+   * ============================================ */
+  /* Single source of truth for button-like controls (our UI baseline is 14/20). */
+  --uf-control-font-size: 14px;
+  --uf-control-line-height: 20px;
+  --uf-control-letter-spacing: 0;
+}
+
+/* ============================================
+ * LEGACY COMPATIBILITY
+ * ============================================ */
+:root {
+  --font-base: var(--uf-font-family-base);
+  --uf-font-family: var(--uf-font-family-base);
+  --uf-font-mono: var(--uf-font-family-mono);
+}

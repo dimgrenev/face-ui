@@ -1,0 +1,208 @@
+{
+  "version": 1,
+  "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+  "tokens": [
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-background",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#000000"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#ffffff"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-panel",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#000000"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#ffffff"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-props-panel",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#151515"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#fbfbfb"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-header",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#000000"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#ffffff"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-input",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#000000"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#ffffff"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-bg-code",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-background)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-foreground)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-border",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#333333"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#e0e0e0"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-border-hover",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "rgba(255, 255, 255, 0.24)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "rgba(0, 0, 0, 0.24)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-border-subtle",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#1a1a1a"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#f0f0f0"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-glyph-line",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#676767"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#949494"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-cta",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#ff4000"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#ff4000"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-cta-contrast",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#ffffff"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#ffffff"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-strip-s",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "0.94"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-strip-l",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "0.68"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "0.48"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-color-strip-edge",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "0.05"
+        }
+      ]
+    }
+  ]
+}

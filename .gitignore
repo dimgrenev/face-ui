@@ -10,3 +10,6 @@ yarn.lock
 .DS_Store
 .env
 .env.*
+
+# Userface scan cache
+.userface-cache/

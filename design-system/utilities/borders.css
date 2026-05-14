@@ -1,0 +1,49 @@
+/**
+ * Utility Classes: Borders
+ *
+ * Утилитарные классы для быстрого применения границ и скруглений
+ */
+
+/* ============================================
+ * BORDER RADIUS
+ * ============================================ */
+.uf-rounded-none { border-radius: var(--uf-radius-none); }
+.uf-rounded-sm { border-radius: var(--uf-radius-sm); }
+.uf-rounded-base { border-radius: var(--uf-radius-base); }
+.uf-rounded-md { border-radius: var(--uf-radius-md); }
+.uf-rounded-lg { border-radius: var(--uf-radius-lg); }
+.uf-rounded-xl { border-radius: var(--uf-radius-xl); }
+.uf-rounded-full { border-radius: var(--uf-radius-full); }
+
+/* ============================================
+ * BORDER WIDTH
+ * ============================================ */
+.uf-border-none { border-width: var(--uf-border-width-none); }
+.uf-border-thin { border-width: var(--uf-border-width-thin); }
+.uf-border-base { border-width: var(--uf-border-width-base); }
+.uf-border-thick { border-width: var(--uf-border-width-thick); }
+
+/* ============================================
+ * BORDER COLOR
+ * ============================================ */
+.uf-border-default { border-color: var(--uf-color-border); }
+.uf-border-subtle { border-color: var(--uf-color-border-subtle); }
+.uf-border-focus { border-color: var(--uf-color-accent); }
+
+/* ============================================
+ * BORDER STYLE
+ * ============================================ */
+.uf-border-solid { border-style: var(--uf-border-style-solid); }
+.uf-border-dashed { border-style: var(--uf-border-style-dashed); }
+.uf-border-dotted { border-style: var(--uf-border-style-dotted); }
+
+/* ============================================
+ * COMPLETE BORDER UTILITIES
+ * ============================================ */
+.uf-border {
+  border: var(--uf-border-default);
+}
+
+.uf-border-subtle {
+  border: var(--uf-border-subtle);
+}

@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+  "tokens": [
+    {
+      "sheet": "semantic-content",
+      "name": "--uf-color-foreground",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#ededed"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#000000"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-content",
+      "name": "--uf-color-text-primary",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#ededed"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#000000"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-content",
+      "name": "--uf-color-text-secondary",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#888888"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#666666"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-content",
+      "name": "--uf-color-text-code",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-foreground)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-background)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-content",
+      "name": "--uf-color-active-text",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#ffffff"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#000000"
+        }
+      ]
+    }
+  ]
+}

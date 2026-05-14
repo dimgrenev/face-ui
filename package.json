@@ -44,6 +44,11 @@
       "import": "./dist/esm/face-ui-react.js",
       "require": "./dist/cjs/face-ui-react.js"
     },
+    "./gallery": {
+      "types": "./dist/types/gallery.d.ts",
+      "import": "./dist/esm/gallery.js",
+      "require": "./dist/cjs/gallery.js"
+    },
     "./uf.runtime": {
       "types": "./dist/types/uf.runtime.d.ts",
       "import": "./dist/esm/uf.runtime.js",
@@ -52,7 +57,14 @@
     "./component-registry.json": "./dist/esm/component-registry.json",
     "./face-ui-react.json": "./dist/esm/face-ui-react.json",
     "./assets/styles/*": "./dist/esm/assets/styles/*",
+    "./assets/fonts/*": "./dist/esm/assets/fonts/*",
     "./assets/Icons/*": "./dist/esm/assets/Icons/*",
+    "./design-system/*": "./dist/esm/design-system/*",
+    "./assets/adapters/react/*": {
+      "types": "./dist/types/assets/adapters/react/*.d.ts",
+      "import": "./dist/esm/assets/adapters/react/*.js",
+      "require": "./dist/cjs/assets/adapters/react/*.js"
+    },
     "./docs.md": "./docs.md",
     "./docs/*": "./docs/*",
     "./Accordion/*.json": "./dist/esm/Accordion/*.json",
@@ -352,6 +364,7 @@
     "README.md",
     "docs.md",
     "docs",
+    "design-system",
     "LICENSE"
   ],
   "publishConfig": {

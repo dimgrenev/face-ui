@@ -1,0 +1,7 @@
+/**
+ * Design System Themes - Main Entry Point
+ *
+ * Темы переопределяют базовые токены для конкретных контекстов
+ */
+
+@import './default.css';

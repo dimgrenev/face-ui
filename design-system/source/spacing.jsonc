@@ -1,0 +1,236 @@
+{
+  "version": 1,
+  "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+  "tokens": [
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-0",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-1",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "4px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-2",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "8px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-3",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-4",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "16px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-5",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "20px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-6",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "24px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-8",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "32px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-10",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "40px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-12",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "48px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-16",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "64px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-20",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "80px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--uf-spacing-24",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "96px"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--space-0",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-0)"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--space-2",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-1)"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--space-4",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-2)"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--space-8",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-2)"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--space-12",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-3)"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--space-16",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-4)"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--space-20",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-5)"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--space-24",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-6)"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--space-32",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-8)"
+        }
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "name": "--space-40",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-10)"
+        }
+      ]
+    }
+  ]
+}

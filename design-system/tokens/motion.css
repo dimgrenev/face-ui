@@ -1,0 +1,19 @@
+/**
+ * Design Tokens: Motion
+ *
+ * Transitions/easings used across the app UI.
+ * Keep these as tokens so components can share timing consistently.
+ */
+
+:root {
+  /* Durations */
+  --uf-motion-instant: 0ms;
+  --uf-motion-fast: 120ms;
+  --uf-motion-snappy: 140ms;
+  --uf-motion-normal: 240ms;
+  --uf-motion-slow: 300ms;
+
+  /* Easings (fast start, slow end) */
+  --uf-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --uf-ease-in-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

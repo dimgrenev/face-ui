@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+  "tokens": [
+    {
+      "sheet": "themes",
+      "name": "--uf-control-font-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "14px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-control-line-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "20px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-control-pad-y",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "6px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-control-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "32px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-control-pad-text",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-control-pad-icon",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "6px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-control-gap",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "10px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-text-body-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "14px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-text-body-line-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "20px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-text-section-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-text-section-line-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "16px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-text-pad-y",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-topbar-control-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "32px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-topbar-pad-top",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-topbar-pad-right",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-topbar-pad-bottom",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-topbar-pad-left",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "sheet": "themes",
+      "name": "--uf-topbar-slot-pad-y",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0px"
+        }
+      ]
+    }
+  ]
+}

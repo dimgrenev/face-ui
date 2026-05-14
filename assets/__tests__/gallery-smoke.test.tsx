@@ -219,14 +219,17 @@ describe('face-ui-react gallery smoke', () => {
 
     const modalCard = getGalleryCard(container, 'Modal')
     const modalTrigger = Array.from(modalCard.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open')) ?? null
-    const modalContent = modalCard.querySelector('[data-part="content"]') as HTMLElement | null
-    expect(modalContent?.hidden).toBe(true)
+    const getShowcaseModalContent = () =>
+      Array.from(document.body.querySelectorAll<HTMLElement>('[data-scope="modal"][data-part="content"]')).find((node) =>
+        node.textContent?.includes('Use this surface for edits, confirmations, and contextual flows.'),
+      ) ?? null
+    expect(getShowcaseModalContent()?.hidden).toBe(true)
 
     await act(async () => {
       modalTrigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    expect(modalContent?.hidden).toBe(false)
+    expect(getShowcaseModalContent()?.hidden).toBe(false)
 
     const calendarCard = getGalleryCard(container, 'Calendar')
     const calendarDayButtons = Array.from(calendarCard.querySelectorAll<HTMLButtonElement>('.uf-calendar-dayButton'))

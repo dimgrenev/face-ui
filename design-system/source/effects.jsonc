@@ -1,0 +1,224 @@
+{
+  "version": 1,
+  "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+  "tokens": [
+    {
+      "sheet": "effects",
+      "name": "--uf-shadow-none",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-shadow-sm",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0 1px 2px rgba(0, 0, 0, 0.05)"
+        },
+        {
+          "selector": ":root[data-theme='light']",
+          "value": "0 1px 2px rgba(0, 0, 0, 0.05)"
+        },
+        {
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "value": "0 1px 2px rgba(0, 0, 0, 0.3)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-shadow-base",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)"
+        },
+        {
+          "selector": ":root[data-theme='light']",
+          "value": "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)"
+        },
+        {
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "value": "0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-shadow-md",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)"
+        },
+        {
+          "selector": ":root[data-theme='light']",
+          "value": "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)"
+        },
+        {
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "value": "0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-shadow-lg",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)"
+        },
+        {
+          "selector": ":root[data-theme='light']",
+          "value": "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)"
+        },
+        {
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "value": "0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.4)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-shadow-xl",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)"
+        },
+        {
+          "selector": ":root[data-theme='light']",
+          "value": "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)"
+        },
+        {
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "value": "0 20px 25px rgba(0, 0, 0, 0.5), 0 10px 10px rgba(0, 0, 0, 0.4)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-elevation-0",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-shadow-none)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-elevation-1",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-shadow-sm)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-elevation-2",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-shadow-base)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-elevation-3",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-shadow-md)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-elevation-4",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-shadow-lg)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-elevation-5",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-shadow-xl)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-z-dropdown",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "2300"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-z-overlay",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "1900"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-z-modal",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "2100"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-z-toast",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "2400"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-backdrop-blur-overlay",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "120px"
+        },
+        {
+          "selector": ":root[data-theme='light']",
+          "value": "120px"
+        },
+        {
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "value": "120px"
+        }
+      ]
+    }
+  ]
+}

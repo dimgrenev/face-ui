@@ -97,14 +97,26 @@ export interface TableProps<T = any> {
 // Helpers
 // ---------------------------------------------------------------------------
 
+function normalizeRowId(value: unknown, index: number): string {
+  if (value == null) return String(index)
+  const id = String(value)
+  return id.trim() ? id : String(index)
+}
+
 function getRowId<T>(row: T, rowKey: string | ((row: T) => string) | undefined, index: number): string {
-  if (typeof rowKey === 'function') return rowKey(row)
+  if (typeof rowKey === 'function') {
+    try {
+      return normalizeRowId(rowKey(row), index)
+    } catch {
+      return String(index)
+    }
+  }
   if (typeof rowKey === 'string') {
     const val = (row as Record<string, unknown>)[rowKey]
-    return val != null ? String(val) : String(index)
+    return normalizeRowId(val, index)
   }
   const asRecord = row as Record<string, unknown>
-  if (asRecord['id'] != null) return String(asRecord['id'])
+  if (asRecord['id'] != null) return normalizeRowId(asRecord['id'], index)
   return String(index)
 }
 
@@ -204,7 +216,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
 
     const resolvedGetRowId = (row: any, i: number) => {
       if (typeof getRowIdProp === 'function') {
-        try { return String(getRowIdProp(row, i)) } catch {}
+        try { return normalizeRowId(getRowIdProp(row, i), i) } catch {}
       }
       return getRowId(row, rowKey, i)
     }

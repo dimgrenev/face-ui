@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+  "tokens": [
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-success",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#28a745"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#28a745"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-success-foreground",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#000000"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#000000"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-on-success",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-success-foreground)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-success-foreground)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-error",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#dc3545"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#dc3545"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-error-foreground",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#000000"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#000000"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-on-error",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-error-foreground)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-error-foreground)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-warning",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#ffc107"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#ffc107"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-warning-foreground",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#000000"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#000000"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-on-warning",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-warning-foreground)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-warning-foreground)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-info",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#17a2b8"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#17a2b8"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-info-foreground",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#000000"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#000000"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-on-info",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-info-foreground)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-info-foreground)"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+/* Generated from canonical design-system source. */
+
+:root {
+  --uf-control-font-size: 14px;
+  --uf-control-gap: 10px;
+  --uf-control-height: 32px;
+  --uf-control-line-height: 20px;
+  --uf-control-pad-icon: 6px;
+  --uf-control-pad-text: 12px;
+  --uf-control-pad-y: 6px;
+  --uf-text-body-line-height: 20px;
+  --uf-text-body-size: 14px;
+  --uf-text-pad-y: 0px;
+  --uf-text-section-line-height: 16px;
+  --uf-text-section-size: 12px;
+  --uf-topbar-control-height: 32px;
+  --uf-topbar-pad-bottom: 12px;
+  --uf-topbar-pad-left: 12px;
+  --uf-topbar-pad-right: 12px;
+  --uf-topbar-pad-top: 12px;
+  --uf-topbar-slot-pad-y: 0px;
+}

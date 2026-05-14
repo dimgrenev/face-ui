@@ -40,7 +40,7 @@ describe('Modal controlled a11y baseline', () => {
   })
 
   function getContent(): HTMLElement {
-    const content = container.querySelector<HTMLElement>('[data-scope="modal"][data-part="content"]')
+    const content = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="content"]')
     expect(content).not.toBeNull()
     return content as HTMLElement
   }
@@ -52,7 +52,7 @@ describe('Modal controlled a11y baseline', () => {
   }
 
   function getBackdrop(): HTMLElement {
-    const backdrop = container.querySelector<HTMLElement>('[data-scope="modal"][data-part="backdrop"]')
+    const backdrop = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="backdrop"]')
     expect(backdrop).not.toBeNull()
     return backdrop as HTMLElement
   }
@@ -73,9 +73,9 @@ describe('Modal controlled a11y baseline', () => {
     })
 
     const content = getContent()
-    const title = container.querySelector<HTMLElement>('[data-scope="modal"][data-part="title"]')
-    const description = container.querySelector<HTMLElement>('[data-scope="modal"][data-part="description"]')
-    const close = container.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
+    const title = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="title"]')
+    const description = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="description"]')
+    const close = document.body.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
 
     expect(content.hidden).toBe(false)
     expect(content.getAttribute('role')).toBe('dialog')
@@ -118,7 +118,7 @@ describe('Modal controlled a11y baseline', () => {
     })
 
     const content = getContent()
-    const close = container.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
+    const close = document.body.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
 
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
     expect(content.hidden).toBe(false)
@@ -155,7 +155,7 @@ describe('Modal controlled a11y baseline', () => {
     })
 
     const content = getContent()
-    const close = container.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
+    const close = document.body.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
     const buttons = Array.from(content.querySelectorAll<HTMLButtonElement>('button:not([disabled])'))
     const lastButton = buttons[buttons.length - 1]
 
@@ -202,7 +202,7 @@ describe('Modal controlled a11y baseline', () => {
 
     const content = getContent()
     const backdrop = getBackdrop()
-    const close = container.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
+    const close = document.body.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
 
     expect(content.hidden).toBe(false)
     expect(content.getAttribute('role')).toBe('alertdialog')

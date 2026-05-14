@@ -1,0 +1,69 @@
+/**
+ * Design Tokens: Geometry
+ *
+ * Централизованная система геометрических размеров для контролов и компонентов
+ * Все Components компоненты используют эти переменные без hardcoded fallbacks
+ */
+
+:root {
+  /* ============================================
+   * CONTROL BASELINE GEOMETRY
+   * ============================================ */
+  /* Базовая высота контролов (кнопки, инпуты, селекты) */
+  --uf-control-height: 32px;
+
+  /* Типографика внутри контролов */
+  --uf-control-font-size: 14px;
+  --uf-control-line-height: 20px;
+  --uf-control-letter-spacing: 0;
+
+  /* Вертикальные паддинги контролов (height = line-height + 2*pad-y) */
+  --uf-control-pad-y: 6px; /* (32 - 20) / 2 = 6 */
+
+  /* Горизонтальные паддинги контролов */
+  --uf-control-pad-text: 12px;  /* сторона с текстом */
+  --uf-control-pad-icon: 6px;   /* сторона с иконкой */
+  --uf-control-gap: 10px;       /* gap между элементами внутри */
+
+  /* ============================================
+   * TEXT COMPONENT GEOMETRY
+   * ============================================ */
+  /* Text component использует control geometry + специфичные паддинги */
+  --uf-text-body-size: 14px;
+  --uf-text-body-line-height: 20px;
+  --uf-text-section-size: 12px;
+  --uf-text-section-line-height: 16px;
+  --uf-text-pad-y: 0px; /* дополнительный вертикальный паддинг для Text */
+
+  /* ============================================
+   * TOP COMPONENT GEOMETRY
+   * ============================================ */
+  /* Top bar (заголовки секций) geometry */
+  --uf-topbar-control-height: 32px;
+  --uf-topbar-pad-top: 12px;
+  --uf-topbar-pad-right: 12px;
+  --uf-topbar-pad-bottom: 2px;
+  --uf-topbar-pad-left: 12px;
+  --uf-topbar-slot-pad-y: 0px; /* вертикальный паддинг внутри слотов */
+
+  /* Расчетная высота Top bar */
+  --uf-topbar-height: calc(
+    var(--uf-topbar-control-height) +
+    var(--uf-topbar-pad-top) +
+    var(--uf-topbar-pad-bottom)
+  );
+
+  /* ============================================
+   * PANEL GEOMETRY (shared across all panels/sidebars/drawers)
+   * ============================================ */
+  --uf-panel-pad-x: 7px;    /* боковые отступы */
+  --uf-panel-pad-y: 7px;    /* верхний/нижний отступы */
+
+  /* ============================================
+   * ICON GEOMETRY
+   * ============================================ */
+  /* Иконки используют нативные размеры SVG, но можно переопределить */
+  --uf-icon-size-sm: 16px;
+  --uf-icon-size-md: 20px;
+  --uf-icon-size-lg: 24px;
+}

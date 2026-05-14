@@ -22,6 +22,12 @@ function readFixture(relativePath: string) {
   return readFileSync(new URL(relativePath, import.meta.url), 'utf8')
 }
 
+function readCssNumberToken(source: string, tokenName: string): number {
+  const match = source.match(new RegExp(`${tokenName}:\\s*([0-9]+);`))
+  if (!match) throw new Error(`Missing CSS token: ${tokenName}`)
+  return Number(match[1])
+}
+
 const componentsCss = readFixture('../styles/components.css')
 const animationsCss = readFixture('../styles/animations.css')
 const tokensCss = readFixture('../styles/tokens.css')
@@ -97,6 +103,18 @@ describe('taxonomy and governance', () => {
     expect(animationsCss).toContain('transition-duration: var(--uf-motion-duration-reduced);')
   })
 
+  it('keeps portalled dropdown layers above modal panels', () => {
+    const overlayZ = readCssNumberToken(tokensCss, '--uf-z-overlay')
+    const modalZ = readCssNumberToken(tokensCss, '--uf-z-modal')
+    const dropdownZ = readCssNumberToken(tokensCss, '--uf-z-dropdown')
+    const toastZ = readCssNumberToken(tokensCss, '--uf-z-toast')
+
+    expect(modalZ).toBeGreaterThan(overlayZ)
+    expect(dropdownZ).toBeGreaterThan(modalZ)
+    expect(toastZ).toBeGreaterThan(dropdownZ)
+    expect(componentsCss).toContain('z-index: var(--uf-z-dropdown);')
+  })
+
   it('keeps Text size schema, data attributes, and CSS token mapping aligned', async () => {
     await act(async () => {
       root.render(
@@ -145,6 +163,14 @@ describe('taxonomy and governance', () => {
     expect(contents[1]?.getAttribute('data-trigger')).toBe('click')
   })
 
+  it('keeps Tooltip colors on dedicated non-inverted tokens', () => {
+    expect(tokensCss).toContain('--uf-tooltip-bg: var(--black-100);')
+    expect(tokensCss).toContain('--uf-tooltip-fg: var(--white-100);')
+    expect(componentsCss).toContain('--uf-text-color: var(--uf-tooltip-fg);')
+    expect(componentsCss).toContain('background: var(--uf-tooltip-bg);')
+    expect(componentsCss).toContain('color: var(--uf-tooltip-fg);')
+  })
+
   it('Drawer renders the modal primitive with directional variants and compat Sheet aliases to it', async () => {
     await act(async () => {
       root.render(
@@ -156,7 +182,7 @@ describe('taxonomy and governance', () => {
       )
     })
 
-    const modals = Array.from(container.querySelectorAll<HTMLElement>('.uf-modal[data-scope]'))
+    const modals = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-modal[data-scope]'))
     expect(modals).toHaveLength(3)
     expect(modals[0]?.getAttribute('data-surface')).toBe('sheet')
     expect(modals[0]?.getAttribute('data-variant')).toBe('bottom')

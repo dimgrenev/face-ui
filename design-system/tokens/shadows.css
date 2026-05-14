@@ -1,0 +1,72 @@
+/**
+ * Design Tokens: Shadows & Elevation
+ *
+ * Централизованная система теней для Userface Design System
+ * Используется для создания глубины и иерархии
+ */
+
+:root {
+  /* ============================================
+   * SHADOW LEVELS (уровни теней)
+   * ============================================ */
+  --uf-shadow-none: none;
+
+  /* Small shadow - для элементов на уровне контента */
+  --uf-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  /* Base shadow - для карточек и панелей */
+  --uf-shadow-base: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+
+  /* Medium shadow - для модальных окон и дропдаунов */
+  --uf-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  /* Large shadow - для важных элементов */
+  --uf-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+
+  /* Extra large shadow - для максимального elevation */
+  --uf-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+
+  /* ============================================
+   * ELEVATION (для темной темы - более яркие тени)
+   * ============================================ */
+  --uf-elevation-0: var(--uf-shadow-none);
+  --uf-elevation-1: var(--uf-shadow-sm);
+  --uf-elevation-2: var(--uf-shadow-base);
+  --uf-elevation-3: var(--uf-shadow-md);
+  --uf-elevation-4: var(--uf-shadow-lg);
+  --uf-elevation-5: var(--uf-shadow-xl);
+
+  /* Z-index stack tokens */
+  --uf-z-dropdown: 2300;
+  --uf-z-overlay: 1900;
+  --uf-z-modal: 2100;
+  --uf-z-toast: 2400;
+
+  /* Backdrop blur tokens (default) */
+  --uf-backdrop-blur-overlay: 120px;
+}
+
+/* Light Theme - более мягкие тени */
+:root[data-theme='light'] {
+  --uf-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --uf-shadow-base: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --uf-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --uf-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --uf-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+
+  /* Backdrop blur tokens */
+  --uf-backdrop-blur-overlay: 120px;
+}
+
+/* Dark Theme - более контрастные тени */
+:root[data-theme='dark'],
+:root:not([data-theme]) {
+  --uf-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --uf-shadow-base: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --uf-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --uf-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.4);
+  --uf-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5), 0 10px 10px rgba(0, 0, 0, 0.4);
+
+  /* Backdrop blur tokens */
+  --uf-backdrop-blur-overlay: 120px;
+}

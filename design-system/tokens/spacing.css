@@ -1,0 +1,58 @@
+/**
+ * Design Tokens: Spacing
+ *
+ * Централизованная система отступов для Userface Design System
+ * Основана на 4px базовой единице для консистентности
+ */
+
+:root {
+  /* ============================================
+   * SPACING SCALE (4px base unit)
+   * ============================================ */
+  --uf-spacing-0: 0px;
+  --uf-spacing-1: 4px;
+  --uf-spacing-2: 8px;
+  --uf-spacing-3: 12px;
+  --uf-spacing-4: 16px;
+  --uf-spacing-5: 20px;
+  --uf-spacing-6: 24px;
+  --uf-spacing-8: 32px;
+  --uf-spacing-10: 40px;
+  --uf-spacing-12: 48px;
+  --uf-spacing-16: 64px;
+  --uf-spacing-20: 80px;
+  --uf-spacing-24: 96px;
+
+  /* ============================================
+   * SEMANTIC SPACING (семантические отступы)
+   * ============================================ */
+  --uf-spacing-xs: var(--uf-spacing-1);    /* 4px - минимальный отступ */
+  --uf-spacing-sm: var(--uf-spacing-2);    /* 8px - маленький отступ */
+  --uf-spacing-md: var(--uf-spacing-4);    /* 16px - средний отступ */
+  --uf-spacing-lg: var(--uf-spacing-6);    /* 24px - большой отступ */
+  --uf-spacing-xl: var(--uf-spacing-10);   /* 40px - очень большой отступ */
+  --uf-spacing-2xl: var(--uf-spacing-16);  /* 64px - экстра большой отступ */
+
+  /* ============================================
+   * COMPONENT SPACING (отступы для компонентов)
+   * ============================================ */
+  --uf-spacing-panel: var(--uf-spacing-5);      /* 20px - отступ панели */
+  --uf-spacing-section: var(--uf-spacing-8);   /* 32px - отступ секции */
+  --uf-spacing-container: var(--uf-spacing-10); /* 40px - отступ контейнера */
+}
+
+/* ============================================
+ * LEGACY COMPATIBILITY (для Components и других)
+ * ============================================ */
+:root {
+  --space-0: var(--uf-spacing-0);
+  --space-2: var(--uf-spacing-1);
+  --space-4: var(--uf-spacing-2);
+  --space-8: var(--uf-spacing-2);
+  --space-12: var(--uf-spacing-3);
+  --space-16: var(--uf-spacing-4);
+  --space-20: var(--uf-spacing-5);
+  --space-24: var(--uf-spacing-6);
+  --space-32: var(--uf-spacing-8);
+  --space-40: var(--uf-spacing-10);
+}

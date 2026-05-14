@@ -1,0 +1,77 @@
+/**
+ * Utility Classes: Interactive
+ *
+ * Reusable interaction patterns for controls/rows/buttons.
+ */
+
+/* A standard "row button" used in panels and lists */
+.uf-row-button {
+  height: var(--uf-control-height);
+  width: 100%;
+  padding: 0 var(--uf-control-pad-text);
+  padding-left: var(--uf-control-pad-icon);
+  display: flex;
+  align-items: center;
+  gap: var(--uf-control-gap);
+  justify-content: flex-start;
+  background: transparent;
+  border: none;
+  border-radius: var(--uf-radius-sm);
+  cursor: pointer;
+  color: var(--uf-color-foreground);
+  text-decoration: none;
+}
+
+.uf-row-button:hover {
+  background: var(--uf-color-hover);
+  font-weight: var(--uf-font-weight-bold);
+}
+
+.uf-row-button[aria-current="true"],
+.uf-row-button[aria-selected="true"],
+.uf-row-button[data-active="true"],
+.uf-row-button--active {
+  background: var(--uf-color-hover);
+  font-weight: var(--uf-font-weight-normal);
+}
+
+.uf-row-button:focus-visible {
+  outline: var(--uf-border-focus);
+  outline-offset: var(--uf-border-width-base);
+}
+
+/* Fixed helpers */
+.uf-fixed-top-right {
+  position: fixed;
+  top: var(--uf-spacing-2);
+  right: var(--uf-spacing-2);
+  /* Must stay BELOW UnifiedPanel (z=1000) so it never overlays the panel. */
+  z-index: 900;
+}
+
+/* Cart button (fixed): must be "normal" regardless of cart contents */
+.uf-cart-button {
+  height: var(--uf-control-height);
+  padding: 0 var(--uf-control-pad-text);
+  padding-left: var(--uf-control-pad-icon);
+  background: var(--uf-color-panel);
+  border: none;
+  border-radius: var(--uf-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--uf-control-gap);
+  cursor: pointer;
+  color: var(--uf-color-foreground);
+  text-decoration: none;
+  font-weight: var(--uf-font-weight-normal);
+}
+
+.uf-cart-button:hover {
+  background: var(--uf-color-hover);
+  font-weight: var(--uf-font-weight-bold);
+}
+
+/* Utility: always use the same background as "hover state" for default interactive controls */
+.uf-bg-hover {
+  background: var(--uf-color-hover);
+}

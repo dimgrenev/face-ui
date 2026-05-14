@@ -44,6 +44,16 @@ async function main() {
     'dist/esm/Button/Button.json',
     'dist/esm/component-registry.json',
     'dist/esm/assets/styles/index.css',
+    'dist/esm/assets/fonts/Begriffsschrift.ttf',
+    'dist/esm/design-system/source/color-system.jsonc',
+    'dist/esm/design-system/tokens/colors.css',
+    'dist/esm/design-system/index.css',
+    'dist/esm/assets/adapters/react/use-floating-position.js',
+    'dist/cjs/assets/adapters/react/use-floating-position.js',
+    'dist/types/assets/adapters/react/use-floating-position.d.ts',
+    'dist/esm/gallery.js',
+    'dist/cjs/gallery.js',
+    'dist/types/gallery.d.ts',
     'dist/esm/uf.runtime.js',
     'dist/types/uf.runtime.d.ts',
     'docs.md',
@@ -82,8 +92,12 @@ async function main() {
   assert(packageJson.files?.includes('docs'), 'package files must include docs/');
   assert(packageJson.exports?.['./docs.md'] === './docs.md', 'package exports must expose docs.md');
   assert(packageJson.exports?.['./docs/*'] === './docs/*', 'package exports must expose docs/* markdown files');
+  assert(packageJson.files?.includes('design-system'), 'package files must include design-system/');
+  assert(packageJson.exports?.['./design-system/*'] === './dist/esm/design-system/*', 'package exports must expose design-system artifacts');
   assert(!packageJson.exports?.['./*'], 'package exports must not expose a generic JS wildcard');
   assert(!packageJson.exports?.['./*.json'], 'package exports must not expose a generic JSON wildcard');
+  assert(packageJson.exports?.['./gallery']?.import === './dist/esm/gallery.js', 'package exports must expose gallery metadata');
+  assert(packageJson.exports?.['./assets/adapters/react/*']?.import === './dist/esm/assets/adapters/react/*.js', 'package exports must expose React adapters explicitly');
   assert(packageJson.exports?.['./Button/*']?.import === './dist/esm/Button/*.js', 'package exports must expose component modules explicitly');
   assert(packageJson.exports?.['./Button/*.json'] === './dist/esm/Button/*.json', 'package exports must expose component contracts explicitly');
 
@@ -113,6 +127,14 @@ async function main() {
     assert(typeof esm.Button === 'object' || typeof esm.Button === 'function', 'ESM root export must expose Button');
   } catch (error) {
     assert(false, `ESM root export failed: ${error.message}`);
+  }
+
+  try {
+    const gallery = await import(pathToFileURL(path.join(root, 'dist/esm/gallery.js')).href);
+    assert(Array.isArray(gallery.FELD_GALLERY_META), 'ESM gallery export must expose FELD_GALLERY_META');
+    assert(Array.isArray(gallery.FELD_GALLERY_ENTRIES), 'ESM gallery export must expose FELD_GALLERY_ENTRIES');
+  } catch (error) {
+    assert(false, `ESM gallery export failed: ${error.message}`);
   }
 
   if (failures.length > 0) {

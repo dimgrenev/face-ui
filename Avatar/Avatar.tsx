@@ -46,8 +46,8 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
 
     return (
       <span ref={ref} {...api.getRootProps()} className={cn('uf-avatar', className)}>
-        <img {...api.getImageProps()} />
-        <span {...api.getFallbackProps()}>
+        <img key="image" {...api.getImageProps()} />
+        <span key="fallback" {...api.getFallbackProps()}>
           {fallback ?? api.initials}
         </span>
       </span>

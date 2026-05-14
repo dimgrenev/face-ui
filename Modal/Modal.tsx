@@ -10,7 +10,8 @@
  * `<Modal open title="Settings" variant="right" width={400} />`
  */
 
-import { forwardRef, useId, useCallback, useEffect, type MutableRefObject, type ReactNode, type HTMLAttributes, type CSSProperties } from 'react'
+import { forwardRef, useId, useCallback, useEffect, useState, type MutableRefObject, type ReactNode, type HTMLAttributes, type CSSProperties } from 'react'
+import { createPortal } from 'react-dom'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import {
   DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
@@ -111,6 +112,12 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
     const titleId = useId()
     const descriptionId = useId()
+    const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null)
+
+    useEffect(() => {
+      if (typeof document === 'undefined') return
+      setPortalTarget(document.body)
+    }, [])
 
     const resolvedOpen = typeof legacyProps.isOpen === 'boolean' ? legacyProps.isOpen : open
     const { state, send } = useMachine<ModalSchema>(modalMachine, {
@@ -162,26 +169,8 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
         }
         : undefined
 
-    return (
+    const overlay = (
       <>
-        {trigger != null && (
-          isPrimitiveTrigger ? (
-            <Button
-              {...(triggerProps as any)}
-              text={String(trigger)}
-              fullWidth={false}
-              membrane={false}
-            />
-          ) : (
-            <span
-              {...triggerProps}
-              style={{ display: 'inline-flex' }}
-            >
-              {trigger}
-            </span>
-          )
-        )}
-
         <div {...backdropProps} className={cn('uf-modal-backdrop')} />
 
         <div {...api.getPositionerProps()} className={cn('uf-modal-positioner')}>
@@ -267,6 +256,30 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
             ) : null}
           </div>
         </div>
+      </>
+    )
+
+    return (
+      <>
+        {trigger != null && (
+          isPrimitiveTrigger ? (
+            <Button
+              {...(triggerProps as any)}
+              text={String(trigger)}
+              fullWidth={false}
+              membrane={false}
+            />
+          ) : (
+            <span
+              {...triggerProps}
+              style={{ display: 'inline-flex' }}
+            >
+              {trigger}
+            </span>
+          )
+        )}
+
+        {portalTarget ? createPortal(overlay, portalTarget) : overlay}
       </>
     )
   },

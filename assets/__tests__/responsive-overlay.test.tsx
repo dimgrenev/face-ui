@@ -1084,8 +1084,8 @@ describe('responsive overlay surfaces', () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const dialog = container.querySelector<HTMLElement>('[data-part="content"]')
-    const positioner = container.querySelector<HTMLElement>('[data-part="positioner"]')
+    const dialog = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="content"]')
+    const positioner = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="positioner"]')
     const buttons = Array.from(dialog?.querySelectorAll<HTMLButtonElement>('button') || [])
     const first = buttons[0]
     const last = buttons[buttons.length - 1]
@@ -1127,7 +1127,7 @@ describe('responsive overlay surfaces', () => {
       close?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    expect(container.querySelector<HTMLElement>('[data-part="content"]')?.hidden).toBe(true)
+    expect(document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="content"]')?.hidden).toBe(true)
     expect(document.activeElement).toBe(trigger)
   })
 
@@ -1152,7 +1152,7 @@ describe('responsive overlay surfaces', () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const positioner = container.querySelector('[data-part="positioner"]') as HTMLElement | null
+    const positioner = document.body.querySelector('[data-scope="modal"][data-part="positioner"]') as HTMLElement | null
     expect(positioner?.getAttribute('data-variant')).toBe('bottom')
   })
 })

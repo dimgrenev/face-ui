@@ -1,0 +1,140 @@
+/**
+ * Utility Classes: Spacing
+ *
+ * Утилитарные классы для быстрого применения отступов
+ * Используют токены из spacing.css
+ */
+
+/* ============================================
+ * MARGIN UTILITIES
+ * ============================================ */
+
+/* Margin All Sides */
+.uf-m-0 { margin: var(--uf-spacing-0); }
+.uf-m-1 { margin: var(--uf-spacing-1); }
+.uf-m-2 { margin: var(--uf-spacing-2); }
+.uf-m-3 { margin: var(--uf-spacing-3); }
+.uf-m-4 { margin: var(--uf-spacing-4); }
+.uf-m-5 { margin: var(--uf-spacing-5); }
+.uf-m-6 { margin: var(--uf-spacing-6); }
+
+/* Margin Top */
+.uf-mt-0 { margin-top: var(--uf-spacing-0); }
+.uf-mt-1 { margin-top: var(--uf-spacing-1); }
+.uf-mt-2 { margin-top: var(--uf-spacing-2); }
+.uf-mt-3 { margin-top: var(--uf-spacing-3); }
+.uf-mt-4 { margin-top: var(--uf-spacing-4); }
+.uf-mt-5 { margin-top: var(--uf-spacing-5); }
+.uf-mt-6 { margin-top: var(--uf-spacing-6); }
+
+/* Margin Bottom */
+.uf-mb-0 { margin-bottom: var(--uf-spacing-0); }
+.uf-mb-1 { margin-bottom: var(--uf-spacing-1); }
+.uf-mb-2 { margin-bottom: var(--uf-spacing-2); }
+.uf-mb-3 { margin-bottom: var(--uf-spacing-3); }
+.uf-mb-4 { margin-bottom: var(--uf-spacing-4); }
+.uf-mb-5 { margin-bottom: var(--uf-spacing-5); }
+.uf-mb-6 { margin-bottom: var(--uf-spacing-6); }
+
+/* Margin Left */
+.uf-ml-0 { margin-left: var(--uf-spacing-0); }
+.uf-ml-1 { margin-left: var(--uf-spacing-1); }
+.uf-ml-2 { margin-left: var(--uf-spacing-2); }
+.uf-ml-3 { margin-left: var(--uf-spacing-3); }
+.uf-ml-4 { margin-left: var(--uf-spacing-4); }
+.uf-ml-5 { margin-left: var(--uf-spacing-5); }
+.uf-ml-6 { margin-left: var(--uf-spacing-6); }
+
+/* Margin Right */
+.uf-mr-0 { margin-right: var(--uf-spacing-0); }
+.uf-mr-1 { margin-right: var(--uf-spacing-1); }
+.uf-mr-2 { margin-right: var(--uf-spacing-2); }
+.uf-mr-3 { margin-right: var(--uf-spacing-3); }
+.uf-mr-4 { margin-right: var(--uf-spacing-4); }
+.uf-mr-5 { margin-right: var(--uf-spacing-5); }
+.uf-mr-6 { margin-right: var(--uf-spacing-6); }
+
+/* Margin Horizontal (left + right) */
+.uf-mx-0 { margin-left: var(--uf-spacing-0); margin-right: var(--uf-spacing-0); }
+.uf-mx-1 { margin-left: var(--uf-spacing-1); margin-right: var(--uf-spacing-1); }
+.uf-mx-2 { margin-left: var(--uf-spacing-2); margin-right: var(--uf-spacing-2); }
+.uf-mx-3 { margin-left: var(--uf-spacing-3); margin-right: var(--uf-spacing-3); }
+.uf-mx-4 { margin-left: var(--uf-spacing-4); margin-right: var(--uf-spacing-4); }
+.uf-mx-5 { margin-left: var(--uf-spacing-5); margin-right: var(--uf-spacing-5); }
+.uf-mx-6 { margin-left: var(--uf-spacing-6); margin-right: var(--uf-spacing-6); }
+
+/* Margin Vertical (top + bottom) */
+.uf-my-0 { margin-top: var(--uf-spacing-0); margin-bottom: var(--uf-spacing-0); }
+.uf-my-1 { margin-top: var(--uf-spacing-1); margin-bottom: var(--uf-spacing-1); }
+.uf-my-2 { margin-top: var(--uf-spacing-2); margin-bottom: var(--uf-spacing-2); }
+.uf-my-3 { margin-top: var(--uf-spacing-3); margin-bottom: var(--uf-spacing-3); }
+.uf-my-4 { margin-top: var(--uf-spacing-4); margin-bottom: var(--uf-spacing-4); }
+.uf-my-5 { margin-top: var(--uf-spacing-5); margin-bottom: var(--uf-spacing-5); }
+.uf-my-6 { margin-top: var(--uf-spacing-6); margin-bottom: var(--uf-spacing-6); }
+
+/* ============================================
+ * PADDING UTILITIES
+ * ============================================ */
+
+/* Padding All Sides */
+.uf-p-0 { padding: var(--uf-spacing-0); }
+.uf-p-1 { padding: var(--uf-spacing-1); }
+.uf-p-2 { padding: var(--uf-spacing-2); }
+.uf-p-3 { padding: var(--uf-spacing-3); }
+.uf-p-4 { padding: var(--uf-spacing-4); }
+.uf-p-5 { padding: var(--uf-spacing-5); }
+.uf-p-6 { padding: var(--uf-spacing-6); }
+
+/* Padding Top */
+.uf-pt-0 { padding-top: var(--uf-spacing-0); }
+.uf-pt-1 { padding-top: var(--uf-spacing-1); }
+.uf-pt-2 { padding-top: var(--uf-spacing-2); }
+.uf-pt-3 { padding-top: var(--uf-spacing-3); }
+.uf-pt-4 { padding-top: var(--uf-spacing-4); }
+.uf-pt-5 { padding-top: var(--uf-spacing-5); }
+.uf-pt-6 { padding-top: var(--uf-spacing-6); }
+
+/* Padding Bottom */
+.uf-pb-0 { padding-bottom: var(--uf-spacing-0); }
+.uf-pb-1 { padding-bottom: var(--uf-spacing-1); }
+.uf-pb-2 { padding-bottom: var(--uf-spacing-2); }
+.uf-pb-3 { padding-bottom: var(--uf-spacing-3); }
+.uf-pb-4 { padding-bottom: var(--uf-spacing-4); }
+.uf-pb-5 { padding-bottom: var(--uf-spacing-5); }
+.uf-pb-6 { padding-bottom: var(--uf-spacing-6); }
+
+/* Padding Left */
+.uf-pl-0 { padding-left: var(--uf-spacing-0); }
+.uf-pl-1 { padding-left: var(--uf-spacing-1); }
+.uf-pl-2 { padding-left: var(--uf-spacing-2); }
+.uf-pl-3 { padding-left: var(--uf-spacing-3); }
+.uf-pl-4 { padding-left: var(--uf-spacing-4); }
+.uf-pl-5 { padding-left: var(--uf-spacing-5); }
+.uf-pl-6 { padding-left: var(--uf-spacing-6); }
+
+/* Padding Right */
+.uf-pr-0 { padding-right: var(--uf-spacing-0); }
+.uf-pr-1 { padding-right: var(--uf-spacing-1); }
+.uf-pr-2 { padding-right: var(--uf-spacing-2); }
+.uf-pr-3 { padding-right: var(--uf-spacing-3); }
+.uf-pr-4 { padding-right: var(--uf-spacing-4); }
+.uf-pr-5 { padding-right: var(--uf-spacing-5); }
+.uf-pr-6 { padding-right: var(--uf-spacing-6); }
+
+/* Padding Horizontal (left + right) */
+.uf-px-0 { padding-left: var(--uf-spacing-0); padding-right: var(--uf-spacing-0); }
+.uf-px-1 { padding-left: var(--uf-spacing-1); padding-right: var(--uf-spacing-1); }
+.uf-px-2 { padding-left: var(--uf-spacing-2); padding-right: var(--uf-spacing-2); }
+.uf-px-3 { padding-left: var(--uf-spacing-3); padding-right: var(--uf-spacing-3); }
+.uf-px-4 { padding-left: var(--uf-spacing-4); padding-right: var(--uf-spacing-4); }
+.uf-px-5 { padding-left: var(--uf-spacing-5); padding-right: var(--uf-spacing-5); }
+.uf-px-6 { padding-left: var(--uf-spacing-6); padding-right: var(--uf-spacing-6); }
+
+/* Padding Vertical (top + bottom) */
+.uf-py-0 { padding-top: var(--uf-spacing-0); padding-bottom: var(--uf-spacing-0); }
+.uf-py-1 { padding-top: var(--uf-spacing-1); padding-bottom: var(--uf-spacing-1); }
+.uf-py-2 { padding-top: var(--uf-spacing-2); padding-bottom: var(--uf-spacing-2); }
+.uf-py-3 { padding-top: var(--uf-spacing-3); padding-bottom: var(--uf-spacing-3); }
+.uf-py-4 { padding-top: var(--uf-spacing-4); padding-bottom: var(--uf-spacing-4); }
+.uf-py-5 { padding-top: var(--uf-spacing-5); padding-bottom: var(--uf-spacing-5); }
+.uf-py-6 { padding-top: var(--uf-spacing-6); padding-bottom: var(--uf-spacing-6); }

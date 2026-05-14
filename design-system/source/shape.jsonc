@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+  "tokens": [
+    {
+      "sheet": "shape",
+      "name": "--uf-border-width-none",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-border-width-thin",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "1px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-border-width-base",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "2px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-border-width-thick",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "4px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-radius-none",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-radius-sm",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "4px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-radius-base",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "6px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-radius-md",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "8px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-radius-lg",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-radius-xl",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "16px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-radius-full",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "9999px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-border-style-solid",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "solid"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-border-style-dashed",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "dashed"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-border-style-dotted",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "dotted"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-border-default",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border)"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-border-subtle",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border-subtle)"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-border-focus",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-border-width-base) var(--uf-border-style-solid) var(--uf-color-accent)"
+        }
+      ]
+    }
+  ]
+}

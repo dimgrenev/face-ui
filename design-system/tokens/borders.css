@@ -1,0 +1,40 @@
+/**
+ * Design Tokens: Borders & Radius
+ *
+ * Централизованная система границ и скруглений для Userface Design System
+ */
+
+:root {
+  /* ============================================
+   * BORDER WIDTHS
+   * ============================================ */
+  --uf-border-width-none: 0;
+  --uf-border-width-thin: 1px;
+  --uf-border-width-base: 2px;
+  --uf-border-width-thick: 4px;
+
+  /* ============================================
+   * BORDER RADIUS
+   * ============================================ */
+  --uf-radius-none: 0;
+  --uf-radius-sm: 4px;
+  --uf-radius-base: 6px;
+  --uf-radius-md: 8px;
+  --uf-radius-lg: 12px;
+  --uf-radius-xl: 16px;
+  --uf-radius-full: 9999px;
+
+  /* ============================================
+   * BORDER STYLES
+   * ============================================ */
+  --uf-border-style-solid: solid;
+  --uf-border-style-dashed: dashed;
+  --uf-border-style-dotted: dotted;
+
+  /* ============================================
+   * SEMANTIC BORDERS (семантические границы)
+   * ============================================ */
+  --uf-border-default: var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border);
+  --uf-border-subtle: var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border-subtle);
+  --uf-border-focus: var(--uf-border-width-base) var(--uf-border-style-solid) var(--uf-color-accent);
+}

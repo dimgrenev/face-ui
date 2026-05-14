@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+  "tokens": [
+    {
+      "sheet": "typography",
+      "name": "--uf-font-family-base",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "'Akt', sans-serif"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-family-mono",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "'Begriffsschrift', monospace"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size-xs",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "10px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size-sm",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "11px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size-base",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size-md",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "14px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size-lg",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "16px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size-xl",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "18px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size-2xl",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "20px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size-3xl",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "24px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size-4xl",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "32px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size-5xl",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "48px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-weight-normal",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "400"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-weight-medium",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "500"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-weight-semibold",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "600"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-weight-bold",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "600"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-line-height-tight",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "1.2"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-line-height-normal",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "1.5"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-line-height-relaxed",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "1.6"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-letter-spacing-tight",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-letter-spacing-normal",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-letter-spacing-wide",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-letter-spacing-wider",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-transform-none",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-transform-uppercase",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "uppercase"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-transform-lowercase",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "lowercase"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-control-font-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "14px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-control-line-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "20px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-control-letter-spacing",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--font-base",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-family-base)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-family",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-family-base)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-mono",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-family-mono)"
+        }
+      ]
+    }
+  ]
+}

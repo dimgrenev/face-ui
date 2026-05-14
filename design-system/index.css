@@ -1,0 +1,25 @@
+/**
+ * Userface Design System - Main Entry Point
+ *
+ * Импортирует все части дизайн-системы:
+ * 1. Tokens (токены)
+ * 2. Typography (типографика)
+ * 3. Utilities (утилитарные классы)
+ *
+ * Использование:
+ * @import 'userface/uf/design-system/index.css';
+ */
+
+/* Tokens */
+@import './tokens/index.css';
+
+/* Themes (default values for all geometry/typography) */
+@import './themes/index.css';
+
+/* Typography Classes */
+@import '../styles/typography.css';
+
+/* Utility Classes */
+@import './utilities/spacing.css';
+@import './utilities/borders.css';
+@import './utilities/interactive.css';

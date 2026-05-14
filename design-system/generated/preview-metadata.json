@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "sheets": [
+    {
+      "sheet": "color",
+      "profile": "design-system",
+      "title": "Color",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "previewKind": "color",
+      "tokenCount": 15,
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "sampleTokens": [
+        "uf-color-data-amber",
+        "uf-color-data-blue",
+        "uf-color-data-blue-soft",
+        "uf-color-data-cyan",
+        "uf-color-data-green",
+        "uf-color-data-lime"
+      ]
+    },
+    {
+      "sheet": "effects",
+      "profile": "design-system",
+      "title": "Effects",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "previewKind": "effects",
+      "tokenCount": 17,
+      "selectors": [
+        ":root",
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
+      ],
+      "sampleTokens": [
+        "uf-shadow-none",
+        "uf-shadow-sm",
+        "uf-shadow-base",
+        "uf-shadow-md",
+        "uf-shadow-lg",
+        "uf-shadow-xl"
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "title": "Semantic / Action",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "previewKind": "semantic",
+      "tokenCount": 5,
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "sampleTokens": [
+        "uf-color-active",
+        "uf-color-hover",
+        "uf-color-accent",
+        "uf-color-accent-hover",
+        "uf-color-cta-hover"
+      ]
+    },
+    {
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "title": "Semantic / Content",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "previewKind": "semantic",
+      "tokenCount": 5,
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "sampleTokens": [
+        "uf-color-foreground",
+        "uf-color-text-primary",
+        "uf-color-text-secondary",
+        "uf-color-text-code",
+        "uf-color-active-text"
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "title": "Semantic / Feedback",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "previewKind": "semantic",
+      "tokenCount": 12,
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "sampleTokens": [
+        "uf-color-success",
+        "uf-color-success-foreground",
+        "uf-color-on-success",
+        "uf-color-error",
+        "uf-color-error-foreground",
+        "uf-color-on-error"
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "title": "Semantic / Surface",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "previewKind": "semantic",
+      "tokenCount": 15,
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "sampleTokens": [
+        "uf-color-background",
+        "uf-color-panel",
+        "uf-color-props-panel",
+        "uf-color-header",
+        "uf-color-input",
+        "uf-color-bg-code"
+      ]
+    },
+    {
+      "sheet": "shape",
+      "profile": "design-system",
+      "title": "Shape",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "previewKind": "shape",
+      "tokenCount": 17,
+      "selectors": [
+        ":root"
+      ],
+      "sampleTokens": [
+        "uf-border-width-none",
+        "uf-border-width-thin",
+        "uf-border-width-base",
+        "uf-border-width-thick",
+        "uf-radius-none",
+        "uf-radius-sm"
+      ]
+    },
+    {
+      "sheet": "spacing",
+      "profile": "design-system",
+      "title": "Spacing",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "previewKind": "spacing",
+      "tokenCount": 23,
+      "selectors": [
+        ":root"
+      ],
+      "sampleTokens": [
+        "uf-spacing-0",
+        "uf-spacing-1",
+        "uf-spacing-2",
+        "uf-spacing-3",
+        "uf-spacing-4",
+        "uf-spacing-5"
+      ]
+    },
+    {
+      "sheet": "themes",
+      "profile": "design-system",
+      "title": "Themes",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "previewKind": "theme-state",
+      "tokenCount": 18,
+      "selectors": [
+        ":root"
+      ],
+      "sampleTokens": [
+        "uf-control-font-size",
+        "uf-control-line-height",
+        "uf-control-pad-y",
+        "uf-control-height",
+        "uf-control-pad-text",
+        "uf-control-pad-icon"
+      ]
+    },
+    {
+      "sheet": "typography",
+      "profile": "design-system",
+      "title": "Typography",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "previewKind": "typography",
+      "tokenCount": 32,
+      "selectors": [
+        ":root"
+      ],
+      "sampleTokens": [
+        "uf-font-family-base",
+        "uf-font-family-mono",
+        "uf-font-size-xs",
+        "uf-font-size-sm",
+        "uf-font-size-base",
+        "uf-font-size-md"
+      ]
+    }
+  ]
+}

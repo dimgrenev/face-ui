@@ -1,0 +1,1998 @@
+{
+  "version": 1,
+  "tokens": [
+    {
+      "name": "uf-color-data-amber",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#f59e0b"
+      ]
+    },
+    {
+      "name": "uf-color-data-blue",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#3b82f6"
+      ]
+    },
+    {
+      "name": "uf-color-data-blue-soft",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#60a5fa"
+      ]
+    },
+    {
+      "name": "uf-color-data-cyan",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#06b6d4"
+      ]
+    },
+    {
+      "name": "uf-color-data-green",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#22c55e"
+      ]
+    },
+    {
+      "name": "uf-color-data-lime",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#84cc16"
+      ]
+    },
+    {
+      "name": "uf-color-data-orange",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#f97316"
+      ]
+    },
+    {
+      "name": "uf-color-data-orange-soft",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#fb923c"
+      ]
+    },
+    {
+      "name": "uf-color-data-pink",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#ec4899"
+      ]
+    },
+    {
+      "name": "uf-color-data-purple",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#a855f7"
+      ]
+    },
+    {
+      "name": "uf-color-data-purple-soft",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#c084fc"
+      ]
+    },
+    {
+      "name": "uf-color-data-rose",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#f43f5e"
+      ]
+    },
+    {
+      "name": "uf-color-data-success",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#22c55e"
+      ]
+    },
+    {
+      "name": "uf-color-data-teal",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#14b8a6"
+      ]
+    },
+    {
+      "name": "uf-color-data-violet",
+      "sheet": "color",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#8b5cf6"
+      ]
+    },
+    {
+      "name": "uf-backdrop-blur-overlay",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root",
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
+      ],
+      "values": [
+        "120px"
+      ]
+    },
+    {
+      "name": "uf-elevation-0",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-shadow-none)"
+      ]
+    },
+    {
+      "name": "uf-elevation-1",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-shadow-sm)"
+      ]
+    },
+    {
+      "name": "uf-elevation-2",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-shadow-base)"
+      ]
+    },
+    {
+      "name": "uf-elevation-3",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-shadow-md)"
+      ]
+    },
+    {
+      "name": "uf-elevation-4",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-shadow-lg)"
+      ]
+    },
+    {
+      "name": "uf-elevation-5",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-shadow-xl)"
+      ]
+    },
+    {
+      "name": "uf-shadow-base",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root",
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
+      ],
+      "values": [
+        "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+        "0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3)"
+      ]
+    },
+    {
+      "name": "uf-shadow-lg",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root",
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
+      ],
+      "values": [
+        "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)",
+        "0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.4)"
+      ]
+    },
+    {
+      "name": "uf-shadow-md",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root",
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
+      ],
+      "values": [
+        "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
+        "0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3)"
+      ]
+    },
+    {
+      "name": "uf-shadow-none",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "none"
+      ]
+    },
+    {
+      "name": "uf-shadow-sm",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root",
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
+      ],
+      "values": [
+        "0 1px 2px rgba(0, 0, 0, 0.05)",
+        "0 1px 2px rgba(0, 0, 0, 0.3)"
+      ]
+    },
+    {
+      "name": "uf-shadow-xl",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root",
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
+      ],
+      "values": [
+        "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)",
+        "0 20px 25px rgba(0, 0, 0, 0.5), 0 10px 10px rgba(0, 0, 0, 0.4)"
+      ]
+    },
+    {
+      "name": "uf-z-dropdown",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "2300"
+      ]
+    },
+    {
+      "name": "uf-z-modal",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "2100"
+      ]
+    },
+    {
+      "name": "uf-z-overlay",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "1900"
+      ]
+    },
+    {
+      "name": "uf-z-toast",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "2400"
+      ]
+    },
+    {
+      "name": "uf-color-accent",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#007bff"
+      ]
+    },
+    {
+      "name": "uf-color-accent-hover",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#0056b3"
+      ]
+    },
+    {
+      "name": "uf-color-active",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "rgba(0, 0, 0, 0.06)",
+        "rgba(255, 255, 255, 0.20)"
+      ]
+    },
+    {
+      "name": "uf-color-cta-hover",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#ff4000"
+      ]
+    },
+    {
+      "name": "uf-color-hover",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "rgba(0, 0, 0, 0.04)",
+        "rgba(255, 255, 255, 0.10)"
+      ]
+    },
+    {
+      "name": "uf-color-active-text",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000",
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "uf-color-foreground",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000",
+        "#ededed"
+      ]
+    },
+    {
+      "name": "uf-color-text-code",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-background)",
+        "var(--uf-color-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-text-primary",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000",
+        "#ededed"
+      ]
+    },
+    {
+      "name": "uf-color-text-secondary",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#666666",
+        "#888888"
+      ]
+    },
+    {
+      "name": "uf-color-error",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#dc3545"
+      ]
+    },
+    {
+      "name": "uf-color-error-foreground",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000"
+      ]
+    },
+    {
+      "name": "uf-color-info",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#17a2b8"
+      ]
+    },
+    {
+      "name": "uf-color-info-foreground",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000"
+      ]
+    },
+    {
+      "name": "uf-color-on-error",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-error-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-on-info",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-info-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-on-success",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-success-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-on-warning",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-warning-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-success",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#28a745"
+      ]
+    },
+    {
+      "name": "uf-color-success-foreground",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000"
+      ]
+    },
+    {
+      "name": "uf-color-warning",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#ffc107"
+      ]
+    },
+    {
+      "name": "uf-color-warning-foreground",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000"
+      ]
+    },
+    {
+      "name": "uf-color-background",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000",
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "uf-color-bg-code",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-background)",
+        "var(--uf-color-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-border",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#333333",
+        "#e0e0e0"
+      ]
+    },
+    {
+      "name": "uf-color-border-hover",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "rgba(0, 0, 0, 0.24)",
+        "rgba(255, 255, 255, 0.24)"
+      ]
+    },
+    {
+      "name": "uf-color-border-subtle",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#1a1a1a",
+        "#f0f0f0"
+      ]
+    },
+    {
+      "name": "uf-color-cta",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#ff4000"
+      ]
+    },
+    {
+      "name": "uf-color-cta-contrast",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "uf-color-glyph-line",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#676767",
+        "#949494"
+      ]
+    },
+    {
+      "name": "uf-color-header",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000",
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "uf-color-input",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000",
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "uf-color-panel",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#000000",
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "uf-color-props-panel",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#151515",
+        "#fbfbfb"
+      ]
+    },
+    {
+      "name": "uf-color-strip-edge",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']"
+      ],
+      "values": [
+        "0.05"
+      ]
+    },
+    {
+      "name": "uf-color-strip-l",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "0.48",
+        "0.68"
+      ]
+    },
+    {
+      "name": "uf-color-strip-s",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']"
+      ],
+      "values": [
+        "0.94"
+      ]
+    },
+    {
+      "name": "uf-border-default",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border)"
+      ]
+    },
+    {
+      "name": "uf-border-focus",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-border-width-base) var(--uf-border-style-solid) var(--uf-color-accent)"
+      ]
+    },
+    {
+      "name": "uf-border-style-dashed",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "dashed"
+      ]
+    },
+    {
+      "name": "uf-border-style-dotted",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "dotted"
+      ]
+    },
+    {
+      "name": "uf-border-style-solid",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "solid"
+      ]
+    },
+    {
+      "name": "uf-border-subtle",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border-subtle)"
+      ]
+    },
+    {
+      "name": "uf-border-width-base",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "2px"
+      ]
+    },
+    {
+      "name": "uf-border-width-none",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "name": "uf-border-width-thick",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "4px"
+      ]
+    },
+    {
+      "name": "uf-border-width-thin",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "1px"
+      ]
+    },
+    {
+      "name": "uf-radius-base",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "6px"
+      ]
+    },
+    {
+      "name": "uf-radius-full",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "9999px"
+      ]
+    },
+    {
+      "name": "uf-radius-lg",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-radius-md",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "8px"
+      ]
+    },
+    {
+      "name": "uf-radius-none",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "name": "uf-radius-sm",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "4px"
+      ]
+    },
+    {
+      "name": "uf-radius-xl",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "16px"
+      ]
+    },
+    {
+      "name": "space-0",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-0)"
+      ]
+    },
+    {
+      "name": "space-12",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-3)"
+      ]
+    },
+    {
+      "name": "space-16",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-4)"
+      ]
+    },
+    {
+      "name": "space-2",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-1)"
+      ]
+    },
+    {
+      "name": "space-20",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-5)"
+      ]
+    },
+    {
+      "name": "space-24",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-6)"
+      ]
+    },
+    {
+      "name": "space-32",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-8)"
+      ]
+    },
+    {
+      "name": "space-4",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-2)"
+      ]
+    },
+    {
+      "name": "space-40",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-10)"
+      ]
+    },
+    {
+      "name": "space-8",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-2)"
+      ]
+    },
+    {
+      "name": "uf-spacing-0",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0px"
+      ]
+    },
+    {
+      "name": "uf-spacing-1",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "4px"
+      ]
+    },
+    {
+      "name": "uf-spacing-10",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "40px"
+      ]
+    },
+    {
+      "name": "uf-spacing-12",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "48px"
+      ]
+    },
+    {
+      "name": "uf-spacing-16",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "64px"
+      ]
+    },
+    {
+      "name": "uf-spacing-2",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "8px"
+      ]
+    },
+    {
+      "name": "uf-spacing-20",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "80px"
+      ]
+    },
+    {
+      "name": "uf-spacing-24",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "96px"
+      ]
+    },
+    {
+      "name": "uf-spacing-3",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-spacing-4",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "16px"
+      ]
+    },
+    {
+      "name": "uf-spacing-5",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "20px"
+      ]
+    },
+    {
+      "name": "uf-spacing-6",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "24px"
+      ]
+    },
+    {
+      "name": "uf-spacing-8",
+      "sheet": "spacing",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "32px"
+      ]
+    },
+    {
+      "name": "uf-control-font-size",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "14px"
+      ]
+    },
+    {
+      "name": "uf-control-gap",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "10px"
+      ]
+    },
+    {
+      "name": "uf-control-height",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "32px"
+      ]
+    },
+    {
+      "name": "uf-control-line-height",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "20px"
+      ]
+    },
+    {
+      "name": "uf-control-pad-icon",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "6px"
+      ]
+    },
+    {
+      "name": "uf-control-pad-text",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-control-pad-y",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "6px"
+      ]
+    },
+    {
+      "name": "uf-text-body-line-height",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "20px"
+      ]
+    },
+    {
+      "name": "uf-text-body-size",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "14px"
+      ]
+    },
+    {
+      "name": "uf-text-pad-y",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0px"
+      ]
+    },
+    {
+      "name": "uf-text-section-line-height",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "16px"
+      ]
+    },
+    {
+      "name": "uf-text-section-size",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-topbar-control-height",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "32px"
+      ]
+    },
+    {
+      "name": "uf-topbar-pad-bottom",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-topbar-pad-left",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-topbar-pad-right",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-topbar-pad-top",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-topbar-slot-pad-y",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0px"
+      ]
+    },
+    {
+      "name": "font-base",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-font-family-base)"
+      ]
+    },
+    {
+      "name": "uf-control-font-size",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "14px"
+      ]
+    },
+    {
+      "name": "uf-control-letter-spacing",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "name": "uf-control-line-height",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "20px"
+      ]
+    },
+    {
+      "name": "uf-font-family",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-font-family-base)"
+      ]
+    },
+    {
+      "name": "uf-font-family-base",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "'Akt', sans-serif"
+      ]
+    },
+    {
+      "name": "uf-font-family-mono",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "'Begriffsschrift', monospace"
+      ]
+    },
+    {
+      "name": "uf-font-mono",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-font-family-mono)"
+      ]
+    },
+    {
+      "name": "uf-font-size-2xl",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "20px"
+      ]
+    },
+    {
+      "name": "uf-font-size-3xl",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "24px"
+      ]
+    },
+    {
+      "name": "uf-font-size-4xl",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "32px"
+      ]
+    },
+    {
+      "name": "uf-font-size-5xl",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "48px"
+      ]
+    },
+    {
+      "name": "uf-font-size-base",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-font-size-lg",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "16px"
+      ]
+    },
+    {
+      "name": "uf-font-size-md",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "14px"
+      ]
+    },
+    {
+      "name": "uf-font-size-sm",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "11px"
+      ]
+    },
+    {
+      "name": "uf-font-size-xl",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "18px"
+      ]
+    },
+    {
+      "name": "uf-font-size-xs",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "10px"
+      ]
+    },
+    {
+      "name": "uf-font-weight-bold",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "600"
+      ]
+    },
+    {
+      "name": "uf-font-weight-medium",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "500"
+      ]
+    },
+    {
+      "name": "uf-font-weight-normal",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "400"
+      ]
+    },
+    {
+      "name": "uf-font-weight-semibold",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "600"
+      ]
+    },
+    {
+      "name": "uf-letter-spacing-normal",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "name": "uf-letter-spacing-tight",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "name": "uf-letter-spacing-wide",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "name": "uf-letter-spacing-wider",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "name": "uf-line-height-normal",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "1.5"
+      ]
+    },
+    {
+      "name": "uf-line-height-relaxed",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "1.6"
+      ]
+    },
+    {
+      "name": "uf-line-height-tight",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "1.2"
+      ]
+    },
+    {
+      "name": "uf-text-transform-lowercase",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "lowercase"
+      ]
+    },
+    {
+      "name": "uf-text-transform-none",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "none"
+      ]
+    },
+    {
+      "name": "uf-text-transform-uppercase",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "uppercase"
+      ]
+    }
+  ]
+}

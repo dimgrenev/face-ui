@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+  "tokens": [
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-amber",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#f59e0b" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#f59e0b" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-blue",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#3b82f6" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#3b82f6" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-blue-soft",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#60a5fa" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#60a5fa" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-cyan",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#06b6d4" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#06b6d4" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-green",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#22c55e" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#22c55e" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-lime",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#84cc16" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#84cc16" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-orange",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#f97316" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#f97316" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-orange-soft",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#fb923c" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#fb923c" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-pink",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#ec4899" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#ec4899" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-purple",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#a855f7" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#a855f7" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-purple-soft",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#c084fc" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#c084fc" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-rose",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#f43f5e" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#f43f5e" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-success",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#22c55e" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#22c55e" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-teal",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#14b8a6" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#14b8a6" }
+      ]
+    },
+    {
+      "sheet": "color",
+      "name": "--uf-color-data-violet",
+      "variants": [
+        { "selector": ":root,\n[data-theme='dark']", "value": "#8b5cf6" },
+        { "selector": ":root[data-theme='light'],\n[data-theme='light']", "value": "#8b5cf6" }
+      ]
+    }
+  ]
+}

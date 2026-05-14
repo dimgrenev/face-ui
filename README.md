@@ -19,6 +19,14 @@ react-dom >=18
 
 ## Use
 
+Load Akt from Google Fonts in the document head:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Akt:wght@100..900&display=swap" rel="stylesheet">
+```
+
 Import the CSS once at the application boundary:
 
 ```tsx
@@ -104,6 +112,8 @@ Face UI ships plain CSS:
 - `assets/styles/index.css`
 
 No Tailwind, CSS-in-JS runtime, or provider is required. Component styling is scoped with `data-scope` and `data-part` attributes, plus `--uf-*` CSS variables.
+
+Typography is token-driven. `Akt` is intentionally loaded by the application shell through Google Fonts; the package keeps only the local `Begriffsschrift` mono face for code UI.
 
 ## Development
 
