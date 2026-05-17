@@ -40,6 +40,8 @@ export interface TabItem {
   actionDisabled?: boolean
   /** Overlay action visibility. Defaults to hover/focus. */
   actionVisibility?: 'hover' | 'always'
+  /** Overlay action position. Defaults to the trailing edge. */
+  actionPosition?: 'right' | 'left-overlay'
   /** Callback fired from the overlay action. */
   onAction?: (details: { value: string; event: MouseEvent<HTMLButtonElement> }) => void
 }
@@ -58,7 +60,7 @@ function renderTabIcon(icon: ReactNode): ReactNode {
 }
 
 export interface TabsProps {
-  /** Tab definitions. Each item supports value, label, content, disabled, panelId, leadingIcon, trailingIcon, and an optional overlay action via actionIcon, actionLabel, actionVisibility, and onAction. */
+  /** Tab definitions. Each item supports value, label, content, disabled, panelId, leadingIcon, trailingIcon, and an optional overlay action via actionIcon, actionLabel, actionVisibility, actionPosition, and onAction. */
   items?: TabItem[]
   /** Legacy tabs alias. */
   tabs?: LegacyTabItem[]
@@ -180,6 +182,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
             const actionIcon = renderTabIcon(item.actionIcon)
             const hasAction = actionIcon != null && typeof item.onAction === 'function'
             const actionVisibility = item.actionVisibility === 'always' ? 'always' : 'hover'
+            const actionPosition = item.actionPosition === 'left-overlay' ? 'left-overlay' : 'right'
             const triggerProps = api.getTriggerProps({ value: item.value, disabled: item.disabled })
             const tabNode = (
               <button
@@ -188,6 +191,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                 aria-controls={item.panelId || triggerProps['aria-controls']}
                 className={cn('uf-tabs-tab')}
                 data-action-overlay={hasAction ? '' : undefined}
+                data-action-position={hasAction ? actionPosition : undefined}
               >
                 {leadingIcon != null ? (
                   <span className="uf-tabs-tabIcon" data-position="left">
@@ -212,12 +216,14 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                 className="uf-tabs-tabSlot"
                 data-action-overlay={hasAction ? '' : undefined}
                 data-action-visibility={hasAction ? actionVisibility : undefined}
+                data-action-position={hasAction ? actionPosition : undefined}
               >
                 {tabNode}
                 {hasAction ? (
                   <button
                     type="button"
                     className="uf-tabs-tabAction"
+                    data-action-position={actionPosition}
                     aria-label={item.actionLabel || `Tab action: ${item.value}`}
                     title={item.actionTitle || item.actionLabel}
                     disabled={item.actionDisabled || item.disabled}

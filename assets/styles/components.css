@@ -608,6 +608,7 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
+  transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-standard);
 }
 .uf-text__content {
   min-width: 0;
@@ -4710,6 +4711,12 @@
   );
   transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-standard);
 }
+.uf-tabs .uf-tabs-tab[data-action-position="left-overlay"]::after {
+  left: 0;
+  right: auto;
+  width: calc(var(--uf-icon-size-sm) + (var(--uf-control-pad-icon) * 2));
+  background: var(--uf-tabs-tab-action-bg);
+}
 .uf-tabs .uf-tabs-tabAction {
   position: absolute;
   z-index: 2;
@@ -4734,6 +4741,11 @@
     color var(--uf-motion-duration-fast) var(--uf-motion-ease-standard),
     background-color var(--uf-motion-duration-fast) var(--uf-motion-ease-standard);
 }
+.uf-tabs .uf-tabs-tabAction[data-action-position="left-overlay"] {
+  left: 0;
+  right: auto;
+  width: calc(var(--uf-icon-size-sm) + (var(--uf-control-pad-icon) * 2));
+}
 .uf-tabs .uf-tabs-tabAction:is(:hover, :focus-visible) {
   color: var(--uf-color-fg);
   background: color-mix(in srgb, var(--uf-color-fg) 8%, transparent);
@@ -4742,6 +4754,10 @@
 .uf-tabs .uf-tabs-tabSlot[data-action-visibility="always"] > .uf-tabs-tabAction {
   opacity: 1;
   pointer-events: auto;
+}
+.uf-tabs .uf-tabs-tabSlot[data-action-position="left-overlay"]:is(:hover, :focus-within) > .uf-tabs-tab .uf-tabs-tabIcon[data-position="left"],
+.uf-tabs .uf-tabs-tabSlot[data-action-position="left-overlay"][data-action-visibility="always"] > .uf-tabs-tab .uf-tabs-tabIcon[data-position="left"] {
+  opacity: 0;
 }
 .uf-tabs .uf-tabs-tabSlot:is(:hover, :focus-within) > .uf-tabs-tab[data-action-overlay]::after,
 .uf-tabs .uf-tabs-tabSlot[data-action-visibility="always"] > .uf-tabs-tab[data-action-overlay]::after {
