@@ -7,7 +7,7 @@
  * `<Text text="Hello" />`
  * `<Text text="⌘K" variant="kbd" />`
  * `<Text text="Label" variant="label" />`
- * `<Text text="Settings" icon={<GearIcon />} />`
+ * `<Text text="Settings" icon={<Icon name="settings" />} />`
  * `<Text text="Flush" inset="none" />`
  */
 

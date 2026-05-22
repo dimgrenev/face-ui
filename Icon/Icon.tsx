@@ -1,10 +1,9 @@
 /**
- * Icon — universal icon renderer for Face UI React.
+ * Icon — Face UI icon renderer.
  *
- * Public component wrapper around the shared icon runtime:
- * - registry names (`name`)
- * - external sources (`src`)
- * - custom renderers via `icon` and `IconProvider`
+ * Public component wrapper around the shared icon runtime.
+ * All rendered icon boxes are 20x20. Unsupported external/custom sources
+ * intentionally render the Face UI notdef icon.
  */
 
 export {

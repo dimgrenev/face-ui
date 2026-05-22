@@ -1,10 +1,5 @@
 import React from 'react';
 
-export type IconName = 'align-horizontal-center' | 'align-horizontal-left' | 'align-horizontal-right' | 'align-vertical-bottom' | 'align-vertical-center' | 'align-vertical-top' | 'alphabet' | 'animation' | 'arrow-down' | 'arrow-left' | 'arrow-right' | 'arrow-up' | 'cart' | 'check' | 'check-off' | 'check-on' | 'clean' | 'close' | 'cloud-done' | 'component' | 'cookie' | 'copy' | 'crop' | 'cursor' | 'date' | 'delete' | 'design-tool' | 'dev-tools' | 'down' | 'download' | 'drag' | 'ds' | 'edit' | 'face' | 'file' | 'filter' | 'folder' | 'folder-go' | 'full' | 'git' | 'info' | 'left' | 'legend' | 'letter-spacing' | 'line-height' | 'link' | 'minus' | 'more' | 'notification' | 'panel' | 'panel-right' | 'pause' | 'play' | 'plus' | 'project' | 'props' | 'radio-off' | 'radio-on' | 'random' | 'render' | 'restart' | 'right' | 'scroll' | 'search' | 'settings' | 'size' | 'sound' | 'stat' | 'store' | 'switch' | 'terminal' | 'theme' | 'type' | 'up' | 'user' | 'userface';
-
-// Runtime list of available icon names (single source of truth alongside IconName union).
-export const ICON_NAMES = ['align-horizontal-center', 'align-horizontal-left', 'align-horizontal-right', 'align-vertical-bottom', 'align-vertical-center', 'align-vertical-top', 'alphabet', 'animation', 'arrow-down', 'arrow-left', 'arrow-right', 'arrow-up', 'cart', 'check', 'check-off', 'check-on', 'clean', 'close', 'cloud-done', 'component', 'cookie', 'copy', 'crop', 'cursor', 'date', 'delete', 'design-tool', 'dev-tools', 'down', 'download', 'drag', 'ds', 'edit', 'face', 'file', 'filter', 'folder', 'folder-go', 'full', 'git', 'info', 'left', 'legend', 'letter-spacing', 'line-height', 'link', 'minus', 'more', 'notification', 'panel', 'panel-right', 'pause', 'play', 'plus', 'project', 'props', 'radio-off', 'radio-on', 'random', 'render', 'restart', 'right', 'scroll', 'search', 'settings', 'size', 'sound', 'stat', 'store', 'switch', 'terminal', 'theme', 'type', 'up', 'user', 'userface'] as const;
-
 export type IconSource =
   | string
   | React.ReactElement
@@ -13,29 +8,32 @@ export type IconSource =
       content: React.ReactNode;
       viewBox?: string;
       nativeSize?: number;
+      nativeWidth?: number;
+      nativeHeight?: number;
     };
 
 export interface IconProviderProps {
   children: React.ReactNode;
-  /** Default icon size for descendants. */
+  /** Compatibility-only. Face UI icons always render at 20x20. */
   size?: number;
-  /** Keep icon box square by default. */
+  /** Compatibility-only. Face UI icons always render at 20x20. */
   square?: boolean;
-  /** Extra icon registry entries available by name. */
+  /** Deprecated compatibility hook. External icon registries resolve to notdef. */
   registry?: Record<string, IconSource>;
-  /** Custom name resolver (e.g. CDN, remote sprite map, dynamic registry). */
+  /** Deprecated compatibility hook. External icon registries resolve to notdef. */
   resolveIcon?: (name: string) => IconSource | null | undefined;
 }
 
 export interface IconProps {
   /** Registry icon name (backward-compatible). */
   name?: IconName | string;
-  /** Universal icon input: name/component/svg element/url/registry entry. */
+  /** Compatibility input. String names resolve to Face UI icons; custom sources render notdef. */
   icon?: IconSource;
-  /** Explicit source URL for external SVG/bitmap icon. */
+  /** Deprecated compatibility input. External URLs render notdef. */
   src?: string;
+  /** Compatibility-only. Face UI icons always render at 20x20. */
   size?: number;
-  /** By default icon is rendered in a square box. */
+  /** Compatibility-only. Face UI icons always render at 20x20. */
   square?: boolean;
   className?: string;
   style?: React.CSSProperties;
@@ -45,11 +43,12 @@ export interface IconProps {
   title?: string;
 }
 
+const FACE_UI_ICON_SIZE = 20;
+
 /**
- * Built-in icon definitions.
- * Keep this registry in sync with assets/Icons/*.svg.
+ * Built-in icon definitions. This registry is the single React runtime source.
  */
-const icons: Record<IconName, React.ReactNode> = {
+const icons = {
   'align-horizontal-center': (
     <path d="M5 5.5H15M7 8.5H13M5 11.5H15M7 14.5H13" stroke="currentColor"/>
   ),
@@ -101,6 +100,13 @@ const icons: Record<IconName, React.ReactNode> = {
       <path d="M14.5 5.5H4.5L5.5 11.5H13.5L14.5 5.5ZM14.5 5.5L18.5 3" stroke="currentColor"/>
       <circle cx="5.5" cy="15.5" r="1.5" stroke="currentColor"/>
       <circle cx="13.5" cy="15.5" r="1.5" stroke="currentColor"/>
+    </>
+  ),
+  'chat': (
+    <>
+      <path d="M11.5 4.50019H9L8.50016 4.50016C6.29096 4.50007 4.5 6.29096 4.5 8.50016V11.5002C4.5 13.7092 6.29076 15.5001 8.49983 15.5002L9 15.5002H11.5C13.7091 15.5002 15.5 13.7093 15.5 11.5002V8.50019C15.5 6.29105 13.7091 4.50019 11.5 4.50019Z" stroke="currentColor"/>
+      <path d="M7 8.5H13" stroke="currentColor"/>
+      <path d="M7 11.5H11" stroke="currentColor"/>
     </>
   ),
   'check': (
@@ -229,20 +235,15 @@ const icons: Record<IconName, React.ReactNode> = {
   ),
   'folder-go': (
     <>
-      <path d="M4.5 9V4.5H9L10.5 6.5H15.5L15.5 15.5H9.2H4.5V13" stroke="currentColor"/>
-      <path d="M10 11L6.92308 8M10 11L6.92308 14M10 11L2 11" stroke="currentColor"/>
+      <path d="M11 15.5H15.5L15.5 6.5H10.5L9 4.5H4.5V8" stroke="currentColor"/>
+      <path d="M6.5 15L9 12.5L6.5 10M9 12.5L3 12.5" stroke="currentColor"/>
     </>
   ),
   'full': (
-    <path d="M13.5 6.5L6.5 13.5M9 3.75L16.25 3.75V11M11 16.25L3.75 16.25V9" stroke="currentColor"/>
-  ),
-  'git': (
     <>
-      <circle cx="10" cy="4.5" r="2" stroke="currentColor"/>
-      <circle cx="10" cy="15.5" r="2" stroke="currentColor"/>
-      <circle cx="15" cy="10" r="2" stroke="currentColor"/>
-      <path d="M10 6.5V13.5" stroke="currentColor"/>
-      <path d="M13 10H10V6.5" stroke="currentColor"/>
+      <path d="M10.2 5L15 5V9.8M9.8 15L5 15V10.2" stroke="currentColor"/>
+      <path d="M9.5 10.5L5 15" stroke="currentColor"/>
+      <path d="M15 5L10.5 9.5" stroke="currentColor"/>
     </>
   ),
   'info': (
@@ -280,15 +281,21 @@ const icons: Record<IconName, React.ReactNode> = {
   ),
   'more': (
     <>
-      <path d="M10.0008 8.30117C10.9397 8.30117 11.7008 9.06229 11.7008 10.0012C11.7008 10.9401 10.9397 11.7012 10.0008 11.7012C9.0619 11.7012 8.30078 10.9401 8.30078 10.0012C8.30078 9.06229 9.0619 8.30117 10.0008 8.30117Z" fill="currentColor"/>
-      <path d="M15.5008 8.30117C16.4397 8.30117 17.2008 9.06229 17.2008 10.0012C17.2008 10.9401 16.4397 11.7012 15.5008 11.7012C14.5619 11.7012 13.8008 10.9401 13.8008 10.0012C13.8008 9.06229 14.5619 8.30117 15.5008 8.30117Z" fill="currentColor"/>
-      <path d="M4.50078 8.30117C5.43967 8.30117 6.20078 9.06229 6.20078 10.0012C6.20078 10.9401 5.43967 11.7012 4.50078 11.7012C3.5619 11.7012 2.80078 10.9401 2.80078 10.0012C2.80078 9.06229 3.5619 8.30117 4.50078 8.30117Z" fill="currentColor"/>
+      <circle cx="10" cy="10" r="1" fill="currentColor"/>
+      <circle cx="14" cy="10" r="1" fill="currentColor"/>
+      <circle cx="6" cy="10" r="1" fill="currentColor"/>
     </>
   ),
   'notification': (
     <>
       <circle cx="10.0008" cy="16.9998" r="1.7" fill="currentColor"/>
       <path d="M10 4.5C6 4.5 4.5 7.5 4.5 10.5V12.25H1.5M10 4.5C14 4.5 15.5 7.5 15.5 10.5V12.25H18.5M10 4.5V1M13 12.25H10H7" stroke="currentColor" strokeMiterlimit="10"/>
+    </>
+  ),
+  'notdef': (
+    <>
+      <path d="M15.5 4.50019H9L4.5 4.5V15.5L9 15.5002H15.5V4.50019Z" stroke="currentColor"/>
+      <path d="M14 6L10.5 9.5M10.5 10.5L14 14M6 6L9.5 9.5M9.5 10.5L6 14" stroke="currentColor"/>
     </>
   ),
   'panel': (
@@ -301,6 +308,14 @@ const icons: Record<IconName, React.ReactNode> = {
     <>
       <path d="M3.50067 5.49993L3.50007 14.4999C3.50003 15.0522 3.94776 15.5 4.50007 15.5H15.4993C16.0515 15.5 16.4992 15.0523 16.4993 14.5001L16.4999 5.50007C16.5 4.94776 16.0522 4.5 15.4999 4.5H4.50067C3.94842 4.5 3.50071 4.94767 3.50067 5.49993Z" stroke="currentColor"/>
       <path d="M11.5 4L11.5 16" stroke="currentColor"/>
+    </>
+  ),
+  'part': (
+    <>
+      <path d="M16 8.7998L11.2 8.7998L11.2 3.9998" stroke="currentColor"/>
+      <path d="M4.30078 15.7002L8.80078 11.2002" stroke="currentColor"/>
+      <path d="M11.1992 8.7998L15.6992 4.2998" stroke="currentColor"/>
+      <path d="M4.00078 11.2L8.80078 11.2L8.80078 16" stroke="currentColor"/>
     </>
   ),
   'pause': (
@@ -392,13 +407,6 @@ const icons: Record<IconName, React.ReactNode> = {
       <circle cx="7" cy="10" r="4.5" fill="var(--uf-color-background)"/>
     </>
   ),
-  'terminal': (
-    <>
-      <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor"/>
-      <path d="M6 9L8.5 11.5L6 14" stroke="currentColor"/>
-      <path d="M10 14H14" stroke="currentColor"/>
-    </>
-  ),
   'theme': (
     <>
       <path d="M7.10502 12.8949C5.50616 11.2961 5.50616 8.7038 7.10502 7.10495C8.70387 5.50609 11.2961 5.50609 12.895 7.10495L7.10502 12.8949Z" fill="currentColor"/>
@@ -431,8 +439,167 @@ const icons: Record<IconName, React.ReactNode> = {
       </clipPath>
       </defs>
     </>
+  ),
+  'account': (
+    <g stroke="currentColor" strokeWidth="1">
+      <circle cx="10" cy="10" r="7.5" />
+      <circle cx="10" cy="7.75" r="2" />
+      <path d="M5.75 15C6.5 13.25 8 12.25 10 12.25C12 12.25 13.5 13.25 14.25 15" />
+    </g>
+  ),
+  'activity-idle': (
+    <g stroke="currentColor" strokeWidth="1">
+      <circle cx="10" cy="8.75" r="3.75" />
+      <path d="M10 12.5V15.5" />
+      <path d="M6 15.5H14" />
+    </g>
+  ),
+  'activity-running': (
+    <path d="M10 3.5C13.5899 3.5 16.5 6.41015 16.5 10C16.5 13.5899 13.5899 16.5 10 16.5C6.41015 16.5 3.5 13.5899 3.5 10C3.5 8.325 4.1332 6.79789 5.17393 5.64434" stroke="currentColor"/>
+  ),
+  'background-task': (
+    <g stroke="currentColor" strokeWidth="1">
+      <path d="M3.5 5.5H16.5V14.5H3.5V5.5Z" />
+      <path d="M6 8.5H10" />
+      <path d="M6 11.5H8.5" />
+      <path d="M12 10A2.5 2.5 0 1 1 13.7678 14.2678" />
+      <path d="M13.75 12V14.25H16" />
+    </g>
+  ),
+  'branch': (
+    <g stroke="currentColor" strokeWidth="1">
+      <circle cx="6" cy="5" r="1.5" />
+      <circle cx="6" cy="15" r="1.5" />
+      <circle cx="14" cy="9" r="1.5" />
+      <path d="M6 6.5V13.5" />
+      <path d="M7.5 12.25C10.5 12.25 11 9 12.5 9" />
+    </g>
+  ),
+  'browser': (
+    <>
+      <path d="M4 10C4 6.18182 7 4 10 4C13 4 16 6.18182 16 10C16 13.8182 13 16 10 16C7 16 4 13.8182 4 10Z" stroke="currentColor"/>
+      <path d="M10 4C10 4 12.5 5.5 12.5 10C12.5 14.5 10 16 10 16" stroke="currentColor"/>
+      <path d="M10 4C10 4 7.5 5.5 7.5 10C7.5 14.5 10 16 10 16" stroke="currentColor"/>
+      <path d="M4.00586 10.0049L16.0059 10.0049" stroke="currentColor"/>
+    </>
+  ),
+  'conflict': (
+    <g stroke="currentColor" strokeWidth="1">
+      <path d="M8 5.5L11.5 9L8 12.5L4.5 9L8 5.5Z" />
+      <path d="M12 7.5L15.5 11L12 14.5L8.5 11L12 7.5Z" />
+    </g>
+  ),
+  'diagnostics': (
+    <>
+      <path d="M3.5 4.5H16.5V15.5H3.5V4.5Z" stroke="currentColor"/>
+      <path d="M3.5 8H16.5" stroke="currentColor"/>
+      <rect x="9.5" y="11.5" width="1" height="1" fill="currentColor"/>
+    </>
+  ),
+  'empty-component': (
+    <g stroke="currentColor" strokeWidth="1">
+      <path d="M4.5 4.5H15.5V15.5H4.5V4.5Z" strokeDasharray="2 2" />
+      <path d="M10 7.5V12.5" />
+      <path d="M7.5 10H12.5" />
+    </g>
+  ),
+  'error': (
+    <g stroke="currentColor" strokeWidth="1">
+      <path d="M7 3.5H13L16.5 7V13L13 16.5H7L3.5 13V7L7 3.5Z" />
+      <path d="M7.75 7.75L12.25 12.25" />
+      <path d="M12.25 7.75L7.75 12.25" />
+    </g>
+  ),
+  'function': (
+    <g stroke="currentColor" strokeWidth="1">
+      <path d="M12.5 4.5H11C9.75 4.5 9 5.25 8.75 6.5L7.25 14C7 15.25 6.25 15.5 5.25 15.5H4.5" />
+      <path d="M6.5 9.5H12.5" />
+      <path d="M12.75 12L15.5 15" />
+      <path d="M15.5 12L12.75 15" />
+    </g>
+  ),
+  'health-issue': (
+    <>
+      <path d="M10 3.5L4.5 6V10.75C4.5 13.75 6.75 16.25 10 17.5C13.25 16.25 15.5 13.75 15.5 10.75V6L10 3.5Z" stroke="currentColor"/>
+      <path d="M10 7.5V11.5" stroke="currentColor"/>
+      <rect x="9.5" y="13.5" width="1" height="1" fill="currentColor"/>
+    </>
+  ),
+  'home': (
+    <g stroke="currentColor" strokeWidth="1">
+      <path d="M3.5 9.5L10 3.75L16.5 9.5" />
+      <path d="M5.5 8.5V16H14.5V8.5" />
+      <path d="M8.5 16V12H11.5V16" />
+    </g>
+  ),
+  'no-icon': (
+    <>
+      <path d="M5.5 5.5H14.5V14.5H5.5V5.5Z" stroke="currentColor"/>
+      <path d="M4.5 15.5L15.5 4.5" stroke="currentColor"/>
+    </>
+  ),
+  'panel-open': (
+    <g stroke="currentColor" strokeWidth="1">
+      <path d="M3.5 4.5H16.5V15.5H3.5V4.5Z" />
+      <path d="M12 4.5V15.5" />
+      <path d="M8.5 8.5L6.5 10.5L8.5 12.5" />
+      <path d="M6.5 10.5H10.5" />
+    </g>
+  ),
+  'plan': (
+    <>
+      <rect x="5.5" y="5.5" width="1" height="1" fill="currentColor"/>
+      <path d="M9.5 6H15" stroke="currentColor"/>
+      <rect x="5.5" y="9.5" width="1" height="1" fill="currentColor"/>
+      <path d="M9.5 10H15" stroke="currentColor"/>
+      <rect x="5.5" y="13.5" width="1" height="1" fill="currentColor"/>
+      <path d="M9.5 14H13.5" stroke="currentColor"/>
+    </>
+  ),
+  'runtime-error': (
+    <g stroke="currentColor" strokeWidth="1">
+      <path d="M3.5 5.5H16.5V14.5H3.5V5.5Z" />
+      <path d="M6 8.5H12.5" />
+      <path d="M6 11.5H9.5" />
+      <path d="M12.25 11.75L15.25 14.75" />
+      <path d="M15.25 11.75L12.25 14.75" />
+    </g>
+  ),
+  'star': (
+    <path d="M10 3.75L11.75 7.25L15.75 7.75L12.75 10.5L13.5 14.5L10 12.5L6.5 14.5L7.25 10.5L4.25 7.75L8.25 7.25L10 3.75Z" stroke="currentColor"/>
+  ),
+  'task-status': (
+    <>
+      <path d="M10 4.5C13.0376 4.5 15.5 6.96243 15.5 10C15.5 13.0376 13.0376 15.5 10 15.5C6.96243 15.5 4.5 13.0376 4.5 10C4.5 8.56474 5.04967 7.25789 5.95 6.27868" stroke="currentColor"/>
+      <rect x="9.25" y="9.25" width="1.5" height="1.5" fill="currentColor"/>
+    </>
+  ),
+  'terminal': (
+    <g stroke="currentColor" strokeWidth="1">
+      <path d="M3.5 5.5H16.5V14.5H3.5V5.5Z" />
+      <path d="M6 8L8 10L6 12" />
+      <path d="M10 12H13.5" />
+    </g>
+  ),
+  'token-add': (
+    <g stroke="currentColor" strokeWidth="1">
+      <path d="M8 4.5L11.5 8L8 11.5L4.5 8L8 4.5Z" />
+      <path d="M15 12.5V17.5" />
+      <path d="M12.5 15H17.5" />
+    </g>
+  ),
+  'warning': (
+    <>
+      <path d="M10 3.5L16.25 15.5H3.75L10 3.5Z" stroke="currentColor"/>
+      <path d="M10 8V11.5" stroke="currentColor"/>
+      <rect x="9.5" y="13.5" width="1" height="1" fill="currentColor"/>
+    </>
   )
-};
+} as const satisfies Record<string, React.ReactNode>;
+
+export type IconName = keyof typeof icons;
+
+export const ICON_NAMES = Object.keys(icons) as IconName[];
 
 // viewBox per icon (from source SVG). Fallback is 0 0 20 20 for legacy icons that omit viewBox.
 const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
@@ -449,6 +616,7 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'arrow-right': "0 0 20 20",
   'arrow-up': "0 0 20 20",
   'cart': "0 0 20 20",
+  'chat': "0 0 20 20",
   'check': "0 0 20 20",
   'check-off': "0 0 20 20",
   'check-on': "0 0 20 20",
@@ -475,7 +643,6 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'folder': "0 0 20 20",
   'folder-go': "0 0 20 20",
   'full': "0 0 20 20",
-  'git': "0 0 20 20",
   'info': "0 0 20 20",
   'left': "0 0 20 20",
   'legend': "0 0 20 20",
@@ -484,9 +651,11 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'link': "0 0 20 20",
   'minus': "0 0 20 20",
   'more': "0 0 20 20",
+  'notdef': "0 0 20 20",
   'notification': "0 0 20 20",
   'panel': "0 0 20 20",
   'panel-right': "0 0 20 20",
+  'part': "0 0 20 20",
   'pause': "0 0 20 20",
   'play': "0 0 20 20",
   'plus': "0 0 20 20",
@@ -496,7 +665,7 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'radio-on': "0 0 20 20",
   'random': "0 0 24 24",
   'render': "0 0 20 20",
-  'restart': "0 0 24 24",
+  'restart': "0 0 20 20",
   'right': "0 0 20 20",
   'scroll': "0 0 20 20",
   'search': "0 0 20 20",
@@ -506,91 +675,33 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'stat': "0 0 20 20",
   'store': "0 0 20 20",
   'switch': "0 0 20 20",
-  'terminal': "0 0 20 20",
   'theme': "0 0 20 20",
   'type': "0 0 20 20",
   'up': "0 0 20 20",
   'user': "0 0 20 20",
-  'userface': "0 0 20 20"
-};
-
-// Native icon size per SVG (width/height). This is our "as-is" baseline size when size prop is not provided.
-const ICON_NATIVE_SIZE: Partial<Record<IconName, number>> = {
-  'align-horizontal-center': 20,
-  'align-horizontal-left': 20,
-  'align-horizontal-right': 20,
-  'align-vertical-bottom': 20,
-  'align-vertical-center': 20,
-  'align-vertical-top': 20,
-  'alphabet': 20,
-  'animation': 20,
-  'arrow-down': 20,
-  'arrow-left': 20,
-  'arrow-right': 20,
-  'arrow-up': 20,
-  'cart': 20,
-  'check': 20,
-  'check-off': 20,
-  'check-on': 20,
-  'clean': 20,
-  'close': 20,
-  'cloud-done': 24,
-  'component': 20,
-  'cookie': 20,
-  'copy': 20,
-  'cursor': 20,
-  'date': 20,
-  'delete': 20,
-  'design-tool': 20,
-  'dev-tools': 20,
-  'down': 20,
-  'download': 20,
-  'drag': 20,
-  'ds': 20,
-  'edit': 20,
-  'face': 20,
-  'file': 20,
-  'filter': 20,
-  'folder': 20,
-  'folder-go': 20,
-  'full': 20,
-  'git': 20,
-  'info': 20,
-  'left': 20,
-  'legend': 20,
-  'letter-spacing': 20,
-  'line-height': 20,
-  'link': 20,
-  'minus': 20,
-  'more': 20,
-  'notification': 20,
-  'panel': 20,
-  'panel-right': 20,
-  'pause': 20,
-  'play': 20,
-  'plus': 20,
-  'project': 20,
-  'props': 20,
-  'radio-off': 20,
-  'radio-on': 20,
-  'random': 24,
-  'render': 20,
-  'restart': 24,
-  'right': 20,
-  'scroll': 20,
-  'search': 20,
-  'settings': 20,
-  'size': 20,
-  'sound': 20,
-  'stat': 20,
-  'store': 20,
-  'switch': 20,
-  'terminal': 20,
-  'theme': 20,
-  'type': 20,
-  'up': 20,
-  'user': 20,
-  'userface': 20
+  'userface': "0 0 20 20",
+  'account': "0 0 20 20",
+  'activity-idle': "0 0 20 20",
+  'activity-running': "0 0 20 20",
+  'background-task': "0 0 20 20",
+  'branch': "0 0 20 20",
+  'browser': "0 0 20 20",
+  'conflict': "0 0 20 20",
+  'diagnostics': "0 0 20 20",
+  'empty-component': "0 0 20 20",
+  'error': "0 0 20 20",
+  'function': "0 0 20 20",
+  'health-issue': "0 0 20 20",
+  'home': "0 0 20 20",
+  'no-icon': "0 0 20 20",
+  'panel-open': "0 0 20 20",
+  'plan': "0 0 20 20",
+  'runtime-error': "0 0 20 20",
+  'star': "0 0 20 20",
+  'task-status': "0 0 20 20",
+  'terminal': "0 0 20 20",
+  'token-add': "0 0 20 20",
+  'warning': "0 0 20 20"
 };
 
 interface IconContextValue {
@@ -606,6 +717,9 @@ const IconContext = React.createContext<IconContextValue>({
   registry: {},
   resolveIcon: undefined,
 });
+
+const LEGACY_BUILTIN_ICON_FALLBACK: IconName = 'notdef';
+const LEGACY_BUILTIN_ICON_NAMES = new Set<string>(['git']);
 
 export const IconProvider: React.FC<IconProviderProps> = ({
   children,
@@ -636,19 +750,12 @@ function looksLikeUrl(input: string): boolean {
   return /^(https?:\/\/|data:image\/|\/|\.\/|\.\.\/)/.test(input) || /\.svg(\?.*)?$/i.test(input);
 }
 
-function toRegistryEntry(
-  source: IconSource | null | undefined,
-): { content: React.ReactNode; viewBox?: string; nativeSize?: number } | null {
-  if (!source) return null;
-  if (typeof source === 'object' && !React.isValidElement(source) && 'content' in source) {
-    return {
-      content: source.content,
-      viewBox: source.viewBox,
-      nativeSize: source.nativeSize,
-    };
-  }
-  if (typeof source === 'function') return null;
-  return { content: source as React.ReactNode };
+function resolveBuiltinIconName(requestedName: string | undefined): IconName | undefined {
+  if (!requestedName) return undefined;
+  if (LEGACY_BUILTIN_ICON_NAMES.has(requestedName)) return LEGACY_BUILTIN_ICON_FALLBACK;
+  return (icons as Record<string, React.ReactNode>)[requestedName]
+    ? requestedName as IconName
+    : LEGACY_BUILTIN_ICON_FALLBACK;
 }
 
 /**
@@ -659,51 +766,37 @@ export const Icon: React.FC<IconProps> = ({
   name,
   icon,
   src,
-  size,
-  square,
   className = '',
   style = {},
   label,
   title,
 }) => {
-  const ctx = React.useContext(IconContext);
-  const squareBox = square ?? ctx.square ?? true;
-  const requestedName = (typeof name === 'string' && name.trim().length > 0) ? name.trim() : undefined;
-  const sourceFromProps = src ?? icon ?? requestedName;
+  const iconStringName = typeof icon === 'string' && !looksLikeUrl(icon.trim()) && icon.trim().length > 0
+    ? icon.trim()
+    : undefined;
+  const requestedName = (typeof name === 'string' && name.trim().length > 0) ? name.trim() : iconStringName;
+  const hasExplicitUnsupportedSource = src != null || (icon != null && iconStringName == null);
+  const builtinName = resolveBuiltinIconName(requestedName)
+    ?? (hasExplicitUnsupportedSource ? LEGACY_BUILTIN_ICON_FALLBACK : undefined);
 
-  const builtinEntry = requestedName && (icons as Record<string, React.ReactNode>)[requestedName]
+  const builtinEntry = builtinName
     ? {
-        content: (icons as Record<string, React.ReactNode>)[requestedName],
-        viewBox: (ICON_VIEWBOX as Record<string, string>)[requestedName] || '0 0 20 20',
-        nativeSize: (ICON_NATIVE_SIZE as Record<string, number>)[requestedName] || 20,
+        content: (icons as Record<string, React.ReactNode>)[builtinName],
+        viewBox: (ICON_VIEWBOX as Record<string, string>)[builtinName] || '0 0 20 20',
+        nativeSize: FACE_UI_ICON_SIZE,
+        nativeWidth: FACE_UI_ICON_SIZE,
+        nativeHeight: FACE_UI_ICON_SIZE,
       }
     : null;
 
-  const providerSource = requestedName
-    ? (ctx.registry[requestedName] ?? ctx.resolveIcon?.(requestedName) ?? null)
-    : null;
-
-  const providerEntry = toRegistryEntry(providerSource);
-  const explicitEntry = toRegistryEntry(
-    (typeof sourceFromProps === 'object' || typeof sourceFromProps === 'function')
-      ? (sourceFromProps as IconSource)
-      : null,
-  );
-
-  const nativeSize = explicitEntry?.nativeSize
-    ?? providerEntry?.nativeSize
-    ?? builtinEntry?.nativeSize
-    ?? 20;
-
-  const resolvedSize = (typeof size === 'number' && Number.isFinite(size))
-    ? size
-    : (typeof ctx.size === 'number' && Number.isFinite(ctx.size))
-      ? ctx.size
-      : nativeSize;
+  const iconEntry = builtinEntry;
+  const resolvedWidth = FACE_UI_ICON_SIZE;
+  const resolvedHeight = FACE_UI_ICON_SIZE;
 
   const mergedStyle: React.CSSProperties = {
     ...style,
-    ...(squareBox ? { width: resolvedSize, height: resolvedSize } : {}),
+    width: resolvedWidth,
+    height: resolvedHeight,
   };
 
   const mergedClassName = ['uf-icon', className].filter(Boolean).join(' ');
@@ -711,62 +804,6 @@ export const Icon: React.FC<IconProps> = ({
     ? { role: 'img' as const, 'aria-label': label }
     : { 'aria-hidden': true as const };
 
-  // URL source (from explicit src/icon string or provider string)
-  const stringSource = typeof sourceFromProps === 'string'
-    ? sourceFromProps
-    : (typeof providerSource === 'string' ? providerSource : null);
-
-  if (stringSource && looksLikeUrl(stringSource)) {
-    return (
-      <img
-        className={mergedClassName}
-        src={stringSource}
-        width={resolvedSize}
-        height={squareBox ? resolvedSize : undefined}
-        style={mergedStyle}
-        alt={label || ''}
-        data-icon={requestedName || 'external'}
-      />
-    );
-  }
-
-  // Component source
-  const componentSource = (
-    typeof sourceFromProps === 'function'
-      ? sourceFromProps
-      : (typeof providerSource === 'function' ? providerSource : null)
-  ) as React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }> | null;
-
-  if (componentSource) {
-    const Comp = componentSource;
-    return (
-      <Comp
-        size={resolvedSize}
-        className={mergedClassName}
-        style={mergedStyle}
-      />
-    );
-  }
-
-  // Full SVG element source
-  const elementSource = (
-    React.isValidElement(sourceFromProps) ? sourceFromProps
-      : React.isValidElement(providerSource) ? providerSource
-      : null
-  ) as React.ReactElement | null;
-
-  if (elementSource && typeof elementSource.type === 'string' && elementSource.type.toLowerCase() === 'svg') {
-    return React.cloneElement(elementSource, {
-      className: `${mergedClassName} ${(elementSource.props as any).className || ''}`.trim(),
-      width: resolvedSize,
-      height: squareBox ? resolvedSize : (elementSource.props as any).height,
-      style: { ...(elementSource.props as any).style, ...mergedStyle },
-      'data-icon': requestedName || (elementSource.props as any)['data-icon'] || 'custom',
-      ...ariaProps,
-    });
-  }
-
-  const iconEntry = explicitEntry ?? providerEntry ?? builtinEntry;
   const iconContent = iconEntry?.content ?? null;
   const viewBox = iconEntry?.viewBox || builtinEntry?.viewBox || '0 0 20 20';
 
@@ -778,13 +815,13 @@ export const Icon: React.FC<IconProps> = ({
   return (
     <svg
       className={mergedClassName}
-      width={resolvedSize}
-      height={squareBox ? resolvedSize : undefined}
+      width={resolvedWidth}
+      height={resolvedHeight}
       viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       style={mergedStyle}
-      data-icon={requestedName || 'custom'}
+      data-icon={requestedName || builtinName || 'notdef'}
       {...ariaProps}
     >
       {title ? <title>{title}</title> : null}

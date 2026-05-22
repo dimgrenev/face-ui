@@ -72,6 +72,8 @@ export interface TileProps extends Omit<HTMLAttributes<HTMLDivElement>, 'childre
   align?: 'left' | 'center' | 'right'
   /** Nesting level for option-like rows: 0..9 */
   level?: number
+  /** Truncate overflowing text content with ellipsis. */
+  truncate?: boolean
   /** Membrane spacing around the tile. */
   membrane?: boolean
   /** Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile. */
@@ -98,6 +100,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
       fullWidth = true,
       align = 'left',
       level,
+      truncate = true,
       membrane = true,
       actions,
       children,
@@ -134,7 +137,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
       (e: KeyboardEvent<HTMLDivElement>) => {
         if (disabled) return
         // Activate on Enter / Space like a native button.
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault()
           tileRef.current?.click()
         }
@@ -176,6 +179,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
         data-full-width={fullWidth ? '' : undefined}
         data-align={align}
         data-level={clampedLevel != null ? '' : undefined}
+        data-truncate={truncate ? '' : undefined}
         data-membrane={membrane ? '' : undefined}
         className={cn('uf-tile', 'uf-option', 'uf-control', className)}
         style={levelStyle}
@@ -189,14 +193,32 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
           </span>
         )}
         {hasText && (
-          <Text as="span" inset="none" membrane={false} {...tileAnatomy.getPartAttrs('text')}>
-            {children ?? text}
-            {rightText != null && (
-              <Text as="span" inset="none" membrane={false} className="uf-tile__rightText">
-                {rightText}
-              </Text>
-            )}
-          </Text>
+          children != null ? (
+            <span
+              {...tileAnatomy.getPartAttrs('text')}
+              data-truncate={truncate ? '' : undefined}
+              className="uf-tile__content"
+            >
+              {children}
+            </span>
+          ) : (
+            <Text
+              as="span"
+              inset="none"
+              membrane={false}
+              truncate={truncate}
+              {...tileAnatomy.getPartAttrs('text')}
+            >
+              <span className="uf-tile__label">
+                {text}
+              </span>
+              {rightText != null && (
+                <Text as="span" inset="none" membrane={false} className="uf-tile__rightText">
+                  {rightText}
+                </Text>
+              )}
+            </Text>
+          )
         )}
         {hasIcon && iconPosition === 'right' && (
           <span {...tileAnatomy.getPartAttrs('icon')} data-position="right">
@@ -219,7 +241,6 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
     return (
       <span
         className={cn('uf-membrane', fullWidth ? 'uf-membrane--full' : undefined)}
-        data-membrane-hover=""
         data-membrane-interactive={disabled ? undefined : ''}
         onClick={(event) => {
           if (event.target !== event.currentTarget) return

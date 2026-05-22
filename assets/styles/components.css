@@ -354,6 +354,7 @@
   text-decoration: none;
   white-space: nowrap;
   min-width: 0;
+  overflow: hidden;
   box-shadow: none;
   background: var(--uf-tile-bg);
   color: var(--uf-tile-fg);
@@ -422,12 +423,17 @@
   display: inline-flex;
   align-items: center;
   gap: var(--uf-control-gap);
+  flex: 0 1 auto;
   min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
+  max-inline-size: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 [data-scope="tile"][data-stretch-text] [data-part="text"] {
-  flex: 1;
+  flex: 1 1 auto;
 }
 /* Make uf-text__content transparent so custom children become direct flex items
    of the inline-flex [data-part="text"] container — prevents block-level children
@@ -435,10 +441,53 @@
 [data-scope="tile"] .uf-text__content {
   display: contents;
 }
+.uf-tile__label {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .uf-tile__rightText {
   margin-left: auto;
   flex-shrink: 0;
   opacity: 0.6;
+}
+[data-scope="tile"] [data-part="text"] > .uf-membrane,
+[data-scope="tile"] [data-part="text"] > .uf-text[data-scope] {
+  min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
+  max-inline-size: 100%;
+}
+[data-scope="tile"] [data-part="text"] > .uf-membrane:not(.uf-membrane--truncate) {
+  flex: 0 0 auto;
+}
+[data-scope="tile"] [data-part="text"] > .uf-membrane--truncate,
+[data-scope="tile"] [data-part="text"] > .uf-text[data-scope][data-truncate] {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+[data-scope="tile"] [data-part="text"] > .uf-membrane {
+  display: flex;
+  overflow: hidden;
+}
+[data-scope="tile"] [data-part="text"] > .uf-membrane > .uf-text[data-scope],
+[data-scope="tile"] [data-part="text"] > .uf-text[data-scope] {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
+  max-inline-size: 100%;
+  overflow: hidden;
+}
+[data-scope="tile"] [data-part="text"] > .uf-membrane > .uf-text[data-scope][data-truncate] .uf-text__content,
+[data-scope="tile"] [data-part="text"] > .uf-text[data-scope][data-truncate] .uf-text__content {
+  display: block;
 }
 [data-scope="tile"] [data-part="actions"] {
   display: inline-flex;
@@ -1779,8 +1828,8 @@
   --uf-slider-edge-gap: calc(var(--uf-membrane) * 2);
   --uf-slider-thumb-w-fallback: 2.125rem;
   --uf-slider-crop-thumb-pad-fallback: var(--uf-spacing-3);
-  --uf-slider-crop-marker-w: var(--uf-control-gap);
-  --uf-slider-crop-marker-h: var(--uf-control-line-height);
+  --uf-slider-crop-marker-h: var(--uf-icon-size);
+  --uf-slider-crop-marker-w: var(--uf-icon-size);
   --uf-slider-crop-allowed-expand: var(--uf-control-gap);
   display: flex;
   align-items: center;
@@ -3020,8 +3069,10 @@
  * ================================================================= */
 .uf-table[data-scope] {
   --uf-table-row-number-width: var(--uf-spacing-12);
-  --uf-table-resize-hit-width: var(--uf-spacing-2);
-  --uf-table-resize-line-offset-x: calc(var(--uf-membrane) * 3);
+  --uf-table-resize-hit-width: var(--uf-workspace-resize-hit-size, var(--uf-spacing-5));
+  --uf-table-resize-line-width: var(--uf-workspace-resize-line-width, var(--uf-table-divider-width));
+  --uf-table-resize-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-chat-border-focus, var(--uf-color-border-hover, var(--uf-color-border))));
+  --uf-table-resize-line-offset-x: calc(var(--uf-table-resize-hit-width) - var(--uf-table-resize-line-width));
   --uf-table-resize-line-inset-y: var(--uf-spacing-2);
   --uf-table-divider-width: var(--uf-membrane);
   --uf-table-membrane-cell-pad-x: calc(var(--uf-membrane) * 3);
@@ -3102,11 +3153,13 @@
   left: var(--uf-table-resize-line-offset-x);
   top: var(--uf-table-resize-line-inset-y);
   bottom: var(--uf-table-resize-line-inset-y);
-  width: var(--uf-table-divider-width);
-  background: var(--uf-color-border);
+  width: var(--uf-table-resize-line-width);
+  background: var(--uf-table-resize-line-color);
   opacity: 0;
+  transition: none;
 }
-.uf-table[data-scope] th:hover .uf-table__resize-handle::after {
+.uf-table[data-scope] th:hover .uf-table__resize-handle::after,
+.uf-table[data-scope] th:focus-within .uf-table__resize-handle::after {
   opacity: 1;
 }
 /* Divider lines between rows */
@@ -3386,7 +3439,10 @@
  * RESIZABLE
  * ================================================================= */
 .uf-resizable[data-scope] {
-  --uf-resizable-handle-size: var(--uf-spacing-1);
+  --uf-resizable-handle-size: var(--uf-workspace-resize-line-width, var(--uf-border-width-thin));
+  --uf-resizable-handle-hit-size: var(--uf-workspace-resize-hit-size, var(--uf-spacing-5));
+  --uf-resizable-handle-hit-offset: calc((var(--uf-resizable-handle-hit-size) - var(--uf-resizable-handle-size)) / -2);
+  --uf-resizable-handle-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-color-border-hover, var(--uf-color-accent)));
   display: flex;
   width: 100%;
   min-height: calc(var(--uf-control-height) * 4);
@@ -3402,22 +3458,63 @@
 }
 [data-scope="resizable"] [data-part="handle"] {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--uf-color-hover-bg);
+  position: relative;
+  background: transparent;
+  transition: none;
+  z-index: 1;
+}
+[data-scope="resizable"] [data-part="handle"]::before {
+  content: "";
+  position: absolute;
+  background: transparent;
+}
+[data-scope="resizable"] [data-part="handle"]::after {
+  content: "";
+  position: absolute;
+  background: var(--uf-resizable-handle-line-color);
+  opacity: 0;
+  transition: none;
 }
 [data-scope="resizable"][data-orientation="horizontal"] [data-part="handle"] {
   width: var(--uf-resizable-handle-size);
   cursor: col-resize;
 }
+[data-scope="resizable"][data-orientation="horizontal"] [data-part="handle"]::before {
+  top: 0;
+  bottom: 0;
+  left: var(--uf-resizable-handle-hit-offset);
+  width: var(--uf-resizable-handle-hit-size);
+}
+[data-scope="resizable"][data-orientation="horizontal"] [data-part="handle"]::after {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--uf-resizable-handle-size);
+}
 [data-scope="resizable"][data-orientation="vertical"] [data-part="handle"] {
   height: var(--uf-resizable-handle-size);
   cursor: row-resize;
 }
+[data-scope="resizable"][data-orientation="vertical"] [data-part="handle"]::before {
+  top: var(--uf-resizable-handle-hit-offset);
+  right: 0;
+  left: 0;
+  height: var(--uf-resizable-handle-hit-size);
+}
+[data-scope="resizable"][data-orientation="vertical"] [data-part="handle"]::after {
+  top: 0;
+  right: 0;
+  left: 0;
+  height: var(--uf-resizable-handle-size);
+}
 [data-scope="resizable"] [data-part="handle"]:hover,
 [data-scope="resizable"] [data-part="handle"][data-dragging] {
-  background: var(--uf-color-accent);
+  background: transparent;
+}
+[data-scope="resizable"] [data-part="handle"]:hover::after,
+[data-scope="resizable"] [data-part="handle"]:focus-visible::after,
+[data-scope="resizable"] [data-part="handle"][data-dragging]::after {
+  opacity: 1;
 }
 
 /* =================================================================
@@ -4482,7 +4579,6 @@
   --uf-carousel-viewport-pad: var(--uf-membrane);
   --uf-carousel-controls-inset: var(--uf-membrane);
   --uf-carousel-indicator-button-size: calc(var(--uf-spacing-2) + (var(--uf-membrane) * 2));
-  --uf-carousel-indicator-dot-size: calc(var(--uf-spacing-2) - (var(--uf-membrane) * 2));
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -4550,13 +4646,6 @@
   color: var(--uf-color-accent);
   background: transparent;
   opacity: 0.28;
-}
-.uf-carousel-indicatorDot {
-  inline-size: var(--uf-carousel-indicator-dot-size);
-  block-size: var(--uf-carousel-indicator-dot-size);
-  border-radius: var(--uf-radius-full);
-  background: currentColor;
-  display: block;
 }
 .uf-carousel-indicatorButton[data-scope="button"][data-icon-only]:hover {
   background: transparent;

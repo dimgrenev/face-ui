@@ -1,6 +1,6 @@
 {
   "name": "Icon",
-  "description": "Universal icon renderer with provider defaults and multi-source inputs",
+  "description": "Face UI icon renderer. Built-in icons always render at 20x20; unsupported sources render notdef.",
   "props": {
     "name": {
       "type": "string",
@@ -11,23 +11,23 @@
     "icon": {
       "type": "any",
       "required": false,
-      "description": "Universal icon input: name/component/svg element/url/registry entry."
+      "description": "Compatibility input. String names resolve to Face UI icons; custom sources render notdef."
     },
     "src": {
       "type": "string",
       "required": false,
-      "description": "Explicit source URL for external SVG/bitmap icon."
+      "description": "Deprecated compatibility input. External URLs render notdef."
     },
     "size": {
       "type": "number",
       "required": false,
-      "description": "Target icon size in px",
+      "description": "Compatibility-only. Face UI icons always render at 20x20.",
       "default": 20
     },
     "square": {
       "type": "boolean",
       "required": false,
-      "description": "By default icon is rendered in a square box.",
+      "description": "Compatibility-only. Face UI icons always render at 20x20.",
       "default": true
     },
     "className": {
@@ -61,10 +61,10 @@
       }
     },
     {
-      "name": "Large",
+      "name": "Compatibility Size Ignored",
       "props": {
         "name": "settings",
-        "size": 28
+        "size": 20
       }
     },
     {
@@ -82,10 +82,10 @@
       }
     },
     {
-      "name": "Decorative Dot",
+      "name": "Compatibility Small Size Ignored",
       "props": {
         "name": "legend",
-        "size": 10
+        "size": 20
       }
     }
   ],
@@ -113,7 +113,7 @@
     ],
     "notes": [
       "Icon inherits color through currentColor and does not own palette semantics.",
-      "Parent component slots may provide --uf-icon-size, but the Icon API still supports numeric size and IconProvider.size for backward compatibility.",
+      "Parent component slots may provide --uf-icon-size, but the rendered Icon DOM box remains 20x20.",
       "Some built-in glyphs use --uf-color-background for internal knockouts; keep this tied to theme background until icon theming is formalized."
     ]
   },

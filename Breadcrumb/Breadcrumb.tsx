@@ -8,6 +8,7 @@ import { forwardRef, type ReactNode } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
+import { Icon } from '../Icon/Icon'
 import { Menu } from '../Menu/Menu'
 
 // ---------------------------------------------------------------------------
@@ -74,25 +75,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
     const visibleItems = shouldCollapse
       ? [items[0], { label: 'More', __overflow: true } as BreadcrumbItem & { __overflow: true }, ...items.slice(-(collapseAfter - 2))]
       : items
-    const defaultSeparatorNode = (
-      <svg
-        className="uf-breadcrumb-separatorSvg"
-        viewBox="0 0 8 24"
-        width="8"
-        height="18"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path
-          d="M2 22L6 2"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    )
+    const defaultSeparatorNode = <Icon name="right" className="uf-breadcrumb-separatorSvg" />
 
     return (
       <nav

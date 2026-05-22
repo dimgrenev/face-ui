@@ -60,10 +60,18 @@
   --uf-panel-pad-y: 7px;    /* верхний/нижний отступы */
 
   /* ============================================
+   * RESIZER GEOMETRY
+   * ============================================ */
+  --uf-workspace-resize-hit-size: 20px;
+  --uf-workspace-resize-hit-offset: calc(var(--uf-workspace-resize-hit-size) / -2);
+  --uf-workspace-resize-line-width: 1px;
+  --uf-workspace-resize-line-transition: none;
+
+  /* ============================================
    * ICON GEOMETRY
    * ============================================ */
-  /* Иконки используют нативные размеры SVG, но можно переопределить */
-  --uf-icon-size-sm: 16px;
+  /* Иконки всегда используют единственный библиотечный размер 20x20 */
+  --uf-icon-size-sm: 20px;
   --uf-icon-size-md: 20px;
-  --uf-icon-size-lg: 24px;
+  --uf-icon-size-lg: 20px;
 }

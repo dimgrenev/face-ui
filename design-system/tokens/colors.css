@@ -31,6 +31,8 @@
   --uf-color-border-hover: rgba(255, 255, 255, 0.24);
   --uf-color-border-subtle: #1a1a1a;
   --uf-color-glyph-line: #676767;
+  --uf-workspace-resize-line-color: var(--uf-color-border);
+  --uf-workspace-resize-line-active-color: var(--uf-color-border-hover);
 
   /* Interactive Colors */
   /* Active/hover must be based on transparency of pure colors (not fixed greys).
@@ -113,6 +115,8 @@
   --uf-color-border-hover: rgba(0, 0, 0, 0.24);
   --uf-color-border-subtle: #f0f0f0;
   --uf-color-glyph-line: #949494;
+  --uf-workspace-resize-line-color: var(--uf-color-border);
+  --uf-workspace-resize-line-active-color: var(--uf-color-border-hover);
 
   /* Interactive Colors */
   /* Light theme: black overlay on light surfaces. Percentages chosen to match previous resulting shades:

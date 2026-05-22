@@ -132,10 +132,16 @@
   --uf-control-gap: 10px;
   --uf-option-indent: 28px;
   --uf-content-inset: 12px;
-  --uf-icon-size: 16px;
+  --uf-icon-size: 20px;
   --uf-icon-only-size: 32px;
   --uf-hidden-input-size: 1px;
   --uf-hidden-input-offset: -1px;
+  --uf-workspace-resize-hit-size: 20px;
+  --uf-workspace-resize-hit-offset: calc(var(--uf-workspace-resize-hit-size) / -2);
+  --uf-workspace-resize-line-width: 1px;
+  --uf-workspace-resize-line-color: var(--uf-color-border);
+  --uf-workspace-resize-line-active-color: var(--uf-color-border-hover);
+  --uf-workspace-resize-line-transition: none;
   --uf-interactive-weight: 500;
 
   /* ---------------------------------------------------------------
@@ -282,7 +288,7 @@
   --uf-switcher-track-inset-inline: 4px;
   --uf-switcher-track-radius: var(--uf-radius-full);
   --uf-toggle-border-width: var(--uf-border-width-thin);
-  --uf-input-icon-size: 16px;
+  --uf-input-icon-size: 20px;
   --uf-input-required-gap: 4px;
   --uf-separator-line-width: var(--uf-border-width-thin);
   --uf-spinner-size: 20px;
@@ -301,8 +307,8 @@
   --uf-slider-body-basis: 160px;
   --uf-slider-thumb-w-fallback: var(--uf-slider-thumb-size);
   --uf-slider-crop-thumb-pad-fallback: 4px;
-  --uf-slider-crop-marker-w: 2px;
-  --uf-slider-crop-marker-h: 12px;
+  --uf-slider-crop-marker-w: 20px;
+  --uf-slider-crop-marker-h: 20px;
   --uf-slider-crop-allowed-expand: 8px;
   --uf-calendar-cell-size: 32px;
   --uf-calendar-nav-size: 32px;
@@ -353,15 +359,20 @@
   --uf-sidebar-preview-inset: var(--uf-spacing-3);
   --uf-sidebar-preview-title-gap: var(--uf-spacing-2);
   --uf-sidebar-preview-section-gap: var(--uf-spacing-4);
-  --uf-resizable-handle-size: 8px;
+  --uf-resizable-handle-size: var(--uf-workspace-resize-line-width, 1px);
+  --uf-resizable-handle-hit-size: var(--uf-workspace-resize-hit-size, 20px);
+  --uf-resizable-handle-hit-offset: calc((var(--uf-resizable-handle-hit-size) - var(--uf-resizable-handle-size)) / -2);
+  --uf-resizable-handle-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-color-border-hover));
   --uf-navigation-content-min-width: 220px;
   --uf-navigation-nested-inset: var(--uf-spacing-3);
   --uf-navigation-sheet-viewport-gap: var(--uf-spacing-3);
   --uf-table-divider-width: var(--uf-border-width-thin);
   --uf-table-row-number-width: 44px;
   --uf-table-sort-icon-gap: 4px;
-  --uf-table-resize-hit-width: 8px;
-  --uf-table-resize-line-offset-x: 4px;
+  --uf-table-resize-hit-width: var(--uf-workspace-resize-hit-size, 20px);
+  --uf-table-resize-line-width: var(--uf-workspace-resize-line-width, 1px);
+  --uf-table-resize-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-color-border-hover));
+  --uf-table-resize-line-offset-x: calc(var(--uf-table-resize-hit-width) - var(--uf-table-resize-line-width));
   --uf-table-resize-line-inset-y: 6px;
   --uf-table-membrane-cell-pad-x: var(--uf-spacing-2);
   --uf-tabs-rail-h: 32px;
@@ -381,7 +392,6 @@
   --uf-carousel-viewport-pad: var(--uf-spacing-2);
   --uf-carousel-controls-inset: var(--uf-spacing-2);
   --uf-carousel-indicator-button-size: 20px;
-  --uf-carousel-indicator-dot-size: 6px;
   --uf-media-fallback-size: 160px;
   --uf-code-header-pad: var(--uf-spacing-3);
   --uf-code-line-number-width: 44px;

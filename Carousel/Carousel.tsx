@@ -121,7 +121,7 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
             <div className="uf-carousel-controls">
               <Button
                 {...api.getPrevProps()}
-                icon={<Icon name="left" size={16} />}
+                icon={<Icon name="left" />}
                 iconOnly
                 fullWidth={false}
                 variant="ghost"
@@ -132,7 +132,7 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
                   <Button
                     key={i}
                     {...api.getIndicatorItemProps(i)}
-                    icon={<span className="uf-carousel-indicatorDot" aria-hidden="true" />}
+                    icon={<Icon name="radio-on" />}
                     iconOnly
                     fullWidth={false}
                     variant="ghost"
@@ -142,7 +142,7 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
               </div>
               <Button
                 {...api.getNextProps()}
-                icon={<Icon name="right" size={16} />}
+                icon={<Icon name="right" />}
                 iconOnly
                 fullWidth={false}
                 variant="ghost"

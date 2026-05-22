@@ -269,7 +269,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <span
         className={cn('uf-membrane', fullWidth ? 'uf-membrane--full' : undefined)}
-        data-membrane-hover=""
         data-membrane-interactive={disabled || loading ? undefined : ''}
         onClick={(event) => {
           if (event.target !== event.currentTarget) return

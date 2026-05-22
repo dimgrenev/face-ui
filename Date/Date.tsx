@@ -449,7 +449,7 @@ export const Date = forwardRef<HTMLDivElement, DateProps>(function Date(props, r
                 {api.triggerLabel}
               </Text>
               <span className="uf-date__icon" aria-hidden="true">
-                <Icon name="date" size={16} />
+                <Icon name="date" />
               </span>
             </button>
           </span>
@@ -463,7 +463,7 @@ export const Date = forwardRef<HTMLDivElement, DateProps>(function Date(props, r
               {api.triggerLabel}
             </Text>
             <span className="uf-date__icon" aria-hidden="true">
-              <Icon name="date" size={16} />
+              <Icon name="date" />
             </span>
           </button>
         )}

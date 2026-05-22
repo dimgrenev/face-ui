@@ -247,7 +247,6 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                 key={`tab-membrane:${item.value}`}
                 className="uf-membrane"
                 data-membrane-interactive=""
-                data-membrane-hover=""
               >
                 {tabWithAction}
               </span>

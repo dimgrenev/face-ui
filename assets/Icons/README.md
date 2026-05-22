@@ -1,8 +1,8 @@
 # Icons
 
-SVG files in this directory are the source assets for the built-in Face UI icon set.
+SVG files in this directory are the raw source assets for the built-in Face UI icon set.
 
-The React runtime is exposed through `assets/Icon.tsx` and the public `Icon/Icon.tsx` wrapper. When adding or changing an icon, keep these pieces aligned:
+The single React runtime registry is `assets/Icon.tsx`. Do not add React icon registries or component entrypoints to this directory. When adding or changing an icon, keep these pieces aligned:
 
 - add or edit the SVG file in this directory
 - update the `IconName` union and `ICON_NAMES` list

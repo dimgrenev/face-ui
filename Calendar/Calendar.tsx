@@ -133,7 +133,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
         <div {...api.getHeaderProps()}>
           <Button
             {...api.getPrevMonthProps()}
-            icon={<Icon name="left" size={16} />}
+            icon={<Icon name="left" />}
             iconOnly
             fullWidth={false}
             className="uf-calendar-navButton"
@@ -149,7 +149,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
           />
           <Button
             {...api.getNextMonthProps()}
-            icon={<Icon name="right" size={16} />}
+            icon={<Icon name="right" />}
             iconOnly
             fullWidth={false}
             className="uf-calendar-navButton"

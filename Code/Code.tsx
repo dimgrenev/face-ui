@@ -161,7 +161,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
             )}
             <div className="uf-code-actions">
               <Button
-                icon={<Icon name="copy" size={16} />}
+                icon={<Icon name="copy" />}
                 iconOnly
                 fullWidth={false}
                 variant="default"
@@ -172,7 +172,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
               />
               {canToggle && (
                 <Button
-                  icon={<Icon name={collapsed ? 'down' : 'up'} size={16} />}
+                  icon={<Icon name={collapsed ? 'down' : 'up'} />}
                   iconOnly
                   fullWidth={false}
                   variant="default"

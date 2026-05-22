@@ -171,7 +171,6 @@
       "--uf-carousel-viewport-pad",
       "--uf-carousel-controls-inset",
       "--uf-carousel-indicator-button-size",
-      "--uf-carousel-indicator-dot-size",
       "--face-runtime-carousel-slides-per-view"
     ],
     "semanticFallbacks": [

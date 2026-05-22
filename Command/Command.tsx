@@ -238,7 +238,6 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
                         key={`${item.id}:membrane`}
                         className="uf-membrane uf-membrane--full uf-command-itemMembrane"
                         data-membrane-interactive=""
-                        data-membrane-hover=""
                         onClick={(event) => {
                           if (event.target !== event.currentTarget) return
                           ;(itemProps as { onClick?: () => void }).onClick?.()
@@ -283,7 +282,6 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
                   key={`${item.id}:membrane`}
                   className="uf-membrane uf-membrane--full uf-command-itemMembrane"
                   data-membrane-interactive=""
-                  data-membrane-hover=""
                   onClick={(event) => {
                     if (event.target !== event.currentTarget) return
                     ;(itemProps as { onClick?: () => void }).onClick?.()
@@ -336,7 +334,7 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
             onClick={() => setDialogOpen(true)}
           >
             <span className="uf-command__triggerIcon" aria-hidden="true">
-              <Icon name="search" size={16} />
+              <Icon name="search" />
             </span>
             <Text
               as="span"

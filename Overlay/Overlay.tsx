@@ -206,7 +206,6 @@ export const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
             {...triggerProps}
             ref={handleTriggerRef as any}
             className="uf-membrane uf-overlay-triggerMembrane"
-            data-membrane-hover=""
             data-membrane-interactive=""
           >
             <Button

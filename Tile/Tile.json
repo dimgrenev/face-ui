@@ -82,6 +82,12 @@
       "description": "Nesting level for option-like rows: 0..9",
       "default": null
     },
+    "truncate": {
+      "type": "boolean",
+      "required": false,
+      "description": "Truncate overflowing text content with ellipsis.",
+      "default": true
+    },
     "membrane": {
       "type": "boolean",
       "required": false,

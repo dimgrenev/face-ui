@@ -262,7 +262,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       >
         {renderSelectLabelNode(triggerLabel, cn('uf-select__value', isPlaceholder && 'uf-select__value--placeholder'))}
         <span className="uf-select__arrow" aria-hidden="true">
-          <Icon name="down" size={16} />
+          <Icon name="down" />
         </span>
       </button>
     )
@@ -300,7 +300,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
               key={`option-membrane:${option.value}`}
               className="uf-membrane uf-membrane--full uf-select__optionMembrane"
               data-membrane-interactive=""
-              data-membrane-hover=""
               onClick={(event) => {
                 if (event.target !== event.currentTarget) return
                 ;(optionProps as { onClick?: () => void }).onClick?.()

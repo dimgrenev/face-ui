@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 
 import React from 'react'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRoot, type Root } from 'react-dom/client'
 import { act } from 'react'
@@ -29,6 +31,7 @@ import { Steps } from '../../Steps/Steps'
 import { Switcher } from '../../Switcher/Switcher'
 import { Table } from '../../Table/Table'
 import { Tabs } from '../../Tabs/Tabs'
+import { Text } from '../../Text/Text'
 import { Tile } from '../../Tile/Tile'
 import { Toast } from '../../Toast/Toast'
 import { Toc } from '../../Toc/Toc'
@@ -44,6 +47,14 @@ function setNativeInputValue(element: HTMLInputElement, value: string) {
 describe('component smoke', () => {
   let container: HTMLDivElement
   let root: Root
+  const settingsPath = 'M10 3L11.8751 5.47299L14.9497 5.05025L14.527 8.12485L17 10L14.527 11.8751L14.9497 14.9497L11.8751 14.527L10 17L8.12485 14.527L5.05025 14.9497L5.47299 11.8751L3 10L5.47299 8.12485L5.05025 5.05025L8.12485 5.47299L10 3Z'
+  const browserPath = 'M4 10C4 6.18182 7 4 10 4C13 4 16 6.18182 16 10C16 13.8182 13 16 10 16C7 16 4 13.8182 4 10Z'
+  const chatPath = 'M11.5 4.50019H9L8.50016 4.50016C6.29096 4.50007 4.5 6.29096 4.5 8.50016V11.5002C4.5 13.7092 6.29076 15.5001 8.49983 15.5002L9 15.5002H11.5C13.7091 15.5002 15.5 13.7093 15.5 11.5002V8.50019C15.5 6.29105 13.7091 4.50019 11.5 4.50019Z'
+  const folderGoPath = 'M11 15.5H15.5L15.5 6.5H10.5L9 4.5H4.5V8'
+  const fullPath = 'M10.2 5L15 5V9.8M9.8 15L5 15V10.2'
+  const partPath = 'M16 8.7998L11.2 8.7998L11.2 3.9998'
+  const notdefPath = 'M15.5 4.50019H9L4.5 4.5V15.5L9 15.5002H15.5V4.50019Z'
+  const moreCenterDotSelector = 'circle[cx="10"][cy="10"][r="1"]'
 
   beforeEach(() => {
     ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
@@ -202,13 +213,121 @@ describe('component smoke', () => {
     expect(controlRef.current?.value).toBe('Note')
   })
 
-  it('Icon wrapper renders the exported icon component directly', async () => {
+  it('Icon wrapper renders Face UI built-ins instead of the notdef fallback', async () => {
     await act(async () => {
       root.render(<Icon name="settings" size={20} />)
     })
 
     const icon = container.querySelector('svg')
     expect(icon).not.toBeNull()
+    expect(container.querySelector(`path[d="${settingsPath}"]`)).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
+  })
+
+  it('Icon wrapper renders unsupported legacy runtime names as notdef', async () => {
+    await act(async () => {
+      root.render(<Icon name="git" size={20} />)
+    })
+
+    expect(container.querySelector('svg[data-icon="git"]')).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).not.toBeNull()
+
+  })
+
+  it('Icon wrapper includes the built-in browser glyph', async () => {
+    await act(async () => {
+      root.render(<Icon name="browser" />)
+    })
+
+    expect(container.querySelector('svg[data-icon="browser"]')).not.toBeNull()
+    expect(container.querySelector(`path[d="${browserPath}"]`)).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
+  })
+
+  it('Icon wrapper includes the built-in chat glyph', async () => {
+    await act(async () => {
+      root.render(<Icon name="chat" />)
+    })
+
+    expect(container.querySelector('svg[data-icon="chat"]')).not.toBeNull()
+    expect(container.querySelector(`path[d="${chatPath}"]`)).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
+  })
+
+  it('Icon wrapper includes the built-in folder-go glyph', async () => {
+    await act(async () => {
+      root.render(<Icon name="folder-go" />)
+    })
+
+    expect(container.querySelector('svg[data-icon="folder-go"]')).not.toBeNull()
+    expect(container.querySelector(`path[d="${folderGoPath}"]`)).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
+  })
+
+  it('Icon wrapper includes the compact more glyph', async () => {
+    await act(async () => {
+      root.render(<Icon name="more" />)
+    })
+
+    expect(container.querySelector('svg[data-icon="more"]')).not.toBeNull()
+    expect(container.querySelector(moreCenterDotSelector)).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
+  })
+
+  it('Icon wrapper includes the compact full glyph', async () => {
+    await act(async () => {
+      root.render(<Icon name="full" />)
+    })
+
+    expect(container.querySelector('svg[data-icon="full"]')).not.toBeNull()
+    expect(container.querySelector(`path[d="${fullPath}"]`)).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
+  })
+
+  it('Icon wrapper includes the built-in part glyph', async () => {
+    await act(async () => {
+      root.render(<Icon name="part" />)
+    })
+
+    expect(container.querySelector('svg[data-icon="part"]')).not.toBeNull()
+    expect(container.querySelector(`path[d="${partPath}"]`)).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
+  })
+
+  it('Icon wrapper always uses the single 20x20 library size', async () => {
+    await act(async () => {
+      root.render(<Icon name="crop" />)
+    })
+
+    let icon = container.querySelector('svg[data-icon="crop"]')
+    expect(icon?.getAttribute('width')).toBe('20')
+    expect(icon?.getAttribute('height')).toBe('20')
+    expect(icon?.getAttribute('viewBox')).toBe('0 0 10 20')
+
+    await act(async () => {
+      root.render(<Icon name="crop" size={16} />)
+    })
+
+    icon = container.querySelector('svg[data-icon="crop"]')
+    expect(icon?.getAttribute('width')).toBe('20')
+    expect(icon?.getAttribute('height')).toBe('20')
+
+    await act(async () => {
+      root.render(<Icon name="random" />)
+    })
+
+    icon = container.querySelector('svg[data-icon="random"]')
+    expect(icon?.getAttribute('width')).toBe('20')
+    expect(icon?.getAttribute('height')).toBe('20')
+
+    await act(async () => {
+      root.render(<Icon icon={<svg viewBox="0 0 12 12"><path d="M0 0H12" /></svg>} />)
+    })
+
+    icon = container.querySelector('svg[data-icon="notdef"]')
+    expect(icon?.getAttribute('width')).toBe('20')
+    expect(icon?.getAttribute('height')).toBe('20')
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).not.toBeNull()
   })
 
   it('Media renders images with auto height when no explicit height is provided', async () => {
@@ -372,6 +491,31 @@ describe('component smoke', () => {
     expect(handleTileClick).toHaveBeenCalledTimes(3)
 
     await act(async () => {
+      const enterFromAction = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
+      const spaceFromAction = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true })
+      expect(action?.dispatchEvent(enterFromAction)).toBe(true)
+      expect(action?.dispatchEvent(spaceFromAction)).toBe(true)
+    })
+
+    expect(handleTileClick).toHaveBeenCalledTimes(3)
+
+    await act(async () => {
+      root.render(
+        <Tile onClick={handleTileClick}>
+          <input aria-label="Project name" defaultValue="Project" />
+        </Tile>,
+      )
+    })
+
+    const nestedInput = container.querySelector('input[aria-label="Project name"]') as HTMLInputElement | null
+    await act(async () => {
+      const spaceFromInput = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true })
+      expect(nestedInput?.dispatchEvent(spaceFromInput)).toBe(true)
+    })
+
+    expect(handleTileClick).toHaveBeenCalledTimes(3)
+
+    await act(async () => {
       root.render(<Tile text="Disabled project" disabled onClick={handleTileClick} />)
     })
 
@@ -385,6 +529,48 @@ describe('component smoke', () => {
     })
 
     expect(handleTileClick).toHaveBeenCalledTimes(3)
+  })
+
+  it('Tile owns ellipsis behavior for constrained text slots', async () => {
+    await act(async () => {
+      root.render(
+        <Tile
+          text="A very long navigation item name that must not expand the tile"
+          rightText="Ready"
+          icon="file"
+          style={{ width: '5rem' }}
+        />,
+      )
+    })
+
+    const tile = container.querySelector('[data-scope="tile"][data-part="root"]') as HTMLElement | null
+    const textSlot = tile?.querySelector('[data-scope="tile"][data-part="text"]') as HTMLElement | null
+    const label = tile?.querySelector('.uf-tile__label') as HTMLElement | null
+
+    expect(tile?.getAttribute('data-truncate')).toBe('')
+    expect(textSlot?.getAttribute('data-truncate')).toBe('')
+    expect(label?.textContent).toContain('A very long navigation item name')
+
+    await act(async () => {
+      root.render(
+        <Tile style={{ width: '5rem' }}>
+          <Button icon="file" iconOnly aria-label="File" />
+          <Text as="span" inset="none" membrane truncate>
+            A very long composed tile label that must shrink
+          </Text>
+        </Tile>,
+      )
+    })
+
+    const composedSlot = container.querySelector('[data-scope="tile"][data-part="text"]') as HTMLElement | null
+    expect(composedSlot?.tagName).toBe('SPAN')
+    expect(composedSlot?.getAttribute('data-truncate')).toBe('')
+    expect(composedSlot?.querySelector('.uf-membrane--truncate')).not.toBeNull()
+
+    const tileStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(tileStyles).toContain('[data-scope="tile"] [data-part="text"] > .uf-membrane--truncate')
+    expect(tileStyles).toContain('[data-scope="tile"] [data-part="text"] > .uf-membrane:not(.uf-membrane--truncate)')
+    expect(tileStyles).toContain('text-overflow: ellipsis;')
   })
 
   it('Carousel advances in uncontrolled mode', async () => {
@@ -821,6 +1007,8 @@ describe('component smoke', () => {
     expect(input).not.toBeNull()
     expect(container.textContent).toContain('Crop')
     expect(cropMarkers).toHaveLength(2)
+    expect(cropMarkers[0]?.querySelector('svg')?.getAttribute('width')).toBe('20')
+    expect(cropMarkers[0]?.querySelector('svg')?.getAttribute('height')).toBe('20')
 
     await act(async () => {
       if (!input) return
