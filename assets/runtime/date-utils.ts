@@ -110,14 +110,61 @@ export function formatTriggerValue(
     locale: string
     timezone: string
     placeholder: string
+    format?: string | null
   },
 ): string {
-  const { mode, selection, locale, timezone, placeholder } = opts
+  const { mode, selection, locale, timezone, placeholder, format } = opts
   if (value == null) return placeholder
+  const customFormat = typeof format === 'string' && format.trim() ? format.trim() : null
+  const formatWithPattern = (date: Date): string => {
+    if (!customFormat) return ''
+    const numericParts = new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: timezone,
+    }).formatToParts(date)
+    const part = (type: Intl.DateTimeFormatPartTypes): string => (
+      numericParts.find((item) => item.type === type)?.value || ''
+    )
+    const year = part('year')
+    const month = part('month')
+    const day = part('day')
+    const hourRaw = Number(part('hour')) || 0
+    const hour24 = ((hourRaw % 24) + 24) % 24
+    const hour12 = hour24 % 12 || 12
+    const minute = part('minute')
+    const monthShort = new Intl.DateTimeFormat(locale, { month: 'short', timeZone: timezone }).format(date)
+    const monthLong = new Intl.DateTimeFormat(locale, { month: 'long', timeZone: timezone }).format(date)
+    const dayPeriod = new Intl.DateTimeFormat(locale, { hour: 'numeric', hour12: true, timeZone: timezone })
+      .formatToParts(date)
+      .find((item) => item.type === 'dayPeriod')?.value || ''
+    const replacements: Record<string, string> = {
+      yyyy: year,
+      yy: year.slice(-2),
+      MMMM: monthLong,
+      MMM: monthShort,
+      MM: month,
+      M: String(Number(month) || month),
+      dd: day,
+      d: String(Number(day) || day),
+      HH: pad2(hour24),
+      H: String(hour24),
+      hh: pad2(hour12),
+      h: String(hour12),
+      mm: minute,
+      a: dayPeriod,
+    }
+    return customFormat.replace(/yyyy|MMMM|MMM|yy|MM|M|dd|d|HH|H|hh|h|mm|a/g, (token) => replacements[token] ?? token)
+  }
   const formatSingle = (iso: string | null): string => {
     if (!iso) return placeholder
     const date = parseDateLike(iso)
     if (!date) return placeholder
+    if (customFormat) return formatWithPattern(date)
     if (mode === 'time') {
       return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: timezone }).format(date)
     }
@@ -227,4 +274,3 @@ export function getMinuteGrid(step = 5): number[] {
   for (let m = 0; m < 60; m += step) list.push(m)
   return list
 }
-

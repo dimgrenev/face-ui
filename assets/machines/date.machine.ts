@@ -67,6 +67,7 @@ export interface DateSchema extends MachineSchema {
     draftMinute: number
     locale: string
     timezone: string
+    triggerFormat: string | null
     weekStartsOn: number
     min: string | null
     max: string | null
@@ -171,6 +172,7 @@ export const dateMachine = createMachine<DateSchema>({
     draftMinute: 0,
     locale: 'en-US',
     timezone: 'UTC',
+    triggerFormat: null,
     weekStartsOn: 1,
     min: null,
     max: null,
@@ -195,6 +197,7 @@ export const dateMachine = createMachine<DateSchema>({
       locale: ctx.locale,
       timezone: ctx.timezone,
       placeholder: ctx.placeholder,
+      format: ctx.triggerFormat,
     }),
     effectiveSelection: (ctx) => getEffectiveSelection(ctx.mode, ctx.selection),
     effectiveViews: (ctx) => {
@@ -497,4 +500,3 @@ export function connectDate(state: MachineSnapshot<DateSchema>, send: SendFn<Dat
     },
   }
 }
-

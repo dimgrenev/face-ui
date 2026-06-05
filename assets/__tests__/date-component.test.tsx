@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createRoot, type Root } from 'react-dom/client'
 import { act } from 'react'
 import { Date as DateField } from '../../Date/Date'
+import { DatePicker } from '../../DatePicker/DatePicker'
 
 describe('Date component', () => {
   let container: HTMLDivElement
@@ -69,5 +70,22 @@ describe('Date component', () => {
     })
 
     expect(trigger?.textContent).not.toContain('Pick date')
+  })
+
+  it('applies the public trigger format prop in Date and DatePicker', async () => {
+    const fixedDate = new globalThis.Date(globalThis.Date.UTC(2026, 2, 6, 14, 35))
+
+    await act(async () => {
+      root.render(
+        <div>
+          <DateField label="Report date" value={fixedDate} timezone="UTC" format="yyyy/MM/dd" />
+          <DatePicker label="Published" value={fixedDate} timezone="UTC" format="MMM dd, yyyy HH:mm" />
+        </div>,
+      )
+    })
+
+    const triggers = Array.from(container.querySelectorAll<HTMLButtonElement>('[data-scope="date"][data-part="trigger"]'))
+    expect(triggers[0]?.textContent).toContain('2026/03/06')
+    expect(triggers[1]?.textContent).toContain('Mar 06, 2026 14:35')
   })
 })
