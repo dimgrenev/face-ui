@@ -25,7 +25,7 @@ export interface StepItem {
 
 export interface StepsProps {
   /** Step definitions. */
-  items: StepItem[]
+  items?: StepItem[]
   /** Current step index (0-based). */
   step?: number
   /** Uncontrolled initial step index. */

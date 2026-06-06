@@ -25,34 +25,38 @@
     "openDelay": {
       "type": "number",
       "required": false,
-      "description": "Delay before opening (ms).",
-      "default": 300
+      "description": "Delay before opening (ms)."
     },
     "closeDelay": {
       "type": "number",
       "required": false,
-      "description": "Delay before closing (ms).",
-      "default": 0
+      "description": "Delay before closing (ms)."
     },
     "side": {
       "type": "enum",
       "required": false,
       "description": "Preferred side placement.",
-      "options": ["top", "right", "bottom", "left"],
-      "default": "top"
+      "options": [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ]
     },
     "align": {
       "type": "enum",
       "required": false,
       "description": "Alignment along the side.",
-      "options": ["start", "center", "end"],
-      "default": "center"
+      "options": [
+        "start",
+        "center",
+        "end"
+      ]
     },
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Offset from the trigger along the side axis (px).",
-      "default": 4
+      "description": "Offset from the trigger along the side axis (px)."
     },
     "onOpenChange": {
       "type": "function",
@@ -82,19 +86,38 @@
     "autoFocusOnOpen": "none"
   },
   "keyboard": {
-    "Escape": { "action": "close" }
+    "Escape": {
+      "action": "close"
+    }
   },
   "aria": {
     "role": "tooltip"
   },
   "composition": {
-    "required": ["root", "trigger", "content"],
-    "recommended": ["arrow"],
+    "required": [
+      "root",
+      "trigger",
+      "content"
+    ],
+    "recommended": [
+      "arrow"
+    ],
     "parts": {
-      "root": { "slot": "root" },
-      "trigger": { "slot": "trigger", "parent": "root" },
-      "content": { "slot": "content", "parent": "root" },
-      "arrow": { "slot": "arrow", "parent": "content" }
+      "root": {
+        "slot": "root"
+      },
+      "trigger": {
+        "slot": "trigger",
+        "parent": "root"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "root"
+      },
+      "arrow": {
+        "slot": "arrow",
+        "parent": "content"
+      }
     }
   },
   "tokenMapping": {

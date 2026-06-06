@@ -27,7 +27,7 @@ export interface TreeNode {
 
 export interface TreeProps {
   /** Tree node definitions (recursive). */
-  items: TreeNode[]
+  items?: TreeNode[]
   /** Currently expanded node IDs. */
   expandedIds?: string[]
   /** Uncontrolled initial expanded node IDs. */

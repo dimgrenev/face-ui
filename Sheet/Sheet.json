@@ -10,6 +10,71 @@
         "top"
       ],
       "default": "bottom"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "description": "Title content rendered inside the modal."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Body content."
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state."
+    },
+    "closeOnOverlayClick": {
+      "type": "boolean",
+      "required": false,
+      "description": "components API compatibility: overlay click behavior."
+    },
+    "closable": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the modal can be closed via Escape / backdrop click."
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "description": "Description content rendered below the title."
+    },
+    "actions": {
+      "type": "array",
+      "required": false,
+      "description": "Optional footer actions."
+    },
+    "trigger": {
+      "type": "string",
+      "required": false,
+      "description": "Trigger element that toggles the modal open."
+    },
+    "width": {
+      "type": "number",
+      "required": false,
+      "description": "Width in px for left/right variants."
+    },
+    "height": {
+      "type": "number",
+      "required": false,
+      "description": "Height in px for top/bottom variants."
+    },
+    "onOpenChange": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    },
+    "surfaceBreakpoint": {
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch to sheet mode."
     }
   },
   "states": [

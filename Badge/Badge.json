@@ -5,8 +5,7 @@
     "text": {
       "type": "string",
       "required": false,
-      "description": "Badge text content",
-      "default": null
+      "description": "Badge text content"
     },
     "variant": {
       "type": "enum",
@@ -19,8 +18,7 @@
         "accent",
         "destructive",
         "outline"
-      ],
-      "default": "default"
+      ]
     },
     "appearance": {
       "type": "enum",
@@ -35,8 +33,7 @@
     "children": {
       "type": "string",
       "required": false,
-      "description": "Custom children content (overrides text)",
-      "default": null
+      "description": "Custom children content (overrides text)"
     }
   },
   "states": [

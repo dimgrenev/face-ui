@@ -29,10 +29,7 @@
     "views": {
       "type": "array",
       "required": false,
-      "description": "Allowed views order",
-      "default": [
-        "day"
-      ]
+      "description": "Allowed views order"
     },
     "openTo": {
       "type": "enum",
@@ -44,8 +41,7 @@
         "day",
         "hours",
         "minutes"
-      ],
-      "default": "day"
+      ]
     },
     "value": {
       "type": "any",
@@ -140,8 +136,7 @@
     "closeOnSelect": {
       "type": "boolean",
       "required": false,
-      "description": "Close panel after completing selection",
-      "default": true
+      "description": "Close panel after completing selection"
     },
     "showNow": {
       "type": "boolean",
@@ -190,20 +185,17 @@
     "label": {
       "type": "string",
       "required": false,
-      "description": "Control label",
-      "default": "Date"
+      "description": "Control label"
     },
     "description": {
       "type": "string",
       "required": false,
-      "description": "Helper text below control",
-      "default": null
+      "description": "Helper text below control"
     },
     "error": {
       "type": "string",
       "required": false,
-      "description": "Error message below control",
-      "default": null
+      "description": "Error message below control"
     },
     "required": {
       "type": "boolean",
@@ -226,8 +218,7 @@
     "placeholder": {
       "type": "string",
       "required": false,
-      "description": "Trigger placeholder text",
-      "default": "Pick date"
+      "description": "Trigger placeholder text"
     },
     "membrane": {
       "type": "boolean",

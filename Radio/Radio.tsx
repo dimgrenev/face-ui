@@ -24,7 +24,7 @@ export interface RadioOption {
 
 export interface RadioProps {
   /** Radio options to render. */
-  options: RadioOption[]
+  options?: RadioOption[]
   /** Currently selected value. */
   value?: string | null
   /** Uncontrolled initial selected value. */

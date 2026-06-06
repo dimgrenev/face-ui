@@ -6,7 +6,10 @@
       "type": "enum",
       "required": false,
       "description": "Simple machine-driven slider or the advanced legacy slider.",
-      "options": ["simple", "advanced"],
+      "options": [
+        "simple",
+        "advanced"
+      ],
       "default": "simple"
     },
     "value": {
@@ -52,14 +55,16 @@
       "type": "enum",
       "required": false,
       "description": "Orientation.",
-      "options": ["horizontal", "vertical"],
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
       "default": "horizontal"
     },
     "label": {
       "type": "string",
       "required": false,
-      "description": "Label content.",
-      "default": null
+      "description": "Label content."
     },
     "onValueChange": {
       "type": "function",
@@ -75,7 +80,12 @@
       "type": "enum",
       "required": false,
       "description": "Leading content mode for the advanced slider.",
-      "options": ["none", "icon", "text", "iconText"],
+      "options": [
+        "none",
+        "icon",
+        "text",
+        "iconText"
+      ],
       "default": "none"
     },
     "leadingIcon": {
@@ -124,23 +134,45 @@
   "states": [
     {
       "name": "Default",
-      "props": { "defaultValue": [50] }
+      "props": {
+        "defaultValue": [
+          50
+        ]
+      }
     },
     {
       "name": "Range",
-      "props": { "defaultValue": [20, 80], "label": "Price range" }
+      "props": {
+        "defaultValue": [
+          20,
+          80
+        ],
+        "label": "Price range"
+      }
     },
     {
       "name": "Advanced",
-      "props": { "variant": "advanced", "defaultValue": [42], "leading": "text", "leadingText": "Zoom" }
+      "props": {
+        "variant": "advanced",
+        "defaultValue": [
+          42
+        ],
+        "leading": "text",
+        "leadingText": "Zoom"
+      }
     },
     {
       "name": "Crop",
       "props": {
         "variant": "advanced",
-        "defaultValue": [40],
+        "defaultValue": [
+          40
+        ],
         "crop": true,
-        "defaultCropRange": { "min": 20, "max": 80 },
+        "defaultCropRange": {
+          "min": 20,
+          "max": 80
+        },
         "cropLocksValue": true,
         "leading": "text",
         "leadingText": "Crop"
@@ -148,36 +180,92 @@
     },
     {
       "name": "Disabled",
-      "props": { "defaultValue": [30], "disabled": true }
+      "props": {
+        "defaultValue": [
+          30
+        ],
+        "disabled": true
+      }
     }
   ],
   "behavior": {
     "rovingFocus": false
   },
   "keyboard": {
-    "ArrowRight": { "action": "increment", "condition": "horizontal" },
-    "ArrowLeft": { "action": "decrement", "condition": "horizontal" },
-    "ArrowUp": { "action": "increment", "condition": "vertical" },
-    "ArrowDown": { "action": "decrement", "condition": "vertical" },
-    "Home": { "action": "setMin" },
-    "End": { "action": "setMax" },
-    "PageUp": { "action": "incrementLarge" },
-    "PageDown": { "action": "decrementLarge" }
+    "ArrowRight": {
+      "action": "increment",
+      "condition": "horizontal"
+    },
+    "ArrowLeft": {
+      "action": "decrement",
+      "condition": "horizontal"
+    },
+    "ArrowUp": {
+      "action": "increment",
+      "condition": "vertical"
+    },
+    "ArrowDown": {
+      "action": "decrement",
+      "condition": "vertical"
+    },
+    "Home": {
+      "action": "setMin"
+    },
+    "End": {
+      "action": "setMax"
+    },
+    "PageUp": {
+      "action": "incrementLarge"
+    },
+    "PageDown": {
+      "action": "decrementLarge"
+    }
   },
   "aria": {
     "role": "slider",
-    "required": ["aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-label"]
+    "required": [
+      "aria-valuemin",
+      "aria-valuemax",
+      "aria-valuenow",
+      "aria-label"
+    ]
   },
   "composition": {
-    "required": ["root", "track", "range", "thumb"],
-    "recommended": ["label", "output"],
+    "required": [
+      "root",
+      "track",
+      "range",
+      "thumb"
+    ],
+    "recommended": [
+      "label",
+      "output"
+    ],
     "parts": {
-      "root": { "slot": "root" },
-      "label": { "slot": "label", "parent": "root" },
-      "track": { "slot": "track", "parent": "root" },
-      "range": { "slot": "range", "parent": "track" },
-      "thumb": { "slot": "thumb", "parent": "track", "multiple": true },
-      "output": { "slot": "output", "parent": "root" }
+      "root": {
+        "slot": "root"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "root"
+      },
+      "track": {
+        "slot": "track",
+        "parent": "root"
+      },
+      "range": {
+        "slot": "range",
+        "parent": "track"
+      },
+      "thumb": {
+        "slot": "thumb",
+        "parent": "track",
+        "multiple": true
+      },
+      "output": {
+        "slot": "output",
+        "parent": "root"
+      }
     }
   },
   "tokenMapping": {
@@ -232,7 +320,11 @@
       "Exact number input (use Input type=number)",
       "Few discrete options (use Radio or Select)"
     ],
-    "alternatives": ["Input", "Radio", "Select"],
+    "alternatives": [
+      "Input",
+      "Radio",
+      "Select"
+    ],
     "context": "both"
   }
 }

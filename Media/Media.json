@@ -16,8 +16,7 @@
     "src": {
       "type": "string",
       "required": true,
-      "description": "Source URL.",
-      "default": "https://picsum.photos/300/200"
+      "description": "Source URL."
     },
     "alt": {
       "type": "string",
@@ -50,8 +49,7 @@
       "options": [
         "lazy",
         "eager"
-      ],
-      "default": null
+      ]
     },
     "decoding": {
       "type": "enum",
@@ -61,8 +59,7 @@
         "async",
         "sync",
         "auto"
-      ],
-      "default": "async"
+      ]
     },
     "poster": {
       "type": "string",
@@ -72,38 +69,32 @@
     "controls": {
       "type": "boolean",
       "required": false,
-      "description": "Show native controls (for video/audio).",
-      "default": false
+      "description": "Show native controls (for video/audio)."
     },
     "autoPlay": {
       "type": "boolean",
       "required": false,
-      "description": "Auto-play media.",
-      "default": false
+      "description": "Auto-play media."
     },
     "loop": {
       "type": "boolean",
       "required": false,
-      "description": "Loop playback.",
-      "default": false
+      "description": "Loop playback."
     },
     "muted": {
       "type": "boolean",
       "required": false,
-      "description": "Start muted.",
-      "default": false
+      "description": "Start muted."
     },
     "width": {
       "type": "string",
       "required": false,
-      "description": "Explicit width.",
-      "default": null
+      "description": "Explicit width."
     },
     "height": {
       "type": "string",
       "required": false,
-      "description": "Explicit height.",
-      "default": null
+      "description": "Explicit height."
     },
     "objectFit": {
       "type": "enum",
@@ -114,8 +105,7 @@
         "contain",
         "fill",
         "none"
-      ],
-      "default": null
+      ]
     },
     "fallback": {
       "type": "string",

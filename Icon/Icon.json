@@ -5,8 +5,7 @@
     "name": {
       "type": "string",
       "required": false,
-      "description": "Registry icon name (backward-compatible).",
-      "default": "settings"
+      "description": "Registry icon name (backward-compatible)."
     },
     "icon": {
       "type": "any",
@@ -21,14 +20,12 @@
     "size": {
       "type": "number",
       "required": false,
-      "description": "Compatibility-only. Face UI icons always render at 20x20.",
-      "default": 20
+      "description": "Compatibility-only. Face UI icons always render at 20x20."
     },
     "square": {
       "type": "boolean",
       "required": false,
-      "description": "Compatibility-only. Face UI icons always render at 20x20.",
-      "default": true
+      "description": "Compatibility-only. Face UI icons always render at 20x20."
     },
     "className": {
       "type": "string",
@@ -43,8 +40,7 @@
     "label": {
       "type": "string",
       "required": false,
-      "description": "Accessible label. If omitted, icon is decorative.",
-      "default": null
+      "description": "Accessible label. If omitted, icon is decorative."
     },
     "title": {
       "type": "string",

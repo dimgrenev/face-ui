@@ -3,22 +3,8 @@
   "props": {
     "items": {
       "type": "array",
-      "required": true,
-      "description": "Segment options inherited from Toggle.",
-      "default": [
-        {
-          "value": "grid",
-          "label": "Grid"
-        },
-        {
-          "value": "list",
-          "label": "List"
-        },
-        {
-          "value": "kanban",
-          "label": "Board"
-        }
-      ]
+      "required": false,
+      "description": "Segment options inherited from Toggle."
     },
     "value": {
       "type": "array",
@@ -43,8 +29,7 @@
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state inherited from Toggle.",
-      "default": false
+      "description": "Disabled state inherited from Toggle."
     },
     "orientation": {
       "type": "enum",
@@ -53,8 +38,7 @@
       "options": [
         "horizontal",
         "vertical"
-      ],
-      "default": "horizontal"
+      ]
     },
     "onValueChange": {
       "type": "function",
@@ -69,8 +53,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each segment item.",
-      "default": true
+      "description": "Outer membrane wrapper around each segment item."
     }
   },
   "states": [

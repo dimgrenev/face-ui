@@ -5,8 +5,7 @@
     "children": {
       "type": "string",
       "required": false,
-      "description": "Bar content (typically BarSection elements).",
-      "default": null
+      "description": "Bar content (typically BarSection elements)."
     },
     "orientation": {
       "type": "enum",
@@ -15,8 +14,7 @@
       "options": [
         "horizontal",
         "vertical"
-      ],
-      "default": "horizontal"
+      ]
     }
   },
   "states": [

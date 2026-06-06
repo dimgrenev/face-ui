@@ -4,22 +4,8 @@
   "props": {
     "options": {
       "type": "array",
-      "required": true,
-      "description": "Radio options to render.",
-      "default": [
-        {
-          "value": "small",
-          "label": "Small"
-        },
-        {
-          "value": "medium",
-          "label": "Medium"
-        },
-        {
-          "value": "large",
-          "label": "Large"
-        }
-      ]
+      "required": false,
+      "description": "Radio options to render."
     },
     "value": {
       "type": "string",
@@ -55,8 +41,7 @@
       "options": [
         "horizontal",
         "vertical"
-      ],
-      "default": "vertical"
+      ]
     },
     "onValueChange": {
       "type": "function",

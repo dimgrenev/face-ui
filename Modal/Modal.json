@@ -5,8 +5,7 @@
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled open state.",
-      "default": true
+      "description": "Controlled open state."
     },
     "variant": {
       "type": "enum",
@@ -36,20 +35,17 @@
     "title": {
       "type": "string",
       "required": false,
-      "description": "Title content rendered inside the modal.",
-      "default": "Dialog Title"
+      "description": "Title content rendered inside the modal."
     },
     "description": {
       "type": "string",
       "required": false,
-      "description": "Description content rendered below the title.",
-      "default": "This is a dialog."
+      "description": "Description content rendered below the title."
     },
     "children": {
       "type": "string",
       "required": false,
-      "description": "Body content.",
-      "default": "Modal content body"
+      "description": "Body content."
     },
     "actions": {
       "type": "array",
@@ -59,8 +55,7 @@
     "trigger": {
       "type": "string",
       "required": false,
-      "description": "Trigger element that toggles the modal open.",
-      "default": "Open"
+      "description": "Trigger element that toggles the modal open."
     },
     "width": {
       "type": "number",
@@ -154,8 +149,13 @@
     "autoFocusOnOpen": "first-focusable"
   },
   "keyboard": {
-    "Escape": { "action": "close" },
-    "Tab": { "action": "focusTrap", "scope": "modal" }
+    "Escape": {
+      "action": "close"
+    },
+    "Tab": {
+      "action": "focusTrap",
+      "scope": "modal"
+    }
   },
   "aria": {
     "role": "dialog",
@@ -164,15 +164,40 @@
     "describedBy": "modal-description"
   },
   "composition": {
-    "required": ["root", "overlay", "content"],
-    "recommended": ["title", "description", "close"],
+    "required": [
+      "root",
+      "overlay",
+      "content"
+    ],
+    "recommended": [
+      "title",
+      "description",
+      "close"
+    ],
     "parts": {
-      "root": { "slot": "root" },
-      "overlay": { "slot": "overlay", "parent": "root" },
-      "content": { "slot": "content", "parent": "root" },
-      "title": { "slot": "title", "parent": "content" },
-      "description": { "slot": "description", "parent": "content" },
-      "close": { "slot": "close", "parent": "content" }
+      "root": {
+        "slot": "root"
+      },
+      "overlay": {
+        "slot": "overlay",
+        "parent": "root"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "root"
+      },
+      "title": {
+        "slot": "title",
+        "parent": "content"
+      },
+      "description": {
+        "slot": "description",
+        "parent": "content"
+      },
+      "close": {
+        "slot": "close",
+        "parent": "content"
+      }
     }
   },
   "tokenMapping": {
@@ -217,9 +242,21 @@
     "inert": true
   },
   "usage": {
-    "whenToUse": ["Focused dialog requiring user decision", "Confirmation before destructive action", "Content that needs full attention"],
-    "whenNotToUse": ["Displaying additional info (use Popover)", "Side panel content (use Drawer)", "Non-blocking notification (use Toaster)"],
-    "alternatives": ["Drawer", "Popover", "Toaster"],
+    "whenToUse": [
+      "Focused dialog requiring user decision",
+      "Confirmation before destructive action",
+      "Content that needs full attention"
+    ],
+    "whenNotToUse": [
+      "Displaying additional info (use Popover)",
+      "Side panel content (use Drawer)",
+      "Non-blocking notification (use Toaster)"
+    ],
+    "alternatives": [
+      "Drawer",
+      "Popover",
+      "Toaster"
+    ],
     "context": "app"
   }
 }

@@ -25,7 +25,7 @@ export type { TocItem }
 
 export interface TocProps {
   /** Section items to render. */
-  items: TocItem[]
+  items?: TocItem[]
   /** Currently active section id (controlled). */
   activeId?: string
   /** Initial active section id (uncontrolled). Falls back to first item. */

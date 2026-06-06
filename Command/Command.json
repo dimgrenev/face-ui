@@ -4,42 +4,13 @@
   "props": {
     "items": {
       "type": "array",
-      "required": true,
-      "description": "Command item definitions.",
-      "default": [
-        {
-          "id": "copy",
-          "label": "Copy",
-          "keywords": [
-            "clipboard"
-          ]
-        },
-        {
-          "id": "paste",
-          "label": "Paste",
-          "keywords": [
-            "clipboard"
-          ]
-        },
-        {
-          "id": "cut",
-          "label": "Cut"
-        },
-        {
-          "id": "undo",
-          "label": "Undo"
-        },
-        {
-          "id": "redo",
-          "label": "Redo"
-        }
-      ]
+      "required": false,
+      "description": "Command item definitions."
     },
     "groups": {
       "type": "array",
       "required": false,
-      "description": "Group definitions for organizing items.",
-      "default": []
+      "description": "Group definitions for organizing items."
     },
     "placeholder": {
       "type": "string",

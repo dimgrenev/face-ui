@@ -4,35 +4,8 @@
   "props": {
     "items": {
       "type": "array",
-      "required": true,
-      "description": "Section items to render.",
-      "default": [
-        {
-          "id": "intro",
-          "label": "Introduction",
-          "level": 1
-        },
-        {
-          "id": "getting-started",
-          "label": "Getting Started",
-          "level": 1
-        },
-        {
-          "id": "installation",
-          "label": "Installation",
-          "level": 2
-        },
-        {
-          "id": "configuration",
-          "label": "Configuration",
-          "level": 2
-        },
-        {
-          "id": "api",
-          "label": "API Reference",
-          "level": 1
-        }
-      ]
+      "required": false,
+      "description": "Section items to render."
     },
     "activeId": {
       "type": "string",

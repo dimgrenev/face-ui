@@ -41,7 +41,7 @@ export interface PanelItem {
 
 export interface PanelProps {
   /** Panel item definitions (supports nested groups). */
-  items: PanelItem[]
+  items?: PanelItem[]
   /** Whether the panel is collapsed. */
   collapsed?: boolean
   /** Uncontrolled initial collapsed state. */

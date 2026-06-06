@@ -10,8 +10,7 @@
     "defaultValue": {
       "type": "string",
       "required": false,
-      "description": "components API compatibility: uncontrolled initial value.",
-      "default": ""
+      "description": "components API compatibility: uncontrolled initial value."
     },
     "name": {
       "type": "string",
@@ -63,14 +62,12 @@
     "label": {
       "type": "string",
       "required": false,
-      "description": "Label rendered above/beside the input.",
-      "default": "Label"
+      "description": "Label rendered above/beside the input."
     },
     "description": {
       "type": "string",
       "required": false,
-      "description": "Description/help text shown below the input.",
-      "default": null
+      "description": "Description/help text shown below the input."
     },
     "error": {
       "type": "string",
@@ -91,8 +88,7 @@
     "placeholder": {
       "type": "string",
       "required": false,
-      "description": "Placeholder text.",
-      "default": "Type here..."
+      "description": "Placeholder text."
     },
     "ariaLabel": {
       "type": "string",

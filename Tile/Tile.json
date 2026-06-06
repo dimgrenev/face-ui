@@ -5,14 +5,12 @@
     "text": {
       "type": "string",
       "required": false,
-      "description": "Primary label.",
-      "default": null
+      "description": "Primary label."
     },
     "rightText": {
       "type": "string",
       "required": false,
-      "description": "Optional secondary text at the far right of the label area.",
-      "default": null
+      "description": "Optional secondary text at the far right of the label area."
     },
     "variant": {
       "type": "enum",
@@ -28,8 +26,7 @@
     "icon": {
       "type": "string",
       "required": false,
-      "description": "Icon (string from registry or ReactNode).",
-      "default": null
+      "description": "Icon (string from registry or ReactNode)."
     },
     "iconPosition": {
       "type": "enum",
@@ -79,8 +76,7 @@
     "level": {
       "type": "number",
       "required": false,
-      "description": "Nesting level for option-like rows: 0..9",
-      "default": null
+      "description": "Nesting level for option-like rows: 0..9"
     },
     "truncate": {
       "type": "boolean",
@@ -97,8 +93,7 @@
     "actions": {
       "type": "string",
       "required": false,
-      "description": "Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile.",
-      "default": null
+      "description": "Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile."
     },
     "children": {
       "type": "string",

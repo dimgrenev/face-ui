@@ -23,7 +23,7 @@ export interface ToggleItem {
 
 export interface ToggleProps {
   /** Toggle items to render. */
-  items: ToggleItem[]
+  items?: ToggleItem[]
   /** Currently selected values. */
   value?: string[]
   /** Uncontrolled initial selected values. */

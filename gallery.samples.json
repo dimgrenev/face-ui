@@ -1,0 +1,474 @@
+{
+  "version": 1,
+  "samples": {
+    "Accordion": {
+      "state": "Disabled",
+      "props": {
+        "onExpandedChange": "",
+        "className": ""
+      }
+    },
+    "Avatar": {
+      "state": "Default"
+    },
+    "Badge": {
+      "state": "Default"
+    },
+    "Bar": {
+      "props": {
+        "children": "Bar content"
+      }
+    },
+    "Breadcrumb": {
+      "props": {
+        "items": [
+          {
+            "label": "Home",
+            "href": "#"
+          },
+          {
+            "label": "Design",
+            "href": "#"
+          },
+          {
+            "label": "System",
+            "href": "#"
+          },
+          {
+            "label": "Components",
+            "href": "#"
+          },
+          {
+            "label": "Navigation",
+            "href": "#"
+          },
+          {
+            "label": "Breadcrumb"
+          }
+        ]
+      }
+    },
+    "Button": {
+      "state": "Default"
+    },
+    "Calendar": {},
+    "Card": {
+      "props": {
+        "title": "Card",
+        "description": "Description",
+        "content": "Card content"
+      }
+    },
+    "Carousel": {},
+    "Checkbox": {
+      "state": "Unchecked",
+      "props": {
+        "defaultChecked": true,
+        "onCheckedChange": "",
+        "className": ""
+      },
+      "omit": [
+        "checked"
+      ]
+    },
+    "Code": {
+      "props": {
+        "code": "/* CSS file example */\n\n:root {\n  --uf-color-hover: rgba(0,0,0,0.08);\n}\n\n.button {\n  height: 32px;\n  padding: 0 8px;\n  border-radius: 6px;\n}\n\n/* long tail to test collapse */\n/* line 1 */\\n/* line 2 */\\n/* line 3 */\\n/* line 4 */\\n/* line 5 */\\n/* line 6 */\\n/* line 7 */\\n/* line 8 */\\n/* line 9 */\\n/* line 10 */\\n/* line 11 */\\n/* line 12 */\\n/* line 13 */\\n/* line 14 */\\n/* line 15 */\\n/* line 16 */\\n/* line 17 */\\n/* line 18 */\\n/* line 19 */\\n/* line 20 */",
+        "language": "css",
+        "title": "Files / Playground",
+        "defaultCollapsed": true
+      }
+    },
+    "Command": {
+      "state": "Default",
+      "props": {
+        "items": [
+          {
+            "id": "copy",
+            "label": "Copy"
+          },
+          {
+            "id": "paste",
+            "label": "Paste"
+          },
+          {
+            "id": "cut",
+            "label": "Cut"
+          }
+        ]
+      }
+    },
+    "DatePicker": {
+      "state": "Default"
+    },
+    "Drawer": {
+      "state": "Default",
+      "props": {
+        "side": "bottom",
+        "title": "Drawer",
+        "description": "Directional edge-aligned surface."
+      }
+    },
+    "Icon": {},
+    "Input": {
+      "props": {
+        "label": "Input",
+        "placeholder": "Type…"
+      },
+      "omit": [
+        "autoGrow"
+      ]
+    },
+    "Markdown": {
+      "state": "Default"
+    },
+    "Media": {
+      "props": {
+        "src": "/media/images/architecture-preview.jpg",
+        "alt": "Architecture sample"
+      }
+    },
+    "Menu": {
+      "props": {
+        "items": [
+          {
+            "value": "edit",
+            "label": "Edit"
+          },
+          {
+            "value": "delete",
+            "label": "Delete"
+          }
+        ],
+        "children": "Menu"
+      }
+    },
+    "Modal": {
+      "state": "Default (Center)",
+      "props": {
+        "trigger": "Open",
+        "title": "Modal",
+        "description": "Focused work surface",
+        "children": "Use this surface for edits, confirmations, and contextual flows.",
+        "surface": "sheet",
+        "actions": [
+          {
+            "label": "Cancel",
+            "variant": "outline"
+          },
+          {
+            "label": "Create",
+            "variant": "accent"
+          }
+        ]
+      },
+      "omit": [
+        "open"
+      ]
+    },
+    "Navigation": {
+      "props": {
+        "items": [
+          {
+            "id": "home",
+            "label": "Home"
+          },
+          {
+            "id": "library",
+            "label": "Library",
+            "items": [
+              {
+                "id": "typefaces",
+                "label": "Typefaces"
+              },
+              {
+                "id": "components",
+                "label": "Components"
+              }
+            ]
+          },
+          {
+            "id": "settings",
+            "label": "Settings"
+          }
+        ],
+        "defaultActiveId": "home"
+      }
+    },
+    "Pagination": {
+      "props": {
+        "total": 120,
+        "defaultPage": 6
+      }
+    },
+    "Panel": {
+      "props": {
+        "items": [],
+        "previewPreset": "workspace",
+        "defaultSelectedId": "overview"
+      }
+    },
+    "Popover": {
+      "state": "Default"
+    },
+    "Progress": {
+      "props": {
+        "value": 60,
+        "showLabel": true
+      }
+    },
+    "Radio": {
+      "props": {
+        "options": [
+          {
+            "value": "1",
+            "label": "Option 1"
+          },
+          {
+            "value": "2",
+            "label": "Option 2"
+          }
+        ],
+        "name": "radio",
+        "defaultValue": "1"
+      }
+    },
+    "Rating": {
+      "state": "Default"
+    },
+    "Scroll": {
+      "props": {
+        "children": "Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. "
+      },
+      "omit": [
+        "ariaLabel"
+      ]
+    },
+    "SegmentedControl": {
+      "state": "Default",
+      "props": {
+        "items": [
+          {
+            "value": "grid",
+            "label": "Grid"
+          },
+          {
+            "value": "list",
+            "label": "List"
+          },
+          {
+            "value": "board",
+            "label": "Board"
+          }
+        ]
+      },
+      "omit": [
+        "disabled",
+        "orientation",
+        "membrane"
+      ]
+    },
+    "Select": {
+      "state": "Default",
+      "props": {
+        "options": [
+          {
+            "value": "1",
+            "label": "Option 1"
+          },
+          {
+            "value": "2",
+            "label": "Option 2"
+          }
+        ],
+        "label": "Select",
+        "defaultValue": "1"
+      }
+    },
+    "Separator": {},
+    "Skeleton": {
+      "props": {
+        "width": 200,
+        "height": 20
+      }
+    },
+    "Slider": {
+      "state": "Crop"
+    },
+    "Steps": {
+      "props": {
+        "items": [
+          {
+            "label": "Account",
+            "content": "Create your workspace and owner account."
+          },
+          {
+            "label": "Profile",
+            "content": "Add brand settings, themes, and team details."
+          },
+          {
+            "label": "Review",
+            "content": "Review the setup before publishing."
+          }
+        ]
+      }
+    },
+    "Switcher": {
+      "state": "Default",
+      "props": {
+        "text": "I accept the End User License Agreement",
+        "defaultChecked": false
+      }
+    },
+    "Table": {
+      "state": "Default",
+      "props": {
+        "columns": [
+          {
+            "id": "name",
+            "header": "Name",
+            "accessor": "name",
+            "truncate": true
+          },
+          {
+            "id": "status",
+            "header": "Status",
+            "accessor": "status"
+          },
+          {
+            "id": "price",
+            "header": "Price",
+            "accessor": "price",
+            "align": "right"
+          }
+        ],
+        "rows": [
+          {
+            "id": "r1",
+            "name": "Akt Typeface 1.0",
+            "status": "Published",
+            "price": "₽ 2 990"
+          },
+          {
+            "id": "r2",
+            "name": "Begriffsschrift",
+            "status": "Draft",
+            "price": "₽ 1 990"
+          },
+          {
+            "id": "r3",
+            "name": "A very long row name to test truncation",
+            "status": "Archived",
+            "price": "—"
+          }
+        ],
+        "showRowNumbers": true
+      },
+      "omit": [
+        "sortColumn",
+        "sortDirection",
+        "selectedRows",
+        "membrane",
+        "ariaLabel"
+      ]
+    },
+    "Tabs": {
+      "props": {
+        "items": [
+          {
+            "value": "a",
+            "label": "Tab A",
+            "content": "Content A"
+          },
+          {
+            "value": "b",
+            "label": "Tab B",
+            "content": "Content B"
+          }
+        ],
+        "defaultValue": "a"
+      },
+      "omit": [
+        "renderPanels"
+      ]
+    },
+    "Text": {
+      "props": {
+        "text": "Text"
+      },
+      "omit": [
+        "truncate"
+      ]
+    },
+    "Tile": {
+      "state": "Default",
+      "omit": [
+        "truncate"
+      ]
+    },
+    "Toast": {},
+    "Toc": {
+      "props": {
+        "items": [
+          {
+            "id": "intro",
+            "label": "Introduction",
+            "level": 1
+          },
+          {
+            "id": "setup",
+            "label": "Setup",
+            "level": 1
+          },
+          {
+            "id": "tokens",
+            "label": "Design tokens",
+            "level": 2
+          },
+          {
+            "id": "themes",
+            "label": "Themes",
+            "level": 3
+          },
+          {
+            "id": "usage",
+            "label": "Usage",
+            "level": 1
+          }
+        ],
+        "defaultActiveId": "tokens"
+      }
+    },
+    "Tooltip": {
+      "state": "Default"
+    },
+    "Tree": {
+      "props": {
+        "items": [
+          {
+            "id": "src",
+            "label": "src",
+            "children": [
+              {
+                "id": "index",
+                "label": "index.ts"
+              },
+              {
+                "id": "utils",
+                "label": "utils.ts"
+              }
+            ]
+          },
+          {
+            "id": "readme",
+            "label": "README.md"
+          }
+        ],
+        "defaultExpandedIds": [
+          "src"
+        ]
+      }
+    },
+    "Upload": {}
+  }
+}

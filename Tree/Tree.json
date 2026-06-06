@@ -4,42 +4,8 @@
   "props": {
     "items": {
       "type": "array",
-      "required": true,
-      "description": "Tree node definitions (recursive).",
-      "default": [
-        {
-          "id": "src",
-          "label": "src",
-          "children": [
-            {
-              "id": "components",
-              "label": "components",
-              "children": [
-                {
-                  "id": "button",
-                  "label": "Button.tsx"
-                },
-                {
-                  "id": "input",
-                  "label": "Input.tsx"
-                }
-              ]
-            },
-            {
-              "id": "index",
-              "label": "index.ts"
-            }
-          ]
-        },
-        {
-          "id": "package",
-          "label": "package.json"
-        },
-        {
-          "id": "readme",
-          "label": "README.md"
-        }
-      ]
+      "required": false,
+      "description": "Tree node definitions (recursive)."
     },
     "expandedIds": {
       "type": "array",

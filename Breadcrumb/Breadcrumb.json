@@ -4,21 +4,8 @@
   "props": {
     "items": {
       "type": "array",
-      "required": true,
-      "description": "Breadcrumb entries, from root to current page.",
-      "default": [
-        {
-          "label": "Home",
-          "href": "/"
-        },
-        {
-          "label": "Products",
-          "href": "/products"
-        },
-        {
-          "label": "Headphones"
-        }
-      ]
+      "required": false,
+      "description": "Breadcrumb entries, from root to current page."
     },
     "separator": {
       "type": "string",

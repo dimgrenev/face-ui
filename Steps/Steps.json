@@ -4,22 +4,8 @@
   "props": {
     "items": {
       "type": "array",
-      "required": true,
-      "description": "Step definitions.",
-      "default": [
-        {
-          "label": "Account",
-          "content": "Create your account credentials."
-        },
-        {
-          "label": "Profile",
-          "content": "Fill in your profile details."
-        },
-        {
-          "label": "Review",
-          "content": "Review and confirm your information."
-        }
-      ]
+      "required": false,
+      "description": "Step definitions."
     },
     "step": {
       "type": "number",

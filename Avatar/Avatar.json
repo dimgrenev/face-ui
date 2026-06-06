@@ -17,8 +17,7 @@
     "fallback": {
       "type": "string",
       "required": false,
-      "description": "Custom fallback content when image is unavailable.",
-      "default": null
+      "description": "Custom fallback content when image is unavailable."
     },
     "fallbackDelayMs": {
       "type": "number",

@@ -4,32 +4,8 @@
   "props": {
     "items": {
       "type": "array",
-      "required": true,
-      "description": "Panel item definitions (supports nested groups).",
-      "default": [
-        {
-          "id": "dashboard",
-          "label": "Dashboard"
-        },
-        {
-          "id": "projects",
-          "label": "Projects",
-          "items": [
-            {
-              "id": "active",
-              "label": "Active"
-            },
-            {
-              "id": "archived",
-              "label": "Archived"
-            }
-          ]
-        },
-        {
-          "id": "settings",
-          "label": "Settings"
-        }
-      ]
+      "required": false,
+      "description": "Panel item definitions (supports nested groups)."
     },
     "collapsed": {
       "type": "boolean",

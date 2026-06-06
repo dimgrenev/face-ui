@@ -36,7 +36,7 @@ export interface SelectOption {
 
 export interface SelectProps {
   /** Available options. */
-  options: SelectOption[]
+  options?: SelectOption[]
   /** Current selected value. String for single, string[] for multiselect. */
   value?: string | string[] | null
   /** Uncontrolled initial selected value. */

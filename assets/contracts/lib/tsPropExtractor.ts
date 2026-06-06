@@ -222,57 +222,6 @@ function normalizeType(tsType: string, unionOptions: string[] | null): { type: s
   return { type: 'any' };
 }
 
-// For `Foo[]` types where Foo is an interface in the same file, extract a sample value
-// so that required array props get a sensible initial value instead of undefined.
-function extractLocalInterfaces(code: string): Record<string, Record<string, string>> {
-  const out: Record<string, Record<string, string>> = {};
-  try {
-    const re = /(?:export\s+)?interface\s+([A-Za-z0-9_]+)[^{]*\{/g;
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(code))) {
-      const name = m[1];
-      const braceStart = m.index + m[0].length - 1;
-      const body = extractBalancedBraces(code, braceStart);
-      if (!body) continue;
-      const fields: Record<string, string> = {};
-      const lines = body.split(/\n|;/).map((l) => l.trim()).filter(Boolean);
-      for (const line of lines) {
-        const fm = /^(\w+)\s*\??\s*:\s*([^;]+)$/.exec(line);
-        if (!fm) continue;
-        fields[fm[1]] = fm[2].trim();
-      }
-      if (Object.keys(fields).length > 0) out[name] = fields;
-    }
-  } catch {}
-  return out;
-}
-
-function generateSampleValue(tsType: string, interfaces: Record<string, Record<string, string>>): any {
-  const t = tsType.trim();
-  const arrayMatch = t.match(/^([A-Za-z0-9_]+)\s*\[\]$/);
-  if (arrayMatch) {
-    const itemType = arrayMatch[1];
-    const iface = interfaces[itemType];
-    if (iface) {
-      const sample: Record<string, any> = {};
-      for (const [k, v] of Object.entries(iface)) {
-        const vl = v.toLowerCase();
-        if (vl.startsWith('string')) sample[k] = k === 'value' ? 'option-1' : k === 'label' ? 'Option 1' : '';
-        else if (vl.startsWith('number')) sample[k] = 0;
-        else if (vl.startsWith('boolean')) sample[k] = false;
-        else sample[k] = '';
-      }
-      const sample2 = { ...sample };
-      for (const [k, v] of Object.entries(sample2)) {
-        if (k === 'value') sample2[k] = 'option-2';
-        else if (k === 'label') sample2[k] = 'Option 2';
-      }
-      return [sample, sample2];
-    }
-  }
-  return undefined;
-}
-
 // Parse rudimentary PropTypes: oneOf([...]), string, number, bool, array, object, func, and .isRequired
 function extractPropTypes(code: string): Record<string, { type: string; options?: string[]; required?: boolean }>{
   const out: Record<string, { type: string; options?: string[]; required?: boolean }> = {};
@@ -309,7 +258,6 @@ export function extractReactTsPropsFromSource(bundle: SourceBundle): ExtractedPr
   const aliases = { ...extractLocalAliases(code), ...extractJsDocAliases(code) };
   const propTypes = extractPropTypes(code);
   const iface = extractPropsInterface(code);
-  const interfaces = extractLocalInterfaces(code);
   const out: ExtractedProp[] = [];
   if (iface) {
     // Collapse multiline types into single entries. Split only on `;` or newlines
@@ -348,9 +296,6 @@ export function extractReactTsPropsFromSource(bundle: SourceBundle): ExtractedPr
       }
       if (Object.prototype.hasOwnProperty.call(defaults, name)) {
         prop.defaultValue = defaults[name];
-      } else if (prop.required && prop.type === 'array') {
-        const sample = generateSampleValue(typeText, interfaces);
-        if (sample !== undefined) prop.defaultValue = sample;
       }
       out.push(prop);
     }
@@ -370,5 +315,4 @@ export function extractReactTsPropsFromSource(bundle: SourceBundle): ExtractedPr
   }
   return out;
 }
-
 

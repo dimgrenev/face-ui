@@ -5,19 +5,7 @@
     "items": {
       "type": "array",
       "required": false,
-      "description": "Accordion item definitions.",
-      "default": [
-        {
-          "value": "a",
-          "label": "Section A",
-          "content": "Content A"
-        },
-        {
-          "value": "b",
-          "label": "Section B",
-          "content": "Content B"
-        }
-      ]
+      "description": "Accordion item definitions."
     },
     "expandedIds": {
       "type": "array",
@@ -27,8 +15,7 @@
     "defaultExpandedIds": {
       "type": "array",
       "required": false,
-      "description": "Uncontrolled initial expanded item IDs.",
-      "default": []
+      "description": "Uncontrolled initial expanded item IDs."
     },
     "multiple": {
       "type": "boolean",

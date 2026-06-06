@@ -39,7 +39,7 @@ export interface BreadcrumbItem {
 
 export interface BreadcrumbProps {
   /** Breadcrumb entries, from root to current page. */
-  items: BreadcrumbItem[]
+  items?: BreadcrumbItem[]
   /** Custom separator between items. Defaults to "/". */
   separator?: ReactNode
   /** Wrap breadcrumb options (link/current) with membrane spacing. */

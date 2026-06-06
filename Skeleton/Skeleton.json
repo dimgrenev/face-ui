@@ -5,14 +5,12 @@
     "width": {
       "type": "string",
       "required": false,
-      "description": "Explicit width",
-      "default": "200px"
+      "description": "Explicit width"
     },
     "height": {
       "type": "string",
       "required": false,
-      "description": "Explicit height",
-      "default": "20px"
+      "description": "Explicit height"
     },
     "variant": {
       "type": "enum",

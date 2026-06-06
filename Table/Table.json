@@ -5,56 +5,17 @@
     "columns": {
       "type": "array",
       "required": false,
-      "description": "Column definitions.",
-      "default": [
-        {
-          "id": "name",
-          "header": "Name",
-          "accessor": "name",
-          "sortable": true
-        },
-        {
-          "id": "email",
-          "header": "Email",
-          "accessor": "email"
-        },
-        {
-          "id": "role",
-          "header": "Role",
-          "accessor": "role"
-        }
-      ]
+      "description": "Column definitions."
     },
     "rows": {
       "type": "array",
       "required": false,
-      "description": "Row data.",
-      "default": [
-        {
-          "id": "1",
-          "name": "Alice Johnson",
-          "email": "alice@example.com",
-          "role": "Admin"
-        },
-        {
-          "id": "2",
-          "name": "Bob Smith",
-          "email": "bob@example.com",
-          "role": "Editor"
-        },
-        {
-          "id": "3",
-          "name": "Carol Williams",
-          "email": "carol@example.com",
-          "role": "Viewer"
-        }
-      ]
+      "description": "Row data."
     },
     "rowKey": {
       "type": "string",
       "required": false,
-      "description": "Key field on each row, or a function returning a unique key.",
-      "default": "id"
+      "description": "Key field on each row, or a function returning a unique key."
     },
     "sortColumn": {
       "type": "string",
@@ -85,8 +46,7 @@
     "selectedRows": {
       "type": "array",
       "required": false,
-      "description": "Controlled selected row IDs.",
-      "default": []
+      "description": "Controlled selected row IDs."
     },
     "onSelectedRowsChange": {
       "type": "function",
@@ -173,8 +133,7 @@
     "ariaLabel": {
       "type": "string",
       "required": false,
-      "description": "Accessible label for the table when there is no visible caption.",
-      "default": "Data table"
+      "description": "Accessible label for the table when there is no visible caption."
     }
   },
   "states": [

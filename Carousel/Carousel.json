@@ -5,12 +5,7 @@
     "children": {
       "type": "array",
       "required": false,
-      "description": "Slide elements. Each child becomes one slide.",
-      "default": [
-        "Slide 1",
-        "Slide 2",
-        "Slide 3"
-      ]
+      "description": "Slide elements. Each child becomes one slide."
     },
     "loop": {
       "type": "boolean",

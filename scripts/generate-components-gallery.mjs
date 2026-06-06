@@ -1,0 +1,234 @@
+/* eslint-disable no-console */
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const THIS_FILE = fileURLToPath(import.meta.url)
+const PACKAGE_ROOT = path.resolve(path.dirname(THIS_FILE), '..')
+const GENERATED_DIR = path.join(PACKAGE_ROOT, 'utils', '__generated__')
+const ENTRIES_FILE = path.join(GENERATED_DIR, 'render_gallery.generated.ts')
+const META_FILE = path.join(GENERATED_DIR, 'render_gallery.meta.generated.ts')
+const REGISTRY_FILE = path.join(PACKAGE_ROOT, 'component-registry.json')
+const SAMPLES_FILE = path.join(PACKAGE_ROOT, 'gallery.samples.json')
+
+const UNCONTROLLED_PROP_PAIRS = [
+  ['value', 'defaultValue'],
+  ['checked', 'defaultChecked'],
+  ['open', 'defaultOpen'],
+  ['collapsed', 'defaultCollapsed'],
+  ['selectedId', 'defaultSelectedId'],
+  ['expandedIds', 'defaultExpandedIds'],
+  ['page', 'defaultPage'],
+  ['step', 'defaultStep'],
+  ['sizes', 'defaultSizes'],
+  ['index', 'defaultIndex'],
+  ['activeId', 'defaultActiveId'],
+  ['cropRange', 'defaultCropRange'],
+]
+
+function readJson(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'))
+}
+
+function stableJson(value) {
+  return JSON.stringify(value)
+}
+
+function formatArrayProperty(name, values) {
+  if (!Array.isArray(values) || values.length === 0) return ''
+  return `, ${name}: ${stableJson(values)}`
+}
+
+function listComponentContracts() {
+  return fs.readdirSync(PACKAGE_ROOT)
+    .sort((left, right) => left.localeCompare(right))
+    .map((name) => {
+      const componentDir = path.join(PACKAGE_ROOT, name)
+      return {
+        name,
+        componentDir,
+        sourcePath: path.join(componentDir, `${name}.tsx`),
+        contractPath: path.join(componentDir, `${name}.json`),
+      }
+    })
+    .filter((entry) => (
+      fs.existsSync(entry.componentDir)
+      && fs.statSync(entry.componentDir).isDirectory()
+      && fs.existsSync(entry.sourcePath)
+      && fs.existsSync(entry.contractPath)
+    ))
+}
+
+function getDefaultProps(contract) {
+  return Object.fromEntries(
+    Object.entries(contract.props || {})
+      .filter(([, prop]) => Object.prototype.hasOwnProperty.call(prop, 'default'))
+      .map(([name, prop]) => [name, prop.default]),
+  )
+}
+
+function convertControlledStateProps(props, contract) {
+  const next = { ...props }
+  for (const [controlled, uncontrolled] of UNCONTROLLED_PROP_PAIRS) {
+    if (
+      Object.prototype.hasOwnProperty.call(next, controlled)
+      && contract.props?.[uncontrolled]
+      && !Object.prototype.hasOwnProperty.call(next, uncontrolled)
+    ) {
+      next[uncontrolled] = next[controlled]
+      delete next[controlled]
+    }
+  }
+  return next
+}
+
+function getStateProps(contract, sampleConfig, componentName) {
+  const stateName = sampleConfig?.state
+  if (!stateName) return {}
+  const state = (contract.states || []).find((entry) => entry.name === stateName)
+  if (!state) {
+    throw new Error(`${componentName} gallery sample references unknown state "${stateName}"`)
+  }
+  return convertControlledStateProps(state.props || {}, contract)
+}
+
+function validateSampleProps(componentName, props, contract) {
+  const contractProps = contract.props || {}
+  for (const propName of Object.keys(props)) {
+    if (!contractProps[propName]) {
+      throw new Error(`${componentName} gallery sample uses unknown prop "${propName}"`)
+    }
+  }
+}
+
+function buildSampleProps(componentName, contract, sampleConfig = {}) {
+  const props = {
+    ...getDefaultProps(contract),
+    ...getStateProps(contract, sampleConfig, componentName),
+    ...(sampleConfig.props || {}),
+  }
+  for (const propName of sampleConfig.omit || []) {
+    delete props[propName]
+  }
+  validateSampleProps(componentName, props, contract)
+  return props
+}
+
+function buildGalleryEntries() {
+  const registry = readJson(REGISTRY_FILE)
+  const samples = readJson(SAMPLES_FILE)
+  const sampleByName = samples.samples || {}
+  const contracts = listComponentContracts()
+  const entries = []
+
+  for (const entry of contracts) {
+    const registryEntry = registry.components?.[entry.name] || {}
+    if (registryEntry.status === 'deprecated') continue
+
+    const contract = readJson(entry.contractPath)
+    const sampleProps = buildSampleProps(entry.name, contract, sampleByName[entry.name])
+    const meta = {
+      name: entry.name,
+      relativeSourcePath: `${entry.name}/${entry.name}.tsx`,
+      sampleProps,
+      ...registryEntry,
+    }
+    entries.push(meta)
+  }
+
+  return entries
+}
+
+function renderEntries(entries) {
+  const imports = entries
+    .map((entry) => `import { ${entry.name} } from '../../${entry.name}/${entry.name}';`)
+    .join('\n')
+  const rows = entries
+    .map((entry) => `  { name: ${stableJson(entry.name)}, Component: ${entry.name}, sampleProps: ${stableJson(entry.sampleProps)} },`)
+    .join('\n')
+
+  return `/* eslint-disable */
+// This file is auto-generated by scripts/generate-components-gallery.mjs
+import React from 'react';
+
+${imports}
+
+export type FeldGalleryEntry = {
+  name: string;
+  Component: React.ComponentType<any>;
+  sampleProps?: Record<string, any>;
+};
+
+export const FELD_GALLERY_ENTRIES: FeldGalleryEntry[] = [
+${rows}
+];
+`
+}
+
+function renderMeta(entries) {
+  const rows = entries
+    .map((entry) => {
+      const registryFields = [
+        entry.category ? `, category: ${stableJson(entry.category)}` : '',
+        entry.status ? `, status: ${stableJson(entry.status)}` : '',
+        formatArrayProperty('aliases', entry.aliases),
+        formatArrayProperty('related', entry.related),
+        formatArrayProperty('replacedBy', entry.replacedBy),
+        entry.responsiveSurface ? `, responsiveSurface: ${stableJson(entry.responsiveSurface)}` : '',
+        typeof entry.a11yReviewed === 'boolean' ? `, a11yReviewed: ${String(entry.a11yReviewed)}` : '',
+        typeof entry.mobileReviewed === 'boolean' ? `, mobileReviewed: ${String(entry.mobileReviewed)}` : '',
+      ].join('')
+      return `  { name: ${stableJson(entry.name)}, relativeSourcePath: ${stableJson(entry.relativeSourcePath)}, sampleProps: ${stableJson(entry.sampleProps)}${registryFields} },`
+    })
+    .join('\n')
+
+  return `/* eslint-disable */
+// This file is auto-generated by scripts/generate-components-gallery.mjs
+
+export type FeldGalleryMetaEntry = {
+  name: string;
+  relativeSourcePath: string;
+  sampleProps?: Record<string, any>;
+  category?: string;
+  status?: string;
+  aliases?: string[];
+  related?: string[];
+  replacedBy?: string[];
+  responsiveSurface?: string;
+  a11yReviewed?: boolean;
+  mobileReviewed?: boolean;
+};
+
+export const FELD_GALLERY_META: FeldGalleryMetaEntry[] = [
+${rows}
+];
+`
+}
+
+function assertUnchanged(filePath, nextContent) {
+  const current = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : ''
+  if (current !== nextContent) {
+    throw new Error(`Generated gallery drift: ${path.relative(PACKAGE_ROOT, filePath)}`)
+  }
+}
+
+function main() {
+  const write = process.argv.includes('--write')
+  const entries = buildGalleryEntries()
+  const nextEntries = renderEntries(entries)
+  const nextMeta = renderMeta(entries)
+
+  if (write) {
+    fs.mkdirSync(GENERATED_DIR, { recursive: true })
+    fs.writeFileSync(ENTRIES_FILE, nextEntries, 'utf8')
+    fs.writeFileSync(META_FILE, nextMeta, 'utf8')
+    console.log(`Generated Face UI gallery (${entries.length} components)`)
+    return
+  }
+
+  assertUnchanged(ENTRIES_FILE, nextEntries)
+  assertUnchanged(META_FILE, nextMeta)
+  console.log(`Face UI gallery is in sync (${entries.length} components)`)
+}
+
+main()

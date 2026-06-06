@@ -15,14 +15,12 @@
     "min": {
       "type": "object",
       "required": false,
-      "description": "Minimum selectable date.",
-      "default": null
+      "description": "Minimum selectable date."
     },
     "max": {
       "type": "object",
       "required": false,
-      "description": "Maximum selectable date.",
-      "default": null
+      "description": "Maximum selectable date."
     },
     "disabledDates": {
       "type": "array",

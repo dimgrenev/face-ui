@@ -5,26 +5,22 @@
     "title": {
       "type": "string",
       "required": false,
-      "description": "Card title",
-      "default": "Card Title"
+      "description": "Card title"
     },
     "description": {
       "type": "string",
       "required": false,
-      "description": "Card description below title",
-      "default": "Card description text."
+      "description": "Card description below title"
     },
     "content": {
       "type": "string",
       "required": false,
-      "description": "Card body content",
-      "default": null
+      "description": "Card body content"
     },
     "footer": {
       "type": "string",
       "required": false,
-      "description": "Card footer content",
-      "default": null
+      "description": "Card footer content"
     },
     "membrane": {
       "type": "boolean",
@@ -35,8 +31,7 @@
     "children": {
       "type": "string",
       "required": false,
-      "description": "Custom children (escape hatch)",
-      "default": null
+      "description": "Custom children (escape hatch)"
     }
   },
   "states": [

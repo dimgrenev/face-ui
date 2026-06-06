@@ -4,15 +4,13 @@
   "props": {
     "code": {
       "type": "string",
-      "required": true,
-      "description": "Source code string.",
-      "default": "const greeting = 'Hello, world!';\nconsole.log(greeting);"
+      "required": false,
+      "description": "Source code string."
     },
     "language": {
       "type": "string",
       "required": false,
-      "description": "Language hint (used as a data attribute for syntax highlighter integration).",
-      "default": "tsx"
+      "description": "Language hint (used as a data attribute for syntax highlighter integration)."
     },
     "tokenizedLines": {
       "type": "array",
@@ -22,8 +20,7 @@
     "title": {
       "type": "string",
       "required": false,
-      "description": "Title shown in the header bar.",
-      "default": "example.tsx"
+      "description": "Title shown in the header bar."
     },
     "showLineNumbers": {
       "type": "boolean",
@@ -34,8 +31,7 @@
     "highlight": {
       "type": "array",
       "required": false,
-      "description": "Line numbers to visually highlight (1-based).",
-      "default": []
+      "description": "Line numbers to visually highlight (1-based)."
     },
     "defaultCollapsed": {
       "type": "boolean",

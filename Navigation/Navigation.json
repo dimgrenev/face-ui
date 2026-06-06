@@ -4,26 +4,8 @@
   "props": {
     "items": {
       "type": "array",
-      "required": true,
-      "description": "Navigation item definitions (supports nested dropdowns).",
-      "default": [
-        {
-          "id": "home",
-          "label": "Home"
-        },
-        {
-          "id": "products",
-          "label": "Products"
-        },
-        {
-          "id": "about",
-          "label": "About"
-        },
-        {
-          "id": "contact",
-          "label": "Contact"
-        }
-      ]
+      "required": false,
+      "description": "Navigation item definitions (supports nested dropdowns)."
     },
     "activeId": {
       "type": "string",

@@ -4,22 +4,8 @@
   "props": {
     "items": {
       "type": "array",
-      "required": true,
-      "description": "Toggle items to render.",
-      "default": [
-        {
-          "value": "bold",
-          "label": "Bold"
-        },
-        {
-          "value": "italic",
-          "label": "Italic"
-        },
-        {
-          "value": "underline",
-          "label": "Underline"
-        }
-      ]
+      "required": false,
+      "description": "Toggle items to render."
     },
     "value": {
       "type": "array",

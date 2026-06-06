@@ -44,7 +44,7 @@ export interface CommandGroup {
 
 export interface CommandProps {
   /** Command item definitions. */
-  items: CommandItem[]
+  items?: CommandItem[]
   /** Group definitions for organizing items. */
   groups?: CommandGroup[]
   /** Placeholder text for the search input. */

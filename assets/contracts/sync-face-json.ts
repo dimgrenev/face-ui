@@ -382,6 +382,40 @@ function extractNamedPropsBody(code: string, interfaceName: string): string | nu
   return null
 }
 
+function extractsFaceUiProps(interfaceName: string, code: string): boolean {
+  const interfacePattern = new RegExp(`(?:export\\s+)?interface\\s+${interfaceName}\\b([^\\{]*)\\{`, 'm')
+  const interfaceMatch = interfacePattern.exec(code)
+  const interfacePreamble = interfaceMatch?.[1] || ''
+  if (/\b(?:HTMLAttributes|ButtonHTMLAttributes|InputHTMLAttributes|TextareaHTMLAttributes|AriaAttributes|DOMAttributes)\b/.test(interfacePreamble)) {
+    return false
+  }
+  if (/\b(?:Omit|Pick|Partial|Required)?\s*<?\s*[A-Z][A-Za-z0-9_]*Props\b/.test(interfacePreamble)) {
+    return true
+  }
+
+  const typePattern = new RegExp(`(?:export\\s+)?type\\s+${interfaceName}\\s*=\\s*([^\\n;]+)`, 'm')
+  const typeMatch = typePattern.exec(code)
+  const typeText = typeMatch?.[1] || ''
+  return /\b(?:Omit|Pick|Partial|Required)?\s*<?\s*[A-Z][A-Za-z0-9_]*Props\b/.test(typeText)
+}
+
+function toPropAnalysis(prop: ParsedProp | EnrichedProp | ExtractedProp): PropAnalysis {
+  return {
+    name: prop.name,
+    type: prop.type,
+    required: prop.required,
+    defaultValue: prop.defaultValue,
+    description: 'description' in prop ? prop.description : undefined,
+    options: prop.options,
+    enumValues: 'enumValues' in prop ? prop.enumValues : undefined,
+    isArray: 'isArray' in prop ? prop.isArray : undefined,
+    arrayItemType: 'arrayItemType' in prop ? prop.arrayItemType : undefined,
+    isObject: 'isObject' in prop ? prop.isObject : undefined,
+    objectShape: 'objectShape' in prop ? prop.objectShape : undefined,
+    isInherited: 'isInherited' in prop ? prop.isInherited : undefined,
+  }
+}
+
 function buildCanonicalAnalyses(componentName: string, relSourcePath: string, code: string): PropAnalysis[] {
   const interfaceName = `${componentName}Props`
   const targetBody = extractNamedPropsBody(code, interfaceName)
@@ -401,6 +435,19 @@ function buildCanonicalAnalyses(componentName: string, relSourcePath: string, co
   }
 
   if (canonicalNames.size > 0) {
+    if (extractsFaceUiProps(interfaceName, code)) {
+      const analyses: PropAnalysis[] = []
+      const seen = new Set<string>()
+      for (const prop of enrichedProps) {
+        if (!prop.name || prop.name === 'id' || prop.name === 'key') continue
+        if (prop.isInherited) continue
+        if (seen.has(prop.name)) continue
+        seen.add(prop.name)
+        analyses.push(toPropAnalysis(prop))
+      }
+      if (analyses.length > 0) return analyses
+    }
+
     const analyses: PropAnalysis[] = []
     for (const canonical of canonicalProps) {
       if (!canonical.name || canonical.name === 'id' || canonical.name === 'key') continue
@@ -535,8 +582,8 @@ function toFaceProp(prop: PropAnalysis, existing?: FaceJsonProp): FaceJsonProp {
 
   if (prop.defaultValue !== undefined) {
     next.default = prop.defaultValue
-  } else if (existing && Object.prototype.hasOwnProperty.call(existing, 'default')) {
-    next.default = existing.default
+  } else {
+    delete next.default
   }
 
   return next

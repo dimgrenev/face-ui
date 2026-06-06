@@ -5,8 +5,7 @@
     "className": {
       "type": "string",
       "required": false,
-      "description": "Additional class name for the toast group container.",
-      "default": null
+      "description": "Additional class name for the toast group container."
     },
     "showTrigger": {
       "type": "boolean",
@@ -39,7 +38,9 @@
     "autoFocusOnOpen": "none"
   },
   "keyboard": {
-    "Escape": { "action": "dismissAll" }
+    "Escape": {
+      "action": "dismissAll"
+    }
   },
   "aria": {
     "role": "status",
@@ -47,16 +48,46 @@
     "variantRolePolicy": "All toast variants stay non-blocking polite status messages. Use Modal or alertdialog for blocking alerts."
   },
   "composition": {
-    "required": ["root", "group", "item"],
-    "recommended": ["title", "description", "action", "close"],
+    "required": [
+      "root",
+      "group",
+      "item"
+    ],
+    "recommended": [
+      "title",
+      "description",
+      "action",
+      "close"
+    ],
     "parts": {
-      "root": { "slot": "root" },
-      "group": { "slot": "group", "parent": "root" },
-      "item": { "slot": "item", "parent": "group", "multiple": true },
-      "title": { "slot": "title", "parent": "item" },
-      "description": { "slot": "description", "parent": "item" },
-      "action": { "slot": "action", "parent": "item" },
-      "close": { "slot": "close", "parent": "item" }
+      "root": {
+        "slot": "root"
+      },
+      "group": {
+        "slot": "group",
+        "parent": "root"
+      },
+      "item": {
+        "slot": "item",
+        "parent": "group",
+        "multiple": true
+      },
+      "title": {
+        "slot": "title",
+        "parent": "item"
+      },
+      "description": {
+        "slot": "description",
+        "parent": "item"
+      },
+      "action": {
+        "slot": "action",
+        "parent": "item"
+      },
+      "close": {
+        "slot": "close",
+        "parent": "item"
+      }
     }
   },
   "tokenMapping": {
@@ -94,7 +125,9 @@
       "Blocking alerts (use Modal)",
       "Inline validation (use Input error prop)"
     ],
-    "alternatives": ["Modal"],
+    "alternatives": [
+      "Modal"
+    ],
     "context": "app"
   }
 }

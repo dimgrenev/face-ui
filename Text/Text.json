@@ -5,8 +5,7 @@
     "text": {
       "type": "string",
       "required": false,
-      "description": "Text content.",
-      "default": null
+      "description": "Text content."
     },
     "variant": {
       "type": "enum",
@@ -41,8 +40,7 @@
         "md",
         "lg",
         "xl"
-      ],
-      "default": null
+      ]
     },
     "as": {
       "type": "enum",
@@ -64,14 +62,12 @@
         "strong",
         "em",
         "small"
-      ],
-      "default": null
+      ]
     },
     "icon": {
       "type": "string",
       "required": false,
-      "description": "Icon element (ReactNode).",
-      "default": null
+      "description": "Icon element (ReactNode)."
     },
     "iconPosition": {
       "type": "enum",
@@ -131,8 +127,7 @@
     "children": {
       "type": "string",
       "required": false,
-      "description": "Custom children (overrides text).",
-      "default": null
+      "description": "Custom children (overrides text)."
     },
     "htmlFor": {
       "type": "string",

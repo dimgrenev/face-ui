@@ -23,7 +23,7 @@ export type ProgressVariant = 'default' | 'success' | 'warning' | 'error'
 
 export interface ProgressProps {
   /** Current value. Pass -1 for indeterminate. */
-  value: number
+  value?: number
   /** Maximum value (default 100). */
   max?: number
   /** Color variant. */
@@ -44,7 +44,7 @@ export interface ProgressProps {
 export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
   function Progress(props, ref) {
     const {
-      value,
+      value = 0,
       max = 100,
       variant = 'default',
       showLabel = false,

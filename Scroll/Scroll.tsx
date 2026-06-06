@@ -28,7 +28,7 @@ export type ScrollbarVisibility = 'auto' | 'always' | 'hover' | 'scroll'
 
 export interface ScrollProps {
   /** Content to make scrollable. */
-  children: ReactNode
+  children?: ReactNode
   /** When scrollbars are visible. */
   type?: ScrollbarVisibility
   /** Which axes can scroll. */

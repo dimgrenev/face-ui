@@ -26,7 +26,7 @@ export interface PaginationProps {
   /** Uncontrolled initial page number (1-indexed). */
   defaultPage?: number
   /** Total number of items. */
-  total: number
+  total?: number
   /** Number of items per page. */
   pageSize?: number
   /** Number of sibling pages shown around the current page. */

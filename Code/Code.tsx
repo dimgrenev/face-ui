@@ -38,7 +38,7 @@ export interface CodeToken {
 
 export interface CodeProps {
   /** Source code string. */
-  code: string
+  code?: string
   /** Language hint (used as a data attribute for syntax highlighter integration). */
   language?: string
   /**

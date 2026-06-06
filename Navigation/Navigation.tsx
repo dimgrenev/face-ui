@@ -37,7 +37,7 @@ export interface NavigationItem {
 
 export interface NavigationProps {
   /** Navigation item definitions (supports nested dropdowns). */
-  items: NavigationItem[]
+  items?: NavigationItem[]
   /** Currently active item ID. */
   activeId?: string
   /** Uncontrolled initial active item ID. */

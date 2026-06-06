@@ -5,8 +5,7 @@
     "text": {
       "type": "string",
       "required": false,
-      "description": "Button label text.",
-      "default": "Button1"
+      "description": "Button label text."
     },
     "rightText": {
       "type": "string",
@@ -41,20 +40,17 @@
       "options": [
         "left",
         "right"
-      ],
-      "default": "left"
+      ]
     },
     "iconOnly": {
       "type": "boolean",
       "required": false,
-      "description": "Icon-only mode (no text, square button).",
-      "default": false
+      "description": "Icon-only mode (no text, square button)."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
-      "default": false
+      "description": "Disabled state."
     },
     "loading": {
       "type": "boolean",
@@ -69,8 +65,7 @@
     "fullWidth": {
       "type": "boolean",
       "required": false,
-      "description": "Full width button.",
-      "default": true
+      "description": "Full width button."
     },
     "align": {
       "type": "enum",
@@ -80,8 +75,7 @@
         "left",
         "right",
         "center"
-      ],
-      "default": null
+      ]
     },
     "level": {
       "type": "number",
@@ -91,14 +85,12 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing around the button.",
-      "default": true
+      "description": "Membrane spacing around the button."
     },
     "copyText": {
       "type": "string",
       "required": false,
-      "description": "Copy text to clipboard on click (Clipboard integration).",
-      "default": null
+      "description": "Copy text to clipboard on click (Clipboard integration)."
     },
     "onCopied": {
       "type": "function",
@@ -108,8 +100,7 @@
     "children": {
       "type": "string",
       "required": false,
-      "description": "Custom children (overrides text/icon rendering).",
-      "default": null
+      "description": "Custom children (overrides text/icon rendering)."
     }
   },
   "states": [

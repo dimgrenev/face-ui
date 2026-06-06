@@ -4,7 +4,7 @@
   "props": {
     "value": {
       "type": "number",
-      "required": true,
+      "required": false,
       "description": "Current value. Pass -1 for indeterminate.",
       "default": 0
     },
@@ -35,8 +35,7 @@
     "label": {
       "type": "string",
       "required": false,
-      "description": "Optional label rendered beside the track.",
-      "default": null
+      "description": "Optional label rendered beside the track."
     },
     "className": {
       "type": "string",

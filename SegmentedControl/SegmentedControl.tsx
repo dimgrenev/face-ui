@@ -5,7 +5,7 @@ export interface SegmentedControlItem extends ToggleItem {}
 
 export interface SegmentedControlProps {
   /** Segment options inherited from Toggle. */
-  items: ToggleItem[]
+  items?: ToggleItem[]
   /** Currently selected segment values. */
   value?: string[]
   /** Uncontrolled initial selected segment values. */
