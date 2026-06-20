@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+  "generatedPath": "design-system/tokens/colors.css",
   "tokens": [
     {
       "sheet": "semantic-feedback",
@@ -8,11 +8,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#28a745"
+          "value": "var(--uf-color-foreground)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#28a745"
+          "value": "var(--uf-color-foreground)"
         }
       ]
     },
@@ -22,11 +22,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#000000"
+          "value": "var(--uf-color-background)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#000000"
+          "value": "var(--uf-color-background)"
         }
       ]
     },
@@ -50,11 +50,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#dc3545"
+          "value": "var(--uf-color-foreground)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#dc3545"
+          "value": "var(--uf-color-foreground)"
         }
       ]
     },
@@ -64,11 +64,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#000000"
+          "value": "var(--uf-color-background)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#000000"
+          "value": "var(--uf-color-background)"
         }
       ]
     },
@@ -92,11 +92,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#ffc107"
+          "value": "var(--uf-color-text-secondary)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#ffc107"
+          "value": "var(--uf-color-text-secondary)"
         }
       ]
     },
@@ -106,11 +106,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#000000"
+          "value": "var(--uf-color-background)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#000000"
+          "value": "var(--uf-color-background)"
         }
       ]
     },
@@ -134,11 +134,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#17a2b8"
+          "value": "var(--uf-color-text-secondary)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#17a2b8"
+          "value": "var(--uf-color-text-secondary)"
         }
       ]
     },
@@ -148,11 +148,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#000000"
+          "value": "var(--uf-color-background)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#000000"
+          "value": "var(--uf-color-background)"
         }
       ]
     },
@@ -167,6 +167,118 @@
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
           "value": "var(--uf-color-info-foreground)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-destructive",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-error)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-error)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-destructive-fg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-error-foreground)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-error-foreground)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-destructive-soft",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-white-12)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-black-8)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-progress-track-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-hover-bg)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-hover-bg)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-progress-indicator-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-fg)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-fg)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-progress-indicator-success-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-success)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-success)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-progress-indicator-warning-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-warning)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-warning)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-progress-indicator-error-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-destructive)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-destructive)"
         }
       ]
     }

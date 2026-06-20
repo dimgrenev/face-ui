@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedPath": "packages/userface-app-ui/design-system/tokens/typography.css",
+  "generatedPath": "design-system/tokens/typography.css",
   "tokens": [
     {
       "sheet": "typography",
@@ -319,6 +319,336 @@
         {
           "selector": ":root",
           "value": "var(--uf-font-family-mono)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-control-font-size)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-font-weight",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-weight-normal)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-color",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-color-foreground)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-font-family",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-family-base)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-font-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-control-font-size)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-font-weight",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-weight)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-line-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-control-line-height)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-letter-spacing",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-min-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-control-height)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-pad-x",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-control-pad-text)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-pad-y",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-control-pad-y)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-body-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-control-font-size)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-body-line-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-control-line-height)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-section-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-control-font-size)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-section-line-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-control-line-height)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-label-font-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-size-sm)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-label-line-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "18px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-caption-font-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-size-xs)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-caption-line-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "16px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-caption-color",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-color-text-secondary)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-heading-font-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-size-xl)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-heading-font-weight",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-weight-semibold)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-size-font-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-font-size)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-h1-delta",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-h2-delta",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "8px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-h3-delta",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "6px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-h4-delta",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "4px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-h5-delta",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "2px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-blockquote-border-width",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-border-width-thick)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-kbd-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "20px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-kbd-pad-x",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "6px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-inset-none-min-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-inset-none-padding",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0"
         }
       ]
     }

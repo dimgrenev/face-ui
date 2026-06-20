@@ -22,8 +22,16 @@
 
   /* Горизонтальные паддинги контролов */
   --uf-control-pad-text: 12px;  /* сторона с текстом */
+  --uf-control-pad-left: var(--uf-control-pad-text);
+  --uf-control-pad-right: var(--uf-control-pad-text);
   --uf-control-pad-icon: 6px;   /* сторона с иконкой */
   --uf-control-gap: 10px;       /* gap между элементами внутри */
+  --uf-option-indent: 28px;
+  --uf-content-inset: 12px;
+  --uf-icon-size: 20px;
+  --uf-icon-only-size: 32px;
+  --uf-hidden-input-size: 1px;
+  --uf-hidden-input-offset: -1px;
 
   /* ============================================
    * TEXT COMPONENT GEOMETRY
@@ -65,7 +73,10 @@
   --uf-workspace-resize-hit-size: 20px;
   --uf-workspace-resize-hit-offset: calc(var(--uf-workspace-resize-hit-size) / -2);
   --uf-workspace-resize-line-width: 1px;
+  --uf-workspace-resize-line-color: var(--uf-color-border);
+  --uf-workspace-resize-line-active-color: var(--uf-color-border-hover);
   --uf-workspace-resize-line-transition: none;
+  --uf-interactive-weight: 500;
 
   /* ============================================
    * ICON GEOMETRY

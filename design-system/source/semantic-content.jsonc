@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+  "generatedPath": "design-system/tokens/colors.css",
   "tokens": [
     {
       "sheet": "semantic-content",
@@ -8,11 +8,25 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#ededed"
+          "value": "var(--uf-color-white-92)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#000000"
+          "value": "var(--uf-color-black-88)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-content",
+      "name": "--uf-color-fg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-foreground)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-foreground)"
         }
       ]
     },
@@ -22,11 +36,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#ededed"
+          "value": "var(--uf-color-foreground)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#000000"
+          "value": "var(--uf-color-foreground)"
         }
       ]
     },
@@ -36,11 +50,25 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#888888"
+          "value": "var(--uf-color-white-54)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#666666"
+          "value": "var(--uf-color-black-48)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-content",
+      "name": "--uf-color-fg-muted",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-text-secondary)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-text-secondary)"
         }
       ]
     },
@@ -64,11 +92,39 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#ffffff"
+          "value": "var(--uf-color-white-100)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#000000"
+          "value": "var(--uf-color-black-100)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-content",
+      "name": "--uf-color-primary",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-white-100)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-black-100)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-content",
+      "name": "--uf-color-primary-fg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-black-100)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-white-100)"
         }
       ]
     }

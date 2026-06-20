@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedPath": "packages/userface-app-ui/design-system/tokens/colors.css",
+  "generatedPath": "design-system/tokens/colors.css",
   "tokens": [
     {
       "sheet": "semantic-action",
@@ -8,11 +8,25 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "rgba(255, 255, 255, 0.20)"
+          "value": "var(--uf-color-white-12)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "rgba(0, 0, 0, 0.06)"
+          "value": "var(--uf-color-black-8)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-active-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-active)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-active)"
         }
       ]
     },
@@ -22,11 +36,25 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "rgba(255, 255, 255, 0.10)"
+          "value": "var(--uf-color-white-8)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "rgba(0, 0, 0, 0.04)"
+          "value": "var(--uf-color-black-6)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-hover-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-hover)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-hover)"
         }
       ]
     },
@@ -36,11 +64,25 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#007bff"
+          "value": "var(--uf-color-foreground)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#007bff"
+          "value": "var(--uf-color-foreground)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-accent-fg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-background)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-background)"
         }
       ]
     },
@@ -50,11 +92,39 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#0056b3"
+          "value": "var(--uf-color-white-88)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#0056b3"
+          "value": "var(--uf-color-black-88)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-primary-hover-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-white-88)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-black-88)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-cta",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-foreground)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-foreground)"
         }
       ]
     },
@@ -64,11 +134,49 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#ff4000"
+          "value": "var(--uf-color-accent-hover)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#ff4000"
+          "value": "var(--uf-color-accent-hover)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-cta-contrast",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-background)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-background)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-color-disabled-opacity",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0.6"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-action",
+      "name": "--uf-button-ring-color",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-border)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-border)"
         }
       ]
     }

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedPath": "packages/userface-app-ui/design-system/tokens/borders.css",
+  "generatedPath": "design-system/tokens/borders.css",
   "tokens": [
     {
       "sheet": "shape",
@@ -59,16 +59,6 @@
         {
           "selector": ":root",
           "value": "4px"
-        }
-      ]
-    },
-    {
-      "sheet": "shape",
-      "name": "--uf-radius-base",
-      "variants": [
-        {
-          "selector": ":root",
-          "value": "6px"
         }
       ]
     },
@@ -168,7 +158,37 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "var(--uf-border-width-base) var(--uf-border-style-solid) var(--uf-color-accent)"
+          "value": "var(--uf-border-width-base) var(--uf-border-style-solid) var(--uf-color-ring)"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-membrane",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "1px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-radius",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "6px"
+        }
+      ]
+    },
+    {
+      "sheet": "shape",
+      "name": "--uf-radius-base",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-radius)"
         }
       ]
     }

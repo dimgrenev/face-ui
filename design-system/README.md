@@ -148,8 +148,8 @@ Product packages keep only app/site-specific compositions and patterns on top of
 ```css
 .button {
   padding: 0.75rem 1.5rem;
-  background: #000000;
-  color: #ffffff;
+  background: var(--uf-color-black-100);
+  color: var(--uf-color-white-100);
   border-radius: 0.375rem;
   font-size: 0.875rem;
 }

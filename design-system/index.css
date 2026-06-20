@@ -3,7 +3,7 @@
  *
  * Импортирует все части дизайн-системы:
  * 1. Tokens (токены)
- * 2. Typography (типографика)
+ * 2. Themes (значения тем)
  * 3. Utilities (утилитарные классы)
  *
  * Использование:
@@ -15,9 +15,6 @@
 
 /* Themes (default values for all geometry/typography) */
 @import './themes/index.css';
-
-/* Typography Classes */
-@import '../styles/typography.css';
 
 /* Utility Classes */
 @import './utilities/spacing.css';

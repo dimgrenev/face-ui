@@ -29,7 +29,7 @@
   --uf-control-pad-right: var(--uf-control-pad-text);
   --uf-button-focus-ring-width: calc(var(--uf-membrane) * 2);
   --uf-button-outline-width: var(--uf-membrane);
-  --uf-button-bg: transparent;
+  --uf-button-bg: var(--uf-color-black-0);
   --uf-button-fg: var(--uf-color-fg);
   --uf-button-hover-bg: var(--uf-color-hover-bg);
   --uf-button-hover-fg: var(--uf-button-fg);
@@ -81,7 +81,7 @@
 
 /* Variants */
 .uf-button[data-scope="button"][data-variant="default"] {
-  --uf-button-bg: transparent;
+  --uf-button-bg: var(--uf-color-black-0);
   --uf-button-fg: var(--uf-color-fg);
   --uf-button-hover-bg: var(--uf-color-hover-bg);
 }
@@ -89,7 +89,7 @@
 .uf-button[data-scope="button"][data-variant="primary"] {
   --uf-button-bg: var(--uf-color-primary);
   --uf-button-fg: var(--uf-color-primary-fg);
-  --uf-button-hover-bg: color-mix(in srgb, var(--uf-color-primary) 88%, transparent);
+  --uf-button-hover-bg: var(--uf-color-primary-hover-bg);
   --uf-button-hover-fg: var(--uf-color-primary-fg);
 }
 
@@ -123,9 +123,9 @@
 }
 
 .uf-button[data-scope="button"][data-variant="ghost"] {
-  --uf-button-bg: transparent;
+  --uf-button-bg: var(--uf-color-black-0);
   --uf-button-fg: var(--uf-color-fg);
-  --uf-button-hover-bg: transparent;
+  --uf-button-hover-bg: var(--uf-color-black-0);
   --uf-button-hover-fg: var(--uf-color-fg);
   opacity: 0.32;
   --uf-control-gap: var(--uf-spacing-2);
@@ -133,14 +133,14 @@
 
 .uf-button[data-scope="button"][data-variant="delete"],
 .uf-button[data-scope="button"][data-variant="destructive"] {
-  --uf-button-bg: transparent;
+  --uf-button-bg: var(--uf-color-black-0);
   --uf-button-fg: var(--uf-color-fg);
   --uf-button-hover-bg: var(--uf-color-destructive-soft);
   --uf-button-hover-fg: var(--uf-color-destructive);
 }
 
 .uf-button[data-scope="button"][data-variant="suggestion"] {
-  --uf-button-bg: transparent;
+  --uf-button-bg: var(--uf-color-black-0);
   --uf-button-fg: var(--uf-color-fg);
   --uf-button-hover-bg: var(--uf-color-hover-bg);
   --uf-button-hover-fg: var(--uf-color-fg);
@@ -265,7 +265,7 @@
   display: inline-block;
   width: var(--uf-spinner-size);
   height: var(--uf-spinner-size);
-  border: var(--uf-spinner-border-width) solid transparent;
+  border: var(--uf-spinner-border-width) solid var(--uf-color-black-0);
   border-top-color: currentColor;
   border-radius: 50%;
   animation: uf-spin var(--uf-motion-duration-spin) var(--uf-motion-ease-linear) var(--uf-motion-iteration-indefinite);
@@ -330,7 +330,7 @@
   --uf-tile-level-compensation: calc(var(--uf-membrane) * 6);
   --uf-tile-action-size: calc(var(--uf-control-height) - (var(--uf-tile-pad) * 2) - (var(--uf-membrane) * 2));
   --uf-tile-focus-ring-width: calc(var(--uf-membrane) * 2);
-  --uf-tile-bg: transparent;
+  --uf-tile-bg: var(--uf-color-black-0);
   --uf-tile-fg: var(--uf-color-fg);
   --uf-tile-hover-bg: var(--uf-color-hover-bg);
   position: relative;
@@ -396,18 +396,18 @@
 
 /* Variants */
 .uf-tile[data-scope="tile"][data-variant="default"] {
-  --uf-tile-bg: transparent;
+  --uf-tile-bg: var(--uf-color-black-0);
 }
 .uf-tile[data-scope="tile"][data-variant="ghost"] {
-  --uf-tile-bg: transparent;
-  --uf-tile-hover-bg: transparent;
+  --uf-tile-bg: var(--uf-color-black-0);
+  --uf-tile-hover-bg: var(--uf-color-black-0);
 }
 .uf-tile[data-scope="tile"][data-variant="ghost"]:hover {
   font-weight: var(--uf-font-weight-bold);
 }
 .uf-tile[data-scope="tile"][data-variant="accent"] {
-  --uf-tile-bg: transparent;
-  --uf-tile-hover-bg: color-mix(in srgb, var(--uf-color-primary) 10%, transparent);
+  --uf-tile-bg: var(--uf-color-black-0);
+  --uf-tile-hover-bg: var(--uf-color-hover-bg);
 }
 
 /* Parts */
@@ -435,7 +435,7 @@
 [data-scope="tile"][data-stretch-text] [data-part="text"] {
   flex: 1 1 auto;
 }
-/* Make uf-text__content transparent so custom children become direct flex items
+/* Let uf-text__content pass layout through so custom children become direct flex items
    of the inline-flex [data-part="text"] container — prevents block-level children
    (e.g. display:flex spans) from stacking vertically. */
 [data-scope="tile"] .uf-text__content {
@@ -676,7 +676,7 @@
 .uf-separator[data-scope] {
   --uf-separator-line-width: var(--uf-membrane);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   display: block;
   box-sizing: border-box;
 }
@@ -691,7 +691,7 @@
   line-height: 0;
   font-size: 0;
   overflow: hidden;
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 .uf-separator[data-scope][data-orientation="horizontal"] {
   display: block;
@@ -760,7 +760,7 @@
   box-shadow: none;
 }
 .uf-badge[data-scope][data-appearance="outline"] {
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-badge-border);
   box-shadow: inset 0 0 0 var(--uf-badge-outline-width) var(--uf-badge-border);
 }
@@ -867,7 +867,7 @@
   justify-content: center;
   flex-shrink: 0;
   color: var(--uf-color-fg);
-  background: transparent;
+  background: var(--uf-color-black-0);
   border: none;
   box-shadow: none;
   outline: none;
@@ -971,7 +971,7 @@
   color: var(--uf-color-fg);
   border: none;
   box-shadow: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 .uf-switcher[data-scope] [data-part="control"][data-state="checked"] {
   opacity: 1;
@@ -1047,7 +1047,7 @@
   border: none;
   box-shadow: none;
   outline: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 .uf-radio-option:hover,
 [data-scope="radio"] [data-part="item"]:hover {
@@ -1063,7 +1063,7 @@
   justify-content: center;
   flex-shrink: 0;
   color: var(--uf-color-fg);
-  background: transparent;
+  background: var(--uf-color-black-0);
   border: none;
   box-shadow: none;
 }
@@ -1094,7 +1094,7 @@
   border: none;
   outline: none;
   box-shadow: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 .uf-input[data-scope="input"][data-label-orientation="horizontal"] {
   display: grid;
@@ -1127,7 +1127,7 @@
   border: none;
   outline: none;
   box-shadow: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   border-radius: var(--uf-radius);
 }
 [data-scope="input"] [data-part="input"],
@@ -1137,7 +1137,7 @@
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border: none;
   border-radius: var(--uf-radius);
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-color-fg);
   font: inherit;
   font-size: var(--uf-control-font-size);
@@ -1273,7 +1273,7 @@
   height: var(--uf-input-icon-size);
   padding: 0;
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-color-fg-muted);
   cursor: pointer;
   opacity: 0;
@@ -1463,7 +1463,7 @@
   padding-right: var(--uf-control-pad-icon);
   border: none;
   border-radius: var(--uf-radius);
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-color-fg);
   font: inherit;
   cursor: pointer;
@@ -1521,7 +1521,7 @@
   width: 100%;
   z-index: var(--uf-z-dropdown);
   padding: 0;
-  background: transparent;
+  background: var(--uf-color-black-0);
   border-radius: 0;
   box-shadow: none;
   border: none;
@@ -1611,7 +1611,7 @@
   border: none;
   box-shadow: none;
   outline: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 [data-scope="select"] [data-part="option"]:hover,
 [data-scope="select"] [data-part="option"][data-highlighted] {
@@ -1661,7 +1661,7 @@
   padding-right: var(--uf-control-pad-icon);
   border: none;
   border-radius: var(--uf-radius);
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-color-fg);
   gap: var(--uf-control-gap);
   cursor: pointer;
@@ -1698,7 +1698,7 @@
   max-width: min(var(--uf-date-content-max-width), calc(100vw - var(--uf-date-content-viewport-gap)));
   max-height: min(80vh, var(--uf-date-content-max-height));
   overflow: visible;
-  background: transparent;
+  background: var(--uf-color-black-0);
   border-radius: 0;
   z-index: var(--uf-z-dropdown);
   padding: 0;
@@ -1842,7 +1842,7 @@
   position: relative;
   height: var(--uf-slider-track-hit-size);
   width: 100%;
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 [data-scope="slider"][data-orientation="horizontal"] [data-part="track"]::before {
   content: "";
@@ -2046,7 +2046,7 @@
   height: var(--uf-slider-crop-marker-h);
   padding: 0;
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2093,7 +2093,7 @@
   min-height: var(--uf-control-height);
   padding: 0;
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   border-radius: var(--uf-radius);
   cursor: pointer;
   font-size: var(--uf-font-size-lg);
@@ -2129,7 +2129,7 @@
   display: inline-flex;
   border-radius: var(--uf-radius);
   overflow: visible;
-  background: transparent;
+  background: var(--uf-color-black-0);
   gap: 0;
   column-gap: 0;
   row-gap: 0;
@@ -2156,7 +2156,7 @@
   min-width: var(--uf-control-height);
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-color-fg);
   font: inherit;
   cursor: pointer;
@@ -2724,7 +2724,7 @@
   height: auto;
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-color-fg-muted);
   font: inherit;
   cursor: pointer;
@@ -2783,7 +2783,7 @@
   padding-left: var(--uf-control-pad-text);
   padding-right: var(--uf-control-pad-icon);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-color-fg);
   font: inherit;
   font-weight: var(--uf-font-weight);
@@ -2891,7 +2891,7 @@
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border: none;
   border-radius: var(--uf-radius);
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-color-fg);
   font: inherit;
 }
@@ -2906,7 +2906,7 @@
 }
 .uf-pagination-current[data-scope="text"] {
   border-radius: var(--uf-radius);
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-color-fg-muted);
   font-weight: var(--uf-font-weight);
   pointer-events: none;
@@ -2977,7 +2977,7 @@
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border-radius: var(--uf-radius);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   font: inherit;
   cursor: pointer;
   color: var(--uf-color-fg-muted);
@@ -3036,7 +3036,7 @@
   text-align: left;
   cursor: default;
   color: var(--uf-color-fg-muted);
-  background: transparent;
+  background: var(--uf-color-black-0);
   border: none;
 }
 [data-scope="file-upload"] [data-part="dropzone"][data-dragging],
@@ -3080,7 +3080,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: var(--uf-control-font-size);
-  background: transparent;
+  background: var(--uf-color-black-0);
   border-radius: 0;
   overflow: visible;
 }
@@ -3089,7 +3089,7 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 .uf-table[data-scope] th {
   text-align: left;
@@ -3101,7 +3101,7 @@
   white-space: nowrap;
   border: none;
   position: relative;
-  background: transparent;
+  background: var(--uf-color-black-0);
   vertical-align: middle;
 }
 .uf-table[data-scope] th[data-sortable] {
@@ -3115,7 +3115,7 @@
   padding: 0;
   color: var(--uf-color-fg);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   vertical-align: middle;
 }
 .uf-table[data-scope] tr[data-selected] td,
@@ -3320,7 +3320,7 @@
   align-items: center;
   justify-content: center;
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   border-radius: var(--uf-radius);
   cursor: pointer;
   color: var(--uf-color-fg-muted);
@@ -3375,7 +3375,7 @@
   font-weight: var(--uf-font-weight-bold);
   border: none;
   padding: 0;
-  background: transparent;
+  background: var(--uf-color-black-0);
   box-shadow: none;
 }
 
@@ -3385,7 +3385,7 @@
   padding: 0;
   width: calc(100% / 7);
   text-align: center;
-  background: transparent;
+  background: var(--uf-color-black-0);
   box-shadow: none;
 }
 [data-scope="calendar"] td > .uf-membrane {
@@ -3404,7 +3404,7 @@
   min-width: var(--uf-control-height);
   padding: 0;
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   border-radius: var(--uf-radius);
   font-size: var(--uf-font-size-sm);
   cursor: pointer;
@@ -3459,14 +3459,14 @@
 [data-scope="resizable"] [data-part="handle"] {
   flex-shrink: 0;
   position: relative;
-  background: transparent;
+  background: var(--uf-color-black-0);
   transition: none;
   z-index: 1;
 }
 [data-scope="resizable"] [data-part="handle"]::before {
   content: "";
   position: absolute;
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 [data-scope="resizable"] [data-part="handle"]::after {
   content: "";
@@ -3509,7 +3509,7 @@
 }
 [data-scope="resizable"] [data-part="handle"]:hover,
 [data-scope="resizable"] [data-part="handle"][data-dragging] {
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 [data-scope="resizable"] [data-part="handle"]:hover::after,
 [data-scope="resizable"] [data-part="handle"]:focus-visible::after,
@@ -3553,7 +3553,7 @@
   padding-right: var(--uf-control-pad-text);
   border: none;
   border-radius: var(--uf-radius);
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: var(--uf-color-fg);
   gap: var(--uf-control-gap);
   font: inherit;
@@ -3641,7 +3641,7 @@
   height: auto;
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   font: inherit;
   font-size: var(--uf-control-font-size);
   line-height: var(--uf-control-line-height);
@@ -3865,7 +3865,7 @@
   height: auto;
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border-radius: var(--uf-radius);
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 .uf-breadcrumb-overflow[data-scope="button"][data-icon-only] {
   --uf-icon-only-size: var(--uf-control-height);
@@ -4004,7 +4004,7 @@
 [data-scope="markdown"] a {
   color: var(--uf-color-fg);
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--uf-color-fg-muted) 70%, transparent);
+  text-decoration-color: var(--uf-color-fg-muted);
   text-underline-offset: var(--uf-markdown-underline-offset);
 }
 [data-scope="markdown"] a:hover {
@@ -4031,7 +4031,7 @@
   overflow-x: auto;
 }
 [data-scope="markdown"] pre code {
-  background: transparent;
+  background: var(--uf-color-black-0);
   border-radius: 0;
   padding: 0;
 }
@@ -4125,7 +4125,7 @@
   overflow: auto;
   white-space: pre;
   tab-size: 2;
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 /* Scrollable (expanded, long content) */
 .uf-code[data-scope] pre.is-scrollable {
@@ -4143,7 +4143,7 @@
   right: 0;
   bottom: 0;
   height: var(--uf-code-fade-h, var(--uf-code-fade-height));
-  background: linear-gradient(to bottom, transparent, var(--black-4));
+  background: linear-gradient(to bottom, var(--uf-color-black-0), var(--uf-color-black-4));
   pointer-events: none;
 }
 /* Lines */
@@ -4251,7 +4251,7 @@
 [data-scope="sidebar"] [data-part="toggle"] {
   width: 100%;
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   padding: var(--uf-spacing-2) var(--uf-content-inset);
   cursor: pointer;
   color: var(--uf-color-fg-muted);
@@ -4306,7 +4306,7 @@
   width: 100%;
   opacity: 1;
   color: var(--uf-color-fg-muted);
-  background: transparent;
+  background: var(--uf-color-black-0);
   font-weight: var(--uf-font-weight);
   box-shadow: none;
 }
@@ -4350,7 +4350,7 @@
   padding: 0 var(--uf-spacing-3) var(--uf-spacing-3);
 }
 .uf-sidebar-sheet .uf-sidebar[data-scope] {
-  background: transparent;
+  background: var(--uf-color-black-0);
   flex: 1 1 auto;
   min-height: 0;
   padding: 0;
@@ -4398,7 +4398,7 @@
   height: auto;
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   font: inherit;
   color: var(--uf-color-fg-muted);
   cursor: pointer;
@@ -4527,7 +4527,7 @@
   font-size: var(--uf-font-size-sm);
   border-radius: var(--uf-radius);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   font: inherit;
   width: 100%;
   text-align: left;
@@ -4588,7 +4588,7 @@
   display: block;
   overflow: hidden;
   border-radius: 0;
-  background: transparent;
+  background: var(--uf-color-black-0);
   position: relative;
   touch-action: pan-y pinch-zoom;
   padding: var(--uf-carousel-viewport-pad);
@@ -4644,16 +4644,16 @@
 .uf-carousel-indicatorButton[data-scope="button"][data-icon-only] {
   --uf-icon-only-size: var(--uf-carousel-indicator-button-size);
   color: var(--uf-color-accent);
-  background: transparent;
+  background: var(--uf-color-black-0);
   opacity: 0.28;
 }
 .uf-carousel-indicatorButton[data-scope="button"][data-icon-only]:hover {
-  background: transparent;
+  background: var(--uf-color-black-0);
   opacity: 0.48;
 }
 [data-scope="carousel"] [data-part="indicator-item"][data-state="active"].uf-carousel-indicatorButton[data-scope="button"] {
   color: var(--uf-color-accent);
-  background: transparent;
+  background: var(--uf-color-black-0);
   opacity: 1;
 }
 
@@ -4795,7 +4795,7 @@
   opacity: 0;
   background: linear-gradient(
     to right,
-    color-mix(in srgb, var(--uf-tabs-tab-action-bg) 0%, transparent),
+    var(--uf-color-black-0),
     var(--uf-tabs-tab-action-bg) 58%
   );
   transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-standard);
@@ -4820,8 +4820,8 @@
   border: 0;
   border-radius: var(--uf-radius-full);
   padding: 0;
-  background: transparent;
-  color: color-mix(in srgb, var(--uf-color-fg) 68%, transparent);
+  background: var(--uf-color-black-0);
+  color: var(--uf-color-fg-muted);
   opacity: 0;
   pointer-events: none;
   cursor: default;
@@ -4837,7 +4837,7 @@
 }
 .uf-tabs .uf-tabs-tabAction:is(:hover, :focus-visible) {
   color: var(--uf-color-fg);
-  background: color-mix(in srgb, var(--uf-color-fg) 8%, transparent);
+  background: var(--uf-color-hover-bg);
 }
 .uf-tabs .uf-tabs-tabSlot:is(:hover, :focus-within) > .uf-tabs-tabAction,
 .uf-tabs .uf-tabs-tabSlot[data-action-visibility="always"] > .uf-tabs-tabAction {
@@ -4983,7 +4983,7 @@
 }
 
 .uf-gallery-icon-button {
-  background: transparent;
+  background: var(--uf-color-black-0);
   border: none;
   padding: 0;
   margin: 0;

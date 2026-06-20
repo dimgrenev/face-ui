@@ -150,7 +150,7 @@ label[data-scope] {
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border-radius: var(--uf-radius);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: inherit;
   font: inherit;
   font-weight: var(--uf-font-weight);
@@ -193,7 +193,7 @@ label[data-scope] {
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border-radius: var(--uf-radius);
   border: none;
-  background: transparent;
+  background: var(--uf-color-black-0);
   color: inherit;
   font: inherit;
   font-weight: var(--uf-font-weight);
@@ -318,7 +318,7 @@ label[data-scope] {
  * --------------------------------------------------------------- */
 [data-scope="scroll"] [data-part="viewport"] {
   scrollbar-width: thin;
-  scrollbar-color: var(--black-20) transparent;
+  scrollbar-color: var(--black-20) var(--uf-color-black-0);
 }
 
 [data-scope="scroll"][data-type="hover"] [data-part="viewport"] {
@@ -334,7 +334,7 @@ label[data-scope] {
   width: var(--uf-border-width-thick);
 }
 [data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--uf-color-black-0);
 }
 [data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar-thumb {
   background: var(--black-20);

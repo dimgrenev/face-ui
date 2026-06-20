@@ -103,6 +103,18 @@ describe('taxonomy and governance', () => {
     expect(animationsCss).toContain('transition-duration: var(--uf-motion-duration-reduced);')
   })
 
+  it('keeps component geometry runtime aliases available', () => {
+    expect(tokensCss).toContain('--uf-membrane: 1px;')
+    expect(tokensCss).toContain('--uf-radius: 6px;')
+    expect(tokensCss).toContain('--uf-radius-base: var(--uf-radius);')
+    expect(tokensCss).toContain('--uf-control-pad-left: var(--uf-control-pad-text);')
+    expect(tokensCss).toContain('--uf-control-pad-right: var(--uf-control-pad-text);')
+    expect(tokensCss).toContain('--uf-content-inset: 12px;')
+    expect(tokensCss).toContain('--uf-button-ring-color: var(--uf-color-border);')
+    expect(componentsCss).toContain('padding: var(--uf-membrane);')
+    expect(componentsCss).toContain('border-radius: var(--uf-radius);')
+  })
+
   it('keeps portalled dropdown layers above modal panels', () => {
     const overlayZ = readCssNumberToken(tokensCss, '--uf-z-overlay')
     const modalZ = readCssNumberToken(tokensCss, '--uf-z-modal')
@@ -164,8 +176,8 @@ describe('taxonomy and governance', () => {
   })
 
   it('keeps Tooltip colors on dedicated non-inverted tokens', () => {
-    expect(tokensCss).toContain('--uf-tooltip-bg: var(--black-100);')
-    expect(tokensCss).toContain('--uf-tooltip-fg: var(--white-100);')
+    expect(tokensCss).toContain('--uf-tooltip-bg: var(--uf-color-black-100);')
+    expect(tokensCss).toContain('--uf-tooltip-fg: var(--uf-color-white-100);')
     expect(componentsCss).toContain('--uf-text-color: var(--uf-tooltip-fg);')
     expect(componentsCss).toContain('background: var(--uf-tooltip-bg);')
     expect(componentsCss).toContain('color: var(--uf-tooltip-fg);')

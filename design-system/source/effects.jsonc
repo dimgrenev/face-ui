@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedPath": "packages/userface-app-ui/design-system/tokens/shadows.css",
+  "generatedPath": "design-system/tokens/shadows.css",
   "tokens": [
     {
       "sheet": "effects",
@@ -18,15 +18,15 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "0 1px 2px rgba(0, 0, 0, 0.05)"
+          "value": "0 1px 2px var(--uf-color-black-6)"
         },
         {
           "selector": ":root[data-theme='light']",
-          "value": "0 1px 2px rgba(0, 0, 0, 0.05)"
+          "value": "0 1px 2px var(--uf-color-black-6)"
         },
         {
           "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
-          "value": "0 1px 2px rgba(0, 0, 0, 0.3)"
+          "value": "0 1px 2px var(--uf-color-black-30)"
         }
       ]
     },
@@ -36,15 +36,15 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)"
+          "value": "0 1px 3px var(--uf-color-black-10), 0 1px 2px var(--uf-color-black-6)"
         },
         {
           "selector": ":root[data-theme='light']",
-          "value": "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)"
+          "value": "0 1px 3px var(--uf-color-black-10), 0 1px 2px var(--uf-color-black-6)"
         },
         {
           "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
-          "value": "0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3)"
+          "value": "0 1px 3px var(--uf-color-black-40), 0 1px 2px var(--uf-color-black-30)"
         }
       ]
     },
@@ -54,15 +54,15 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)"
+          "value": "0 4px 6px var(--uf-color-black-10), 0 2px 4px var(--uf-color-black-6)"
         },
         {
           "selector": ":root[data-theme='light']",
-          "value": "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)"
+          "value": "0 4px 6px var(--uf-color-black-10), 0 2px 4px var(--uf-color-black-6)"
         },
         {
           "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
-          "value": "0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3)"
+          "value": "0 4px 6px var(--uf-color-black-40), 0 2px 4px var(--uf-color-black-30)"
         }
       ]
     },
@@ -72,15 +72,15 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)"
+          "value": "0 10px 15px var(--uf-color-black-10), 0 4px 6px var(--uf-color-black-6)"
         },
         {
           "selector": ":root[data-theme='light']",
-          "value": "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)"
+          "value": "0 10px 15px var(--uf-color-black-10), 0 4px 6px var(--uf-color-black-6)"
         },
         {
           "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
-          "value": "0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.4)"
+          "value": "0 10px 15px var(--uf-color-black-50), 0 4px 6px var(--uf-color-black-40)"
         }
       ]
     },
@@ -90,15 +90,15 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)"
+          "value": "0 20px 25px var(--uf-color-black-10), 0 10px 10px var(--uf-color-black-4)"
         },
         {
           "selector": ":root[data-theme='light']",
-          "value": "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)"
+          "value": "0 20px 25px var(--uf-color-black-10), 0 10px 10px var(--uf-color-black-4)"
         },
         {
           "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
-          "value": "0 20px 25px rgba(0, 0, 0, 0.5), 0 10px 10px rgba(0, 0, 0, 0.4)"
+          "value": "0 20px 25px var(--uf-color-black-50), 0 10px 10px var(--uf-color-black-40)"
         }
       ]
     },
@@ -217,6 +217,56 @@
         {
           "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
           "value": "120px"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-overlay-backdrop-blur",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "28px"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-overlay-surface-blur",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "24px"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-overlay-surface-shadow",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-overlay-enter-y",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "10px"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-overlay-enter-scale",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0.985"
         }
       ]
     }

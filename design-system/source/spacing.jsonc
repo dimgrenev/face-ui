@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedPath": "packages/userface-app-ui/design-system/tokens/spacing.css",
+  "generatedPath": "design-system/tokens/spacing.css",
   "tokens": [
     {
       "sheet": "spacing",

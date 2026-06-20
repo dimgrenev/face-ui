@@ -14,7 +14,7 @@
   align-items: center;
   gap: var(--uf-control-gap);
   justify-content: flex-start;
-  background: transparent;
+  background: var(--uf-color-black-0);
   border: none;
   border-radius: var(--uf-radius-sm);
   cursor: pointer;

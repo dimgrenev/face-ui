@@ -1,21 +1,8 @@
-/**
- * Design Tokens: Typography
- *
- * Централизованная система типографики для Userface Design System
- * Akt is loaded by product shells from Google Fonts.
- * Begriffsschrift is the only local monospace font.
- */
+/* Generated from canonical design-system source. */
 
 :root {
-  /* ============================================
-   * FONT FAMILIES
-   * ============================================ */
   --uf-font-family-base: 'Akt', sans-serif;
   --uf-font-family-mono: 'Begriffsschrift', monospace;
-
-  /* ============================================
-   * FONT SIZES
-   * ============================================ */
   --uf-font-size-xs: 10px;
   --uf-font-size-sm: 11px;
   --uf-font-size-base: 12px;
@@ -26,51 +13,57 @@
   --uf-font-size-3xl: 24px;
   --uf-font-size-4xl: 32px;
   --uf-font-size-5xl: 48px;
-
-  /* ============================================
-   * FONT WEIGHTS
-   * ============================================ */
   --uf-font-weight-normal: 400;
   --uf-font-weight-medium: 500;
   --uf-font-weight-semibold: 600;
   --uf-font-weight-bold: 600;
-
-  /* ============================================
-   * LINE HEIGHTS
-   * ============================================ */
   --uf-line-height-tight: 1.2;
   --uf-line-height-normal: 1.5;
   --uf-line-height-relaxed: 1.6;
-
-  /* ============================================
-   * LETTER SPACING
-   * ============================================ */
   --uf-letter-spacing-tight: 0;
   --uf-letter-spacing-normal: 0;
   --uf-letter-spacing-wide: 0;
   --uf-letter-spacing-wider: 0;
-
-  /* ============================================
-   * TEXT TRANSFORMS
-   * ============================================ */
   --uf-text-transform-none: none;
   --uf-text-transform-uppercase: uppercase;
   --uf-text-transform-lowercase: lowercase;
-
-  /* ============================================
-   * CONTROL TYPOGRAPHY (32px controls)
-   * ============================================ */
-  /* Single source of truth for button-like controls (our UI baseline is 14/20). */
   --uf-control-font-size: 14px;
   --uf-control-line-height: 20px;
   --uf-control-letter-spacing: 0;
-}
-
-/* ============================================
- * LEGACY COMPATIBILITY
- * ============================================ */
-:root {
   --font-base: var(--uf-font-family-base);
   --uf-font-family: var(--uf-font-family-base);
   --uf-font-mono: var(--uf-font-family-mono);
+  --uf-font-size: var(--uf-control-font-size);
+  --uf-font-weight: var(--uf-font-weight-normal);
+  --uf-text-color: var(--uf-color-foreground);
+  --uf-text-font-family: var(--uf-font-family-base);
+  --uf-text-font-size: var(--uf-control-font-size);
+  --uf-text-font-weight: var(--uf-font-weight);
+  --uf-text-line-height: var(--uf-control-line-height);
+  --uf-text-letter-spacing: 0;
+  --uf-text-min-height: var(--uf-control-height);
+  --uf-text-pad-x: var(--uf-control-pad-text);
+  --uf-text-pad-y: var(--uf-control-pad-y);
+  --uf-text-body-size: var(--uf-control-font-size);
+  --uf-text-body-line-height: var(--uf-control-line-height);
+  --uf-text-section-size: var(--uf-control-font-size);
+  --uf-text-section-line-height: var(--uf-control-line-height);
+  --uf-text-label-font-size: var(--uf-font-size-sm);
+  --uf-text-label-line-height: 18px;
+  --uf-text-caption-font-size: var(--uf-font-size-xs);
+  --uf-text-caption-line-height: 16px;
+  --uf-text-caption-color: var(--uf-color-text-secondary);
+  --uf-text-heading-font-size: var(--uf-font-size-xl);
+  --uf-text-heading-font-weight: var(--uf-font-weight-semibold);
+  --uf-text-size-font-size: var(--uf-font-size);
+  --uf-text-h1-delta: 12px;
+  --uf-text-h2-delta: 8px;
+  --uf-text-h3-delta: 6px;
+  --uf-text-h4-delta: 4px;
+  --uf-text-h5-delta: 2px;
+  --uf-text-blockquote-border-width: var(--uf-border-width-thick);
+  --uf-text-kbd-height: 20px;
+  --uf-text-kbd-pad-x: 6px;
+  --uf-text-inset-none-min-height: 0;
+  --uf-text-inset-none-padding: 0;
 }
