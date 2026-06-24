@@ -54,7 +54,7 @@
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-black-2)"
+          "value": "var(--uf-color-background)"
         }
       ]
     },

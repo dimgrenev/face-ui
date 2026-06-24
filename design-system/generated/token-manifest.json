@@ -3668,6 +3668,20 @@
       ]
     },
     {
+      "name": "uf-color-new",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "#78bfff",
+        "#3b9dff"
+      ]
+    },
+    {
       "name": "uf-color-on-success",
       "sheet": "semantic-feedback",
       "profile": "design-system",
@@ -3972,7 +3986,7 @@
       ],
       "values": [
         "var(--uf-color-white-8)",
-        "var(--uf-color-black-2)"
+        "var(--uf-color-background)"
       ]
     },
     {

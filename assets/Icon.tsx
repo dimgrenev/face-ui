@@ -422,6 +422,9 @@ const icons = {
   'up': (
     <path d="M5 12L10 7L15 12" stroke="currentColor"/>
   ),
+  'unreaded': (
+    <path d="M7 10C7 8.09091 8.5 7 10 7C11.5 7 13 8.09091 13 10C13 11.9091 11.5 13 10 13C8.5 13 7 11.9091 7 10Z" fill="currentColor"/>
+  ),
   'user': (
     <path d="M4 17C4 14 6 12 10 12C14 12 16 14 16 17M15.5 16.5H4.5M13 6C13 4 12 3 10 3C8 3 7 4 7 6C7 8 8 9 10 9C12 9 13 8 13 6Z" stroke="currentColor"/>
   ),
@@ -678,6 +681,7 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'theme': "0 0 20 20",
   'type': "0 0 20 20",
   'up': "0 0 20 20",
+  'unreaded': "0 0 20 20",
   'user': "0 0 20 20",
   'userface': "0 0 20 20",
   'account': "0 0 20 20",

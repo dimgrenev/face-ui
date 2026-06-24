@@ -1,5 +1,5 @@
 /**
- * Scroll — scroll area with custom scrollbar styling hooks.
+ * Scroll — native scroll area.
  *
  * `<Scroll>{content}</Scroll>`
  * `<Scroll type="always" orientation="both">{content}</Scroll>`
@@ -13,12 +13,7 @@ import { cn } from '../assets/utils'
 // Anatomy
 // ---------------------------------------------------------------------------
 
-export const scrollAnatomy = createAnatomy('scroll').parts(
-  'root',
-  'viewport',
-  'scrollbar',
-  'thumb',
-)
+export const scrollAnatomy = createAnatomy('scroll').parts('root', 'viewport')
 
 // ---------------------------------------------------------------------------
 // Types
@@ -29,7 +24,7 @@ export type ScrollbarVisibility = 'auto' | 'always' | 'hover' | 'scroll'
 export interface ScrollProps {
   /** Content to make scrollable. */
   children?: ReactNode
-  /** When scrollbars are visible. */
+  /** Legacy visibility hint. Native scrollbar rendering is browser-owned. */
   type?: ScrollbarVisibility
   /** Which axes can scroll. */
   orientation?: 'vertical' | 'horizontal' | 'both'

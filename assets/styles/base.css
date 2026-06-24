@@ -312,37 +312,3 @@ label[data-scope] {
 [data-scope] [hidden] {
   display: none;
 }
-
-/* ---------------------------------------------------------------
- * Scrollbar styling (for Scroll component)
- * --------------------------------------------------------------- */
-[data-scope="scroll"] [data-part="viewport"] {
-  scrollbar-width: thin;
-  scrollbar-color: var(--black-20) var(--uf-color-black-0);
-}
-
-[data-scope="scroll"][data-type="hover"] [data-part="viewport"] {
-  scrollbar-width: none;
-}
-
-[data-scope="scroll"][data-type="hover"]:hover [data-part="viewport"] {
-  scrollbar-width: thin;
-}
-
-/* Chromium / Electron: full scrollbar control via ::-webkit-scrollbar */
-[data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar {
-  width: var(--uf-border-width-thick);
-}
-[data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar-track {
-  background: var(--uf-color-black-0);
-}
-[data-scope="scroll"] [data-part="viewport"]::-webkit-scrollbar-thumb {
-  background: var(--black-20);
-  border-radius: calc(var(--uf-border-width-thick) / 2);
-}
-[data-scope="scroll"][data-type="hover"] [data-part="viewport"]::-webkit-scrollbar {
-  width: 0;
-}
-[data-scope="scroll"][data-type="hover"]:hover [data-part="viewport"]::-webkit-scrollbar {
-  width: var(--uf-border-width-thick);
-}

@@ -172,6 +172,20 @@
     },
     {
       "sheet": "semantic-feedback",
+      "name": "--uf-color-new",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "#78bfff"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "#3b9dff"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
       "name": "--uf-color-destructive",
       "variants": [
         {

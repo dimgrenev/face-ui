@@ -293,6 +293,7 @@
   --uf-color-info: var(--uf-color-text-secondary);
   --uf-color-info-foreground: var(--uf-color-background);
   --uf-color-on-info: var(--uf-color-info-foreground);
+  --uf-color-new: #78bfff;
   --uf-color-destructive: var(--uf-color-error);
   --uf-color-destructive-fg: var(--uf-color-error-foreground);
   --uf-color-destructive-soft: var(--uf-color-white-12);
@@ -323,7 +324,7 @@
   --uf-color-background: var(--uf-color-white-100);
   --uf-color-bg: var(--uf-color-background);
   --uf-color-panel: var(--uf-color-white-100);
-  --uf-color-props-panel: var(--uf-color-black-2);
+  --uf-color-props-panel: var(--uf-color-background);
   --uf-color-header: var(--uf-color-background);
   --uf-color-input: var(--uf-color-background);
   --uf-color-bg-code: var(--uf-color-foreground);
@@ -374,6 +375,7 @@
   --uf-color-info: var(--uf-color-text-secondary);
   --uf-color-info-foreground: var(--uf-color-background);
   --uf-color-on-info: var(--uf-color-info-foreground);
+  --uf-color-new: #3b9dff;
   --uf-color-destructive: var(--uf-color-error);
   --uf-color-destructive-fg: var(--uf-color-error-foreground);
   --uf-color-destructive-soft: var(--uf-color-black-8);

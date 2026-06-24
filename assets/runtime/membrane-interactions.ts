@@ -29,12 +29,24 @@ function resolveMembraneTarget(membrane: HTMLElement): HTMLElement | null {
   return candidate as HTMLElement
 }
 
+function resolveDirectInteractiveTarget(eventTarget: Element, membrane: HTMLElement): HTMLElement | null {
+  const candidate = eventTarget.closest(INTERACTIVE_SELECTOR)
+  if (!candidate || !isElement(candidate)) return null
+  if (!membrane.contains(candidate)) return null
+  return candidate as HTMLElement
+}
+
 function clearMembraneState(membrane: HTMLElement): void {
   membrane.removeAttribute('data-membrane-hover')
   membrane.removeAttribute('data-membrane-pressed')
 }
 
 function setHoverStateIfPaddingHit(eventTarget: Element, membrane: HTMLElement): void {
+  if (resolveDirectInteractiveTarget(eventTarget, membrane)) {
+    membrane.setAttribute('data-membrane-interactive', '')
+    membrane.removeAttribute('data-membrane-hover')
+    return
+  }
   const target = resolveMembraneTarget(membrane)
   if (!target) {
     clearMembraneState(membrane)
@@ -75,6 +87,10 @@ export function installMembraneInteractions(): void {
     if (!isElement(event.target)) return
     const membrane = event.target.closest('.uf-membrane')
     if (!membrane || !isElement(membrane)) return
+    if (resolveDirectInteractiveTarget(event.target, membrane as HTMLElement)) {
+      ;(membrane as HTMLElement).setAttribute('data-membrane-interactive', '')
+      return
+    }
     const target = resolveMembraneTarget(membrane as HTMLElement)
     if (!target) return
     ;(membrane as HTMLElement).setAttribute('data-membrane-interactive', '')
@@ -97,6 +113,10 @@ export function installMembraneInteractions(): void {
     if (!isElement(event.target)) return
     const membrane = event.target.closest('.uf-membrane')
     if (!membrane || !isElement(membrane)) return
+    if (resolveDirectInteractiveTarget(event.target, membrane as HTMLElement)) {
+      ;(membrane as HTMLElement).setAttribute('data-membrane-interactive', '')
+      return
+    }
     const target = resolveMembraneTarget(membrane as HTMLElement)
     if (!target) return
     ;(membrane as HTMLElement).setAttribute('data-membrane-interactive', '')
@@ -109,4 +129,3 @@ export function installMembraneInteractions(): void {
     target.click()
   }, true)
 }
-

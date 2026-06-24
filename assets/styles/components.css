@@ -25,6 +25,7 @@
  * BUTTON
  * ================================================================= */
 .uf-button[data-scope="button"] {
+  --uf-button-content-gap: calc(var(--uf-control-gap) - var(--uf-spacing-1, 4px));
   --uf-control-pad-left: var(--uf-control-pad-text);
   --uf-control-pad-right: var(--uf-control-pad-text);
   --uf-button-focus-ring-width: calc(var(--uf-membrane) * 2);
@@ -39,7 +40,7 @@
   justify-content: center;
   min-height: var(--uf-control-height);
   height: auto;
-  gap: var(--uf-control-gap);
+  gap: var(--uf-button-content-gap);
   padding-top: var(--uf-control-pad-y);
   padding-bottom: var(--uf-control-pad-y);
   padding-left: var(--uf-control-pad-left);
@@ -326,6 +327,7 @@
  * TILE — interactive row with nested actions
  * ================================================================= */
 .uf-tile[data-scope="tile"] {
+  --uf-tile-content-gap: calc(var(--uf-control-gap) - var(--uf-spacing-1, 4px));
   --uf-tile-pad: calc(var(--uf-membrane) * 3);
   --uf-tile-level-compensation: calc(var(--uf-membrane) * 6);
   --uf-tile-action-size: calc(var(--uf-control-height) - (var(--uf-tile-pad) * 2) - (var(--uf-membrane) * 2));
@@ -338,7 +340,7 @@
   align-items: center;
   min-height: var(--uf-control-height);
   height: auto;
-  gap: var(--uf-control-gap);
+  gap: var(--uf-tile-content-gap);
   box-sizing: border-box;
   padding: var(--uf-tile-pad);
   border-radius: var(--uf-radius);
@@ -422,7 +424,7 @@
 [data-scope="tile"] [data-part="text"] {
   display: inline-flex;
   align-items: center;
-  gap: var(--uf-control-gap);
+  gap: var(--uf-tile-content-gap, var(--uf-control-gap));
   flex: 0 1 auto;
   min-width: 0;
   min-inline-size: 0;
@@ -4725,14 +4727,9 @@
   min-height: var(--uf-control-height);
   overflow-x: auto;
   overflow-y: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
   overscroll-behavior-x: contain;
   scroll-behavior: smooth;
   flex-wrap: nowrap;
-}
-.uf-tabs .uf-tabs-header::-webkit-scrollbar {
-  display: none;
 }
 .uf-tabs.uf-tabs--wrap .uf-tabs-header {
   flex-wrap: wrap;

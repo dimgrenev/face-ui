@@ -1,6 +1,6 @@
 {
   "name": "Scroll",
-  "description": "Scroll area with custom scrollbar styling hooks",
+  "description": "Native scroll area",
   "props": {
     "children": {
       "type": "string",
@@ -10,7 +10,7 @@
     "type": {
       "type": "enum",
       "required": false,
-      "description": "When scrollbars are visible.",
+      "description": "Legacy visibility hint. Native scrollbar rendering is browser-owned.",
       "options": [
         "auto",
         "always",
@@ -54,12 +54,6 @@
       "props": {}
     },
     {
-      "name": "Always Visible",
-      "props": {
-        "type": "always"
-      }
-    },
-    {
       "name": "Horizontal",
       "props": {
         "orientation": "horizontal"
@@ -85,10 +79,7 @@
       "root",
       "viewport"
     ],
-    "recommended": [
-      "scrollbar",
-      "thumb"
-    ],
+    "recommended": [],
     "parts": {
       "root": {
         "slot": "root"
@@ -96,14 +87,6 @@
       "viewport": {
         "slot": "viewport",
         "parent": "root"
-      },
-      "scrollbar": {
-        "slot": "scrollbar",
-        "parent": "root"
-      },
-      "thumb": {
-        "slot": "thumb",
-        "parent": "scrollbar"
       }
     }
   },
@@ -121,7 +104,7 @@
   "platform": {},
   "usage": {
     "whenToUse": [
-      "Custom scrollable areas",
+      "Scrollable panels",
       "Virtualized long lists",
       "Horizontal scroll containers"
     ],

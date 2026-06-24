@@ -90,7 +90,7 @@
       "title": "Semantic / Feedback",
       "generatedPath": "design-system/tokens/colors.css",
       "previewKind": "semantic",
-      "tokenCount": 20,
+      "tokenCount": 21,
       "selectors": [
         ":root,\n[data-theme='dark']",
         ":root[data-theme='light'],\n[data-theme='light']"
