@@ -109,7 +109,9 @@
         "description": "Directional edge-aligned surface."
       }
     },
-    "Icon": {},
+    "Icon": {
+      "state": "Default"
+    },
     "Input": {
       "props": {
         "label": "Input",

@@ -53,6 +53,8 @@ describe('component smoke', () => {
   const folderGoPath = 'M11 15.5H15.5L15.5 6.5H10.5L9 4.5H4.5V8'
   const fullPath = 'M10.2 5L15 5V9.8M9.8 15L5 15V10.2'
   const partPath = 'M16 8.7998L11.2 8.7998L11.2 3.9998'
+  const micPath = 'M7.5 5.5C7.5 4.39543 8.39543 3.5 9.5 3.5H10.5C11.6046 3.5 12.5 4.39543 12.5 5.5V10.5C12.5 11.6046 11.6046 12.5 10.5 12.5L9.5 12.5C8.39543 12.5 7.5 11.6046 7.5 10.5V5.5Z'
+  const sidebarLeftClosedPath = 'M5.5 6.36035C5.85346 6.36035 6.13965 6.64654 6.13965 7V13C6.13965 13.3535 5.85346 13.6396 5.5 13.6396C5.14654 13.6396 4.86035 13.3535 4.86035 13V7C4.86035 6.64654 5.14654 6.36035 5.5 6.36035Z'
   const notdefPath = 'M15.5 4.50019H9L4.5 4.5V15.5L9 15.5002H15.5V4.50019Z'
   const moreCenterDotSelector = 'circle[cx="10"][cy="10"][r="1"]'
 
@@ -129,6 +131,25 @@ describe('component smoke', () => {
     expect(icon).not.toBeNull()
   })
 
+  it('Button selector mode renders a compact system indicator', async () => {
+    await act(async () => {
+      root.render(<Button text="GPT-5.5" selector fullWidth={false} />)
+    })
+
+    const button = container.querySelector('[data-scope="button"][data-selector]') as HTMLButtonElement | null
+    expect(button?.textContent).toContain('GPT-5.5')
+    expect(button?.querySelector('[data-part="indicator"] svg[data-icon="select-chevron-down"]')).not.toBeNull()
+
+    await act(async () => {
+      root.render(<Button text="GPT-5.5" selector selectorOpen fullWidth={false} />)
+    })
+
+    expect(container.querySelector('[data-part="indicator"] svg[data-icon="select-chevron-up"]')).not.toBeNull()
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toContain('--uf-control-pad-right: var(--uf-selector-indicator-edge-gap);')
+  })
+
   it('Input syncs controlled value updates from props', async () => {
     const handleValueChange = vi.fn()
 
@@ -168,10 +189,14 @@ describe('component smoke', () => {
 
     const trigger = container.querySelector<HTMLButtonElement>('[data-scope="select"][data-part="trigger"]')
     expect(trigger?.textContent).toContain('Alpha')
+    expect(trigger?.querySelector('[data-part="indicator"] svg[data-icon="select-chevron-down"]')).not.toBeNull()
+    expect(readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8'))
+      .toContain('padding-right: var(--uf-select-indicator-edge-gap);')
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
+    expect(trigger?.querySelector('[data-part="indicator"] svg[data-icon="select-chevron-up"]')).not.toBeNull()
 
     const betaOption = Array.from(container.querySelectorAll<HTMLElement>('[role="option"]'))
       .find((option) => option.dataset.value === 'beta') ?? null
@@ -291,6 +316,36 @@ describe('component smoke', () => {
 
     expect(container.querySelector('svg[data-icon="part"]')).not.toBeNull()
     expect(container.querySelector(`path[d="${partPath}"]`)).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
+  })
+
+  it('Icon wrapper includes the built-in mic glyph', async () => {
+    await act(async () => {
+      root.render(<Icon name="mic" />)
+    })
+
+    expect(container.querySelector('svg[data-icon="mic"]')).not.toBeNull()
+    expect(container.querySelector(`path[d="${micPath}"]`)).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
+  })
+
+  it('Icon wrapper includes sidebar layout state glyphs', async () => {
+    await act(async () => {
+      root.render(
+        <>
+          <Icon name="layout-sidebar-left" />
+          <Icon name="layout-sidebar-left-open" />
+          <Icon name="layout-sidebar-right" />
+          <Icon name="layout-sidebar-right-open" />
+        </>
+      )
+    })
+
+    expect(container.querySelector('svg[data-icon="layout-sidebar-left"]')).not.toBeNull()
+    expect(container.querySelector('svg[data-icon="layout-sidebar-left-open"]')).not.toBeNull()
+    expect(container.querySelector('svg[data-icon="layout-sidebar-right"]')).not.toBeNull()
+    expect(container.querySelector('svg[data-icon="layout-sidebar-right-open"]')).not.toBeNull()
+    expect(container.querySelector(`path[d="${sidebarLeftClosedPath}"]`)).not.toBeNull()
     expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
   })
 
@@ -571,6 +626,20 @@ describe('component smoke', () => {
     expect(tileStyles).toContain('[data-scope="tile"] [data-part="text"] > .uf-membrane--truncate')
     expect(tileStyles).toContain('[data-scope="tile"] [data-part="text"] > .uf-membrane:not(.uf-membrane--truncate)')
     expect(tileStyles).toContain('text-overflow: ellipsis;')
+  })
+
+  it('Tile selector mode renders the selector indicator inside the text slot', async () => {
+    await act(async () => {
+      root.render(<Tile text="Project" icon="folder" selector selectorOpen />)
+    })
+
+    const tile = container.querySelector('[data-scope="tile"][data-selector]') as HTMLElement | null
+    const textSlot = tile?.querySelector('[data-scope="tile"][data-part="text"]') as HTMLElement | null
+    const indicator = textSlot?.querySelector('[data-part="indicator"] svg[data-icon="select-chevron-up"]')
+
+    expect(tile?.getAttribute('data-stretch-text')).toBeNull()
+    expect(textSlot?.textContent).toContain('Project')
+    expect(indicator).not.toBeNull()
   })
 
   it('Carousel advances in uncontrolled mode', async () => {

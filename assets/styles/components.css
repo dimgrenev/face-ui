@@ -21,11 +21,25 @@
   user-select: none;
 }
 
+[data-scope="button"] [data-part="indicator"],
+[data-scope="tile"] [data-part="indicator"],
+[data-scope="select"] [data-part="indicator"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--uf-selector-indicator-size);
+  height: var(--uf-selector-indicator-size);
+  margin-inline-start: var(--uf-selector-indicator-offset-inline-start, 0px);
+  opacity: 0.7;
+  transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-out);
+}
+
 /* =================================================================
  * BUTTON
  * ================================================================= */
 .uf-button[data-scope="button"] {
-  --uf-button-content-gap: calc(var(--uf-control-gap) - var(--uf-spacing-1, 4px));
+  --uf-button-content-gap: var(--uf-control-gap);
   --uf-control-pad-left: var(--uf-control-pad-text);
   --uf-control-pad-right: var(--uf-control-pad-text);
   --uf-button-focus-ring-width: calc(var(--uf-membrane) * 2);
@@ -69,6 +83,10 @@
 
 .uf-button[data-scope="button"][data-icon-right]:not([data-icon-only]) {
   --uf-control-pad-right: var(--uf-control-pad-icon);
+}
+
+.uf-button[data-scope="button"][data-selector] {
+  --uf-control-pad-right: var(--uf-selector-indicator-edge-gap);
 }
 
 .uf-button[data-scope="button"]:hover {
@@ -287,6 +305,19 @@
   align-items: center;
   gap: var(--uf-control-gap);
 }
+.uf-button[data-scope="button"][data-selector] [data-part="text"] {
+  gap: var(--uf-selector-indicator-gap);
+  flex: 0 1 auto;
+  width: auto;
+}
+.uf-button[data-scope="button"][data-selector][data-stretch-text] [data-part="text"] {
+  flex: 1 1 auto;
+  width: 100%;
+}
+.uf-button[data-scope="button"][data-selector]:hover [data-part="indicator"],
+.uf-button[data-scope="button"][data-selector]:focus-visible [data-part="indicator"] {
+  opacity: 1;
+}
 
 /* Right text */
 .uf-button__rightText {
@@ -332,6 +363,8 @@
   --uf-tile-level-compensation: calc(var(--uf-membrane) * 6);
   --uf-tile-action-size: calc(var(--uf-control-height) - (var(--uf-tile-pad) * 2) - (var(--uf-membrane) * 2));
   --uf-tile-focus-ring-width: calc(var(--uf-membrane) * 2);
+  --uf-tile-selector-indicator-opacity: 0;
+  --uf-tile-selector-indicator-hover-opacity: 0.7;
   --uf-tile-bg: var(--uf-color-black-0);
   --uf-tile-fg: var(--uf-color-fg);
   --uf-tile-hover-bg: var(--uf-color-hover-bg);
@@ -373,8 +406,8 @@
 .uf-tile[data-scope="tile"][data-align="right"] {
   justify-content: flex-end;
 }
-/* Tile level indent: base pad, plus one-step compensation to align with button icons.
-   L0: 3, L1: 38, L2: 66, L3: 94, L4: 122 ... */
+/* Tile level indent: base pad plus one-step compensation so rows with leading
+   icons align with Button text on the shared option indent rhythm. */
 .uf-tile[data-scope="tile"][data-level] {
   padding-left: calc(var(--uf-tile-pad) + var(--face-runtime-option-level, 0) * var(--uf-option-indent) + min(var(--face-runtime-option-level, 0), 1) * var(--uf-tile-level-compensation));
 }
@@ -437,6 +470,12 @@
 [data-scope="tile"][data-stretch-text] [data-part="text"] {
   flex: 1 1 auto;
 }
+.uf-tile[data-scope="tile"][data-selector] [data-part="text"] {
+  gap: var(--uf-selector-indicator-gap);
+}
+.uf-tile[data-scope="tile"][data-selector] [data-part="indicator"] {
+  opacity: var(--uf-tile-selector-indicator-opacity, 0);
+}
 /* Let uf-text__content pass layout through so custom children become direct flex items
    of the inline-flex [data-part="text"] container — prevents block-level children
    (e.g. display:flex spans) from stacking vertically. */
@@ -454,10 +493,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.uf-tile[data-scope="tile"][data-selector] .uf-tile__label {
+  flex: 0 1 auto;
+}
 .uf-tile__rightText {
   margin-left: auto;
   flex-shrink: 0;
   opacity: 0.6;
+}
+.uf-tile[data-scope="tile"][data-selector] .uf-tile__rightText {
+  margin-left: var(--uf-selector-indicator-gap);
 }
 [data-scope="tile"] [data-part="text"] > .uf-membrane,
 [data-scope="tile"] [data-part="text"] > .uf-text[data-scope] {
@@ -474,6 +519,10 @@
   flex: 1 1 auto;
   overflow: hidden;
 }
+.uf-tile[data-scope="tile"][data-selector] [data-part="text"] > .uf-membrane--truncate,
+.uf-tile[data-scope="tile"][data-selector] [data-part="text"] > .uf-text[data-scope][data-truncate] {
+  flex: 0 1 auto;
+}
 [data-scope="tile"] [data-part="text"] > .uf-membrane {
   display: flex;
   overflow: hidden;
@@ -486,6 +535,15 @@
   max-width: 100%;
   max-inline-size: 100%;
   overflow: hidden;
+}
+.uf-tile[data-scope="tile"][data-selector] [data-part="text"] > .uf-membrane > .uf-text[data-scope],
+.uf-tile[data-scope="tile"][data-selector] [data-part="text"] > .uf-text[data-scope] {
+  flex: 0 1 auto;
+}
+.uf-tile[data-scope="tile"][data-selector]:hover [data-part="indicator"],
+.uf-tile[data-scope="tile"][data-selector]:focus-visible [data-part="indicator"],
+.uf-tile[data-scope="tile"][data-selector]:focus-within [data-part="indicator"] {
+  opacity: var(--uf-tile-selector-indicator-hover-opacity, 0.7);
 }
 [data-scope="tile"] [data-part="text"] > .uf-membrane > .uf-text[data-scope][data-truncate] .uf-text__content,
 [data-scope="tile"] [data-part="text"] > .uf-text[data-scope][data-truncate] .uf-text__content {
@@ -1453,23 +1511,26 @@
   width: 100%;
 }
 [data-scope="select"] [data-part="trigger"] {
+  --uf-select-indicator-gap: var(--uf-selector-indicator-gap);
+  --uf-select-indicator-edge-gap: var(--uf-selector-indicator-edge-gap);
+  --uf-select-indicator-size: var(--uf-selector-indicator-size);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   min-height: var(--uf-control-height);
   height: auto;
   width: 100%;
   padding-top: var(--uf-control-pad-y);
   padding-bottom: var(--uf-control-pad-y);
   padding-left: var(--uf-control-pad-text);
-  padding-right: var(--uf-control-pad-icon);
+  padding-right: var(--uf-select-indicator-edge-gap);
   border: none;
   border-radius: var(--uf-radius);
   background: var(--uf-color-black-0);
   color: var(--uf-color-fg);
   font: inherit;
   cursor: pointer;
-  gap: var(--uf-control-gap);
+  gap: var(--uf-select-indicator-gap);
   box-shadow: none;
   outline: none;
   appearance: none;
@@ -1487,28 +1548,32 @@
   cursor: not-allowed;
 }
 .uf-select__value {
-  flex: 1;
+  flex: 0 1 auto;
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
 }
+[data-scope="select"] [data-part="trigger"][data-stretch-text] .uf-select__value {
+  flex: 1 1 auto;
+}
 .uf-select__value--placeholder {
   color: var(--uf-color-fg-muted);
 }
-.uf-select__arrow {
+.uf-select__indicator,
+[data-scope="select"] [data-part="indicator"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
+  width: var(--uf-select-indicator-size);
+  height: var(--uf-select-indicator-size);
   opacity: 0.7;
-  transition:
-    transform var(--uf-motion-duration-fast) var(--uf-motion-ease-out),
-    opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-out);
+  transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-out);
 }
-.uf-select[data-scope="select"][data-state="open"] .uf-select__arrow {
-  transform: rotate(180deg);
+.uf-select[data-scope="select"][data-state="open"] .uf-select__indicator,
+.uf-select[data-scope="select"][data-state="open"] [data-part="indicator"] {
   opacity: 1;
 }
 :is([data-scope="select"] [data-part="content"], [data-scope="select"][data-part="content"]) {
@@ -4409,6 +4474,7 @@
 }
 [data-scope="navigation"] [data-part="trigger"]:hover,
 [data-scope="navigation"] [data-part="link"]:hover {
+  background: var(--uf-color-hover-bg);
   color: var(--uf-color-fg);
 }
 [data-scope="navigation"] [data-part="link"][aria-current="page"] {

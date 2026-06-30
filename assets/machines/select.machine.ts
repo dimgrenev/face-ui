@@ -20,6 +20,7 @@ import type { MachineSchema, MachineSnapshot, SendFn } from '../types'
 export const selectAnatomy = createAnatomy('select').parts(
   'root',
   'trigger',
+  'indicator',
   'content',
   'option',
 )

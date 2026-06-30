@@ -21,12 +21,12 @@
   --uf-control-pad-y: 6px; /* (32 - 20) / 2 = 6 */
 
   /* Горизонтальные паддинги контролов */
-  --uf-control-pad-text: 12px;  /* сторона с текстом */
+  --uf-control-pad-text: 8px;   /* сторона с текстом */
   --uf-control-pad-left: var(--uf-control-pad-text);
   --uf-control-pad-right: var(--uf-control-pad-text);
   --uf-control-pad-icon: 6px;   /* сторона с иконкой */
-  --uf-control-gap: 10px;       /* gap между элементами внутри */
-  --uf-option-indent: 28px;
+  --uf-control-gap: 8px;        /* gap между элементами внутри */
+  --uf-option-indent: calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1));
   --uf-content-inset: 12px;
   --uf-icon-size: 20px;
   --uf-icon-only-size: 32px;

@@ -31,6 +31,9 @@ function readCssNumberToken(source: string, tokenName: string): number {
 const componentsCss = readFixture('../styles/components.css')
 const animationsCss = readFixture('../styles/animations.css')
 const tokensCss = readFixture('../styles/tokens.css')
+const designSystemColorCss = readFixture('../../design-system/tokens/colors.css')
+const colorSystemSource = readFixture('../../design-system/source/color-system.jsonc')
+const semanticFeedbackSource = readFixture('../../design-system/source/semantic-feedback.jsonc')
 const textMeta = JSON.parse(readFixture('../../Text/Text.json')) as {
   props?: { size?: { options?: string[] } }
   tokenMapping?: { component?: string[]; semanticFallbacks?: string[] }
@@ -46,6 +49,53 @@ const textSizeOptions = Object.keys(textSizeTokenMap) as Array<keyof typeof text
 
 function queryModal(container: HTMLElement): HTMLElement | null {
   return container.querySelector('.uf-modal[data-scope]') as HTMLElement | null
+}
+
+function escapeRegExp(input: string): string {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function readCssBlock(source: string, selector: string): string {
+  const match = source.match(new RegExp(`${escapeRegExp(selector)}\\s*\\{([\\s\\S]*?)\\n\\}`))
+  if (!match) throw new Error(`Missing CSS selector: ${selector}`)
+  return match[1] || ''
+}
+
+function readCssBlocks(source: string, selector: string): string[] {
+  return Array.from(source.matchAll(new RegExp(`${escapeRegExp(selector)}\\s*\\{([\\s\\S]*?)\\n\\}`, 'g')))
+    .map((match) => match[1] || '')
+}
+
+function expectCssBlockContains(source: string, selector: string, declaration: string) {
+  const blocks = readCssBlocks(source, selector)
+  expect(blocks.length, `${selector} should exist`).toBeGreaterThan(0)
+  expect(
+    blocks.some((block) => block.includes(declaration)),
+    `${selector} should contain ${declaration}`,
+  ).toBe(true)
+}
+
+function isAllowedMonochromeColorLiteral(literal: string): boolean {
+  const normalized = literal.toLowerCase().replace(/\s+/g, '')
+  if (normalized === '#000' || normalized === '#000000' || normalized === '#fff' || normalized === '#ffffff') {
+    return true
+  }
+
+  const rgba = normalized.match(/^rgba?\((0|255),(0|255),(0|255)(?:,([0-9.]+))?\)$/)
+  if (!rgba) return false
+  if (!(rgba[1] === rgba[2] && rgba[2] === rgba[3])) return false
+
+  const alpha = rgba[4] == null ? 1 : Number(rgba[4])
+  if (!Number.isFinite(alpha) || alpha < 0 || alpha > 1) return false
+
+  const percent = alpha * 100
+  return Math.abs(Math.round(percent) - percent) < 0.0001 && Math.round(percent) % 2 === 0
+}
+
+function findNonMonochromeColorLiterals(source: string): string[] {
+  const colorLiteralPattern = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]+\)|hsla?\([^)]+\)|hsl\([^)]+\)|oklch\([^)]+\)|color\([^)]+\)/g
+  const literals = source.match(colorLiteralPattern) || []
+  return literals.filter((literal) => !isAllowedMonochromeColorLiteral(literal))
 }
 
 describe('taxonomy and governance', () => {
@@ -109,10 +159,119 @@ describe('taxonomy and governance', () => {
     expect(tokensCss).toContain('--uf-radius-base: var(--uf-radius);')
     expect(tokensCss).toContain('--uf-control-pad-left: var(--uf-control-pad-text);')
     expect(tokensCss).toContain('--uf-control-pad-right: var(--uf-control-pad-text);')
+    expect(tokensCss).toContain('--uf-option-indent: calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1));')
+    expect(tokensCss).toContain('--uf-selector-indicator-gap: var(--uf-spacing-1);')
+    expect(tokensCss).toContain('--uf-selector-indicator-offset-inline-start: calc(var(--uf-membrane) * -2);')
+    expect(tokensCss).toContain('--uf-selector-indicator-edge-gap: var(--uf-spacing-1);')
+    expect(tokensCss).toContain('--uf-select-indicator-edge-gap: var(--uf-selector-indicator-edge-gap);')
     expect(tokensCss).toContain('--uf-content-inset: 12px;')
     expect(tokensCss).toContain('--uf-button-ring-color: var(--uf-color-border);')
     expect(componentsCss).toContain('padding: var(--uf-membrane);')
     expect(componentsCss).toContain('border-radius: var(--uf-radius);')
+  })
+
+  it('keeps runtime and design-system colors monochrome-only', () => {
+    const sources = {
+      'assets/styles/tokens.css': tokensCss,
+      'design-system/tokens/colors.css': designSystemColorCss,
+      'design-system/source/color-system.jsonc': colorSystemSource,
+      'design-system/source/semantic-feedback.jsonc': semanticFeedbackSource,
+    }
+    const offenders = Object.entries(sources).flatMap(([sourceName, source]) =>
+      findNonMonochromeColorLiterals(source).map((literal) => `${sourceName}: ${literal}`),
+    )
+
+    for (let opacity = 0; opacity <= 100; opacity += 2) {
+      expect(tokensCss).toContain(`--uf-color-black-${opacity}:`)
+      expect(tokensCss).toContain(`--uf-color-white-${opacity}:`)
+      expect(designSystemColorCss).toContain(`--uf-color-black-${opacity}:`)
+      expect(designSystemColorCss).toContain(`--uf-color-white-${opacity}:`)
+    }
+
+    expect(tokensCss).toContain('--uf-color-new: var(--uf-color-foreground);')
+    expect(designSystemColorCss).toContain('--uf-color-new: var(--uf-color-foreground);')
+    expect(offenders).toEqual([])
+  })
+
+  it('keeps core controls on the 32px geometry contract with compact and large as explicit density variants', () => {
+    expect(tokensCss).toContain('--uf-control-height: 32px;')
+    expect(readCssBlock(tokensCss, '.uf-compact')).toContain('--uf-control-height: 28px;')
+    expect(readCssBlock(tokensCss, '.uf-large')).toContain('--uf-control-height: 40px;')
+
+    const controlSelectors = [
+      '.uf-button[data-scope="button"]',
+      '.uf-tile[data-scope="tile"]',
+      '.uf-checkbox[data-scope="checkbox"]',
+      '.uf-switcher[data-scope]',
+      '[data-scope="radio"] [data-part="item"]',
+      '[data-scope="input"] [data-part="input"],\n[data-scope="input"] [data-part="textarea"]',
+      '[data-scope="select"] [data-part="trigger"]',
+      '[data-scope="select"] [data-part="option"]',
+      '.uf-date__trigger',
+      '.uf-slider[data-scope="slider"]',
+      '.uf-rating-star',
+      '[data-scope="toggle-group"] [data-part="item"],\n.uf-toggle[data-scope] [data-part="item"]',
+      '[data-scope="tabs"] [data-part="trigger"]',
+      '[data-scope="accordion"] [data-part="trigger"],\n[data-scope="accordion"] [data-part="item-trigger"]',
+      '[data-scope="steps"] [data-part="trigger"]',
+      '.uf-command__trigger',
+      '.uf-breadcrumb[data-scope] a',
+      '.uf-sidebar-item',
+      '[data-scope="navigation"] [data-part="trigger"],\n[data-scope="navigation"] [data-part="link"]',
+      '.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]),\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"])',
+    ]
+
+    for (const selector of controlSelectors) {
+      expectCssBlockContains(componentsCss, selector, 'min-height: var(--uf-control-height);')
+    }
+
+    expect(readCssBlock(componentsCss, '.uf-button[data-scope="button"][data-selector]'))
+      .toContain('--uf-control-pad-right: var(--uf-selector-indicator-edge-gap);')
+    expect(readCssBlock(componentsCss, '[data-scope="button"] [data-part="indicator"],\n[data-scope="tile"] [data-part="indicator"],\n[data-scope="select"] [data-part="indicator"]'))
+      .toContain('margin-inline-start: var(--uf-selector-indicator-offset-inline-start, 0px);')
+    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector] [data-part="indicator"]'))
+      .toContain('opacity: var(--uf-tile-selector-indicator-opacity, 0);')
+    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector]:hover [data-part="indicator"],\n.uf-tile[data-scope="tile"][data-selector]:focus-visible [data-part="indicator"],\n.uf-tile[data-scope="tile"][data-selector]:focus-within [data-part="indicator"]'))
+      .toContain('opacity: var(--uf-tile-selector-indicator-hover-opacity, 0.7);')
+    expect(readCssBlock(componentsCss, '[data-scope="select"] [data-part="trigger"]'))
+      .toContain('padding-right: var(--uf-select-indicator-edge-gap);')
+  })
+
+  it('keeps standard interactive hover surfaces on the shared hover background token', () => {
+    const hoverSelectors = [
+      '.uf-button[data-scope="button"]:hover',
+      '.uf-tile[data-scope="tile"]:hover',
+      '.uf-checkbox[data-scope="checkbox"]:hover',
+      '.uf-switcher[data-scope]:hover:not([data-disabled])',
+      '.uf-radio-option:hover,\n[data-scope="radio"] [data-part="item"]:hover',
+      '[data-scope="input"] [data-part="input"]:hover,\n[data-scope="input"] [data-part="textarea"]:hover',
+      '[data-scope="select"] [data-part="trigger"]:hover',
+      '[data-scope="select"] [data-part="option"]:hover,\n[data-scope="select"] [data-part="option"][data-highlighted]',
+      '.uf-date__trigger:hover',
+      '.uf-rating-star:hover',
+      '[data-scope="toggle-group"] [data-part="item"]:hover,\n.uf-toggle[data-scope] [data-part="item"]:hover',
+      '.uf-menu-item:hover,\n.uf-menu-item[data-highlighted]',
+      '[data-scope="tabs"] [data-part="trigger"]:hover',
+      '[data-scope="accordion"] [data-part="trigger"]:hover,\n[data-scope="accordion"] [data-part="item-trigger"]:hover',
+      '.uf-pagination[data-scope] button:hover',
+      '[data-scope="steps"] [data-part="trigger"]:hover',
+      '[data-scope="calendar"] [data-part="prevButton"]:hover,\n[data-scope="calendar"] [data-part="nextButton"]:hover',
+      '.uf-command__trigger:hover',
+      '.uf-breadcrumb[data-scope] a:hover',
+      '.uf-sidebar-item:hover',
+      '[data-scope="navigation"] [data-part="trigger"]:hover,\n[data-scope="navigation"] [data-part="link"]:hover',
+      '[data-scope="tree-view"] [data-part="item"]:hover,\n[data-scope="tree-view"] [data-part="branchTrigger"]:hover,\n.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]):hover,\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]):hover',
+    ]
+    const hoverBackgroundPattern = /background:\s*var\(--uf-(?:color-hover-bg|button-hover-bg|tile-hover-bg)\);/
+
+    for (const selector of hoverSelectors) {
+      const blocks = readCssBlocks(componentsCss, selector)
+      expect(blocks.length, `${selector} should exist`).toBeGreaterThan(0)
+      expect(
+        blocks.some((block) => hoverBackgroundPattern.test(block)),
+        `${selector} should use shared hover background`,
+      ).toBe(true)
+    }
   })
 
   it('keeps portalled dropdown layers above modal panels', () => {

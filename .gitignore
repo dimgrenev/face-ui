@@ -13,3 +13,6 @@ yarn.lock
 
 # Userface scan cache
 .userface-cache/
+
+# Local runtime evidence/state generated while testing.
+.userface/

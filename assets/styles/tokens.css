@@ -293,7 +293,7 @@
   --uf-color-info: var(--uf-color-text-secondary);
   --uf-color-info-foreground: var(--uf-color-background);
   --uf-color-on-info: var(--uf-color-info-foreground);
-  --uf-color-new: #78bfff;
+  --uf-color-new: var(--uf-color-foreground);
   --uf-color-destructive: var(--uf-color-error);
   --uf-color-destructive-fg: var(--uf-color-error-foreground);
   --uf-color-destructive-soft: var(--uf-color-white-12);
@@ -375,7 +375,7 @@
   --uf-color-info: var(--uf-color-text-secondary);
   --uf-color-info-foreground: var(--uf-color-background);
   --uf-color-on-info: var(--uf-color-info-foreground);
-  --uf-color-new: #3b9dff;
+  --uf-color-new: var(--uf-color-foreground);
   --uf-color-destructive: var(--uf-color-error);
   --uf-color-destructive-fg: var(--uf-color-error-foreground);
   --uf-color-destructive-soft: var(--uf-color-black-8);
@@ -528,12 +528,12 @@
   --uf-control-pad-y: 6px; /* (32 - 20) / 2 = 6 */
 
   /* Горизонтальные паддинги контролов */
-  --uf-control-pad-text: 12px;  /* сторона с текстом */
+  --uf-control-pad-text: 8px;   /* сторона с текстом */
   --uf-control-pad-left: var(--uf-control-pad-text);
   --uf-control-pad-right: var(--uf-control-pad-text);
   --uf-control-pad-icon: 6px;   /* сторона с иконкой */
-  --uf-control-gap: 10px;       /* gap между элементами внутри */
-  --uf-option-indent: 28px;
+  --uf-control-gap: 8px;        /* gap между элементами внутри */
+  --uf-option-indent: calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1));
   --uf-content-inset: 12px;
   --uf-icon-size: 20px;
   --uf-icon-only-size: 32px;
@@ -805,7 +805,14 @@
   --uf-menu-sheet-gap: var(--uf-spacing-2);
   --uf-menu-sheet-inset: var(--uf-spacing-2);
   --uf-menu-sheet-enter-y: 6px;
+  --uf-selector-indicator-gap: var(--uf-spacing-1);
+  --uf-selector-indicator-offset-inline-start: calc(var(--uf-membrane) * -2);
+  --uf-selector-indicator-edge-gap: var(--uf-spacing-1);
+  --uf-selector-indicator-size: var(--uf-icon-size);
   --uf-select-content-max-height: 320px;
+  --uf-select-indicator-gap: var(--uf-selector-indicator-gap);
+  --uf-select-indicator-edge-gap: var(--uf-selector-indicator-edge-gap);
+  --uf-select-indicator-size: var(--uf-selector-indicator-size);
   --uf-select-panel-pad: var(--uf-spacing-2);
   --uf-select-sheet-gap: var(--uf-spacing-2);
   --uf-select-sheet-inset: var(--uf-spacing-2);

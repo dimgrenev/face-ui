@@ -5,9 +5,9 @@
   --uf-control-line-height: 20px;
   --uf-control-pad-y: 6px;
   --uf-control-height: 32px;
-  --uf-control-pad-text: 12px;
+  --uf-control-pad-text: 8px;
   --uf-control-pad-icon: 6px;
-  --uf-control-gap: 10px;
+  --uf-control-gap: 8px;
   --uf-text-body-size: 14px;
   --uf-text-body-line-height: 20px;
   --uf-text-section-size: 12px;
@@ -21,7 +21,7 @@
   --uf-topbar-slot-pad-y: 0px;
   --uf-control-pad-left: var(--uf-control-pad-text);
   --uf-control-pad-right: var(--uf-control-pad-text);
-  --uf-option-indent: 28px;
+  --uf-option-indent: calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1));
   --uf-content-inset: 12px;
   --uf-icon-size: 20px;
   --uf-icon-only-size: 32px;

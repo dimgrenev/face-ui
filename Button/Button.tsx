@@ -19,7 +19,7 @@ import { Icon } from '../Icon/Icon'
 // ---------------------------------------------------------------------------
 
 export const buttonAnatomy = createAnatomy('button').parts(
-  'root', 'icon', 'text', 'group',
+  'root', 'icon', 'text', 'indicator', 'group',
 )
 
 // ---------------------------------------------------------------------------
@@ -55,6 +55,10 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   loading?: boolean
   /** Stretch text area (flex:1). */
   stretchText?: boolean
+  /** Render a compact selector indicator after the label. */
+  selector?: boolean
+  /** Open state for the selector indicator. */
+  selectorOpen?: boolean
   /** Full width button. */
   fullWidth?: boolean
   /** Text alignment. */
@@ -114,7 +118,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       iconOnly = false,
       disabled = false,
       loading = false,
-      stretchText = false,
+      stretchText: rawStretchText,
+      selector = false,
+      selectorOpen = false,
       fullWidth = true,
       align,
       level,
@@ -203,6 +209,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const hasIcon = resolvedIcon != null
     const hasText = text != null || children != null
     const isIconOnly = iconOnly || (hasIcon && !hasText)
+    const hasSelectorIndicator = selector && !isIconOnly
+    const resolvedIconPosition = hasSelectorIndicator ? 'left' : iconPosition
+    const stretchText = rawStretchText ?? false
+    const selectorIndicator = hasSelectorIndicator ? (
+      <span {...buttonAnatomy.getPartAttrs('indicator')} aria-hidden="true">
+        <Icon name={selectorOpen ? 'select-chevron-up' : 'select-chevron-down'} />
+      </span>
+    ) : null
 
     const levelStyle = clampedLevel != null
       ? { ...style, '--face-runtime-option-level': clampedLevel } as React.CSSProperties
@@ -220,8 +234,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         data-stretch-text={stretchText ? '' : undefined}
         data-full-width={fullWidth ? '' : undefined}
         data-align={align}
-        data-icon-left={hasIcon && !isIconOnly && iconPosition === 'left' ? '' : undefined}
-        data-icon-right={hasIcon && !isIconOnly && iconPosition === 'right' ? '' : undefined}
+        data-icon-left={hasIcon && !isIconOnly && resolvedIconPosition === 'left' ? '' : undefined}
+        data-icon-right={hasIcon && !isIconOnly && resolvedIconPosition === 'right' ? '' : undefined}
+        data-selector={hasSelectorIndicator ? '' : undefined}
         data-level={clampedLevel != null ? '' : undefined}
         data-loading={loading ? '' : undefined}
         data-copied={copied ? '' : undefined}
@@ -236,7 +251,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             <span className="uf-spinner uf-spinner--small" />
           </span>
         )}
-        {hasIcon && !isIconOnly && iconPosition === 'left' && (
+        {hasIcon && !isIconOnly && resolvedIconPosition === 'left' && (
           <span {...buttonAnatomy.getPartAttrs('icon')} data-position="left">
             {resolvedIcon}
           </span>
@@ -254,9 +269,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 {rightText}
               </span>
             )}
+            {selectorIndicator}
           </span>
         )}
-        {hasIcon && !isIconOnly && iconPosition === 'right' && (
+        {hasIcon && !isIconOnly && resolvedIconPosition === 'right' && (
           <span {...buttonAnatomy.getPartAttrs('icon')} data-position="right">
             {resolvedIcon}
           </span>

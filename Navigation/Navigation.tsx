@@ -177,7 +177,7 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
     if (isSheetSurface) {
       const triggerNode = trigger ?? (
         <Button
-          icon="panel"
+          icon="layout-sidebar-left"
           iconOnly
           fullWidth={false}
           variant="ghost"

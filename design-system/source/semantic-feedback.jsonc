@@ -176,11 +176,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#78bfff"
+          "value": "var(--uf-color-foreground)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#3b9dff"
+          "value": "var(--uf-color-foreground)"
         }
       ]
     },

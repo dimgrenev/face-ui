@@ -176,6 +176,7 @@
     "required": [
       "root",
       "trigger",
+      "indicator",
       "content"
     ],
     "recommended": [
@@ -190,6 +191,10 @@
       "trigger": {
         "slot": "trigger",
         "parent": "root"
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "trigger"
       },
       "content": {
         "slot": "content",
@@ -216,6 +221,13 @@
       "--uf-select-sheet-inset",
       "--uf-select-sheet-gap",
       "--uf-select-content-max-height",
+      "--uf-selector-indicator-gap",
+      "--uf-selector-indicator-offset-inline-start",
+      "--uf-selector-indicator-edge-gap",
+      "--uf-selector-indicator-size",
+      "--uf-select-indicator-gap",
+      "--uf-select-indicator-edge-gap",
+      "--uf-select-indicator-size",
       "--uf-select-panel-pad",
       "--uf-select-sheet-enter-y"
     ],
@@ -255,7 +267,7 @@
     ],
     "notes": [
       "Select shares overlay tokens with responsive sheets and popovers; keep trigger and option geometry on control tokens.",
-      "Trigger arrow rotation and opacity feedback consume shared Face UI motion tokens.",
+      "Trigger indicator is a selector-specific system icon and uses compact indicator spacing instead of generic button icon spacing.",
       "Option labels should render through Text-compatible label nodes rather than raw typography classes."
     ]
   },

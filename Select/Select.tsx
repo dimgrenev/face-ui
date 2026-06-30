@@ -19,7 +19,7 @@ import {
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
 import { useFloatingPosition } from '../assets/adapters/react/use-floating-position'
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
-import { selectMachine, connectSelect } from '../assets/machines/select.machine'
+import { selectAnatomy, selectMachine, connectSelect } from '../assets/machines/select.machine'
 import { cn } from '../assets/utils'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
@@ -261,8 +261,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         data-stretch-text={stretchText ? '' : undefined}
       >
         {renderSelectLabelNode(triggerLabel, cn('uf-select__value', isPlaceholder && 'uf-select__value--placeholder'))}
-        <span className="uf-select__arrow" aria-hidden="true">
-          <Icon name="down" />
+        <span {...selectAnatomy.getPartAttrs('indicator')} className="uf-select__indicator" aria-hidden="true">
+          <Icon name={isOpen ? 'select-chevron-up' : 'select-chevron-down'} />
         </span>
       </button>
     )

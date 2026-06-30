@@ -48,7 +48,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "12px"
+          "value": "8px"
         }
       ]
     },
@@ -68,7 +68,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "10px"
+          "value": "8px"
         }
       ]
     },
@@ -208,7 +208,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "28px"
+          "value": "calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1))"
         }
       ]
     },

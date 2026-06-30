@@ -53,8 +53,19 @@
     "stretchText": {
       "type": "boolean",
       "required": false,
-      "description": "Stretch text area (flex:1).",
-      "default": true
+      "description": "Stretch text area (flex:1)."
+    },
+    "selector": {
+      "type": "boolean",
+      "required": false,
+      "description": "Render a compact selector indicator after the label.",
+      "default": false
+    },
+    "selectorOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Open state for the selector indicator.",
+      "default": false
     },
     "fullWidth": {
       "type": "boolean",
@@ -148,6 +159,15 @@
         "icon": "file",
         "level": 1
       }
+    },
+    {
+      "name": "Selector parent",
+      "props": {
+        "text": "Project",
+        "icon": "folder",
+        "selector": true,
+        "selectorOpen": true
+      }
     }
   ],
   "behavior": {},
@@ -169,6 +189,7 @@
     "recommended": [
       "icon",
       "text",
+      "indicator",
       "actions"
     ],
     "parts": {
@@ -183,6 +204,10 @@
         "slot": "text",
         "parent": "root"
       },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "text"
+      },
       "actions": {
         "slot": "actions",
         "parent": "root"
@@ -195,9 +220,15 @@
       "--uf-tile-level-compensation",
       "--uf-tile-action-size",
       "--uf-tile-focus-ring-width",
+      "--uf-tile-selector-indicator-opacity",
+      "--uf-tile-selector-indicator-hover-opacity",
       "--uf-tile-bg",
       "--uf-tile-fg",
       "--uf-tile-hover-bg",
+      "--uf-selector-indicator-gap",
+      "--uf-selector-indicator-offset-inline-start",
+      "--uf-selector-indicator-edge-gap",
+      "--uf-selector-indicator-size",
       "--face-runtime-option-level"
     ],
     "semanticFallbacks": [
@@ -221,6 +252,7 @@
     ],
     "notes": [
       "Tile text and rightText render through Text; nested actions should remain Button or UF action components.",
+      "Selector mode renders a compact indicator inside the text slot and defaults stretchText to false unless explicitly overridden.",
       "Level indentation is driven by --face-runtime-option-level from the level prop and shared option indentation tokens.",
       "Hover font-weight feedback and action reveal transitions consume shared Face UI motion tokens."
     ]

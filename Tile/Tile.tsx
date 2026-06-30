@@ -37,7 +37,7 @@ import { Icon } from '../Icon/Icon'
 // ---------------------------------------------------------------------------
 
 export const tileAnatomy = createAnatomy('tile').parts(
-  'root', 'icon', 'text', 'actions',
+  'root', 'icon', 'text', 'indicator', 'actions',
 )
 
 // ---------------------------------------------------------------------------
@@ -66,6 +66,10 @@ export interface TileProps extends Omit<HTMLAttributes<HTMLDivElement>, 'childre
   active?: boolean
   /** Stretch text area (flex:1). */
   stretchText?: boolean
+  /** Render a compact selector indicator after the label. */
+  selector?: boolean
+  /** Open state for the selector indicator. */
+  selectorOpen?: boolean
   /** Full width tile. */
   fullWidth?: boolean
   /** Text alignment. */
@@ -96,7 +100,9 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
       iconPosition = 'left',
       disabled = false,
       active = false,
-      stretchText = true,
+      stretchText: rawStretchText,
+      selector = false,
+      selectorOpen = false,
       fullWidth = true,
       align = 'left',
       level,
@@ -160,6 +166,13 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
 
     const hasIcon = resolvedIcon != null
     const hasText = text != null || children != null
+    const hasSelectorIndicator = selector && hasText
+    const stretchText = rawStretchText ?? (hasSelectorIndicator ? false : true)
+    const selectorIndicator = hasSelectorIndicator ? (
+      <span {...tileAnatomy.getPartAttrs('indicator')} aria-hidden="true">
+        <Icon name={selectorOpen ? 'select-chevron-up' : 'select-chevron-down'} />
+      </span>
+    ) : null
 
     const levelStyle = clampedLevel != null
       ? { ...style, '--face-runtime-option-level': clampedLevel } as React.CSSProperties
@@ -178,6 +191,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
         data-stretch-text={stretchText ? '' : undefined}
         data-full-width={fullWidth ? '' : undefined}
         data-align={align}
+        data-selector={hasSelectorIndicator ? '' : undefined}
         data-level={clampedLevel != null ? '' : undefined}
         data-truncate={truncate ? '' : undefined}
         data-membrane={membrane ? '' : undefined}
@@ -200,6 +214,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
               className="uf-tile__content"
             >
               {children}
+              {selectorIndicator}
             </span>
           ) : (
             <Text
@@ -217,6 +232,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
                   {rightText}
                 </Text>
               )}
+              {selectorIndicator}
             </Text>
           )
         )}

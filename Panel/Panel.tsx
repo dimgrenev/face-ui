@@ -219,7 +219,7 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
       {
         title: 'Workspace',
         items: [
-          { id: 'overview', label: 'Overview', icon: 'panel' as const },
+          { id: 'overview', label: 'Overview', icon: 'layout-sidebar-left-open' as const },
           { id: 'components', label: 'Components', icon: 'component' as const },
           { id: 'tokens', label: 'Tokens', icon: 'props' as const },
         ],
@@ -248,7 +248,7 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
               <Bar.Right>
                 <Button
                   {...toggleProps}
-                  icon={<Icon name={isCollapsed ? 'right' : 'left'} />}
+                  icon={<Icon name={isCollapsed ? 'layout-sidebar-left' : 'layout-sidebar-left-open'} />}
                   iconOnly
                   fullWidth={false}
                   variant="default"
@@ -348,7 +348,7 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
     if (isSheetSurface) {
       const triggerNode = trigger ?? (
         <Button
-          icon="panel"
+          icon="layout-sidebar-left"
           iconOnly
           fullWidth={false}
           variant="ghost"

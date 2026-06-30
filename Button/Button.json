@@ -62,6 +62,16 @@
       "required": false,
       "description": "Stretch text area (flex:1)."
     },
+    "selector": {
+      "type": "boolean",
+      "required": false,
+      "description": "Render a compact selector indicator after the label."
+    },
+    "selectorOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Open state for the selector indicator."
+    },
     "fullWidth": {
       "type": "boolean",
       "required": false,
@@ -165,6 +175,13 @@
         "text": "Full Width",
         "fullWidth": true
       }
+    },
+    {
+      "name": "Selector",
+      "props": {
+        "text": "GPT-5.5",
+        "selector": true
+      }
     }
   ],
   "behavior": {
@@ -190,7 +207,8 @@
     ],
     "recommended": [
       "icon",
-      "text"
+      "text",
+      "indicator"
     ],
     "parts": {
       "root": {
@@ -203,6 +221,10 @@
       "text": {
         "slot": "text",
         "parent": "root"
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "text"
       }
     }
   },
@@ -217,6 +239,10 @@
       "--uf-button-hover-bg",
       "--uf-button-hover-fg",
       "--uf-button-ring-color",
+      "--uf-selector-indicator-gap",
+      "--uf-selector-indicator-offset-inline-start",
+      "--uf-selector-indicator-edge-gap",
+      "--uf-selector-indicator-size",
       "--uf-icon-only-size",
       "--face-runtime-option-level",
       "--uf-interactive-weight",
@@ -257,6 +283,7 @@
     ],
     "notes": [
       "Variants set component foreground/background tokens on the root and consume shared control geometry.",
+      "Selector mode renders a compact indicator inside the text slot so the chevron stays close to the label.",
       "Hover font-weight feedback uses --uf-interactive-weight and loading spinner geometry/motion consume shared Face UI tokens.",
       "Use Text for pure typography; Button text is action copy inside an interactive control."
     ]

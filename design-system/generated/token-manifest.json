@@ -34,7 +34,7 @@
         ":root"
       ],
       "values": [
-        "10px"
+        "8px"
       ]
     },
     {
@@ -106,7 +106,7 @@
         ":root"
       ],
       "values": [
-        "12px"
+        "8px"
       ]
     },
     {
@@ -190,7 +190,7 @@
         ":root"
       ],
       "values": [
-        "28px"
+        "calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1))"
       ]
     },
     {
@@ -3677,8 +3677,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "#78bfff",
-        "#3b9dff"
+        "var(--uf-color-foreground)",
+        "var(--uf-color-foreground)"
       ]
     },
     {

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createRoot, type Root } from 'react-dom/client'
 import { act } from 'react'
 import FaceUiReact from '../../face-ui-react'
+import { FELD_GALLERY_META } from '../../gallery'
 
 function setNativeInputValue(element: HTMLInputElement, value: string) {
   const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set
@@ -42,6 +43,34 @@ describe('face-ui-react gallery smoke', () => {
       root.unmount()
     })
     container.remove()
+  })
+
+  it('renders every active face.json gallery component with non-empty preview content', async () => {
+    await act(async () => {
+      root.render(<FaceUiReact />)
+    })
+
+    const activeNames = FELD_GALLERY_META
+      .map((entry) => entry.name)
+      .sort((left, right) => left.localeCompare(right))
+    const cardTitles = Array.from(container.querySelectorAll<HTMLElement>('.uf-gallery-itemTitle'))
+      .map((node) => node.textContent?.trim() || '')
+      .filter(Boolean)
+      .sort((left, right) => left.localeCompare(right))
+
+    expect(cardTitles).toEqual(activeNames)
+    expect(container.textContent).not.toContain('Preview error')
+    expect(container.textContent).not.toContain('No component export')
+
+    for (const name of activeNames) {
+      const card = getGalleryCard(container, name)
+      const surface = card.querySelector<HTMLElement>('.uf-gallery-itemSurface')
+      expect(surface, `${name} should have a preview surface`).not.toBeNull()
+      expect(
+        surface?.querySelector('[data-scope], svg, img, video, canvas, input, textarea, button, table, [role]'),
+        `${name} should render visible component DOM in its preview surface`,
+      ).not.toBeNull()
+    }
   })
 
   it('keeps stateful showcase cards interactive', async () => {
