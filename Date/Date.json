@@ -481,11 +481,11 @@
       "Relative time display"
     ],
     "whenNotToUse": [
-      "Date input (use DatePicker)",
+      "Date input with calendar trigger",
       "Calendar view (use Calendar)"
     ],
     "alternatives": [
-      "DatePicker",
+      "Calendar",
       "Text"
     ],
     "context": "both"

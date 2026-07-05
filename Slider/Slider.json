@@ -135,6 +135,7 @@
     {
       "name": "Default",
       "props": {
+        "label": "Value",
         "defaultValue": [
           50
         ]
@@ -154,6 +155,7 @@
       "name": "Advanced",
       "props": {
         "variant": "advanced",
+        "label": "Zoom",
         "defaultValue": [
           42
         ],
@@ -165,6 +167,7 @@
       "name": "Crop",
       "props": {
         "variant": "advanced",
+        "label": "Crop",
         "defaultValue": [
           40
         ],

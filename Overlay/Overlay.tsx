@@ -64,7 +64,7 @@ export const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
       closeDelay,
       side = 'top',
       align = 'center',
-      sideOffset = 8,
+      sideOffset = 2,
       onOpenChange,
       className,
       ...rest
@@ -87,7 +87,7 @@ export const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
     const [contentStyle, setContentStyle] = useState<CSSProperties>({ position: 'fixed', top: -9999, left: -9999 })
 
     const triggerProps = api.getTriggerProps()
-    const contentProps = api.getContentProps()
+    const contentProps = api.getContentProps() as any
     const isPrimitiveTrigger = children == null || typeof children === 'string' || typeof children === 'number'
 
     const updateFloatingPosition = useCallback(() => {
@@ -173,24 +173,36 @@ export const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
     const contentNode = (
       typeof rawContentNode === 'string' || typeof rawContentNode === 'number'
         ? (
-            <Text as="div" fullWidth>
+            <Text as="div" fullWidth membrane={false} inset="none" align="left">
               {String(rawContentNode)}
             </Text>
           )
         : rawContentNode
     )
 
+    const contentState = contentProps['data-state'] ?? (isOpen ? 'open' : 'closed')
     const contentElement = (
       <div
         ref={handleContentRef}
         {...contentProps}
-        data-trigger={trigger}
-        className={cn('uf-overlay-content', className)}
+        className={cn('uf-overlay-contentMembrane', 'uf-membrane')}
         style={contentStyle}
-        {...rest}
       >
-        <div {...api.getArrowProps()} className={cn('uf-overlay-arrow')} />
-        {contentNode}
+        <div
+          data-scope="overlay"
+          data-part="content"
+          data-state={contentState}
+          data-side={contentProps['data-side']}
+          data-align={contentProps['data-align']}
+          data-trigger={trigger}
+          role={contentProps.role}
+          hidden={contentProps.hidden}
+          className={cn('uf-overlay-content', className)}
+          {...rest}
+        >
+          <div {...api.getArrowProps()} className={cn('uf-overlay-arrow')} />
+          {contentNode}
+        </div>
       </div>
     )
 
@@ -219,7 +231,7 @@ export const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
           <span
             {...triggerProps}
             ref={handleTriggerRef}
-            className={cn('uf-overlay-trigger')}
+            className={cn('uf-membrane', 'uf-overlay-trigger', 'uf-overlay-triggerMembrane')}
             style={{ display: 'inline-flex' }}
           >
             {children}

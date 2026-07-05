@@ -75,16 +75,48 @@
       "type": "number",
       "required": false,
       "description": "Breakpoint where auto surfaces switch to sheet mode."
+    },
+    "autoFocusOnOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Move focus into the modal when it opens. Disable for bounded previews that render open modals inline."
+    },
+    "portal": {
+      "type": "boolean",
+      "required": false,
+      "description": "Render overlay into document.body. Disable for bounded component previews."
+    },
+    "backdropClassName": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the backdrop element."
+    },
+    "positionerClassName": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the positioner element."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
+        "open": true,
+        "portal": false,
         "trigger": "Open sheet",
         "title": "Bottom sheet",
         "description": "Compact actions and selections.",
-        "children": "Sheet content"
+        "children": "Sheet content",
+        "actions": [
+          {
+            "label": "Cancel",
+            "variant": "outline"
+          },
+          {
+            "label": "Apply",
+            "variant": "accent"
+          }
+        ]
       }
     }
   ],

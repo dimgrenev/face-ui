@@ -127,7 +127,7 @@ export const accordionMachine: MachineConfig<AccordionSchema> = createMachine<Ac
   context: {
     expandedIds: [],
     focusedValue: null,
-    multiple: false,
+    multiple: true,
     collapsible: true,
     disabled: false,
     onExpandedChange: null,

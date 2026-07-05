@@ -75,7 +75,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
     const visibleItems = shouldCollapse
       ? [items[0], { label: 'More', __overflow: true } as BreadcrumbItem & { __overflow: true }, ...items.slice(-(collapseAfter - 2))]
       : items
-    const defaultSeparatorNode = <Icon name="right" className="uf-breadcrumb-separatorSvg" />
+    const defaultSeparatorNode = <Icon name="slash" className="uf-breadcrumb-separatorSvg" />
 
     return (
       <nav

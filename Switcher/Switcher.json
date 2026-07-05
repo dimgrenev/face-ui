@@ -89,7 +89,7 @@
     {
       "name": "Checked",
       "props": {
-        "checked": true,
+        "defaultChecked": true,
         "label": "Enabled"
       }
     },

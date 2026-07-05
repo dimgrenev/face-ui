@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { readFileSync } from 'node:fs'
 import React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRoot, type Root } from 'react-dom/client'
@@ -8,7 +9,6 @@ import { Button } from '../../Button/Button'
 import { Checkbox } from '../../Checkbox/Checkbox'
 import { Command } from '../../Command/Command'
 import { Date } from '../../Date/Date'
-import { DatePicker } from '../../DatePicker/DatePicker'
 import { Input } from '../../Input/Input'
 import { Menu } from '../../Menu/Menu'
 import { Modal } from '../../Modal/Modal'
@@ -26,7 +26,12 @@ interface MatchMediaStub {
   listeners: Set<(event: MediaQueryListEvent) => void>
 }
 
-function installMatchMedia(matches: boolean): () => void {
+type MatchMediaRestore = (() => void) & {
+  setMatches: (matches: boolean) => void
+  dispatchChange: () => void
+}
+
+function installMatchMedia(matches: boolean): MatchMediaRestore {
   const original = window.matchMedia
   const stub: MatchMediaStub = {
     matches,
@@ -52,15 +57,25 @@ function installMatchMedia(matches: boolean): () => void {
     dispatchEvent: () => true,
   }))
 
-  return () => {
+  const restore = (() => {
     window.matchMedia = original
+  }) as MatchMediaRestore
+
+  restore.setMatches = (nextMatches: boolean) => {
+    stub.matches = nextMatches
   }
+  restore.dispatchChange = () => {
+    const event = { matches: stub.matches } as MediaQueryListEvent
+    stub.listeners.forEach((listener) => listener(event))
+  }
+
+  return restore
 }
 
 describe('responsive overlay surfaces', () => {
   let container: HTMLDivElement
   let root: Root
-  let restoreMatchMedia: (() => void) | null
+  let restoreMatchMedia: MatchMediaRestore | null
 
   beforeEach(() => {
     ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
@@ -495,18 +510,83 @@ describe('responsive overlay surfaces', () => {
     })
 
     const content = container.querySelector('[data-part="content"]') as HTMLElement | null
+    const calendar = content?.querySelector('.uf-calendar[data-scope="calendar"]') as HTMLElement | null
     expect(content?.getAttribute('data-surface')).toBe('sheet')
     expect(content?.hidden).toBe(false)
+    expect(calendar).not.toBeNull()
     expect(document.body.style.overflow).toBe('hidden')
     expect(container.textContent).toContain('Choose date')
+
+    const componentStyles = readFileSync(`${process.cwd()}/assets/styles/components.css`, 'utf8')
+    expect(componentStyles).toMatch(
+      /\.uf-date__content\[data-surface="sheet"\] \.uf-date__grid,\s*\.uf-date__content\[data-surface="sheet"\] \.uf-calendar\[data-scope="calendar"\] \{\s*width: 100%;\s*inline-size: 100%;\s*min-inline-size: 0;\s*\}/,
+    )
+    expect(componentStyles).toContain('.uf-date__content[data-surface="sheet"] .uf-date__grid > .uf-membrane')
   })
 
-  it('DatePicker exposes visible label and keyboard dialog trigger semantics', async () => {
+  it('Date keeps auto surfaces as a popover on wide viewports', async () => {
+    restoreMatchMedia?.setMatches(false)
+
+    await act(async () => {
+      root.render(<Date />)
+    })
+
+    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
+    expect(trigger).not.toBeNull()
+
+    await act(async () => {
+      trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    const content = container.querySelector('[data-part="content"]') as HTMLElement | null
+    expect(content?.getAttribute('data-surface')).toBe('popover')
+    expect(content?.hidden).toBe(false)
+    expect(container.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
+    expect(document.body.style.overflow).toBe('')
+    expect(container.textContent).not.toContain('Choose date')
+  })
+
+  it('Date reevaluates auto surfaces after crossing the responsive breakpoint', async () => {
+    await act(async () => {
+      root.render(<Date />)
+    })
+
+    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
+    await act(async () => {
+      trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    const content = container.querySelector('[data-part="content"]') as HTMLElement | null
+    expect(content?.getAttribute('data-surface')).toBe('sheet')
+    expect(document.body.style.overflow).toBe('hidden')
+
+    restoreMatchMedia?.setMatches(false)
+
+    await act(async () => {
+      window.dispatchEvent(new Event('resize'))
+    })
+
+    expect(content?.getAttribute('data-surface')).toBe('popover')
+    expect(container.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
+    expect(document.body.style.overflow).toBe('')
+
+    restoreMatchMedia?.setMatches(true)
+
+    await act(async () => {
+      restoreMatchMedia?.dispatchChange()
+    })
+
+    expect(content?.getAttribute('data-surface')).toBe('sheet')
+    expect(container.querySelector('.uf-responsive-overlay-backdrop')).not.toBeNull()
+    expect(document.body.style.overflow).toBe('hidden')
+  })
+
+  it('Date exposes visible label and keyboard dialog trigger semantics', async () => {
     const handleOpenChange = vi.fn()
 
     await act(async () => {
       root.render(
-        <DatePicker
+        <Date
           label="Start date"
           placeholder="Pick start"
           required
@@ -999,7 +1079,7 @@ describe('responsive overlay surfaces', () => {
     const input = container.querySelector('[role="combobox"]') as HTMLInputElement | null
     expect(input).not.toBeNull()
     expect(document.body.style.overflow).toBe('hidden')
-    expect(container.textContent).toContain('Command')
+    expect(container.querySelector('.uf-command .uf-responsive-sheetHeader')).toBeNull()
 
     const pasteButton = Array.from(container.querySelectorAll<HTMLButtonElement>('.uf-command-item')).find((button) => button.textContent?.includes('Paste')) ?? null
     expect(pasteButton).not.toBeNull()

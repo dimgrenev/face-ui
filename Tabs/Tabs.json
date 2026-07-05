@@ -81,23 +81,98 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "items": [
+          {
+            "value": "overview",
+            "label": "Overview",
+            "content": "Overview content"
+          },
+          {
+            "value": "details",
+            "label": "Details",
+            "content": "Details content"
+          },
+          {
+            "value": "activity",
+            "label": "Activity",
+            "content": "Activity content"
+          }
+        ],
+        "defaultValue": "overview",
+        "orientation": "horizontal",
+        "membrane": true
+      }
     },
     {
       "name": "Vertical",
       "props": {
+        "items": [
+          {
+            "value": "overview",
+            "label": "Overview",
+            "content": "Overview content"
+          },
+          {
+            "value": "details",
+            "label": "Details",
+            "content": "Details content"
+          },
+          {
+            "value": "activity",
+            "label": "Activity",
+            "content": "Activity content"
+          }
+        ],
+        "defaultValue": "overview",
         "orientation": "vertical"
       }
     },
     {
       "name": "Manual Activation",
       "props": {
+        "items": [
+          {
+            "value": "overview",
+            "label": "Overview",
+            "content": "Overview content"
+          },
+          {
+            "value": "details",
+            "label": "Details",
+            "content": "Details content"
+          },
+          {
+            "value": "activity",
+            "label": "Activity",
+            "content": "Activity content"
+          }
+        ],
+        "defaultValue": "overview",
         "activationMode": "manual"
       }
     },
     {
       "name": "Disabled",
       "props": {
+        "items": [
+          {
+            "value": "overview",
+            "label": "Overview",
+            "content": "Overview content"
+          },
+          {
+            "value": "details",
+            "label": "Details",
+            "content": "Details content"
+          },
+          {
+            "value": "activity",
+            "label": "Activity",
+            "content": "Activity content"
+          }
+        ],
+        "defaultValue": "overview",
         "disabled": true
       }
     }

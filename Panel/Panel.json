@@ -109,17 +109,27 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "items": [],
+        "previewPreset": "workspace",
+        "defaultSelectedId": "overview"
+      }
     },
     {
       "name": "Collapsed",
       "props": {
+        "items": [],
+        "previewPreset": "workspace",
+        "defaultSelectedId": "overview",
         "collapsed": true
       }
     },
     {
       "name": "Custom Width",
       "props": {
+        "items": [],
+        "previewPreset": "workspace",
+        "defaultSelectedId": "overview",
         "width": 300
       }
     }

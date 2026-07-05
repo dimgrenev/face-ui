@@ -111,8 +111,8 @@ export type { TableProps, TableColumn } from './Table/Table'
 export { Calendar } from './Calendar/Calendar'
 export type { CalendarProps } from './Calendar/Calendar'
 
-export { DatePicker } from './DatePicker/DatePicker'
-export type { DatePickerProps, DatePreset } from './DatePicker/DatePicker'
+export { Date } from './Date/Date'
+export type { DateProps, DatePreset } from './Date/Date'
 
 export { Drawer } from './Drawer/Drawer'
 export type { DrawerProps } from './Drawer/Drawer'

@@ -21,7 +21,7 @@
       "type": "boolean",
       "required": false,
       "description": "Allow multiple items to be expanded simultaneously.",
-      "default": false
+      "default": true
     },
     "collapsible": {
       "type": "boolean",
@@ -49,18 +49,29 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "defaultExpandedIds": [
+          "getting-started"
+        ]
+      }
     },
     {
       "name": "Multiple",
       "props": {
-        "multiple": true
+        "multiple": true,
+        "defaultExpandedIds": [
+          "getting-started",
+          "usage"
+        ]
       }
     },
     {
       "name": "Non-Collapsible",
       "props": {
-        "collapsible": false
+        "collapsible": false,
+        "defaultExpandedIds": [
+          "getting-started"
+        ]
       }
     },
     {
@@ -72,7 +83,7 @@
   ],
   "behavior": {
     "stateModel": "Machine stores expandedIds and supports controlled or uncontrolled expansion.",
-    "multiple": "When multiple=false, opening one item closes the others.",
+    "multiple": "By default, opening one item keeps already open items expanded. Set multiple=false to force single-open behavior.",
     "collapsible": "When collapsible=false, the last open item cannot be closed by toggling it.",
     "autoFocusOnOpen": "none"
   },
@@ -145,6 +156,7 @@
       "--uf-control-gap",
       "--uf-control-pad-text",
       "--uf-control-pad-icon",
+      "--uf-accordion-content-inset",
       "--uf-font-size",
       "--uf-font-weight",
       "--uf-radius",
@@ -156,6 +168,7 @@
     ],
     "notes": [
       "Accordion intentionally uses shared control geometry and motion tokens instead of accordion-local size or timing tokens.",
+      "Content panels use --uf-accordion-content-inset to align direct content under the trigger label.",
       "Trigger labels and content strings route through Text; nested action content should remain Face UI or UF components."
     ]
   },

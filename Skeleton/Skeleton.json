@@ -26,15 +26,19 @@
   },
   "states": [
     {
-      "name": "Default (Text)",
-      "props": {}
+      "name": "Default",
+      "props": {
+        "variant": "circle",
+        "width": "var(--uf-control-height)",
+        "height": "var(--uf-control-height)"
+      }
     },
     {
       "name": "Circle",
       "props": {
         "variant": "circle",
-        "width": "48px",
-        "height": "48px"
+        "width": "var(--uf-control-height)",
+        "height": "var(--uf-control-height)"
       }
     },
     {

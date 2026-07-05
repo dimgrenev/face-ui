@@ -8,6 +8,7 @@
 import { forwardRef, type ReactNode } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
+import { Text } from '../Text/Text'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -36,6 +37,26 @@ export interface ScrollProps {
   ariaLabel?: string
 }
 
+const DEFAULT_SCROLL_TEXT = [
+  'По мотивам Чехова: «Вся Россия - наш сад».',
+  'Вечером в доме стало так тихо, что слышно было, как в соседней комнате остывает самовар. Лампа горела ровно, но каждый ее круг света казался тревожным: за столом сидели люди, которые давно знали правду и все еще делали вид, будто можно отложить разговор до завтра.',
+  'Она смотрела в окно, где чернели ветви, и думала не о дороге, не о деньгах, не о письме, лежавшем в ящике, а о том странном мгновении, когда прошлое вдруг становится вещью: его можно потрогать, потерять, продать или оставить чужим людям.',
+  'Он сказал несколько простых слов, почти будничных, и от этого всем стало тяжелее. Никто не спорил. В передней скрипнула дверь, где-то в саду ударил топор, и в этой сухой паузе каждый понял: прежняя жизнь уже закончилась, только в комнате еще продолжали сидеть как прежде.',
+  'Потом заговорили о погоде, о поезде, о мелких расходах. Так всегда бывает в минуты, когда главное произнесено без голоса. Человек берется за пустяки, чтобы не видеть, как под ногами меняется земля.',
+].join('\n\n')
+
+function renderScrollContent(children: ReactNode) {
+  if (children == null || typeof children === 'string' || typeof children === 'number') {
+    const text = String(children ?? DEFAULT_SCROLL_TEXT)
+    return (
+      <Text as="div" fullWidth membrane inset="control" className="uf-scroll__text">
+        {text}
+      </Text>
+    )
+  }
+  return children
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -47,8 +68,8 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(
       type = 'auto',
       orientation = 'vertical',
       className,
-      height = 160,
-      ariaLabel = 'Scrollable content',
+      height = 240,
+      ariaLabel = 'Scrollable text',
     } = props
 
     const overflowStyle = (() => {
@@ -79,7 +100,7 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(
           role="region"
           aria-label={ariaLabel}
         >
-          {children}
+          {renderScrollContent(children)}
         </div>
       </div>
     )

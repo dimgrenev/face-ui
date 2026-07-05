@@ -3,7 +3,7 @@
  *
  * Uses core carousel machine + Face UI primitives:
  * - Button for nav and indicators
- * - Card/Text for primitive slide content fallback
+ * - Media for fallback slide content
  */
 
 import { forwardRef, Children, isValidElement, type CSSProperties, type ReactNode } from 'react'
@@ -12,9 +12,7 @@ import { useControllableMachineProp } from '../assets/adapters/react/use-control
 import { carouselMachine, connectCarousel } from '../assets/machines/carousel.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
-import { Card } from '../Card/Card'
-import { Text } from '../Text/Text'
-import { Icon } from '../Icon/Icon'
+import { Media } from '../Media/Media'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -42,6 +40,33 @@ export interface CarouselProps {
   className?: string
 }
 
+type CarouselMediaSlide = {
+  src: string
+  alt?: string
+}
+
+type CarouselSlideInput = ReactNode | CarouselMediaSlide
+
+function preserveButtonScope<T extends { 'data-scope'?: string }>(props: T): Omit<T, 'data-scope'> {
+  const { 'data-scope': _scope, ...rest } = props
+  return rest
+}
+
+const fallbackSlides: CarouselMediaSlide[] = [
+  {
+    src: '/assets/media/examples/office-core/lobby-day.webp',
+    alt: 'Bright office lobby with glass-block wall, seating, and plants',
+  },
+  {
+    src: '/assets/media/examples/office-core/lobby-glass-blocks.webp',
+    alt: 'Office lobby with glass-block wall, seating, and a person standing by the window',
+  },
+  {
+    src: '/assets/media/examples/office-core/skyline-window-day.webp',
+    alt: 'Two people looking out from a high-rise office window during the day',
+  },
+]
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -62,9 +87,9 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
     } = props
 
     const providedSlides = Children.toArray(children)
-    const slides = providedSlides.length > 0
-      ? providedSlides
-      : ['Build faster', 'Compose interfaces', 'Ship clean UI']
+    const slides: CarouselSlideInput[] = providedSlides.length > 0
+      ? providedSlides as CarouselSlideInput[]
+      : fallbackSlides
     const total = slides.length
     const clampedSlidesPerView = Math.max(1, Math.floor(slidesPerView))
     const machineIndex = useControllableMachineProp(
@@ -91,66 +116,76 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
       '--face-runtime-carousel-slides-per-view': String(clampedSlidesPerView),
     } as CSSProperties
 
-    const renderSlide = (slide: ReactNode, slideIndex: number) => {
+    const renderSlide = (slide: CarouselSlideInput, slideIndex: number) => {
       if (isValidElement(slide)) return slide
+      if (slide && typeof slide === 'object' && 'src' in (slide as Record<string, unknown>)) {
+        const mediaSlide = slide as { src: string; alt?: string }
+        return (
+          <Media
+            src={mediaSlide.src}
+            alt={mediaSlide.alt ?? `Slide ${slideIndex + 1}`}
+            objectFit="cover"
+            width="100%"
+            membrane
+            className="uf-carousel-slideMedia"
+          />
+        )
+      }
       return (
-        <Card membrane={false} className="uf-carousel-slideCard">
-          <div className="uf-carousel-slideCardBody">
-            <Text as="div" membrane={false} className="uf-carousel-slideTitle">
-              Slide {slideIndex + 1}
-            </Text>
-            <Text as="div" membrane={false} variant="muted">
-              {String(slide)}
-            </Text>
-          </div>
-        </Card>
+        <Media
+          src={String(slide)}
+          alt={`Slide ${slideIndex + 1}`}
+          objectFit="cover"
+          width="100%"
+          membrane
+          className="uf-carousel-slideMedia"
+        />
       )
     }
 
     return (
       <div ref={ref} {...api.getRootProps()} style={rootStyle} className={cn('uf-carousel', className)}>
-        <span className="uf-membrane uf-membrane--full">
-          <div {...api.getViewportProps()}>
-            <div className="uf-carousel-track" style={{ transform: trackTransform }}>
-              {slides.map((slide, i) => (
-                <div key={i} {...api.getSlideProps(i)}>
-                  {renderSlide(slide, i)}
-                </div>
-              ))}
-            </div>
-            <div className="uf-carousel-controls">
-              <Button
-                {...api.getPrevProps()}
-                icon={<Icon name="left" />}
-                iconOnly
-                fullWidth={false}
-                variant="ghost"
-                className="uf-carousel-nav uf-carousel-navPrev"
-              />
-              <div {...api.getIndicatorProps()} className="uf-carousel-indicators">
-                {slides.map((_, i) => (
-                  <Button
-                    key={i}
-                    {...api.getIndicatorItemProps(i)}
-                    icon={<Icon name="radio-on" />}
-                    iconOnly
-                    fullWidth={false}
-                    variant="ghost"
-                    className="uf-carousel-indicatorButton"
-                  />
-                ))}
+        <div {...api.getViewportProps()}>
+          <div className="uf-carousel-track" style={{ transform: trackTransform }}>
+            {slides.map((slide, i) => (
+              <div key={i} {...api.getSlideProps(i)}>
+                {renderSlide(slide, i)}
               </div>
+            ))}
+          </div>
+        </div>
+        <div className="uf-carousel-controls">
+          <div className="uf-carousel-navSlot uf-carousel-navSlot--prev">
+            <Button
+              {...preserveButtonScope(api.getPrevProps())}
+              icon="arrow-left"
+              iconOnly
+              fullWidth={false}
+              className="uf-carousel-nav uf-carousel-navPrev"
+            />
+          </div>
+          <div {...api.getIndicatorProps()} className="uf-carousel-indicators">
+            {slides.map((_, i) => (
               <Button
-                {...api.getNextProps()}
-                icon={<Icon name="right" />}
+                key={i}
+                {...preserveButtonScope(api.getIndicatorItemProps(i))}
+                icon={api.index === i ? 'radio-on' : 'radio-off'}
                 iconOnly
                 fullWidth={false}
-                variant="ghost"
-                className="uf-carousel-nav uf-carousel-navNext"
+                className="uf-carousel-indicatorButton"
               />
-            </div>
+            ))}
           </div>
-        </span>
+          <div className="uf-carousel-navSlot uf-carousel-navSlot--next">
+            <Button
+              {...preserveButtonScope(api.getNextProps())}
+              icon="arrow-right"
+              iconOnly
+              fullWidth={false}
+              className="uf-carousel-nav uf-carousel-navNext"
+            />
+          </div>
+        </div>
       </div>
     )
   },

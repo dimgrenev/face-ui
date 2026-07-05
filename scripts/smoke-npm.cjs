@@ -45,6 +45,8 @@ async function main() {
     'dist/esm/component-registry.json',
     'dist/esm/assets/styles/index.css',
     'dist/esm/assets/fonts/Begriffsschrift.ttf',
+    'dist/esm/assets/media/examples/office-core/manifest.json',
+    'dist/esm/assets/media/examples/office-core/lobby-day.webp',
     'dist/esm/design-system/source/color-system.jsonc',
     'dist/esm/design-system/tokens/colors.css',
     'dist/esm/design-system/index.css',
@@ -70,6 +72,12 @@ async function main() {
     const distFiles = walk(dist).map(rel);
     const forbiddenPatterns = [
       /(^|\/)\.git(\/|$)/,
+      /(^|\/)\.cache(\/|$)/,
+      /(^|\/)\.next(\/|$)/,
+      /(^|\/)\.next-[^/]+(\/|$)/,
+      /(^|\/)\.turbo(\/|$)/,
+      /(^|\/)\.userface(\/|$)/,
+      /(^|\/)\.userface-cache(\/|$)/,
       /(^|\/)node_modules(\/|$)/,
       /(^|\/)__tests__(\/|$)/,
       /\.(test|spec)\.[cm]?[jt]sx?$/,
@@ -94,6 +102,7 @@ async function main() {
   assert(packageJson.exports?.['./docs/*'] === './docs/*', 'package exports must expose docs/* markdown files');
   assert(packageJson.files?.includes('design-system'), 'package files must include design-system/');
   assert(packageJson.exports?.['./design-system/*'] === './dist/esm/design-system/*', 'package exports must expose design-system artifacts');
+  assert(packageJson.exports?.['./assets/media/*'] === './dist/esm/assets/media/*', 'package exports must expose media example assets');
   assert(!packageJson.exports?.['./*'], 'package exports must not expose a generic JS wildcard');
   assert(!packageJson.exports?.['./*.json'], 'package exports must not expose a generic JSON wildcard');
   assert(packageJson.exports?.['./gallery']?.import === './dist/esm/gallery.js', 'package exports must expose gallery metadata');

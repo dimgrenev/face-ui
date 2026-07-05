@@ -133,6 +133,8 @@ export function SliderAdvanced({
   const draggingRef = useRef(false)
   const dragKindRef = useRef<DragKind>(null)
   const dragOffsetRef = useRef(0)
+  const lastDragValueRef = useRef<number | null>(null)
+  const lastDragCropRef = useRef<SliderCropRange | null>(null)
 
   useEffect(() => {
     if (!isControlled || draggingRef.current) return
@@ -162,7 +164,7 @@ export function SliderAdvanced({
     : committedCrop
 
   const committedValue = isControlled ? (controlledValue as number) : internalValue
-  const renderValueRaw = dragKindRef.current === 'thumb' && typeof dragValue === 'number' ? dragValue : committedValue
+  const renderValueRaw = draggingRef.current && typeof dragValue === 'number' ? dragValue : committedValue
   const normalizeValueToCrop = (next: number, cropNow: SliderCropRange) => {
     const base = snapToStep(next)
     if (!cropLocks) return base
@@ -193,7 +195,19 @@ export function SliderAdvanced({
     }
   }, [decimals])
 
-  const measureLabel = formatValue(renderValueRaw)
+  const measureLabel = useMemo(() => {
+    const candidates = [
+      formatValue(mn),
+      formatValue(mx),
+      formatValue(renderValue),
+      cropEnabled ? formatValue(renderCrop.min) : '',
+      cropEnabled ? formatValue(renderCrop.max) : '',
+    ].filter(Boolean)
+
+    return candidates.reduce((longest, candidate) => (
+      candidate.length > longest.length ? candidate : longest
+    ), candidates[0] ?? formatValue(renderValue))
+  }, [cropEnabled, formatValue, mn, mx, renderCrop.min, renderCrop.max, renderValue])
 
   useLayoutEffect(() => {
     const el = thumbMeasureRef.current
@@ -275,10 +289,11 @@ export function SliderAdvanced({
     return clamp(thumbLeftAtHi + thumbW + BUFFER_PX, 0, geom.trackW - MARKER_W_PX)
   }, [cropEnabled, geom.ok, geom.thumbUsable, geom.trackW, mn, mx, renderCrop.min, renderCrop.max, thumbW])
 
-  const emitValue = (next: number) => {
+  const emitValue = (next: number, options: { commit?: boolean; crop?: SliderCropRange } = {}) => {
     if (disabled) return
-    const normalized = cropLocks ? normalizeValueToCrop(next, renderCrop) : snapToStep(next)
-    if (!isControlled) setInternalValue(normalized)
+    const normalized = cropLocks ? normalizeValueToCrop(next, options.crop ?? renderCrop) : snapToStep(next)
+    lastDragValueRef.current = normalized
+    if (!isControlled && options.commit !== false) setInternalValue(normalized)
     onChange?.(normalized)
     onValueChange?.({ value: [normalized] })
   }
@@ -286,6 +301,7 @@ export function SliderAdvanced({
   const emitCrop = (next: SliderCropRange) => {
     if (!cropEnabled || disabled) return
     const normalized = normalizeCrop(next)
+    lastDragCropRef.current = normalized
     if (!isCropControlled) setInternalCrop(normalized)
     onCropChange?.(normalized)
   }
@@ -293,6 +309,8 @@ export function SliderAdvanced({
   const startThumbDrag = (clientX: number, rect: DOMRect | ReturnType<NonNullable<HTMLDivElement['getBoundingClientRect']>>) => {
     draggingRef.current = true
     dragKindRef.current = 'thumb'
+    lastDragValueRef.current = Number.isFinite(renderValue) ? renderValue : null
+    lastDragCropRef.current = renderCrop
     setDragValue(Number.isFinite(renderValue) ? renderValue : null)
 
     if (geom.ok) {
@@ -313,7 +331,7 @@ export function SliderAdvanced({
           : clamp(left / Math.max(1e-9, usable), 0, 1)
         const next = valueFromT(tThumb)
         setDragValue(next)
-        emitValue(next)
+        emitValue(next, { commit: false })
       }
     } else {
       dragOffsetRef.current = thumbW / 2
@@ -331,17 +349,22 @@ export function SliderAdvanced({
         : clamp(left / Math.max(1e-9, usable), 0, 1)
       const next = valueFromT(tThumb)
       setDragValue(next)
-      emitValue(next)
+      emitValue(next, { commit: false })
     }
 
     const onUp = () => {
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
       window.removeEventListener('pointercancel', onUp)
+      if (!isControlled && lastDragValueRef.current != null) {
+        setInternalValue(lastDragValueRef.current)
+      }
       draggingRef.current = false
       dragKindRef.current = null
       dragOffsetRef.current = 0
       setDragValue(null)
+      lastDragValueRef.current = null
+      lastDragCropRef.current = null
     }
 
     window.addEventListener('pointermove', onMove, { passive: true })
@@ -356,6 +379,8 @@ export function SliderAdvanced({
   ) => {
     draggingRef.current = true
     dragKindRef.current = which === 'min' ? 'crop-min' : 'crop-max'
+    lastDragValueRef.current = Number.isFinite(renderValue) ? renderValue : null
+    lastDragCropRef.current = committedCrop
     setDragCrop(committedCrop)
 
     if (geom.ok) {
@@ -372,7 +397,7 @@ export function SliderAdvanced({
       const desiredLeft = x - dragOffsetRef.current
       let markerLeft = clamp(desiredLeft, 0, geom.markerUsable)
 
-      const currentValue = Number(dragKindRef.current === 'thumb' && typeof dragValue === 'number' ? dragValue : renderValue)
+      const currentValue = Number(lastDragValueRef.current ?? renderValue)
       const tCur = tFromValue(currentValue)
       const pad = cropEnabled ? (MARKER_W_PX + BUFFER_PX) : 0
       const usable = cropEnabled ? (geom.thumbUsable - (pad * 2)) : geom.thumbUsable
@@ -402,9 +427,10 @@ export function SliderAdvanced({
         : clamp(thumbLeftAtBoundary / Math.max(1e-9, usable2), 0, 1)
 
       const nextValue = valueFromT(t)
+      const baseCrop = lastDragCropRef.current ?? committedCrop
       const nextCrop = normalizeCrop(which === 'min'
-        ? { min: nextValue, max: (dragCrop ?? committedCrop).max }
-        : { min: (dragCrop ?? committedCrop).min, max: nextValue })
+        ? { min: nextValue, max: baseCrop.max }
+        : { min: baseCrop.min, max: nextValue })
 
       setDragCrop(nextCrop)
       emitCrop(nextCrop)
@@ -412,7 +438,7 @@ export function SliderAdvanced({
       if (cropLocks) {
         const clampedValue = normalizeValueToCrop(currentValue, nextCrop)
         setDragValue(clampedValue)
-        emitValue(clampedValue)
+        emitValue(clampedValue, { commit: false, crop: nextCrop })
       }
     }
 
@@ -420,10 +446,16 @@ export function SliderAdvanced({
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
       window.removeEventListener('pointercancel', onUp)
+      if (!isControlled && lastDragValueRef.current != null) {
+        setInternalValue(lastDragValueRef.current)
+      }
       draggingRef.current = false
       dragKindRef.current = null
       dragOffsetRef.current = 0
       setDragCrop(null)
+      setDragValue(null)
+      lastDragValueRef.current = null
+      lastDragCropRef.current = null
     }
 
     window.addEventListener('pointermove', onMove, { passive: true })

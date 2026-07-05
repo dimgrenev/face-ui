@@ -7,10 +7,10 @@
  * `<Switcher text="Long description..." withText textWrap="wrap" />`
  */
 
-import { forwardRef, useId, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useEffect, useId, useMemo, useRef, type HTMLAttributes, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { switcherMachine, connectSwitcher } from '../assets/machines/switcher.machine'
+import type { SwitcherSchema } from '../assets/machines/switcher.machine'
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
 
@@ -75,24 +75,44 @@ export const Switcher = forwardRef<HTMLDivElement, SwitcherProps>(
       ...rest
     } = props
 
-    const resolvedChecked = useControllableMachineProp(
-      checked !== undefined ? checked : undefined,
-      defaultChecked ?? false,
-    )
+    const isControlled = checked !== undefined
+    const initialCheckedRef = useRef(Boolean(checked ?? defaultChecked ?? false))
+    const switcherMachineConfig = useMemo(() => ({
+      ...switcherMachine,
+      initial: initialCheckedRef.current ? 'checked' : 'unchecked',
+      context: {
+        ...switcherMachine.context,
+        checked: initialCheckedRef.current,
+      },
+    } as typeof switcherMachine), [])
 
-    const { state, send } = useMachine(switcherMachine, {
-      checked: resolvedChecked,
+    const { state, send } = useMachine<SwitcherSchema>(switcherMachineConfig, {
       disabled,
       required,
       name,
       value,
       onCheckedChange: ((details: { checked: boolean }) => {
+        if (isControlled && details.checked === checked) return
         try { onCheckedChange?.(details) } catch {}
         try { onChange?.(details.checked) } catch {}
       }) as any,
     })
 
+    useEffect(() => {
+      if (checked === undefined) return
+      const nextChecked = Boolean(checked)
+      if (state.context.checked === nextChecked) return
+      send({ type: 'SET', checked: nextChecked })
+    }, [checked, send, state.context.checked])
+
     const api = connectSwitcher(state, send)
+    const rootProps = { ...(api.getRootProps() as any) }
+    const labelProps = { ...(api.getLabelProps() as any) }
+    const controlProps = { ...(api.getControlProps() as any) }
+    const hiddenInputProps = { ...(api.getHiddenInputProps() as any) }
+    delete labelProps.onClick
+    delete controlProps.onClick
+    delete hiddenInputProps.onChange
     const generatedLabelId = useId()
 
     // Determine label content: explicit `label` prop takes priority, then `text` when `withText`
@@ -104,23 +124,34 @@ export const Switcher = forwardRef<HTMLDivElement, SwitcherProps>(
     const rootNode = (
       <div
         ref={ref}
-        {...api.getRootProps()}
+        {...rootProps}
         {...rest}
         data-switch-only={switchOnly || undefined}
         data-text-wrap={textWrap === 'wrap' || undefined}
         className={cn('uf-switcher', className)}
+        onClick={(event) => {
+          const target = event.target as HTMLElement | null
+          if (target?.tagName === 'INPUT') return
+          send({ type: 'TOGGLE' })
+        }}
       >
         {hasLabel && (
-          <label {...api.getLabelProps()} id={labelId}>
+          <label {...labelProps} id={labelId}>
             <Text as="span" variant="body" inset="none" membrane={false}>
               {labelContent}
             </Text>
           </label>
         )}
-        <div {...api.getControlProps()} aria-labelledby={labelId}>
+        <div {...controlProps} aria-labelledby={labelId}>
           <span {...api.getThumbProps()} />
         </div>
-        <input {...api.getHiddenInputProps()} />
+        <input
+          {...hiddenInputProps}
+          readOnly
+          onClick={(event) => {
+            event.preventDefault()
+          }}
+        />
       </div>
     )
 

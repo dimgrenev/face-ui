@@ -1,15 +1,16 @@
 /**
  * Progress — data display indicator.
  *
- * Shows loading progress as a bar with track + indicator.
+ * Shows loading progress as a linear bar or circular ring with track + indicator.
  * Pass value=-1 for indeterminate state.
  *
  * `<Progress value={50} max={100} />`
+ * `<Progress value={50} shape="circle" showLabel />`
  * `<Progress value={-1} label="Loading..." />`
  * `<Progress value={75} variant="success" showLabel />`
  */
 
-import { forwardRef, useId, type ReactNode } from 'react'
+import { forwardRef, useId, type CSSProperties, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { progressMachine, connectProgress } from '../assets/machines/progress.machine'
 import { cn } from '../assets/utils'
@@ -20,6 +21,7 @@ import { Text } from '../Text/Text'
 // ---------------------------------------------------------------------------
 
 export type ProgressVariant = 'default' | 'success' | 'warning' | 'error'
+export type ProgressShape = 'linear' | 'circle'
 
 export interface ProgressProps {
   /** Current value. Pass -1 for indeterminate. */
@@ -28,9 +30,11 @@ export interface ProgressProps {
   max?: number
   /** Color variant. */
   variant?: ProgressVariant
-  /** Show percentage label beside the track. */
+  /** Visual progress shape. */
+  shape?: ProgressShape
+  /** Show percentage label in the header for linear progress or beside the ring for circular progress. */
   showLabel?: boolean
-  /** Optional label rendered beside the track. */
+  /** Optional label rendered in the header for linear progress or beside the ring for circular progress. */
   label?: ReactNode
   /** Accessible label for the progressbar when no visible label is rendered. */
   'aria-label'?: string
@@ -47,6 +51,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       value = 0,
       max = 100,
       variant = 'default',
+      shape = 'linear',
       showLabel = false,
       label,
       'aria-label': ariaLabel,
@@ -60,6 +65,34 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
     const api = connectProgress(state, send)
     const generatedLabelId = useId()
     const labelId = label != null ? `${generatedLabelId}-label` : undefined
+    const indicatorProps = api.getIndicatorProps()
+    const displayPercent = Math.round(api.percent)
+    const indicatorStyle = {
+      ...(shape === 'circle' ? {} : indicatorProps.style),
+      '--uf-progress-percent': api.isIndeterminate ? '40%' : `${displayPercent}%`,
+    } as CSSProperties
+    const labelNode = label != null ? (
+      <Text
+        as="span"
+        inset="none"
+        membrane={false}
+        id={labelId}
+        className="uf-progress-title"
+        {...api.getLabelProps()}
+      >
+        {label}
+      </Text>
+    ) : null
+    const valueNode = showLabel ? (
+      <Text as="span" inset="none" membrane={false} className="uf-progress-label">
+        {displayPercent}%
+      </Text>
+    ) : null
+    const trackNode = (
+      <div {...api.getTrackProps()}>
+        <div {...indicatorProps} style={indicatorStyle} />
+      </div>
+    )
 
     return (
       <div
@@ -68,20 +101,27 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         aria-label={ariaLabel}
         aria-labelledby={labelId}
         data-variant={variant}
+        data-shape={shape}
         className={cn('uf-progress', className)}
       >
-        {label != null && (
-          <Text as="span" inset="none" membrane={false} id={labelId} {...api.getLabelProps()}>
-            {label}
-          </Text>
-        )}
-        <div {...api.getTrackProps()}>
-          <div {...api.getIndicatorProps()} />
-        </div>
-        {showLabel && (
-          <Text as="span" inset="none" membrane={false} className="uf-progress-label">
-            {Math.round(api.percent)}%
-          </Text>
+        {shape === 'linear' ? (
+          <>
+            {(labelNode || valueNode) ? (
+              <div className="uf-progress__header">
+                {labelNode}
+                {valueNode}
+              </div>
+            ) : null}
+            <div className="uf-progress__trackWrap">
+              {trackNode}
+            </div>
+          </>
+        ) : (
+          <>
+            {labelNode}
+            {trackNode}
+            {valueNode}
+          </>
         )}
       </div>
     )

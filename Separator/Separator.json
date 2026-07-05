@@ -28,18 +28,26 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "orientation": "horizontal",
+        "decorative": true,
+        "membrane": true
+      }
     },
     {
       "name": "Vertical",
       "props": {
-        "orientation": "vertical"
+        "orientation": "vertical",
+        "decorative": true,
+        "membrane": true
       }
     },
     {
       "name": "Semantic",
       "props": {
-        "decorative": false
+        "orientation": "horizontal",
+        "decorative": false,
+        "membrane": true
       }
     }
   ],
@@ -68,7 +76,7 @@
       "--uf-color-border"
     ],
     "notes": [
-      "Separator line width is a component-local alias over membrane thickness.",
+      "Separator line width is a thin border token and must not scale with membrane spacing.",
       "Membrane spacing keeps horizontal separators aligned with control/text insets."
     ]
   },

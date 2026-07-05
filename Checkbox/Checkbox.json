@@ -74,14 +74,14 @@
     {
       "name": "Checked",
       "props": {
-        "checked": true,
+        "defaultChecked": true,
         "label": "Checked"
       }
     },
     {
       "name": "Indeterminate",
       "props": {
-        "checked": "indeterminate",
+        "defaultChecked": "indeterminate",
         "label": "Partially selected"
       }
     },
@@ -95,7 +95,7 @@
     {
       "name": "Icon Only",
       "props": {
-        "checked": true
+        "defaultChecked": true
       }
     },
     {

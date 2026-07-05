@@ -362,7 +362,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
                     )}
                     {api.sortColumn === col.id && (
                       <span aria-hidden="true" className="uf-table__sort-icon">
-                        <Icon name={api.sortDirection === 'asc' ? 'up' : 'down'} />
+                        <Icon name={api.sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'} />
                       </span>
                     )}
                   </div>

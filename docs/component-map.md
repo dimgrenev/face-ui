@@ -34,7 +34,7 @@
 - `Slider`
 - `Rating`
 - `Select`
-- `DatePicker`
+- `Date`
 - `Calendar`
 
 ## Patterns
@@ -47,4 +47,3 @@
 - `Toggle` -> use `SegmentedControl`
 - `Sidebar` -> use `Panel`
 - `Sheet` -> use `Drawer` with `side="bottom"` or `side="top"`
-- `Date` -> use `DatePicker`

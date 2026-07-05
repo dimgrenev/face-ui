@@ -3510,7 +3510,7 @@
       ],
       "values": [
         "var(--uf-color-foreground)",
-        "var(--uf-color-background)"
+        "var(--uf-color-foreground)"
       ]
     },
     {
@@ -3873,8 +3873,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-background)",
-        "var(--uf-color-foreground)"
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
       ]
     },
     {
@@ -4069,8 +4069,36 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-panel)",
-        "var(--uf-color-panel)"
+        "var(--uf-color-surface-sidebar, var(--uf-color-white-10))",
+        "var(--uf-color-surface-sidebar, var(--uf-color-black-4))"
+      ]
+    },
+    {
+      "name": "uf-overlay-surface-underlay-bg",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-overlay-surface-background",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg)",
+        "linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg)"
       ]
     },
     {
@@ -4097,8 +4125,22 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-black-100)",
-        "var(--uf-color-black-100)"
+        "var(--uf-overlay-surface-bg)",
+        "var(--uf-overlay-surface-bg)"
+      ]
+    },
+    {
+      "name": "uf-tooltip-background",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-overlay-surface-underlay-bg)",
+        "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-overlay-surface-underlay-bg)"
       ]
     },
     {
@@ -4111,8 +4153,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-black-0)",
-        "var(--uf-color-black-0)"
+        "var(--uf-overlay-surface-border)",
+        "var(--uf-overlay-surface-border)"
       ]
     },
     {
@@ -4125,8 +4167,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-100)",
-        "var(--uf-color-white-100)"
+        "var(--uf-color-fg)",
+        "var(--uf-color-fg)"
       ]
     },
     {

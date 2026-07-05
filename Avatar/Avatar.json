@@ -14,10 +14,20 @@
       "description": "User name (used for initials fallback and alt text).",
       "default": ""
     },
+    "icon": {
+      "type": "string",
+      "required": false,
+      "description": "Icon content shown when no image is available."
+    },
     "fallback": {
       "type": "string",
       "required": false,
       "description": "Custom fallback content when image is unavailable."
+    },
+    "children": {
+      "type": "string",
+      "required": false,
+      "description": "Custom media content. Rendered inside the clipped avatar circle when no image is available."
     },
     "fallbackDelayMs": {
       "type": "number",

@@ -20,7 +20,8 @@
     "placeholder": {
       "type": "string",
       "required": false,
-      "description": "Placeholder text when no value is selected."
+      "description": "Placeholder text when no value is selected.",
+      "default": "Select option"
     },
     "disabled": {
       "type": "boolean",
@@ -116,13 +117,38 @@
     {
       "name": "Default",
       "props": {
-        "placeholder": "Choose..."
+        "options": [
+          {
+            "value": "1",
+            "label": "Option 1"
+          },
+          {
+            "value": "2",
+            "label": "Option 2"
+          }
+        ],
+        "label": "Select",
+        "placeholder": "Choose option"
       }
     },
     {
       "name": "Multiselect",
       "props": {
         "type": "multiselect",
+        "options": [
+          {
+            "value": "1",
+            "label": "Option 1"
+          },
+          {
+            "value": "2",
+            "label": "Option 2"
+          },
+          {
+            "value": "3",
+            "label": "Option 3"
+          }
+        ],
         "placeholder": "Select items..."
       }
     },

@@ -165,7 +165,6 @@
     "component": [
       "--uf-carousel-viewport-pad",
       "--uf-carousel-controls-inset",
-      "--uf-carousel-indicator-button-size",
       "--face-runtime-carousel-slides-per-view"
     ],
     "semanticFallbacks": [
@@ -178,7 +177,7 @@
       "--uf-motion-ease-standard"
     ],
     "notes": [
-      "Carousel uses Button, Card, Text and Icon for controls and fallback slide content.",
+      "Carousel uses Media for fallback slide content and Button icon-only controls with Icon assets for navigation and indicators.",
       "slidesPerView and track transform are runtime layout state surfaced through component custom properties/styles.",
       "Track transition uses shared Face UI motion tokens."
     ]

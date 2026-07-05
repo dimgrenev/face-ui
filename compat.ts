@@ -12,6 +12,3 @@ export type { PanelProps as SidebarProps, PanelItem as SidebarItem } from './Pan
 
 export { Sheet } from './Sheet/Sheet'
 export type { SheetProps } from './Sheet/Sheet'
-
-export { Date } from './Date/Date'
-export type { DateProps, DatePreset } from './Date/Date'

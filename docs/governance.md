@@ -18,7 +18,7 @@
 - `Panel` is public. `Sidebar` is a compatibility alias.
 - `Drawer` is the public directional edge surface built on `Modal`.
 - `Sheet` is a compatibility alias for bottom/top `Drawer`.
-- `DatePicker` is public. `Date` is a compatibility alias only.
+- `Date` is the single public date selection component.
 
 ## Public Surface Rules
 - The primary barrel is `index.ts`.

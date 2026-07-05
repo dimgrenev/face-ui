@@ -64,7 +64,7 @@ Components that own their text internally and do NOT need `<Text>` wrapping:
 - `Menu` (item labels)
 - `Command` (item labels)
 - `Code` (title)
-- `DatePicker` (label, description, error)
+- `Date` (label, description, error)
 
 For all other text content — headings, descriptions, paragraphs, metadata, status text, section titles, card content text — use `<Text>`.
 
@@ -189,7 +189,7 @@ Membranes are the 1px outer spacing contract used by the library.
 ### 2.6 Responsive Overlays
 
 These components have first-class responsive surface behavior:
-`Select`, `DatePicker`, `Menu`, `Command`, `Modal`, `Drawer`, `Panel`, `Navigation`.
+`Select`, `Date`, `Menu`, `Command`, `Modal`, `Drawer`, `Panel`, `Navigation`.
 
 Default rule:
 - Desktop/wide viewport: keep contextual surface behavior.
@@ -202,7 +202,7 @@ Use these names in new code:
 - `Panel`, not `Sidebar`
 - `SegmentedControl`, not `Toggle`
 - `Drawer`, not `Sheet`
-- `DatePicker`, not `Date`
+- `Date`
 - `Tooltip` or `Popover`, not `Overlay`
 
 ### 2.8 Protocol of Use — How an Agent Should Work
@@ -297,7 +297,7 @@ Before composing UI, use this matrix to choose the right component.
 | Carousel | `Carousel` |
 | Scrollable area | `Scroll` |
 | Date grid | `Calendar` |
-| Date input + picker | `DatePicker` |
+| Date input + picker | `Date` |
 
 ---
 
@@ -671,13 +671,13 @@ Before composing UI, use this matrix to choose the right component.
 **Purpose:** Standalone date grid (always visible, no trigger).
 
 **When to use:** Calendar is permanently visible in the layout.
-**When NOT to use:** Need trigger + overlay → use `DatePicker`.
+**When NOT to use:** Need trigger + overlay → use `Date`.
 
 ---
 
-### 4.16 DatePicker
+### 4.16 Date
 
-**Purpose:** Canonical date selection component. Replaces deprecated `Date`.
+**Purpose:** Canonical date selection component.
 
 **When to use:** UI needs a trigger/control plus calendar/time selection.
 
@@ -1187,9 +1187,9 @@ The library uses CSS custom properties as design tokens:
 - `--uf-control-height`: 32px
 - `--uf-control-font-size`: 14px
 - `--uf-control-pad-y`: 6px
-- `--uf-control-pad-text`: 12px
+- `--uf-control-pad-text`: 8px
 - `--uf-control-pad-icon`: 6px
-- `--uf-control-gap`: 10px
+- `--uf-control-gap`: 8px
 
 **Radius:**
 - `--uf-radius-sm`: 4px
@@ -1213,7 +1213,6 @@ Do NOT use in new code:
 | `Toggle` | `SegmentedControl` |
 | `Sidebar` | `Panel` |
 | `Sheet` | `Drawer` |
-| `Date` | `DatePicker` |
 
 ---
 
@@ -1223,7 +1222,7 @@ Do NOT use in new code:
 - `Panel` for app structure
 - `Bar` for page header/actions
 - `Text` for section labels and help
-- `Input`, `Select`, `Switcher`, `Checkbox`, `DatePicker` for fields
+- `Input`, `Select`, `Switcher`, `Checkbox`, `Date` for fields
 - `Button` for save/reset actions
 
 ### Command/search workflow

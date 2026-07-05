@@ -7,7 +7,7 @@
  * `<Tabs items={[{ value: 'a', label: 'Alpha', content: <p>Alpha</p> }]} value="a" />`
  */
 
-import { forwardRef, useEffect, useRef, type MouseEvent, type ReactNode } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, type MouseEvent, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { tabsMachine, connectTabs } from '../assets/machines/tabs.machine'
@@ -126,12 +126,13 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       : []
     const items = Array.isArray(rawItems) && rawItems.length > 0 ? rawItems : itemsFromTabs
     const controlledValue = typeof props.activeTab === 'string' ? props.activeTab : value
-    const machineValue = useControllableMachineProp(
-      controlledValue,
-      defaultValue ?? props.defaultActiveTab ?? (items.length > 0 ? items[0].value : ''),
-    )
     const itemOrder = items.map((item) => item.value)
     const disabledValues = items.filter((item) => item.disabled).map((item) => item.value)
+    const firstEnabledValue = items.find((item) => !item.disabled)?.value ?? ''
+    const defaultMachineValue = defaultValue ?? props.defaultActiveTab ?? firstEnabledValue
+    const isControlled = controlledValue !== undefined
+    const machineValue = useControllableMachineProp(controlledValue, defaultMachineValue)
+    const itemOrderSignature = useMemo(() => itemOrder.join('\u0001'), [itemOrder])
 
     const { state, send } = useMachine(tabsMachine, {
       value: machineValue,
@@ -141,6 +142,9 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       activationMode,
       disabled,
       onValueChange: ((details: { value: string }) => {
+        if (isControlled && details.value === controlledValue) {
+          return
+        }
         try { onValueChange?.(details) } catch {}
         try { legacyOnChange?.(details.value) } catch {}
       }) as any,
@@ -148,6 +152,14 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
 
     const api = connectTabs(state, send)
     const rootRef = useRef<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+      if (isControlled) return
+      if (!firstEnabledValue) return
+      const currentValue = state.context.value
+      if (itemOrder.includes(currentValue) && !disabledValues.includes(currentValue)) return
+      send({ type: 'SET_VALUE', value: firstEnabledValue })
+    }, [disabledValues, firstEnabledValue, isControlled, itemOrder, itemOrderSignature, send, state.context.value])
 
     useEffect(() => {
       const targetValue = state.context.focusedValue

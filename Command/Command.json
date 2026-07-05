@@ -55,11 +55,6 @@
       "required": false,
       "description": "Breakpoint where auto surfaces switch from inline to dialog."
     },
-    "surfaceTitle": {
-      "type": "string",
-      "required": false,
-      "description": "Optional title used for the mobile dialog header."
-    },
     "open": {
       "type": "boolean",
       "required": false,

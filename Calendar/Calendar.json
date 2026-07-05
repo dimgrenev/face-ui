@@ -12,6 +12,16 @@
       "required": false,
       "description": "Default selected date (uncontrolled)."
     },
+    "selection": {
+      "type": "enum",
+      "required": false,
+      "description": "Selection model.",
+      "options": [
+        "single",
+        "range"
+      ],
+      "default": "single"
+    },
     "min": {
       "type": "object",
       "required": false,
@@ -62,7 +72,13 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "selection": "range",
+        "defaultValue": {
+          "start": "2026-03-06",
+          "end": "2026-03-12"
+        }
+      }
     },
     {
       "name": "Monday Start",
@@ -191,11 +207,11 @@
       "Event scheduling grid"
     ],
     "whenNotToUse": [
-      "Date input in forms (use DatePicker)",
+      "Date input in forms (use Date)",
       "Simple date display (use Text)"
     ],
     "alternatives": [
-      "DatePicker"
+      "Date"
     ],
     "context": "app"
   }

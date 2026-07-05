@@ -11,7 +11,7 @@
  * `<Text text="Flush" inset="none" />`
  */
 
-import { forwardRef, type ReactNode, type HTMLAttributes, type ElementType } from 'react'
+import React, { forwardRef, type ReactNode, type HTMLAttributes, type ElementType } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
 import { Icon } from '../Icon/Icon'

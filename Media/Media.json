@@ -127,6 +127,12 @@
       "required": false,
       "description": "Additional class name on the root element."
     },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around media.",
+      "default": false
+    },
     "role": {
       "type": "string",
       "required": false,
@@ -157,14 +163,15 @@
     {
       "name": "Default Image",
       "props": {
-        "src": "https://picsum.photos/300/200",
-        "alt": "Sample image"
+        "src": "/assets/media/examples/office-core/lobby-day.webp",
+        "alt": "Bright office lobby with glass-block wall, seating, and plants"
       }
     },
     {
       "name": "Cover Fit",
       "props": {
-        "src": "https://picsum.photos/300/200",
+        "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
+        "alt": "Office lobby with glass-block wall, seating, and a person standing by the window",
         "objectFit": "cover",
         "width": "200",
         "height": "200"
@@ -173,7 +180,8 @@
     {
       "name": "Contain Fit",
       "props": {
-        "src": "https://picsum.photos/300/200",
+        "src": "/assets/media/examples/office-core/skyline-window-day.webp",
+        "alt": "Two people looking out from a high-rise office window during the day",
         "objectFit": "contain",
         "width": "200",
         "height": "200"

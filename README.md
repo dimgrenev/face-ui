@@ -61,7 +61,7 @@ import { Sheet, Toggle } from '@userface/face-ui-react/compat';
 
 Primitives: `Button`, `Text`, `Icon`, `Separator`, `Tile`.
 
-Forms: `Input`, `Checkbox`, `Radio`, `Switcher`, `SegmentedControl`, `Slider`, `Rating`, `Select`, `DatePicker`, `Calendar`, `Upload`.
+Forms: `Input`, `Checkbox`, `Radio`, `Switcher`, `SegmentedControl`, `Slider`, `Rating`, `Select`, `Date`, `Calendar`, `Upload`.
 
 Overlays: `Tooltip`, `Popover`, `Menu`, `Modal`, `Drawer`, `Command`.
 
@@ -77,7 +77,6 @@ Deprecated compatibility names are still shipped for migration, but new code sho
 | `Toggle` | `SegmentedControl` |
 | `Sidebar` | `Panel` |
 | `Sheet` | `Drawer` |
-| `Date` | `DatePicker` |
 
 ## Contracts
 
@@ -114,6 +113,17 @@ Face UI ships plain CSS:
 No Tailwind, CSS-in-JS runtime, or provider is required. Component styling is scoped with `data-scope` and `data-part` attributes, plus `--uf-*` CSS variables.
 
 Typography is token-driven. `Akt` is intentionally loaded by the application shell through Google Fonts; the package keeps only the local `Begriffsschrift` mono face for code UI.
+
+## Example Media
+
+Curated media examples ship with the package under `assets/media/examples`. They are intended for `Media`, `Carousel`, cards, and gallery previews, not as product content.
+
+```ts
+import officeCoreManifest from '@userface/face-ui-react/assets/media/examples/office-core/manifest.json';
+```
+
+Image files are exposed through the same package subpath, for example `@userface/face-ui-react/assets/media/examples/office-core/lobby-day.webp`.
+When a host serves package examples as static preview assets, use the manifest `publicPath` values such as `/assets/media/examples/office-core/lobby-day.webp`.
 
 ## Development
 

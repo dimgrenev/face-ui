@@ -82,6 +82,13 @@ function normalizeValues(input: unknown): number[] | undefined {
   return undefined
 }
 
+function sliderValuesEqual(left: number[] | undefined, right: number[] | undefined): boolean {
+  if (left === right) return true
+  if (!left || !right) return false
+  if (left.length !== right.length) return false
+  return left.every((item, index) => item === right[index])
+}
+
 export const Slider = forwardRef<HTMLDivElement, SliderProps>(
   function Slider({
     variant = 'simple',
@@ -156,9 +163,14 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
 
     const initialValue = defaultValues
       ?? (typeof scalarValue === 'number' && Number.isFinite(scalarValue) ? [scalarValue] : [0])
-    const machineValue = useControllableMachineProp(controlledValue, initialValue)
+    const isControlled = controlledValue !== undefined
+    const machineValue = useControllableMachineProp(
+      isControlled ? controlledValue : undefined,
+      initialValue,
+    )
 
     const handleValueChange = (details: { value: number[] }) => {
+      if (isControlled && sliderValuesEqual(details.value, controlledValue)) return
       try { onValueChange?.(details) } catch {}
       if (typeof onChange === 'function') {
         try { onChange(Number(details?.value?.[0] ?? 0)) } catch {}

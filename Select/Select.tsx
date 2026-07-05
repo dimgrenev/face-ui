@@ -136,7 +136,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       options: rawOptions,
       value,
       defaultValue,
-      placeholder,
+      placeholder = 'Select option',
       disabled = false,
       type = 'select',
       label,

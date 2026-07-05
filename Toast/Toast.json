@@ -111,6 +111,7 @@
     ],
     "notes": [
       "Toast content uses Text and Bar/Button primitives internally; do not create toast-local typography classes for new copy.",
+      "Toast surfaces use the shared overlay/dropdown background and border tokens so notifications match Menu, Select, Popover and Tooltip surfaces.",
       "The toaster z-index remains an implementation detail until a global layer token is introduced."
     ]
   },

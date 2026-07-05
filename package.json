@@ -59,6 +59,7 @@
     "./assets/styles/*": "./dist/esm/assets/styles/*",
     "./assets/fonts/*": "./dist/esm/assets/fonts/*",
     "./assets/Icons/*": "./dist/esm/assets/Icons/*",
+    "./assets/media/*": "./dist/esm/assets/media/*",
     "./design-system/*": "./dist/esm/design-system/*",
     "./assets/adapters/react/*": {
       "types": "./dist/types/assets/adapters/react/*.d.ts",
@@ -144,12 +145,6 @@
       "types": "./dist/types/Date/*.d.ts",
       "import": "./dist/esm/Date/*.js",
       "require": "./dist/cjs/Date/*.js"
-    },
-    "./DatePicker/*.json": "./dist/esm/DatePicker/*.json",
-    "./DatePicker/*": {
-      "types": "./dist/types/DatePicker/*.d.ts",
-      "import": "./dist/esm/DatePicker/*.js",
-      "require": "./dist/cjs/DatePicker/*.js"
     },
     "./Drawer/*.json": "./dist/esm/Drawer/*.json",
     "./Drawer/*": {

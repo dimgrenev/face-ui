@@ -45,18 +45,60 @@
     {
       "name": "Default",
       "props": {
-        "step": 0
+        "items": [
+          {
+            "label": "Account",
+            "content": "Create your workspace and owner account."
+          },
+          {
+            "label": "Profile",
+            "content": "Add brand settings, themes, and team details."
+          },
+          {
+            "label": "Review",
+            "content": "Review the setup before publishing."
+          }
+        ],
+        "defaultStep": 0
       }
     },
     {
       "name": "Second Step",
       "props": {
-        "step": 1
+        "items": [
+          {
+            "label": "Account",
+            "content": "Create your workspace and owner account."
+          },
+          {
+            "label": "Profile",
+            "content": "Add brand settings, themes, and team details."
+          },
+          {
+            "label": "Review",
+            "content": "Review the setup before publishing."
+          }
+        ],
+        "defaultStep": 1
       }
     },
     {
       "name": "Non-Linear",
       "props": {
+        "items": [
+          {
+            "label": "Account",
+            "content": "Create your workspace and owner account."
+          },
+          {
+            "label": "Profile",
+            "content": "Add brand settings, themes, and team details."
+          },
+          {
+            "label": "Review",
+            "content": "Review the setup before publishing."
+          }
+        ],
         "step": 0,
         "linear": false
       }
@@ -64,6 +106,20 @@
     {
       "name": "Disabled",
       "props": {
+        "items": [
+          {
+            "label": "Account",
+            "content": "Create your workspace and owner account."
+          },
+          {
+            "label": "Profile",
+            "content": "Add brand settings, themes, and team details."
+          },
+          {
+            "label": "Review",
+            "content": "Review the setup before publishing."
+          }
+        ],
         "step": 0,
         "disabled": true
       }
@@ -130,6 +186,7 @@
       "--uf-control-pad-text",
       "--uf-control-gap",
       "--uf-control-font-size",
+      "--uf-steps-indicator-width",
       "--uf-radius",
       "--uf-font-weight-bold",
       "--uf-color-fg",
@@ -138,6 +195,7 @@
     ],
     "notes": [
       "Steps intentionally uses shared control geometry and Text instead of a dedicated component token namespace.",
+      "Step content strings render through plain Text with its default control inset and no step-specific alignment offset.",
       "Step content strings route through Text; indicators use compact text glyphs."
     ]
   },

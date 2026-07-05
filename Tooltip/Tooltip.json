@@ -126,6 +126,11 @@
       "--uf-overlay-content-border-width"
     ],
     "semanticFallbacks": [
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-font-size",
+      "--uf-control-line-height",
       "--uf-spacing-1",
       "--uf-spacing-2",
       "--uf-spacing-3",
@@ -144,10 +149,16 @@
       "--uf-overlay-surface-border",
       "--uf-overlay-surface-blur",
       "--uf-overlay-enter-y",
-      "--uf-overlay-enter-scale"
+      "--uf-overlay-enter-scale",
+      "--uf-tooltip-bg",
+      "--uf-tooltip-fg",
+      "--uf-tooltip-border"
     ],
     "notes": [
       "Tooltip is the non-interactive hover variant of Overlay.",
+      "Tooltip uses Button-compatible control padding and a 240px max width, then wraps copy instead of truncating.",
+      "Tooltip appears with a 2px side offset from the trigger surface; membrane on both sides contributes its own visual spacing.",
+      "Tooltip background and border are aliases of the shared overlay/dropdown surface tokens.",
       "Tooltip copy must stay brief; use Popover for interactive or rich content."
     ]
   },

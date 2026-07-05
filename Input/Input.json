@@ -421,13 +421,13 @@
     "whenNotToUse": [
       "Choosing from predefined options (use Select)",
       "Binary yes/no (use Switcher or Checkbox)",
-      "Date entry (use DatePicker)"
+      "Date entry (use Date)"
     ],
     "alternatives": [
       "Select",
       "Switcher",
       "Checkbox",
-      "DatePicker"
+      "Date"
     ],
     "context": "both"
   }

@@ -46,6 +46,17 @@ export interface ToggleProps {
 // Component
 // ---------------------------------------------------------------------------
 
+function normalizeToggleValue(value: unknown): string[] | undefined {
+  return Array.isArray(value) ? value.map((item) => String(item)) : undefined
+}
+
+function toggleValuesEqual(left: string[] | undefined, right: string[] | undefined): boolean {
+  if (left === right) return true
+  if (!left || !right) return false
+  if (left.length !== right.length) return false
+  return left.every((item, index) => item === right[index])
+}
+
 export const Toggle = forwardRef<HTMLDivElement, ToggleProps>(
   function Toggle(props, ref) {
     const {
@@ -61,17 +72,19 @@ export const Toggle = forwardRef<HTMLDivElement, ToggleProps>(
     } = props
 
     const items = Array.isArray(rawItems) ? rawItems : []
-    const machineValue = useControllableMachineProp(
-      Array.isArray(value) ? value.map((item) => String(item)) : undefined,
-      Array.isArray(defaultValue) ? defaultValue.map((item) => String(item)) : [],
-    )
+    const controlledValue = normalizeToggleValue(value)
+    const isControlled = controlledValue !== undefined
+    const machineValue = useControllableMachineProp(controlledValue, normalizeToggleValue(defaultValue) ?? [])
 
     const { state, send } = useMachine(toggleMachine, {
       value: machineValue,
       type,
       disabled,
       orientation,
-      onValueChange,
+      onValueChange: ((details: { value: string[] }) => {
+        if (isControlled && toggleValuesEqual(details.value, controlledValue)) return
+        try { onValueChange?.(details) } catch {}
+      }) as any,
     })
 
     const api = connectToggle(state, send)
@@ -91,7 +104,7 @@ export const Toggle = forwardRef<HTMLDivElement, ToggleProps>(
           )
           if (!membrane) return itemNode
           return (
-            <span key={`toggle-membrane:${item.value}`} className="uf-membrane">
+            <span key={`toggle-membrane:${item.value}`} className="uf-membrane" data-membrane-interactive="">
               {itemNode}
             </span>
           )

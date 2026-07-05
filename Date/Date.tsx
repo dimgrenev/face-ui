@@ -289,6 +289,7 @@ export const Date = forwardRef<HTMLDivElement, DateProps>(function Date(props, r
             value={selectedDateForCalendar}
             onValueChange={(details) => {
               const date = details?.value
+              if (!(date instanceof globalThis.Date)) return
               if (!date) return
               const iso = toISODate(date)
               send({ type: 'SELECT_DAY', date: iso })

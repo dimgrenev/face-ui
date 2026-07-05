@@ -5,7 +5,7 @@
     "items": {
       "type": "array",
       "required": false,
-      "description": "Tree node definitions (recursive)."
+      "description": "Recursive tree nodes. Nodes may use kind \"button\", \"tile\", or \"custom\", plus icon, rightText, actions, content, or render."
     },
     "expandedIds": {
       "type": "array",
@@ -37,6 +37,11 @@
       "required": false,
       "description": "Callback when selected node changes."
     },
+    "renderNode": {
+      "type": "function",
+      "required": false,
+      "description": "Global render override for custom node bodies. Tree still owns nesting, expansion, focus, and selection."
+    },
     "className": {
       "type": "string",
       "required": false,
@@ -46,12 +51,111 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "items": [
+          {
+            "id": "src",
+            "label": "src",
+            "icon": "folder",
+            "children": [
+              {
+                "id": "components",
+                "label": "components",
+                "icon": "folder",
+                "children": [
+                  {
+                    "id": "button",
+                    "label": "Button.tsx",
+                    "icon": "file"
+                  },
+                  {
+                    "id": "tile",
+                    "label": "Tile.tsx",
+                    "icon": "file",
+                    "kind": "tile"
+                  }
+                ]
+              },
+              {
+                "id": "assets",
+                "label": "assets",
+                "icon": "folder",
+                "children": [
+                  {
+                    "id": "icons",
+                    "label": "icons",
+                    "icon": "folder",
+                    "children": [
+                      {
+                        "id": "search-icon",
+                        "label": "search.svg",
+                        "icon": "file"
+                      },
+                      {
+                        "id": "folder-icon",
+                        "label": "folder.svg",
+                        "icon": "file"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "index",
+                "label": "index.ts",
+                "icon": "file"
+              }
+            ]
+          },
+          {
+            "id": "readme",
+            "label": "README.md",
+            "icon": "file"
+          }
+        ],
+        "defaultExpandedIds": [
+          "src",
+          "components",
+          "assets",
+          "icons"
+        ],
+        "defaultSelectedId": "button"
+      }
     },
     {
-      "name": "With Selection",
+      "name": "Mixed Rows",
       "props": {
-        "selectedId": "button"
+        "items": [
+          {
+            "id": "workspace",
+            "label": "Workspace",
+            "icon": "folder",
+            "kind": "tile",
+            "children": [
+              {
+                "id": "overview",
+                "label": "Overview",
+                "icon": "file",
+                "kind": "tile"
+              },
+              {
+                "id": "settings",
+                "label": "Settings",
+                "icon": "settings",
+                "rightText": "3"
+              },
+              {
+                "id": "tokens",
+                "label": "Tokens",
+                "icon": "theme"
+              }
+            ]
+          }
+        ],
+        "defaultExpandedIds": [
+          "workspace"
+        ],
+        "defaultSelectedId": "overview"
       }
     }
   ],

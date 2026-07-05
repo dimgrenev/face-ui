@@ -40,29 +40,107 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "items": [
+          {
+            "label": "Home",
+            "href": "#"
+          },
+          {
+            "label": "Design",
+            "href": "#"
+          },
+          {
+            "label": "System",
+            "href": "#"
+          },
+          {
+            "label": "Components",
+            "href": "#"
+          },
+          {
+            "label": "Navigation",
+            "href": "#"
+          },
+          {
+            "label": "Breadcrumb"
+          }
+        ]
+      }
     },
     {
       "name": "Without Membrane",
       "props": {
+        "items": [
+          {
+            "label": "Home",
+            "href": "#"
+          },
+          {
+            "label": "Library",
+            "href": "#"
+          },
+          {
+            "label": "Breadcrumb"
+          }
+        ],
         "membrane": false
       }
     },
     {
       "name": "Custom Separator",
       "props": {
+        "items": [
+          {
+            "label": "Home",
+            "href": "#"
+          },
+          {
+            "label": "Library",
+            "href": "#"
+          },
+          {
+            "label": "Breadcrumb"
+          }
+        ],
         "separator": ">"
       }
     },
     {
       "name": "Arrow Separator",
       "props": {
+        "items": [
+          {
+            "label": "Home",
+            "href": "#"
+          },
+          {
+            "label": "Library",
+            "href": "#"
+          },
+          {
+            "label": "Breadcrumb"
+          }
+        ],
         "separator": "→"
       }
     },
     {
       "name": "Navigation Enabled",
       "props": {
+        "items": [
+          {
+            "label": "Home",
+            "href": "#"
+          },
+          {
+            "label": "Library",
+            "href": "#"
+          },
+          {
+            "label": "Breadcrumb"
+          }
+        ],
         "allowNavigation": true
       }
     }

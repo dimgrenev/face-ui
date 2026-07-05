@@ -81,6 +81,9 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
     })
 
     const api = connectUpload(state, send)
+    const triggerProps = { ...(api.getTriggerProps() as any) }
+    delete triggerProps['data-scope']
+    delete triggerProps['data-part']
 
     const handleTriggerClick = () => {
       if (!disabled && inputRef.current) {
@@ -97,7 +100,7 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
             {api.isDragging ? 'Drop files here' : 'Drop files here or choose from system'}
           </Text>
           <Button
-            {...(api.getTriggerProps() as any)}
+            {...triggerProps}
             text="Choose files"
             variant="default"
             align="left"

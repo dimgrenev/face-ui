@@ -70,7 +70,7 @@
       "type": "number",
       "required": false,
       "description": "Offset from the trigger along the side axis (px).",
-      "default": 8
+      "default": 2
     },
     "onOpenChange": {
       "type": "function",
@@ -167,15 +167,16 @@
     ],
     "semanticFallbacks": [
       "--uf-membrane",
-      "--uf-spacing-1",
-      "--uf-spacing-2",
-      "--uf-spacing-3",
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-font-size",
+      "--uf-control-line-height",
       "--uf-radius",
-      "--uf-font-size-xs",
-      "--uf-font-size-sm",
       "--uf-font-weight",
-      "--uf-color-primary",
-      "--uf-color-primary-fg",
+      "--uf-tooltip-bg",
+      "--uf-tooltip-fg",
+      "--uf-tooltip-border",
       "--uf-overlay-surface-bg",
       "--uf-overlay-surface-border",
       "--uf-overlay-surface-blur",
@@ -187,9 +188,9 @@
       "--uf-z-overlay"
     ],
     "notes": [
-      "Overlay trigger content is rendered through Button; string content is wrapped in Text.",
+      "Overlay trigger content is rendered through Button; primitive content is wrapped in flush Text so the surface owns padding.",
       "sideOffset and floating coordinates are positioning data produced by the floating adapter, not visual tokens.",
-      "Hover overlays use primary surface tokens while interactive popovers use overlay surface tokens.",
+      "Hover and click overlays share card/dropdown surface tokens; tooltip-specific aliases only preserve semantic naming.",
       "Responsive overlay backdrops use --uf-responsive-overlay-zero-blur as the closed-state blur sentinel before open-state backdrop blur applies."
     ]
   },

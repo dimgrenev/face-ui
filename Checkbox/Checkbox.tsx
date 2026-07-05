@@ -5,7 +5,7 @@
  * `<Checkbox checked disabled />`
  */
 
-import { forwardRef, useEffect, useMemo, useRef, type ReactNode } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, type ChangeEvent, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { checkboxMachine, connectCheckbox } from '../assets/machines/checkbox.machine'
 import { cn } from '../assets/utils'
@@ -94,14 +94,22 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
 
     const hasLabel = label != null && String(label).trim().length > 0
     const controlVisualProps = { ...(api.getControlProps() as any) }
-    delete controlVisualProps.onClick
     const labelVisualProps = { ...(api.getLabelProps() as any) }
+    const hiddenInputProps = { ...(api.getHiddenInputProps() as any) }
+    delete controlVisualProps.onClick
     delete labelVisualProps.onClick
+    delete hiddenInputProps.onChange
 
     const rootNode = (
       <label
         ref={ref}
         {...api.getRootProps()}
+        onClick={(event) => {
+          const target = event.target as HTMLElement | null
+          event.preventDefault()
+          if (target?.tagName === 'INPUT') return
+          send({ type: 'TOGGLE' })
+        }}
         data-has-label={hasLabel ? '' : undefined}
         data-icon-left={hasLabel ? '' : undefined}
         data-icon-only={!hasLabel ? '' : undefined}
@@ -120,10 +128,11 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
               : <CheckOffIcon />}
         </span>
         <input
-          {...api.getHiddenInputProps()}
-          onChange={(event) => {
-            try { (api.getHiddenInputProps() as any).onChange?.(event) } catch {}
-            try { legacyProps.onChange?.(event) } catch {}
+          {...hiddenInputProps}
+          readOnly
+          onClick={(event) => {
+            event.preventDefault()
+            try { legacyProps.onChange?.(event as unknown as ChangeEvent<HTMLInputElement>) } catch {}
           }}
         />
         {hasLabel && (

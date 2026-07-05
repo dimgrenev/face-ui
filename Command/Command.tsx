@@ -16,7 +16,6 @@ import {
   useResponsiveOverlaySurface,
 } from '../assets/adapters/react/use-responsive-overlay-surface'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
-import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
 import { commandMachine, connectCommand } from '../assets/machines/command.machine'
 import type { CommandItemDef, CommandGroupDef } from '../assets/machines/command.machine'
 import { cn } from '../assets/utils'
@@ -61,8 +60,6 @@ export interface CommandProps {
   surface?: 'auto' | 'inline' | 'dialog'
   /** Breakpoint where auto surfaces switch from inline to dialog. */
   surfaceBreakpoint?: number
-  /** Optional title used for the mobile dialog header. */
-  surfaceTitle?: ReactNode
   /** Controlled dialog open state (used in dialog surface). */
   open?: boolean
   /** Uncontrolled initial dialog open state (used in dialog surface). */
@@ -107,7 +104,6 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
       onSelect,
       surface = 'auto',
       surfaceBreakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
-      surfaceTitle,
       open,
       defaultOpen = false,
       onOpenChange,
@@ -130,7 +126,6 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
     )
     const resolvedSurface = responsiveOverlaySurface === 'sheet' ? 'dialog' : 'inline'
     const isDialogSurface = resolvedSurface === 'dialog'
-    const dialogTitle = surfaceTitle ?? 'Command'
     const [dialogOpen, setDialogOpen] = useControllableOpenState(open, defaultOpen, onOpenChange)
     const inputRef = useRef<HTMLInputElement | null>(null)
 
@@ -204,10 +199,6 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
         className={cn('uf-command', className)}
         data-surface={resolvedSurface}
       >
-        {isDialogSurface ? (
-          <ResponsiveSheetHeader title={dialogTitle} onClose={() => setDialogOpen(false)} />
-        ) : null}
-
         <span className="uf-membrane uf-membrane--full uf-command__inputMembrane">
           {inputNode}
         </span>

@@ -90,7 +90,7 @@ describe('face-ui-react contracts', () => {
       collectFaceJsonContracts()
         .map((entry) => [entry.componentName, entry.currentContract] as const),
     )
-    const deprecatedComponents = new Set(['Date', 'Overlay', 'Sheet', 'Toggle'])
+    const deprecatedComponents = new Set(['Overlay', 'Sheet', 'Toggle'])
     const activeContractNames = Array.from(contracts.keys())
       .filter((name) => !deprecatedComponents.has(name))
       .sort((left, right) => left.localeCompare(right))
@@ -102,7 +102,7 @@ describe('face-ui-react contracts', () => {
     expect(galleryNames).not.toContain('Overlay')
     expect(galleryNames).not.toContain('Sheet')
     expect(galleryNames).not.toContain('Toggle')
-    expect(galleryNames).not.toContain('Date')
+    expect(galleryNames).toContain('Date')
 
     for (const entry of FELD_GALLERY_META) {
       const contract = contracts.get(entry.name)

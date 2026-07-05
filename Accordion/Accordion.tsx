@@ -8,7 +8,7 @@
  * `<Accordion items={[{ value: 'solo', label: 'Toggle', content: <p>...</p> }]} collapsible />`
  */
 
-import { Children, Fragment, forwardRef, isValidElement, useId, useMemo, type ReactNode } from 'react'
+import React, { Children, Fragment, forwardRef, isValidElement, useId, useMemo, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { accordionMachine, connectAccordion } from '../assets/machines/accordion.machine'
@@ -105,7 +105,7 @@ function renderAccordionContentNode(node: ReactNode): ReactNode {
   if (isValidElement(node) || Array.isArray(node)) return node
   if (typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
     return (
-      <Text as="div" fullWidth>
+      <Text as="div" fullWidth membrane={false} className="uf-accordion-contentText">
         {String(node)}
       </Text>
     )
@@ -128,7 +128,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
       items: rawItems,
       expandedIds,
       defaultExpandedIds,
-      multiple = false,
+      multiple = true,
       collapsible = true,
       disabled = false,
       onExpandedChange,
@@ -207,13 +207,13 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
                 id={contentId}
                 aria-labelledby={triggerId}
               >
-                <Text as="div" inset="none" membrane={false} className="uf-accordion-content-inner">
+                <div className="uf-accordion-content-inner">
                   {flattenAccordionContent(item.content).map((node, idx) => (
                     <div className="uf-accordion-slot" key={`${item.value}:slot:${idx}`}>
                       {renderAccordionContentNode(node)}
                     </div>
                   ))}
-                </Text>
+                </div>
               </div>
             </div>
           )

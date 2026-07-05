@@ -2,21 +2,43 @@
   "version": 1,
   "samples": {
     "Accordion": {
-      "state": "Disabled",
+      "state": "Default",
       "props": {
-        "onExpandedChange": "",
-        "className": ""
+        "defaultExpandedIds": [
+          "getting-started"
+        ]
       }
     },
     "Avatar": {
-      "state": "Default"
+      "props": {
+        "icon": "user",
+        "name": "Userface"
+      }
     },
     "Badge": {
       "state": "Default"
     },
     "Bar": {
       "props": {
-        "children": "Bar content"
+        "children": [
+          {
+            "__componentName__": "Text",
+            "text": "Workspace",
+            "variant": "label",
+            "membrane": false
+          },
+          {
+            "__componentName__": "Bar.Right",
+            "children": [
+              {
+                "__componentName__": "Button",
+                "text": "Share",
+                "icon": "link",
+                "fullWidth": false
+              }
+            ]
+          }
+        ]
       }
     },
     "Breadcrumb": {
@@ -49,21 +71,33 @@
       }
     },
     "Button": {
-      "state": "Default"
-    },
-    "Calendar": {},
-    "Card": {
       "props": {
-        "title": "Card",
-        "description": "Description",
-        "content": "Card content"
+        "text": "Create",
+        "icon": "plus",
+        "fullWidth": false
       }
     },
-    "Carousel": {},
+    "Calendar": {
+      "props": {
+        "selection": "range",
+        "defaultValue": {
+          "start": "2026-03-06",
+          "end": "2026-03-12"
+        }
+      }
+    },
+    "Card": {
+      "state": "Default"
+    },
+    "Carousel": {
+      "props": {
+        "slidesPerView": 1
+      }
+    },
     "Checkbox": {
       "state": "Unchecked",
       "props": {
-        "defaultChecked": true,
+        "defaultChecked": false,
         "onCheckedChange": "",
         "className": ""
       },
@@ -98,15 +132,28 @@
         ]
       }
     },
-    "DatePicker": {
+    "Date": {
       "state": "Default"
     },
     "Drawer": {
       "state": "Default",
       "props": {
-        "side": "bottom",
+        "open": true,
+        "portal": false,
+        "side": "right",
         "title": "Drawer",
-        "description": "Directional edge-aligned surface."
+        "description": "Directional edge-aligned surface.",
+        "children": "Drawer content",
+        "actions": [
+          {
+            "label": "Cancel",
+            "variant": "outline"
+          },
+          {
+            "label": "Apply",
+            "variant": "accent"
+          }
+        ]
       }
     },
     "Icon": {
@@ -126,8 +173,8 @@
     },
     "Media": {
       "props": {
-        "src": "/media/images/architecture-preview.jpg",
-        "alt": "Architecture sample"
+        "src": "/assets/media/examples/office-core/lobby-day.webp",
+        "alt": "Bright office lobby with glass-block wall, seating, and plants"
       }
     },
     "Menu": {
@@ -148,11 +195,12 @@
     "Modal": {
       "state": "Default (Center)",
       "props": {
-        "trigger": "Open",
+        "open": true,
+        "portal": false,
         "title": "Modal",
         "description": "Focused work surface",
-        "children": "Use this surface for edits, confirmations, and contextual flows.",
-        "surface": "sheet",
+        "children": "Short modal copy aligned to the left edge of the content area.",
+        "surface": "dialog",
         "actions": [
           {
             "label": "Cancel",
@@ -163,10 +211,7 @@
             "variant": "accent"
           }
         ]
-      },
-      "omit": [
-        "open"
-      ]
+      }
     },
     "Navigation": {
       "props": {
@@ -215,7 +260,10 @@
     },
     "Progress": {
       "props": {
-        "value": 60,
+        "value": 28,
+        "max": 100,
+        "shape": "linear",
+        "label": "Typography",
         "showLabel": true
       }
     },
@@ -240,7 +288,8 @@
     },
     "Scroll": {
       "props": {
-        "children": "Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. Scrollable content. "
+        "children": "По мотивам Чехова: «Вся Россия - наш сад».\n\nВечером в доме стало так тихо, что слышно было, как в соседней комнате остывает самовар. Лампа горела ровно, но каждый ее круг света казался тревожным: за столом сидели люди, которые давно знали правду и все еще делали вид, будто можно отложить разговор до завтра.\n\nОна смотрела в окно, где чернели ветви, и думала не о дороге, не о деньгах, не о письме, лежавшем в ящике, а о том странном мгновении, когда прошлое вдруг становится вещью: его можно потрогать, потерять, продать или оставить чужим людям.\n\nОн сказал несколько простых слов, почти будничных, и от этого всем стало тяжелее. Никто не спорил. В передней скрипнула дверь, где-то в саду ударил топор, и в этой сухой паузе каждый понял: прежняя жизнь уже закончилась, только в комнате еще продолжали сидеть как прежде.",
+        "height": 240
       },
       "omit": [
         "ariaLabel"
@@ -249,6 +298,7 @@
     "SegmentedControl": {
       "state": "Default",
       "props": {
+        "membrane": true,
         "items": [
           {
             "value": "grid",
@@ -266,8 +316,7 @@
       },
       "omit": [
         "disabled",
-        "orientation",
-        "membrane"
+        "orientation"
       ]
     },
     "Select": {
@@ -284,14 +333,41 @@
           }
         ],
         "label": "Select",
-        "defaultValue": "1"
+        "placeholder": "Choose option"
       }
     },
-    "Separator": {},
+    "Separator": {
+      "props": {
+        "orientation": "horizontal",
+        "decorative": true,
+        "membrane": true
+      }
+    },
     "Skeleton": {
       "props": {
-        "width": 200,
-        "height": 20
+        "variant": "circle",
+        "width": "var(--uf-control-height)",
+        "height": "var(--uf-control-height)"
+      }
+    },
+    "Sheet": {
+      "props": {
+        "open": true,
+        "portal": false,
+        "side": "bottom",
+        "title": "Sheet",
+        "description": "Bottom sheet surface.",
+        "children": "Sheet content aligned inside a compact overlay surface.",
+        "actions": [
+          {
+            "label": "Cancel",
+            "variant": "outline"
+          },
+          {
+            "label": "Done",
+            "variant": "accent"
+          }
+        ]
       }
     },
     "Slider": {
@@ -325,6 +401,7 @@
     "Table": {
       "state": "Default",
       "props": {
+        "resizable": false,
         "columns": [
           {
             "id": "name",

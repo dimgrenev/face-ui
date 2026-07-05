@@ -7,12 +7,12 @@
  * `<Tree items={[{ id: 'a', label: 'Folder', children: [{ id: 'b', label: 'File' }] }]} />`
  */
 
-import { forwardRef, useEffect, useMemo, useRef, type ReactNode } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { treeMachine, connectTree } from '../assets/machines/tree.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
+import { Tile } from '../Tile/Tile'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -23,6 +23,18 @@ export interface TreeNode {
   label: ReactNode
   children?: TreeNode[]
   disabled?: boolean
+  /** Preferred default row component for this node. */
+  kind?: 'button' | 'tile' | 'custom'
+  /** Optional icon rendered by default button/tile rows. */
+  icon?: ReactNode
+  /** Optional secondary text rendered at the far edge of default button/tile rows. */
+  rightText?: ReactNode
+  /** Optional nested actions for tile rows. */
+  actions?: ReactNode
+  /** Custom node body. Tree still owns selection, focus, and nesting layout. */
+  content?: ReactNode
+  /** Per-node render override. */
+  render?: (details: TreeRenderNodeDetails) => ReactNode
 }
 
 export interface TreeProps {
@@ -40,8 +52,68 @@ export interface TreeProps {
   onExpandedChange?: (details: { expandedIds: string[] }) => void
   /** Callback when selected node changes. */
   onSelectedChange?: (details: { selectedId: string }) => void
+  /** Global render override for node content. */
+  renderNode?: (details: TreeRenderNodeDetails) => ReactNode
   /** Additional class name on the root element. */
   className?: string
+}
+
+const defaultTreeItems: TreeNode[] = [
+  {
+    id: 'src',
+    label: 'src',
+    icon: 'folder',
+    children: [
+      {
+        id: 'components',
+        label: 'components',
+        icon: 'folder',
+        children: [
+          { id: 'button', label: 'Button.tsx', icon: 'file' },
+          { id: 'tile', label: 'Tile.tsx', icon: 'file' },
+        ],
+      },
+      {
+        id: 'assets',
+        label: 'assets',
+        icon: 'folder',
+        children: [
+          {
+            id: 'icons',
+            label: 'icons',
+            icon: 'folder',
+            children: [
+              { id: 'search-icon', label: 'search.svg', icon: 'file' },
+              { id: 'folder-icon', label: 'folder.svg', icon: 'file' },
+            ],
+          },
+        ],
+      },
+      { id: 'index', label: 'index.ts', icon: 'file' },
+    ],
+  },
+  { id: 'readme', label: 'README.md', icon: 'file' },
+]
+
+export interface TreeRenderNodeDetails {
+  node: TreeNode
+  depth: number
+  hasChildren: boolean
+  expanded: boolean
+  selected: boolean
+  focused: boolean
+  activePath: boolean
+}
+
+function normalizeIdArray(value: string[] | undefined): string[] | undefined {
+  return Array.isArray(value) ? value.map((id) => String(id)) : undefined
+}
+
+function idArraysEqual(left: string[] | undefined, right: string[] | undefined): boolean {
+  if (left === right) return true
+  if (!Array.isArray(left) || !Array.isArray(right)) return false
+  if (left.length !== right.length) return false
+  return left.every((item, index) => item === right[index])
 }
 
 // ---------------------------------------------------------------------------
@@ -53,35 +125,103 @@ interface TreeNodeRendererProps {
   api: ReturnType<typeof connectTree>
   depth: number
   activePathIds: Set<string>
+  renderNode?: TreeProps['renderNode']
 }
 
 function TreeNodeRenderer(props: TreeNodeRendererProps) {
-  const { node, api, depth, activePathIds } = props
+  const { node, api, depth, activePathIds, renderNode } = props
   const hasChildren = Array.isArray(node.children) && node.children.length > 0
   const isInActivePath = activePathIds.has(node.id)
+  const isExpanded = api.expandedIds.includes(node.id)
+  const isSelected = api.selectedId === node.id
+  const isFocused = api.focusedId === node.id
+  const renderDetails: TreeRenderNodeDetails = {
+    node,
+    depth,
+    hasChildren,
+    expanded: isExpanded,
+    selected: isSelected,
+    focused: isFocused,
+    activePath: isInActivePath,
+  }
 
-  if (!hasChildren) {
-    const itemProps = { ...(api.getItemProps({ id: node.id, disabled: node.disabled, depth }) as any) }
-    delete itemProps['data-scope']
-    delete itemProps['data-part']
+  const renderLabel = () => {
+    if (typeof node.label === 'string' || typeof node.label === 'number') return undefined
+    return node.label
+  }
+
+  const renderDefaultRow = (rowProps: Record<string, any>, className: string) => {
+    const customContent = node.render?.(renderDetails) ?? renderNode?.(renderDetails) ?? node.content
+    if (customContent != null || node.kind === 'custom') {
+      return (
+        <div
+          {...rowProps}
+          data-tree-node-id={node.id}
+          data-active-path={isInActivePath ? '' : undefined}
+          data-kind="custom"
+          className={cn('uf-tree-custom-node', className)}
+          style={{ '--face-runtime-option-level': Math.max(0, depth) } as CSSProperties}
+        >
+          {customContent ?? node.label}
+        </div>
+      )
+    }
+
+    const text = typeof node.label === 'string' || typeof node.label === 'number'
+      ? String(node.label)
+      : undefined
+    const commonProps = {
+      ...rowProps,
+      'data-tree-node-id': node.id,
+      'data-active-path': isInActivePath ? '' : undefined,
+      level: depth,
+      align: 'left' as const,
+      stretchText: true,
+      fullWidth: true,
+      membrane: true,
+      icon: node.icon,
+      rightText: node.rightText,
+      className,
+    }
+
+    if (node.kind === 'tile') {
+      return (
+        <Tile
+          {...commonProps}
+          text={text}
+          active={isSelected || isInActivePath}
+          selector={hasChildren}
+          selectorOpen={isExpanded}
+          actions={node.actions}
+        >
+          {renderLabel()}
+        </Tile>
+      )
+    }
+
     return (
       <Button
-        {...itemProps}
-        data-tree-node-id={node.id}
-        data-active-path={isInActivePath ? '' : undefined}
-        level={depth}
+        {...commonProps}
+        text={text}
         variant="default"
-        align="left"
-        stretchText
-        membrane
-        className="uf-tree-item-button"
+        selector={hasChildren}
+        selectorOpen={isExpanded}
       >
-        {node.label}
+        {renderLabel()}
       </Button>
     )
   }
 
-  const branchProps = api.getBranchProps({ id: node.id, disabled: node.disabled, depth })
+  if (!hasChildren) {
+    const itemProps = { ...(api.getItemProps({ id: node.id, disabled: node.disabled, depth }) as any) }
+    itemProps['aria-level'] = depth + 1
+    delete itemProps['data-scope']
+    delete itemProps['data-part']
+    return renderDefaultRow(itemProps, 'uf-tree-item-button')
+  }
+
+  const branchProps = { ...(api.getBranchProps({ id: node.id, disabled: node.disabled, depth }) as any) }
+  branchProps.className = cn('uf-tree-branch', branchProps.className)
   const branchTriggerProps = { ...(api.getBranchTriggerProps({ id: node.id, disabled: node.disabled, depth }) as any) }
   const branchSelectProps = api.getItemProps({ id: node.id, disabled: node.disabled, depth }) as any
   const branchTriggerOnClick = branchTriggerProps.onClick
@@ -90,36 +230,27 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
   delete branchTriggerProps.onClick
   delete branchTriggerProps.onFocus
   delete branchTriggerProps.onBlur
+  branchTriggerProps['aria-level'] = depth + 1
 
   return (
     <div {...branchProps}>
-      <Button
-        {...branchTriggerProps}
-        role={branchSelectProps.role}
-        tabIndex={branchProps.tabIndex}
-        onFocus={branchSelectProps.onFocus}
-        onBlur={branchSelectProps.onBlur}
-        data-tree-node-id={node.id}
-        data-value={node.id}
-        aria-selected={branchSelectProps['aria-selected']}
-        data-selected={branchSelectProps['data-selected']}
-        data-focused={branchProps['data-focused']}
-        data-disabled={branchProps['data-disabled']}
-        data-active-path={isInActivePath ? '' : undefined}
-        level={depth}
-        variant="default"
-        align="left"
-        stretchText
-        membrane
-        className="uf-tree-branch-button"
-        onClick={() => {
+      {renderDefaultRow({
+        ...branchTriggerProps,
+        role: branchSelectProps.role,
+        tabIndex: branchProps.tabIndex,
+        onFocus: branchSelectProps.onFocus,
+        onBlur: branchSelectProps.onBlur,
+        'data-value': node.id,
+        'aria-selected': branchSelectProps['aria-selected'],
+        'data-selected': branchSelectProps['data-selected'],
+        'data-focused': branchProps['data-focused'],
+        'data-disabled': branchProps['data-disabled'],
+        onClick: () => {
           try { branchTriggerOnClick?.() } catch {}
           try { branchSelectProps.onClick?.() } catch {}
-        }}
-      >
-        {node.label}
-      </Button>
-      <div {...api.getBranchContentProps({ id: node.id, disabled: node.disabled, depth })}>
+        },
+      }, 'uf-tree-branch-button')}
+      <div {...api.getBranchContentProps({ id: node.id, disabled: node.disabled, depth })} className="uf-tree-branch-content">
         {node.children!.map((child) => (
           <TreeNodeRenderer
             key={child.id}
@@ -127,6 +258,7 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
             api={api}
             depth={depth + 1}
             activePathIds={activePathIds}
+            renderNode={renderNode}
           />
         ))}
       </div>
@@ -148,18 +280,25 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
       defaultSelectedId,
       onExpandedChange,
       onSelectedChange,
+      renderNode,
       className,
     } = props
 
-    const items = Array.isArray(rawItems) ? rawItems : []
-    const machineExpandedIds = useControllableMachineProp(
-      Array.isArray(expandedIds) ? expandedIds.map((id) => String(id)) : undefined,
-      Array.isArray(defaultExpandedIds) ? defaultExpandedIds.map((id) => String(id)) : [],
-    )
-    const machineSelectedId = useControllableMachineProp(
-      selectedId !== undefined ? String(selectedId) : undefined,
-      defaultSelectedId ? String(defaultSelectedId) : null,
-    )
+    const items = Array.isArray(rawItems) ? rawItems : defaultTreeItems
+    const controlledExpandedIds = normalizeIdArray(expandedIds)
+    const isExpandedControlled = controlledExpandedIds !== undefined && typeof onExpandedChange === 'function'
+    const initialExpandedIds = controlledExpandedIds ?? normalizeIdArray(defaultExpandedIds) ?? []
+    const [uncontrolledExpandedIds, setUncontrolledExpandedIds] = useState(initialExpandedIds)
+    const machineExpandedIds = isExpandedControlled ? controlledExpandedIds : uncontrolledExpandedIds
+    const uncontrolledExpandedSeedRef = useRef(controlledExpandedIds?.join('\u0001') ?? null)
+
+    const controlledSelectedId = selectedId !== undefined ? String(selectedId) : undefined
+    const isSelectedControlled = controlledSelectedId !== undefined && typeof onSelectedChange === 'function'
+    const initialSelectedId = controlledSelectedId ?? (defaultSelectedId ? String(defaultSelectedId) : null)
+    const [uncontrolledSelectedId, setUncontrolledSelectedId] = useState<string | null>(initialSelectedId)
+    const machineSelectedId = isSelectedControlled ? controlledSelectedId : uncontrolledSelectedId
+    const uncontrolledSelectedSeedRef = useRef(controlledSelectedId ?? null)
+
     const computeVisibleIds = (nodes: TreeNode[], expandedSet: Set<string>): string[] => {
       const ids: string[] = []
       const visit = (itemsToVisit: TreeNode[]) => {
@@ -179,8 +318,22 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
       expandedIds: machineExpandedIds,
       visibleIds,
       selectedId: machineSelectedId,
-      onExpandedChange: onExpandedChange ?? null,
-      onSelectedChange: onSelectedChange ?? null,
+      onExpandedChange: ((details: { expandedIds: string[] }) => {
+        if (!isExpandedControlled) {
+          setUncontrolledExpandedIds(details.expandedIds)
+        } else if (idArraysEqual(details.expandedIds, controlledExpandedIds)) {
+          return
+        }
+        onExpandedChange?.(details)
+      }) as any,
+      onSelectedChange: ((details: { selectedId: string }) => {
+        if (!isSelectedControlled) {
+          setUncontrolledSelectedId(details.selectedId)
+        } else if (details.selectedId === controlledSelectedId) {
+          return
+        }
+        onSelectedChange?.(details)
+      }) as any,
     })
 
     const api = connectTree(state, send)
@@ -208,6 +361,21 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
       visit(items, [])
       return set
     }, [api.selectedId, items])
+
+    useEffect(() => {
+      if (isExpandedControlled || controlledExpandedIds === undefined) return
+      const nextSeed = controlledExpandedIds.join('\u0001')
+      if (uncontrolledExpandedSeedRef.current === nextSeed) return
+      uncontrolledExpandedSeedRef.current = nextSeed
+      setUncontrolledExpandedIds(controlledExpandedIds)
+    }, [controlledExpandedIds, isExpandedControlled])
+
+    useEffect(() => {
+      if (isSelectedControlled || controlledSelectedId === undefined) return
+      if (uncontrolledSelectedSeedRef.current === controlledSelectedId) return
+      uncontrolledSelectedSeedRef.current = controlledSelectedId
+      setUncontrolledSelectedId(controlledSelectedId)
+    }, [controlledSelectedId, isSelectedControlled])
 
     useEffect(() => {
       const nextVisibleIds = computeVisibleIds(items, new Set(state.context.expandedIds))
@@ -257,6 +425,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
             api={api}
             depth={0}
             activePathIds={activePathIds}
+            renderNode={renderNode}
           />
         ))}
       </div>

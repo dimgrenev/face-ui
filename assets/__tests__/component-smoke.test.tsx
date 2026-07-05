@@ -7,8 +7,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRoot, type Root } from 'react-dom/client'
 import { act } from 'react'
 import { Accordion } from '../../Accordion/Accordion'
+import { Avatar } from '../../Avatar/Avatar'
 import { Button } from '../../Button/Button'
 import { Calendar } from '../../Calendar/Calendar'
+import { Card } from '../../Card/Card'
 import { Carousel } from '../../Carousel/Carousel'
 import { Checkbox } from '../../Checkbox/Checkbox'
 import { Code } from '../../Code/Code'
@@ -21,6 +23,7 @@ import { Modal } from '../../Modal/Modal'
 import { Navigation } from '../../Navigation/Navigation'
 import { Pagination } from '../../Pagination/Pagination'
 import { Panel } from '../../Panel/Panel'
+import { Progress } from '../../Progress/Progress'
 import { Radio } from '../../Radio/Radio'
 import { Rating } from '../../Rating/Rating'
 import { Scroll } from '../../Scroll/Scroll'
@@ -120,6 +123,8 @@ describe('component smoke', () => {
 
     const textNode = container.querySelector('[data-part="content"] [data-scope="text"]') as HTMLElement | null
     expect(textNode?.textContent).toContain('Content A')
+    expect(textNode?.classList.contains('uf-accordion-contentText')).toBe(true)
+    expect(textNode?.hasAttribute('data-membrane')).toBe(false)
   })
 
   it('Button resolves string icon names through Icon', async () => {
@@ -148,6 +153,74 @@ describe('component smoke', () => {
 
     const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
     expect(componentStyles).toContain('--uf-control-pad-right: var(--uf-selector-indicator-edge-gap);')
+  })
+
+  it('Avatar centers icon fallback content inside a square control box', async () => {
+    await act(async () => {
+      root.render(<Avatar icon="user" />)
+    })
+
+    const avatar = container.querySelector<HTMLElement>('[data-scope="avatar"]')
+    const icon = avatar?.querySelector<SVGElement>('.uf-avatar__content > svg[data-icon="user"]')
+    expect(avatar).not.toBeNull()
+    expect(icon).not.toBeNull()
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toContain('block-size: var(--uf-control-height);')
+    expect(componentStyles).toContain('[data-scope="avatar"] [data-part="fallback"]')
+    expect(componentStyles).toContain('display: flex;')
+    expect(componentStyles).toContain('.uf-avatar__content > :is(svg, img, .uf-icon)')
+  })
+
+  it('Card renders text slots through Text membranes and a descriptor footer button', async () => {
+    const bodyText = 'Workspace settings and recent activity stay grouped in one place'
+
+    await act(async () => {
+      root.render(
+        <Card
+          title="Card Title"
+          description="Card description text"
+          content={bodyText}
+          footer={{
+            __componentName__: 'Button',
+            text: 'Open',
+            icon: 'arrow-right',
+            iconPosition: 'right',
+            fullWidth: false,
+          } as any}
+        />,
+      )
+    })
+
+    const card = container.querySelector<HTMLElement>('[data-scope="card"]')
+    expect(card).not.toBeNull()
+    expect(card?.getAttribute('data-membrane')).toBe('')
+
+    const textNodes = Array.from(container.querySelectorAll<HTMLElement>('[data-scope="text"]'))
+    const title = textNodes.find((node) => node.textContent?.trim() === 'Card Title') ?? null
+    const description = textNodes.find((node) => node.textContent?.trim() === 'Card description text') ?? null
+    const content = textNodes.find((node) => node.textContent?.trim() === bodyText) ?? null
+
+    expect(title?.getAttribute('data-inset')).toBe('control')
+    expect(description?.getAttribute('data-inset')).toBe('control')
+    expect(content?.getAttribute('data-inset')).toBe('control')
+    expect(title?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+    expect(description?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+    expect(content?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+    expect(title?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
+    expect(description?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
+    expect(content?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
+
+    const footerButton = container.querySelector<HTMLButtonElement>('[data-part="footer"] [data-scope="button"]')
+    expect(footerButton?.textContent).toContain('Open')
+    expect(footerButton?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toContain('--uf-card-bg: var(--uf-overlay-surface-bg);')
+    expect(componentStyles).toContain('background: var(--uf-card-background);')
+    expect(componentStyles).toContain('--uf-card-pad: 7px;')
+    expect(componentStyles).toContain('.uf-card[data-scope] .uf-text__content')
+    expect(componentStyles).toContain('overflow-wrap: anywhere;')
   })
 
   it('Input syncs controlled value updates from props', async () => {
@@ -349,6 +422,23 @@ describe('component smoke', () => {
     expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
   })
 
+  it('Icon wrapper includes main-window expand and save glyphs', async () => {
+    await act(async () => {
+      root.render(
+        <>
+          <Icon name="arrow_expand_simple" />
+          <Icon name="arrows_contract_simple" />
+          <Icon name="floppy-disk" />
+        </>
+      )
+    })
+
+    expect(container.querySelector('svg[data-icon="arrow_expand_simple"]')).not.toBeNull()
+    expect(container.querySelector('svg[data-icon="arrows_contract_simple"]')).not.toBeNull()
+    expect(container.querySelector('svg[data-icon="floppy-disk"]')).not.toBeNull()
+    expect(container.querySelector(`path[d="${notdefPath}"]`)).toBeNull()
+  })
+
   it('Icon wrapper always uses the single 20x20 library size', async () => {
     await act(async () => {
       root.render(<Icon name="crop" />)
@@ -385,15 +475,24 @@ describe('component smoke', () => {
     expect(container.querySelector(`path[d="${notdefPath}"]`)).not.toBeNull()
   })
 
-  it('Media renders images with auto height when no explicit height is provided', async () => {
+  it('Media defaults to iframe-width layout with auto image height', async () => {
     await act(async () => {
       root.render(<Media src="https://example.com/image.jpg" alt="Preview" />)
     })
 
+    const media = container.querySelector('[data-scope="media"][data-part="root"]') as HTMLElement | null
     const img = container.querySelector('img') as HTMLImageElement | null
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(media).not.toBeNull()
+    expect(media?.style.width).toBe('100%')
     expect(img).not.toBeNull()
     expect(img?.style.width).toBe('100%')
     expect(img?.style.height).toBe('auto')
+    expect(componentStyles).toContain('.uf-media[data-scope] {')
+    expect(componentStyles).toContain('display: flex;')
+    expect(componentStyles).toContain('width: 100%;')
+    const runtimeSource = readFileSync(join(process.cwd(), 'uf.runtime.ts'), 'utf8')
+    expect(runtimeSource).toContain("'Media'")
   })
 
   it('Media exposes wrapper aria-label when a role is provided', async () => {
@@ -413,6 +512,24 @@ describe('component smoke', () => {
     expect(media?.getAttribute('role')).toBe('img')
     expect(media?.getAttribute('aria-label')).toBe('Architecture preview')
     expect(img?.getAttribute('alt')).toBe('Preview')
+  })
+
+  it('Media can opt into the system membrane without forcing it by default', async () => {
+    await act(async () => {
+      root.render(
+        <>
+          <Media src="https://example.com/default.jpg" alt="Default media" />
+          <Media src="https://example.com/membrane.jpg" alt="Membrane media" width="100%" membrane />
+        </>,
+      )
+    })
+
+    const mediaNodes = Array.from(container.querySelectorAll('[data-scope="media"][data-part="root"]')) as HTMLElement[]
+    expect(mediaNodes).toHaveLength(2)
+    expect(mediaNodes[0]?.parentElement?.classList.contains('uf-membrane')).toBe(false)
+    expect(mediaNodes[1]?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+    expect(mediaNodes[1]?.parentElement?.classList.contains('uf-mediaMembrane')).toBe(true)
+    expect(mediaNodes[1]?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
   })
 
   it('Checkbox keeps its hidden input out of the focus order and visible to a11y APIs', async () => {
@@ -447,14 +564,50 @@ describe('component smoke', () => {
     })
 
     const input = container.querySelector('.uf-checkbox input[type="checkbox"]') as HTMLInputElement | null
+    const control = container.querySelector('[data-scope="checkbox"][data-part="control"]') as HTMLElement | null
     expect(input?.checked).toBe(true)
 
     await act(async () => {
-      input?.click()
+      control?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
     })
 
     expect(handleCheckedChange).toHaveBeenCalledWith(false)
     expect(input?.checked).toBe(false)
+  })
+
+  it('Checkbox toggles in uncontrolled mode from the visible control and label text', async () => {
+    await act(async () => {
+      root.render(<Checkbox label="Receive updates" defaultChecked={false} />)
+    })
+
+    const control = container.querySelector('[data-scope="checkbox"][data-part="control"]') as HTMLElement | null
+    const label = container.querySelector('[data-scope="checkbox"][data-part="label"]') as HTMLElement | null
+    const input = container.querySelector('.uf-checkbox input[type="checkbox"]') as HTMLInputElement | null
+
+    expect(control?.getAttribute('aria-checked')).toBe('false')
+    expect(input?.checked).toBe(false)
+
+    await act(async () => {
+      control?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    })
+
+    expect(control?.getAttribute('aria-checked')).toBe('true')
+    expect(input?.checked).toBe(true)
+
+    await act(async () => {
+      label?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    })
+
+    expect(control?.getAttribute('aria-checked')).toBe('false')
+    expect(input?.checked).toBe(false)
+
+    const rootLabel = container.querySelector('.uf-checkbox') as HTMLLabelElement | null
+    await act(async () => {
+      rootLabel?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    })
+
+    expect(control?.getAttribute('aria-checked')).toBe('true')
+    expect(input?.checked).toBe(true)
   })
 
   it('Separator keeps decorative dividers hidden from landmarks and exposes semantic separators on demand', async () => {
@@ -473,11 +626,33 @@ describe('component smoke', () => {
     const semantic = separators[1]
 
     expect(wrapper).not.toBeNull()
+    expect(wrapper?.classList.contains('uf-membrane--full')).toBe(true)
+    expect(decorative?.getAttribute('data-orientation')).toBe('horizontal')
     expect(decorative?.getAttribute('role')).toBe('none')
     expect(decorative?.getAttribute('aria-orientation')).toBeNull()
     expect(semantic?.getAttribute('role')).toBe('separator')
     expect(semantic?.getAttribute('aria-orientation')).toBe('vertical')
     expect(semantic?.getAttribute('data-orientation')).toBe('vertical')
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    const tokenStyles = readFileSync(join(process.cwd(), 'assets/styles/tokens.css'), 'utf8')
+    const galleryMetaSource = readFileSync(join(process.cwd(), 'utils/__generated__/render_gallery.meta.generated.ts'), 'utf8')
+    const runtimeSource = readFileSync(join(process.cwd(), 'uf.runtime.ts'), 'utf8')
+    expect(componentStyles).toContain('.uf-separator-membrane {')
+    expect(tokenStyles).toContain('--uf-border-width-thin: 1px;')
+    expect(tokenStyles).toContain('--uf-separator-line-width: var(--uf-border-width-thin);')
+    expect(componentStyles).not.toContain('--uf-separator-line-width: var(--uf-membrane);')
+    expect(componentStyles).toContain('inline-size: 100%;')
+    expect(componentStyles).toContain('padding: var(--uf-membrane) var(--uf-control-pad-text);')
+    expect(componentStyles).toContain('flex: 1 1 100%;')
+    expect(componentStyles).toContain('justify-self: stretch;')
+    expect(componentStyles).toContain('.uf-gallery-itemSurface:has(> .uf-separator-membrane)')
+    expect(componentStyles).toContain('.uf-gallery-itemSurface > .uf-separator-membrane')
+    expect(galleryMetaSource).toContain('name: "Separator"')
+    expect(galleryMetaSource).toContain('sampleProps: {"orientation":"horizontal","decorative":true,"membrane":true}')
+    expect(runtimeSource).toContain("maxWidth: '100%'")
+    expect(runtimeSource).toContain("fullFrameComponents: ['face-ui-react']")
+    expect(runtimeSource).toContain("fullWidthComponents: ['face-ui-react', 'Card', 'Carousel', 'Media', 'Modal', 'Progress', 'Scroll', 'Separator', 'Table', 'Toc']")
   })
 
   it('Scroll exposes a focusable labelled region with a contextual aria label', async () => {
@@ -499,6 +674,29 @@ describe('component smoke', () => {
     expect(viewport?.tabIndex).toBe(0)
     expect(viewport?.style.overflowX).toBe('auto')
     expect(viewport?.style.overflowY).toBe('auto')
+  })
+
+  it('Scroll renders plain content through a membraned Text surface inside the scroll card', async () => {
+    await act(async () => {
+      root.render(
+        <Scroll ariaLabel="Literary excerpt">
+          Вечером в доме стало тихо.
+        </Scroll>,
+      )
+    })
+
+    const rootNode = container.querySelector('[data-scope="scroll"][data-part="root"]') as HTMLElement | null
+    const text = container.querySelector('[data-scope="text"].uf-scroll__text') as HTMLElement | null
+    const membrane = container.querySelector('[data-scope="scroll"] [data-part="viewport"] > .uf-membrane.uf-membrane--full') as HTMLElement | null
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+
+    expect(rootNode?.style.height).toBe('240px')
+    expect(membrane).not.toBeNull()
+    expect(text?.getAttribute('data-membrane')).toBe('')
+    expect(text?.getAttribute('data-inset')).toBe('control')
+    expect(text?.textContent).toBe('Вечером в доме стало тихо.')
+    expect(componentStyles).toContain('--uf-scroll-card-inset: 7px;')
+    expect(componentStyles).toContain('padding: var(--uf-scroll-card-inset);')
   })
 
   it('Tile preserves button-like keyboard semantics and nested action isolation', async () => {
@@ -655,11 +853,13 @@ describe('component smoke', () => {
 
     const slideA = container.querySelector('[data-part="slide"][data-index="0"]') as HTMLElement | null
     const slideB = container.querySelector('[data-part="slide"][data-index="1"]') as HTMLElement | null
-    const nextButton = container.querySelector('[data-part="next"]') as HTMLButtonElement | null
+    const nextButton = container.querySelector('[data-scope="button"][data-part="next"]') as HTMLButtonElement | null
+    const inactiveIndicator = container.querySelector('[data-scope="button"][data-part="indicator-item"][data-state="inactive"] svg[data-icon="radio-off"]')
 
     expect(slideA?.getAttribute('data-current')).toBe('')
     expect(slideB?.hasAttribute('data-current')).toBe(false)
     expect(nextButton).not.toBeNull()
+    expect(inactiveIndicator).not.toBeNull()
 
     await act(async () => {
       nextButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
@@ -667,6 +867,58 @@ describe('component smoke', () => {
 
     expect(slideA?.hasAttribute('data-current')).toBe(false)
     expect(slideB?.getAttribute('data-current')).toBe('')
+  })
+
+  it('Carousel fallback uses responsive Media slides and button-scoped controls', async () => {
+    await act(async () => {
+      root.render(<Carousel defaultIndex={0} />)
+    })
+
+    const rootNode = container.querySelector<HTMLElement>('[data-scope="carousel"]')
+    const viewport = container.querySelector<HTMLElement>('[data-scope="carousel"][data-part="viewport"]')
+    const controls = container.querySelector<HTMLElement>('.uf-carousel-controls')
+    const mediaSlide = container.querySelector<HTMLElement>('[data-scope="media"].uf-carousel-slideMedia')
+    const mediaMembrane = mediaSlide?.parentElement
+    const prevSlot = container.querySelector<HTMLElement>('.uf-carousel-navSlot--prev')
+    const nextSlot = container.querySelector<HTMLElement>('.uf-carousel-navSlot--next')
+    const indicators = container.querySelector<HTMLElement>('.uf-carousel-indicators')
+    const prevButton = container.querySelector<HTMLButtonElement>('[data-scope="button"][data-part="prev"]')
+    const nextButton = container.querySelector<HTMLButtonElement>('[data-scope="button"][data-part="next"]')
+    const indicatorButtons = Array.from(container.querySelectorAll<HTMLButtonElement>('[data-scope="button"][data-part="indicator-item"]'))
+    const mediaImage = mediaSlide?.querySelector<HTMLImageElement>('img')
+    const activeIndicator = container.querySelector<HTMLElement>('[data-scope="button"][data-part="indicator-item"][data-state="active"] svg[data-icon="radio-on"]')
+    const inactiveIndicator = container.querySelector<HTMLElement>('[data-scope="button"][data-part="indicator-item"][data-state="inactive"] svg[data-icon="radio-off"]')
+
+    expect(rootNode).not.toBeNull()
+    expect(viewport).not.toBeNull()
+    expect(controls).not.toBeNull()
+    expect(viewport?.nextElementSibling).toBe(controls)
+    expect(mediaSlide).not.toBeNull()
+    expect(mediaImage?.getAttribute('src')).toBe('/assets/media/examples/office-core/lobby-day.webp')
+    expect(mediaMembrane?.classList.contains('uf-membrane')).toBe(true)
+    expect(mediaMembrane?.classList.contains('uf-mediaMembrane')).toBe(true)
+    expect(prevSlot?.contains(prevButton)).toBe(true)
+    expect(nextSlot?.contains(nextButton)).toBe(true)
+    expect(controls?.contains(indicators)).toBe(true)
+    expect(prevButton?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+    expect(nextButton).not.toBeNull()
+    expect(nextButton?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+    expect(indicatorButtons.length).toBeGreaterThan(0)
+    expect(indicatorButtons.every((button) => button.parentElement?.classList.contains('uf-membrane'))).toBe(true)
+    expect(activeIndicator).not.toBeNull()
+    expect(inactiveIndicator).not.toBeNull()
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toContain('background: transparent;')
+    expect(componentStyles).toContain('border: none;')
+    expect(componentStyles).toContain('.uf-carousel-controls')
+    expect(componentStyles).toContain('grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);')
+    expect(componentStyles).toContain('.uf-carousel-navSlot--prev')
+    expect(componentStyles).toContain('.uf-carousel-navSlot--next')
+    expect(componentStyles).toContain('position: static;')
+    expect(componentStyles).toContain('max-width: calc(100% / var(--face-runtime-carousel-slides-per-view, 1));')
+    expect(componentStyles).toContain('.uf-carousel-indicators')
+    expect(componentStyles).toContain('gap: 0;')
   })
 
   it('Command updates its query and selects a clicked item in uncontrolled mode', async () => {
@@ -773,6 +1025,30 @@ describe('component smoke', () => {
     expect(content?.hidden).toBe(true)
   })
 
+  it('Modal lets open override the legacy isOpen alias', async () => {
+    await act(async () => {
+      root.render(
+        <Modal
+          {...({ isOpen: false } as any)}
+          open
+          portal={false}
+          variant="center"
+          title="Preview modal"
+        >
+          Visible preview content
+        </Modal>,
+      )
+    })
+
+    const content = container.querySelector('[data-scope="modal"][data-part="content"]') as HTMLElement | null
+    const runtimeSource = readFileSync(join(process.cwd(), 'uf.runtime.ts'), 'utf8')
+    expect(content).not.toBeNull()
+    expect(content?.hidden).toBe(false)
+    expect(container.textContent).toContain('Preview modal')
+    expect(container.textContent).toContain('Visible preview content')
+    expect(runtimeSource).toContain("'Modal'")
+  })
+
   it('Toast demo opens a toast and renders a close button', async () => {
     await act(async () => {
       root.render(<Toast />)
@@ -821,9 +1097,19 @@ describe('component smoke', () => {
 
     const nextButton = container.querySelector('[data-part="next"]') as HTMLButtonElement | null
     const currentPage = container.querySelector('.uf-pagination-current[data-scope="text"]') as HTMLElement | null
+    const pagePicker = document.querySelector('.uf-pagination-pagePicker')
+    const pagePickerItem = pagePicker?.querySelector('.uf-menu-item') as HTMLButtonElement | null
     expect(nextButton).not.toBeNull()
     expect(nextButton?.closest('.uf-membrane')).not.toBeNull()
     expect(currentPage?.textContent).toBe('1')
+    expect(pagePicker).not.toBeNull()
+    expect(pagePickerItem).not.toBeNull()
+    expect(pagePickerItem?.getAttribute('data-align')).toBe('left')
+    expect(pagePickerItem?.textContent).toContain('Page 1')
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles)
+      .toMatch(/\.uf-pagination-pagePicker\[data-scope\]\s+\.uf-menu-item\s*\{[^}]*justify-content:\s*flex-start;/)
 
     await act(async () => {
       nextButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
@@ -831,6 +1117,81 @@ describe('component smoke', () => {
 
     expect(currentPage?.textContent).toBe('2')
     expect(currentPage?.getAttribute('aria-current')).toBe('page')
+  })
+
+  it('Progress renders a visible track without requiring text labels', async () => {
+    await act(async () => {
+      root.render(<Progress value={60} aria-label="Build progress" />)
+    })
+
+    const rootNode = container.querySelector('[data-scope="progress"]') as HTMLElement | null
+    const header = container.querySelector('.uf-progress__header') as HTMLElement | null
+    const trackWrap = container.querySelector('.uf-progress__trackWrap') as HTMLElement | null
+    const track = container.querySelector('[data-scope="progress"] [data-part="track"]') as HTMLElement | null
+    const indicator = container.querySelector('[data-scope="progress"] [data-part="indicator"]') as HTMLElement | null
+
+    expect(rootNode?.getAttribute('aria-label')).toBe('Build progress')
+    expect(rootNode?.getAttribute('data-shape')).toBe('linear')
+    expect(header).toBeNull()
+    expect(trackWrap).not.toBeNull()
+    expect(track).not.toBeNull()
+    expect(indicator).not.toBeNull()
+    expect(indicator?.style.width).toBe('60%')
+    expect(container.textContent).not.toContain('%')
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toContain('--uf-progress-track-height: var(--uf-membrane);')
+    expect(componentStyles).toContain('--uf-progress-track-inset-inline: var(--uf-control-pad-text);')
+    expect(componentStyles).toMatch(/\.uf-progress__header\s*\{[^}]*padding:\s*var\(--uf-control-pad-y\) var\(--uf-control-pad-text\);/)
+    expect(componentStyles).toMatch(/\.uf-progress__trackWrap\s*\{[^}]*padding:\s*0 var\(--uf-progress-track-inset-inline\);/)
+    expect(componentStyles).toContain('.uf-gallery-itemSurface:has(> .uf-progress[data-scope][data-shape="linear"])')
+    expect(readFileSync(join(process.cwd(), 'uf.runtime.ts'), 'utf8'))
+      .toContain("'Progress'")
+  })
+
+  it('Progress aligns linear labels above the one-pixel track', async () => {
+    await act(async () => {
+      root.render(<Progress value={28} label="Typography" showLabel />)
+    })
+
+    const header = container.querySelector('.uf-progress__header') as HTMLElement | null
+    const label = container.querySelector('[data-scope="progress"][data-part="label"]') as HTMLElement | null
+    const percent = container.querySelector('.uf-progress-label') as HTMLElement | null
+    const trackWrap = container.querySelector('.uf-progress__trackWrap') as HTMLElement | null
+    const track = container.querySelector('[data-scope="progress"] [data-part="track"]') as HTMLElement | null
+
+    expect(header).not.toBeNull()
+    expect(label?.textContent).toBe('Typography')
+    expect(percent?.textContent).toBe('28%')
+    expect(trackWrap).not.toBeNull()
+    expect(track).not.toBeNull()
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toMatch(/\.uf-progress__header\s*\{[^}]*justify-content:\s*space-between;/)
+    expect(componentStyles).toMatch(/\[data-scope="progress"\] \[data-part="track"\]\s*\{[^}]*max-height:\s*var\(--uf-progress-track-height\);/)
+  })
+
+  it('Progress renders a circular ring variant without scaling the ring by percent width', async () => {
+    await act(async () => {
+      root.render(<Progress value={28} shape="circle" showLabel aria-label="Context progress" />)
+    })
+
+    const rootNode = container.querySelector('[data-scope="progress"]') as HTMLElement | null
+    const track = container.querySelector('[data-scope="progress"] [data-part="track"]') as HTMLElement | null
+    const indicator = container.querySelector('[data-scope="progress"] [data-part="indicator"]') as HTMLElement | null
+
+    expect(rootNode?.getAttribute('aria-label')).toBe('Context progress')
+    expect(rootNode?.getAttribute('data-shape')).toBe('circle')
+    expect(track).not.toBeNull()
+    expect(indicator).not.toBeNull()
+    expect(indicator?.style.width).toBe('')
+    expect(indicator?.style.getPropertyValue('--uf-progress-percent')).toBe('28%')
+    expect(container.textContent).toContain('28%')
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toContain('background: conic-gradient(')
+    expect(componentStyles).toContain('-webkit-mask: radial-gradient(circle, transparent 52%, #000 54%);')
+    expect(componentStyles).toContain('mask: radial-gradient(circle, transparent 52%, #000 54%);')
   })
 
   it('Table wraps primitive headers and aligned cells through Text', async () => {
@@ -854,6 +1215,9 @@ describe('component smoke', () => {
     expect(rowNumberHeader?.textContent).toContain('#')
     const table = container.querySelector('.uf-table[data-scope="table"]') as HTMLTableElement | null
     expect(table?.getAttribute('aria-label')).toBe('Price list')
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toContain('inline-size: 100%;')
+    expect(componentStyles).toContain('max-inline-size: 100%;')
 
     const rowNumberCell = container.querySelector('td[data-row-number] [data-scope="text"][data-align="left"]') as HTMLElement | null
     expect(rowNumberCell?.textContent).toContain('1')
@@ -975,10 +1339,24 @@ describe('component smoke', () => {
     })
 
     const control = container.querySelector('[role="switch"]') as HTMLElement | null
+    const label = container.querySelector('[data-scope="switcher"][data-part="label"]') as HTMLElement | null
+    const rootNode = container.querySelector('.uf-switcher') as HTMLElement | null
     expect(control?.getAttribute('aria-checked')).toBe('false')
 
     await act(async () => {
       control?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(control?.getAttribute('aria-checked')).toBe('true')
+
+    await act(async () => {
+      label?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(control?.getAttribute('aria-checked')).toBe('false')
+
+    await act(async () => {
+      rootNode?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
     expect(control?.getAttribute('aria-checked')).toBe('true')
@@ -1037,6 +1415,7 @@ describe('component smoke', () => {
       root.render(
         <Slider
           variant="advanced"
+          label="Crop"
           min={0}
           max={100}
           step={1}
@@ -1058,6 +1437,7 @@ describe('component smoke', () => {
     const renderAdvancedSlider = () => (
       <Slider
         variant="advanced"
+        label="Crop"
         min={0}
         max={100}
         step={1}
@@ -1075,6 +1455,7 @@ describe('component smoke', () => {
 
     expect(input).not.toBeNull()
     expect(container.textContent).toContain('Crop')
+    expect(container.querySelector('label')?.textContent).toBe('Crop')
     expect(cropMarkers).toHaveLength(2)
     expect(cropMarkers[0]?.querySelector('svg')?.getAttribute('width')).toBe('20')
     expect(cropMarkers[0]?.querySelector('svg')?.getAttribute('height')).toBe('20')
@@ -1137,6 +1518,39 @@ describe('component smoke', () => {
     expect(handleCropChange).not.toHaveBeenCalled()
   })
 
+  it('Slider advanced keeps thumb measurement stable while value text changes', async () => {
+    await act(async () => {
+      root.render(
+        <Slider
+          variant="advanced"
+          label="Zoom"
+          min={0}
+          max={100}
+          step={1}
+          defaultValue={[9]}
+        />,
+      )
+    })
+
+    const input = container.querySelector('.uf-slider--advanced input[type="range"]') as HTMLInputElement | null
+    const visibleThumbText = container.querySelector('.uf-slider-thumbButtonWrap .uf-slider-thumbButton [data-part="text"]') as HTMLElement | null
+    const measureThumbText = container.querySelector('.uf-slider-thumbMeasure .uf-slider-thumbButton [data-part="text"]') as HTMLElement | null
+
+    expect(container.querySelector('label')?.textContent).toBe('Zoom')
+    expect(visibleThumbText?.textContent).toBe('9')
+    expect(measureThumbText?.textContent).toBe('100')
+
+    await act(async () => {
+      if (!input) return
+      setNativeInputValue(input, '10')
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+
+    expect(visibleThumbText?.textContent).toBe('10')
+    expect(measureThumbText?.textContent).toBe('100')
+  })
+
   it('Rating changes value in uncontrolled mode', async () => {
     await act(async () => {
       root.render(<Rating defaultValue={2} />)
@@ -1151,6 +1565,10 @@ describe('component smoke', () => {
     })
 
     expect(stars[3]?.getAttribute('aria-checked')).toBe('true')
+    expect(stars[0]?.getAttribute('data-selected')).toBe('')
+    expect(stars[2]?.getAttribute('data-selected')).toBe('')
+    expect(stars[3]?.getAttribute('data-selected')).toBe('')
+    expect(stars[4]?.getAttribute('data-selected')).toBeNull()
 
     await act(async () => {
       stars[1]?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
@@ -1158,6 +1576,7 @@ describe('component smoke', () => {
 
     expect(stars[1]?.getAttribute('data-highlighted')).not.toBeNull()
     expect(stars[3]?.getAttribute('data-highlighted')).toBeNull()
+    expect(stars[3]?.getAttribute('data-selected')).toBe('')
   })
 
   it('Steps changes active step and reveals matching content in uncontrolled mode', async () => {
@@ -1177,6 +1596,11 @@ describe('component smoke', () => {
     const triggers = Array.from(container.querySelectorAll<HTMLButtonElement>('[data-part="trigger"]'))
     expect(triggers[0]?.getAttribute('data-state')).toBe('active')
     expect(container.textContent).toContain('Create your workspace and owner account.')
+    const firstContentText = container.querySelector('[data-scope="steps"][data-part="content"]:not([hidden]) [data-scope="text"]') as HTMLElement | null
+    expect(firstContentText?.classList.contains('uf-steps-contentText')).toBe(false)
+    expect(firstContentText?.getAttribute('data-inset')).toBe('control')
+    expect(firstContentText?.hasAttribute('data-membrane')).toBe(true)
+    expect(firstContentText?.parentElement?.classList.contains('uf-membrane')).toBe(true)
 
     await act(async () => {
       triggers[1]?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
@@ -1203,6 +1627,8 @@ describe('component smoke', () => {
     const setup = Array.from(container.querySelectorAll<HTMLElement>('button')).find((button) => button.textContent?.includes('Setup')) ?? null
 
     expect(intro?.getAttribute('aria-current')).toBe('location')
+    expect(intro?.getAttribute('data-full-width')).toBe('')
+    expect(setup?.getAttribute('data-full-width')).toBe('')
 
     await act(async () => {
       setup?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
@@ -1219,9 +1645,16 @@ describe('component smoke', () => {
             {
               id: 'src',
               label: 'src',
+              icon: 'folder',
               children: [
-                { id: 'index', label: 'index.ts' },
-                { id: 'utils', label: 'utils.ts' },
+                { id: 'index', label: 'index.ts', icon: 'file' },
+                { id: 'utils', label: 'utils.ts', icon: 'file', kind: 'tile' },
+                {
+                  id: 'custom',
+                  label: 'Custom',
+                  kind: 'custom',
+                  content: <span data-testid="custom-tree-content">Custom node</span>,
+                },
               ],
             },
           ]}
@@ -1234,21 +1667,75 @@ describe('component smoke', () => {
 
     expect(branchButton).not.toBeNull()
     expect(branchContent?.hidden).toBe(true)
+    expect(branchButton?.getAttribute('data-full-width')).toBe('')
+    expect(branchButton?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
 
     await act(async () => {
       branchButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
     expect(branchContent?.hidden).toBe(false)
+    expect(branchContent?.classList.contains('uf-tree-branch-content')).toBe(true)
 
     const childButton = container.querySelector('[data-tree-node-id="index"]') as HTMLButtonElement | null
     expect(childButton).not.toBeNull()
+    expect(childButton?.getAttribute('data-full-width')).toBe('')
+    expect(childButton?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
 
     await act(async () => {
       childButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
     expect(childButton?.getAttribute('data-selected')).toBe('')
+
+    const tileNode = container.querySelector('[data-tree-node-id="utils"][data-scope="tile"]') as HTMLElement | null
+    const customNode = container.querySelector('[data-tree-node-id="custom"].uf-tree-custom-node') as HTMLElement | null
+    expect(tileNode).not.toBeNull()
+    expect(tileNode?.getAttribute('data-full-width')).toBe('')
+    expect(customNode?.textContent).toContain('Custom node')
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toContain('.uf-tree[data-scope] .uf-tree-branch')
+    expect(componentStyles).toContain('.uf-tree[data-scope] [data-part="branchContent"]')
+    expect(componentStyles).toContain('flex-direction: column;')
+    expect(componentStyles).toContain('width: 100%;')
+  })
+
+  it('Tree keeps uncontrolled interaction when expandedIds is passed without a change handler', async () => {
+    await act(async () => {
+      root.render(
+        <Tree
+          expandedIds={['src']}
+          selectedId="index"
+          items={[
+            {
+              id: 'src',
+              label: 'src',
+              icon: 'folder',
+              children: [
+                { id: 'index', label: 'index.ts', icon: 'file' },
+              ],
+            },
+          ]}
+        />,
+      )
+    })
+
+    const branchButton = container.querySelector('[data-tree-node-id="src"]') as HTMLButtonElement | null
+    const branchContent = container.querySelector('[data-part="branchContent"][data-value="src"]') as HTMLElement | null
+    expect(branchContent?.hidden).toBe(false)
+
+    await act(async () => {
+      branchButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(branchContent?.hidden).toBe(true)
+
+    await act(async () => {
+      branchButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(branchContent?.hidden).toBe(false)
   })
 
   it('Panel workspace preset renders and changes selection', async () => {
@@ -1269,6 +1756,40 @@ describe('component smoke', () => {
     })
 
     expect(buttons[1]?.getAttribute('data-variant')).toBe('default')
+  })
+
+  it('Panel items API renders rows as system buttons with membranes and nesting levels', async () => {
+    await act(async () => {
+      root.render(
+        <Panel
+          surface="inline"
+          defaultSelectedId="leaf"
+          items={[
+            {
+              id: 'parent',
+              label: 'Parent',
+              icon: <Icon name="folder" />,
+              items: [
+                { id: 'child', label: 'Child' },
+              ],
+            },
+            {
+              id: 'leaf',
+              label: 'Leaf',
+              icon: <Icon name="component" />,
+            },
+          ]}
+        />,
+      )
+    })
+
+    const rows = Array.from(container.querySelectorAll<HTMLButtonElement>('.uf-sidebar-itemButton'))
+    expect(rows).toHaveLength(3)
+    expect(rows.every((row) => row.getAttribute('data-scope') === 'button')).toBe(true)
+    expect(rows.every((row) => row.parentElement?.classList.contains('uf-membrane'))).toBe(true)
+    expect(rows[0]?.getAttribute('data-selector')).toBe('')
+    expect(rows[1]?.style.getPropertyValue('--face-runtime-option-level')).toBe('1')
+    expect(rows[2]?.getAttribute('data-selected')).toBe('')
   })
 
   it('Markdown renders styled block structure for rich content', async () => {

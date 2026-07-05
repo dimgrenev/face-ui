@@ -121,6 +121,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
           <Menu
             items={pageItems}
             surfaceTitle={surfaceTitle}
+            className="uf-pagination-pagePicker"
             onSelect={(details) => {
               const nextPage = Number(details.value)
               if (!Number.isFinite(nextPage)) return

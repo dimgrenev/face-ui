@@ -37,6 +37,7 @@ interface ModalContext {
   open: boolean
   variant: ModalVariant
   closable: boolean
+  autoFocusOnOpen: boolean
   contentEl: HTMLElement | null
   previousFocusEl: HTMLElement | null
   titleId: string
@@ -99,6 +100,7 @@ function getFocusableElements(root: HTMLElement | null): HTMLElement[] {
 }
 
 function focusInitialElement(ctx: ModalContext): void {
+  if (!ctx.autoFocusOnOpen) return
   const el = ctx.contentEl
   if (!el) return
   const focusable = getFocusableElements(el)
@@ -182,6 +184,7 @@ export const modalMachine = createMachine<ModalSchema>({
     open: false,
     variant: 'center',
     closable: true,
+    autoFocusOnOpen: true,
     contentEl: null,
     previousFocusEl: null,
     titleId: '',

@@ -170,6 +170,7 @@ export function connectRating(
     getItemProps(index: number) {
       // index is 1-based (1 = first star, max = last star)
       const isHighlighted = index <= displayValue
+      const isSelectedRange = index <= value
       const isHalf = allowHalf && index - 0.5 === displayValue
       const isSelected = index === value
 
@@ -181,6 +182,7 @@ export function connectRating(
         'aria-label': `${index} star${index !== 1 ? 's' : ''}`,
         'data-index': index,
         'data-highlighted': isHighlighted || undefined,
+        'data-selected': isSelectedRange ? '' : undefined,
         'data-half': isHalf || undefined,
         'data-disabled': disabled || undefined,
         tabIndex: disabled ? -1 : isSelected || (value === 0 && index === 1) ? 0 : -1,

@@ -121,7 +121,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       stretchText: rawStretchText,
       selector = false,
       selectorOpen = false,
-      fullWidth = true,
+      fullWidth = false,
       align,
       level,
       membrane = true,

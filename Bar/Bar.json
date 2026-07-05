@@ -20,7 +20,27 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "children": [
+          {
+            "__componentName__": "Text",
+            "text": "Workspace",
+            "variant": "label",
+            "membrane": false
+          },
+          {
+            "__componentName__": "Bar.Right",
+            "children": [
+              {
+                "__componentName__": "Button",
+                "text": "Share",
+                "icon": "link",
+                "fullWidth": false
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "name": "Horizontal",

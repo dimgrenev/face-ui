@@ -15,8 +15,8 @@
     }
   ],
   "behavior": {
-    "themeToggle": "Local gallery theme switches between light and dark.",
-    "clear": "Clears local gallery overrides and restores the light theme."
+    "themeToggle": "Local gallery theme toggles an explicit light/dark override on top of the inherited app theme.",
+    "clear": "Clears local gallery overrides and returns the showcase to the inherited app theme."
   },
   "keyboard": {},
   "aria": {},
@@ -58,6 +58,7 @@
   },
   "tokenMapping": {
     "component": [
+      "--face-gallery-inset",
       "--face-gallery-header-height",
       "--face-gallery-header-inset",
       "--face-gallery-header-action-gap",
@@ -67,6 +68,7 @@
       "--face-gallery-surface-radius",
       "--face-gallery-surface-min-height",
       "--face-gallery-surface-pad",
+      "--face-gallery-frame-min-height",
       "--face-gallery-date-min-height",
       "--face-gallery-sidebar-min-height",
       "--face-gallery-modal-min-height",
@@ -83,6 +85,8 @@
       "--uf-radius-md",
       "--uf-membrane",
       "--uf-font-weight-bold",
+      "--uf-color-panel",
+      "--uf-overlay-surface-background",
       "--uf-color-background",
       "--uf-color-foreground",
       "--uf-color-hover-bg",
@@ -90,7 +94,8 @@
     ],
     "notes": [
       "Gallery-only tokens belong to the root face-ui-react showcase component, not to the individual previewed components.",
-      "The gallery renders Bar, Text and Icon primitives but owns its preview grid, header sizing and component preview surface geometry."
+      "The gallery renders Bar, Text and Button primitives but owns its preview grid, header sizing and component preview surface geometry.",
+      "Root background follows the iframe panel surface, while component preview cards use the same overlay surface as navigation/dropdown panels."
     ]
   },
   "platform": {},

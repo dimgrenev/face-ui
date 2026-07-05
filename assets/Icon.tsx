@@ -117,6 +117,30 @@ const icons = {
   'arrow-up': (
     <path d="M10 4L5 9M10 4L15 9M10 4L10 17" stroke="currentColor"/>
   ),
+  'arrow_expand_simple': (
+    <>
+      <path d="M7.5 4.5H4.5V7.5" stroke="currentColor"/>
+      <path d="M4.5 4.5L8.5 8.5" stroke="currentColor"/>
+      <path d="M12.5 4.5H15.5V7.5" stroke="currentColor"/>
+      <path d="M15.5 4.5L11.5 8.5" stroke="currentColor"/>
+      <path d="M7.5 15.5H4.5V12.5" stroke="currentColor"/>
+      <path d="M4.5 15.5L8.5 11.5" stroke="currentColor"/>
+      <path d="M12.5 15.5H15.5V12.5" stroke="currentColor"/>
+      <path d="M15.5 15.5L11.5 11.5" stroke="currentColor"/>
+    </>
+  ),
+  'arrows_contract_simple': (
+    <>
+      <path d="M4.5 8.5H8.5V4.5" stroke="currentColor"/>
+      <path d="M8.5 8.5L4.5 4.5" stroke="currentColor"/>
+      <path d="M15.5 8.5H11.5V4.5" stroke="currentColor"/>
+      <path d="M11.5 8.5L15.5 4.5" stroke="currentColor"/>
+      <path d="M4.5 11.5H8.5V15.5" stroke="currentColor"/>
+      <path d="M8.5 11.5L4.5 15.5" stroke="currentColor"/>
+      <path d="M15.5 11.5H11.5V15.5" stroke="currentColor"/>
+      <path d="M11.5 11.5L15.5 15.5" stroke="currentColor"/>
+    </>
+  ),
   'cart': (
     <>
       <path d="M14.5 5.5H4.5L5.5 11.5H13.5L14.5 5.5ZM14.5 5.5L18.5 3" stroke="currentColor"/>
@@ -204,6 +228,14 @@ const icons = {
     <>
       <path d="M15 7L10 12L5 7M10 2L10 9" stroke="currentColor"/>
       <path d="M15 16H5" stroke="currentColor"/>
+    </>
+  ),
+  'floppy-disk': (
+    <>
+      <path d="M4.5 4.5H13.5L15.5 6.5V15.5H4.5V4.5Z" stroke="currentColor"/>
+      <path d="M7 4.5V8H12.5V4.5" stroke="currentColor"/>
+      <path d="M7 15.5V11.5H13V15.5" stroke="currentColor"/>
+      <path d="M11 6V7" stroke="currentColor"/>
     </>
   ),
   'drag': (
@@ -404,6 +436,9 @@ const icons = {
   ),
   'select-chevron-up': (
     <path d="M6.53305 11.9465C6.42638 11.8398 6.37305 11.6975 6.37305 11.5195C6.37305 11.3422 6.42638 11.1822 6.53305 11.0395L9.57305 8.05349C9.67971 7.94682 9.82205 7.89349 10 7.89349C10.178 7.89349 10.3204 7.94682 10.427 8.05349L13.467 11.0395C13.5737 11.1822 13.627 11.3422 13.627 11.5195C13.627 11.6975 13.5647 11.8398 13.44 11.9465C13.3154 12.0532 13.1644 12.1065 12.987 12.1065C12.809 12.1065 12.6667 12.0532 12.56 11.9465L10 9.38649L7.44005 11.9465C7.33338 12.0532 7.19105 12.1065 7.01305 12.1065C6.83571 12.1065 6.67571 12.0532 6.53305 11.9465Z" fill="currentColor"/>
+  ),
+  'slash': (
+    <path d="M12.5 5L7.5 15" stroke="currentColor" strokeLinecap="round"/>
   ),
   'settings': (
     <>
@@ -644,6 +679,8 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'arrow-left': "0 0 20 20",
   'arrow-right': "0 0 20 20",
   'arrow-up': "0 0 20 20",
+  'arrow_expand_simple': "0 0 20 20",
+  'arrows_contract_simple': "0 0 20 20",
   'cart': "0 0 20 20",
   'chat': "0 0 20 20",
   'check': "0 0 20 20",
@@ -663,6 +700,7 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'dev-tools': "0 0 20 20",
   'down': "0 0 20 20",
   'download': "0 0 20 20",
+  'floppy-disk': "0 0 20 20",
   'drag': "0 0 20 20",
   'ds': "0 0 20 20",
   'edit': "0 0 20 20",
@@ -705,6 +743,7 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'search': "0 0 20 20",
   'select-chevron-down': "0 0 20 20",
   'select-chevron-up': "0 0 20 20",
+  'slash': "0 0 20 20",
   'settings': "0 0 20 20",
   'size': "0 0 20 20",
   'sound': "0 0 20 20",

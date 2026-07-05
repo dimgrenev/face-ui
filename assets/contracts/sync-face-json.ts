@@ -71,26 +71,35 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   },
   Badge: {
     patchProps: {
+      variant: {
+        type: 'enum',
+        default: 'default',
+        options: ['default', 'primary', 'secondary'],
+        description: 'Structural badge variant. Combine with tone for semantic status color.',
+      },
       appearance: {
         type: 'enum',
-        default: 'fill',
+        default: 'outline',
         options: ['fill', 'outline'],
         description: 'Fill or outline appearance',
       },
+      tone: {
+        type: 'enum',
+        default: 'neutral',
+        options: ['neutral', 'accent', 'positive', 'warning', 'destructive'],
+        description: 'Semantic status tone. Combines with fill or outline appearance.',
+      },
     },
-    patchStates: (states) => states.map((state) => {
-      if (state.props?.variant === 'outline') {
-        return {
-          ...state,
-          props: {
-            ...state.props,
-            variant: 'default',
-            appearance: 'outline',
-          },
-        }
-      }
-      return state
-    }),
+    patchStates: () => [
+      { name: 'Default', props: { text: 'Badge' } },
+      { name: 'Primary Fill', props: { text: 'Primary', variant: 'primary', appearance: 'fill' } },
+      { name: 'Secondary Fill', props: { text: 'Secondary', variant: 'secondary', appearance: 'fill' } },
+      { name: 'Accent Outline', props: { text: 'Accent', tone: 'accent' } },
+      { name: 'Positive Outline', props: { text: 'Positive', tone: 'positive' } },
+      { name: 'Warning Outline', props: { text: 'Warning', tone: 'warning' } },
+      { name: 'Destructive Outline', props: { text: 'Destructive', tone: 'destructive' } },
+      { name: 'Destructive Fill', props: { text: 'Destructive', appearance: 'fill', tone: 'destructive' } },
+    ],
   },
   Button: {
     patchProps: {
@@ -100,8 +109,23 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         options: ['default', 'primary', 'secondary', 'accent', 'outline', 'ghost', 'destructive', 'suggestion'],
         description: 'Visual style variant',
       },
+      fullWidth: {
+        type: 'boolean',
+        default: false,
+        description: 'Full width button.',
+      },
     },
     patchStates: (states) => states.map((state) => {
+      if (state.name === 'Default') {
+        return {
+          ...state,
+          props: {
+            text: 'Create',
+            icon: 'plus',
+            fullWidth: false,
+          },
+        }
+      }
       if (state.name === 'Delete') {
         return {
           ...state,
@@ -123,6 +147,16 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       }
       return state
     }),
+  },
+  Card: {
+    patchProps: {
+      footer: {
+        type: 'object',
+        required: false,
+        controlType: 'object',
+        description: 'Card footer slot. Use a structured component descriptor, for example Button.',
+      },
+    },
   },
   Checkbox: {
     omitProps: ['onChange'],
@@ -175,8 +209,98 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     },
   },
+  Separator: {
+    patchStates: () => [
+      {
+        name: 'Default',
+        props: {
+          orientation: 'horizontal',
+          decorative: true,
+          membrane: true,
+        },
+      },
+      {
+        name: 'Vertical',
+        props: {
+          orientation: 'vertical',
+          decorative: true,
+          membrane: true,
+        },
+      },
+      {
+        name: 'Semantic',
+        props: {
+          orientation: 'horizontal',
+          decorative: false,
+          membrane: true,
+        },
+      },
+    ],
+  },
   Radio: {
     omitProps: ['flow', 'onChange'],
+    patchProps: {
+      options: {
+        type: 'array',
+        required: false,
+        description: 'Radio options to render.',
+        default: [
+          { value: 'one', label: 'Option one' },
+          { value: 'two', label: 'Option two' },
+          { value: 'three', label: 'Option three', disabled: true },
+        ],
+      },
+      defaultValue: {
+        type: 'string',
+        required: false,
+        description: 'Uncontrolled initial selected value.',
+        default: 'one',
+      },
+      orientation: {
+        type: 'enum',
+        required: false,
+        description: 'Layout orientation.',
+        options: ['horizontal', 'vertical'],
+        default: 'vertical',
+      },
+    },
+    patchStates: () => [
+      {
+        name: 'Default',
+        props: {
+          options: [
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two' },
+            { value: 'three', label: 'Option three', disabled: true },
+          ],
+          defaultValue: 'one',
+        },
+      },
+      {
+        name: 'Horizontal',
+        props: {
+          options: [
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two' },
+            { value: 'three', label: 'Option three', disabled: true },
+          ],
+          defaultValue: 'one',
+          orientation: 'horizontal',
+        },
+      },
+      {
+        name: 'Disabled',
+        props: {
+          options: [
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two' },
+            { value: 'three', label: 'Option three', disabled: true },
+          ],
+          defaultValue: 'one',
+          disabled: true,
+        },
+      },
+    ],
   },
   Select: {
     omitProps: ['onChange'],
@@ -249,6 +373,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Default',
         props: {
+          label: 'Value',
           defaultValue: [50],
         },
       },
@@ -263,6 +388,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         name: 'Advanced',
         props: {
           variant: 'advanced',
+          label: 'Zoom',
           defaultValue: [42],
           leading: 'text',
           leadingText: 'Zoom',
@@ -272,6 +398,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         name: 'Crop',
         props: {
           variant: 'advanced',
+          label: 'Crop',
           defaultValue: [40],
           crop: true,
           defaultCropRange: { min: 20, max: 80 },
@@ -297,6 +424,85 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   },
   Toc: {
     omitProps: ['onChange'],
+  },
+  Tree: {
+    patchProps: {
+      items: {
+        type: 'array',
+        required: false,
+        description: 'Recursive tree nodes. Nodes may use kind "button", "tile", or "custom", plus icon, rightText, actions, content, or render.',
+      },
+      renderNode: {
+        type: 'function',
+        required: false,
+        description: 'Global render override for custom node bodies. Tree still owns nesting, expansion, focus, and selection.',
+      },
+    },
+    patchStates: () => [
+      {
+        name: 'Default',
+        props: {
+          items: [
+            {
+              id: 'src',
+              label: 'src',
+              icon: 'folder',
+              children: [
+                {
+                  id: 'components',
+                  label: 'components',
+                  icon: 'folder',
+                  children: [
+                    { id: 'button', label: 'Button.tsx', icon: 'file' },
+                    { id: 'tile', label: 'Tile.tsx', icon: 'file', kind: 'tile' },
+                  ],
+                },
+                {
+                  id: 'assets',
+                  label: 'assets',
+                  icon: 'folder',
+                  children: [
+                    {
+                      id: 'icons',
+                      label: 'icons',
+                      icon: 'folder',
+                      children: [
+                        { id: 'search-icon', label: 'search.svg', icon: 'file' },
+                        { id: 'folder-icon', label: 'folder.svg', icon: 'file' },
+                      ],
+                    },
+                  ],
+                },
+                { id: 'index', label: 'index.ts', icon: 'file' },
+              ],
+            },
+            { id: 'readme', label: 'README.md', icon: 'file' },
+          ],
+          defaultExpandedIds: ['src', 'components', 'assets', 'icons'],
+          defaultSelectedId: 'button',
+        },
+      },
+      {
+        name: 'Mixed Rows',
+        props: {
+          items: [
+            {
+              id: 'workspace',
+              label: 'Workspace',
+              icon: 'folder',
+              kind: 'tile',
+              children: [
+                { id: 'overview', label: 'Overview', icon: 'file', kind: 'tile' },
+                { id: 'settings', label: 'Settings', icon: 'settings', rightText: '3' },
+                { id: 'tokens', label: 'Tokens', icon: 'theme' },
+              ],
+            },
+          ],
+          defaultExpandedIds: ['workspace'],
+          defaultSelectedId: 'overview',
+        },
+      },
+    ],
   },
   Upload: {
     omitProps: ['size', 'type', 'reason'],

@@ -18,9 +18,10 @@
       "description": "Card body content"
     },
     "footer": {
-      "type": "string",
+      "type": "object",
+      "controlType": "object",
       "required": false,
-      "description": "Card footer content"
+      "description": "Card footer slot. Use a structured component descriptor, for example Button."
     },
     "membrane": {
       "type": "boolean",
@@ -39,23 +40,45 @@
       "name": "Default",
       "props": {
         "title": "Card Title",
-        "description": "Card description text."
+        "content": "Workspace settings and recent activity stay grouped in one place",
+        "footer": {
+          "__componentName__": "Button",
+          "text": "Open",
+          "icon": "arrow-right",
+          "iconPosition": "right",
+          "membrane": true,
+          "fullWidth": false
+        }
       }
     },
     {
       "name": "With Content",
       "props": {
         "title": "Settings",
-        "content": "Card body content goes here."
+        "content": "Adjust workspace preferences and keep the card rhythm aligned with other controls.",
+        "footer": {
+          "__componentName__": "Button",
+          "text": "Apply",
+          "variant": "accent",
+          "membrane": true,
+          "fullWidth": false
+        }
       }
     },
     {
       "name": "Full",
       "props": {
         "title": "Card Title",
-        "description": "A description.",
+        "description": "A description",
         "content": "Main content.",
-        "footer": "Footer area"
+        "footer": {
+          "__componentName__": "Button",
+          "text": "Continue",
+          "icon": "arrow-right",
+          "iconPosition": "right",
+          "membrane": true,
+          "fullWidth": false
+        }
       }
     },
     {

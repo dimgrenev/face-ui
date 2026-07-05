@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 // NOTE: This file exists primarily for the Render playground:
 // dropping the `face-ui-react/` folder will be recognized as a component folder
 // (entry = `face-ui-react/face-ui-react.tsx`), and this component will render a gallery.
 
 import { FELD_GALLERY_ENTRIES } from './utils/__generated__/render_gallery.generated';
 import { Bar } from './Bar/Bar';
-import { Icon } from './Icon/Icon';
+import { Button } from './Button/Button';
 import { Text } from './Text/Text';
 
 // NOTE: This file must NOT import global CSS directly (Next.js restriction).
@@ -28,6 +28,30 @@ export type FeldGalleryFace = FeldGalleryFaceV1;
 
 export interface FeldGalleryProps {
   face?: FeldGalleryFace;
+}
+
+type FeldGalleryTheme = 'light' | 'dark';
+
+function normalizeGalleryTheme(value: unknown): FeldGalleryTheme | null {
+  return value === 'light' || value === 'dark' ? value : null;
+}
+
+function readInheritedGalleryTheme(root: HTMLElement | null): FeldGalleryTheme {
+  let node = root?.parentElement ?? null;
+  while (node) {
+    const theme = normalizeGalleryTheme(node.getAttribute('data-theme'));
+    if (theme) return theme;
+    node = node.parentElement;
+  }
+
+  if (typeof document !== 'undefined') {
+    const htmlTheme = normalizeGalleryTheme(document.documentElement.getAttribute('data-theme'));
+    if (htmlTheme) return htmlTheme;
+    const bodyTheme = normalizeGalleryTheme(document.body?.getAttribute('data-theme'));
+    if (bodyTheme) return bodyTheme;
+  }
+
+  return 'dark';
 }
 
 class PreviewErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }> {
@@ -120,6 +144,7 @@ function resolveRenderableComponent(candidate: any, fallbackExportName?: string)
 // Совместимость sandbox обеспечивается на стороне iframe-хоста (`public/runtime/sandbox/react-host.js`).
 
 export default function faceUiReact(props: FeldGalleryProps) {
+  const galleryRef = useRef<HTMLDivElement | null>(null);
   const face = (props && props.face && typeof props.face === 'object' && Array.isArray((props.face as any).cards))
     ? normalizeFace(props.face as FeldGalleryFaceV1)
     : createDefaultFace();
@@ -127,8 +152,35 @@ export default function faceUiReact(props: FeldGalleryProps) {
   const [localFaceOverride, setLocalFaceOverride] = useState<FeldGalleryFaceV1 | null>(null);
   const effectiveFace = localFaceOverride || face;
 
-  const [localTheme, setLocalTheme] = useState<'light' | 'dark'>(() => 'light');
-  const theme: 'light' | 'dark' = localTheme;
+  const [themeOverride, setThemeOverride] = useState<FeldGalleryTheme | null>(null);
+  const [inheritedTheme, setInheritedTheme] = useState<FeldGalleryTheme>(() => 'dark');
+  const theme: FeldGalleryTheme = themeOverride ?? inheritedTheme;
+
+  useEffect(() => {
+    const updateInheritedTheme = () => {
+      setInheritedTheme(readInheritedGalleryTheme(galleryRef.current));
+    };
+
+    updateInheritedTheme();
+
+    if (typeof MutationObserver === 'undefined' || typeof document === 'undefined') return undefined;
+
+    const observer = new MutationObserver(updateInheritedTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+      subtree: true,
+    });
+    if (document.body) {
+      observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+        subtree: true,
+      });
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const entryByName = useMemo(() => {
     const map = new Map<string, any>();
@@ -148,28 +200,32 @@ export default function faceUiReact(props: FeldGalleryProps) {
   }, [effectiveFace.cards]);
 
   return (
-    <div className="uf-gallery" data-theme={theme}>
+    <div ref={galleryRef} className="uf-gallery" data-theme={theme}>
       <Bar className="uf-gallery-header">
         <Bar.LeftEllipsis>
-          <Text as="span" className="uf-bar__slotText uf-text-body">face-ui-react</Text>
+          <Text as="span" className="uf-gallery-title" fullWidth truncate>face-ui-react</Text>
         </Bar.LeftEllipsis>
         <Bar.Right>
-          <button
+          <Button
             type="button"
-            className="uf-gallery-icon-button uf-text-body uf-control"
+            className="uf-gallery-icon-button"
+            icon="theme"
+            iconOnly
+            membrane
             title="Toggle theme"
-            onClick={() => setLocalTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
-          >
-            <Icon name="theme" />
-          </button>
-          <button
+            aria-label="Toggle theme"
+            onClick={() => setThemeOverride(theme === 'dark' ? 'light' : 'dark')}
+          />
+          <Button
             type="button"
-            className="uf-gallery-icon-button uf-text-body uf-control"
+            className="uf-gallery-icon-button"
+            icon="clean"
+            iconOnly
+            membrane
             title="Clear"
-            onClick={() => { setLocalFaceOverride(null); setLocalTheme('light'); }}
-          >
-            <Icon name="clean" />
-          </button>
+            aria-label="Clear"
+            onClick={() => { setLocalFaceOverride(null); setThemeOverride(null); }}
+          />
         </Bar.Right>
       </Bar>
 
@@ -195,10 +251,14 @@ export default function faceUiReact(props: FeldGalleryProps) {
           const baseSampleProps = ((entry as any)?.sampleProps && typeof (entry as any).sampleProps === 'object')
             ? (entry as any).sampleProps
             : {};
-          const sampleProps = baseSampleProps;
+          const sampleProps = (
+            normalizedName === 'modal' || normalizedName === 'drawer'
+          )
+            ? { ...baseSampleProps, autoFocusOnOpen: false }
+            : baseSampleProps;
           return (
             <div key={card?.id || rawName} className="uf-gallery-item">
-              <Text as="div" className="uf-gallery-itemTitle uf-text-body">
+              <Text as="div" variant="label" className="uf-gallery-itemTitle" fullWidth truncate membrane>
                 {String(card?.title || cleanLeafName)}
               </Text>
               <div className="uf-gallery-itemPreview">

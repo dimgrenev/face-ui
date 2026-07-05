@@ -7,7 +7,7 @@
  * `<Panel items={[{ id: 'home', label: 'Home', icon: <HomeIcon /> }]} />`
  */
 
-import { forwardRef, type ReactNode } from 'react'
+import { forwardRef, type KeyboardEvent, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import {
   DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
@@ -86,82 +86,110 @@ interface PanelItemRendererProps {
   item: PanelItem
   api: ReturnType<typeof connectSidebar>
   collapsed: boolean
+  level?: number
 }
 
 function PanelItemRenderer(props: PanelItemRendererProps) {
-  const { item, api, collapsed } = props
+  const { item, api, collapsed, level = 0 } = props
   const hasChildren = Array.isArray(item.items) && item.items.length > 0
+  const iconNode = item.icon && <span data-scope="sidebar" data-part="itemIcon">{item.icon}</span>
 
   if (!hasChildren) {
     const itemProps = api.getItemProps({ id: item.id, disabled: item.disabled })
-
-    const handleClick = () => {
-      itemProps.onClick()
-      item.onClick?.()
+    const {
+      className: itemClassName,
+      onClick: selectItem,
+      onKeyDown,
+      'data-scope': _itemScope,
+      'data-part': _itemPart,
+      ...itemDomProps
+    } = itemProps as typeof itemProps & {
+      className?: string
+      onClick?: () => void
+      onKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void
+      'data-scope'?: string
+      'data-part'?: string
     }
 
-    if (item.href) {
-      return (
-        <a
-          {...itemProps}
-          href={item.href}
-          className={cn('uf-sidebar-item', (itemProps as { className?: string }).className)}
-          onClick={(e) => {
-            handleClick()
-            if (item.onClick) {
-              e.preventDefault()
-              item.onClick()
-            }
-          }}
-        >
-          {item.icon && <span data-scope="sidebar" data-part="itemIcon">{item.icon}</span>}
-          {!collapsed && (
-            <Text as="span" inset="none" membrane={false} data-scope="sidebar" data-part="itemLabel">
-              {item.label}
-            </Text>
-          )}
-        </a>
-      )
+    const handleClick = () => {
+      selectItem?.()
+      item.onClick?.()
+      if (item.href && !item.onClick && typeof window !== 'undefined') {
+        window.location.assign(item.href)
+      }
     }
 
     return (
-      <div
-        {...itemProps}
-        className={cn('uf-sidebar-item', (itemProps as { className?: string }).className)}
+      <Button
+        {...itemDomProps}
+        icon={iconNode}
+        iconOnly={collapsed}
+        fullWidth
+        align="left"
+        stretchText
+        membrane
+        variant="default"
+        level={level}
+        disabled={item.disabled}
+        className={cn('uf-sidebar-itemButton', itemClassName)}
         onClick={handleClick}
+        onKeyDown={onKeyDown}
       >
-        {item.icon && <span data-scope="sidebar" data-part="itemIcon">{item.icon}</span>}
         {!collapsed && (
-          <span data-scope="sidebar" data-part="itemLabel" className="uf-text-body">
+          <span data-scope="sidebar" data-part="itemLabel">
             {item.label}
           </span>
         )}
-      </div>
+      </Button>
     )
   }
 
   // Group with sub-items
   const groupLabelProps = api.getGroupLabelProps({ id: item.id })
+  const {
+    className: groupLabelClassName,
+    onClick: toggleGroup,
+    onKeyDown: onGroupKeyDown,
+    'data-scope': _groupLabelScope,
+    'data-part': _groupLabelPart,
+    ...groupLabelDomProps
+  } = groupLabelProps as typeof groupLabelProps & {
+    className?: string
+    onClick?: () => void
+    onKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void
+    'data-scope'?: string
+    'data-part'?: string
+  }
+  const isGroupOpen = groupLabelProps['data-state'] === 'open'
+
   return (
     <div {...api.getGroupProps({ id: item.id })}>
-      <div
-        {...groupLabelProps}
-        className={cn(
-          'uf-sidebar-item',
-          (groupLabelProps as { className?: string }).className,
-        )}
+      <Button
+        {...groupLabelDomProps}
+        icon={iconNode}
+        iconOnly={collapsed}
+        fullWidth
+        align="left"
+        stretchText
+        selector={!collapsed}
+        selectorOpen={isGroupOpen}
+        membrane
+        variant="default"
+        level={level}
+        className={cn('uf-sidebar-itemButton', 'uf-sidebar-groupButton', groupLabelClassName)}
+        onClick={() => toggleGroup?.()}
+        onKeyDown={onGroupKeyDown}
       >
-        {item.icon && <span data-scope="sidebar" data-part="itemIcon">{item.icon}</span>}
         {!collapsed && (
-          <span data-scope="sidebar" data-part="itemLabel" className="uf-text-body">
+          <span data-scope="sidebar" data-part="itemLabel">
             {item.label}
           </span>
         )}
-      </div>
+      </Button>
       {!collapsed && (
         <div data-scope="sidebar" data-part="groupContent">
           {item.items!.map((child) => (
-            <PanelItemRenderer key={child.id} item={child} api={api} collapsed={collapsed} />
+            <PanelItemRenderer key={child.id} item={child} api={api} collapsed={collapsed} level={level + 1} />
           ))}
         </div>
       )}

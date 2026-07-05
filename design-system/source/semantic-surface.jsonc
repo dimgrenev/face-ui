@@ -92,11 +92,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-background)"
+          "value": "var(--uf-color-black-100)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-foreground)"
+          "value": "var(--uf-color-white-100)"
         }
       ]
     },
@@ -190,11 +190,67 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-panel)"
+          "value": "var(--uf-color-surface-sidebar, var(--uf-color-white-10))"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-panel)"
+          "value": "var(--uf-color-surface-sidebar, var(--uf-color-black-4))"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-overlay-surface-underlay-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-black-100)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-white-100)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-overlay-surface-background",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-overlay-header-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-color-black-0)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-black-0)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-overlay-header-background",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-overlay-header-bg)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-overlay-header-bg)"
         }
       ]
     },
@@ -218,11 +274,25 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-black-100)"
+          "value": "var(--uf-overlay-surface-bg)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-black-100)"
+          "value": "var(--uf-overlay-surface-bg)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-tooltip-background",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-overlay-surface-underlay-bg)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-overlay-surface-underlay-bg)"
         }
       ]
     },
@@ -232,11 +302,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-white-100)"
+          "value": "var(--uf-color-fg)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-white-100)"
+          "value": "var(--uf-color-fg)"
         }
       ]
     },
@@ -246,11 +316,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-black-0)"
+          "value": "var(--uf-overlay-surface-border)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-black-0)"
+          "value": "var(--uf-overlay-surface-border)"
         }
       ]
     },

@@ -5,9 +5,8 @@
  * `<Rating value={2.5} allowHalf max={10} />`
  */
 
-import { forwardRef, type ReactNode } from 'react'
+import { forwardRef, useState, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { ratingMachine, connectRating } from '../assets/machines/rating.machine'
 import { cn } from '../assets/utils'
 import { Icon } from '../Icon/Icon'
@@ -61,14 +60,20 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(
       className,
     } = props
 
-    const machineValue = useControllableMachineProp(value, defaultValue)
+    const isControlled = value !== undefined
+    const [uncontrolledValue, setUncontrolledValue] = useState<number>(() => defaultValue)
+    const machineValue = isControlled ? Number(value) : uncontrolledValue
 
     const { state, send } = useMachine(ratingMachine, {
       value: machineValue,
       max,
       disabled,
       allowHalf,
-      onValueChange,
+      onValueChange: ((details: { value: number }) => {
+        if (!isControlled) setUncontrolledValue(details.value)
+        if (isControlled && details.value === value) return
+        try { onValueChange?.(details) } catch {}
+      }) as any,
     })
 
     const api = connectRating(state, send)

@@ -66,9 +66,25 @@ function shouldSkipDir(relPath) {
     || relPath.startsWith('.git/')
     || relPath === '.artifacts'
     || relPath.includes('/.artifacts')
+    || relPath === '.cache'
+    || relPath.startsWith('.cache/')
     || relPath === '.github'
     || relPath.startsWith('.github/')
+    || relPath === '.next'
+    || relPath.startsWith('.next/')
+    || relPath.startsWith('.next-')
+    || relPath.includes('/.next-')
+    || relPath === '.turbo'
+    || relPath.startsWith('.turbo/')
+    || relPath === '.userface'
+    || relPath.startsWith('.userface/')
+    || relPath === '.userface-cache'
+    || relPath.startsWith('.userface-cache/')
+    || relPath === 'coverage'
+    || relPath.startsWith('coverage/')
     || relPath === 'node_modules'
+    || relPath === 'out'
+    || relPath.startsWith('out/')
     || relPath === 'docs'
     || relPath.startsWith('docs/')
     || relPath === 'scripts'

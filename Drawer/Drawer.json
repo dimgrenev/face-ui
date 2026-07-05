@@ -17,7 +17,8 @@
     "title": {
       "type": "string",
       "required": false,
-      "description": "Title content rendered inside the modal."
+      "description": "Title content rendered inside the modal.",
+      "default": "Drawer"
     },
     "className": {
       "type": "string",
@@ -27,7 +28,8 @@
     "children": {
       "type": "string",
       "required": false,
-      "description": "Body content."
+      "description": "Body content.",
+      "default": "Drawer content"
     },
     "open": {
       "type": "boolean",
@@ -57,7 +59,8 @@
     "trigger": {
       "type": "string",
       "required": false,
-      "description": "Trigger element that toggles the modal open."
+      "description": "Trigger element that toggles the modal open.",
+      "default": "Open drawer"
     },
     "width": {
       "type": "number",
@@ -78,32 +81,72 @@
       "type": "number",
       "required": false,
       "description": "Breakpoint where auto surfaces switch to sheet mode."
+    },
+    "autoFocusOnOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Move focus into the modal when it opens. Disable for bounded previews that render open modals inline."
+    },
+    "portal": {
+      "type": "boolean",
+      "required": false,
+      "description": "Render overlay into document.body. Disable for bounded component previews."
+    },
+    "backdropClassName": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the backdrop element."
+    },
+    "positionerClassName": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the positioner element."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
+        "open": true,
+        "portal": false,
         "trigger": "Open drawer",
         "title": "Right drawer",
         "description": "Persistent side workflow surface.",
-        "children": "Drawer content"
+        "children": "Drawer content",
+        "actions": [
+          {
+            "label": "Close",
+            "variant": "outline"
+          },
+          {
+            "label": "Apply",
+            "variant": "accent"
+          }
+        ]
       }
     },
     {
       "name": "Left Side",
       "props": {
+        "open": true,
+        "portal": false,
         "side": "left",
         "trigger": "Open left drawer",
-        "title": "Left drawer"
+        "title": "Left drawer",
+        "description": "Persistent side workflow surface.",
+        "children": "Drawer content"
       }
     },
     {
       "name": "Bottom Sheet",
       "props": {
+        "open": true,
+        "portal": false,
         "side": "bottom",
         "trigger": "Open bottom sheet",
-        "title": "Bottom sheet"
+        "title": "Bottom sheet",
+        "description": "Compact action surface.",
+        "children": "Drawer content"
       }
     }
   ],

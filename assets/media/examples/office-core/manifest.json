@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "collection": "office-core",
+  "format": "webp",
+  "publicBasePath": "/assets/media/examples/office-core",
+  "compression": {
+    "encoder": "cwebp",
+    "quality": 90,
+    "method": 6,
+    "resized": false
+  },
+  "images": [
+    {
+      "id": "office-core-hallway-bench-day",
+      "path": "assets/media/examples/office-core/hallway-bench-day.webp",
+      "publicPath": "/assets/media/examples/office-core/hallway-bench-day.webp",
+      "alt": "Daylit office hallway with a bench and planter",
+      "width": 1024,
+      "height": 1536,
+      "source": "office-core/ab-platform/f04d3459-101a-4fb5-8f73-8556e73f2e9f.png"
+    },
+    {
+      "id": "office-core-lobby-glass-blocks",
+      "path": "assets/media/examples/office-core/lobby-glass-blocks.webp",
+      "publicPath": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
+      "alt": "Office lobby with glass-block wall, seating, and a person standing by the window",
+      "width": 1086,
+      "height": 1448,
+      "source": "office-core/ab-platform/7b56f04d-7d96-46b5-8f11-edc373f74409.png"
+    },
+    {
+      "id": "office-core-skyline-window-day",
+      "path": "assets/media/examples/office-core/skyline-window-day.webp",
+      "publicPath": "/assets/media/examples/office-core/skyline-window-day.webp",
+      "alt": "Two people looking out from a high-rise office window during the day",
+      "width": 1122,
+      "height": 1402,
+      "source": "office-core/ab-platform/5a722b55-2504-4e00-8176-8be0b40947f2.png"
+    },
+    {
+      "id": "office-core-hallway-window-night",
+      "path": "assets/media/examples/office-core/hallway-window-night.webp",
+      "publicPath": "/assets/media/examples/office-core/hallway-window-night.webp",
+      "alt": "Office hallway at night with two people near a city-view window",
+      "width": 1024,
+      "height": 1536,
+      "source": "office-core/data-portal/09f7d5c4-cb2b-4e98-b70a-ae706336d1f0.png"
+    },
+    {
+      "id": "office-core-facade-night",
+      "path": "assets/media/examples/office-core/facade-night.webp",
+      "publicPath": "/assets/media/examples/office-core/facade-night.webp",
+      "alt": "Night exterior of a glass office facade with illuminated lobby",
+      "width": 1086,
+      "height": 1448,
+      "source": "office-core/data-portal/14f1053b-b704-4c72-ba59-1ede132d2561.png"
+    },
+    {
+      "id": "office-core-workspace-night",
+      "path": "assets/media/examples/office-core/workspace-night.webp",
+      "publicPath": "/assets/media/examples/office-core/workspace-night.webp",
+      "alt": "Night office desk with lamp and blurred workers behind glass partitions",
+      "width": 1086,
+      "height": 1448,
+      "source": "office-core/data-portal/47c5c1e9-e184-440f-bb71-878dc261f599.png"
+    },
+    {
+      "id": "office-core-lobby-day",
+      "path": "assets/media/examples/office-core/lobby-day.webp",
+      "publicPath": "/assets/media/examples/office-core/lobby-day.webp",
+      "alt": "Bright office lobby with glass-block wall, seating, and plants",
+      "width": 1024,
+      "height": 1536,
+      "source": "office-core/data-portal/378f2946-c687-4fb6-842f-df92ce26c490.png"
+    }
+  ]
+}

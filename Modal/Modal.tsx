@@ -65,8 +65,16 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   surface?: ModalSurface
   /** Breakpoint where auto surfaces switch to sheet mode. */
   surfaceBreakpoint?: number
+  /** Move focus into the modal when it opens. Disable for bounded previews that render open modals inline. */
+  autoFocusOnOpen?: boolean
+  /** Render overlay into document.body. Disable for bounded component previews. */
+  portal?: boolean
   /** Additional class name for the content element. */
   className?: string
+  /** Additional class name for the backdrop element. */
+  backdropClassName?: string
+  /** Additional class name for the positioner element. */
+  positionerClassName?: string
 }
 
 interface ModalLegacyProps {
@@ -96,7 +104,11 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       onOpenChange,
       surface = 'auto',
       surfaceBreakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
+      autoFocusOnOpen = true,
+      portal = true,
       className,
+      backdropClassName,
+      positionerClassName,
       ...rest
     } = props
 
@@ -119,11 +131,12 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       setPortalTarget(document.body)
     }, [])
 
-    const resolvedOpen = typeof legacyProps.isOpen === 'boolean' ? legacyProps.isOpen : open
+    const resolvedOpen = typeof open === 'boolean' ? open : legacyProps.isOpen
     const { state, send } = useMachine<ModalSchema>(modalMachine, {
       open: resolvedOpen,
       variant: effectiveVariant,
       closable,
+      autoFocusOnOpen,
       titleId,
       descriptionId,
       onOpenChange: ((details: { open: boolean }) => {
@@ -171,9 +184,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
     const overlay = (
       <>
-        <div {...backdropProps} className={cn('uf-modal-backdrop')} />
+        <div {...backdropProps} data-portal={portal ? 'true' : 'false'} className={cn('uf-modal-backdrop', backdropClassName)} />
 
-        <div {...api.getPositionerProps()} className={cn('uf-modal-positioner')}>
+        <div {...api.getPositionerProps()} data-portal={portal ? 'true' : 'false'} className={cn('uf-modal-positioner', positionerClassName)}>
           <div
             ref={handleRef}
             {...api.getContentProps()}
@@ -279,7 +292,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
           )
         )}
 
-        {portalTarget ? createPortal(overlay, portalTarget) : overlay}
+        {portal && portalTarget
+          ? createPortal(overlay, portalTarget)
+          : <span className="uf-modal-inlineHost">{overlay}</span>}
       </>
     )
   },

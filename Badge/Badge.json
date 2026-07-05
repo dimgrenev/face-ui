@@ -10,15 +10,13 @@
     "variant": {
       "type": "enum",
       "required": false,
-      "description": "Visual style variant",
+      "description": "Structural badge variant. Combine with tone for semantic status color.",
       "options": [
         "default",
         "primary",
-        "secondary",
-        "accent",
-        "destructive",
-        "outline"
-      ]
+        "secondary"
+      ],
+      "default": "default"
     },
     "appearance": {
       "type": "enum",
@@ -28,7 +26,20 @@
         "fill",
         "outline"
       ],
-      "default": "fill"
+      "default": "outline"
+    },
+    "tone": {
+      "type": "enum",
+      "required": false,
+      "description": "Semantic status tone. Combines with fill or outline appearance.",
+      "options": [
+        "neutral",
+        "accent",
+        "positive",
+        "warning",
+        "destructive"
+      ],
+      "default": "neutral"
     },
     "children": {
       "type": "string",
@@ -44,39 +55,55 @@
       }
     },
     {
-      "name": "Primary",
+      "name": "Primary Fill",
       "props": {
         "text": "Primary",
-        "variant": "primary"
+        "variant": "primary",
+        "appearance": "fill"
       }
     },
     {
-      "name": "Secondary",
+      "name": "Secondary Fill",
       "props": {
         "text": "Secondary",
-        "variant": "secondary"
+        "variant": "secondary",
+        "appearance": "fill"
       }
     },
     {
-      "name": "Accent",
+      "name": "Accent Outline",
       "props": {
         "text": "Accent",
-        "variant": "accent"
+        "tone": "accent"
       }
     },
     {
-      "name": "Outline",
+      "name": "Positive Outline",
       "props": {
-        "text": "Outline",
-        "variant": "default",
-        "appearance": "outline"
+        "text": "Positive",
+        "tone": "positive"
       }
     },
     {
-      "name": "Destructive",
+      "name": "Warning Outline",
+      "props": {
+        "text": "Warning",
+        "tone": "warning"
+      }
+    },
+    {
+      "name": "Destructive Outline",
       "props": {
         "text": "Destructive",
-        "variant": "destructive"
+        "tone": "destructive"
+      }
+    },
+    {
+      "name": "Destructive Fill",
+      "props": {
+        "text": "Destructive",
+        "appearance": "fill",
+        "tone": "destructive"
       }
     }
   ],
@@ -117,7 +144,11 @@
       "--uf-color-destructive",
       "--uf-color-destructive-fg",
       "--uf-color-accent",
-      "--uf-color-accent-fg"
+      "--uf-color-accent-fg",
+      "--uf-color-success",
+      "--uf-color-success-foreground",
+      "--uf-color-warning",
+      "--uf-color-warning-foreground"
     ],
     "notes": [
       "Badge content renders through Text with inset=control and membrane enabled.",

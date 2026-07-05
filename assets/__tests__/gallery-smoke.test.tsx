@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 
 import React from 'react'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createRoot, type Root } from 'react-dom/client'
 import { act } from 'react'
@@ -73,6 +75,92 @@ describe('face-ui-react gallery smoke', () => {
     }
   })
 
+  it('keeps the root showcase as a full-width visible flow layout', async () => {
+    await act(async () => {
+      root.render(<FaceUiReact />)
+    })
+
+    const gallery = container.querySelector<HTMLElement>('.uf-gallery')
+    const headerTitle = container.querySelector<HTMLElement>('.uf-gallery-title')
+    const headerButtons = Array.from(container.querySelectorAll<HTMLButtonElement>('.uf-gallery-icon-button[data-scope="button"][data-icon-only]'))
+    const firstCard = container.querySelector<HTMLElement>('.uf-gallery-item')
+    const firstTitle = firstCard?.querySelector<HTMLElement>('.uf-gallery-itemTitle')
+    const firstPreview = firstCard?.querySelector<HTMLElement>('.uf-gallery-itemPreview')
+    const firstSurface = firstCard?.querySelector<HTMLElement>('.uf-gallery-itemSurface')
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    const runtimeSource = readFileSync(join(process.cwd(), 'uf.runtime.ts'), 'utf8')
+
+    expect(gallery).not.toBeNull()
+    expect(headerTitle?.getAttribute('data-inset')).toBe('control')
+    expect(headerTitle?.getAttribute('data-full-width')).toBe('')
+    expect(headerTitle?.getAttribute('data-truncate')).toBe('')
+    expect(headerTitle?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+    expect(headerTitle?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
+    expect(headerButtons).toHaveLength(2)
+    expect(headerButtons.every((button) => button.parentElement?.classList.contains('uf-membrane'))).toBe(true)
+    expect(firstCard).not.toBeNull()
+    expect(firstTitle?.getAttribute('data-full-width')).toBe('')
+    expect(firstTitle?.getAttribute('data-truncate')).toBe('')
+    expect(firstTitle?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
+    expect(firstPreview).not.toBeNull()
+    expect(firstSurface).not.toBeNull()
+    expect(componentStyles).toContain('.uf-gallery {')
+    expect(componentStyles).toContain('--face-gallery-inset: 7px;')
+    expect(componentStyles).toContain('--face-gallery-header-action-gap: 0px;')
+    expect(componentStyles).toContain('--face-gallery-grid-pad-top: 0px;')
+    expect(componentStyles).toContain('--face-gallery-surface-radius: 20px;')
+    expect(componentStyles).toContain('max-width: none;')
+    expect(componentStyles).toContain('--face-gallery-frame-min-height: 100dvh;')
+    expect(componentStyles).toContain('height: 100%;')
+    expect(componentStyles).toContain('min-height: var(--face-gallery-frame-min-height);')
+    expect(componentStyles).toContain('padding: var(--face-gallery-inset);')
+    expect(componentStyles).toContain('--face-gallery-frame-bg: transparent;')
+    expect(componentStyles).toContain('--face-gallery-surface-bg: var(--uf-color-surface-sidebar, var(--uf-overlay-surface-background));')
+    expect(componentStyles).toContain('background: var(--face-gallery-frame-bg);')
+    expect(componentStyles).toContain('overflow: hidden;')
+    expect(componentStyles).toContain('align-content: start;')
+    expect(componentStyles).toContain('overflow: auto;')
+    expect(componentStyles).toContain('.uf-gallery-icon-button[data-scope="button"][data-icon-only]')
+    expect(componentStyles).toContain('.uf-gallery-item > .uf-membrane')
+    expect(componentStyles).toContain('.uf-gallery-itemPreview {')
+    expect(componentStyles).toContain('.uf-gallery-itemSurface {')
+    expect(componentStyles).toContain('background: var(--face-gallery-surface-bg);')
+    expect(runtimeSource).toContain("maxWidth: '100%'")
+    expect(runtimeSource).toContain("fullFrameComponents: ['face-ui-react']")
+    expect(runtimeSource).toContain("'face-ui-react'")
+  })
+
+  it('renders the Card showcase from its default state with structured footer content', async () => {
+    const bodyText = 'Workspace settings and recent activity stay grouped in one place'
+
+    await act(async () => {
+      root.render(<FaceUiReact />)
+    })
+
+    const card = getGalleryCard(container, 'Card')
+    const preview = card.querySelector<HTMLElement>('.uf-gallery-itemSurface')
+    const cardRoot = preview?.querySelector<HTMLElement>('[data-scope="card"]')
+    const footerButton = cardRoot?.querySelector<HTMLButtonElement>('[data-part="footer"] [data-scope="button"]') ?? null
+
+    expect(cardRoot).not.toBeNull()
+    expect(cardRoot?.textContent).toContain('Card Title')
+    expect(cardRoot?.textContent).not.toContain('Card description text')
+    expect(cardRoot?.textContent).toContain(bodyText)
+    expect(cardRoot?.textContent).not.toContain('[object Object]')
+    expect(footerButton?.textContent).toContain('Open')
+    expect(footerButton?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+
+    const textNodes = Array.from(cardRoot?.querySelectorAll<HTMLElement>('[data-scope="text"]') ?? [])
+    const titleText = textNodes.find((node) => node.textContent?.trim() === 'Card Title') ?? null
+    const contentText = textNodes.find((node) => node.textContent?.trim() === bodyText) ?? null
+    expect(titleText?.getAttribute('data-inset')).toBe('control')
+    expect(titleText?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+    expect(titleText?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
+    expect(contentText?.getAttribute('data-inset')).toBe('control')
+    expect(contentText?.parentElement?.classList.contains('uf-membrane')).toBe(true)
+    expect(contentText?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
+  })
+
   it('keeps stateful showcase cards interactive', async () => {
     await act(async () => {
       root.render(<FaceUiReact />)
@@ -83,16 +171,23 @@ describe('face-ui-react gallery smoke', () => {
     expect(hasGalleryCard(container, 'Toggle')).toBe(false)
 
     const carouselCard = getGalleryCard(container, 'Carousel')
-    const nextSlide = carouselCard.querySelector('[data-part="next"]') as HTMLButtonElement | null
+    const nextSlide = carouselCard.querySelector('[data-scope="button"][data-part="next"]') as HTMLButtonElement | null
     const slideOne = carouselCard.querySelector('[data-part="slide"][data-index="0"]') as HTMLElement | null
     const slideTwo = carouselCard.querySelector('[data-part="slide"][data-index="1"]') as HTMLElement | null
+    const mediaSlide = carouselCard.querySelector('[data-scope="media"].uf-carousel-slideMedia') as HTMLElement | null
+    const mediaImage = mediaSlide?.querySelector<HTMLImageElement>('img') ?? null
+    const inactiveIndicatorBefore = carouselCard.querySelector('[data-scope="button"][data-part="indicator-item"][data-state="inactive"] svg[data-icon="radio-off"]') as HTMLElement | null
+    expect(mediaSlide).not.toBeNull()
+    expect(mediaImage?.getAttribute('src')).toBe('/assets/media/examples/office-core/lobby-day.webp')
+    expect(inactiveIndicatorBefore).not.toBeNull()
     await act(async () => {
       nextSlide?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
     expect(slideOne?.hasAttribute('data-current')).toBe(false)
     expect(slideTwo?.getAttribute('data-current')).toBe('')
-    const activeIndicator = carouselCard.querySelector('[data-part="indicator-item"][data-index="1"]') as HTMLButtonElement | null
+    const activeIndicator = carouselCard.querySelector('[data-scope="button"][data-part="indicator-item"][data-index="1"]') as HTMLButtonElement | null
     expect(activeIndicator?.getAttribute('data-state')).toBe('active')
+    expect(activeIndicator?.querySelector('svg[data-icon="radio-on"]')).not.toBeNull()
 
     const navigationCard = getGalleryCard(container, 'Navigation')
     const settingsButton = Array.from(navigationCard.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Settings')) ?? null
@@ -126,7 +221,7 @@ describe('face-ui-react gallery smoke', () => {
       sliderInput.dispatchEvent(new Event('input', { bubbles: true }))
       sliderInput.dispatchEvent(new Event('change', { bubbles: true }))
     })
-    const updatedSliderThumb = sliderCard.querySelector('.uf-slider--advanced .uf-slider-thumbButton [data-part="text"]') as HTMLElement | null
+    const updatedSliderThumb = sliderCard.querySelector('.uf-slider--advanced .uf-slider-thumbButtonWrap .uf-slider-thumbButton [data-part="text"]') as HTMLElement | null
     expect(updatedSliderThumb?.textContent).toContain('41')
     expect(sliderCard.textContent).toContain('Crop')
 
@@ -247,18 +342,11 @@ describe('face-ui-react gallery smoke', () => {
     })
 
     const modalCard = getGalleryCard(container, 'Modal')
-    const modalTrigger = Array.from(modalCard.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open')) ?? null
-    const getShowcaseModalContent = () =>
-      Array.from(document.body.querySelectorAll<HTMLElement>('[data-scope="modal"][data-part="content"]')).find((node) =>
-        node.textContent?.includes('Use this surface for edits, confirmations, and contextual flows.'),
-      ) ?? null
-    expect(getShowcaseModalContent()?.hidden).toBe(true)
-
-    await act(async () => {
-      modalTrigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    })
-
-    expect(getShowcaseModalContent()?.hidden).toBe(false)
+    const showcaseModalContent = modalCard.querySelector<HTMLElement>('[data-scope="modal"][data-part="content"]')
+    expect(showcaseModalContent?.hidden).toBe(false)
+    expect(showcaseModalContent?.textContent).toContain('Focused work surface')
+    expect(showcaseModalContent?.textContent).toContain('Short modal copy aligned')
+    expect(document.activeElement?.closest?.('[data-scope="modal"]')).toBeNull()
 
     const calendarCard = getGalleryCard(container, 'Calendar')
     const calendarDayButtons = Array.from(calendarCard.querySelectorAll<HTMLButtonElement>('.uf-calendar-dayButton'))
@@ -273,7 +361,7 @@ describe('face-ui-react gallery smoke', () => {
 
     expect(calendarDay?.getAttribute('data-selected')).not.toBeNull()
 
-    const dateCard = getGalleryCard(container, 'DatePicker')
+    const dateCard = getGalleryCard(container, 'Date')
     const dateTrigger = dateCard.querySelector('button') as HTMLButtonElement | null
     expect(dateTrigger?.textContent).toContain('Pick date')
 
@@ -293,7 +381,7 @@ describe('face-ui-react gallery smoke', () => {
 
     const selectCard = getGalleryCard(container, 'Select')
     const selectTrigger = selectCard.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
-    expect(selectTrigger?.textContent).toContain('Option 1')
+    expect(selectTrigger?.textContent).toContain('Choose option')
 
     await act(async () => {
       selectTrigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))

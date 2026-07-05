@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import {
-  DatePicker,
+  Date as DateField,
   Drawer,
   getFaceUiComponentMeta,
   isDeprecatedFaceUiComponent,
@@ -121,26 +121,24 @@ describe('taxonomy and governance', () => {
     expect(isDeprecatedFaceUiComponent('Overlay')).toBe(true)
     expect(isDeprecatedFaceUiComponent('Toggle')).toBe(true)
     expect(isDeprecatedFaceUiComponent('Sheet')).toBe(true)
-    expect(isDeprecatedFaceUiComponent('Date')).toBe(true)
+    expect(isDeprecatedFaceUiComponent('Date')).toBe(false)
     expect(getFaceUiComponentMeta('Sidebar')?.status).toBe('stable')
     expect(getFaceUiComponentMeta('Sidebar')?.aliases).toContain('Sidebar')
     expect(getFaceUiComponentMeta('Overlay')?.replacedBy).toEqual(['Tooltip', 'Popover'])
     expect(getFaceUiComponentMeta('Sheet')?.replacedBy).toEqual(['Drawer'])
-    expect(getFaceUiComponentMeta('Date')?.replacedBy).toEqual(['DatePicker'])
   })
 
-  it('keeps deprecated aliases out of the primary barrel and exposes them only through compat', () => {
+  it('keeps deprecated aliases governed by the public and compat barrels', () => {
     expect('Overlay' in faceUiIndex).toBe(false)
     expect('Toggle' in faceUiIndex).toBe(false)
     expect('Sidebar' in faceUiIndex).toBe(false)
     expect('Sheet' in faceUiIndex).toBe(false)
-    expect('Date' in faceUiIndex).toBe(false)
+    expect('Date' in faceUiIndex).toBe(true)
 
     expect('Overlay' in faceUiCompat).toBe(true)
     expect('Toggle' in faceUiCompat).toBe(true)
     expect('Sidebar' in faceUiCompat).toBe(true)
     expect('Sheet' in faceUiCompat).toBe(true)
-    expect('Date' in faceUiCompat).toBe(true)
   })
 
   it('routes component motion through tokens and reduced-motion overrides', () => {
@@ -201,6 +199,7 @@ describe('taxonomy and governance', () => {
     const controlSelectors = [
       '.uf-button[data-scope="button"]',
       '.uf-tile[data-scope="tile"]',
+      '.uf-badge[data-scope]',
       '.uf-checkbox[data-scope="checkbox"]',
       '.uf-switcher[data-scope]',
       '[data-scope="radio"] [data-part="item"]',
@@ -218,7 +217,7 @@ describe('taxonomy and governance', () => {
       '.uf-breadcrumb[data-scope] a',
       '.uf-sidebar-item',
       '[data-scope="navigation"] [data-part="trigger"],\n[data-scope="navigation"] [data-part="link"]',
-      '.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]),\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"])',
+      '.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]),\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]),\n.uf-tree[data-scope] .uf-tree-custom-node',
     ]
 
     for (const selector of controlSelectors) {
@@ -235,6 +234,31 @@ describe('taxonomy and governance', () => {
       .toContain('opacity: var(--uf-tile-selector-indicator-hover-opacity, 0.7);')
     expect(readCssBlock(componentsCss, '[data-scope="select"] [data-part="trigger"]'))
       .toContain('padding-right: var(--uf-select-indicator-edge-gap);')
+    expect(readCssBlock(componentsCss, '.uf-badge[data-scope]'))
+      .toContain('padding: var(--uf-control-pad-y) var(--uf-control-pad-text);')
+    expect(readCssBlock(componentsCss, '.uf-badge[data-scope]'))
+      .toContain('font-size: var(--uf-control-font-size);')
+    expect(readCssBlock(componentsCss, '.uf-bar[data-scope="bar"]'))
+      .toContain('gap: var(--uf-control-gap);')
+    expect(readCssBlock(componentsCss, '.uf-bar__left,\n.uf-bar__right'))
+      .toContain('gap: var(--uf-control-gap);')
+    expect(readCssBlock(componentsCss, '.uf-breadcrumb[data-scope] a'))
+      .toContain('line-height: var(--uf-control-line-height);')
+    expect(readCssBlock(componentsCss, '[data-scope="accordion"][data-part="root"]'))
+      .toContain('--uf-accordion-content-inset: var(--uf-control-pad-text);')
+    expect(readCssBlock(componentsCss, '[data-scope="accordion"] [data-part="content"],\n[data-scope="accordion"] [data-part="item-content"]'))
+      .toContain('padding: 0 0 0 var(--uf-accordion-content-inset);')
+    expect(readCssBlock(componentsCss, '[data-scope="accordion"] .uf-accordion-slot > .uf-text[data-scope="text"],\n[data-scope="accordion"] .uf-accordion-slot > .uf-membrane > .uf-text[data-scope="text"]'))
+      .toContain('--uf-text-pad-x: 0;')
+    expect(readCssBlock(componentsCss, '.uf-steps[data-scope]'))
+      .not.toContain('--uf-steps-label-inset')
+    expect(readCssBlock(componentsCss, '[data-scope="steps"] [data-part="trigger"]'))
+      .toContain('--uf-control-pad-left: var(--uf-control-pad-icon);')
+    expect(readCssBlock(componentsCss, '[data-scope="steps"] [data-part="trigger"]'))
+      .toContain('padding-left: var(--uf-control-pad-left);')
+    expect(componentsCss).not.toContain('.uf-steps-contentText')
+    expect(readCssBlock(componentsCss, '[data-scope="steps"] [data-part="content"]'))
+      .toContain('padding: 0;')
   })
 
   it('keeps standard interactive hover surfaces on the shared hover background token', () => {
@@ -260,7 +284,7 @@ describe('taxonomy and governance', () => {
       '.uf-breadcrumb[data-scope] a:hover',
       '.uf-sidebar-item:hover',
       '[data-scope="navigation"] [data-part="trigger"]:hover,\n[data-scope="navigation"] [data-part="link"]:hover',
-      '[data-scope="tree-view"] [data-part="item"]:hover,\n[data-scope="tree-view"] [data-part="branchTrigger"]:hover,\n.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]):hover,\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]):hover',
+      '[data-scope="tree-view"] [data-part="item"]:hover,\n[data-scope="tree-view"] [data-part="branchTrigger"]:hover,\n.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]):hover,\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]):hover,\n.uf-tree[data-scope] .uf-tree-custom-node:hover',
     ]
     const hoverBackgroundPattern = /background:\s*var\(--uf-(?:color-hover-bg|button-hover-bg|tile-hover-bg)\);/
 
@@ -334,11 +358,16 @@ describe('taxonomy and governance', () => {
     expect(contents[1]?.getAttribute('data-trigger')).toBe('click')
   })
 
-  it('keeps Tooltip colors on dedicated non-inverted tokens', () => {
-    expect(tokensCss).toContain('--uf-tooltip-bg: var(--uf-color-black-100);')
-    expect(tokensCss).toContain('--uf-tooltip-fg: var(--uf-color-white-100);')
+  it('keeps Tooltip colors on shared overlay surface tokens', () => {
+    expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-black-100);')
+    expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-white-100);')
+    expect(tokensCss).toContain('--uf-overlay-surface-background: linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg);')
+    expect(tokensCss).toContain('--uf-tooltip-bg: var(--uf-overlay-surface-bg);')
+    expect(tokensCss).toContain('--uf-tooltip-background: linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-overlay-surface-underlay-bg);')
+    expect(tokensCss).toContain('--uf-tooltip-fg: var(--uf-color-fg);')
+    expect(tokensCss).toContain('--uf-tooltip-border: var(--uf-overlay-surface-border);')
     expect(componentsCss).toContain('--uf-text-color: var(--uf-tooltip-fg);')
-    expect(componentsCss).toContain('background: var(--uf-tooltip-bg);')
+    expect(componentsCss).toContain('background: var(--uf-tooltip-background);')
     expect(componentsCss).toContain('color: var(--uf-tooltip-fg);')
   })
 
@@ -358,11 +387,14 @@ describe('taxonomy and governance', () => {
     expect(modals[0]?.getAttribute('data-surface')).toBe('sheet')
     expect(modals[0]?.getAttribute('data-variant')).toBe('bottom')
     expect(modals[1]?.getAttribute('data-variant')).toBe('left')
+    expect(modals[1]?.classList.contains('uf-drawer')).toBe(true)
     expect(modals[2]?.getAttribute('data-surface')).toBe('sheet')
     expect(modals[2]?.getAttribute('data-variant')).toBe('top')
+    expect(componentsCss).toContain('.uf-modal[data-scope].uf-drawer')
+    expect(componentsCss).toContain('border: 0;')
   })
 
-  it('SegmentedControl defaults to single selection and DatePicker reuses Date behavior', async () => {
+  it('SegmentedControl defaults to single selection and Date renders date field behavior', async () => {
     await act(async () => {
       root.render(
         <div>
@@ -373,7 +405,7 @@ describe('taxonomy and governance', () => {
             ]}
             defaultValue={['grid']}
           />
-          <DatePicker label="Date" />
+          <DateField label="Date" />
         </div>,
       )
     })

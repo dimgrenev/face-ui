@@ -1,6 +1,6 @@
 {
   "name": "Progress",
-  "description": "Loading progress indicator bar",
+  "description": "Loading progress indicator bar or circular ring",
   "props": {
     "value": {
       "type": "number",
@@ -26,16 +26,26 @@
       ],
       "default": "default"
     },
+    "shape": {
+      "type": "enum",
+      "required": false,
+      "description": "Visual progress shape.",
+      "options": [
+        "linear",
+        "circle"
+      ],
+      "default": "linear"
+    },
     "showLabel": {
       "type": "boolean",
       "required": false,
-      "description": "Show percentage label beside the track.",
+      "description": "Show percentage label in the header for linear progress or beside the ring for circular progress.",
       "default": false
     },
     "label": {
       "type": "string",
       "required": false,
-      "description": "Optional label rendered beside the track."
+      "description": "Optional label rendered in the header for linear progress or beside the ring for circular progress."
     },
     "className": {
       "type": "string",
@@ -47,7 +57,9 @@
     {
       "name": "Default",
       "props": {
-        "value": 50
+        "value": 28,
+        "label": "Typography",
+        "showLabel": true
       }
     },
     {
@@ -61,6 +73,14 @@
       "props": {
         "value": 75,
         "label": "Uploading..."
+      }
+    },
+    {
+      "name": "Circle",
+      "props": {
+        "value": 28,
+        "shape": "circle",
+        "showLabel": true
       }
     },
     {
@@ -112,7 +132,9 @@
   "tokenMapping": {
     "component": [
       "--uf-progress-track-height",
+      "--uf-progress-track-inset-inline",
       "--uf-progress-label-min-width",
+      "--uf-progress-circle-size",
       "--uf-progress-track-bg",
       "--uf-progress-indicator-bg",
       "--uf-progress-indicator-success-bg",
@@ -140,7 +162,9 @@
     ],
     "notes": [
       "Progress labels render through Text.",
-      "Determinate width and indeterminate animation remain behavior/data outputs, with motion driven by shared Face UI motion tokens."
+      "Linear progress uses a label/value header plus a one-membrane track inset to the same horizontal rhythm as Input and Select labels.",
+      "Circular progress maps the same percent into --uf-progress-percent for a conic-gradient ring.",
+      "Determinate width/ring fill and indeterminate animation remain behavior/data outputs, with motion driven by shared Face UI motion tokens."
     ]
   },
   "platform": {},

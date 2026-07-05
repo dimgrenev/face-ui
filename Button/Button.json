@@ -75,7 +75,8 @@
     "fullWidth": {
       "type": "boolean",
       "required": false,
-      "description": "Full width button."
+      "description": "Full width button.",
+      "default": false
     },
     "align": {
       "type": "enum",
@@ -117,7 +118,9 @@
     {
       "name": "Default",
       "props": {
-        "text": "Button"
+        "text": "Create",
+        "icon": "plus",
+        "fullWidth": false
       }
     },
     {

@@ -66,6 +66,8 @@ export interface MediaProps {
   onLoad?: () => void
   /** Additional class name on the root element. */
   className?: string
+  /** Membrane spacing around media. */
+  membrane?: boolean
   /** Wrapper-level compatibility attrs from components API. */
   id?: string
   role?: string
@@ -104,6 +106,7 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
       onError,
       onLoad,
       className,
+      membrane = false,
       id,
       role,
       ariaLabel,
@@ -132,6 +135,7 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
     }
 
     const wrapperStyle: React.CSSProperties = {
+      ...(width == null && style?.width == null ? { width: '100%' } : {}),
       ...(style || {}),
       ...(width != null ? { width } : {}),
       ...(height != null ? { height } : {}),
@@ -198,7 +202,7 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
       }
     }
 
-    return (
+    const mediaNode = (
       <div
         ref={ref}
         {...mediaAnatomy.getPartAttrs('root')}
@@ -214,6 +218,16 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
       >
         {renderElement()}
       </div>
+    )
+
+    if (!membrane) return mediaNode
+
+    const isFullWidth = width === '100%' || wrapperStyle.width === '100%'
+
+    return (
+      <span className={cn('uf-membrane', 'uf-mediaMembrane', isFullWidth && 'uf-membrane--full uf-mediaMembrane--full')}>
+        {mediaNode}
+      </span>
     )
   },
 )

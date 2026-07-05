@@ -200,7 +200,7 @@
       "name": "Stretch + Full Width",
       "props": {
         "text": "Pinned right icon",
-        "icon": "right",
+        "icon": "arrow-right",
         "iconPosition": "right",
         "stretchText": true,
         "fullWidth": true

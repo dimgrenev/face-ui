@@ -72,8 +72,9 @@ export const Radio = forwardRef<HTMLDivElement, RadioProps>(
     const options = Array.isArray(rawOptions) ? rawOptions : []
     const itemOrder = options.map((option) => option.value)
     const disabledValues = options.filter((option) => option.disabled).map((option) => option.value)
+    const isControlled = value !== undefined
     const machineValue = useControllableMachineProp(
-      value !== undefined ? value : undefined,
+      isControlled ? value ?? null : undefined,
       defaultValue ?? null,
     )
 
@@ -84,6 +85,7 @@ export const Radio = forwardRef<HTMLDivElement, RadioProps>(
       disabled,
       orientation: effectiveOrientation,
       onValueChange: ((details: { value: string }) => {
+        if (isControlled && details.value === value) return
         try { onValueChange?.(details) } catch {}
         try { props.onChange?.(details.value) } catch {}
       }) as any,
@@ -139,14 +141,10 @@ export const Radio = forwardRef<HTMLDivElement, RadioProps>(
                 name={name}
                 value={option.value}
                 checked={state.context.value === option.value}
+                readOnly
                 disabled={optionDisabled}
                 tabIndex={-1}
                 required={required}
-                onChange={() => {
-                  if (!optionDisabled) {
-                    send({ type: 'SELECT', value: option.value })
-                  }
-                }}
                 style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', borderWidth: 0 }}
               />
               <span className="uf-radio-indicator" {...api.getIndicatorProps()}>

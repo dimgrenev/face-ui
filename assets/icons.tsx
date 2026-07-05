@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react'
+import React, { type ReactElement } from 'react'
 import { Icon, type IconName } from './Icon'
 
 type LegacyIconProps = {

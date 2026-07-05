@@ -122,6 +122,7 @@ export const Toc = forwardRef<HTMLElement, TocProps>(
                 className="uf-toc-item"
                 align="left"
                 stretchText
+                fullWidth
                 level={Math.max(0, (item.level ?? 1) - 1)}
                 membrane
                 variant="default"

@@ -12,7 +12,6 @@ import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
 import { Button } from '../Button/Button'
-import { Icon } from '../Icon/Icon'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -161,7 +160,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
             )}
             <div className="uf-code-actions">
               <Button
-                icon={<Icon name="copy" />}
+                icon="copy"
                 iconOnly
                 fullWidth={false}
                 variant="default"
@@ -172,7 +171,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
               />
               {canToggle && (
                 <Button
-                  icon={<Icon name={collapsed ? 'down' : 'up'} />}
+                  icon={collapsed ? 'arrow-down' : 'arrow-up'}
                   iconOnly
                   fullWidth={false}
                   variant="default"

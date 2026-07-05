@@ -90,10 +90,32 @@
       "required": false,
       "description": "Breakpoint where auto surfaces switch to sheet mode."
     },
+    "autoFocusOnOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Move focus into the modal when it opens. Disable for bounded previews that render open modals inline.",
+      "default": true
+    },
+    "portal": {
+      "type": "boolean",
+      "required": false,
+      "description": "Render overlay into document.body. Disable for bounded component previews.",
+      "default": true
+    },
     "className": {
       "type": "string",
       "required": false,
       "description": "Additional class name for the content element."
+    },
+    "backdropClassName": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the backdrop element."
+    },
+    "positionerClassName": {
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the positioner element."
     }
   },
   "states": [
@@ -101,16 +123,27 @@
       "name": "Default (Center)",
       "props": {
         "open": true,
+        "portal": false,
         "variant": "center",
         "title": "Dialog Title",
         "description": "This is a dialog.",
-        "children": "Modal content body"
+        "actions": [
+          {
+            "label": "Cancel",
+            "variant": "outline"
+          },
+          {
+            "label": "Continue",
+            "variant": "accent"
+          }
+        ]
       }
     },
     {
       "name": "Drawer Left",
       "props": {
         "open": true,
+        "portal": false,
         "variant": "left",
         "title": "Left Drawer"
       }
@@ -119,6 +152,7 @@
       "name": "Drawer Right",
       "props": {
         "open": true,
+        "portal": false,
         "variant": "right",
         "title": "Right Drawer"
       }
@@ -127,6 +161,7 @@
       "name": "Sheet Bottom",
       "props": {
         "open": true,
+        "portal": false,
         "variant": "bottom",
         "title": "Bottom Sheet"
       }
@@ -135,6 +170,7 @@
       "name": "Alert (Non-Closable)",
       "props": {
         "open": true,
+        "portal": false,
         "closable": false,
         "title": "Are you sure?"
       }

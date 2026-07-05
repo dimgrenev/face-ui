@@ -113,7 +113,7 @@ describe('Accordion and Navigation disclosure a11y baseline', () => {
     expect(billingContent.hidden).toBe(true)
   })
 
-  it('keeps single Accordion expansion and honors collapsible mode', async () => {
+  it('keeps multiple Accordion sections open by default and honors collapsible mode', async () => {
     await act(async () => {
       root.render(
         <Accordion
@@ -135,8 +135,8 @@ describe('Accordion and Navigation disclosure a11y baseline', () => {
       getAccordionTrigger('billing').dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    expect(getAccordionTrigger('overview').getAttribute('aria-expanded')).toBe('false')
-    expect(getAccordionContent('overview').hidden).toBe(true)
+    expect(getAccordionTrigger('overview').getAttribute('aria-expanded')).toBe('true')
+    expect(getAccordionContent('overview').hidden).toBe(false)
     expect(getAccordionTrigger('billing').getAttribute('aria-expanded')).toBe('true')
     expect(getAccordionContent('billing').hidden).toBe(false)
 
@@ -157,6 +157,27 @@ describe('Accordion and Navigation disclosure a11y baseline', () => {
 
     expect(getAccordionTrigger('overview').getAttribute('aria-expanded')).toBe('false')
     expect(getAccordionContent('overview').hidden).toBe(true)
+  })
+
+  it('keeps single Accordion expansion only when multiple is explicitly false', async () => {
+    await act(async () => {
+      root.render(
+        <Accordion
+          items={accordionItems}
+          defaultExpandedIds={['overview']}
+          multiple={false}
+        />,
+      )
+    })
+
+    await act(async () => {
+      getAccordionTrigger('billing').dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(getAccordionTrigger('overview').getAttribute('aria-expanded')).toBe('false')
+    expect(getAccordionContent('overview').hidden).toBe(true)
+    expect(getAccordionTrigger('billing').getAttribute('aria-expanded')).toBe('true')
+    expect(getAccordionContent('billing').hidden).toBe(false)
   })
 
   it('wires Navigation menubar relationships and roves focus around disabled items', async () => {

@@ -249,27 +249,9 @@
     },
     "Date": {
       "category": "overlay-form",
-      "status": "deprecated",
-      "a11yReviewed": true,
-      "mobileReviewed": true,
-      "responsiveSurface": "auto->sheet",
-      "related": [
-        "Calendar",
-        "DatePicker",
-        "Select"
-      ],
-      "replacedBy": [
-        "DatePicker"
-      ]
-    },
-    "DatePicker": {
-      "category": "overlay-form",
       "status": "stable",
       "a11yReviewed": true,
       "mobileReviewed": true,
-      "aliases": [
-        "Date"
-      ],
       "responsiveSurface": "auto->sheet",
       "related": [
         "Calendar",
@@ -282,8 +264,7 @@
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
-        "Date",
-        "DatePicker"
+        "Date"
       ]
     },
     "Tooltip": {

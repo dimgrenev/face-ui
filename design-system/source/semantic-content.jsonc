@@ -82,7 +82,7 @@
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-background)"
+          "value": "var(--uf-color-foreground)"
         }
       ]
     },

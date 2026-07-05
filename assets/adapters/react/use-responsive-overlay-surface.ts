@@ -5,8 +5,15 @@ export type ResolvedOverlaySurface = Exclude<ResponsiveOverlaySurface, 'auto'>
 
 export const DEFAULT_OVERLAY_SURFACE_BREAKPOINT = 900
 
+function normalizeBreakpoint(breakpoint: number): number {
+  const numericBreakpoint = Number(breakpoint)
+  return Number.isFinite(numericBreakpoint) && numericBreakpoint > 0
+    ? numericBreakpoint
+    : DEFAULT_OVERLAY_SURFACE_BREAKPOINT
+}
+
 function getCompactMediaQuery(breakpoint: number): string {
-  return `(max-width: ${Math.max(0, breakpoint - 1)}px)`
+  return `(max-width: ${Math.max(0, normalizeBreakpoint(breakpoint) - 1)}px)`
 }
 
 function resolveSurface(
@@ -43,22 +50,27 @@ export function useResponsiveOverlaySurface(
       return
     }
 
-    const mediaQuery = window.matchMedia(getCompactMediaQuery(breakpoint))
+    const normalizedBreakpoint = normalizeBreakpoint(breakpoint)
+    const query = getCompactMediaQuery(normalizedBreakpoint)
+    const mediaQuery = window.matchMedia(query)
     const updateSurface = () => {
-      setResolvedSurface(mediaQuery.matches ? 'sheet' : 'popover')
+      setResolvedSurface(resolveSurface(surface, normalizedBreakpoint))
     }
 
     updateSurface()
+    window.addEventListener('resize', updateSurface)
 
     if (typeof mediaQuery.addEventListener === 'function') {
       mediaQuery.addEventListener('change', updateSurface)
       return () => {
+        window.removeEventListener('resize', updateSurface)
         mediaQuery.removeEventListener('change', updateSurface)
       }
     }
 
     mediaQuery.addListener(updateSurface)
     return () => {
+      window.removeEventListener('resize', updateSurface)
       mediaQuery.removeListener(updateSurface)
     }
   }, [surface, breakpoint])

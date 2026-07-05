@@ -47,11 +47,67 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "items": [
+          {
+            "id": "intro",
+            "label": "Introduction",
+            "level": 1
+          },
+          {
+            "id": "setup",
+            "label": "Setup",
+            "level": 1
+          },
+          {
+            "id": "tokens",
+            "label": "Design tokens",
+            "level": 2
+          },
+          {
+            "id": "themes",
+            "label": "Themes",
+            "level": 3
+          },
+          {
+            "id": "usage",
+            "label": "Usage",
+            "level": 1
+          }
+        ],
+        "defaultActiveId": "intro"
+      }
     },
     {
       "name": "With Active",
       "props": {
+        "items": [
+          {
+            "id": "intro",
+            "label": "Introduction",
+            "level": 1
+          },
+          {
+            "id": "setup",
+            "label": "Setup",
+            "level": 1
+          },
+          {
+            "id": "tokens",
+            "label": "Design tokens",
+            "level": 2
+          },
+          {
+            "id": "themes",
+            "label": "Themes",
+            "level": 3
+          },
+          {
+            "id": "usage",
+            "label": "Usage",
+            "level": 1
+          }
+        ],
         "activeId": "intro"
       }
     }
