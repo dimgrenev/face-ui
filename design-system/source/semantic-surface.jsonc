@@ -194,7 +194,7 @@
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-surface-sidebar, var(--uf-color-black-4))"
+          "value": "var(--uf-color-white-100)"
         }
       ]
     },
@@ -274,11 +274,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-overlay-surface-bg)"
+          "value": "var(--uf-color-surface-sidebar, var(--uf-color-white-10))"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-overlay-surface-bg)"
+          "value": "var(--uf-color-surface-sidebar, var(--uf-color-white-10))"
         }
       ]
     },
@@ -288,11 +288,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-overlay-surface-underlay-bg)"
+          "value": "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-100)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-overlay-surface-underlay-bg)"
+          "value": "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-100)"
         }
       ]
     },
@@ -302,11 +302,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-fg)"
+          "value": "var(--uf-color-white-92)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-fg)"
+          "value": "var(--uf-color-white-92)"
         }
       ]
     },
@@ -316,11 +316,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-overlay-surface-border)"
+          "value": "var(--uf-color-white-20)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-overlay-surface-border)"
+          "value": "var(--uf-color-white-20)"
         }
       ]
     },

@@ -22,8 +22,7 @@ import type { ModalSchema } from '../assets/machines/modal.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
 import type { ButtonVariant } from '../Button/Button'
-import { Bar } from '../Bar/Bar'
-import { Text } from '../Text/Text'
+import { Card } from '../Card/Card'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -174,6 +173,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
     // Build inline style for width/height CSS custom properties (only on matching variants)
     const isHorizontal = effectiveVariant === 'left' || effectiveVariant === 'right'
     const isVertical = effectiveVariant === 'top' || effectiveVariant === 'bottom'
+    const contentRadius = isHorizontal ? 'none' : 'lg'
+    const drawerEdge = (rest as { 'data-drawer-edge'?: unknown })['data-drawer-edge']
+    const contentBorder = !(drawerEdge === 'flush' && contentRadius === 'none')
     const contentStyle: CSSProperties | undefined =
       (isHorizontal && width != null) || (isVertical && height != null)
         ? {
@@ -187,18 +189,23 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
         <div {...backdropProps} data-portal={portal ? 'true' : 'false'} className={cn('uf-modal-backdrop', backdropClassName)} />
 
         <div {...api.getPositionerProps()} data-portal={portal ? 'true' : 'false'} className={cn('uf-modal-positioner', positionerClassName)}>
-          <div
+          <Card
             ref={handleRef}
             {...api.getContentProps()}
             data-surface={resolvedSurface}
+            variant="dialog"
+            padding="default"
+            radius={contentRadius}
+            border={contentBorder}
+            footerLayout="between"
             className={cn('uf-modal', className)}
             style={contentStyle}
             {...rest}
           >
             {(title != null || closable) && (
-              <Bar className="uf-modal-bar">
+              <Card.Header layout="bar" className="uf-modal-bar">
                 {title != null ? (
-                  <Text
+                  <Card.Title
                     {...(api.getTitleProps() as any)}
                     as="div"
                     fullWidth
@@ -206,10 +213,10 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     className={cn('uf-modal-title')}
                   >
                     {title}
-                  </Text>
+                  </Card.Title>
                 ) : null}
                 {closable ? (
-                  <Bar.Right>
+                  <Card.Actions className="uf-modal-closeActions">
                     <Button
                       {...api.getCloseProps()}
                       icon="close"
@@ -220,13 +227,13 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                       aria-label="Close modal"
                       title="Close"
                     />
-                  </Bar.Right>
+                  </Card.Actions>
                 ) : null}
-              </Bar>
+              </Card.Header>
             )}
 
             {description != null && (
-              <Text
+              <Card.Description
                 {...(api.getDescriptionProps() as any)}
                 as="div"
                 variant="muted"
@@ -235,24 +242,18 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 className={cn('uf-modal-description')}
               >
                 {description}
-              </Text>
+              </Card.Description>
             )}
 
             {children != null ? (
-              typeof children === 'string' || typeof children === 'number' ? (
-                <div className="uf-modal-body">
-                  <Text as="div" fullWidth align="left">
-                    {children}
-                  </Text>
-                </div>
-              ) : (
-                <div className="uf-modal-body">{children}</div>
-              )
+              <Card.Content className="uf-modal-body">
+                {children}
+              </Card.Content>
             ) : null}
 
             {actions.length > 0 ? (
-              <Bar className="uf-modal-actionsBar">
-                <Bar.Right>
+              <Card.Footer className="uf-modal-actionsBar" layout="between">
+                <Card.Actions align="between">
                   {actions.map((action, index) => (
                     <Button
                       key={`modal-action:${index}`}
@@ -264,10 +265,10 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                       {typeof action.label === 'string' || typeof action.label === 'number' ? undefined : action.label}
                     </Button>
                   ))}
-                </Bar.Right>
-              </Bar>
+                </Card.Actions>
+              </Card.Footer>
             ) : null}
-          </div>
+          </Card>
         </div>
       </>
     )

@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Panel",
   "description": "Collapsible panel navigation with nested groups",
   "props": {
@@ -110,6 +112,11 @@
     {
       "name": "Default",
       "props": {
+        "defaultCollapsed": false,
+        "width": 260,
+        "collapsedWidth": 60,
+        "surface": "auto",
+        "defaultOpen": false,
         "items": [],
         "previewPreset": "workspace",
         "defaultSelectedId": "overview"
@@ -179,6 +186,13 @@
       "--uf-sidebar-preview-inset",
       "--uf-sidebar-preview-section-gap",
       "--uf-sidebar-preview-title-gap",
+      "--uf-sidebar-bg",
+      "--uf-sidebar-fg",
+      "--uf-sidebar-muted",
+      "--uf-sidebar-hover-bg",
+      "--uf-sidebar-active-bg",
+      "--uf-sidebar-row-radius",
+      "--uf-sidebar-section-gap",
       "--face-runtime-sidebar-sheet-w",
       "--uf-sidebar-sheet-w-default",
       "--uf-sidebar-sheet-viewport-gap",
@@ -195,9 +209,12 @@
       "--uf-font-weight",
       "--uf-font-weight-bold",
       "--uf-color-bg",
+      "--uf-color-panel",
+      "--uf-color-surface-sidebar",
       "--uf-color-fg",
       "--uf-color-fg-muted",
       "--uf-color-hover-bg",
+      "--uf-color-active-bg",
       "--uf-color-border"
     ],
     "notes": [

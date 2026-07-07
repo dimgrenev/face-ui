@@ -15,6 +15,7 @@ import { accordionMachine, connectAccordion } from '../assets/machines/accordion
 import { cn } from '../assets/utils'
 import { RightIcon } from '../assets/icons'
 import { Button } from '../Button/Button'
+import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 
 // ---------------------------------------------------------------------------
@@ -24,6 +25,7 @@ import { Text } from '../Text/Text'
 export interface AccordionItem {
   value: string
   label: ReactNode
+  icon?: ReactNode
   content: ReactNode
   disabled?: boolean
 }
@@ -31,6 +33,8 @@ export interface AccordionItem {
 export interface AccordionProps {
   /** Accordion item definitions. */
   items?: AccordionItem[]
+  /** Default left icon for item triggers. Individual items can override it with item.icon. */
+  icon?: ReactNode
   /** Currently expanded item IDs (controlled). */
   expandedIds?: string[]
   /** Uncontrolled initial expanded item IDs. */
@@ -59,9 +63,9 @@ function buildDefaultItems(): AccordionItem[] {
       label: 'Getting Started',
       content: (
         <>
-          <Button text="Install package" variant="default" align="left" stretchText membrane />
-          <Button text="Quick start" variant="default" align="left" stretchText membrane />
-          <Button text="Delete setup" variant="delete" align="left" stretchText membrane />
+          <Button text="Install package" variant="default" align="left" stretchText fullWidth membrane />
+          <Button text="Quick start" variant="default" align="left" stretchText fullWidth membrane />
+          <Button text="Delete setup" variant="delete" align="left" stretchText fullWidth membrane />
         </>
       ),
     },
@@ -70,8 +74,8 @@ function buildDefaultItems(): AccordionItem[] {
       label: 'Usage Guide',
       content: (
         <>
-          <Button text="Basic usage" variant="default" align="left" stretchText membrane />
-          <Button text="Advanced usage" variant="default" align="left" stretchText membrane />
+          <Button text="Basic usage" variant="default" align="left" stretchText fullWidth membrane />
+          <Button text="Advanced usage" variant="default" align="left" stretchText fullWidth membrane />
         </>
       ),
     },
@@ -80,8 +84,8 @@ function buildDefaultItems(): AccordionItem[] {
       label: 'API Reference',
       content: (
         <>
-          <Button text="Props" variant="default" align="left" stretchText membrane />
-          <Button text="Events" variant="default" align="left" stretchText membrane />
+          <Button text="Props" variant="default" align="left" stretchText fullWidth membrane />
+          <Button text="Events" variant="default" align="left" stretchText fullWidth membrane />
         </>
       ),
     },
@@ -105,7 +109,7 @@ function renderAccordionContentNode(node: ReactNode): ReactNode {
   if (isValidElement(node) || Array.isArray(node)) return node
   if (typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
     return (
-      <Text as="div" fullWidth membrane={false} className="uf-accordion-contentText">
+      <Text as="div" fullWidth className="uf-accordion-contentText">
         {String(node)}
       </Text>
     )
@@ -126,6 +130,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
     const legacyProps = props as AccordionProps & AccordionLegacyProps
     const {
       items: rawItems,
+      icon,
       expandedIds,
       defaultExpandedIds,
       multiple = true,
@@ -138,7 +143,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
     const legacyOnChange = legacyProps.onChange
 
     const legacySource = Array.isArray(legacyItems) ? legacyItems : []
-    const fromLegacy = legacySource.map((item, index) => ({
+    const fromLegacy: AccordionItem[] = legacySource.map((item, index) => ({
         value: String(item.id ?? index),
         label: item.summary,
         content: item.content,
@@ -188,6 +193,11 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
         {items.map((item) => {
           const triggerId = getAccordionDomId(accordionInstanceId, 'trigger', item.value)
           const contentId = getAccordionDomId(accordionInstanceId, 'content', item.value)
+          const itemIcon = item.icon === undefined ? icon : item.icon
+          const resolvedIcon = typeof itemIcon === 'string'
+            ? <Icon name={itemIcon} />
+            : itemIcon
+          const hasIcon = resolvedIcon != null
           return (
             <div key={item.value} {...api.getItemProps({ value: item.value, disabled: item.disabled })}>
               <span className="uf-membrane uf-membrane--full">
@@ -195,7 +205,13 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
                   {...api.getTriggerProps({ value: item.value, disabled: item.disabled })}
                   id={triggerId}
                   aria-controls={contentId}
+                  data-icon-left={hasIcon ? '' : undefined}
                 >
+                  {hasIcon && (
+                    <span className="uf-accordion-icon" aria-hidden="true">
+                      {resolvedIcon}
+                    </span>
+                  )}
                   <Text as="span" inset="none" membrane={false} className="uf-accordion-label">
                     {item.label}
                   </Text>
@@ -206,6 +222,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
                 {...api.getContentProps({ value: item.value })}
                 id={contentId}
                 aria-labelledby={triggerId}
+                data-icon-left={hasIcon ? '' : undefined}
               >
                 <div className="uf-accordion-content-inner">
                   {flattenAccordionContent(item.content).map((node, idx) => (

@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Slider",
   "description": "Range input with single or multiple thumbs",
   "props": {

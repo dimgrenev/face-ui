@@ -1,7 +1,20 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Select",
   "description": "Option picker with single and multi-select support",
   "props": {
+    "variant": {
+      "type": "enum",
+      "required": false,
+      "description": "Visual/behavioral variant.",
+      "options": [
+        "default",
+        "side",
+        "iconOnly"
+      ],
+      "default": "default"
+    },
     "options": {
       "type": "array",
       "required": false,
@@ -62,7 +75,7 @@
     "displayValue": {
       "type": "string",
       "required": false,
-      "description": "Optional override for the text shown in the trigger."
+      "description": "Optional override for the content shown in the trigger."
     },
     "stretchText": {
       "type": "boolean",
@@ -101,11 +114,31 @@
       "required": false,
       "description": "Optional title used for the mobile sheet header."
     },
+    "contentMinWidth": {
+      "type": "string",
+      "required": false,
+      "description": "Minimum width for popover content. Useful when the trigger is compact."
+    },
     "membrane": {
       "type": "boolean",
       "required": false,
       "description": "Outer membrane wrapper around trigger/option geometry.",
       "default": true
+    },
+    "triggerClassName": {
+      "type": "string",
+      "required": false,
+      "description": "Class applied directly to the trigger button."
+    },
+    "valueClassName": {
+      "type": "string",
+      "required": false,
+      "description": "Class applied directly to the trigger value node."
+    },
+    "contentClassName": {
+      "type": "string",
+      "required": false,
+      "description": "Class applied directly to the floating content node."
     },
     "className": {
       "type": "string",
@@ -117,6 +150,14 @@
     {
       "name": "Default",
       "props": {
+        "variant": "default",
+        "placeholder": "Choose option",
+        "disabled": false,
+        "type": "select",
+        "labelOrientation": "vertical",
+        "stretchText": false,
+        "surface": "auto",
+        "membrane": true,
         "options": [
           {
             "value": "1",
@@ -127,8 +168,7 @@
             "label": "Option 2"
           }
         ],
-        "label": "Select",
-        "placeholder": "Choose option"
+        "label": "Select"
       }
     },
     {
@@ -150,6 +190,49 @@
           }
         ],
         "placeholder": "Select items..."
+      }
+    },
+    {
+      "name": "Side",
+      "props": {
+        "variant": "side",
+        "stretchText": true,
+        "options": [
+          {
+            "value": "icon",
+            "label": "Icon"
+          },
+          {
+            "value": "responsive-sheet-header",
+            "label": "ResponsiveSheetHeader"
+          }
+        ],
+        "placeholder": "Select..."
+      }
+    },
+    {
+      "name": "Icon only",
+      "props": {
+        "variant": "iconOnly",
+        "surface": "popover",
+        "ariaLabel": "Change type",
+        "displayValue": "{}",
+        "contentMinWidth": "10rem",
+        "options": [
+          {
+            "value": "string",
+            "label": "String"
+          },
+          {
+            "value": "boolean",
+            "label": "Boolean"
+          },
+          {
+            "value": "object",
+            "label": "Object"
+          }
+        ],
+        "placeholder": "Type"
       }
     },
     {
@@ -202,7 +285,6 @@
     "required": [
       "root",
       "trigger",
-      "indicator",
       "content"
     ],
     "recommended": [
@@ -251,6 +333,7 @@
       "--uf-selector-indicator-offset-inline-start",
       "--uf-selector-indicator-edge-gap",
       "--uf-selector-indicator-size",
+      "--uf-select-content-min-width",
       "--uf-select-indicator-gap",
       "--uf-select-indicator-edge-gap",
       "--uf-select-indicator-size",

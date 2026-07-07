@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Date",
   "description": "Unified date/time picker with multi-view and range support",
   "props": {
@@ -243,10 +245,25 @@
       "name": "Default",
       "props": {
         "mode": "date",
-        "label": "Date",
-        "placeholder": "Pick date",
+        "selection": "single",
+        "defaultValue": null,
+        "valueFormat": "iso",
+        "locale": "en-US",
+        "timezone": "UTC",
+        "weekStartsOn": 1,
+        "min": null,
+        "max": null,
         "showNow": true,
-        "showClear": true
+        "showClear": true,
+        "showPresets": false,
+        "surface": "auto",
+        "required": false,
+        "disabled": false,
+        "readOnly": false,
+        "membrane": true,
+        "fullWidth": true,
+        "label": "Date",
+        "placeholder": "Pick date"
       }
     },
     {

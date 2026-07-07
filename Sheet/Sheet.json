@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Sheet",
   "props": {
     "side": {
@@ -10,6 +12,15 @@
         "top"
       ],
       "default": "bottom"
+    },
+    "edge": {
+      "type": "enum",
+      "required": false,
+      "description": "Visual edge treatment inherited from Drawer.",
+      "options": [
+        "inset",
+        "flush"
+      ]
     },
     "title": {
       "type": "string",
@@ -103,6 +114,7 @@
       "props": {
         "open": true,
         "portal": false,
+        "edge": "inset",
         "trigger": "Open sheet",
         "title": "Bottom sheet",
         "description": "Compact actions and selections.",

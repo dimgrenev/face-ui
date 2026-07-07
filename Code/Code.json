@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Code",
   "description": "Source code display with optional line numbers and highlighting",
   "props": {
@@ -70,8 +72,12 @@
     {
       "name": "Default",
       "props": {
-        "title": "example.tsx",
-        "code": "const x = 1;\nconsole.log(x);"
+        "showLineNumbers": false,
+        "defaultCollapsed": true,
+        "collapsedHeight": 160,
+        "code": "/* CSS file example */\n\n:root {\n  --uf-color-hover: var(--uf-color-black-8);\n}\n\n.button {\n  height: 32px;\n  padding: 0 8px;\n  border-radius: 6px;\n}\n\n/* long tail to test collapse */\n/* line 1 */\\n/* line 2 */\\n/* line 3 */\\n/* line 4 */\\n/* line 5 */\\n/* line 6 */\\n/* line 7 */\\n/* line 8 */\\n/* line 9 */\\n/* line 10 */\\n/* line 11 */\\n/* line 12 */\\n/* line 13 */\\n/* line 14 */\\n/* line 15 */\\n/* line 16 */\\n/* line 17 */\\n/* line 18 */\\n/* line 19 */\\n/* line 20 */",
+        "language": "css",
+        "title": "Files / Playground"
       }
     },
     {

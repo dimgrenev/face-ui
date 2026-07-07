@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Popover",
   "description": "Floating interactive surface anchored to a trigger element",
   "props": {
@@ -74,6 +76,7 @@
     {
       "name": "Default",
       "props": {
+        "interactive": true,
         "children": "Open popover",
         "content": "Popover content"
       }

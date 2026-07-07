@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "face-ui-react",
   "description": "Root Face UI showcase gallery contract for the Render playground.",
   "props": {

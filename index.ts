@@ -5,7 +5,7 @@ export { Button, ButtonGroup, buttonAnatomy } from './Button/Button'
 export type { ButtonProps, ButtonVariant, ButtonGroupProps } from './Button/Button'
 
 export { Tile, tileAnatomy } from './Tile/Tile'
-export type { TileProps, TileVariant } from './Tile/Tile'
+export type { TileActionVisibility, TileDensity, TileIntent, TileProps, TileTone, TileVariant } from './Tile/Tile'
 
 export { Text, textAnatomy } from './Text/Text'
 export type { TextProps, TextVariant } from './Text/Text'
@@ -18,7 +18,22 @@ export { Badge, badgeAnatomy } from './Badge/Badge'
 export type { BadgeProps, BadgeVariant } from './Badge/Badge'
 
 export { Card, cardAnatomy } from './Card/Card'
-export type { CardProps } from './Card/Card'
+export type {
+  CardActionAlign,
+  CardActionsProps,
+  CardCompoundComponent,
+  CardDescriptionProps,
+  CardFooterLayout,
+  CardFooterProps,
+  CardHeaderLayout,
+  CardHeaderProps,
+  CardPadding,
+  CardProps,
+  CardRadius,
+  CardSlotProps,
+  CardTitleProps,
+  CardVariant,
+} from './Card/Card'
 
 export { Skeleton, skeletonAnatomy } from './Skeleton/Skeleton'
 export type { SkeletonProps } from './Skeleton/Skeleton'

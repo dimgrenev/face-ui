@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Separator",
   "description": "Visual divider for separating content",
   "props": {

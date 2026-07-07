@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Icon",
   "description": "Face UI icon renderer. Built-in icons always render at 20x20; unsupported sources render notdef.",
   "props": {

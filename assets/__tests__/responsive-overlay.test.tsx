@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRoot, type Root } from 'react-dom/client'
@@ -20,6 +20,7 @@ import { Select } from '../../Select/Select'
 import { Steps } from '../../Steps/Steps'
 import { Switcher } from '../../Switcher/Switcher'
 import { Tooltip } from '../../Tooltip/Tooltip'
+import { useResponsiveOverlaySurface } from '../adapters/react/use-responsive-overlay-surface'
 
 interface MatchMediaStub {
   matches: boolean
@@ -72,6 +73,20 @@ function installMatchMedia(matches: boolean): MatchMediaRestore {
   return restore
 }
 
+function readComponentStyles() {
+  const cwd = process.cwd()
+  const candidates = [
+    `${cwd}/assets/styles/components.css`,
+    `${cwd}/../face-ui/assets/styles/components.css`,
+    `${cwd}/face-ui/assets/styles/components.css`,
+  ]
+  const componentStylesPath = candidates.find((candidate) => existsSync(candidate))
+  if (!componentStylesPath) {
+    throw new Error(`Unable to locate Face UI component styles from ${cwd}`)
+  }
+  return readFileSync(componentStylesPath, 'utf8')
+}
+
 describe('responsive overlay surfaces', () => {
   let container: HTMLDivElement
   let root: Root
@@ -96,6 +111,24 @@ describe('responsive overlay surfaces', () => {
     document.body.style.paddingRight = ''
     document.body.style.touchAction = ''
     container.remove()
+  })
+
+  it('keeps auto overlay initial render SSR-stable before compact viewport promotion', async () => {
+    const renderSequence: string[] = []
+
+    function SurfaceProbe() {
+      const surface = useResponsiveOverlaySurface('auto')
+      renderSequence.push(surface)
+      return <div data-testid="surface-probe" data-surface={surface} />
+    }
+
+    await act(async () => {
+      root.render(<SurfaceProbe />)
+    })
+
+    expect(renderSequence[0]).toBe('popover')
+    expect(renderSequence).toContain('sheet')
+    expect(container.querySelector('[data-testid="surface-probe"]')?.getAttribute('data-surface')).toBe('sheet')
   })
 
   it('Select switches auto surfaces to a bottom sheet on compact viewports', async () => {
@@ -517,7 +550,7 @@ describe('responsive overlay surfaces', () => {
     expect(document.body.style.overflow).toBe('hidden')
     expect(container.textContent).toContain('Choose date')
 
-    const componentStyles = readFileSync(`${process.cwd()}/assets/styles/components.css`, 'utf8')
+    const componentStyles = readComponentStyles()
     expect(componentStyles).toMatch(
       /\.uf-date__content\[data-surface="sheet"\] \.uf-date__grid,\s*\.uf-date__content\[data-surface="sheet"\] \.uf-calendar\[data-scope="calendar"\] \{\s*width: 100%;\s*inline-size: 100%;\s*min-inline-size: 0;\s*\}/,
     )
@@ -836,6 +869,193 @@ describe('responsive overlay surfaces', () => {
     expect(trigger?.getAttribute('aria-expanded')).toBe('false')
   })
 
+  it('Menu applies explicit popover alignment, trigger offset, and membrane surface', async () => {
+    await act(async () => {
+      root.render(
+        <Menu
+          surface="popover"
+          align="start"
+          sideOffset={4}
+          items={[
+            { value: 'copy', label: 'Copy' },
+          ]}
+        >
+          <Button text="Open menu" fullWidth={false} membrane={false} />
+        </Menu>,
+      )
+    })
+
+    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open menu')) ?? null
+    const triggerAnchor = container.querySelector('.uf-menu-trigger') as HTMLElement | null
+    const content = document.body.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement | null
+    expect(trigger).not.toBeNull()
+    expect(triggerAnchor).not.toBeNull()
+    expect(content).not.toBeNull()
+
+    Object.defineProperty(triggerAnchor, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({
+        top: 40,
+        right: 180,
+        bottom: 72,
+        left: 100,
+        width: 80,
+        height: 32,
+        x: 100,
+        y: 40,
+        toJSON: () => {},
+      }),
+    })
+    Object.defineProperty(content, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({
+        top: 0,
+        right: 0,
+        bottom: 100,
+        left: 0,
+        width: 160,
+        height: 100,
+        x: 0,
+        y: 0,
+        toJSON: () => {},
+      }),
+    })
+
+    await act(async () => {
+      trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      await Promise.resolve()
+    })
+
+    expect(content?.style.left).toBe('100px')
+    expect(content?.style.top).toBe('76px')
+
+    const membrane = content?.querySelector('.uf-menu-contentMembrane') as HTMLElement | null
+    const panel = content?.querySelector('.uf-menu-contentPanel') as HTMLElement | null
+    expect(membrane).not.toBeNull()
+    expect(membrane?.classList.contains('uf-membrane')).toBe(true)
+    expect(membrane?.classList.contains('uf-membrane--full')).toBe(true)
+    expect(panel?.getAttribute('data-scope')).toBe('card')
+    expect(panel?.getAttribute('data-card-variant')).toBe('floating')
+    expect(panel?.getAttribute('data-padding')).toBe('membrane')
+    expect(panel?.hasAttribute('data-full-width')).toBe(true)
+
+    const componentStyles = readComponentStyles()
+    const menuPanelBlock = componentStyles.match(/\.uf-menu-contentPanel\s*\{[^}]*\}/)?.[0] ?? ''
+    expect(menuPanelBlock).not.toContain('max-height')
+  })
+
+  it('Menu dismisses on outside pointerdown before bubbled events can be stopped', async () => {
+    await act(async () => {
+      root.render(
+        <>
+          <Menu
+            surface="popover"
+            items={[
+              { value: 'copy', label: 'Copy' },
+            ]}
+          >
+            <Button text="Open menu" fullWidth={false} membrane={false} />
+          </Menu>
+          <button
+            type="button"
+            data-testid="outside-stop"
+            onPointerDown={(event) => event.stopPropagation()}
+          >
+            Outside
+          </button>
+        </>,
+      )
+    })
+
+    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open menu')) ?? null
+    const outside = container.querySelector('[data-testid="outside-stop"]') as HTMLButtonElement | null
+    expect(trigger).not.toBeNull()
+    expect(outside).not.toBeNull()
+
+    await act(async () => {
+      trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      await Promise.resolve()
+    })
+
+    const content = document.body.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement | null
+    expect(content?.hidden).toBe(false)
+
+    await act(async () => {
+      outside?.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+      await Promise.resolve()
+    })
+
+    expect(content?.hidden).toBe(true)
+  })
+
+  it('Menu dismisses on outside click when pointerdown is not delivered', async () => {
+    await act(async () => {
+      root.render(
+        <>
+          <Menu
+            surface="popover"
+            items={[
+              { value: 'copy', label: 'Copy' },
+            ]}
+          >
+            <Button text="Open menu" fullWidth={false} membrane={false} />
+          </Menu>
+          <button type="button" data-testid="outside-click">
+            Outside
+          </button>
+        </>,
+      )
+    })
+
+    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open menu')) ?? null
+    const outside = container.querySelector('[data-testid="outside-click"]') as HTMLButtonElement | null
+    expect(trigger).not.toBeNull()
+    expect(outside).not.toBeNull()
+
+    await act(async () => {
+      trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      await Promise.resolve()
+    })
+
+    const content = document.body.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement | null
+    expect(content?.hidden).toBe(false)
+
+    await act(async () => {
+      outside?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      await Promise.resolve()
+    })
+
+    expect(content?.hidden).toBe(true)
+  })
+
+  it('Menu keeps context trigger behavior in the React adapter', async () => {
+    await act(async () => {
+      root.render(
+        <Menu
+          trigger="context"
+          surface="popover"
+          items={[
+            { value: 'inspect', label: 'Inspect' },
+          ]}
+        >
+          <Button text="Context target" fullWidth={false} membrane={false} />
+        </Menu>,
+      )
+    })
+
+    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Context target')) ?? null
+    expect(trigger).not.toBeNull()
+
+    await act(async () => {
+      trigger?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+    })
+
+    const content = document.body.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement | null
+    expect(content?.hidden).toBe(false)
+    expect(content?.textContent).toContain('Inspect')
+  })
+
   it('Menu roves focus across enabled items and selects highlighted items from the keyboard', async () => {
     const handleSelect = vi.fn()
 
@@ -983,6 +1203,45 @@ describe('responsive overlay surfaces', () => {
     expect(content?.getAttribute('data-surface')).toBe('popover')
     expect(container.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
     expect(document.body.style.overflow).toBe('')
+  })
+
+  it('Select uses the shared outside click fallback for popover dismissal', async () => {
+    await act(async () => {
+      root.render(
+        <>
+          <Select
+            surface="popover"
+            options={[
+              { value: 'a', label: 'Alpha' },
+              { value: 'b', label: 'Beta' },
+            ]}
+          />
+          <button type="button" data-testid="select-outside-click">
+            Outside
+          </button>
+        </>,
+      )
+    })
+
+    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
+    const outside = container.querySelector('[data-testid="select-outside-click"]') as HTMLButtonElement | null
+    expect(trigger).not.toBeNull()
+    expect(outside).not.toBeNull()
+
+    await act(async () => {
+      trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      await Promise.resolve()
+    })
+
+    const contentId = trigger?.getAttribute('aria-controls') ?? ''
+    expect(document.getElementById(contentId)).not.toBeNull()
+
+    await act(async () => {
+      outside?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      await Promise.resolve()
+    })
+
+    expect(document.getElementById(contentId)).toBeNull()
   })
 
   it('Command binds combobox, grouped listbox and keyboard active-descendant semantics', async () => {

@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Toc",
   "description": "Table of contents navigation with active-item tracking",
   "props": {
@@ -48,6 +50,8 @@
     {
       "name": "Default",
       "props": {
+        "withLine": true,
+        "lineSide": "left",
         "items": [
           {
             "id": "intro",
@@ -75,7 +79,7 @@
             "level": 1
           }
         ],
-        "defaultActiveId": "intro"
+        "defaultActiveId": "tokens"
       }
     },
     {

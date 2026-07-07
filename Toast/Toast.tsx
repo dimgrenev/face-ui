@@ -96,6 +96,9 @@ export function createToastContext(options?: {
             <Card
               key={toast.id}
               {...api.getToastProps(toast)}
+              variant="floating"
+              padding="compact"
+              radius="md"
               className={cn('uf-toast')}
             >
               <div className="uf-toast-body">

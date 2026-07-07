@@ -88,6 +88,7 @@ describe('face-ui-react gallery smoke', () => {
     const firstPreview = firstCard?.querySelector<HTMLElement>('.uf-gallery-itemPreview')
     const firstSurface = firstCard?.querySelector<HTMLElement>('.uf-gallery-itemSurface')
     const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    const galleryGeneratorSource = readFileSync(join(process.cwd(), 'scripts/generate-components-gallery.mjs'), 'utf8')
     const runtimeSource = readFileSync(join(process.cwd(), 'uf.runtime.ts'), 'utf8')
 
     expect(gallery).not.toBeNull()
@@ -104,18 +105,22 @@ describe('face-ui-react gallery smoke', () => {
     expect(firstTitle?.parentElement?.classList.contains('uf-membrane--full')).toBe(true)
     expect(firstPreview).not.toBeNull()
     expect(firstSurface).not.toBeNull()
+    expect(firstSurface?.getAttribute('data-card-variant')).toBe('showcase')
+    expect(firstSurface?.getAttribute('data-padding')).toBe('showcase')
+    expect(firstSurface?.getAttribute('data-radius')).toBe('showcase')
+    expect(firstSurface?.getAttribute('data-border')).toBe('false')
     expect(componentStyles).toContain('.uf-gallery {')
     expect(componentStyles).toContain('--face-gallery-inset: 7px;')
     expect(componentStyles).toContain('--face-gallery-header-action-gap: 0px;')
     expect(componentStyles).toContain('--face-gallery-grid-pad-top: 0px;')
-    expect(componentStyles).toContain('--face-gallery-surface-radius: 20px;')
+    expect(componentStyles).toContain('--face-gallery-surface-radius: var(--uf-radius-lg);')
     expect(componentStyles).toContain('max-width: none;')
     expect(componentStyles).toContain('--face-gallery-frame-min-height: 100dvh;')
     expect(componentStyles).toContain('height: 100%;')
     expect(componentStyles).toContain('min-height: var(--face-gallery-frame-min-height);')
     expect(componentStyles).toContain('padding: var(--face-gallery-inset);')
     expect(componentStyles).toContain('--face-gallery-frame-bg: transparent;')
-    expect(componentStyles).toContain('--face-gallery-surface-bg: var(--uf-color-surface-sidebar, var(--uf-overlay-surface-background));')
+    expect(componentStyles).toContain('--face-gallery-surface-bg: var(--uf-overlay-surface-bg);')
     expect(componentStyles).toContain('background: var(--face-gallery-frame-bg);')
     expect(componentStyles).toContain('overflow: hidden;')
     expect(componentStyles).toContain('align-content: start;')
@@ -124,7 +129,11 @@ describe('face-ui-react gallery smoke', () => {
     expect(componentStyles).toContain('.uf-gallery-item > .uf-membrane')
     expect(componentStyles).toContain('.uf-gallery-itemPreview {')
     expect(componentStyles).toContain('.uf-gallery-itemSurface {')
-    expect(componentStyles).toContain('background: var(--face-gallery-surface-bg);')
+    expect(componentStyles).toContain('.uf-card[data-scope][data-card-variant="showcase"]')
+    expect(componentStyles).toContain('--uf-card-bg: var(--face-gallery-surface-bg, var(--uf-overlay-surface-bg));')
+    expect(componentStyles).not.toContain('.uf-gallery-itemSurface:has(> .uf-card[data-scope]),')
+    expect(galleryGeneratorSource).toContain('function getDefaultStateProps(contract)')
+    expect(galleryGeneratorSource).not.toContain('gallery.samples.json')
     expect(runtimeSource).toContain("maxWidth: '100%'")
     expect(runtimeSource).toContain("fullFrameComponents: ['face-ui-react']")
     expect(runtimeSource).toContain("'face-ui-react'")
@@ -214,16 +223,11 @@ describe('face-ui-react gallery smoke', () => {
     expect(ratingStars[3]?.getAttribute('aria-checked')).toBe('true')
 
     const sliderCard = getGalleryCard(container, 'Slider')
-    const sliderInput = sliderCard.querySelector('.uf-slider--advanced input[type="range"]') as HTMLInputElement | null
-    await act(async () => {
-      if (!sliderInput) return
-      setNativeInputValue(sliderInput, '41')
-      sliderInput.dispatchEvent(new Event('input', { bubbles: true }))
-      sliderInput.dispatchEvent(new Event('change', { bubbles: true }))
-    })
-    const updatedSliderThumb = sliderCard.querySelector('.uf-slider--advanced .uf-slider-thumbButtonWrap .uf-slider-thumbButton [data-part="text"]') as HTMLElement | null
-    expect(updatedSliderThumb?.textContent).toContain('41')
-    expect(sliderCard.textContent).toContain('Crop')
+    const sliderRoot = sliderCard.querySelector('.uf-slider[data-scope="slider"]') as HTMLElement | null
+    const sliderThumb = sliderCard.querySelector('[data-part="thumb"][role="slider"]') as HTMLElement | null
+    expect(sliderRoot).not.toBeNull()
+    expect(sliderThumb?.getAttribute('aria-valuenow')).toBe('50')
+    expect(sliderCard.textContent).toContain('Value')
 
     const stepsCard = getGalleryCard(container, 'Steps')
     const profileStep = Array.from(stepsCard.querySelectorAll<HTMLButtonElement>('[data-part="trigger"]')).find((button) => button.textContent?.includes('Profile')) ?? null

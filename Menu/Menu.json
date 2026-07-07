@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Menu",
   "description": "Contextual action list (dropdown or context menu)",
   "props": {
@@ -117,6 +119,23 @@
       "required": false,
       "description": "Breakpoint where auto surfaces switch from popover to sheet."
     },
+    "align": {
+      "type": "enum",
+      "required": false,
+      "description": "Popover alignment relative to the trigger.",
+      "options": [
+        "start",
+        "center",
+        "end"
+      ],
+      "default": "end"
+    },
+    "sideOffset": {
+      "type": "number",
+      "required": false,
+      "description": "Popover distance from the trigger in pixels.",
+      "default": 4
+    },
     "surfaceTitle": {
       "type": "string",
       "required": false,
@@ -132,7 +151,22 @@
     {
       "name": "Default",
       "props": {
-        "trigger": "click"
+        "trigger": "click",
+        "disabled": false,
+        "surface": "auto",
+        "align": "end",
+        "sideOffset": 4,
+        "items": [
+          {
+            "value": "edit",
+            "label": "Edit"
+          },
+          {
+            "value": "delete",
+            "label": "Delete"
+          }
+        ],
+        "children": "Menu"
       }
     },
     {

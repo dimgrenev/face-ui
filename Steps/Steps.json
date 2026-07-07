@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Steps",
   "description": "Step-by-step wizard navigation",
   "props": {
@@ -45,6 +47,9 @@
     {
       "name": "Default",
       "props": {
+        "defaultStep": 0,
+        "linear": true,
+        "disabled": false,
         "items": [
           {
             "label": "Account",
@@ -58,8 +63,7 @@
             "label": "Review",
             "content": "Review the setup before publishing."
           }
-        ],
-        "defaultStep": 0
+        ]
       }
     },
     {

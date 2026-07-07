@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Text",
   "description": "Typography component unifying body, heading, label, kbd, and code",
   "props": {
@@ -139,9 +141,14 @@
     {
       "name": "Default (Body)",
       "props": {
-        "text": "Body text content.",
+        "variant": "default",
+        "iconPosition": "left",
+        "inset": "control",
+        "stretchText": false,
+        "fullWidth": false,
         "align": "left",
-        "inset": "control"
+        "membrane": true,
+        "text": "Text"
       }
     },
     {

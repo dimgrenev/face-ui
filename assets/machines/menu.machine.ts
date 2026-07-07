@@ -272,7 +272,6 @@ export const menuMachine = createMachine<MenuSchema>({
     open: {
       tags: ['visible'],
       entry: [syncOpenTrue],
-      effects: ['trackDismiss', 'trackContextMenu'],
       on: {
         CLOSE: { target: 'closed' },
         OPEN_FIRST: { actions: [highlightFirst] },
@@ -293,56 +292,6 @@ export const menuMachine = createMachine<MenuSchema>({
     },
   },
 
-  implementations: {
-    effects: {
-      trackDismiss: (ctx, send) => {
-        if (typeof document === 'undefined') return
-
-        const onKeyDown = (e: KeyboardEvent) => {
-          if (e.key === 'Escape') {
-            send({ type: 'DISMISS' })
-          }
-        }
-
-        const onPointerDown = (e: MouseEvent) => {
-          const target = e.target as Node | null
-          if (!target) return
-          const isInsideTrigger = ctx.triggerEl?.contains(target) ?? false
-          const isInsideContent = ctx.contentEl?.contains(target) ?? false
-          if (!isInsideTrigger && !isInsideContent) {
-            send({ type: 'DISMISS' })
-          }
-        }
-
-        document.addEventListener('keydown', onKeyDown)
-        document.addEventListener('pointerdown', onPointerDown)
-
-        return () => {
-          document.removeEventListener('keydown', onKeyDown)
-          document.removeEventListener('pointerdown', onPointerDown)
-        }
-      },
-
-      trackContextMenu: (ctx, send) => {
-        // Only attach context menu listener for context trigger
-        if (ctx.trigger !== 'context') return
-
-        const el = ctx.triggerEl
-        if (!el) return
-
-        const onContextMenu = (e: MouseEvent) => {
-          e.preventDefault()
-          send({ type: 'OPEN' })
-        }
-
-        el.addEventListener('contextmenu', onContextMenu)
-
-        return () => {
-          el.removeEventListener('contextmenu', onContextMenu)
-        }
-      },
-    },
-  },
 })
 
 // ---------------------------------------------------------------------------

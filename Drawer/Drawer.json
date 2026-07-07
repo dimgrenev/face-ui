@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Drawer",
   "description": "Side-anchored overlay panel for persistent workflows",
   "props": {
@@ -13,6 +15,15 @@
         "bottom"
       ],
       "default": "right"
+    },
+    "edge": {
+      "type": "enum",
+      "required": false,
+      "description": "Visual edge treatment. Inset keeps sheet-like screen spacing and rounded corners; flush attaches the drawer to the viewport edge without rounding.",
+      "options": [
+        "inset",
+        "flush"
+      ]
     },
     "title": {
       "type": "string",
@@ -107,15 +118,17 @@
     {
       "name": "Default",
       "props": {
+        "side": "right",
+        "title": "Drawer",
+        "children": "Drawer content",
+        "trigger": "Open drawer",
         "open": true,
         "portal": false,
-        "trigger": "Open drawer",
-        "title": "Right drawer",
-        "description": "Persistent side workflow surface.",
-        "children": "Drawer content",
+        "edge": "flush",
+        "description": "Directional edge-aligned surface.",
         "actions": [
           {
-            "label": "Close",
+            "label": "Cancel",
             "variant": "outline"
           },
           {
@@ -131,6 +144,7 @@
         "open": true,
         "portal": false,
         "side": "left",
+        "edge": "flush",
         "trigger": "Open left drawer",
         "title": "Left drawer",
         "description": "Persistent side workflow surface.",
@@ -143,9 +157,36 @@
         "open": true,
         "portal": false,
         "side": "bottom",
+        "edge": "inset",
         "trigger": "Open bottom sheet",
         "title": "Bottom sheet",
         "description": "Compact action surface.",
+        "children": "Drawer content"
+      }
+    },
+    {
+      "name": "Top Inset",
+      "props": {
+        "open": true,
+        "portal": false,
+        "side": "top",
+        "edge": "inset",
+        "trigger": "Open top drawer",
+        "title": "Top drawer",
+        "description": "Full-width inset surface.",
+        "children": "Drawer content"
+      }
+    },
+    {
+      "name": "Right Inset",
+      "props": {
+        "open": true,
+        "portal": false,
+        "side": "right",
+        "edge": "inset",
+        "trigger": "Open inset drawer",
+        "title": "Inset drawer",
+        "description": "Rounded side surface with viewport spacing.",
         "children": "Drawer content"
       }
     }
@@ -237,6 +278,7 @@
     ],
     "notes": [
       "Drawer delegates to Modal with side-specific variant and inherits modal overlay tokens.",
+      "The edge prop separates viewport attachment from side: inset drawers use sheet spacing and radius on every side, while flush drawers attach directly to the viewport edge.",
       "Width and height props delegate to Modal private runtime custom properties while default sizing remains in the modal token namespace."
     ]
   },

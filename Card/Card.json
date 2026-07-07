@@ -1,21 +1,23 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Card",
-  "description": "Content container with title, description, content, and footer",
+  "description": "Composable contained surface for cards, modal bodies, drawers, popovers, toasts, and grouped content.",
   "props": {
     "title": {
       "type": "string",
       "required": false,
-      "description": "Card title"
+      "description": "Legacy title slot. Rendered through Card.Title and Text."
     },
     "description": {
       "type": "string",
       "required": false,
-      "description": "Card description below title"
+      "description": "Legacy description slot below title. Rendered through Card.Description and Text."
     },
     "content": {
       "type": "string",
       "required": false,
-      "description": "Card body content"
+      "description": "Legacy body slot. Strings render through Text with default control inset."
     },
     "footer": {
       "type": "object",
@@ -23,16 +25,86 @@
       "required": false,
       "description": "Card footer slot. Use a structured component descriptor, for example Button."
     },
+    "variant": {
+      "type": "enum",
+      "controlType": "select",
+      "required": false,
+      "options": [
+        "default",
+        "floating",
+        "dialog",
+        "code",
+        "showcase",
+        "plain"
+      ],
+      "description": "Surface preset for the container's role in the system."
+    },
+    "padding": {
+      "type": "enum",
+      "controlType": "select",
+      "required": false,
+      "options": [
+        "membrane",
+        "default",
+        "showcase",
+        "none",
+        "compact",
+        "control",
+        "spacious"
+      ],
+      "description": "Internal surface inset. Default is the Face UI 7px contained-surface rhythm."
+    },
+    "radius": {
+      "type": "enum",
+      "controlType": "select",
+      "required": false,
+      "options": [
+        "showcase",
+        "none",
+        "base",
+        "sm",
+        "md",
+        "lg",
+        "xl"
+      ],
+      "description": "Surface corner radius."
+    },
+    "border": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the surface draws the membrane/border stroke."
+    },
+    "interactive": {
+      "type": "boolean",
+      "required": false,
+      "description": "Applies interactive hover surface behavior without making the card itself a button."
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the card stretches to the available inline size. When disabled, the card keeps intrinsic width and centers in the available inline space."
+    },
+    "footerLayout": {
+      "type": "enum",
+      "controlType": "select",
+      "required": false,
+      "options": [
+        "start",
+        "end",
+        "between",
+        "split"
+      ],
+      "description": "Legacy footer layout. Compound usage can set Card.Footer layout directly."
+    },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing",
-      "default": true
+      "description": "Membrane spacing state for the root surface."
     },
     "children": {
       "type": "string",
       "required": false,
-      "description": "Custom children (escape hatch)"
+      "description": "Compound children or custom content escape hatch."
     }
   },
   "states": [
@@ -52,40 +124,94 @@
       }
     },
     {
-      "name": "With Content",
+      "name": "Modal Surface",
       "props": {
-        "title": "Settings",
-        "content": "Adjust workspace preferences and keep the card rhythm aligned with other controls.",
-        "footer": {
-          "__componentName__": "Button",
-          "text": "Apply",
-          "variant": "accent",
-          "membrane": true,
-          "fullWidth": false
-        }
+        "variant": "dialog",
+        "radius": "lg",
+        "footerLayout": "between",
+        "title": "Confirm publish",
+        "content": "Review the final settings before sending this workspace live.",
+        "footer": [
+          {
+            "__componentName__": "Button",
+            "text": "Cancel",
+            "variant": "outline",
+            "membrane": true,
+            "fullWidth": false
+          },
+          {
+            "__componentName__": "Button",
+            "text": "Publish",
+            "variant": "accent",
+            "membrane": true,
+            "fullWidth": false
+          }
+        ]
       }
     },
     {
-      "name": "Full",
+      "name": "Floating Surface",
       "props": {
-        "title": "Card Title",
-        "description": "A description",
-        "content": "Main content.",
+        "variant": "floating",
+        "padding": "membrane",
+        "radius": "base",
+        "content": "Compact overlay surface for menus, selects and date pickers."
+      }
+    },
+    {
+      "name": "Compact Floating Surface",
+      "props": {
+        "variant": "floating",
+        "padding": "control",
+        "radius": "base",
+        "fullWidth": false,
+        "content": "Tooltip surface with control-like padding."
+      }
+    },
+    {
+      "name": "Code Surface",
+      "props": {
+        "variant": "code",
+        "padding": "none",
+        "radius": "md",
+        "border": false,
+        "content": "const surface = 'code'"
+      }
+    },
+    {
+      "name": "Showcase Surface",
+      "props": {
+        "variant": "showcase",
+        "padding": "showcase",
+        "radius": "showcase",
+        "border": false,
+        "content": "Gallery preview surface"
+      }
+    },
+    {
+      "name": "Plain",
+      "props": {
+        "variant": "plain",
+        "padding": "none",
+        "radius": "none",
+        "border": false,
+        "content": "Unframed card content for composition inside another surface."
+      }
+    },
+    {
+      "name": "Interactive",
+      "props": {
+        "interactive": true,
+        "title": "Deploy preview",
+        "content": "Interactive surfaces can react to hover while still leaving click behavior to their children.",
         "footer": {
           "__componentName__": "Button",
-          "text": "Continue",
+          "text": "Inspect",
           "icon": "arrow-right",
           "iconPosition": "right",
           "membrane": true,
           "fullWidth": false
         }
-      }
-    },
-    {
-      "name": "No Membrane",
-      "props": {
-        "title": "Card",
-        "membrane": false
       }
     }
   ],
@@ -103,7 +229,8 @@
       "title",
       "description",
       "content",
-      "footer"
+      "footer",
+      "actions"
     ],
     "parts": {
       "root": {
@@ -128,19 +255,30 @@
       "footer": {
         "slot": "footer",
         "parent": "root"
+      },
+      "actions": {
+        "slot": "actions",
+        "parent": "footer"
       }
     }
   },
   "tokenMapping": {
     "component": [],
     "semanticFallbacks": [
+      "--uf-overlay-surface-bg",
+      "--uf-overlay-surface-underlay-bg",
+      "--uf-overlay-surface-border",
       "--uf-radius-md",
+      "--uf-radius-lg",
       "--uf-font-weight-bold",
       "--uf-font-size-md"
     ],
     "notes": [
-      "Card intentionally uses shared content, radius, surface and typography tokens rather than card-local aliases.",
-      "Title, description, string content and footer strings render through Text; arbitrary children remain an explicit escape hatch."
+      "Card is the shared contained-surface shell for other composed components.",
+      "Card separates visual surface presets from behavior; Modal still owns dialog behavior and can render its body through Card.",
+      "Title, description, string content and footer strings render through Text; Button descriptors receive membranes by default.",
+      "Flush square surfaces with padding none and radius none suppress the border automatically because they are already bounded by their parent edge.",
+      "The surface background is layered over an underlay token so transparency stays stable across parent backgrounds."
     ]
   },
   "platform": {},
@@ -149,15 +287,17 @@
       "Grouping related content visually",
       "Dashboard widget container",
       "Settings section wrapper",
-      "Content preview block"
+      "Content preview block",
+      "Shared contained surface for Modal, Drawer, Popover, Toast, and gallery examples"
     ],
     "whenNotToUse": [
-      "Full-page layout container (use page structure)",
-      "Interactive list item (use Button with variant)",
-      "Modal content (use Modal)"
+      "Clickable list item by itself (use Button or Tile for interaction semantics)",
+      "Full-page layout container without a contained surface role",
+      "Dialog behavior by itself (use Modal; Modal may compose Card internally)"
     ],
     "alternatives": [
-      "Accordion",
+      "Tile",
+      "Panel",
       "Modal"
     ],
     "context": "both"

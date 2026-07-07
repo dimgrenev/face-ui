@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Progress",
   "description": "Loading progress indicator bar or circular ring",
   "props": {
@@ -58,8 +60,11 @@
       "name": "Default",
       "props": {
         "value": 28,
-        "label": "Typography",
-        "showLabel": true
+        "max": 100,
+        "variant": "default",
+        "shape": "linear",
+        "showLabel": true,
+        "label": "Typography"
       }
     },
     {

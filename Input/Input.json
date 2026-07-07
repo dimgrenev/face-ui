@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Input",
   "description": "Text input control with focus management and clear button",
   "props": {
@@ -262,8 +264,18 @@
     {
       "name": "Default",
       "props": {
-        "label": "Label",
-        "placeholder": "Type here..."
+        "type": "default",
+        "textLayout": "scroll",
+        "disabled": false,
+        "readOnly": false,
+        "error": "",
+        "labelOrientation": "vertical",
+        "iconPosition": "left",
+        "stretchText": false,
+        "required": false,
+        "membrane": false,
+        "label": "Input",
+        "placeholder": "Type…"
       }
     },
     {

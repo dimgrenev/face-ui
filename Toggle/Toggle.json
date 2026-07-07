@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Toggle",
   "description": "Unified toggle and toggle group with single or multiple selection",
   "props": {

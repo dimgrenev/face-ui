@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Button",
   "description": "Action component with variants, icons, and clipboard support",
   "props": {
@@ -71,6 +73,15 @@
       "type": "boolean",
       "required": false,
       "description": "Open state for the selector indicator."
+    },
+    "selectorDirection": {
+      "type": "enum",
+      "required": false,
+      "description": "Direction of the selector indicator. Use side for side-panel selectors.",
+      "options": [
+        "vertical",
+        "side"
+      ]
     },
     "fullWidth": {
       "type": "boolean",
@@ -185,6 +196,14 @@
         "text": "GPT-5.5",
         "selector": true
       }
+    },
+    {
+      "name": "Side Selector",
+      "props": {
+        "text": "Nested",
+        "selector": true,
+        "selectorDirection": "side"
+      }
     }
   ],
   "behavior": {
@@ -211,6 +230,7 @@
     "recommended": [
       "icon",
       "text",
+      "label",
       "indicator"
     ],
     "parts": {
@@ -224,6 +244,10 @@
       "text": {
         "slot": "text",
         "parent": "root"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "text"
       },
       "indicator": {
         "slot": "indicator",

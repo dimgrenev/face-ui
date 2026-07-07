@@ -68,6 +68,59 @@ const FACE_UI_ROOT = path.resolve(CONTRACTS_DIR, '../..')
 const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   Accordion: {
     omitProps: ['legacyItems', 'onChange'],
+    patchProps: {
+      items: {
+        description: 'Accordion item definitions. Each item can include icon, matching Button icon input semantics.',
+      },
+      icon: {
+        type: 'string',
+        required: false,
+        description: 'Default left icon for item triggers. Individual items can override it with item.icon.',
+      },
+    },
+    patchStates: (states) => {
+      const withIconsState = {
+        name: 'With Icons',
+        props: {
+          defaultExpandedIds: ['docs'],
+          items: [
+            {
+              value: 'docs',
+              label: 'Documentation',
+              icon: 'folder',
+              content: 'Guides, references, and release notes stay grouped here.',
+            },
+            {
+              value: 'components',
+              label: 'Components',
+              icon: 'component',
+              content: 'Reusable interface primitives and composed patterns.',
+            },
+            {
+              value: 'files',
+              label: 'Files',
+              icon: 'file',
+              content: 'Project assets and implementation examples.',
+            },
+          ],
+        },
+      }
+      const normalizedStates = states.map((state) => {
+        if (state.name === 'Default') {
+          return {
+            ...state,
+            props: {
+              ...state.props,
+              icon: 'folder',
+            },
+          }
+        }
+        return state
+      })
+      return normalizedStates.some((state) => state.name === withIconsState.name)
+        ? normalizedStates.map((state) => state.name === withIconsState.name ? withIconsState : state)
+        : [...normalizedStates, withIconsState]
+    },
   },
   Badge: {
     patchProps: {
@@ -421,6 +474,135 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   },
   Tabs: {
     omitProps: ['tabs', 'activeTab', 'defaultActiveTab', 'onChange'],
+  },
+  Tile: {
+    patchProps: {
+      intent: {
+        type: 'enum',
+        required: false,
+        default: 'option',
+        options: ['option', 'navigation', 'disclosure', 'tree', 'tab', 'section'],
+        description: 'Semantic row intent. Use option for generic rows, navigation for selected app routes, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.',
+      },
+      density: {
+        type: 'enum',
+        required: false,
+        default: 'default',
+        options: ['default', 'compact', 'spacious'],
+        description: 'Internal spacing density. Default follows Button text padding; compact tightens tree/sidebar rows; spacious gives inspection rows more breathing room.',
+      },
+      tone: {
+        type: 'enum',
+        required: false,
+        default: 'neutral',
+        options: ['neutral', 'muted', 'accent', 'positive', 'warning', 'destructive'],
+        description: 'Semantic visual tone for row foreground and hover treatment.',
+      },
+      actionVisibility: {
+        type: 'enum',
+        required: false,
+        default: 'reveal',
+        options: ['reveal', 'hover', 'always', 'hidden'],
+        description: 'How the actions slot is exposed: reveal on hover/focus/active, hover only, always visible, or hidden.',
+      },
+      leading: {
+        type: 'ReactNode',
+        required: false,
+        description: 'Isolated leading slot for nested controls. Use icon for decorative icons and leading for actionable controls.',
+      },
+      meta: {
+        type: 'ReactNode',
+        required: false,
+        description: 'Trailing non-interactive metadata rendered before actions.',
+      },
+      busy: {
+        type: 'boolean',
+        required: false,
+        default: false,
+        description: 'Marks the row busy with data-busy and aria-busy without disabling it by itself.',
+      },
+      selectedDescendant: {
+        type: 'boolean',
+        required: false,
+        default: false,
+        description: 'Marks parent rows that contain the selected descendant, commonly while collapsed.',
+      },
+      interactive: {
+        type: 'boolean',
+        required: false,
+        description: 'Override interactive semantics. Set false for section/header rows that should not expose button behavior.',
+      },
+    },
+    patchStates: () => [
+      {
+        name: 'Default',
+        props: {
+          text: 'Page title',
+          icon: 'file',
+        },
+      },
+      {
+        name: 'Navigation Active',
+        props: {
+          intent: 'navigation',
+          text: 'Current page',
+          icon: 'file',
+          active: true,
+        },
+      },
+      {
+        name: 'Disclosure Parent',
+        props: {
+          intent: 'disclosure',
+          text: 'Project',
+          icon: 'folder',
+          selector: true,
+          selectorOpen: true,
+          actionVisibility: 'hover',
+          actions: '[Button icon=plus]',
+        },
+      },
+      {
+        name: 'Tree Row',
+        props: {
+          intent: 'tree',
+          density: 'compact',
+          text: 'src/components/Button.tsx',
+          icon: 'file',
+          level: 2,
+        },
+      },
+      {
+        name: 'Tab',
+        props: {
+          intent: 'tab',
+          text: 'Preview',
+          icon: 'browser',
+          active: true,
+          fullWidth: false,
+          actionVisibility: 'hover',
+          actions: '[Button icon=close]',
+        },
+      },
+      {
+        name: 'Section',
+        props: {
+          intent: 'section',
+          text: 'Collections',
+          interactive: false,
+        },
+      },
+      {
+        name: 'Busy Destructive',
+        props: {
+          text: 'Delete chat?',
+          tone: 'destructive',
+          busy: true,
+          actionVisibility: 'always',
+          actions: '[Button icon=close]',
+        },
+      },
+    ],
   },
   Toc: {
     omitProps: ['onChange'],

@@ -123,6 +123,7 @@ export function SliderAdvanced({
     return normalizeCrop(initialCrop)
   })
   const [dragValue, setDragValue] = useState<number | null>(null)
+  const [optimisticValue, setOptimisticValue] = useState<number | null>(null)
   const [dragCrop, setDragCrop] = useState<SliderCropRange | null>(null)
   const [thumbW, setThumbW] = useState(34)
   const [bodyW, setBodyW] = useState(0)
@@ -135,10 +136,31 @@ export function SliderAdvanced({
   const dragOffsetRef = useRef(0)
   const lastDragValueRef = useRef<number | null>(null)
   const lastDragCropRef = useRef<SliderCropRange | null>(null)
+  const optimisticValueRef = useRef<number | null>(null)
+
+  const clearOptimisticValue = () => {
+    optimisticValueRef.current = null
+    setOptimisticValue(null)
+  }
+
+  const setOptimisticControlledValue = (next: number) => {
+    if (!isControlled) return
+    optimisticValueRef.current = next
+    setOptimisticValue(next)
+  }
 
   useEffect(() => {
-    if (!isControlled || draggingRef.current) return
-    setInternalValue(snapToStep(controlledValue as number))
+    if (!isControlled) {
+      if (optimisticValueRef.current != null) clearOptimisticValue()
+      return
+    }
+
+    const next = snapToStep(controlledValue as number)
+    if (!draggingRef.current) setInternalValue(next)
+    if (optimisticValueRef.current == null) return
+    if (optimisticValueRef.current === next || !draggingRef.current) {
+      clearOptimisticValue()
+    }
   }, [controlledValue, isControlled, mn, mx, safeStep])
 
   useEffect(() => {
@@ -163,7 +185,7 @@ export function SliderAdvanced({
     ? dragCrop
     : committedCrop
 
-  const committedValue = isControlled ? (controlledValue as number) : internalValue
+  const committedValue = isControlled ? (optimisticValue ?? (controlledValue as number)) : internalValue
   const renderValueRaw = draggingRef.current && typeof dragValue === 'number' ? dragValue : committedValue
   const normalizeValueToCrop = (next: number, cropNow: SliderCropRange) => {
     const base = snapToStep(next)
@@ -293,7 +315,11 @@ export function SliderAdvanced({
     if (disabled) return
     const normalized = cropLocks ? normalizeValueToCrop(next, options.crop ?? renderCrop) : snapToStep(next)
     lastDragValueRef.current = normalized
-    if (!isControlled && options.commit !== false) setInternalValue(normalized)
+    if (isControlled) {
+      setOptimisticControlledValue(normalized)
+    } else if (options.commit !== false) {
+      setInternalValue(normalized)
+    }
     onChange?.(normalized)
     onValueChange?.({ value: [normalized] })
   }
@@ -356,8 +382,8 @@ export function SliderAdvanced({
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
       window.removeEventListener('pointercancel', onUp)
-      if (!isControlled && lastDragValueRef.current != null) {
-        setInternalValue(lastDragValueRef.current)
+      if (lastDragValueRef.current != null) {
+        if (!isControlled) setInternalValue(lastDragValueRef.current)
       }
       draggingRef.current = false
       dragKindRef.current = null
@@ -446,8 +472,8 @@ export function SliderAdvanced({
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
       window.removeEventListener('pointercancel', onUp)
-      if (!isControlled && lastDragValueRef.current != null) {
-        setInternalValue(lastDragValueRef.current)
+      if (lastDragValueRef.current != null) {
+        if (!isControlled) setInternalValue(lastDragValueRef.current)
       }
       draggingRef.current = false
       dragKindRef.current = null

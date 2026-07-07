@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "SegmentedControl",
   "props": {
     "items": {
@@ -60,6 +62,7 @@
     {
       "name": "Default",
       "props": {
+        "selectionMode": "single",
         "items": [
           {
             "value": "grid",
@@ -70,13 +73,14 @@
             "label": "List"
           },
           {
-            "value": "kanban",
+            "value": "board",
             "label": "Board"
           }
         ],
         "defaultValue": [
           "grid"
-        ]
+        ],
+        "membrane": true
       }
     }
   ],

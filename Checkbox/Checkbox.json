@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Checkbox",
   "description": "Boolean or indeterminate form control with a visible label and hidden native input",
   "props": {
@@ -68,6 +70,11 @@
     {
       "name": "Unchecked",
       "props": {
+        "defaultChecked": false,
+        "disabled": false,
+        "required": false,
+        "name": "",
+        "membrane": true,
         "label": "Checkbox"
       }
     },

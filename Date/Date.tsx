@@ -10,6 +10,7 @@ import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
 import { Calendar } from '../Calendar/Calendar'
 import { Button } from '../Button/Button'
+import { Card } from '../Card/Card'
 import { Text } from '../Text/Text'
 import { Icon } from '../Icon/Icon'
 import { cn } from '../assets/utils'
@@ -262,7 +263,13 @@ export const Date = forwardRef<HTMLDivElement, DateProps>(function Date(props, r
   const hours = getHourGrid(1)
   const minutes = getMinuteGrid(5)
   const contentPanel = (
-    <div className="uf-date__contentPanel">
+    <Card
+      variant="floating"
+      padding="membrane"
+      radius="base"
+      fullWidth={resolvedSurface === 'sheet'}
+      className="uf-date__contentPanel"
+    >
       {resolvedSurface === 'sheet' ? (
         <ResponsiveSheetHeader
           title={sheetTitle}
@@ -423,7 +430,7 @@ export const Date = forwardRef<HTMLDivElement, DateProps>(function Date(props, r
           </span>
         ) : null}
       </div>
-    </div>
+    </Card>
   )
 
   return (

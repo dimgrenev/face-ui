@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Badge",
   "description": "Status indicator label",
   "props": {

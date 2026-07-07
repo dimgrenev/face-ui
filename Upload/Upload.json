@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Upload",
   "description": "File upload with drag-and-drop support",
   "props": {
@@ -56,7 +58,13 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "accept": "",
+        "multiple": false,
+        "maxSize": 0,
+        "maxFiles": 0,
+        "disabled": false
+      }
     },
     {
       "name": "Images Only",

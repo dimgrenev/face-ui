@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Pagination",
   "description": "Compact page navigation with previous/next buttons, current page text and a Menu-backed page picker.",
   "props": {
@@ -61,8 +63,12 @@
     {
       "name": "Default",
       "props": {
-        "total": 100,
-        "page": 1
+        "siblingCount": 1,
+        "disabled": false,
+        "membrane": true,
+        "surfaceTitle": "Choose page",
+        "total": 120,
+        "defaultPage": 6
       }
     },
     {

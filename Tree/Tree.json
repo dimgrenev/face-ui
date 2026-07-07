@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Tree",
   "description": "Hierarchical tree view with expand/collapse and selection",
   "props": {

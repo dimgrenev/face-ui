@@ -1,11 +1,18 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Accordion",
   "description": "Expandable panel navigation with single or multiple open items",
   "props": {
     "items": {
       "type": "array",
       "required": false,
-      "description": "Accordion item definitions."
+      "description": "Accordion item definitions. Each item can include icon, matching Button icon input semantics."
+    },
+    "icon": {
+      "type": "string",
+      "required": false,
+      "description": "Default left icon for item triggers. Individual items can override it with item.icon."
     },
     "expandedIds": {
       "type": "array",
@@ -50,6 +57,10 @@
     {
       "name": "Default",
       "props": {
+        "multiple": true,
+        "collapsible": true,
+        "disabled": false,
+        "icon": "folder",
         "defaultExpandedIds": [
           "getting-started"
         ]
@@ -62,6 +73,34 @@
         "defaultExpandedIds": [
           "getting-started",
           "usage"
+        ]
+      }
+    },
+    {
+      "name": "With Icons",
+      "props": {
+        "defaultExpandedIds": [
+          "docs"
+        ],
+        "items": [
+          {
+            "value": "docs",
+            "label": "Documentation",
+            "icon": "folder",
+            "content": "Guides, references, and release notes stay grouped here."
+          },
+          {
+            "value": "components",
+            "label": "Components",
+            "icon": "component",
+            "content": "Reusable interface primitives and composed patterns."
+          },
+          {
+            "value": "files",
+            "label": "Files",
+            "icon": "file",
+            "content": "Project assets and implementation examples."
+          }
         ]
       }
     },
@@ -156,7 +195,7 @@
       "--uf-control-gap",
       "--uf-control-pad-text",
       "--uf-control-pad-icon",
-      "--uf-accordion-content-inset",
+      "--uf-icon-size",
       "--uf-font-size",
       "--uf-font-weight",
       "--uf-radius",
@@ -168,7 +207,8 @@
     ],
     "notes": [
       "Accordion intentionally uses shared control geometry and motion tokens instead of accordion-local size or timing tokens.",
-      "Content panels use --uf-accordion-content-inset to align direct content under the trigger label.",
+      "Item icons reuse Button icon semantics: string names resolve through Icon, React nodes render directly, and left-icon triggers use --uf-control-pad-icon.",
+      "Content panels keep full slot width so nested controls retain their own system insets and full-width behavior.",
       "Trigger labels and content strings route through Text; nested action content should remain Face UI or UF components."
     ]
   },

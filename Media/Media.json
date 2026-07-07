@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Media",
   "description": "Unified image, video, and audio renderer",
   "props": {
@@ -163,8 +165,12 @@
     {
       "name": "Default Image",
       "props": {
-        "src": "/assets/media/examples/office-core/lobby-day.webp",
-        "alt": "Bright office lobby with glass-block wall, seating, and plants"
+        "type": "image",
+        "alt": "Bright office lobby with glass-block wall, seating, and plants",
+        "variant": "default",
+        "lazy": false,
+        "membrane": false,
+        "src": "/assets/media/examples/office-core/lobby-day.webp"
       }
     },
     {

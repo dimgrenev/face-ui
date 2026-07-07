@@ -204,8 +204,8 @@ describe('taxonomy and governance', () => {
       '.uf-switcher[data-scope]',
       '[data-scope="radio"] [data-part="item"]',
       '[data-scope="input"] [data-part="input"],\n[data-scope="input"] [data-part="textarea"]',
-      '[data-scope="select"] [data-part="trigger"]',
-      '[data-scope="select"] [data-part="option"]',
+      '.uf-select[data-scope="select"] [data-part="trigger"]',
+      ':is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"]',
       '.uf-date__trigger',
       '.uf-slider[data-scope="slider"]',
       '.uf-rating-star',
@@ -226,12 +226,36 @@ describe('taxonomy and governance', () => {
 
     expect(readCssBlock(componentsCss, '.uf-button[data-scope="button"][data-selector]'))
       .toContain('--uf-control-pad-right: var(--uf-selector-indicator-edge-gap);')
-    expect(readCssBlock(componentsCss, '[data-scope="button"] [data-part="indicator"],\n[data-scope="tile"] [data-part="indicator"],\n[data-scope="select"] [data-part="indicator"]'))
+    expect(readCssBlock(componentsCss, '[data-scope="button"] [data-part="label"],\n.uf-button__label'))
+      .toContain('text-overflow: ellipsis;')
+    expect(readCssBlock(componentsCss, '[data-scope="button"] [data-part="indicator"],\n[data-scope="tile"] [data-part="indicator"],\n.uf-select[data-scope="select"] [data-part="indicator"]'))
       .toContain('margin-inline-start: var(--uf-selector-indicator-offset-inline-start, 0px);')
     expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector] [data-part="indicator"]'))
       .toContain('opacity: var(--uf-tile-selector-indicator-opacity, 0);')
-    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector]:hover [data-part="indicator"],\n.uf-tile[data-scope="tile"][data-selector]:focus-visible [data-part="indicator"],\n.uf-tile[data-scope="tile"][data-selector]:focus-within [data-part="indicator"]'))
+    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector] [data-part="text"]'))
+      .toContain('gap: var(--uf-selector-indicator-gap);')
+    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector] [data-part="text"]'))
+      .toContain('width: auto;')
+    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector]:hover [data-part="indicator"],\n.uf-tile[data-scope="tile"][data-selector]:focus-visible [data-part="indicator"]'))
       .toContain('opacity: var(--uf-tile-selector-indicator-hover-opacity, 0.7);')
+    expect(componentsCss).not.toContain('.uf-tile[data-scope="tile"][data-selector]:focus-within [data-part="indicator"]')
+    const tileBlock = readCssBlock(componentsCss, '.uf-tile[data-scope="tile"]')
+    expect(tileBlock).toContain('--uf-tile-pad: calc(var(--uf-membrane) * 3);')
+    expect(tileBlock).toContain('--uf-tile-pad-y: var(--uf-tile-pad);')
+    expect(tileBlock).toContain('--uf-tile-pad-x: var(--uf-tile-pad);')
+    expect(tileBlock).toContain('--uf-tile-action-size: calc(var(--uf-control-height) - (var(--uf-tile-pad) * 2) - (var(--uf-membrane) * 2));')
+    expect(tileBlock).toContain('padding-top: var(--uf-tile-pad-y);')
+    expect(tileBlock).toContain('padding-left: var(--uf-tile-pad-left);')
+    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-icon-left]'))
+      .toContain('--uf-tile-pad-left: var(--uf-control-pad-icon);')
+    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-icon-right]'))
+      .toContain('--uf-tile-pad-right: var(--uf-control-pad-icon);')
+    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-action-visibility="always"] [data-part="actions"]'))
+      .toContain('pointer-events: auto;')
+    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-action-visibility="hidden"] [data-part="actions"]'))
+      .toContain('pointer-events: none;')
+    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-intent="section"]'))
+      .toContain('cursor: default;')
     expect(readCssBlock(componentsCss, '[data-scope="select"] [data-part="trigger"]'))
       .toContain('padding-right: var(--uf-select-indicator-edge-gap);')
     expect(readCssBlock(componentsCss, '.uf-badge[data-scope]'))
@@ -244,12 +268,14 @@ describe('taxonomy and governance', () => {
       .toContain('gap: var(--uf-control-gap);')
     expect(readCssBlock(componentsCss, '.uf-breadcrumb[data-scope] a'))
       .toContain('line-height: var(--uf-control-line-height);')
-    expect(readCssBlock(componentsCss, '[data-scope="accordion"][data-part="root"]'))
-      .toContain('--uf-accordion-content-inset: var(--uf-control-pad-text);')
     expect(readCssBlock(componentsCss, '[data-scope="accordion"] [data-part="content"],\n[data-scope="accordion"] [data-part="item-content"]'))
-      .toContain('padding: 0 0 0 var(--uf-accordion-content-inset);')
-    expect(readCssBlock(componentsCss, '[data-scope="accordion"] .uf-accordion-slot > .uf-text[data-scope="text"],\n[data-scope="accordion"] .uf-accordion-slot > .uf-membrane > .uf-text[data-scope="text"]'))
-      .toContain('--uf-text-pad-x: 0;')
+      .toContain('padding: 0;')
+    expect(readCssBlock(componentsCss, '[data-scope="accordion"] .uf-accordion-slot'))
+      .toContain('display: flex;')
+    expect(readCssBlock(componentsCss, '[data-scope="accordion"] .uf-accordion-slot > .uf-membrane,\n[data-scope="accordion"] .uf-accordion-slot > .uf-button[data-scope="button"],\n[data-scope="accordion"] .uf-accordion-slot > .uf-tile[data-scope="tile"],\n[data-scope="accordion"] .uf-accordion-slot > .uf-text[data-scope="text"]'))
+      .toContain('width: 100%;')
+    expect(readCssBlocks(componentsCss, '[data-scope="accordion"] .uf-accordion-slot > .uf-text[data-scope="text"],\n[data-scope="accordion"] .uf-accordion-slot > .uf-membrane > .uf-text[data-scope="text"]'))
+      .toHaveLength(0)
     expect(readCssBlock(componentsCss, '.uf-steps[data-scope]'))
       .not.toContain('--uf-steps-label-inset')
     expect(readCssBlock(componentsCss, '[data-scope="steps"] [data-part="trigger"]'))
@@ -259,6 +285,16 @@ describe('taxonomy and governance', () => {
     expect(componentsCss).not.toContain('.uf-steps-contentText')
     expect(readCssBlock(componentsCss, '[data-scope="steps"] [data-part="content"]'))
       .toContain('padding: 0;')
+    expect(readCssBlock(componentsCss, '.uf-code[data-scope]'))
+      .toContain('max-inline-size: 100%;')
+    expect(readCssBlock(componentsCss, '.uf-code[data-scope] pre'))
+      .toContain('min-inline-size: 0;')
+    expect(readCssBlock(componentsCss, '.uf-code[data-scope] pre'))
+      .toContain('overflow-x: auto;')
+    expect(readCssBlock(componentsCss, '.uf-code[data-scope] code'))
+      .toContain('min-inline-size: max-content;')
+    expect(readCssBlock(componentsCss, '[data-scope="code"] [data-part="line"]'))
+      .toContain('min-inline-size: max-content;')
   })
 
   it('keeps standard interactive hover surfaces on the shared hover background token', () => {
@@ -269,8 +305,8 @@ describe('taxonomy and governance', () => {
       '.uf-switcher[data-scope]:hover:not([data-disabled])',
       '.uf-radio-option:hover,\n[data-scope="radio"] [data-part="item"]:hover',
       '[data-scope="input"] [data-part="input"]:hover,\n[data-scope="input"] [data-part="textarea"]:hover',
-      '[data-scope="select"] [data-part="trigger"]:hover',
-      '[data-scope="select"] [data-part="option"]:hover,\n[data-scope="select"] [data-part="option"][data-highlighted]',
+      '.uf-select[data-scope="select"] [data-part="trigger"]:hover',
+      ':is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"]:hover,\n:is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"][data-highlighted]',
       '.uf-date__trigger:hover',
       '.uf-rating-star:hover',
       '[data-scope="toggle-group"] [data-part="item"]:hover,\n.uf-toggle[data-scope] [data-part="item"]:hover',
@@ -358,16 +394,25 @@ describe('taxonomy and governance', () => {
     expect(contents[1]?.getAttribute('data-trigger')).toBe('click')
   })
 
-  it('keeps Tooltip colors on shared overlay surface tokens', () => {
+  it('keeps Tooltip colors theme-invariant while overlay surfaces can theme', () => {
+    expect(tokensCss).toContain('--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-10));')
+    expect(tokensCss).toContain('--uf-overlay-surface-bg: var(--uf-color-white-100);')
+    expect(designSystemColorCss).toContain('--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-10));')
+    expect(designSystemColorCss).toContain('--uf-overlay-surface-bg: var(--uf-color-white-100);')
     expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-black-100);')
     expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-white-100);')
     expect(tokensCss).toContain('--uf-overlay-surface-background: linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg);')
-    expect(tokensCss).toContain('--uf-tooltip-bg: var(--uf-overlay-surface-bg);')
-    expect(tokensCss).toContain('--uf-tooltip-background: linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-overlay-surface-underlay-bg);')
-    expect(tokensCss).toContain('--uf-tooltip-fg: var(--uf-color-fg);')
-    expect(tokensCss).toContain('--uf-tooltip-border: var(--uf-overlay-surface-border);')
+    expect(tokensCss).toContain('--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-10));')
+    expect(tokensCss).toContain('--uf-tooltip-background: linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-100);')
+    expect(tokensCss).toContain('--uf-tooltip-fg: var(--uf-color-white-92);')
+    expect(tokensCss).toContain('--uf-tooltip-border: var(--uf-color-white-20);')
+    expect(designSystemColorCss).toContain('--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-10));')
+    expect(designSystemColorCss).toContain('--uf-tooltip-fg: var(--uf-color-white-92);')
+    expect(componentsCss).toContain('.uf-card[data-scope][data-card-variant="floating"]')
+    expect(componentsCss).toContain('--uf-card-bg: var(--uf-tooltip-bg);')
+    expect(componentsCss).toContain('--uf-card-background: var(--uf-tooltip-background);')
+    expect(componentsCss).toContain('--uf-card-border: var(--uf-tooltip-border);')
     expect(componentsCss).toContain('--uf-text-color: var(--uf-tooltip-fg);')
-    expect(componentsCss).toContain('background: var(--uf-tooltip-background);')
     expect(componentsCss).toContain('color: var(--uf-tooltip-fg);')
   })
 
@@ -378,20 +423,35 @@ describe('taxonomy and governance', () => {
           <faceUiCompat.Sheet open title="Drawer" side="bottom">Content</faceUiCompat.Sheet>
           <Drawer open title="Drawer" side="left">Content</Drawer>
           <Drawer open title="Drawer" side="top">Content</Drawer>
+          <Drawer open title="Drawer" side="right" edge="inset">Content</Drawer>
         </div>,
       )
     })
 
     const modals = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-modal[data-scope]'))
-    expect(modals).toHaveLength(3)
+    const positioners = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-modal-positioner[data-scope]'))
+    expect(modals).toHaveLength(4)
     expect(modals[0]?.getAttribute('data-surface')).toBe('sheet')
     expect(modals[0]?.getAttribute('data-variant')).toBe('bottom')
+    expect(modals[0]?.classList.contains('uf-drawer--inset')).toBe(true)
+    expect(positioners[0]?.classList.contains('uf-drawer-positioner--inset')).toBe(true)
     expect(modals[1]?.getAttribute('data-variant')).toBe('left')
     expect(modals[1]?.classList.contains('uf-drawer')).toBe(true)
+    expect(modals[1]?.classList.contains('uf-drawer--flush')).toBe(true)
+    expect(positioners[1]?.classList.contains('uf-drawer-positioner--flush')).toBe(true)
     expect(modals[2]?.getAttribute('data-surface')).toBe('sheet')
     expect(modals[2]?.getAttribute('data-variant')).toBe('top')
-    expect(componentsCss).toContain('.uf-modal[data-scope].uf-drawer')
-    expect(componentsCss).toContain('border: 0;')
+    expect(modals[2]?.classList.contains('uf-drawer--inset')).toBe(true)
+    expect(modals[3]?.getAttribute('data-variant')).toBe('right')
+    expect(modals[3]?.classList.contains('uf-drawer--inset')).toBe(true)
+    expect(modals[0]?.getAttribute('data-border')).toBe('true')
+    expect(modals[1]?.getAttribute('data-border')).toBe('false')
+    expect(modals[2]?.getAttribute('data-border')).toBe('true')
+    expect(modals[3]?.getAttribute('data-border')).toBe('true')
+    expect(componentsCss).not.toMatch(/\.uf-modal\[data-scope\]\.uf-drawer\s*\{[^}]*border\s*:\s*0\s*;?[^}]*\}/)
+    expect(componentsCss).toContain('.uf-modal-positioner[data-scope].uf-drawer-positioner--inset[data-variant="top"]')
+    expect(componentsCss).toContain('.uf-modal[data-scope].uf-drawer--flush:is([data-variant="top"], [data-variant="bottom"])')
+    expect(componentsCss).toContain('.uf-modal[data-scope].uf-drawer--inset:is([data-variant="top"], [data-variant="bottom"])')
   })
 
   it('SegmentedControl defaults to single selection and Date renders date field behavior', async () => {

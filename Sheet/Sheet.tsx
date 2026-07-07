@@ -1,8 +1,9 @@
 import { forwardRef } from 'react'
-import { Drawer, type DrawerProps } from '../Drawer/Drawer'
+import { Drawer, type DrawerEdge, type DrawerProps } from '../Drawer/Drawer'
 
 export interface SheetProps extends Omit<DrawerProps, 'side'> {
   side?: 'bottom' | 'top'
+  edge?: DrawerEdge
 }
 
 export const Sheet = forwardRef<HTMLDivElement, SheetProps>(function Sheet(props, ref) {

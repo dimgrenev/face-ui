@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Radio",
   "description": "Radio group for single-option selection",
   "props": {

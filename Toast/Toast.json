@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Toast",
   "description": "Notification system with toaster singleton and factory",
   "props": {
@@ -23,7 +25,10 @@
   "states": [
     {
       "name": "Default (Trigger Button)",
-      "props": {}
+      "props": {
+        "showTrigger": true,
+        "autoShow": false
+      }
     },
     {
       "name": "Auto Show",

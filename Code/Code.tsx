@@ -12,6 +12,7 @@ import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
 import { Button } from '../Button/Button'
+import { Card } from '../Card/Card'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -138,9 +139,13 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
     const onToggle = useCallback(() => setCollapsed((v) => !v), [])
 
     return (
-      <div
+      <Card
         ref={ref}
         {...codeAnatomy.getPartAttrs('root')}
+        variant="code"
+        padding="none"
+        radius="md"
+        fullWidth
         data-language={language}
         data-line-numbers={showLineNumbers || undefined}
         data-collapsed={collapsed || undefined}
@@ -231,7 +236,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
             })}
           </code>
         </pre>
-      </div>
+      </Card>
     )
   },
 )

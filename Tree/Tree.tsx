@@ -7,8 +7,9 @@
  * `<Tree items={[{ id: 'a', label: 'Folder', children: [{ id: 'b', label: 'File' }] }]} />`
  */
 
-import { forwardRef, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, type CSSProperties, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
+import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { treeMachine, connectTree } from '../assets/machines/tree.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
@@ -116,6 +117,20 @@ function idArraysEqual(left: string[] | undefined, right: string[] | undefined):
   return left.every((item, index) => item === right[index])
 }
 
+function computeVisibleIds(nodes: TreeNode[], expandedSet: Set<string>): string[] {
+  const ids: string[] = []
+  const visit = (itemsToVisit: TreeNode[]) => {
+    for (const item of itemsToVisit) {
+      ids.push(item.id)
+      if (expandedSet.has(item.id) && Array.isArray(item.children) && item.children.length > 0) {
+        visit(item.children)
+      }
+    }
+  }
+  visit(nodes)
+  return ids
+}
+
 // ---------------------------------------------------------------------------
 // Recursive node renderer
 // ---------------------------------------------------------------------------
@@ -130,6 +145,8 @@ interface TreeNodeRendererProps {
 
 function TreeNodeRenderer(props: TreeNodeRendererProps) {
   const { node, api, depth, activePathIds, renderNode } = props
+  const nodeRender = typeof node.render === 'function' ? node.render : undefined
+  const treeRenderNode = typeof renderNode === 'function' ? renderNode : undefined
   const hasChildren = Array.isArray(node.children) && node.children.length > 0
   const isInActivePath = activePathIds.has(node.id)
   const isExpanded = api.expandedIds.includes(node.id)
@@ -151,7 +168,7 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
   }
 
   const renderDefaultRow = (rowProps: Record<string, any>, className: string) => {
-    const customContent = node.render?.(renderDetails) ?? renderNode?.(renderDetails) ?? node.content
+    const customContent = nodeRender?.(renderDetails) ?? treeRenderNode?.(renderDetails) ?? node.content
     if (customContent != null || node.kind === 'custom') {
       return (
         <div
@@ -285,54 +302,43 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
     } = props
 
     const items = Array.isArray(rawItems) ? rawItems : defaultTreeItems
+    const expandedChangeHandler = typeof onExpandedChange === 'function' ? onExpandedChange : undefined
+    const selectedChangeHandler = typeof onSelectedChange === 'function' ? onSelectedChange : undefined
+
     const controlledExpandedIds = normalizeIdArray(expandedIds)
-    const isExpandedControlled = controlledExpandedIds !== undefined && typeof onExpandedChange === 'function'
+    const isExpandedControlled = controlledExpandedIds !== undefined && expandedChangeHandler !== undefined
     const initialExpandedIds = controlledExpandedIds ?? normalizeIdArray(defaultExpandedIds) ?? []
-    const [uncontrolledExpandedIds, setUncontrolledExpandedIds] = useState(initialExpandedIds)
-    const machineExpandedIds = isExpandedControlled ? controlledExpandedIds : uncontrolledExpandedIds
-    const uncontrolledExpandedSeedRef = useRef(controlledExpandedIds?.join('\u0001') ?? null)
+    const machineExpandedIds = useControllableMachineProp(
+      isExpandedControlled ? controlledExpandedIds : undefined,
+      initialExpandedIds,
+    )
 
     const controlledSelectedId = selectedId !== undefined ? String(selectedId) : undefined
-    const isSelectedControlled = controlledSelectedId !== undefined && typeof onSelectedChange === 'function'
+    const isSelectedControlled = controlledSelectedId !== undefined && selectedChangeHandler !== undefined
     const initialSelectedId = controlledSelectedId ?? (defaultSelectedId ? String(defaultSelectedId) : null)
-    const [uncontrolledSelectedId, setUncontrolledSelectedId] = useState<string | null>(initialSelectedId)
-    const machineSelectedId = isSelectedControlled ? controlledSelectedId : uncontrolledSelectedId
-    const uncontrolledSelectedSeedRef = useRef(controlledSelectedId ?? null)
+    const machineSelectedId = useControllableMachineProp<string | null>(
+      isSelectedControlled ? controlledSelectedId : undefined,
+      initialSelectedId,
+    )
 
-    const computeVisibleIds = (nodes: TreeNode[], expandedSet: Set<string>): string[] => {
-      const ids: string[] = []
-      const visit = (itemsToVisit: TreeNode[]) => {
-        for (const item of itemsToVisit) {
-          ids.push(item.id)
-          if (expandedSet.has(item.id) && Array.isArray(item.children) && item.children.length > 0) {
-            visit(item.children)
-          }
-        }
-      }
-      visit(nodes)
-      return ids
-    }
-    const visibleIds = computeVisibleIds(items, new Set(machineExpandedIds ?? []))
+    const initialVisibleIds = computeVisibleIds(items, new Set(initialExpandedIds))
+    const machineVisibleIds = useControllableMachineProp<string[] | undefined>(undefined, initialVisibleIds)
 
     const { state, send } = useMachine(treeMachine, {
       expandedIds: machineExpandedIds,
-      visibleIds,
+      visibleIds: machineVisibleIds,
       selectedId: machineSelectedId,
       onExpandedChange: ((details: { expandedIds: string[] }) => {
-        if (!isExpandedControlled) {
-          setUncontrolledExpandedIds(details.expandedIds)
-        } else if (idArraysEqual(details.expandedIds, controlledExpandedIds)) {
+        if (isExpandedControlled && idArraysEqual(details.expandedIds, controlledExpandedIds)) {
           return
         }
-        onExpandedChange?.(details)
+        expandedChangeHandler?.(details)
       }) as any,
       onSelectedChange: ((details: { selectedId: string }) => {
-        if (!isSelectedControlled) {
-          setUncontrolledSelectedId(details.selectedId)
-        } else if (details.selectedId === controlledSelectedId) {
+        if (isSelectedControlled && details.selectedId === controlledSelectedId) {
           return
         }
-        onSelectedChange?.(details)
+        selectedChangeHandler?.(details)
       }) as any,
     })
 
@@ -361,21 +367,6 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
       visit(items, [])
       return set
     }, [api.selectedId, items])
-
-    useEffect(() => {
-      if (isExpandedControlled || controlledExpandedIds === undefined) return
-      const nextSeed = controlledExpandedIds.join('\u0001')
-      if (uncontrolledExpandedSeedRef.current === nextSeed) return
-      uncontrolledExpandedSeedRef.current = nextSeed
-      setUncontrolledExpandedIds(controlledExpandedIds)
-    }, [controlledExpandedIds, isExpandedControlled])
-
-    useEffect(() => {
-      if (isSelectedControlled || controlledSelectedId === undefined) return
-      if (uncontrolledSelectedSeedRef.current === controlledSelectedId) return
-      uncontrolledSelectedSeedRef.current = controlledSelectedId
-      setUncontrolledSelectedId(controlledSelectedId)
-    }, [controlledSelectedId, isSelectedControlled])
 
     useEffect(() => {
       const nextVisibleIds = computeVisibleIds(items, new Set(state.context.expandedIds))

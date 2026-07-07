@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Overlay",
   "description": "Floating content surface unifying tooltip, popover, and hover card",
   "props": {

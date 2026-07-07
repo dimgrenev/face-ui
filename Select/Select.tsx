@@ -7,7 +7,18 @@
  * `<Select options={items} placeholder="Choose..." />`
  * `<Select type="multiselect" options={items} value={['a','b']} />`
  */
-import { forwardRef, useCallback, useEffect, useId, useRef, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from 'react'
 import { createPortal } from 'react-dom'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
@@ -17,10 +28,12 @@ import {
   type ResponsiveOverlaySurface,
 } from '../assets/adapters/react/use-responsive-overlay-surface'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
+import { useDismissOutside } from '../assets/adapters/react/use-dismiss-outside'
 import { useFloatingPosition } from '../assets/adapters/react/use-floating-position'
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
 import { selectAnatomy, selectMachine, connectSelect } from '../assets/machines/select.machine'
 import { cn } from '../assets/utils'
+import { Card } from '../Card/Card'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 
@@ -34,7 +47,11 @@ export interface SelectOption {
   disabled?: boolean
 }
 
+export type SelectVariant = 'default' | 'side' | 'iconOnly'
+
 export interface SelectProps {
+  /** Visual/behavioral variant. */
+  variant?: SelectVariant
   /** Available options. */
   options?: SelectOption[]
   /** Current selected value. String for single, string[] for multiselect. */
@@ -53,8 +70,8 @@ export interface SelectProps {
   labelOrientation?: 'vertical' | 'horizontal'
   /** Accessible label (aria-label). */
   ariaLabel?: string
-  /** Optional override for the text shown in the trigger. */
-  displayValue?: string
+  /** Optional override for the content shown in the trigger. */
+  displayValue?: ReactNode
   /** Stretch the value area so the arrow pins to the right edge. */
   stretchText?: boolean
   /** Callback when value changes. */
@@ -69,8 +86,16 @@ export interface SelectProps {
   surfaceBreakpoint?: number
   /** Optional title used for the mobile sheet header. */
   surfaceTitle?: ReactNode
+  /** Minimum width for popover content. Useful when the trigger is compact. */
+  contentMinWidth?: number | string
   /** Outer membrane wrapper around trigger/option geometry. */
   membrane?: boolean
+  /** Class applied directly to the trigger button. */
+  triggerClassName?: string
+  /** Class applied directly to the trigger value node. */
+  valueClassName?: string
+  /** Class applied directly to the floating content node. */
+  contentClassName?: string
   className?: string
 }
 
@@ -126,6 +151,119 @@ function renderSelectLabelNode(node: ReactNode, className?: string) {
   )
 }
 
+function formatSelectCssSize(value: number | string | undefined): string | undefined {
+  if (value == null) return undefined
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? `${value}px` : undefined
+  }
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed : undefined
+}
+
+const SELECT_SIDE_BOUNDARY_SELECTOR = '[data-uf-select-side-boundary]'
+const SELECT_SIDE_WIDTH = 240
+const SELECT_SIDE_MAX_HEIGHT = 480
+const SELECT_SIDE_VIEWPORT_INSET = 4
+const SELECT_SIDE_GAP = 4
+
+const sideInitialStyle: CSSProperties = {
+  position: 'fixed',
+  top: -9999,
+  left: -9999,
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(min, value), Math.max(min, max))
+}
+
+function resolveSideBoundary(triggerEl: HTMLElement | null) {
+  return triggerEl?.closest(SELECT_SIDE_BOUNDARY_SELECTOR) as HTMLElement | null
+}
+
+function useSelectSidePosition(options: {
+  open: boolean
+  triggerRef: RefObject<HTMLElement | null>
+  contentRef: RefObject<HTMLDivElement | null>
+}) {
+  const { open, triggerRef, contentRef } = options
+  const [style, setStyle] = useState<CSSProperties>(sideInitialStyle)
+
+  const update = useCallback(() => {
+    if (typeof window === 'undefined') return
+    const triggerEl = triggerRef.current
+    const contentEl = contentRef.current
+    if (!triggerEl || !contentEl) return
+
+    const triggerRect = triggerEl.getBoundingClientRect()
+    const contentRect = contentEl.getBoundingClientRect()
+    const boundaryRect = resolveSideBoundary(triggerEl)?.getBoundingClientRect()
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+    const panelWidth = Math.min(
+      SELECT_SIDE_WIDTH,
+      Math.max(80, viewportWidth - SELECT_SIDE_VIEWPORT_INSET * 2),
+    )
+    const panelHeight = Math.min(
+      SELECT_SIDE_MAX_HEIGHT,
+      Math.max(80, contentRect.height || SELECT_SIDE_MAX_HEIGHT),
+      Math.max(80, viewportHeight - SELECT_SIDE_VIEWPORT_INSET * 2),
+    )
+
+    const anchorLeft = boundaryRect ? boundaryRect.right : triggerRect.right
+    const anchorRight = boundaryRect ? boundaryRect.left : triggerRect.left
+    const rightSpace = viewportWidth - anchorLeft - SELECT_SIDE_VIEWPORT_INSET
+    const leftSpace = anchorRight - SELECT_SIDE_VIEWPORT_INSET
+    const openLeft = rightSpace < panelWidth + SELECT_SIDE_GAP && leftSpace > rightSpace
+    const left = openLeft
+      ? anchorRight - panelWidth - SELECT_SIDE_GAP
+      : anchorLeft + SELECT_SIDE_GAP
+    const top = triggerRect.top + (triggerRect.height - panelHeight) / 2
+
+    setStyle({
+      position: 'fixed',
+      top: Math.round(clamp(top, SELECT_SIDE_VIEWPORT_INSET, viewportHeight - panelHeight - SELECT_SIDE_VIEWPORT_INSET)),
+      left: Math.round(clamp(left, SELECT_SIDE_VIEWPORT_INSET, viewportWidth - panelWidth - SELECT_SIDE_VIEWPORT_INSET)),
+      right: 'auto',
+      bottom: 'auto',
+      width: Math.round(panelWidth),
+      maxWidth: `calc(100vw - ${SELECT_SIDE_VIEWPORT_INSET * 2}px)`,
+      maxHeight: Math.round(panelHeight),
+      overflowY: 'auto',
+    })
+  }, [contentRef, triggerRef])
+
+  useEffect(() => {
+    if (!open) {
+      setStyle(sideInitialStyle)
+      return
+    }
+
+    update()
+    const rafId = window.requestAnimationFrame(update)
+    const handleWindowChange = () => update()
+    const resizeObserver =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(handleWindowChange)
+        : null
+
+    if (triggerRef.current) resizeObserver?.observe(triggerRef.current)
+    if (contentRef.current) resizeObserver?.observe(contentRef.current)
+    const boundaryEl = resolveSideBoundary(triggerRef.current)
+    if (boundaryEl) resizeObserver?.observe(boundaryEl)
+    window.addEventListener('resize', handleWindowChange)
+    window.addEventListener('scroll', handleWindowChange, true)
+
+    return () => {
+      window.cancelAnimationFrame(rafId)
+      resizeObserver?.disconnect()
+      window.removeEventListener('resize', handleWindowChange)
+      window.removeEventListener('scroll', handleWindowChange, true)
+    }
+  }, [contentRef, open, triggerRef, update])
+
+  return { style, update }
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -133,6 +271,7 @@ function renderSelectLabelNode(node: ReactNode, className?: string) {
 export const Select = forwardRef<HTMLDivElement, SelectProps>(
   function Select(props, ref) {
     const {
+      variant = 'default',
       options: rawOptions,
       value,
       defaultValue,
@@ -149,10 +288,16 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       surface = 'auto',
       surfaceBreakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
       surfaceTitle,
+      contentMinWidth,
       membrane = true,
+      triggerClassName,
+      valueClassName,
+      contentClassName,
       className,
     } = props
 
+    const isSideVariant = variant === 'side'
+    const isIconOnlyVariant = variant === 'iconOnly'
     const options = Array.isArray(rawOptions) ? rawOptions : []
     const optionOrder = options.map((option) => option.value)
     const disabledValues = options
@@ -162,6 +307,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     const rootRef = useRef<HTMLDivElement | null>(null)
     const triggerElRef = useRef<HTMLElement | null>(null)
     const contentElRef = useRef<HTMLDivElement | null>(null)
+    const dismissRefs = useMemo(() => [rootRef, contentElRef], [])
     const machineValue = useControllableMachineProp(
       value !== undefined ? value : undefined,
       defaultValue ?? (type === 'multiselect' ? [] : null),
@@ -184,7 +330,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     })
     const api = connectSelect(state, send)
     const isOpen = state.matches('open')
-    const resolvedSurface = useResponsiveOverlaySurface(surface, surfaceBreakpoint)
+    const responsiveSurface = useResponsiveOverlaySurface(surface, surfaceBreakpoint)
+    const resolvedSurface = isSideVariant ? 'side' : responsiveSurface
     const { style: floatingStyle } = useFloatingPosition({
       open: isOpen && resolvedSurface === 'popover',
       triggerRef: triggerElRef,
@@ -194,24 +341,45 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       sideOffset: 4,
       matchTriggerWidth: true,
     })
+    const { style: sideFloatingStyle } = useSelectSidePosition({
+      open: isOpen && resolvedSurface === 'side',
+      triggerRef: triggerElRef,
+      contentRef: contentElRef,
+    })
     useBodyScrollLock(isOpen && resolvedSurface === 'sheet')
+    const sideCloseTimerRef = useRef<number | null>(null)
 
-    useEffect(() => {
-      if (!isOpen || resolvedSurface !== 'popover') return
+    const clearSideCloseTimer = useCallback(() => {
+      if (sideCloseTimerRef.current == null) return
+      window.clearTimeout(sideCloseTimerRef.current)
+      sideCloseTimerRef.current = null
+    }, [])
 
-      const handlePointerDown = (event: MouseEvent) => {
-        const target = event.target as Node | null
-        if (!target) return
-        if (rootRef.current?.contains(target)) return
-        if (contentElRef.current?.contains(target)) return
+    const openSideSelect = useCallback(() => {
+      if (disabled || options.length === 0) return
+      clearSideCloseTimer()
+      send({ type: 'OPEN' })
+    }, [clearSideCloseTimer, disabled, options.length, send])
+
+    const scheduleSideClose = useCallback(() => {
+      if (!isSideVariant) return
+      clearSideCloseTimer()
+      sideCloseTimerRef.current = window.setTimeout(() => {
         send({ type: 'CLOSE' })
-      }
+      }, 80)
+    }, [clearSideCloseTimer, isSideVariant, send])
 
-      document.addEventListener('mousedown', handlePointerDown)
-      return () => {
-        document.removeEventListener('mousedown', handlePointerDown)
-      }
-    }, [isOpen, resolvedSurface, send])
+    useEffect(() => () => clearSideCloseTimer(), [clearSideCloseTimer])
+
+    const dismissSelect = useCallback(() => {
+      send({ type: 'CLOSE' })
+    }, [send])
+
+    useDismissOutside({
+      enabled: isOpen && (resolvedSurface === 'popover' || resolvedSurface === 'side'),
+      refs: dismissRefs,
+      onDismiss: dismissSelect,
+    })
 
     const mergedRef = useCallback((node: HTMLDivElement | null) => {
       rootRef.current = node
@@ -233,6 +401,18 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     const activeDescendantId = highlightedOptionIndex >= 0
       ? `${contentId}:option:${highlightedOptionIndex}`
       : undefined
+    const contentMinWidthValue = formatSelectCssSize(contentMinWidth)
+    const baseContentStyle = resolvedSurface === 'popover'
+      ? floatingStyle
+      : resolvedSurface === 'side'
+        ? sideFloatingStyle
+        : undefined
+    const contentStyle = contentMinWidthValue == null
+      ? baseContentStyle
+      : {
+          ...baseContentStyle,
+          '--face-runtime-select-content-min-width': contentMinWidthValue,
+        } as CSSProperties
     const contentProps = api.getContentProps({
       id: contentId,
       labelId,
@@ -258,16 +438,29 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         {...triggerProps}
         ref={handleTriggerRef}
         type="button"
+        disabled={disabled || options.length === 0}
+        className={cn((triggerProps as { className?: string }).className, triggerClassName)}
         data-stretch-text={stretchText ? '' : undefined}
+        data-icon-only={isIconOnlyVariant ? '' : undefined}
+        onMouseEnter={isSideVariant ? openSideSelect : undefined}
+        onMouseLeave={isSideVariant ? scheduleSideClose : undefined}
+        onClick={isSideVariant ? openSideSelect : (triggerProps as { onClick?: () => void }).onClick}
       >
-        {renderSelectLabelNode(triggerLabel, cn('uf-select__value', isPlaceholder && 'uf-select__value--placeholder'))}
-        <span {...selectAnatomy.getPartAttrs('indicator')} className="uf-select__indicator" aria-hidden="true">
-          <Icon name={isOpen ? 'select-chevron-up' : 'select-chevron-down'} />
-        </span>
+        {renderSelectLabelNode(triggerLabel, cn('uf-select__value', isPlaceholder && 'uf-select__value--placeholder', valueClassName))}
+        {!isIconOnlyVariant ? (
+          <span {...selectAnatomy.getPartAttrs('indicator')} className="uf-select__indicator" aria-hidden="true">
+            <Icon name={isSideVariant ? 'select-chevron-right' : isOpen ? 'select-chevron-up' : 'select-chevron-down'} />
+          </span>
+        ) : null}
       </button>
     )
     const contentNode = (
-      <div className="uf-select__contentPanel">
+      <Card
+        variant="floating"
+        padding="membrane"
+        radius="base"
+        className="uf-select__contentPanel"
+      >
         {resolvedSurface === 'sheet' ? (
           <ResponsiveSheetHeader
             title={sheetTitle}
@@ -309,16 +502,21 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
             </span>
           )
         })}
-      </div>
+      </Card>
     )
 
     const contentElement = (
       <div
         ref={handleContentRef}
         {...contentProps}
-        className={cn('uf-select__content', (contentProps as { className?: string }).className)}
+        className={cn('uf-select__content', (contentProps as { className?: string }).className, contentClassName)}
         data-surface={resolvedSurface}
-        style={resolvedSurface === 'popover' ? floatingStyle : undefined}
+        data-select-variant={variant}
+        data-uf-select-side-boundary={isSideVariant ? '' : undefined}
+        data-uf-select-side-panel={isSideVariant ? '' : undefined}
+        style={contentStyle}
+        onMouseEnter={isSideVariant ? clearSideCloseTimer : undefined}
+        onMouseLeave={isSideVariant ? scheduleSideClose : undefined}
       >
         {membrane ? (
           <span className="uf-membrane uf-membrane--full uf-select__contentMembrane">
@@ -338,6 +536,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       <div
         ref={mergedRef}
         {...api.getRootProps()}
+        data-variant={variant}
         data-label-orientation={labelOrientation}
         className={cn('uf-select', className)}
       >

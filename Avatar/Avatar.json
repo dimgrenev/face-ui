@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Avatar",
   "description": "User identity display with image and fallback initials",
   "props": {
@@ -45,7 +47,10 @@
     {
       "name": "Default",
       "props": {
-        "name": "John Doe"
+        "src": "",
+        "name": "Userface",
+        "fallbackDelayMs": 0,
+        "icon": "user"
       }
     },
     {

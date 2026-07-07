@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Breadcrumb",
   "description": "Navigation trail showing current location in a hierarchy",
   "props": {
@@ -41,6 +43,10 @@
     {
       "name": "Default",
       "props": {
+        "separator": "/",
+        "membrane": true,
+        "allowNavigation": false,
+        "collapseAfter": 4,
         "items": [
           {
             "label": "Home",

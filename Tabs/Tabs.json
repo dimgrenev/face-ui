@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Tabs",
   "description": "Tabbed navigation with content panels",
   "props": {
@@ -82,26 +84,25 @@
     {
       "name": "Default",
       "props": {
+        "orientation": "horizontal",
+        "activationMode": "automatic",
+        "disabled": false,
+        "withLine": false,
+        "wrap": false,
+        "membrane": true,
         "items": [
           {
-            "value": "overview",
-            "label": "Overview",
-            "content": "Overview content"
+            "value": "a",
+            "label": "Tab A",
+            "content": "Content A"
           },
           {
-            "value": "details",
-            "label": "Details",
-            "content": "Details content"
-          },
-          {
-            "value": "activity",
-            "label": "Activity",
-            "content": "Activity content"
+            "value": "b",
+            "label": "Tab B",
+            "content": "Content B"
           }
         ],
-        "defaultValue": "overview",
-        "orientation": "horizontal",
-        "membrane": true
+        "defaultValue": "a"
       }
     },
     {

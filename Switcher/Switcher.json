@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Switcher",
   "description": "Binary toggle control with thumb animation",
   "props": {
@@ -83,7 +85,16 @@
     {
       "name": "Default",
       "props": {
-        "label": "Dark mode"
+        "disabled": false,
+        "required": false,
+        "name": "",
+        "value": "on",
+        "withText": true,
+        "textWrap": "truncate",
+        "membrane": true,
+        "label": "Dark mode",
+        "text": "I accept the End User License Agreement",
+        "defaultChecked": false
       }
     },
     {

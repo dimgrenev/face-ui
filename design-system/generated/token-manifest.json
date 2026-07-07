@@ -4070,7 +4070,7 @@
       ],
       "values": [
         "var(--uf-color-surface-sidebar, var(--uf-color-white-10))",
-        "var(--uf-color-surface-sidebar, var(--uf-color-black-4))"
+        "var(--uf-color-white-100)"
       ]
     },
     {
@@ -4125,8 +4125,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-overlay-surface-bg)",
-        "var(--uf-overlay-surface-bg)"
+        "var(--uf-color-surface-sidebar, var(--uf-color-white-10))",
+        "var(--uf-color-surface-sidebar, var(--uf-color-white-10))"
       ]
     },
     {
@@ -4139,8 +4139,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-overlay-surface-underlay-bg)",
-        "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-overlay-surface-underlay-bg)"
+        "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-100)",
+        "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-100)"
       ]
     },
     {
@@ -4153,8 +4153,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-overlay-surface-border)",
-        "var(--uf-overlay-surface-border)"
+        "var(--uf-color-white-20)",
+        "var(--uf-color-white-20)"
       ]
     },
     {
@@ -4167,8 +4167,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-fg)",
-        "var(--uf-color-fg)"
+        "var(--uf-color-white-92)",
+        "var(--uf-color-white-92)"
       ]
     },
     {

@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Rating",
   "description": "Star rating control with optional half-star support",
   "props": {
@@ -51,7 +53,10 @@
     {
       "name": "Default",
       "props": {
-        "value": 3
+        "defaultValue": 3,
+        "max": 5,
+        "disabled": false,
+        "allowHalf": false
       }
     },
     {

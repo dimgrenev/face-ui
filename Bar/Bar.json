@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Bar",
   "description": "Toolbar layout component with start/end sections",
   "props": {

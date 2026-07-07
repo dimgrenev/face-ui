@@ -19,7 +19,7 @@ import { Icon } from '../Icon/Icon'
 // ---------------------------------------------------------------------------
 
 export const buttonAnatomy = createAnatomy('button').parts(
-  'root', 'icon', 'text', 'indicator', 'group',
+  'root', 'icon', 'text', 'label', 'indicator', 'group',
 )
 
 // ---------------------------------------------------------------------------
@@ -35,6 +35,8 @@ export type ButtonVariant =
   | 'ghost'
   | 'destructive'
   | 'suggestion'
+
+export type ButtonSelectorDirection = 'vertical' | 'side'
 
 export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   /** Button label text. */
@@ -59,6 +61,8 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   selector?: boolean
   /** Open state for the selector indicator. */
   selectorOpen?: boolean
+  /** Direction of the selector indicator. Use side for side-panel selectors. */
+  selectorDirection?: ButtonSelectorDirection
   /** Full width button. */
   fullWidth?: boolean
   /** Text alignment. */
@@ -121,6 +125,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       stretchText: rawStretchText,
       selector = false,
       selectorOpen = false,
+      selectorDirection = 'vertical',
       fullWidth = false,
       align,
       level,
@@ -212,9 +217,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const hasSelectorIndicator = selector && !isIconOnly
     const resolvedIconPosition = hasSelectorIndicator ? 'left' : iconPosition
     const stretchText = rawStretchText ?? false
+    const resolvedSelectorDirection: ButtonSelectorDirection = selectorDirection === 'side' ? 'side' : 'vertical'
+    const selectorIconName = resolvedSelectorDirection === 'side'
+      ? 'select-chevron-right'
+      : selectorOpen ? 'select-chevron-up' : 'select-chevron-down'
     const selectorIndicator = hasSelectorIndicator ? (
       <span {...buttonAnatomy.getPartAttrs('indicator')} aria-hidden="true">
-        <Icon name={selectorOpen ? 'select-chevron-up' : 'select-chevron-down'} />
+        <Icon name={selectorIconName} />
       </span>
     ) : null
 
@@ -237,6 +246,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         data-icon-left={hasIcon && !isIconOnly && resolvedIconPosition === 'left' ? '' : undefined}
         data-icon-right={hasIcon && !isIconOnly && resolvedIconPosition === 'right' ? '' : undefined}
         data-selector={hasSelectorIndicator ? '' : undefined}
+        data-selector-direction={hasSelectorIndicator ? resolvedSelectorDirection : undefined}
         data-level={clampedLevel != null ? '' : undefined}
         data-loading={loading ? '' : undefined}
         data-copied={copied ? '' : undefined}
@@ -263,7 +273,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         {hasText && !isIconOnly && (
           <span {...buttonAnatomy.getPartAttrs('text')}>
-            {children ?? text}
+            <span {...buttonAnatomy.getPartAttrs('label')} className="uf-button__label">
+              {children ?? text}
+            </span>
             {rightText != null && (
               <span className="uf-button__rightText uf-text-body">
                 {rightText}

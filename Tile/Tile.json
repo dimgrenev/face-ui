@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Tile",
   "description": "Interactive row with nested action buttons. Acts as a single clickable surface while allowing independent nested Button actions (like Notion sidebar tabs). Uses div[role=button] to allow valid HTML nesting of child buttons.",
   "props": {
@@ -23,6 +25,57 @@
       ],
       "default": "default"
     },
+    "intent": {
+      "type": "enum",
+      "required": false,
+      "description": "Semantic row intent. Use option for generic rows, navigation for selected app routes, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.",
+      "options": [
+        "option",
+        "navigation",
+        "disclosure",
+        "tree",
+        "tab",
+        "section"
+      ],
+      "default": "option"
+    },
+    "density": {
+      "type": "enum",
+      "required": false,
+      "description": "Internal spacing density. Default follows Button text padding; compact tightens tree/sidebar rows; spacious gives inspection rows more breathing room.",
+      "options": [
+        "default",
+        "compact",
+        "spacious"
+      ],
+      "default": "default"
+    },
+    "tone": {
+      "type": "enum",
+      "required": false,
+      "description": "Semantic visual tone for row foreground and hover treatment.",
+      "options": [
+        "neutral",
+        "muted",
+        "accent",
+        "positive",
+        "warning",
+        "destructive"
+      ],
+      "default": "neutral"
+    },
+    "actionVisibility": {
+      "type": "enum",
+      "required": false,
+      "description": "How the actions slot is exposed: reveal on hover/focus/active, hover only, always visible, or hidden.",
+      "options": [
+        "reveal",
+        "hover",
+        "always",
+        "hidden"
+      ],
+      "default": "reveal"
+    },
     "icon": {
       "type": "string",
       "required": false,
@@ -38,10 +91,26 @@
       ],
       "default": "left"
     },
+    "leading": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Isolated leading slot for nested controls. Use icon for decorative icons and leading for actionable controls."
+    },
+    "meta": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Trailing non-interactive metadata rendered before actions."
+    },
     "disabled": {
       "type": "boolean",
       "required": false,
       "description": "Disabled state.",
+      "default": false
+    },
+    "busy": {
+      "type": "boolean",
+      "required": false,
+      "description": "Marks the row busy with data-busy and aria-busy without disabling it by itself.",
       "default": false
     },
     "active": {
@@ -49,6 +118,17 @@
       "required": false,
       "description": "Active / selected state.",
       "default": false
+    },
+    "selectedDescendant": {
+      "type": "boolean",
+      "required": false,
+      "description": "Marks parent rows that contain the selected descendant, commonly while collapsed.",
+      "default": false
+    },
+    "interactive": {
+      "type": "boolean",
+      "required": false,
+      "description": "Override interactive semantics. Set false for section/header rows that should not expose button behavior."
     },
     "stretchText": {
       "type": "boolean",
@@ -121,52 +201,64 @@
       }
     },
     {
-      "name": "With actions",
+      "name": "Navigation Active",
       "props": {
-        "text": "Page title",
-        "icon": "file",
-        "actions": "[Button icon=more] [Button icon=close]"
-      }
-    },
-    {
-      "name": "Active",
-      "props": {
+        "intent": "navigation",
         "text": "Current page",
         "icon": "file",
         "active": true
       }
     },
     {
-      "name": "Disabled",
+      "name": "Disclosure Parent",
       "props": {
-        "text": "Archived",
-        "icon": "file",
-        "disabled": true
-      }
-    },
-    {
-      "name": "Ghost",
-      "props": {
-        "text": "Settings",
-        "icon": "settings",
-        "variant": "ghost"
-      }
-    },
-    {
-      "name": "Nested level",
-      "props": {
-        "text": "Sub-page",
-        "icon": "file",
-        "level": 1
-      }
-    },
-    {
-      "name": "Selector parent",
-      "props": {
+        "intent": "disclosure",
         "text": "Project",
         "icon": "folder",
         "selector": true,
-        "selectorOpen": true
+        "selectorOpen": true,
+        "actionVisibility": "hover",
+        "actions": "[Button icon=plus]"
+      }
+    },
+    {
+      "name": "Tree Row",
+      "props": {
+        "intent": "tree",
+        "density": "compact",
+        "text": "src/components/Button.tsx",
+        "icon": "file",
+        "level": 2
+      }
+    },
+    {
+      "name": "Tab",
+      "props": {
+        "intent": "tab",
+        "text": "Preview",
+        "icon": "browser",
+        "active": true,
+        "fullWidth": false,
+        "actionVisibility": "hover",
+        "actions": "[Button icon=close]"
+      }
+    },
+    {
+      "name": "Section",
+      "props": {
+        "intent": "section",
+        "text": "Collections",
+        "interactive": false
+      }
+    },
+    {
+      "name": "Busy Destructive",
+      "props": {
+        "text": "Delete chat?",
+        "tone": "destructive",
+        "busy": true,
+        "actionVisibility": "always",
+        "actions": "[Button icon=close]"
       }
     }
   ],

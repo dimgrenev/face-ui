@@ -9,7 +9,6 @@ const GENERATED_DIR = path.join(PACKAGE_ROOT, 'utils', '__generated__')
 const ENTRIES_FILE = path.join(GENERATED_DIR, 'render_gallery.generated.ts')
 const META_FILE = path.join(GENERATED_DIR, 'render_gallery.meta.generated.ts')
 const REGISTRY_FILE = path.join(PACKAGE_ROOT, 'component-registry.json')
-const SAMPLES_FILE = path.join(PACKAGE_ROOT, 'gallery.samples.json')
 
 const UNCONTROLLED_PROP_PAIRS = [
   ['value', 'defaultValue'],
@@ -59,7 +58,11 @@ function listComponentContracts() {
     ))
 }
 
-function getDefaultProps(contract) {
+function hasRecordEntries(value) {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length > 0)
+}
+
+function getFallbackDefaultProps(contract) {
   return Object.fromEntries(
     Object.entries(contract.props || {})
       .filter(([, prop]) => Object.prototype.hasOwnProperty.call(prop, 'default'))
@@ -82,14 +85,12 @@ function convertControlledStateProps(props, contract) {
   return next
 }
 
-function getStateProps(contract, sampleConfig, componentName) {
-  const stateName = sampleConfig?.state
-  if (!stateName) return {}
-  const state = (contract.states || []).find((entry) => entry.name === stateName)
-  if (!state) {
-    throw new Error(`${componentName} gallery sample references unknown state "${stateName}"`)
-  }
-  return convertControlledStateProps(state.props || {}, contract)
+function getDefaultStateProps(contract) {
+  const states = Array.isArray(contract.states) ? contract.states : []
+  const defaultState =
+    states.find((entry) => String(entry?.name || '').trim().toLowerCase().includes('default') && hasRecordEntries(entry.props)) ||
+    states.find((entry) => hasRecordEntries(entry.props))
+  return convertControlledStateProps(defaultState?.props || {}, contract)
 }
 
 function validateSampleProps(componentName, props, contract) {
@@ -101,23 +102,15 @@ function validateSampleProps(componentName, props, contract) {
   }
 }
 
-function buildSampleProps(componentName, contract, sampleConfig = {}) {
-  const props = {
-    ...getDefaultProps(contract),
-    ...getStateProps(contract, sampleConfig, componentName),
-    ...(sampleConfig.props || {}),
-  }
-  for (const propName of sampleConfig.omit || []) {
-    delete props[propName]
-  }
+function buildSampleProps(componentName, contract) {
+  const stateProps = getDefaultStateProps(contract)
+  const props = hasRecordEntries(stateProps) ? stateProps : getFallbackDefaultProps(contract)
   validateSampleProps(componentName, props, contract)
   return props
 }
 
 function buildGalleryEntries() {
   const registry = readJson(REGISTRY_FILE)
-  const samples = readJson(SAMPLES_FILE)
-  const sampleByName = samples.samples || {}
   const contracts = listComponentContracts()
   const entries = []
 
@@ -126,7 +119,7 @@ function buildGalleryEntries() {
     if (registryEntry.status === 'deprecated') continue
 
     const contract = readJson(entry.contractPath)
-    const sampleProps = buildSampleProps(entry.name, contract, sampleByName[entry.name])
+    const sampleProps = buildSampleProps(entry.name, contract)
     const meta = {
       name: entry.name,
       relativeSourcePath: `${entry.name}/${entry.name}.tsx`,

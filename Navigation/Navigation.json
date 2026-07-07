@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Navigation",
   "description": "Horizontal or vertical navigation bar with hover dropdowns",
   "props": {
@@ -85,7 +87,34 @@
     {
       "name": "Default",
       "props": {
-        "orientation": "horizontal"
+        "defaultActiveId": "home",
+        "orientation": "horizontal",
+        "surface": "auto",
+        "defaultOpen": false,
+        "items": [
+          {
+            "id": "home",
+            "label": "Home"
+          },
+          {
+            "id": "library",
+            "label": "Library",
+            "items": [
+              {
+                "id": "typefaces",
+                "label": "Typefaces"
+              },
+              {
+                "id": "components",
+                "label": "Components"
+              }
+            ]
+          },
+          {
+            "id": "settings",
+            "label": "Settings"
+          }
+        ]
       }
     },
     {

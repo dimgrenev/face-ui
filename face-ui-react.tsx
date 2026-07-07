@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FELD_GALLERY_ENTRIES } from './utils/__generated__/render_gallery.generated';
 import { Bar } from './Bar/Bar';
 import { Button } from './Button/Button';
+import { Card } from './Card/Card';
 import { Text } from './Text/Text';
 
 // NOTE: This file must NOT import global CSS directly (Next.js restriction).
@@ -245,7 +246,7 @@ export default function faceUiReact(props: FeldGalleryProps) {
           const rawCmp: any = entry ? (entry as any).Component : null;
           const Cmp: any = resolveRenderableComponent(rawCmp, cleanLeafName);
           // Keep strict preview parity with single-component mode:
-          // source-of-truth for gallery cards is component sampleProps from generated meta.
+          // generated meta derives sampleProps from the component contract default state.
           // We intentionally ignore card-level props here to prevent stale/empty overrides
           // from drifting the showcase away from the per-component folder preview.
           const baseSampleProps = ((entry as any)?.sampleProps && typeof (entry as any).sampleProps === 'object')
@@ -262,11 +263,17 @@ export default function faceUiReact(props: FeldGalleryProps) {
                 {String(card?.title || cleanLeafName)}
               </Text>
               <div className="uf-gallery-itemPreview">
-                <div className="uf-gallery-itemSurface">
+                <Card
+                  variant="showcase"
+                  padding="showcase"
+                  radius="showcase"
+                  border={false}
+                  className="uf-gallery-itemSurface"
+                >
                   <PreviewErrorBoundary>
                     {Cmp ? <Cmp {...sampleProps} /> : <Text as="span" className="uf-text-body">No component export</Text>}
                   </PreviewErrorBoundary>
-                </div>
+                </Card>
               </div>
             </div>
           );

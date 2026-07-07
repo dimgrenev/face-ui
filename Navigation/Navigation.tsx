@@ -20,6 +20,7 @@ import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
 import { navigationMachine, connectNavigation } from '../assets/machines/navigation.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
+import { Card } from '../Card/Card'
 import { Text } from '../Text/Text'
 
 // ---------------------------------------------------------------------------
@@ -240,7 +241,13 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
             data-state={sheetOpen ? 'open' : 'closed'}
             onClick={() => setSheetOpen(false)}
           />
-          <div className="uf-responsive-panel uf-navigation-sheet" data-state={sheetOpen ? 'open' : 'closed'}>
+          <Card
+            variant="dialog"
+            padding="default"
+            radius="lg"
+            className="uf-responsive-panel uf-navigation-sheet"
+            data-state={sheetOpen ? 'open' : 'closed'}
+          >
             <ResponsiveSheetHeader
               title={surfaceTitle ?? 'Navigation'}
               onClose={() => setSheetOpen(false)}
@@ -248,7 +255,7 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
             <div className="uf-navigation-sheetList">
               {items.map((item) => renderSheetItem(item))}
             </div>
-          </div>
+          </Card>
         </div>
       )
     }
@@ -282,11 +289,17 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
                     >
                       {item.label}
                     </Button>
-                    <div {...api.getContentProps({ id: item.id, hasItems, disabled: item.disabled })}>
+                    <Card
+                      {...api.getContentProps({ id: item.id, hasItems, disabled: item.disabled })}
+                      variant="floating"
+                      padding="membrane"
+                      radius="md"
+                      fullWidth={false}
+                    >
                       {item.items!.map((child) => (
                         <DropdownItemRenderer key={child.id} item={child} api={api} />
                       ))}
-                    </div>
+                    </Card>
                   </>
                 ) : item.href ? (
                   <a

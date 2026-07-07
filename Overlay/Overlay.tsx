@@ -15,6 +15,7 @@ import { overlayMachine, connectOverlay } from '../assets/machines/overlay.machi
 import type { OverlaySchema } from '../assets/machines/overlay.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
+import { Card } from '../Card/Card'
 import { Text } from '../Text/Text'
 
 // ---------------------------------------------------------------------------
@@ -188,13 +189,17 @@ export const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
         className={cn('uf-overlay-contentMembrane', 'uf-membrane')}
         style={contentStyle}
       >
-        <div
+        <Card
           data-scope="overlay"
           data-part="content"
           data-state={contentState}
           data-side={contentProps['data-side']}
           data-align={contentProps['data-align']}
           data-trigger={trigger}
+          variant="floating"
+          padding="control"
+          radius="base"
+          fullWidth={false}
           role={contentProps.role}
           hidden={contentProps.hidden}
           className={cn('uf-overlay-content', className)}
@@ -202,7 +207,7 @@ export const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
         >
           <div {...api.getArrowProps()} className={cn('uf-overlay-arrow')} />
           {contentNode}
-        </div>
+        </Card>
       </div>
     )
 

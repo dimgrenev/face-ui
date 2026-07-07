@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Icon",
   "description": "Auto-generated face.json for Icon. Rendered icons always use the single 20x20 Face UI size.",
   "props": {
@@ -96,6 +98,7 @@
         "scroll",
         "search",
         "select-chevron-down",
+        "select-chevron-right",
         "select-chevron-up",
         "slash",
         "settings",

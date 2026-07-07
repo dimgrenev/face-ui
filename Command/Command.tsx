@@ -20,6 +20,7 @@ import { commandMachine, connectCommand } from '../assets/machines/command.machi
 import type { CommandItemDef, CommandGroupDef } from '../assets/machines/command.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
+import { Card } from '../Card/Card'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 
@@ -193,9 +194,13 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
     const showPalette = !isDialogSurface || dialogOpen
     const triggerLabel = api.query || placeholder
     const commandBody = (
-      <div
+      <Card
         ref={showPalette ? ref : null}
         {...api.getRootProps()}
+        variant="floating"
+        padding={isDialogSurface ? 'none' : 'membrane'}
+        radius="md"
+        fullWidth
         className={cn('uf-command', className)}
         data-surface={resolvedSurface}
       >
@@ -307,7 +312,7 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
             })
           })}
         </div>
-      </div>
+      </Card>
     )
 
     if (!isDialogSurface) {

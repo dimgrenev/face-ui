@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Modal",
   "description": "Overlay surface component unifying dialog, drawer, and alert dialog",
   "props": {
@@ -122,21 +124,28 @@
     {
       "name": "Default (Center)",
       "props": {
-        "open": true,
-        "portal": false,
         "variant": "center",
-        "title": "Dialog Title",
-        "description": "This is a dialog.",
+        "closeOnOverlayClick": true,
+        "closable": true,
+        "width": 400,
+        "height": 420,
+        "surface": "dialog",
+        "autoFocusOnOpen": true,
+        "portal": false,
+        "open": true,
+        "title": "Modal",
+        "description": "Focused work surface",
         "actions": [
           {
             "label": "Cancel",
             "variant": "outline"
           },
           {
-            "label": "Continue",
+            "label": "Create",
             "variant": "accent"
           }
-        ]
+        ],
+        "children": "Short modal copy aligned to the left edge of the content area."
       }
     },
     {

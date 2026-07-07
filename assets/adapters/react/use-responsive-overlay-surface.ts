@@ -36,7 +36,7 @@ export function useResponsiveOverlaySurface(
   breakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
 ): ResolvedOverlaySurface {
   const [resolvedSurface, setResolvedSurface] = useState<ResolvedOverlaySurface>(() => (
-    resolveSurface(surface, breakpoint)
+    surface === 'popover' || surface === 'sheet' ? surface : 'popover'
   ))
 
   useEffect(() => {

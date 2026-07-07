@@ -21,6 +21,7 @@ import { sidebarMachine, connectSidebar } from '../assets/machines/sidebar.machi
 import { cn } from '../assets/utils'
 import { Bar } from '../Bar/Bar'
 import { Button } from '../Button/Button'
+import { Card } from '../Card/Card'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 import { Tree } from '../Tree/Tree'
@@ -173,6 +174,7 @@ function PanelItemRenderer(props: PanelItemRendererProps) {
         stretchText
         selector={!collapsed}
         selectorOpen={isGroupOpen}
+        selectorDirection="side"
         membrane
         variant="default"
         level={level}
@@ -243,6 +245,23 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
 
     const api = connectSidebar(state, send)
     const isCollapsed = isSheetSurface ? false : api.collapsed
+
+    const getToggleButtonProps = () => {
+      const toggleProps = api.getToggleProps()
+      const {
+        className: toggleClassName,
+        'data-scope': _toggleScope,
+        'data-part': _togglePart,
+        ...toggleButtonProps
+      } = toggleProps as typeof toggleProps & {
+        className?: string
+        'data-scope'?: string
+        'data-part'?: string
+      }
+
+      return { toggleButtonProps, toggleClassName }
+    }
+
     const previewSections = [
       {
         title: 'Workspace',
@@ -263,24 +282,25 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
     ]
 
     const renderWorkspacePreview = (showHeaderBar: boolean) => {
-      const toggleProps = api.getToggleProps()
+      const { toggleButtonProps, toggleClassName } = getToggleButtonProps()
       return (
         <div className="uf-sidebar-preview">
           {showHeaderBar ? (
             <Bar className="uf-sidebar-preview-bar">
               <Bar.LeftEllipsis>
-                <Text as="span" variant="label" fullWidth>
+                <Text as="span" variant="label" fullWidth membrane truncate>
                   {isCollapsed ? 'UF' : 'FaceUI React'}
                 </Text>
               </Bar.LeftEllipsis>
               <Bar.Right>
                 <Button
-                  {...toggleProps}
+                  {...toggleButtonProps}
                   icon={<Icon name={isCollapsed ? 'layout-sidebar-left' : 'layout-sidebar-left-open'} />}
                   iconOnly
                   fullWidth={false}
                   variant="default"
-                  className="uf-sidebar-preview-toggle"
+                  membrane
+                  className={cn('uf-sidebar-preview-toggle', toggleClassName)}
                   aria-label={isCollapsed ? 'Expand panel' : 'Collapse panel'}
                 />
               </Bar.Right>
@@ -295,6 +315,8 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
                     as="div"
                     variant="label"
                     fullWidth
+                    membrane
+                    truncate
                     className="uf-sidebar-preview-sectionTitle"
                   >
                     {section.title}
@@ -333,6 +355,8 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
                   as="div"
                   variant="label"
                   fullWidth
+                  membrane
+                  truncate
                   className="uf-sidebar-preview-sectionTitle"
                 >
                   Structure
@@ -344,10 +368,12 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
                     {
                       id: 'workspace',
                       label: 'Workspace',
+                      icon: 'folder',
+                      kind: 'tile',
                       children: [
-                        { id: 'overview-screen', label: 'Overview' },
-                        { id: 'components-screen', label: 'Components' },
-                        { id: 'tokens-screen', label: 'Tokens' },
+                        { id: 'overview-screen', label: 'Overview', icon: 'layout-sidebar-left-open' },
+                        { id: 'components-screen', label: 'Components', icon: 'component' },
+                        { id: 'tokens-screen', label: 'Tokens', icon: 'props' },
                       ],
                     },
                   ]}
@@ -359,10 +385,22 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
       )
     }
 
-    const renderPanelItems = () => (
-      <>
-        <div {...api.getHeaderProps()}>
-          <button {...api.getToggleProps()} />
+    const renderPanelItems = () => {
+      const { toggleButtonProps, toggleClassName } = getToggleButtonProps()
+
+      return (
+        <>
+          <div {...api.getHeaderProps()}>
+            <Button
+              {...toggleButtonProps}
+              icon={<Icon name={isCollapsed ? 'layout-sidebar-left' : 'layout-sidebar-left-open'} />}
+              iconOnly
+              fullWidth={false}
+              variant="default"
+              membrane
+              className={cn('uf-sidebar-toggleButton', toggleClassName)}
+              aria-label={isCollapsed ? 'Expand panel' : 'Collapse panel'}
+            />
         </div>
         <div {...api.getContentProps()}>
           {items.map((item) => (
@@ -370,8 +408,9 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
           ))}
         </div>
         <div {...api.getFooterProps()} />
-      </>
-    )
+        </>
+      )
+    }
 
     if (isSheetSurface) {
       const triggerNode = trigger ?? (
@@ -380,6 +419,7 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
           iconOnly
           fullWidth={false}
           variant="ghost"
+          membrane
           aria-label="Open panel"
         />
       )
@@ -398,7 +438,11 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
             data-state={sheetOpen ? 'open' : 'closed'}
             onClick={() => setSheetOpen(false)}
           />
-          <div
+          <Card
+            variant="plain"
+            padding="none"
+            radius="none"
+            border={false}
             className="uf-responsive-panel uf-sidebar-sheet"
             data-state={sheetOpen ? 'open' : 'closed'}
             data-placement="left"
@@ -411,7 +455,7 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
             <nav className={cn('uf-sidebar', previewPreset === 'workspace' && 'uf-sidebar--workspace')}>
               {previewPreset === 'workspace' ? renderWorkspacePreview(false) : renderPanelItems()}
             </nav>
-          </div>
+          </Card>
         </div>
       )
     }

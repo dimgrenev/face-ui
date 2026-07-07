@@ -254,7 +254,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
       <textarea
         ref={setControlRef as React.Ref<HTMLTextAreaElement>}
         {...(inputProps as any)}
-        data-part={inputProps['data-part'] ?? 'textarea'}
+        data-part="textarea"
         data-text-layout="wrap"
         placeholder={placeholder}
         aria-label={ariaLabel}

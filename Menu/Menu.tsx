@@ -31,12 +31,14 @@ import {
   type ResponsiveOverlaySurface,
 } from '../assets/adapters/react/use-responsive-overlay-surface'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
-import { useFloatingPosition } from '../assets/adapters/react/use-floating-position'
+import { useDismissOutside } from '../assets/adapters/react/use-dismiss-outside'
+import { useFloatingPosition, type FloatingAlign } from '../assets/adapters/react/use-floating-position'
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
 import { menuMachine, connectMenu } from '../assets/machines/menu.machine'
 import type { MenuSchema } from '../assets/machines/menu.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
+import { Card } from '../Card/Card'
 import { Separator } from '../Separator/Separator'
 import { Text } from '../Text/Text'
 
@@ -81,6 +83,10 @@ export interface MenuProps {
   surface?: ResponsiveOverlaySurface
   /** Breakpoint where auto surfaces switch from popover to sheet. */
   surfaceBreakpoint?: number
+  /** Popover alignment relative to the trigger. */
+  align?: FloatingAlign
+  /** Popover distance from the trigger in pixels. */
+  sideOffset?: number
   /** Optional title used for the mobile sheet header. */
   surfaceTitle?: ReactNode
   /** Additional class name for the content element. */
@@ -184,6 +190,8 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
       onOpenChange,
       surface = 'auto',
       surfaceBreakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
+      align = 'end',
+      sideOffset = 4,
       surfaceTitle,
       className,
     } = props
@@ -207,14 +215,45 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
     const contentId = useId()
     const triggerElRef = useRef<HTMLElement | null>(null)
     const contentElRef = useRef<HTMLDivElement | null>(null)
+    const dismissRefs = useMemo(() => [triggerElRef, contentElRef], [])
     const { style: floatingStyle } = useFloatingPosition({
       open: isOpen && resolvedSurface === 'popover',
       triggerRef: triggerElRef,
       contentRef: contentElRef,
       side: 'bottom',
-      align: 'end',
-      sideOffset: 4,
+      align,
+      sideOffset,
     })
+    const dismissMenu = useCallback(() => {
+      send({ type: 'DISMISS' })
+    }, [send])
+
+    useDismissOutside({
+      enabled: isOpen && resolvedSurface === 'popover',
+      refs: dismissRefs,
+      onDismiss: dismissMenu,
+    })
+
+    useEffect(() => {
+      if (!isOpen) return undefined
+
+      const ownerDocument = contentElRef.current?.ownerDocument
+        ?? triggerElRef.current?.ownerDocument
+        ?? (typeof document === 'undefined' ? null : document)
+      if (!ownerDocument) return undefined
+
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          dismissMenu()
+        }
+      }
+
+      ownerDocument.addEventListener('keydown', handleKeyDown, true)
+      return () => {
+        ownerDocument.removeEventListener('keydown', handleKeyDown, true)
+      }
+    }, [dismissMenu, isOpen])
+
     useBodyScrollLock(isOpen && resolvedSurface === 'sheet')
     const sheetTitle = surfaceTitle ?? (
       typeof children === 'string' || typeof children === 'number'
@@ -347,16 +386,26 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
         id={contentId}
         data-surface={resolvedSurface}
         data-trigger={trigger}
-        className={cn('uf-menu-content', className)}
+        className={cn('uf-menu-content', (contentProps as { className?: string }).className, className)}
         style={resolvedSurface === 'popover' ? floatingStyle : undefined}
       >
-        {resolvedSurface === 'sheet' ? (
-          <ResponsiveSheetHeader
-            title={sheetTitle}
-            onClose={() => send({ type: 'DISMISS' })}
-          />
-        ) : null}
-        {renderEntries(items)}
+        <span className="uf-membrane uf-membrane--full uf-menu-contentMembrane">
+          <Card
+            variant="floating"
+            padding="membrane"
+            radius="md"
+            fullWidth
+            className="uf-menu-contentPanel"
+          >
+            {resolvedSurface === 'sheet' ? (
+              <ResponsiveSheetHeader
+                title={sheetTitle}
+                onClose={() => send({ type: 'DISMISS' })}
+              />
+            ) : null}
+            {renderEntries(items)}
+          </Card>
+        </span>
       </div>
     )
 

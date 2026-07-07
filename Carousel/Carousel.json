@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Carousel",
   "description": "Multi-slide content display with navigation and indicators",
   "props": {
@@ -66,7 +68,14 @@
   "states": [
     {
       "name": "Default",
-      "props": {}
+      "props": {
+        "loop": false,
+        "autoPlay": false,
+        "autoPlayInterval": 3000,
+        "orientation": "horizontal",
+        "slidesPerView": 1,
+        "defaultIndex": 0
+      }
     },
     {
       "name": "Loop",

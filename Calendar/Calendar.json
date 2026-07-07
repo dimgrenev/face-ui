@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Calendar",
   "description": "Standalone date picker grid",
   "props": {
@@ -74,6 +76,8 @@
       "name": "Default",
       "props": {
         "selection": "range",
+        "locale": "en-US",
+        "weekStartsOn": 0,
         "defaultValue": {
           "start": "2026-03-06",
           "end": "2026-03-12"

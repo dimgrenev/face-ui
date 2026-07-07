@@ -37,7 +37,7 @@ import { Icon } from '../Icon/Icon'
 // ---------------------------------------------------------------------------
 
 export const tileAnatomy = createAnatomy('tile').parts(
-  'root', 'icon', 'text', 'indicator', 'actions',
+  'root', 'leading', 'icon', 'text', 'indicator', 'meta', 'actions',
 )
 
 // ---------------------------------------------------------------------------
@@ -49,6 +49,33 @@ export type TileVariant =
   | 'ghost'
   | 'accent'
 
+export type TileIntent =
+  | 'option'
+  | 'navigation'
+  | 'disclosure'
+  | 'tree'
+  | 'tab'
+  | 'section'
+
+export type TileDensity =
+  | 'default'
+  | 'compact'
+  | 'spacious'
+
+export type TileTone =
+  | 'neutral'
+  | 'muted'
+  | 'accent'
+  | 'positive'
+  | 'warning'
+  | 'destructive'
+
+export type TileActionVisibility =
+  | 'reveal'
+  | 'hover'
+  | 'always'
+  | 'hidden'
+
 export interface TileProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /** Primary label. */
   text?: string
@@ -56,14 +83,32 @@ export interface TileProps extends Omit<HTMLAttributes<HTMLDivElement>, 'childre
   rightText?: ReactNode
   /** Visual variant. */
   variant?: TileVariant
+  /** Semantic row intent. Keeps app row variants on one small taxonomy. */
+  intent?: TileIntent
+  /** Density adjusts internal padding while keeping the shared control rhythm. */
+  density?: TileDensity
+  /** Semantic visual tone for muted, accent, status, or destructive rows. */
+  tone?: TileTone
+  /** Controls how the actions slot is revealed. */
+  actionVisibility?: TileActionVisibility
   /** Icon (string from registry or ReactNode). */
   icon?: ReactNode
   /** Icon position relative to text. */
   iconPosition?: 'left' | 'right'
+  /** Isolated leading slot for nested controls such as disclosure or file action buttons. */
+  leading?: ReactNode
+  /** Non-interactive trailing metadata rendered before actions. */
+  meta?: ReactNode
   /** Disabled state. */
   disabled?: boolean
+  /** Busy state. Adds aria-busy/data-busy without disabling by itself. */
+  busy?: boolean
   /** Active / selected state. */
   active?: boolean
+  /** Parent row contains the selected descendant, usually while collapsed. */
+  selectedDescendant?: boolean
+  /** Set false for section/header rows that should not expose button semantics. */
+  interactive?: boolean
   /** Stretch text area (flex:1). */
   stretchText?: boolean
   /** Render a compact selector indicator after the label. */
@@ -96,10 +141,19 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
       text,
       rightText,
       variant = 'default',
+      intent = 'option',
+      density = 'default',
+      tone = 'neutral',
+      actionVisibility = 'reveal',
       icon,
       iconPosition = 'left',
+      leading,
+      meta,
       disabled = false,
+      busy = false,
       active = false,
+      selectedDescendant = false,
+      interactive: rawInteractive,
       stretchText: rawStretchText,
       selector = false,
       selectorOpen = false,
@@ -113,6 +167,9 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
       className,
       onClick,
       onKeyDown,
+      role,
+      tabIndex,
+      'aria-busy': ariaBusy,
       style,
       ...rest
     } = props
@@ -120,6 +177,9 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
     const clampedLevel = (level != null && Number.isFinite(Number(level)))
       ? Math.max(0, Math.min(9, Number(level)))
       : undefined
+    const resolvedInteractive = rawInteractive ?? !(intent === 'section' && onClick == null && role == null)
+    const resolvedRole = role ?? (resolvedInteractive ? (intent === 'tab' ? 'tab' : 'button') : undefined)
+    const resolvedTabIndex = tabIndex ?? (resolvedInteractive ? (disabled ? -1 : 0) : undefined)
 
     const tileRef = useRef<HTMLDivElement | null>(null)
 
@@ -133,26 +193,26 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
 
     const handleClick = useCallback(
       (e: MouseEvent<HTMLDivElement>) => {
-        if (disabled) return
+        if (disabled || !resolvedInteractive) return
         onClick?.(e)
       },
-      [disabled, onClick],
+      [disabled, onClick, resolvedInteractive],
     )
 
     const handleKeyDown = useCallback(
       (e: KeyboardEvent<HTMLDivElement>) => {
         if (disabled) return
         // Activate on Enter / Space like a native button.
-        if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+        if (resolvedInteractive && e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault()
           tileRef.current?.click()
         }
         onKeyDown?.(e)
       },
-      [disabled, onKeyDown],
+      [disabled, onKeyDown, resolvedInteractive],
     )
 
-    const handleActionsClick = useCallback(
+    const handleIsolatedSlotClick = useCallback(
       (e: MouseEvent<HTMLDivElement>) => {
         // Prevent tile's onClick from firing when a nested action is clicked.
         e.stopPropagation()
@@ -165,7 +225,10 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
       : icon
 
     const hasIcon = resolvedIcon != null
+    const hasLeading = leading != null
+    const hasMeta = meta != null
     const hasText = text != null || children != null
+    const childrenArePlainText = typeof children === 'string' || typeof children === 'number'
     const hasSelectorIndicator = selector && hasText
     const stretchText = rawStretchText ?? (hasSelectorIndicator ? false : true)
     const selectorIndicator = hasSelectorIndicator ? (
@@ -181,13 +244,21 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
     const tileNode = (
       <div
         ref={setRefs}
-        role="button"
-        tabIndex={disabled ? -1 : 0}
+        role={resolvedRole}
+        tabIndex={resolvedTabIndex}
         aria-disabled={disabled || undefined}
+        aria-busy={ariaBusy ?? (busy ? true : undefined)}
         {...tileAnatomy.getPartAttrs('root')}
         data-variant={variant}
+        data-intent={intent}
+        data-density={density}
+        data-tone={tone}
+        data-action-visibility={actionVisibility}
         data-active={active ? '' : undefined}
+        data-selected-descendant={selectedDescendant ? '' : undefined}
         data-disabled={disabled ? '' : undefined}
+        data-busy={busy ? '' : undefined}
+        data-interactive={resolvedInteractive ? '' : undefined}
         data-stretch-text={stretchText ? '' : undefined}
         data-full-width={fullWidth ? '' : undefined}
         data-align={align}
@@ -195,25 +266,41 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
         data-level={clampedLevel != null ? '' : undefined}
         data-truncate={truncate ? '' : undefined}
         data-membrane={membrane ? '' : undefined}
+        data-leading={hasLeading ? '' : undefined}
+        data-meta={hasMeta ? '' : undefined}
+        data-icon-left={hasIcon && iconPosition === 'left' ? '' : undefined}
+        data-icon-right={hasIcon && iconPosition === 'right' ? '' : undefined}
         className={cn('uf-tile', 'uf-option', 'uf-control', className)}
         style={levelStyle}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         {...rest}
       >
+        {hasLeading && (
+          <span
+            {...tileAnatomy.getPartAttrs('leading')}
+            onClick={handleIsolatedSlotClick}
+          >
+            {leading}
+          </span>
+        )}
         {hasIcon && iconPosition === 'left' && (
           <span {...tileAnatomy.getPartAttrs('icon')} data-position="left">
             {resolvedIcon}
           </span>
         )}
         {hasText && (
-          children != null ? (
+          children != null && !childrenArePlainText ? (
             <span
               {...tileAnatomy.getPartAttrs('text')}
               data-truncate={truncate ? '' : undefined}
               className="uf-tile__content"
             >
-              {children}
+              {hasSelectorIndicator ? (
+                <span className="uf-tile__label uf-tile__labelSlot">
+                  {children}
+                </span>
+              ) : children}
               {selectorIndicator}
             </span>
           ) : (
@@ -225,7 +312,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
               {...tileAnatomy.getPartAttrs('text')}
             >
               <span className="uf-tile__label">
-                {text}
+                {childrenArePlainText ? children : text}
               </span>
               {rightText != null && (
                 <Text as="span" inset="none" membrane={false} className="uf-tile__rightText">
@@ -241,10 +328,15 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
             {resolvedIcon}
           </span>
         )}
+        {hasMeta && (
+          <span {...tileAnatomy.getPartAttrs('meta')}>
+            {meta}
+          </span>
+        )}
         {actions != null && (
           <div
             {...tileAnatomy.getPartAttrs('actions')}
-            onClick={handleActionsClick}
+            onClick={handleIsolatedSlotClick}
           >
             {actions}
           </div>
@@ -257,10 +349,10 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
     return (
       <span
         className={cn('uf-membrane', fullWidth ? 'uf-membrane--full' : undefined)}
-        data-membrane-interactive={disabled ? undefined : ''}
+        data-membrane-interactive={!disabled && resolvedInteractive ? '' : undefined}
         onClick={(event) => {
           if (event.target !== event.currentTarget) return
-          if (disabled) return
+          if (disabled || !resolvedInteractive) return
           tileRef.current?.focus()
           tileRef.current?.click()
         }}

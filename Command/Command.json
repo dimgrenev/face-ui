@@ -1,4 +1,6 @@
 {
+  "schema": "face",
+  "schema-version": 1,
   "name": "Command",
   "description": "Command palette and search component with filtering and keyboard navigation",
   "props": {
@@ -87,7 +89,25 @@
     {
       "name": "Default",
       "props": {
-        "placeholder": "Type a command..."
+        "placeholder": "Type a command...",
+        "defaultValue": "",
+        "surface": "auto",
+        "defaultOpen": false,
+        "emptyContent": "No results found.",
+        "items": [
+          {
+            "id": "copy",
+            "label": "Copy"
+          },
+          {
+            "id": "paste",
+            "label": "Paste"
+          },
+          {
+            "id": "cut",
+            "label": "Cut"
+          }
+        ]
       }
     },
     {

@@ -15,6 +15,7 @@ import { Carousel } from '../../Carousel/Carousel'
 import { Checkbox } from '../../Checkbox/Checkbox'
 import { Code } from '../../Code/Code'
 import { Command } from '../../Command/Command'
+import { Drawer } from '../../Drawer/Drawer'
 import { Icon } from '../../Icon/Icon'
 import { Input } from '../../Input/Input'
 import { Markdown } from '../../Markdown/Markdown'
@@ -29,6 +30,7 @@ import { Rating } from '../../Rating/Rating'
 import { Scroll } from '../../Scroll/Scroll'
 import { Separator } from '../../Separator/Separator'
 import { Select } from '../../Select/Select'
+import { Sheet } from '../../Sheet/Sheet'
 import { Slider } from '../../Slider/Slider'
 import { Steps } from '../../Steps/Steps'
 import { Switcher } from '../../Switcher/Switcher'
@@ -122,9 +124,64 @@ describe('component smoke', () => {
     })
 
     const textNode = container.querySelector('[data-part="content"] [data-scope="text"]') as HTMLElement | null
+    const membrane = textNode?.parentElement as HTMLElement | null
     expect(textNode?.textContent).toContain('Content A')
     expect(textNode?.classList.contains('uf-accordion-contentText')).toBe(true)
-    expect(textNode?.hasAttribute('data-membrane')).toBe(false)
+    expect(textNode?.hasAttribute('data-membrane')).toBe(true)
+    expect(textNode?.getAttribute('data-full-width')).toBe('')
+    expect(membrane?.classList.contains('uf-membrane--full')).toBe(true)
+  })
+
+  it('Accordion keeps nested controls full width inside opened content', async () => {
+    await act(async () => {
+      root.render(<Accordion defaultExpandedIds={['getting-started']} />)
+    })
+
+    const content = container.querySelector('[data-part="content"]:not([hidden])') as HTMLElement | null
+    const button = content?.querySelector('.uf-button[data-scope="button"]') as HTMLButtonElement | null
+    const membrane = button?.parentElement as HTMLElement | null
+
+    expect(content).not.toBeNull()
+    expect(button).not.toBeNull()
+    expect(button?.getAttribute('data-full-width')).toBe('')
+    expect(membrane?.classList.contains('uf-membrane--full')).toBe(true)
+  })
+
+  it('Accordion resolves item icons through the shared Icon renderer', async () => {
+    await act(async () => {
+      root.render(
+        <Accordion
+          items={[
+            { value: 'docs', label: 'Docs', icon: 'folder', content: 'Docs content' },
+          ]}
+        />,
+      )
+    })
+
+    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
+    expect(trigger).not.toBeNull()
+    expect(trigger?.getAttribute('data-icon-left')).toBe('')
+    expect(trigger?.querySelector('.uf-accordion-icon svg')).not.toBeNull()
+    expect(container.querySelector('[data-part="content"]')?.getAttribute('data-icon-left')).toBe('')
+  })
+
+  it('Accordion resolves the default icon prop through the shared Icon renderer', async () => {
+    await act(async () => {
+      root.render(
+        <Accordion
+          icon="folder"
+          items={[
+            { value: 'docs', label: 'Docs', content: 'Docs content' },
+          ]}
+        />,
+      )
+    })
+
+    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
+    expect(trigger).not.toBeNull()
+    expect(trigger?.getAttribute('data-icon-left')).toBe('')
+    expect(trigger?.querySelector('.uf-accordion-icon svg[data-icon="folder"]')).not.toBeNull()
+    expect(container.querySelector('[data-part="content"]')?.getAttribute('data-icon-left')).toBe('')
   })
 
   it('Button resolves string icon names through Icon', async () => {
@@ -151,8 +208,45 @@ describe('component smoke', () => {
 
     expect(container.querySelector('[data-part="indicator"] svg[data-icon="select-chevron-up"]')).not.toBeNull()
 
+    await act(async () => {
+      root.render(<Button text="Nested" selector selectorDirection="side" fullWidth={false} />)
+    })
+
+    const sideButton = container.querySelector('[data-scope="button"][data-selector-direction="side"]') as HTMLButtonElement | null
+    expect(sideButton?.querySelector('[data-part="indicator"] svg[data-icon="select-chevron-right"]')).not.toBeNull()
+
     const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
     expect(componentStyles).toContain('--uf-control-pad-right: var(--uf-selector-indicator-edge-gap);')
+  })
+
+  it('Button wraps text in a truncatable label slot inside constrained actions', async () => {
+    await act(async () => {
+      root.render(
+        <div style={{ width: 96 }}>
+          <Button
+            icon="account"
+            text="Dmitry Grer With A Very Long Account Name"
+            fullWidth
+            stretchText
+            rightText="Pro"
+          />
+        </div>,
+      )
+    })
+
+    const button = container.querySelector<HTMLButtonElement>('.uf-button[data-scope="button"]')
+    const textSlot = button?.querySelector<HTMLElement>('[data-part="text"]')
+    const label = button?.querySelector<HTMLElement>('[data-part="label"].uf-button__label')
+
+    expect(button?.getAttribute('data-full-width')).toBe('')
+    expect(button?.getAttribute('data-stretch-text')).toBe('')
+    expect(textSlot).not.toBeNull()
+    expect(label?.textContent).toBe('Dmitry Grer With A Very Long Account Name')
+    expect(button?.querySelector('.uf-button__rightText')?.textContent).toBe('Pro')
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toContain('[data-scope="button"] [data-part="label"],\n.uf-button__label {')
+    expect(componentStyles).toContain('text-overflow: ellipsis;')
   })
 
   it('Avatar centers icon fallback content inside a square control box', async () => {
@@ -195,6 +289,10 @@ describe('component smoke', () => {
     const card = container.querySelector<HTMLElement>('[data-scope="card"]')
     expect(card).not.toBeNull()
     expect(card?.getAttribute('data-membrane')).toBe('')
+    expect(card?.getAttribute('data-card-variant')).toBe('default')
+    expect(card?.getAttribute('data-padding')).toBe('default')
+    expect(card?.getAttribute('data-radius')).toBe('md')
+    expect(card?.getAttribute('data-border')).toBe('true')
 
     const textNodes = Array.from(container.querySelectorAll<HTMLElement>('[data-scope="text"]'))
     const title = textNodes.find((node) => node.textContent?.trim() === 'Card Title') ?? null
@@ -219,8 +317,57 @@ describe('component smoke', () => {
     expect(componentStyles).toContain('--uf-card-bg: var(--uf-overlay-surface-bg);')
     expect(componentStyles).toContain('background: var(--uf-card-background);')
     expect(componentStyles).toContain('--uf-card-pad: 7px;')
+    expect(componentStyles).toContain('.uf-card[data-scope][data-card-variant="dialog"]')
+    expect(componentStyles).toContain('.uf-card[data-scope][data-card-variant="floating"]')
+    expect(componentStyles).toContain('.uf-card[data-scope][data-border="false"]')
+    expect(componentStyles).toContain('.uf-card[data-scope][data-padding="none"][data-radius="none"]')
+    expect(componentStyles).toContain('.uf-card[data-scope] > [data-part="footer"][data-layout="between"]')
     expect(componentStyles).toContain('.uf-card[data-scope] .uf-text__content')
     expect(componentStyles).toContain('overflow-wrap: anywhere;')
+    const getCardVariantBlock = (variant: string) => (
+      componentStyles.match(new RegExp(`\\.uf-card\\[data-scope\\]\\[data-card-variant="${variant}"\\]\\s*\\{[^}]*\\}`))?.[0] ?? ''
+    )
+    expect(getCardVariantBlock('plain')).not.toContain('--uf-card-border-width')
+    expect(getCardVariantBlock('code')).not.toContain('--uf-card-border-width')
+    expect(getCardVariantBlock('showcase')).not.toContain('--uf-card-border-width')
+    expect(componentStyles).toMatch(
+      /\.uf-card\[data-scope\]:not\(\[data-full-width\]\) \{[\s\S]*?inline-size: max-content;[\s\S]*?margin-inline: auto;[\s\S]*?align-self: center;[\s\S]*?justify-self: center;[\s\S]*?\}/,
+    )
+  })
+
+  it('Card supports compound slots for modal-grade surfaces', async () => {
+    await act(async () => {
+      root.render(
+        <Card variant="dialog" radius="lg" footerLayout="between">
+          <Card.Header layout="bar">
+            <Card.Title>System surface</Card.Title>
+            <Card.Actions>
+              <Button icon="close" iconOnly fullWidth={false} />
+            </Card.Actions>
+          </Card.Header>
+          <Card.Content>Shared content shell.</Card.Content>
+          <Card.Footer layout="between">
+            <Card.Actions align="between">
+              <Button text="Cancel" variant="outline" fullWidth={false} />
+              <Button text="Continue" variant="accent" fullWidth={false} />
+            </Card.Actions>
+          </Card.Footer>
+        </Card>,
+      )
+    })
+
+    const card = container.querySelector<HTMLElement>('[data-scope="card"]')
+    expect(card?.getAttribute('data-card-variant')).toBe('dialog')
+    expect(card?.getAttribute('data-radius')).toBe('lg')
+    expect(card?.querySelector('[data-part="header"]')?.getAttribute('data-layout')).toBe('bar')
+    expect(card?.querySelector('[data-part="footer"]')?.getAttribute('data-layout')).toBe('between')
+    expect(card?.querySelector('[data-part="actions"]')?.getAttribute('data-align')).toBe('end')
+    expect(card?.textContent).toContain('System surface')
+    expect(card?.textContent).toContain('Shared content shell.')
+    const buttons = Array.from(card?.querySelectorAll<HTMLElement>('[data-scope="button"]') ?? [])
+    expect(buttons.some((button) => button.textContent?.includes('Cancel'))).toBe(true)
+    expect(buttons.some((button) => button.textContent?.includes('Continue'))).toBe(true)
+    expect(buttons.some((button) => button.getAttribute('data-icon-only') === '')).toBe(true)
   })
 
   it('Input syncs controlled value updates from props', async () => {
@@ -298,6 +445,46 @@ describe('component smoke', () => {
 
     expect(handleValueChange).toHaveBeenCalledTimes(1)
     expect(trigger?.textContent).toContain('Beta')
+  })
+
+  it('Select supports an icon-only trigger without shrinking the popover', async () => {
+    await act(async () => {
+      root.render(
+        <Select
+          variant="iconOnly"
+          surface="popover"
+          ariaLabel="Change type"
+          displayValue={<Icon name="brackets-curly" />}
+          contentMinWidth="10rem"
+          options={[
+            { value: 'string', label: 'String' },
+            { value: 'boolean', label: 'Boolean' },
+          ]}
+        />,
+      )
+    })
+
+    const selectRoot = container.querySelector<HTMLElement>('[data-scope="select"]')
+    const trigger = container.querySelector<HTMLButtonElement>('[data-scope="select"][data-part="trigger"]')
+
+    expect(selectRoot?.getAttribute('data-variant')).toBe('iconOnly')
+    expect(trigger?.getAttribute('data-icon-only')).toBe('')
+    expect(trigger?.querySelector('[data-part="indicator"]')).toBeNull()
+    expect(trigger?.querySelector('.uf-select__value svg[data-icon="brackets-curly"]')).not.toBeNull()
+
+    await act(async () => {
+      trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      await Promise.resolve()
+    })
+
+    const contentId = trigger?.getAttribute('aria-controls') ?? ''
+    const content = document.getElementById(contentId) as HTMLElement | null
+    expect(content?.getAttribute('data-select-variant')).toBe('iconOnly')
+    expect(content?.style.getPropertyValue('--face-runtime-select-content-min-width')).toBe('10rem')
+
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toContain('.uf-select[data-scope="select"][data-variant="iconOnly"] [data-part="trigger"]')
+    expect(componentStyles).toContain('[data-select-variant="iconOnly"]')
   })
 
   it('Input exposes the native textarea through controlRef', async () => {
@@ -643,10 +830,17 @@ describe('component smoke', () => {
     expect(tokenStyles).toContain('--uf-separator-line-width: var(--uf-border-width-thin);')
     expect(componentStyles).not.toContain('--uf-separator-line-width: var(--uf-membrane);')
     expect(componentStyles).toContain('inline-size: 100%;')
+    expect(componentStyles).toMatch(/\.uf-separator\[data-scope\] \{[\s\S]*?padding: 0;[\s\S]*?\}/)
+    expect(componentStyles).toMatch(
+      /\.uf-separator\[data-scope\]\[data-orientation="horizontal"\] \{[\s\S]*?height: var\(--uf-separator-line-width\);[\s\S]*?background: var\(--uf-color-border\);[\s\S]*?\}/,
+    )
+    expect(componentStyles).toMatch(
+      /\.uf-separator\[data-scope\]\[data-orientation="vertical"\] \{[\s\S]*?width: var\(--uf-separator-line-width\);[\s\S]*?border-left: none;[\s\S]*?background: var\(--uf-color-border\);[\s\S]*?\}/,
+    )
     expect(componentStyles).toContain('padding: var(--uf-membrane) var(--uf-control-pad-text);')
     expect(componentStyles).toContain('flex: 1 1 100%;')
     expect(componentStyles).toContain('justify-self: stretch;')
-    expect(componentStyles).toContain('.uf-gallery-itemSurface:has(> .uf-separator-membrane)')
+    expect(componentStyles).not.toContain('.uf-gallery-itemSurface:has(> .uf-separator-membrane),')
     expect(componentStyles).toContain('.uf-gallery-itemSurface > .uf-separator-membrane')
     expect(galleryMetaSource).toContain('name: "Separator"')
     expect(galleryMetaSource).toContain('sampleProps: {"orientation":"horizontal","decorative":true,"membrane":true}')
@@ -691,6 +885,7 @@ describe('component smoke', () => {
     const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
 
     expect(rootNode?.style.height).toBe('240px')
+    expect(rootNode?.getAttribute('data-border')).toBe('true')
     expect(membrane).not.toBeNull()
     expect(text?.getAttribute('data-membrane')).toBe('')
     expect(text?.getAttribute('data-inset')).toBe('control')
@@ -826,6 +1021,110 @@ describe('component smoke', () => {
     expect(tileStyles).toContain('text-overflow: ellipsis;')
   })
 
+  it('Tile applies Button-like icon inset only for its own icon slot', async () => {
+    await act(async () => {
+      root.render(<Tile icon="file" text="Page title" />)
+    })
+
+    const iconTile = container.querySelector('[data-scope="tile"][data-part="root"]') as HTMLElement | null
+    expect(iconTile?.getAttribute('data-icon-left')).toBe('')
+    expect(iconTile?.querySelector('[data-scope="tile"][data-part="icon"]')).not.toBeNull()
+
+    await act(async () => {
+      root.render(
+        <Tile
+          leading={<Button icon="folder" iconOnly aria-label="Open folder" />}
+          actions={<Button icon="plus" iconOnly aria-label="Add" />}
+        >
+          Folder
+        </Tile>,
+      )
+    })
+
+    const nestedButtonTile = container.querySelector('[data-scope="tile"][data-part="root"]') as HTMLElement | null
+    expect(nestedButtonTile?.hasAttribute('data-icon-left')).toBe(false)
+    expect(nestedButtonTile?.hasAttribute('data-icon-right')).toBe(false)
+    expect(nestedButtonTile?.querySelector('[data-scope="tile"][data-part="leading"] button[data-scope="button"]')).not.toBeNull()
+    expect(nestedButtonTile?.querySelector('[data-scope="tile"][data-part="actions"] button[data-scope="button"]')).not.toBeNull()
+  })
+
+  it('Tile exposes the app row taxonomy without local class contracts', async () => {
+    const handleTileClick = vi.fn()
+    const handleLeadingClick = vi.fn()
+
+    await act(async () => {
+      root.render(
+        <Tile
+          intent="disclosure"
+          density="compact"
+          tone="muted"
+          selectedDescendant
+          busy
+          selector
+          selectorOpen={false}
+          actionVisibility="always"
+          leading={<Button icon="folder" iconOnly onClick={handleLeadingClick} />}
+          meta={<span>3</span>}
+          actions={<Button icon="plus" iconOnly />}
+          onClick={handleTileClick}
+        >
+          Workspaces
+        </Tile>,
+      )
+    })
+
+    const tile = container.querySelector('[data-scope="tile"][data-part="root"]') as HTMLElement | null
+    const text = tile?.querySelector('[data-scope="tile"][data-part="text"]') as HTMLElement | null
+    const leading = tile?.querySelector('[data-scope="tile"][data-part="leading"]') as HTMLElement | null
+    const meta = tile?.querySelector('[data-scope="tile"][data-part="meta"]') as HTMLElement | null
+
+    expect(tile?.getAttribute('data-intent')).toBe('disclosure')
+    expect(tile?.getAttribute('data-density')).toBe('compact')
+    expect(tile?.getAttribute('data-tone')).toBe('muted')
+    expect(tile?.getAttribute('data-action-visibility')).toBe('always')
+    expect(tile?.getAttribute('data-selected-descendant')).toBe('')
+    expect(tile?.getAttribute('data-busy')).toBe('')
+    expect(tile?.getAttribute('aria-busy')).toBe('true')
+    expect(text?.textContent).toContain('Workspaces')
+    expect(leading).not.toBeNull()
+    expect(meta?.textContent).toBe('3')
+
+    await act(async () => {
+      leading?.querySelector('button')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(handleLeadingClick).toHaveBeenCalledTimes(1)
+    expect(handleTileClick).not.toHaveBeenCalled()
+
+    await act(async () => {
+      tile?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(handleTileClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('Tile section intent can render non-interactive headings', async () => {
+    await act(async () => {
+      root.render(
+        <Tile intent="section" interactive={false}>
+          Collections
+        </Tile>,
+      )
+    })
+
+    const tile = container.querySelector('[data-scope="tile"][data-part="root"]') as HTMLElement | null
+    const text = tile?.querySelector('[data-scope="tile"][data-part="text"]') as HTMLElement | null
+    const membrane = tile?.parentElement as HTMLElement | null
+
+    expect(tile?.getAttribute('data-intent')).toBe('section')
+    expect(tile?.hasAttribute('data-interactive')).toBe(false)
+    expect(tile?.getAttribute('role')).toBeNull()
+    expect(tile?.getAttribute('tabindex')).toBeNull()
+    expect(membrane?.classList.contains('uf-membrane')).toBe(true)
+    expect(membrane?.hasAttribute('data-membrane-interactive')).toBe(false)
+    expect(text?.textContent).toContain('Collections')
+  })
+
   it('Tile selector mode renders the selector indicator inside the text slot', async () => {
     await act(async () => {
       root.render(<Tile text="Project" icon="folder" selector selectorOpen />)
@@ -838,6 +1137,21 @@ describe('component smoke', () => {
     expect(tile?.getAttribute('data-stretch-text')).toBeNull()
     expect(textSlot?.textContent).toContain('Project')
     expect(indicator).not.toBeNull()
+
+    await act(async () => {
+      root.render(
+        <Tile selector selectorOpen>
+          <span className="custom-label">Properties</span>
+        </Tile>,
+      )
+    })
+
+    const customTextSlot = container.querySelector('[data-scope="tile"][data-part="text"]') as HTMLElement | null
+    const labelSlot = customTextSlot?.querySelector('.uf-tile__labelSlot') as HTMLElement | null
+
+    expect(customTextSlot?.textContent).toContain('Properties')
+    expect(labelSlot?.querySelector('.custom-label')?.textContent).toBe('Properties')
+    expect(customTextSlot?.querySelector('[data-part="indicator"] svg[data-icon="select-chevron-up"]')).not.toBeNull()
   })
 
   it('Carousel advances in uncontrolled mode', async () => {
@@ -986,6 +1300,10 @@ describe('component smoke', () => {
     })
 
     const title = container.querySelector('.uf-code-title[data-scope="text"]') as HTMLElement | null
+    const codeRoot = container.querySelector('[data-scope="code"][data-part="root"]') as HTMLElement | null
+    expect(codeRoot?.getAttribute('data-border')).toBe('true')
+    expect(codeRoot?.getAttribute('data-card-variant')).toBe('code')
+    expect(codeRoot?.getAttribute('data-full-width')).toBe('')
     expect(title?.textContent).toContain('Files / Playground')
 
     const actions = Array.from(container.querySelectorAll<HTMLButtonElement>('.uf-code-action[data-scope="button"]'))
@@ -1044,9 +1362,50 @@ describe('component smoke', () => {
     const runtimeSource = readFileSync(join(process.cwd(), 'uf.runtime.ts'), 'utf8')
     expect(content).not.toBeNull()
     expect(content?.hidden).toBe(false)
+    expect(content?.classList.contains('uf-card')).toBe(true)
+    expect(content?.getAttribute('data-card-variant')).toBe('dialog')
+    expect(content?.getAttribute('data-border')).toBe('true')
     expect(container.textContent).toContain('Preview modal')
     expect(container.textContent).toContain('Visible preview content')
     expect(runtimeSource).toContain("'Modal'")
+  })
+
+  it('Sheet keeps the composed drawer Card border enabled by default', async () => {
+    await act(async () => {
+      root.render(
+        <Sheet open portal={false} side="bottom" title="Bottom sheet">
+          Drawer content
+        </Sheet>,
+      )
+    })
+
+    const content = container.querySelector('[data-scope="modal"][data-part="content"]') as HTMLElement | null
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(content).not.toBeNull()
+    expect(content?.classList.contains('uf-card')).toBe(true)
+    expect(content?.classList.contains('uf-drawer')).toBe(true)
+    expect(content?.getAttribute('data-surface')).toBe('sheet')
+    expect(content?.getAttribute('data-card-variant')).toBe('dialog')
+    expect(content?.getAttribute('data-border')).toBe('true')
+    expect(componentStyles).not.toMatch(/\.uf-modal\[data-scope\]\.uf-drawer\s*\{[^}]*border\s*:\s*0\s*;?[^}]*\}/)
+  })
+
+  it('Drawer disables the composed Card border for flush square edge surfaces', async () => {
+    await act(async () => {
+      root.render(
+        <Drawer open portal={false} side="right" edge="flush" title="Right drawer">
+          Drawer content
+        </Drawer>,
+      )
+    })
+
+    const content = container.querySelector('[data-scope="modal"][data-part="content"]') as HTMLElement | null
+    expect(content).not.toBeNull()
+    expect(content?.classList.contains('uf-card')).toBe(true)
+    expect(content?.classList.contains('uf-drawer--flush')).toBe(true)
+    expect(content?.getAttribute('data-radius')).toBe('none')
+    expect(content?.getAttribute('data-drawer-edge')).toBe('flush')
+    expect(content?.getAttribute('data-border')).toBe('false')
   })
 
   it('Toast demo opens a toast and renders a close button', async () => {
@@ -1144,7 +1503,7 @@ describe('component smoke', () => {
     expect(componentStyles).toContain('--uf-progress-track-inset-inline: var(--uf-control-pad-text);')
     expect(componentStyles).toMatch(/\.uf-progress__header\s*\{[^}]*padding:\s*var\(--uf-control-pad-y\) var\(--uf-control-pad-text\);/)
     expect(componentStyles).toMatch(/\.uf-progress__trackWrap\s*\{[^}]*padding:\s*0 var\(--uf-progress-track-inset-inline\);/)
-    expect(componentStyles).toContain('.uf-gallery-itemSurface:has(> .uf-progress[data-scope][data-shape="linear"])')
+    expect(componentStyles).not.toContain('.uf-gallery-itemSurface:has(> .uf-progress[data-scope][data-shape="linear"])')
     expect(readFileSync(join(process.cwd(), 'uf.runtime.ts'), 'utf8'))
       .toContain("'Progress'")
   })
@@ -1551,6 +1910,54 @@ describe('component smoke', () => {
     expect(measureThumbText?.textContent).toBe('100')
   })
 
+  it('Slider advanced keeps the latest edited value while a controlled parent catches up', async () => {
+    vi.useFakeTimers()
+    const handleValueChange = vi.fn()
+
+    const renderControlledSlider = (nextValue: number) => (
+      <Slider
+        variant="advanced"
+        label="Value"
+        min={0}
+        max={100}
+        step={1}
+        value={[nextValue]}
+        onValueChange={handleValueChange}
+      />
+    )
+
+    await act(async () => {
+      root.render(renderControlledSlider(0))
+    })
+
+    const input = container.querySelector('.uf-slider--advanced input[type="range"]') as HTMLInputElement | null
+    const visibleThumbText = container.querySelector('.uf-slider-thumbButtonWrap .uf-slider-thumbButton [data-part="text"]') as HTMLElement | null
+
+    expect(visibleThumbText?.textContent).toBe('0')
+
+    await act(async () => {
+      if (!input) return
+      setNativeInputValue(input, '42')
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+
+    expect(handleValueChange).toHaveBeenLastCalledWith({ value: [42] })
+    expect(visibleThumbText?.textContent).toBe('42')
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1_000)
+    })
+
+    expect(visibleThumbText?.textContent).toBe('42')
+
+    await act(async () => {
+      root.render(renderControlledSlider(7))
+    })
+
+    expect(visibleThumbText?.textContent).toBe('7')
+  })
+
   it('Rating changes value in uncontrolled mode', async () => {
     await act(async () => {
       root.render(<Rating defaultValue={2} />)
@@ -1736,6 +2143,101 @@ describe('component smoke', () => {
     })
 
     expect(branchContent?.hidden).toBe(false)
+  })
+
+  it('Tree ignores non-function render overrides from generated preview props', async () => {
+    await act(async () => {
+      root.render(
+        <Tree
+          renderNode={'preview-string-placeholder' as any}
+          items={[
+            {
+              id: 'readme',
+              label: 'README.md',
+              icon: 'file',
+              render: 'preview-string-placeholder' as any,
+            },
+          ]}
+        />,
+      )
+    })
+
+    const node = container.querySelector('[data-tree-node-id="readme"]') as HTMLElement | null
+    expect(node).not.toBeNull()
+    expect(node?.textContent).toContain('README.md')
+  })
+
+  it('Tree keeps expansion stable when preview bridge promotes it to controlled props', async () => {
+    const items = [
+      {
+        id: 'src',
+        label: 'src',
+        icon: 'folder',
+        children: [
+          {
+            id: 'components',
+            label: 'components',
+            icon: 'folder',
+            children: [
+              { id: 'button', label: 'Button.tsx', icon: 'file' },
+            ],
+          },
+          {
+            id: 'assets',
+            label: 'assets',
+            icon: 'folder',
+            children: [
+              { id: 'icons', label: 'icons', icon: 'folder' },
+            ],
+          },
+        ],
+      },
+    ]
+
+    function PreviewBridgeHarness() {
+      const [bridgeProps, setBridgeProps] = React.useState<Record<string, unknown>>({
+        defaultExpandedIds: ['src'],
+        defaultSelectedId: 'button',
+      })
+
+      return (
+        <Tree
+          items={items}
+          {...bridgeProps}
+          onExpandedChange={(details) => {
+            setBridgeProps((prev) => ({ ...prev, expandedIds: details.expandedIds }))
+          }}
+          onSelectedChange={(details) => {
+            setBridgeProps((prev) => ({ ...prev, selectedId: details.selectedId }))
+          }}
+        />
+      )
+    }
+
+    await act(async () => {
+      root.render(<PreviewBridgeHarness />)
+    })
+
+    const assetsButton = container.querySelector('[data-tree-node-id="assets"]') as HTMLButtonElement | null
+    const componentsButton = container.querySelector('[data-tree-node-id="components"]') as HTMLButtonElement | null
+    const assetsContent = container.querySelector('[data-part="branchContent"][data-value="assets"]') as HTMLElement | null
+    const componentsContent = container.querySelector('[data-part="branchContent"][data-value="components"]') as HTMLElement | null
+
+    expect(assetsContent?.hidden).toBe(true)
+    expect(componentsContent?.hidden).toBe(true)
+
+    await act(async () => {
+      assetsButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(assetsContent?.hidden).toBe(false)
+
+    await act(async () => {
+      componentsButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    expect(assetsContent?.hidden).toBe(false)
+    expect(componentsContent?.hidden).toBe(false)
   })
 
   it('Panel workspace preset renders and changes selection', async () => {

@@ -8,6 +8,7 @@
 import { forwardRef, type ReactNode } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
+import { Card } from '../Card/Card'
 import { Text } from '../Text/Text'
 
 // ---------------------------------------------------------------------------
@@ -85,9 +86,12 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(
     })()
 
     return (
-      <div
+      <Card
         ref={ref}
         {...scrollAnatomy.getPartAttrs('root')}
+        variant="code"
+        padding="none"
+        radius="base"
         data-type={type}
         data-orientation={orientation}
         className={cn('uf-scroll', className)}
@@ -102,7 +106,7 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(
         >
           {renderScrollContent(children)}
         </div>
-      </div>
+      </Card>
     )
   },
 )
