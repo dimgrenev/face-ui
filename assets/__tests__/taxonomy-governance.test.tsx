@@ -35,7 +35,7 @@ const designSystemColorCss = readFixture('../../design-system/tokens/colors.css'
 const colorSystemSource = readFixture('../../design-system/source/color-system.jsonc')
 const semanticFeedbackSource = readFixture('../../design-system/source/semantic-feedback.jsonc')
 const textMeta = JSON.parse(readFixture('../../Text/Text.json')) as {
-  props?: { size?: { options?: string[] } }
+  props?: { size?: { options?: string[] }; variant?: { options?: string[] } }
   tokenMapping?: { component?: string[]; semanticFallbacks?: string[] }
 }
 const textSizeTokenMap = {
@@ -353,13 +353,23 @@ describe('taxonomy and governance', () => {
           {textSizeOptions.map((size) => (
             <Text key={size} text={size} size={size} />
           ))}
+          <Text text="Markdown text" variant="markdown" />
         </div>,
       )
     })
 
     expect(textMeta.props?.size?.options).toEqual(textSizeOptions)
+    expect(textMeta.props?.variant?.options).toContain('markdown')
     expect(textMeta.tokenMapping?.component).toContain('--uf-text-size-font-size')
     expect(componentsCss).toContain('font-size: var(--uf-text-font-size, var(--uf-text-size-font-size,')
+    expect(componentsCss).toContain('.uf-text[data-scope][data-variant="markdown"]')
+    expect(componentsCss).toContain('--uf-text-markdown-line-height: 24px;')
+    expect(componentsCss).toContain('.uf-text[data-scope][data-variant="markdown"] .uf-text__content')
+    expect(componentsCss).toContain('line-height: inherit;')
+    expect(componentsCss).toContain('calc(var(--uf-text-pad-y, var(--uf-control-pad-y)) - 2px)')
+
+    const markdownNode = container.querySelector<HTMLElement>('.uf-text[data-scope="text"][data-variant="markdown"]')
+    expect(markdownNode).not.toBeNull()
 
     for (const size of textSizeOptions) {
       const token = textSizeTokenMap[size]

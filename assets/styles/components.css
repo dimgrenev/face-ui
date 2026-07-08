@@ -799,6 +799,19 @@
   font-family: var(--uf-font-family-mono);
   font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-font-size-sm)));
 }
+.uf-text[data-scope][data-variant="markdown"] {
+  --uf-text-markdown-line-height: 24px;
+  line-height: var(--uf-text-markdown-line-height);
+}
+.uf-text[data-scope][data-variant="markdown"] .uf-text__content {
+  line-height: inherit;
+}
+.uf-text[data-scope][data-variant="markdown"]:not([data-inset="none"]) {
+  --uf-text-markdown-pad-y: max(0px, calc(var(--uf-text-pad-y, var(--uf-control-pad-y)) - 2px));
+  min-height: calc(var(--uf-text-markdown-line-height) + (var(--uf-text-markdown-pad-y) * 2));
+  padding-top: var(--uf-text-markdown-pad-y);
+  padding-bottom: var(--uf-text-markdown-pad-y);
+}
 /* Heading levels (match Markdown heading hierarchy) */
 .uf-text[data-scope][data-variant="h1"] {
   font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, calc(var(--uf-control-font-size) + var(--uf-text-h1-delta))));
@@ -1210,6 +1223,135 @@
   min-inline-size: 0;
   max-inline-size: 100%;
   overflow-wrap: anywhere;
+}
+
+/* =================================================================
+ * SETTING — settings row + group pattern
+ * ================================================================= */
+.uf-setting[data-scope="setting"] {
+  --uf-setting-pad-x: var(--uf-spacing-3);
+  --uf-setting-pad-y: var(--uf-spacing-3);
+  --uf-setting-control-max-width: 24rem;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--uf-spacing-2) var(--uf-spacing-4);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: var(--uf-setting-pad-y) var(--uf-setting-pad-x);
+  border-radius: var(--uf-radius);
+  transition: background-color var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
+}
+.uf-setting[data-scope="setting"][data-align="start"] {
+  align-items: flex-start;
+}
+.uf-setting[data-scope="setting"][data-layout="stack"] {
+  flex-direction: column;
+  align-items: stretch;
+}
+.uf-setting[data-scope="setting"][data-disabled] {
+  opacity: var(--uf-color-disabled-opacity);
+  pointer-events: none;
+}
+.uf-setting[data-scope="setting"][data-highlighted] {
+  background: var(--uf-color-hover-bg);
+}
+.uf-setting[data-scope="setting"] [data-part="info"] {
+  display: flex;
+  /* Zero flex-basis keeps long copy from pushing the control onto the wrap
+   * line; the control only wraps below a real minimum width. */
+  flex: 1 1 0%;
+  flex-direction: column;
+  gap: var(--uf-spacing-1);
+  min-width: min(14rem, 100%);
+}
+.uf-setting[data-scope="setting"] .uf-setting__label-row {
+  display: flex;
+  align-items: center;
+  gap: var(--uf-spacing-2);
+  min-width: 0;
+}
+.uf-setting[data-scope="setting"] [data-part="label"] {
+  min-width: 0;
+}
+.uf-setting[data-scope="setting"] [data-part="description"] {
+  min-width: 0;
+}
+.uf-setting[data-scope="setting"] [data-part="warning"] {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--uf-spacing-1);
+  min-width: 0;
+}
+.uf-setting[data-scope="setting"] [data-part="warning"] > .uf-icon {
+  flex: 0 0 auto;
+}
+.uf-setting[data-scope="setting"] [data-part="control"] {
+  display: flex;
+  /* Never squeeze controls; overflow wraps onto the next line instead. */
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--uf-spacing-2);
+  min-width: 0;
+  max-width: var(--uf-setting-control-max-width);
+  min-height: var(--uf-control-height);
+}
+.uf-setting[data-scope="setting"] [data-part="control"] > * {
+  /* Membrane wrappers around controls must not squeeze their content. */
+  flex: 0 0 auto;
+  min-width: 0;
+}
+.uf-setting[data-scope="setting"][data-layout="stack"] [data-part="control"] {
+  justify-content: flex-start;
+  max-width: none;
+  width: 100%;
+}
+.uf-setting[data-scope="setting"] [data-part="content"] {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+}
+.uf-setting-group[data-scope="setting"][data-part="group"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uf-spacing-2);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+.uf-setting-group[data-scope="setting"] [data-part="group-header"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uf-spacing-1);
+  min-width: 0;
+  padding: 0 var(--uf-spacing-3);
+}
+.uf-setting-group[data-scope="setting"] [data-part="group-body"] {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.uf-setting-group[data-scope="setting"][data-variant="framed"] [data-part="group-body"] {
+  border: var(--uf-border-default);
+  border-radius: var(--uf-radius-md);
+}
+.uf-setting-group[data-scope="setting"][data-variant="framed"] [data-part="group-body"] > .uf-setting[data-scope="setting"] {
+  border-radius: 0;
+}
+.uf-setting-group[data-scope="setting"][data-variant="framed"] [data-part="group-body"] > .uf-setting[data-scope="setting"]:first-child {
+  border-start-start-radius: var(--uf-radius-md);
+  border-start-end-radius: var(--uf-radius-md);
+}
+.uf-setting-group[data-scope="setting"][data-variant="framed"] [data-part="group-body"] > .uf-setting[data-scope="setting"]:last-child {
+  border-end-start-radius: var(--uf-radius-md);
+  border-end-end-radius: var(--uf-radius-md);
+}
+.uf-setting-group[data-scope="setting"][data-variant="framed"] [data-part="group-body"] > .uf-setting[data-scope="setting"] + .uf-setting[data-scope="setting"] {
+  border-top: var(--uf-border-subtle);
 }
 
 /* =================================================================

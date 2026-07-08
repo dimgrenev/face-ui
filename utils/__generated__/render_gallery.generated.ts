@@ -33,6 +33,7 @@ import { Scroll } from '../../Scroll/Scroll';
 import { SegmentedControl } from '../../SegmentedControl/SegmentedControl';
 import { Select } from '../../Select/Select';
 import { Separator } from '../../Separator/Separator';
+import { Setting } from '../../Setting/Setting';
 import { Skeleton } from '../../Skeleton/Skeleton';
 import { Slider } from '../../Slider/Slider';
 import { Steps } from '../../Steps/Steps';
@@ -85,6 +86,7 @@ export const FELD_GALLERY_ENTRIES: FeldGalleryEntry[] = [
   { name: "SegmentedControl", Component: SegmentedControl, sampleProps: {"selectionMode":"single","items":[{"value":"grid","label":"Grid"},{"value":"list","label":"List"},{"value":"board","label":"Board"}],"defaultValue":["grid"],"membrane":true} },
   { name: "Select", Component: Select, sampleProps: {"variant":"default","placeholder":"Choose option","disabled":false,"type":"select","labelOrientation":"vertical","stretchText":false,"surface":"auto","membrane":true,"options":[{"value":"1","label":"Option 1"},{"value":"2","label":"Option 2"}],"label":"Select"} },
   { name: "Separator", Component: Separator, sampleProps: {"orientation":"horizontal","decorative":true,"membrane":true} },
+  { name: "Setting", Component: Setting, sampleProps: {"label":"System notifications","description":"Show a system notification when the agent completes or needs attention.","control":{"__componentName__":"Switcher","defaultChecked":true,"withText":false}} },
   { name: "Skeleton", Component: Skeleton, sampleProps: {"variant":"circle","width":"var(--uf-control-height)","height":"var(--uf-control-height)"} },
   { name: "Slider", Component: Slider, sampleProps: {"label":"Value","defaultValue":[50]} },
   { name: "Steps", Component: Steps, sampleProps: {"defaultStep":0,"linear":true,"disabled":false,"items":[{"label":"Account","content":"Create your workspace and owner account."},{"label":"Profile","content":"Add brand settings, themes, and team details."},{"label":"Review","content":"Review the setup before publishing."}]} },

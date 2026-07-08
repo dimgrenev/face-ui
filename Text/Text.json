@@ -27,6 +27,7 @@
         "caption",
         "kbd",
         "code",
+        "markdown",
         "muted",
         "blockquote"
       ],

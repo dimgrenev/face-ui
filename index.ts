@@ -38,6 +38,9 @@ export type {
 export { Skeleton, skeletonAnatomy } from './Skeleton/Skeleton'
 export type { SkeletonProps } from './Skeleton/Skeleton'
 
+export { Setting, settingAnatomy } from './Setting/Setting'
+export type { SettingProps, SettingGroupProps, SettingLayout, SettingAlign, SettingGroupVariant } from './Setting/Setting'
+
 // Form Controls
 export { Checkbox } from './Checkbox/Checkbox'
 export type { CheckboxProps } from './Checkbox/Checkbox'

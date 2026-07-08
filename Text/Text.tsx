@@ -40,6 +40,7 @@ export type TextVariant =
   | 'caption'
   | 'kbd'
   | 'code'
+  | 'markdown'
   | 'muted'
   | 'blockquote'
 

@@ -100,6 +100,18 @@
         "Media"
       ]
     },
+    "Setting": {
+      "category": "pattern",
+      "status": "beta",
+      "a11yReviewed": false,
+      "mobileReviewed": false,
+      "related": [
+        "Card",
+        "Switcher",
+        "Select",
+        "SegmentedControl"
+      ]
+    },
     "Skeleton": {
       "category": "display",
       "status": "stable",

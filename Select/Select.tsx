@@ -165,6 +165,13 @@ const SELECT_SIDE_WIDTH = 240
 const SELECT_SIDE_MAX_HEIGHT = 480
 const SELECT_SIDE_VIEWPORT_INSET = 4
 const SELECT_SIDE_GAP = 4
+const SELECT_SIDE_MIN_HEIGHT = 80
+const SELECT_SIDE_ACTIVE_OPTION_SELECTOR = [
+  '[data-part="option"][aria-selected="true"]',
+  '[data-part="option"][data-state="selected"]',
+  '[data-part="option"][data-highlighted]',
+  '[data-part="option"]',
+].join(',')
 
 const sideInitialStyle: CSSProperties = {
   position: 'fixed',
@@ -174,6 +181,100 @@ const sideInitialStyle: CSSProperties = {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(min, value), Math.max(min, max))
+}
+
+type SelectSideRect = Pick<DOMRect, 'left' | 'right' | 'top' | 'bottom' | 'width' | 'height'>
+
+export interface SelectSidePosition {
+  top: number
+  left: number
+  width: number
+  maxHeight: number
+}
+
+export function computeSelectSidePosition(params: {
+  triggerRect: SelectSideRect
+  boundaryRect: SelectSideRect | null | undefined
+  contentHeight: number
+  viewportWidth: number
+  viewportHeight: number
+  requestedWidth?: number
+  requestedMaxHeight?: number
+  requestedGap?: number
+  requestedInset?: number
+  activeOptionCenterOffset?: number | null
+}): SelectSidePosition {
+  const {
+    triggerRect,
+    boundaryRect,
+    contentHeight,
+    viewportWidth,
+    viewportHeight,
+    requestedWidth = SELECT_SIDE_WIDTH,
+    requestedMaxHeight = SELECT_SIDE_MAX_HEIGHT,
+    requestedGap = SELECT_SIDE_GAP,
+    requestedInset = SELECT_SIDE_VIEWPORT_INSET,
+    activeOptionCenterOffset,
+  } = params
+  const inset = Math.max(0, requestedInset)
+  const gap = Math.max(0, requestedGap)
+  const viewportLeft = inset
+  const viewportRight = Math.max(viewportLeft, viewportWidth - inset)
+  const viewportTop = inset
+  const viewportBottom = Math.max(viewportTop, viewportHeight - inset)
+  const boundaryTop = boundaryRect == null
+    ? viewportTop
+    : clamp(boundaryRect.top, viewportTop, viewportBottom)
+  const boundaryBottom = boundaryRect == null
+    ? viewportBottom
+    : clamp(boundaryRect.bottom, viewportTop, viewportBottom)
+  const panelWidth = Math.min(
+    requestedWidth,
+    Math.max(SELECT_SIDE_MIN_HEIGHT, viewportRight - viewportLeft),
+  )
+  const verticalMin = Math.min(boundaryTop + gap, viewportBottom)
+  const verticalMax = Math.max(verticalMin, boundaryBottom - gap)
+  const availableHeight = Math.max(SELECT_SIDE_MIN_HEIGHT, verticalMax - verticalMin)
+  const panelHeight = Math.min(
+    requestedMaxHeight,
+    Math.max(SELECT_SIDE_MIN_HEIGHT, contentHeight || requestedMaxHeight),
+    availableHeight,
+  )
+  const anchorLeft = boundaryRect ? boundaryRect.right : triggerRect.right
+  const anchorRight = boundaryRect ? boundaryRect.left : triggerRect.left
+  const rightSpace = viewportRight - anchorLeft
+  const leftSpace = anchorRight - viewportLeft
+  const openLeft = rightSpace < panelWidth + gap && leftSpace > rightSpace
+  const desiredLeft = openLeft
+    ? anchorRight - panelWidth - gap
+    : anchorLeft + gap
+  const triggerCenter = triggerRect.top + triggerRect.height / 2
+  const desiredTop = typeof activeOptionCenterOffset === 'number' && Number.isFinite(activeOptionCenterOffset)
+    ? triggerCenter - activeOptionCenterOffset
+    : triggerRect.top
+
+  return {
+    top: Math.round(clamp(desiredTop, verticalMin, verticalMax - panelHeight)),
+    left: Math.round(clamp(desiredLeft, viewportLeft, viewportRight - panelWidth)),
+    width: Math.round(panelWidth),
+    maxHeight: Math.round(panelHeight),
+  }
+}
+
+function readSelectActiveOptionCenterOffset(contentEl: HTMLElement): number | null {
+  const activeOption = contentEl.querySelector(SELECT_SIDE_ACTIVE_OPTION_SELECTOR) as HTMLElement | null
+  if (!activeOption || typeof activeOption.getBoundingClientRect !== 'function') return null
+  const contentRect = contentEl.getBoundingClientRect()
+  const optionRect = activeOption.getBoundingClientRect()
+  if (
+    !Number.isFinite(contentRect.top) ||
+    !Number.isFinite(optionRect.top) ||
+    !Number.isFinite(optionRect.height) ||
+    optionRect.height <= 0
+  ) {
+    return null
+  }
+  return optionRect.top - contentRect.top + optionRect.height / 2
 }
 
 function resolveSideBoundary(triggerEl: HTMLElement | null) {
@@ -197,39 +298,28 @@ function useSelectSidePosition(options: {
     const triggerRect = triggerEl.getBoundingClientRect()
     const contentRect = contentEl.getBoundingClientRect()
     const boundaryRect = resolveSideBoundary(triggerEl)?.getBoundingClientRect()
-    const viewportWidth = window.innerWidth
-    const viewportHeight = window.innerHeight
-    const panelWidth = Math.min(
-      SELECT_SIDE_WIDTH,
-      Math.max(80, viewportWidth - SELECT_SIDE_VIEWPORT_INSET * 2),
-    )
-    const panelHeight = Math.min(
-      SELECT_SIDE_MAX_HEIGHT,
-      Math.max(80, contentRect.height || SELECT_SIDE_MAX_HEIGHT),
-      Math.max(80, viewportHeight - SELECT_SIDE_VIEWPORT_INSET * 2),
-    )
-
-    const anchorLeft = boundaryRect ? boundaryRect.right : triggerRect.right
-    const anchorRight = boundaryRect ? boundaryRect.left : triggerRect.left
-    const rightSpace = viewportWidth - anchorLeft - SELECT_SIDE_VIEWPORT_INSET
-    const leftSpace = anchorRight - SELECT_SIDE_VIEWPORT_INSET
-    const openLeft = rightSpace < panelWidth + SELECT_SIDE_GAP && leftSpace > rightSpace
-    const left = openLeft
-      ? anchorRight - panelWidth - SELECT_SIDE_GAP
-      : anchorLeft + SELECT_SIDE_GAP
-    const top = triggerRect.top + (triggerRect.height - panelHeight) / 2
+    const activeOptionCenterOffset = readSelectActiveOptionCenterOffset(contentEl)
+    const position = computeSelectSidePosition({
+      triggerRect,
+      boundaryRect,
+      contentHeight: contentRect.height,
+      activeOptionCenterOffset,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+    })
 
     setStyle({
       position: 'fixed',
-      top: Math.round(clamp(top, SELECT_SIDE_VIEWPORT_INSET, viewportHeight - panelHeight - SELECT_SIDE_VIEWPORT_INSET)),
-      left: Math.round(clamp(left, SELECT_SIDE_VIEWPORT_INSET, viewportWidth - panelWidth - SELECT_SIDE_VIEWPORT_INSET)),
+      top: position.top,
+      left: position.left,
       right: 'auto',
       bottom: 'auto',
-      width: Math.round(panelWidth),
+      width: position.width,
       maxWidth: `calc(100vw - ${SELECT_SIDE_VIEWPORT_INSET * 2}px)`,
-      maxHeight: Math.round(panelHeight),
+      maxHeight: position.maxHeight,
+      '--uf-select-content-max-height': `${position.maxHeight}px`,
       overflowY: 'auto',
-    })
+    } as CSSProperties)
   }, [contentRef, triggerRef])
 
   useEffect(() => {
