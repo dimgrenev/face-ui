@@ -137,19 +137,10 @@
     },
     "Escape": {
       "action": "close"
-    },
-    "Home": {
-      "action": "focusFirst",
-      "scope": "list"
-    },
-    "End": {
-      "action": "focusLast",
-      "scope": "list"
     }
   },
   "aria": {
-    "role": "combobox",
-    "labelledBy": "command-label"
+    "role": "combobox"
   },
   "composition": {
     "required": [
@@ -160,6 +151,7 @@
     "recommended": [
       "item",
       "group",
+      "groupLabel",
       "empty"
     ],
     "parts": {
@@ -184,9 +176,13 @@
         "parent": "list",
         "multiple": true
       },
+      "groupLabel": {
+        "slot": "groupLabel",
+        "parent": "group"
+      },
       "empty": {
         "slot": "empty",
-        "parent": "root"
+        "parent": "list"
       }
     }
   },

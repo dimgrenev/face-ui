@@ -86,15 +86,9 @@
   ],
   "description": "Horizontal toggle group for switching between 2–4 mutually exclusive views or filters",
   "behavior": {
-    "rovingFocus": true
+    "rovingFocus": false
   },
   "keyboard": {
-    "ArrowRight": {
-      "action": "focusNext"
-    },
-    "ArrowLeft": {
-      "action": "focusPrevious"
-    },
     "Enter": {
       "action": "select"
     },
@@ -103,7 +97,7 @@
     }
   },
   "aria": {
-    "role": "radiogroup",
+    "role": "group",
     "required": [
       "aria-label"
     ]
@@ -111,8 +105,7 @@
   "composition": {
     "required": [
       "root",
-      "item",
-      "indicator"
+      "item"
     ],
     "parts": {
       "root": {
@@ -122,10 +115,6 @@
         "slot": "item",
         "parent": "root",
         "multiple": true
-      },
-      "indicator": {
-        "slot": "indicator",
-        "parent": "root"
       }
     }
   },

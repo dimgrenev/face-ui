@@ -359,6 +359,7 @@
     "README.md",
     "docs.md",
     "docs",
+    "!docs/audit",
     "design-system",
     "LICENSE"
   ],

@@ -28,8 +28,7 @@
     "title": {
       "type": "string",
       "required": false,
-      "description": "Title content rendered inside the modal.",
-      "default": "Drawer"
+      "description": "Title content rendered inside the modal."
     },
     "className": {
       "type": "string",
@@ -39,8 +38,7 @@
     "children": {
       "type": "string",
       "required": false,
-      "description": "Body content.",
-      "default": "Drawer content"
+      "description": "Body content."
     },
     "open": {
       "type": "boolean",
@@ -70,8 +68,7 @@
     "trigger": {
       "type": "string",
       "required": false,
-      "description": "Trigger element that toggles the modal open.",
-      "default": "Open drawer"
+      "description": "Trigger element that toggles the modal open."
     },
     "width": {
       "type": "number",

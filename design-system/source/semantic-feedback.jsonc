@@ -8,11 +8,25 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-foreground)"
+          "value": "#3fb950"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-foreground)"
+          "value": "#1a7f37"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-success-soft",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "rgba(63, 185, 80, 0.16)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "rgba(26, 127, 55, 0.12)"
         }
       ]
     },
@@ -50,11 +64,25 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-foreground)"
+          "value": "#f85149"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-foreground)"
+          "value": "#cf222e"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-error-soft",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "rgba(248, 81, 73, 0.16)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "rgba(207, 34, 46, 0.12)"
         }
       ]
     },
@@ -92,11 +120,25 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-text-secondary)"
+          "value": "#d29922"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-text-secondary)"
+          "value": "#9a6700"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-warning-soft",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "rgba(210, 153, 34, 0.16)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "rgba(154, 103, 0, 0.12)"
         }
       ]
     },
@@ -134,11 +176,25 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-text-secondary)"
+          "value": "#58a6ff"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-text-secondary)"
+          "value": "#0969da"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-feedback",
+      "name": "--uf-color-info-soft",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "rgba(88, 166, 255, 0.16)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "rgba(9, 105, 218, 0.12)"
         }
       ]
     },
@@ -218,11 +274,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-white-12)"
+          "value": "var(--uf-color-error-soft)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-black-8)"
+          "value": "var(--uf-color-error-soft)"
         }
       ]
     },

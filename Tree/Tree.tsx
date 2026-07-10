@@ -14,16 +14,14 @@ import { treeMachine, connectTree } from '../assets/machines/tree.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
 import { Tile } from '../Tile/Tile'
+import type { NavItemBase } from '../assets/nav-item'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface TreeNode {
-  id: string
-  label: ReactNode
+export interface TreeNode extends NavItemBase {
   children?: TreeNode[]
-  disabled?: boolean
   /** Preferred default row component for this node. */
   kind?: 'button' | 'tile' | 'custom'
   /** Optional icon rendered by default button/tile rows. */
@@ -58,43 +56,6 @@ export interface TreeProps {
   /** Additional class name on the root element. */
   className?: string
 }
-
-const defaultTreeItems: TreeNode[] = [
-  {
-    id: 'src',
-    label: 'src',
-    icon: 'folder',
-    children: [
-      {
-        id: 'components',
-        label: 'components',
-        icon: 'folder',
-        children: [
-          { id: 'button', label: 'Button.tsx', icon: 'file' },
-          { id: 'tile', label: 'Tile.tsx', icon: 'file' },
-        ],
-      },
-      {
-        id: 'assets',
-        label: 'assets',
-        icon: 'folder',
-        children: [
-          {
-            id: 'icons',
-            label: 'icons',
-            icon: 'folder',
-            children: [
-              { id: 'search-icon', label: 'search.svg', icon: 'file' },
-              { id: 'folder-icon', label: 'folder.svg', icon: 'file' },
-            ],
-          },
-        ],
-      },
-      { id: 'index', label: 'index.ts', icon: 'file' },
-    ],
-  },
-  { id: 'readme', label: 'README.md', icon: 'file' },
-]
 
 export interface TreeRenderNodeDetails {
   node: TreeNode
@@ -301,7 +262,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
       className,
     } = props
 
-    const items = Array.isArray(rawItems) ? rawItems : defaultTreeItems
+    const items = Array.isArray(rawItems) ? rawItems : []
     const expandedChangeHandler = typeof onExpandedChange === 'function' ? onExpandedChange : undefined
     const selectedChangeHandler = typeof onSelectedChange === 'function' ? onSelectedChange : undefined
 

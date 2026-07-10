@@ -111,7 +111,7 @@
     "required": [
       "root",
       "track",
-      "range"
+      "indicator"
     ],
     "recommended": [
       "label"
@@ -128,8 +128,8 @@
         "slot": "track",
         "parent": "root"
       },
-      "range": {
-        "slot": "range",
+      "indicator": {
+        "slot": "indicator",
         "parent": "track"
       }
     }

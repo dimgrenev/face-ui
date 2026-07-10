@@ -130,16 +130,8 @@
     }
   ],
   "behavior": {},
-  "keyboard": {
-    "ArrowRight": {
-      "action": "focusNextStep"
-    },
-    "ArrowLeft": {
-      "action": "focusPreviousStep"
-    }
-  },
+  "keyboard": {},
   "aria": {
-    "role": "list",
     "required": [
       "aria-label"
     ]
@@ -152,8 +144,7 @@
       "content"
     ],
     "recommended": [
-      "indicator",
-      "separator"
+      "indicator"
     ],
     "parts": {
       "root": {
@@ -172,13 +163,10 @@
         "slot": "indicator",
         "parent": "trigger"
       },
-      "separator": {
-        "slot": "separator",
-        "parent": "root"
-      },
       "content": {
         "slot": "content",
-        "parent": "item"
+        "parent": "root",
+        "multiple": true
       }
     }
   },

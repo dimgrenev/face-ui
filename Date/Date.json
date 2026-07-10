@@ -130,11 +130,6 @@
       "required": false,
       "description": "disabledTime prop"
     },
-    "minutes": {
-      "type": "number",
-      "required": false,
-      "description": "minutes prop"
-    },
     "closeOnSelect": {
       "type": "boolean",
       "required": false,

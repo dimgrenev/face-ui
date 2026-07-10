@@ -35,23 +35,6 @@
       "description": "Uncontrolled initial selected value.",
       "default": "one"
     },
-    "name": {
-      "type": "string",
-      "required": false,
-      "description": "Form field name."
-    },
-    "disabled": {
-      "type": "boolean",
-      "required": false,
-      "description": "Disabled state for the entire group.",
-      "default": false
-    },
-    "required": {
-      "type": "boolean",
-      "required": false,
-      "description": "Mark as required.",
-      "default": false
-    },
     "orientation": {
       "type": "enum",
       "required": false,
@@ -67,16 +50,43 @@
       "required": false,
       "description": "Callback when value changes."
     },
-    "className": {
+    "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Additional CSS class."
+      "description": "Accessible label for the radio group (role=\"radiogroup\" requires a name)."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "ID of an element that labels the radio group."
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state for the entire group.",
+      "default": false
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Mark as required.",
+      "default": false
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Form field name."
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each option geometry.",
+      "description": "Outer membrane wrapper around control geometry.",
       "default": true
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
     }
   },
   "states": [
@@ -173,12 +183,9 @@
     "required": [
       "root",
       "item",
-      "control",
       "indicator"
     ],
-    "recommended": [
-      "label"
-    ],
+    "recommended": [],
     "parts": {
       "root": {
         "slot": "root"
@@ -188,16 +195,8 @@
         "parent": "root",
         "multiple": true
       },
-      "control": {
-        "slot": "control",
-        "parent": "item"
-      },
       "indicator": {
         "slot": "indicator",
-        "parent": "control"
-      },
-      "label": {
-        "slot": "label",
         "parent": "item"
       }
     }

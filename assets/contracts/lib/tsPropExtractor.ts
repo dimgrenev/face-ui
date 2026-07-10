@@ -260,9 +260,46 @@ export function extractReactTsPropsFromSource(bundle: SourceBundle): ExtractedPr
   const iface = extractPropsInterface(code);
   const out: ExtractedProp[] = [];
   if (iface) {
-    // Collapse multiline types into single entries. Split only on `;` or newlines
-    // that start a new property declaration (name followed by `?:` or `:`).
-    const rawEntries = iface.split(/[;\n]/).map((l) => l.trim()).filter(Boolean);
+    // Collapse multiline types into single entries. Split on `;`/newline, but
+    // ONLY at bracket depth 0 — otherwise inline object types inside callback
+    // params (e.g. `onSortChange?: (d: { column: string; direction: 'asc' }) => void`)
+    // leak their inner keys as phantom top-level props. We track `()`/`{}`/`[]`
+    // only (not `<>`, which is ambiguous with the `=>` in arrow types), and we
+    // ignore brackets/separators inside string literals so a stray `(` or `;`
+    // in a string-union option can't desync the depth counter.
+    const rawEntries: string[] = [];
+    {
+      let depth = 0;
+      let buf = '';
+      let quote = '';
+      let prev = '';
+      for (const ch of iface) {
+        if (quote) {
+          buf += ch;
+          if (ch === quote && prev !== '\\') quote = '';
+          prev = ch;
+          continue;
+        }
+        if (ch === "'" || ch === '"' || ch === '`') {
+          quote = ch;
+          buf += ch;
+          prev = ch;
+          continue;
+        }
+        if (ch === '(' || ch === '[' || ch === '{') depth++;
+        else if (ch === ')' || ch === ']' || ch === '}') depth = Math.max(0, depth - 1);
+        if ((ch === ';' || ch === '\n') && depth === 0) {
+          const t = buf.trim();
+          if (t) rawEntries.push(t);
+          buf = '';
+        } else {
+          buf += ch;
+        }
+        prev = ch;
+      }
+      const tail = buf.trim();
+      if (tail) rawEntries.push(tail);
+    }
     // Rejoin fragments that are continuations (don't start with a property name pattern).
     const entries: string[] = [];
     for (const raw of rawEntries) {

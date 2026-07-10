@@ -243,8 +243,7 @@
       "thumb"
     ],
     "recommended": [
-      "label",
-      "output"
+      "label"
     ],
     "parts": {
       "root": {
@@ -266,10 +265,6 @@
         "slot": "thumb",
         "parent": "track",
         "multiple": true
-      },
-      "output": {
-        "slot": "output",
-        "parent": "root"
       }
     }
   },

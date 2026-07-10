@@ -8,7 +8,7 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-black-100)"
+          "value": "var(--uf-color-black-96)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
@@ -36,7 +36,7 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-black-100)"
+          "value": "var(--uf-color-black-96)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
@@ -50,7 +50,7 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-white-8)"
+          "value": "var(--uf-color-white-12)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
@@ -92,7 +92,7 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-black-100)"
+          "value": "var(--uf-color-black-96)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
@@ -190,7 +190,7 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-surface-sidebar, var(--uf-color-white-10))"
+          "value": "var(--uf-color-surface-sidebar, var(--uf-color-white-14))"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
@@ -204,7 +204,7 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-black-100)"
+          "value": "var(--uf-color-black-96)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
@@ -274,7 +274,7 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-surface-sidebar, var(--uf-color-white-10))"
+          "value": "var(--uf-color-surface-sidebar, var(--uf-color-white-14))"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
@@ -288,7 +288,7 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-100)"
+          "value": "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-96)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",

@@ -153,25 +153,6 @@ export const Bar = forwardRef<HTMLDivElement, BarProps>(
       if (leftNode == null) leftNode = child
     }
 
-    if (leftNode == null && rightNode == null) {
-      leftNode = (
-        <Text as="span" className="uf-bar__slotText">
-          Bar
-        </Text>
-      )
-      rightNode = (
-        <Button
-          type="button"
-          aria-label="Close"
-          title="Close"
-          icon="close"
-          iconOnly
-          fullWidth={false}
-          variant="default"
-        />
-      )
-    }
-
     if (leftNode != null || rightNode != null) {
       return (
         <div
@@ -199,7 +180,7 @@ export const Bar = forwardRef<HTMLDivElement, BarProps>(
         className={cn('uf-bar', className)}
         {...rest}
       >
-        {children}
+        {renderSlot(children)}
       </div>
     )
   },

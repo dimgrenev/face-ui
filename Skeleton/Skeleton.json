@@ -62,10 +62,8 @@
   "behavior": {},
   "keyboard": {},
   "aria": {
-    "role": "progressbar",
-    "required": [
-      "aria-label"
-    ]
+    "role": "none — root sets aria-hidden=\"true\" and is excluded from the accessibility tree",
+    "notes": "Skeleton is a decorative loading placeholder. It sets no role and requires no aria-label; announce loading state via an aria-live region in the surrounding content instead."
   },
   "composition": {
     "required": [

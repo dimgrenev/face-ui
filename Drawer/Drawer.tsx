@@ -13,9 +13,9 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
   const {
     side = 'right',
     edge,
-    trigger = 'Open drawer',
-    title = 'Drawer',
-    children = 'Drawer content',
+    trigger,
+    title,
+    children,
     className,
     positionerClassName,
     ...rest

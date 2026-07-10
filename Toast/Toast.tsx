@@ -99,6 +99,7 @@ export function createToastContext(options?: {
               variant="floating"
               padding="compact"
               radius="md"
+              data-tone={toast.variant}
               className={cn('uf-toast')}
             >
               <div className="uf-toast-body">

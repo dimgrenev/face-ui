@@ -76,9 +76,10 @@
   "behavior": {},
   "keyboard": {},
   "aria": {
-    "role": "img",
-    "required": [
-      "aria-label"
+    "nativeElement": "Root is a <span> container with no ARIA role. The `image` part is a native <img> whose accessible name comes from the `name` prop applied as `alt`.",
+    "notes": [
+      "Accessible name is provided by `name` (rendered as the image `alt` and used to derive the initials fallback). The component does not accept or apply an `aria-label`.",
+      "When the image is unavailable, the fallback (initials, `icon`, or custom `fallback`/`children`) is shown as visible text."
     ]
   },
   "composition": {

@@ -22,18 +22,16 @@ import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
 import { Card } from '../Card/Card'
 import { Text } from '../Text/Text'
+import type { NavItemBase } from '../assets/nav-item'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface NavigationItem {
-  id: string
-  label: ReactNode
+export interface NavigationItem extends NavItemBase {
   href?: string
   onClick?: () => void
   items?: NavigationItem[]
-  disabled?: boolean
 }
 
 export interface NavigationProps {

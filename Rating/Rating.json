@@ -108,9 +108,7 @@
     "role": "radiogroup",
     "required": [
       "aria-label",
-      "aria-valuenow",
-      "aria-valuemin",
-      "aria-valuemax"
+      "aria-checked"
     ]
   },
   "composition": {

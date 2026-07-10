@@ -16,6 +16,7 @@ import { cn } from '../assets/utils'
 import { CloseIcon } from '../assets/icons'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
+import type { FormControlProps } from '../assets/form-control-props'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -25,23 +26,19 @@ export type InputType = 'default' | 'text' | 'email' | 'number' | 'date' | 'pass
 export type InputTextLayout = 'scroll' | 'wrap'
 export type InputLabelOrientation = 'vertical' | 'horizontal'
 
-export interface InputProps {
+export interface InputProps extends FormControlProps {
   /** Current input value. */
   value?: string
   /** components API compatibility: uncontrolled initial value. */
   defaultValue?: string
   /** Native input id. When omitted, a stable React id is generated. */
   id?: string
-  /** Native input name. */
-  name?: string
   /** Input type. 'default' renders a textarea-like free text. Others render <input type="...">. */
   type?: InputType
   /** Text layout for type="default": 'scroll' (single-line) or 'wrap' (multi-line auto-grow). */
   textLayout?: InputTextLayout
   /** Auto-grow textarea height in wrap mode. */
   autoGrow?: boolean
-  /** Disable the input. */
-  disabled?: boolean
   /** Make the input read-only. */
   readOnly?: boolean
   /** Label rendered above/beside the input. */
@@ -76,8 +73,6 @@ export interface InputProps {
   iconPosition?: 'left' | 'right'
   /** Stretch the input text area so right-side icons pin to the edge. */
   stretchText?: boolean
-  /** Show required indicator (*). */
-  required?: boolean
   /** Auto-focus on mount. */
   autoFocus?: boolean
   /** Native browser autocomplete hint. */
@@ -106,9 +101,6 @@ export interface InputProps {
   onKeyDown?: KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>
   /** Ref to the native input or textarea control. */
   controlRef?: Ref<HTMLInputElement | HTMLTextAreaElement>
-  /** Outer membrane wrapper around control geometry. */
-  membrane?: boolean
-  className?: string
 }
 
 // ---------------------------------------------------------------------------

@@ -217,9 +217,7 @@
   ],
   "behavior": {},
   "keyboard": {},
-  "aria": {
-    "role": "region"
-  },
+  "aria": {},
   "composition": {
     "required": [
       "root"

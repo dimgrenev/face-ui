@@ -111,9 +111,7 @@
   ],
   "behavior": {},
   "keyboard": {},
-  "aria": {
-    "role": "status"
-  },
+  "aria": {},
   "composition": {
     "required": [
       "root"

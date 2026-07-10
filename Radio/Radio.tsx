@@ -11,6 +11,7 @@ import { radioMachine, connectRadio } from '../assets/machines/radio.machine'
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
 import { RadioOnIcon, RadioOffIcon } from '../assets/icons'
+import type { FormControlProps } from '../assets/form-control-props'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -22,31 +23,25 @@ export interface RadioOption {
   disabled?: boolean
 }
 
-export interface RadioProps {
+export interface RadioProps extends FormControlProps {
   /** Radio options to render. */
   options?: RadioOption[]
   /** Currently selected value. */
   value?: string | null
   /** Uncontrolled initial selected value. */
   defaultValue?: string
-  /** Form field name. */
-  name?: string
-  /** Disabled state for the entire group. */
-  disabled?: boolean
-  /** Mark as required. */
-  required?: boolean
   /** Layout orientation. */
   orientation?: 'horizontal' | 'vertical'
   /** Callback when value changes. */
   onValueChange?: (details: { value: string }) => void
   /** Legacy callback alias that receives the plain selected value. */
   onChange?: (value: string) => void
-  /** Additional CSS class. */
-  className?: string
-  /** Outer membrane wrapper around each option geometry. */
-  membrane?: boolean
   /** Legacy orientation alias. */
   flow?: 'horizontal' | 'vertical'
+  /** Accessible label for the radio group (role="radiogroup" requires a name). */
+  'aria-label'?: string
+  /** ID of an element that labels the radio group. */
+  'aria-labelledby'?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -117,6 +112,8 @@ export const Radio = forwardRef<HTMLDivElement, RadioProps>(
           else if (ref) (ref as any).current = node
         }}
         {...api.getRootProps()}
+        aria-label={props['aria-label']}
+        aria-labelledby={props['aria-labelledby']}
         data-orientation={effectiveOrientation}
         data-disabled={disabled ? '' : undefined}
         className={cn('uf-radio', className)}

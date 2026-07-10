@@ -288,6 +288,10 @@
       "root": {
         "slot": "root"
       },
+      "leading": {
+        "slot": "leading",
+        "parent": "root"
+      },
       "icon": {
         "slot": "icon",
         "parent": "root"
@@ -299,6 +303,10 @@
       "indicator": {
         "slot": "indicator",
         "parent": "text"
+      },
+      "meta": {
+        "slot": "meta",
+        "parent": "root"
       },
       "actions": {
         "slot": "actions",

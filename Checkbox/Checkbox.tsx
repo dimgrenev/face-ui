@@ -11,30 +11,21 @@ import { checkboxMachine, connectCheckbox } from '../assets/machines/checkbox.ma
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
 import { CheckOnIcon, CheckOffIcon, MinusIcon } from '../assets/icons'
+import type { FormControlProps } from '../assets/form-control-props'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface CheckboxProps {
+export interface CheckboxProps extends FormControlProps {
   /** Checked state (boolean or 'indeterminate'). */
   checked?: boolean | 'indeterminate'
   /** Uncontrolled initial checked state. */
   defaultChecked?: boolean | 'indeterminate'
-  /** Disabled state. */
-  disabled?: boolean
-  /** Mark as required. */
-  required?: boolean
-  /** Form field name. */
-  name?: string
   /** Label content. */
   label?: ReactNode
   /** Callback when checked state changes. */
   onCheckedChange?: (details: { checked: boolean | 'indeterminate' }) => void
-  /** Additional CSS class. */
-  className?: string
-  /** Outer membrane wrapper around control geometry. */
-  membrane?: boolean
 }
 
 interface CheckboxLegacyProps {

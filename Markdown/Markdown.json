@@ -191,9 +191,7 @@
   ],
   "behavior": {},
   "keyboard": {},
-  "aria": {
-    "role": "document"
-  },
+  "aria": {},
   "composition": {
     "required": [
       "root"
@@ -201,6 +199,9 @@
     "parts": {
       "root": {
         "slot": "root"
+      },
+      "content": {
+        "slot": "content"
       }
     }
   },

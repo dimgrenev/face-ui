@@ -42,6 +42,8 @@ export { Setting, settingAnatomy } from './Setting/Setting'
 export type { SettingProps, SettingGroupProps, SettingLayout, SettingAlign, SettingGroupVariant } from './Setting/Setting'
 
 // Form Controls
+export type { FormControlProps } from './assets/form-control-props'
+
 export { Checkbox } from './Checkbox/Checkbox'
 export type { CheckboxProps } from './Checkbox/Checkbox'
 
@@ -107,6 +109,8 @@ export { Carousel } from './Carousel/Carousel'
 export type { CarouselProps } from './Carousel/Carousel'
 
 // Tree / Panel / Navigation / Command
+export type { NavItemBase } from './assets/nav-item'
+
 export { Tree } from './Tree/Tree'
 export type { TreeProps, TreeNode } from './Tree/Tree'
 

@@ -197,14 +197,16 @@
   "behavior": {},
   "keyboard": {},
   "aria": {
-    "role": "img",
-    "required": [
-      "aria-label"
+    "nativeElement": "Root is a <div> container whose ARIA role is the pass-through `role` prop (no default → none). The `element` part is a native <img>/<video>/<audio>; for images the accessible name comes from `alt`, and playback semantics come from the native <video>/<audio> element.",
+    "notes": [
+      "No fixed root role is emitted. Pass `role` explicitly (e.g. \"img\") only when the container itself should expose one.",
+      "For images provide `alt` for an accessible name; an empty `alt` marks the image presentational. `aria-label` is an optional wrapper label, not the image name."
     ]
   },
   "composition": {
     "required": [
-      "root"
+      "root",
+      "element"
     ],
     "recommended": [
       "fallback"
@@ -212,6 +214,10 @@
     "parts": {
       "root": {
         "slot": "root"
+      },
+      "element": {
+        "slot": "element",
+        "parent": "root"
       },
       "fallback": {
         "slot": "fallback",

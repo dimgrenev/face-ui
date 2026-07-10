@@ -211,10 +211,12 @@
   "composition": {
     "required": [
       "root",
-      "overlay",
+      "backdrop",
+      "positioner",
       "content"
     ],
     "recommended": [
+      "trigger",
       "title",
       "description",
       "close"
@@ -223,13 +225,21 @@
       "root": {
         "slot": "root"
       },
-      "overlay": {
-        "slot": "overlay",
+      "trigger": {
+        "slot": "trigger",
+        "parent": "root"
+      },
+      "backdrop": {
+        "slot": "backdrop",
+        "parent": "root"
+      },
+      "positioner": {
+        "slot": "positioner",
         "parent": "root"
       },
       "content": {
         "slot": "content",
-        "parent": "root"
+        "parent": "positioner"
       },
       "title": {
         "slot": "title",

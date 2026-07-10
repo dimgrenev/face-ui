@@ -290,6 +290,13 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     ],
   },
+  Input: {
+    patchProps: {
+      required: {
+        description: 'Show the required indicator (*).',
+      },
+    },
+  },
   Radio: {
     omitProps: ['flow', 'onChange'],
     patchProps: {
@@ -315,6 +322,9 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         description: 'Layout orientation.',
         options: ['horizontal', 'vertical'],
         default: 'vertical',
+      },
+      disabled: {
+        description: 'Disabled state for the entire group.',
       },
     },
     patchStates: () => [

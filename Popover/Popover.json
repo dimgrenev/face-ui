@@ -93,51 +93,37 @@
   "behavior": {
     "dismissOnEscape": true,
     "dismissOnClickOutside": true,
-    "returnFocusOnClose": true,
-    "autoFocusOnOpen": "first-focusable"
+    "returnFocusOnClose": false,
+    "autoFocusOnOpen": "none"
   },
   "keyboard": {
     "Escape": {
       "action": "close"
-    },
-    "Tab": {
-      "action": "focusTrap",
-      "scope": "popover",
-      "condition": "interactive"
     }
   },
   "aria": {
-    "role": "dialog",
-    "labelledBy": "popover-title"
+    "notes": [
+      "The trigger exposes aria-expanded reflecting the open/closed state.",
+      "No ARIA role is set on the floating content in the click (popover) variant; supply aria-label or aria-labelledby on the popover to give the content an accessible name when needed."
+    ]
   },
   "composition": {
     "required": [
-      "root",
       "trigger",
       "content"
     ],
     "recommended": [
-      "arrow",
-      "close"
+      "arrow"
     ],
     "parts": {
-      "root": {
-        "slot": "root"
-      },
       "trigger": {
-        "slot": "trigger",
-        "parent": "root"
+        "slot": "trigger"
       },
       "content": {
-        "slot": "content",
-        "parent": "root"
+        "slot": "content"
       },
       "arrow": {
         "slot": "arrow",
-        "parent": "content"
-      },
-      "close": {
-        "slot": "close",
         "parent": "content"
       }
     }

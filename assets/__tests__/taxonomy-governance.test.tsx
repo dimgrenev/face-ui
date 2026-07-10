@@ -92,10 +92,36 @@ function isAllowedMonochromeColorLiteral(literal: string): boolean {
   return Math.abs(Math.round(percent) - percent) < 0.0001 && Math.round(percent) % 2 === 0
 }
 
+// Semantic feedback tokens are intentionally chromatic (success/error/warning/
+// info + their -soft/-foreground pairs); everything else stays monochrome.
+const SEMANTIC_FEEDBACK_TOKEN_DECL = /--uf-color-(success|error|warning|info)(-soft|-foreground|-fg)?\s*:/
+
 function findNonMonochromeColorLiterals(source: string): string[] {
   const colorLiteralPattern = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]+\)|hsla?\([^)]+\)|hsl\([^)]+\)|oklch\([^)]+\)|color\([^)]+\)/g
-  const literals = source.match(colorLiteralPattern) || []
-  return literals.filter((literal) => !isAllowedMonochromeColorLiteral(literal))
+  return source.split('\n').flatMap((line) => {
+    if (SEMANTIC_FEEDBACK_TOKEN_DECL.test(line)) return []
+    const literals = line.match(colorLiteralPattern) || []
+    return literals.filter((literal) => !isAllowedMonochromeColorLiteral(literal))
+  })
+}
+
+// The semantic-feedback shard is the ONE designated chromatic source. Chromatic
+// values are allowed only on the feedback token names; any other token there
+// going chromatic is still an offender.
+const FEEDBACK_TOKEN_NAME = /^--uf-color-(success|error|warning|info)(-soft)?$/
+function findFeedbackSourceOffenders(jsoncSource: string): string[] {
+  let parsed: { tokens?: Array<{ name?: string; variants?: Array<{ value?: string }> }> }
+  try { parsed = JSON.parse(jsoncSource) } catch { return ['semantic-feedback.jsonc: unparseable'] }
+  const out: string[] = []
+  for (const tok of parsed.tokens ?? []) {
+    for (const variant of tok.variants ?? []) {
+      const chromatic = findNonMonochromeColorLiterals(String(variant.value ?? ''))
+      if (chromatic.length && !FEEDBACK_TOKEN_NAME.test(String(tok.name ?? ''))) {
+        out.push(`semantic-feedback.jsonc: ${tok.name}=${variant.value}`)
+      }
+    }
+  }
+  return out
 }
 
 describe('taxonomy and governance', () => {
@@ -168,16 +194,20 @@ describe('taxonomy and governance', () => {
     expect(componentsCss).toContain('border-radius: var(--uf-radius);')
   })
 
-  it('keeps runtime and design-system colors monochrome-only', () => {
+  it('keeps runtime and design-system colors monochrome except semantic feedback tokens', () => {
     const sources = {
       'assets/styles/tokens.css': tokensCss,
       'design-system/tokens/colors.css': designSystemColorCss,
       'design-system/source/color-system.jsonc': colorSystemSource,
-      'design-system/source/semantic-feedback.jsonc': semanticFeedbackSource,
     }
-    const offenders = Object.entries(sources).flatMap(([sourceName, source]) =>
-      findNonMonochromeColorLiterals(source).map((literal) => `${sourceName}: ${literal}`),
-    )
+    const offenders = [
+      ...Object.entries(sources).flatMap(([sourceName, source]) =>
+        findNonMonochromeColorLiterals(source).map((literal) => `${sourceName}: ${literal}`),
+      ),
+      // semantic-feedback.jsonc is the designated chromatic feedback palette:
+      // only its feedback token names may carry chromatic values.
+      ...findFeedbackSourceOffenders(semanticFeedbackSource),
+    ]
 
     for (let opacity = 0; opacity <= 100; opacity += 2) {
       expect(tokensCss).toContain(`--uf-color-black-${opacity}:`)
@@ -405,18 +435,18 @@ describe('taxonomy and governance', () => {
   })
 
   it('keeps Tooltip colors theme-invariant while overlay surfaces can theme', () => {
-    expect(tokensCss).toContain('--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-10));')
+    expect(tokensCss).toContain('--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
     expect(tokensCss).toContain('--uf-overlay-surface-bg: var(--uf-color-white-100);')
-    expect(designSystemColorCss).toContain('--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-10));')
+    expect(designSystemColorCss).toContain('--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
     expect(designSystemColorCss).toContain('--uf-overlay-surface-bg: var(--uf-color-white-100);')
-    expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-black-100);')
+    expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-black-96);')
     expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-white-100);')
     expect(tokensCss).toContain('--uf-overlay-surface-background: linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg);')
-    expect(tokensCss).toContain('--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-10));')
-    expect(tokensCss).toContain('--uf-tooltip-background: linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-100);')
+    expect(tokensCss).toContain('--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
+    expect(tokensCss).toContain('--uf-tooltip-background: linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-96);')
     expect(tokensCss).toContain('--uf-tooltip-fg: var(--uf-color-white-92);')
     expect(tokensCss).toContain('--uf-tooltip-border: var(--uf-color-white-20);')
-    expect(designSystemColorCss).toContain('--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-10));')
+    expect(designSystemColorCss).toContain('--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
     expect(designSystemColorCss).toContain('--uf-tooltip-fg: var(--uf-color-white-92);')
     expect(componentsCss).toContain('.uf-card[data-scope][data-card-variant="floating"]')
     expect(componentsCss).toContain('--uf-card-bg: var(--uf-tooltip-bg);')

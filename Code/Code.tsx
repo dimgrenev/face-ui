@@ -147,9 +147,6 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
         radius="md"
         fullWidth
         data-language={language}
-        data-line-numbers={showLineNumbers || undefined}
-        data-collapsed={collapsed || undefined}
-        data-has-header={hasHeader || undefined}
         className={cn('uf-code', className)}
         id={id}
         role={role}

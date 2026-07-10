@@ -198,14 +198,6 @@
       "action": "focusPrevious",
       "scope": "menu"
     },
-    "ArrowRight": {
-      "action": "openSubmenu",
-      "condition": "hasSubmenu"
-    },
-    "ArrowLeft": {
-      "action": "closeSubmenu",
-      "condition": "inSubmenu"
-    },
     "Enter": {
       "action": "select"
     },
@@ -236,7 +228,8 @@
     "recommended": [
       "item",
       "separator",
-      "group"
+      "group",
+      "group-label"
     ],
     "parts": {
       "root": {
@@ -263,6 +256,11 @@
       "group": {
         "slot": "group",
         "parent": "content",
+        "multiple": true
+      },
+      "group-label": {
+        "slot": "group-label",
+        "parent": "group",
         "multiple": true
       }
     }

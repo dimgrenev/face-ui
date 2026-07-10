@@ -26,6 +26,16 @@
       ],
       "default": false
     },
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible label content rendered through Face UI Text."
+    },
+    "onCheckedChange": {
+      "type": "function",
+      "required": false,
+      "description": "Callback fired with { checked } when the machine state changes."
+    },
     "disabled": {
       "type": "boolean",
       "required": false,
@@ -44,26 +54,16 @@
       "description": "Native form field name for the hidden input.",
       "default": ""
     },
-    "label": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Visible label content rendered through Face UI Text."
-    },
-    "onCheckedChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback fired with { checked } when the machine state changes."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional className on the root label."
-    },
     "membrane": {
       "type": "boolean",
       "required": false,
       "description": "Wrap the control in the standard one-token membrane.",
       "default": true
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Additional className on the root label."
     }
   },
   "states": [

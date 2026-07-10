@@ -89,87 +89,42 @@ function sliderValuesEqual(left: number[] | undefined, right: number[] | undefin
   return left.every((item, index) => item === right[index])
 }
 
-export const Slider = forwardRef<HTMLDivElement, SliderProps>(
-  function Slider({
-    variant = 'simple',
-    value,
-    defaultValue,
-    scalarValue,
-    min = 0,
-    max = 100,
-    step = 1,
-    disabled = false,
-    orientation = 'horizontal',
-    label,
-    'aria-label': ariaLabel,
-    onValueChange,
-    onChange,
-    leading = 'none',
-    leadingIcon,
-    leadingText,
-    crop = false,
-    defaultCropRange,
-    cropRange,
-    cropLocksValue = true,
-    onCropChange,
-    className,
-  }, ref) {
-    const controlledValue = normalizeValues(value)
-    const defaultValues = normalizeValues(defaultValue)
+/**
+ * Simple, machine-driven slider. Split out from `Slider` so its hooks are
+ * always called unconditionally — the advanced/simple branch is decided by the
+ * `Slider` dispatcher below, which must never call a hook before returning.
+ */
+interface SliderSimpleProps extends SliderProps {
+  forwardedRef?: React.Ref<HTMLDivElement>
+}
 
-    const advancedFeaturesRequested =
-      variant === 'advanced' ||
-      scalarValue !== undefined ||
-      typeof onChange === 'function' ||
-      leading !== 'none' ||
-      leadingIcon != null ||
-      leadingText != null ||
-      crop ||
-      defaultCropRange != null ||
-      cropRange != null ||
-      cropLocksValue !== true
+function SliderSimple({
+  value,
+  defaultValue,
+  scalarValue,
+  min = 0,
+  max = 100,
+  step = 1,
+  disabled = false,
+  orientation = 'horizontal',
+  label,
+  'aria-label': ariaLabel,
+  onValueChange,
+  onChange,
+  className,
+  forwardedRef,
+}: SliderSimpleProps) {
+  const controlledValue = normalizeValues(value)
 
-    const canRenderAdvanced =
-      orientation === 'horizontal' &&
-      (controlledValue?.length ?? defaultValues?.length ?? 1) <= 1
+  const initialValue = normalizeValues(defaultValue)
+    ?? (typeof scalarValue === 'number' && Number.isFinite(scalarValue) ? [scalarValue] : [0])
+  const isControlled = controlledValue !== undefined
+  const machineValue = useControllableMachineProp(
+    isControlled ? controlledValue : undefined,
+    initialValue,
+  )
 
-    if (advancedFeaturesRequested && canRenderAdvanced) {
-      return (
-        <SliderAdvanced
-          rootRef={ref}
-          value={controlledValue}
-          defaultValue={defaultValues}
-          scalarValue={scalarValue}
-          min={min}
-          max={max}
-          step={step}
-          disabled={disabled}
-          label={label}
-          aria-label={ariaLabel}
-          onValueChange={onValueChange}
-          onChange={onChange}
-          leading={leading}
-          leadingIcon={leadingIcon}
-          leadingText={leadingText}
-          crop={crop}
-          defaultCropRange={defaultCropRange}
-          cropRange={cropRange}
-          cropLocksValue={cropLocksValue}
-          onCropChange={onCropChange}
-          className={className}
-        />
-      )
-    }
-
-    const initialValue = defaultValues
-      ?? (typeof scalarValue === 'number' && Number.isFinite(scalarValue) ? [scalarValue] : [0])
-    const isControlled = controlledValue !== undefined
-    const machineValue = useControllableMachineProp(
-      isControlled ? controlledValue : undefined,
-      initialValue,
-    )
-
-    const handleValueChange = (details: { value: number[] }) => {
+  const handleValueChange = (details: { value: number[] }) => {
       if (isControlled && sliderValuesEqual(details.value, controlledValue)) return
       try { onValueChange?.(details) } catch {}
       if (typeof onChange === 'function') {
@@ -245,7 +200,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     }
 
     return (
-      <div ref={ref} {...api.getRootProps()} className={cn('uf-slider', className)}>
+      <div ref={forwardedRef} {...api.getRootProps()} className={cn('uf-slider', className)}>
         {label != null && (
           <Text {...(api.getLabelProps() as any)} as="label" variant="label">
             {label}
@@ -269,6 +224,77 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         </div>
       </div>
     )
+}
+
+/**
+ * Slider — dispatches between the simple machine-driven slider and the advanced
+ * slider. This wrapper performs only pure prop computation before returning, so
+ * neither branch conditionally skips React hooks (both live in child components).
+ */
+export const Slider = forwardRef<HTMLDivElement, SliderProps>(
+  function Slider(props, ref) {
+    const {
+      variant = 'simple',
+      scalarValue,
+      onChange,
+      orientation = 'horizontal',
+      leading = 'none',
+      leadingIcon,
+      leadingText,
+      crop = false,
+      defaultCropRange,
+      cropRange,
+      cropLocksValue = true,
+    } = props
+
+    const controlledValue = normalizeValues(props.value)
+    const defaultValues = normalizeValues(props.defaultValue)
+
+    const advancedFeaturesRequested =
+      variant === 'advanced' ||
+      scalarValue !== undefined ||
+      typeof onChange === 'function' ||
+      leading !== 'none' ||
+      leadingIcon != null ||
+      leadingText != null ||
+      crop ||
+      defaultCropRange != null ||
+      cropRange != null ||
+      cropLocksValue !== true
+
+    const canRenderAdvanced =
+      orientation === 'horizontal' &&
+      (controlledValue?.length ?? defaultValues?.length ?? 1) <= 1
+
+    if (advancedFeaturesRequested && canRenderAdvanced) {
+      return (
+        <SliderAdvanced
+          rootRef={ref}
+          value={controlledValue}
+          defaultValue={defaultValues}
+          scalarValue={scalarValue}
+          min={props.min ?? 0}
+          max={props.max ?? 100}
+          step={props.step ?? 1}
+          disabled={props.disabled ?? false}
+          label={props.label}
+          aria-label={props['aria-label']}
+          onValueChange={props.onValueChange}
+          onChange={onChange}
+          leading={leading}
+          leadingIcon={leadingIcon}
+          leadingText={leadingText}
+          crop={crop}
+          defaultCropRange={defaultCropRange}
+          cropRange={cropRange}
+          cropLocksValue={cropLocksValue}
+          onCropChange={props.onCropChange}
+          className={props.className}
+        />
+      )
+    }
+
+    return <SliderSimple {...props} forwardedRef={ref} />
   },
 )
 

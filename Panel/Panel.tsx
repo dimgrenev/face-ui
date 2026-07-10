@@ -25,19 +25,17 @@ import { Card } from '../Card/Card'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 import { Tree } from '../Tree/Tree'
+import type { NavItemBase } from '../assets/nav-item'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface PanelItem {
-  id: string
-  label: ReactNode
+export interface PanelItem extends NavItemBase {
   icon?: ReactNode
   href?: string
   onClick?: () => void
   items?: PanelItem[]
-  disabled?: boolean
 }
 
 export interface PanelProps {

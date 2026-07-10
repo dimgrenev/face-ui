@@ -40,11 +40,6 @@
       "required": false,
       "description": "Callback when sort changes."
     },
-    "direction": {
-      "type": "function",
-      "required": true,
-      "description": "direction prop"
-    },
     "selectedRows": {
       "type": "array",
       "required": false,

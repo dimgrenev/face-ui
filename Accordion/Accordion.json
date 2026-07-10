@@ -127,18 +127,6 @@
     "autoFocusOnOpen": "none"
   },
   "keyboard": {
-    "ArrowDown": {
-      "action": "focusNextTrigger"
-    },
-    "ArrowUp": {
-      "action": "focusPreviousTrigger"
-    },
-    "Home": {
-      "action": "focusFirstTrigger"
-    },
-    "End": {
-      "action": "focusLastTrigger"
-    },
     "Enter": {
       "action": "toggleItem"
     },

@@ -156,7 +156,6 @@
   --uf-control-gap: var(--uf-spacing-2);
 }
 
-.uf-button[data-scope="button"][data-variant="delete"],
 .uf-button[data-scope="button"][data-variant="destructive"] {
   --uf-button-bg: var(--uf-color-black-0);
   --uf-button-fg: var(--uf-color-fg);
@@ -2777,9 +2776,6 @@
   row-gap: 0;
   border: var(--uf-toggle-border-width) solid var(--uf-overlay-surface-border);
 }
-.uf-toggle[data-scope].uf-segmented-borderless {
-  border: none;
-}
 .uf-toggle[data-scope] > .uf-membrane {
   padding: var(--uf-membrane);
   margin: 0;
@@ -3459,6 +3455,22 @@
   flex-direction: column;
   align-items: stretch;
   gap: 0;
+}
+/* Semantic tones — restrained accent (leading border + colored title) so the
+   floating surface stays neutral. Driven by data-tone (data-variant is owned by
+   the underlying Card's "floating" variant). */
+.uf-toast[data-tone="success"] { --uf-toast-accent: var(--uf-color-success); }
+.uf-toast[data-tone="error"] { --uf-toast-accent: var(--uf-color-error); }
+.uf-toast[data-tone="warning"] { --uf-toast-accent: var(--uf-color-warning); }
+.uf-toast[data-tone="success"],
+.uf-toast[data-tone="error"],
+.uf-toast[data-tone="warning"] {
+  border-inline-start: 3px solid var(--uf-toast-accent);
+}
+.uf-toast[data-tone="success"] .uf-toast-title,
+.uf-toast[data-tone="error"] .uf-toast-title,
+.uf-toast[data-tone="warning"] .uf-toast-title {
+  color: var(--uf-toast-accent);
 }
 .uf-toast-body {
   display: flex;

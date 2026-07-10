@@ -116,33 +116,31 @@
   ],
   "behavior": {},
   "keyboard": {},
-  "aria": {
-    "role": "code"
-  },
+  "aria": {},
   "composition": {
     "required": [
       "root",
       "pre"
     ],
     "recommended": [
-      "header",
-      "lineNumbers"
+      "line",
+      "lineNumber"
     ],
     "parts": {
       "root": {
         "slot": "root"
       },
-      "header": {
-        "slot": "header",
-        "parent": "root"
-      },
       "pre": {
         "slot": "pre",
         "parent": "root"
       },
-      "lineNumbers": {
-        "slot": "lineNumbers",
+      "line": {
+        "slot": "line",
         "parent": "pre"
+      },
+      "lineNumber": {
+        "slot": "lineNumber",
+        "parent": "line"
       }
     }
   },

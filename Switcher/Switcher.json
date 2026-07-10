@@ -131,16 +131,26 @@
   },
   "aria": {
     "role": "switch",
+    "nativeElement": "A visually hidden native input[type=\"checkbox\"] preserves form participation and is marked aria-hidden.",
+    "states": [
+      "aria-checked=true",
+      "aria-checked=false",
+      "aria-disabled",
+      "aria-required"
+    ],
     "required": [
-      "aria-checked",
-      "aria-label"
+      "visible label or external accessible name"
+    ],
+    "notes": [
+      "role=\"switch\" and aria-checked are set on the control part; when a visible label is present it is associated to the control via aria-labelledby."
     ]
   },
   "composition": {
     "required": [
       "root",
       "control",
-      "thumb"
+      "thumb",
+      "hiddenInput"
     ],
     "recommended": [
       "label"
@@ -159,6 +169,10 @@
       },
       "label": {
         "slot": "label",
+        "parent": "root"
+      },
+      "hiddenInput": {
+        "slot": "hiddenInput",
         "parent": "root"
       }
     }

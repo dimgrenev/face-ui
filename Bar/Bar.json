@@ -67,19 +67,14 @@
       "root"
     ],
     "recommended": [
-      "start",
-      "end"
+      "section"
     ],
     "parts": {
       "root": {
         "slot": "root"
       },
-      "start": {
-        "slot": "start",
-        "parent": "root"
-      },
-      "end": {
-        "slot": "end",
+      "section": {
+        "slot": "section",
         "parent": "root"
       }
     }

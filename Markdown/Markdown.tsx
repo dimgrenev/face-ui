@@ -106,7 +106,9 @@ function getStrictSanitizeOptions(linkTarget: '_self' | '_blank', linkRel: strin
         tagName: 'input',
         attribs: {
           ...attribs,
-          type: attribs.type === 'checkbox' ? 'checkbox' : 'checkbox',
+          // Markdown task-list items are the only inputs we render; force them to
+          // rendered-but-inert checkboxes regardless of the source type.
+          type: 'checkbox',
           disabled: 'disabled',
         },
       }),
