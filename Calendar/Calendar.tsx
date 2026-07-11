@@ -213,7 +213,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                     <Text
                       as="span"
                       text={firstLetter}
-                      variant="caption"
+                      variant="label"
                       inset="none"
                       className="uf-calendar-weekdayText"
                     />

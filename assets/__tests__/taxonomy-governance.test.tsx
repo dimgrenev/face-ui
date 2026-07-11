@@ -373,75 +373,81 @@ describe('taxonomy and governance', () => {
             <Text key={size} text={size} size={size} />
           ))}
           <Text text="Markdown text" variant="markdown" />
-          <Text text="Caption text" variant="caption" />
+          <Text text="Label text" variant="label" />
+          <Text text="Legacy caption text" variant={'caption' as 'label'} />
         </div>,
       )
     })
 
     expect(textMeta.props?.size?.options).toEqual(textSizeOptions)
     expect(textMeta.props?.variant?.options).toContain('markdown')
-    expect(textMeta.props?.variant?.options).toContain('caption')
+    expect(textMeta.props?.variant?.options).toContain('label')
+    expect(textMeta.props?.variant?.options).not.toContain('caption')
     expect(textMeta.tokenMapping?.component).toContain('--uf-text-size-font-size')
-    expect(textMeta.tokenMapping?.component).toContain('--uf-text-caption-font-size')
-    expect(textMeta.tokenMapping?.component).toContain('--uf-text-caption-line-height')
-    expect(textMeta.tokenMapping?.component).toContain('--uf-text-caption-min-height')
-    expect(textMeta.tokenMapping?.component).toContain('--uf-text-caption-pad-y')
+    expect(textMeta.tokenMapping?.component).toContain('--uf-text-label-font-size')
+    expect(textMeta.tokenMapping?.component).toContain('--uf-text-label-line-height')
+    expect(textMeta.tokenMapping?.component).toContain('--uf-text-label-min-height')
+    expect(textMeta.tokenMapping?.component).toContain('--uf-text-label-pad-y')
     expect(componentsCss).toContain('font-size: var(--uf-text-font-size, var(--uf-text-size-font-size,')
     expect(componentsCss).toContain('.uf-text[data-scope][data-variant="markdown"]')
     expect(componentsCss).toContain('--uf-text-markdown-line-height: 24px;')
     expect(componentsCss).toContain('.uf-text[data-scope][data-variant="markdown"] .uf-text__content')
     expect(componentsCss).toContain('line-height: inherit;')
     expect(componentsCss).toContain('calc(var(--uf-text-pad-y, var(--uf-control-pad-y)) - 2px)')
-    expect(tokensCss).toContain('--uf-text-caption-font-size: var(--uf-font-size-base);')
-    expect(tokensCss).toContain('--uf-text-caption-line-height: 16px;')
-    expect(tokensCss).toContain('--uf-text-caption-min-height: var(--uf-spacing-6);')
-    expect(tokensCss).toContain('--uf-text-caption-pad-y: var(--uf-spacing-1);')
+    expect(tokensCss).toContain('--uf-text-label-font-size: var(--uf-font-size-base);')
+    expect(tokensCss).toContain('--uf-text-label-line-height: 16px;')
+    expect(tokensCss).toContain('--uf-text-label-min-height: var(--uf-spacing-6);')
+    expect(tokensCss).toContain('--uf-text-label-pad-y: var(--uf-spacing-1);')
     expectCssBlockContains(
       componentsCss,
-      '.uf-text[data-scope][data-variant="caption"]',
-      '--uf-text-font-size: var(--uf-text-caption-font-size, 12px);',
+      '.uf-text[data-scope][data-variant="label"]',
+      '--uf-text-font-size: var(--uf-text-label-font-size, 12px);',
     )
     expectCssBlockContains(
       componentsCss,
-      '.uf-text[data-scope][data-variant="caption"]',
-      '--uf-text-line-height: var(--uf-text-caption-line-height, 16px);',
+      '.uf-text[data-scope][data-variant="label"]',
+      '--uf-text-line-height: var(--uf-text-label-line-height, 16px);',
     )
     expectCssBlockContains(
       componentsCss,
-      '.uf-text[data-scope][data-variant="caption"]',
+      '.uf-text[data-scope][data-variant="label"]',
       'font-size: var(--uf-text-font-size);',
     )
     expectCssBlockContains(
       componentsCss,
-      '.uf-text[data-scope][data-variant="caption"]',
+      '.uf-text[data-scope][data-variant="label"]',
       'line-height: var(--uf-text-line-height);',
     )
     expectCssBlockContains(
       componentsCss,
-      '.uf-text[data-scope][data-variant="caption"]:not([data-inset="none"])',
+      '.uf-text[data-scope][data-variant="label"]:not([data-inset="none"])',
       'box-sizing: border-box;',
     )
     expectCssBlockContains(
       componentsCss,
-      '.uf-text[data-scope][data-variant="caption"]:not([data-inset="none"])',
-      'min-height: var(--uf-text-caption-min-height, var(--uf-spacing-6));',
+      '.uf-text[data-scope][data-variant="label"]:not([data-inset="none"])',
+      'min-height: var(--uf-text-label-min-height, var(--uf-spacing-6));',
     )
     expectCssBlockContains(
       componentsCss,
-      '.uf-text[data-scope][data-variant="caption"]:not([data-inset="none"])',
-      'padding-top: var(--uf-text-caption-pad-y, var(--uf-spacing-1));',
+      '.uf-text[data-scope][data-variant="label"]:not([data-inset="none"])',
+      'padding-top: var(--uf-text-label-pad-y, var(--uf-spacing-1));',
     )
     expectCssBlockContains(
       componentsCss,
-      '.uf-text[data-scope][data-variant="caption"]:not([data-inset="none"])',
-      'padding-bottom: var(--uf-text-caption-pad-y, var(--uf-spacing-1));',
+      '.uf-text[data-scope][data-variant="label"]:not([data-inset="none"])',
+      'padding-bottom: var(--uf-text-label-pad-y, var(--uf-spacing-1));',
     )
 
     const markdownNode = container.querySelector<HTMLElement>('.uf-text[data-scope="text"][data-variant="markdown"]')
     expect(markdownNode).not.toBeNull()
-    const captionNode = container.querySelector<HTMLElement>('.uf-text[data-scope="text"][data-variant="caption"]')
-    expect(captionNode).not.toBeNull()
-    expect(captionNode?.tagName).toBe('SMALL')
+    const labelNode = container.querySelector<HTMLElement>('.uf-text[data-scope="text"][data-variant="label"]')
+    expect(labelNode).not.toBeNull()
+    expect(labelNode?.tagName).toBe('LABEL')
+    const legacyCaptionNode = Array.from(container.querySelectorAll<HTMLElement>('.uf-text[data-scope="text"][data-variant="label"]'))
+      .find((node) => node.textContent === 'Legacy caption text')
+    expect(legacyCaptionNode).not.toBeNull()
+    expect(legacyCaptionNode?.tagName).toBe('SMALL')
 
     for (const size of textSizeOptions) {
       const token = textSizeTokenMap[size]

@@ -2,582 +2,6 @@
   "version": 1,
   "tokens": [
     {
-      "name": "uf-content-inset",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-control-font-size",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "14px"
-      ]
-    },
-    {
-      "name": "uf-control-gap",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "8px"
-      ]
-    },
-    {
-      "name": "uf-control-height",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "32px"
-      ]
-    },
-    {
-      "name": "uf-control-line-height",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "20px"
-      ]
-    },
-    {
-      "name": "uf-control-pad-icon",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "6px"
-      ]
-    },
-    {
-      "name": "uf-control-pad-left",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-control-pad-text)"
-      ]
-    },
-    {
-      "name": "uf-control-pad-right",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-control-pad-text)"
-      ]
-    },
-    {
-      "name": "uf-control-pad-text",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "8px"
-      ]
-    },
-    {
-      "name": "uf-control-pad-y",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "6px"
-      ]
-    },
-    {
-      "name": "uf-hidden-input-offset",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "-1px"
-      ]
-    },
-    {
-      "name": "uf-hidden-input-size",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "1px"
-      ]
-    },
-    {
-      "name": "uf-icon-only-size",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "32px"
-      ]
-    },
-    {
-      "name": "uf-icon-size",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "20px"
-      ]
-    },
-    {
-      "name": "uf-interactive-weight",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "500"
-      ]
-    },
-    {
-      "name": "uf-option-indent",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1))"
-      ]
-    },
-    {
-      "name": "uf-text-body-line-height",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "20px"
-      ]
-    },
-    {
-      "name": "uf-text-body-size",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "14px"
-      ]
-    },
-    {
-      "name": "uf-text-pad-y",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "0px"
-      ]
-    },
-    {
-      "name": "uf-text-section-line-height",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "16px"
-      ]
-    },
-    {
-      "name": "uf-text-section-size",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-topbar-control-height",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "32px"
-      ]
-    },
-    {
-      "name": "uf-topbar-pad-bottom",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-topbar-pad-left",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-topbar-pad-right",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-topbar-pad-top",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-topbar-slot-pad-y",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "0px"
-      ]
-    },
-    {
-      "name": "uf-workspace-resize-line-active-color",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-color-border-hover)"
-      ]
-    },
-    {
-      "name": "uf-workspace-resize-line-color",
-      "sheet": "themes",
-      "profile": "design-system",
-      "generatedPath": "design-system/themes/default.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-color-border)"
-      ]
-    },
-    {
-      "name": "uf-border-default",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border)"
-      ]
-    },
-    {
-      "name": "uf-border-focus",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-border-width-base) var(--uf-border-style-solid) var(--uf-color-ring)"
-      ]
-    },
-    {
-      "name": "uf-border-style-dashed",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "dashed"
-      ]
-    },
-    {
-      "name": "uf-border-style-dotted",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "dotted"
-      ]
-    },
-    {
-      "name": "uf-border-style-solid",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "solid"
-      ]
-    },
-    {
-      "name": "uf-border-subtle",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border-subtle)"
-      ]
-    },
-    {
-      "name": "uf-border-width-base",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "2px"
-      ]
-    },
-    {
-      "name": "uf-border-width-none",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "0"
-      ]
-    },
-    {
-      "name": "uf-border-width-thick",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "4px"
-      ]
-    },
-    {
-      "name": "uf-border-width-thin",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "1px"
-      ]
-    },
-    {
-      "name": "uf-membrane",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "1px"
-      ]
-    },
-    {
-      "name": "uf-radius",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "6px"
-      ]
-    },
-    {
-      "name": "uf-radius-base",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-radius)"
-      ]
-    },
-    {
-      "name": "uf-radius-full",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "9999px"
-      ]
-    },
-    {
-      "name": "uf-radius-lg",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-radius-md",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "8px"
-      ]
-    },
-    {
-      "name": "uf-radius-none",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "0"
-      ]
-    },
-    {
-      "name": "uf-radius-sm",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "4px"
-      ]
-    },
-    {
-      "name": "uf-radius-xl",
-      "sheet": "shape",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/borders.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "16px"
-      ]
-    },
-    {
       "name": "black-0",
       "sheet": "color",
       "profile": "design-system",
@@ -1811,8 +1235,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-24)",
-        "var(--uf-color-black-24)"
+        "var(--uf-color-black-24)",
+        "var(--uf-color-white-24)"
       ]
     },
     {
@@ -1825,8 +1249,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-32)",
-        "var(--uf-color-black-32)"
+        "var(--uf-color-black-32)",
+        "var(--uf-color-white-32)"
       ]
     },
     {
@@ -1839,8 +1263,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-38)",
-        "var(--uf-color-black-38)"
+        "var(--uf-color-black-38)",
+        "var(--uf-color-white-38)"
       ]
     },
     {
@@ -1853,8 +1277,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-44)",
-        "var(--uf-color-black-44)"
+        "var(--uf-color-black-44)",
+        "var(--uf-color-white-44)"
       ]
     },
     {
@@ -1867,8 +1291,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-50)",
-        "var(--uf-color-black-50)"
+        "var(--uf-color-black-50)",
+        "var(--uf-color-white-50)"
       ]
     },
     {
@@ -1881,8 +1305,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-56)",
-        "var(--uf-color-black-56)"
+        "var(--uf-color-black-56)",
+        "var(--uf-color-white-56)"
       ]
     },
     {
@@ -1895,8 +1319,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-62)",
-        "var(--uf-color-black-62)"
+        "var(--uf-color-black-62)",
+        "var(--uf-color-white-62)"
       ]
     },
     {
@@ -1909,8 +1333,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-68)",
-        "var(--uf-color-black-68)"
+        "var(--uf-color-black-68)",
+        "var(--uf-color-white-68)"
       ]
     },
     {
@@ -1923,8 +1347,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-74)",
-        "var(--uf-color-black-74)"
+        "var(--uf-color-black-74)",
+        "var(--uf-color-white-74)"
       ]
     },
     {
@@ -1937,8 +1361,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-80)",
-        "var(--uf-color-black-80)"
+        "var(--uf-color-black-80)",
+        "var(--uf-color-white-80)"
       ]
     },
     {
@@ -1951,8 +1375,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-86)",
-        "var(--uf-color-black-86)"
+        "var(--uf-color-black-86)",
+        "var(--uf-color-white-86)"
       ]
     },
     {
@@ -1965,8 +1389,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-92)",
-        "var(--uf-color-black-92)"
+        "var(--uf-color-black-92)",
+        "var(--uf-color-white-92)"
       ]
     },
     {
@@ -1979,8 +1403,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-100)",
-        "var(--uf-color-black-100)"
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
       ]
     },
     {
@@ -1993,8 +1417,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-72)",
-        "var(--uf-color-black-72)"
+        "var(--uf-color-black-72)",
+        "var(--uf-color-white-72)"
       ]
     },
     {
@@ -2007,8 +1431,8 @@
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "values": [
-        "var(--uf-color-white-88)",
-        "var(--uf-color-black-88)"
+        "var(--uf-color-black-88)",
+        "var(--uf-color-white-88)"
       ]
     },
     {
@@ -3236,1010 +2660,16 @@
       ]
     },
     {
-      "name": "uf-button-ring-color",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-border)",
-        "var(--uf-color-border)"
-      ]
-    },
-    {
-      "name": "uf-color-accent",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-foreground)",
-        "var(--uf-color-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-accent-fg",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-background)",
-        "var(--uf-color-background)"
-      ]
-    },
-    {
-      "name": "uf-color-accent-hover",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-88)",
-        "var(--uf-color-black-88)"
-      ]
-    },
-    {
-      "name": "uf-color-active",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-12)",
-        "var(--uf-color-black-8)"
-      ]
-    },
-    {
-      "name": "uf-color-active-bg",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-active)",
-        "var(--uf-color-active)"
-      ]
-    },
-    {
-      "name": "uf-color-cta",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-foreground)",
-        "var(--uf-color-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-cta-contrast",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-background)",
-        "var(--uf-color-background)"
-      ]
-    },
-    {
-      "name": "uf-color-cta-hover",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-accent-hover)",
-        "var(--uf-color-accent-hover)"
-      ]
-    },
-    {
-      "name": "uf-color-disabled-opacity",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "0.6"
-      ]
-    },
-    {
-      "name": "uf-color-hover",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-8)",
-        "var(--uf-color-black-6)"
-      ]
-    },
-    {
-      "name": "uf-color-hover-bg",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-hover)",
-        "var(--uf-color-hover)"
-      ]
-    },
-    {
-      "name": "uf-color-primary-hover-bg",
-      "sheet": "semantic-action",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-88)",
-        "var(--uf-color-black-88)"
-      ]
-    },
-    {
-      "name": "uf-color-active-text",
-      "sheet": "semantic-content",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-100)",
-        "var(--uf-color-black-100)"
-      ]
-    },
-    {
-      "name": "uf-color-fg",
-      "sheet": "semantic-content",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-foreground)",
-        "var(--uf-color-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-fg-muted",
-      "sheet": "semantic-content",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-text-secondary)",
-        "var(--uf-color-text-secondary)"
-      ]
-    },
-    {
-      "name": "uf-color-foreground",
-      "sheet": "semantic-content",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-92)",
-        "var(--uf-color-black-88)"
-      ]
-    },
-    {
-      "name": "uf-color-primary",
-      "sheet": "semantic-content",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-100)",
-        "var(--uf-color-black-100)"
-      ]
-    },
-    {
-      "name": "uf-color-primary-fg",
-      "sheet": "semantic-content",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-black-100)",
-        "var(--uf-color-white-100)"
-      ]
-    },
-    {
-      "name": "uf-color-text-code",
-      "sheet": "semantic-content",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-foreground)",
-        "var(--uf-color-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-text-primary",
-      "sheet": "semantic-content",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-foreground)",
-        "var(--uf-color-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-text-secondary",
-      "sheet": "semantic-content",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-54)",
-        "var(--uf-color-black-48)"
-      ]
-    },
-    {
-      "name": "uf-color-destructive",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-error)",
-        "var(--uf-color-error)"
-      ]
-    },
-    {
-      "name": "uf-color-destructive-fg",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-error-foreground)",
-        "var(--uf-color-error-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-destructive-soft",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-error-soft)",
-        "var(--uf-color-error-soft)"
-      ]
-    },
-    {
-      "name": "uf-color-error",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "#f85149",
-        "#cf222e"
-      ]
-    },
-    {
-      "name": "uf-color-error-soft",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "rgba(248, 81, 73, 0.16)",
-        "rgba(207, 34, 46, 0.12)"
-      ]
-    },
-    {
-      "name": "uf-color-error-foreground",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-background)",
-        "var(--uf-color-background)"
-      ]
-    },
-    {
-      "name": "uf-color-info",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "#58a6ff",
-        "#0969da"
-      ]
-    },
-    {
-      "name": "uf-color-info-soft",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "rgba(88, 166, 255, 0.16)",
-        "rgba(9, 105, 218, 0.12)"
-      ]
-    },
-    {
-      "name": "uf-color-info-foreground",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-background)",
-        "var(--uf-color-background)"
-      ]
-    },
-    {
-      "name": "uf-color-on-error",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-error-foreground)",
-        "var(--uf-color-error-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-on-info",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-info-foreground)",
-        "var(--uf-color-info-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-new",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-foreground)",
-        "var(--uf-color-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-on-success",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-success-foreground)",
-        "var(--uf-color-success-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-on-warning",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-warning-foreground)",
-        "var(--uf-color-warning-foreground)"
-      ]
-    },
-    {
-      "name": "uf-color-success",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "#3fb950",
-        "#1a7f37"
-      ]
-    },
-    {
-      "name": "uf-color-success-soft",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "rgba(63, 185, 80, 0.16)",
-        "rgba(26, 127, 55, 0.12)"
-      ]
-    },
-    {
-      "name": "uf-color-success-foreground",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-background)",
-        "var(--uf-color-background)"
-      ]
-    },
-    {
-      "name": "uf-color-warning",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "#d29922",
-        "#9a6700"
-      ]
-    },
-    {
-      "name": "uf-color-warning-soft",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "rgba(210, 153, 34, 0.16)",
-        "rgba(154, 103, 0, 0.12)"
-      ]
-    },
-    {
-      "name": "uf-color-warning-foreground",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-background)",
-        "var(--uf-color-background)"
-      ]
-    },
-    {
-      "name": "uf-progress-indicator-bg",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-fg)",
-        "var(--uf-color-fg)"
-      ]
-    },
-    {
-      "name": "uf-progress-indicator-destructive-bg",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-destructive)",
-        "var(--uf-color-destructive)"
-      ]
-    },
-    {
-      "name": "uf-progress-indicator-positive-bg",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-success)",
-        "var(--uf-color-success)"
-      ]
-    },
-    {
-      "name": "uf-progress-indicator-warning-bg",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-warning)",
-        "var(--uf-color-warning)"
-      ]
-    },
-    {
-      "name": "uf-progress-track-bg",
-      "sheet": "semantic-feedback",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-hover-bg)",
-        "var(--uf-color-hover-bg)"
-      ]
-    },
-    {
-      "name": "uf-color-background",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-black-96)",
-        "var(--uf-color-white-100)"
-      ]
-    },
-    {
-      "name": "uf-color-bg",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-background)",
-        "var(--uf-color-background)"
-      ]
-    },
-    {
-      "name": "uf-color-bg-code",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-black-96)",
-        "var(--uf-color-white-100)"
-      ]
-    },
-    {
-      "name": "uf-color-border",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-20)",
-        "var(--uf-color-black-12)"
-      ]
-    },
-    {
-      "name": "uf-color-border-hover",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-24)",
-        "var(--uf-color-black-24)"
-      ]
-    },
-    {
-      "name": "uf-color-border-subtle",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-8)",
-        "var(--uf-color-black-6)"
-      ]
-    },
-    {
-      "name": "uf-color-glyph-line",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-40)",
-        "var(--uf-color-black-42)"
-      ]
-    },
-    {
-      "name": "uf-color-header",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-background)",
-        "var(--uf-color-background)"
-      ]
-    },
-    {
-      "name": "uf-color-input",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-background)",
-        "var(--uf-color-background)"
-      ]
-    },
-    {
-      "name": "uf-color-panel",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-black-96)",
-        "var(--uf-color-white-100)"
-      ]
-    },
-    {
-      "name": "uf-color-props-panel",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-12)",
-        "var(--uf-color-background)"
-      ]
-    },
-    {
-      "name": "uf-color-ring",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-88)",
-        "var(--uf-color-black-88)"
-      ]
-    },
-    {
-      "name": "uf-color-strip-edge",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "0.02",
-        "0.02"
-      ]
-    },
-    {
-      "name": "uf-color-strip-l",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "1",
-        "0"
-      ]
-    },
-    {
-      "name": "uf-color-strip-s",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "0",
-        "0"
-      ]
-    },
-    {
-      "name": "uf-overlay-backdrop-bg",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-black-0)",
-        "var(--uf-color-black-0)"
-      ]
-    },
-    {
-      "name": "uf-overlay-surface-bg",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-surface-sidebar, var(--uf-color-white-14))",
-        "var(--uf-color-white-100)"
-      ]
-    },
-    {
-      "name": "uf-overlay-surface-underlay-bg",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-black-96)",
-        "var(--uf-color-white-100)"
-      ]
-    },
-    {
-      "name": "uf-overlay-surface-background",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg)",
-        "linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg)"
-      ]
-    },
-    {
-      "name": "uf-overlay-surface-border",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-border)",
-        "var(--uf-color-border)"
-      ]
-    },
-    {
-      "name": "uf-tooltip-bg",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-surface-sidebar, var(--uf-color-white-14))",
-        "var(--uf-color-surface-sidebar, var(--uf-color-white-10))"
-      ]
-    },
-    {
-      "name": "uf-tooltip-background",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-96)",
-        "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-100)"
-      ]
-    },
-    {
-      "name": "uf-tooltip-border",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-20)",
-        "var(--uf-color-white-20)"
-      ]
-    },
-    {
-      "name": "uf-tooltip-fg",
-      "sheet": "semantic-surface",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/colors.css",
-      "selectors": [
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
-      ],
-      "values": [
-        "var(--uf-color-white-92)",
-        "var(--uf-color-white-92)"
-      ]
-    },
-    {
       "name": "uf-backdrop-blur-overlay",
       "sheet": "effects",
       "profile": "design-system",
       "generatedPath": "design-system/tokens/shadows.css",
       "selectors": [
         ":root",
-        ":root[data-theme='light']",
-        ":root[data-theme='dark'],\n:root:not([data-theme])"
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
       ],
       "values": [
-        "120px",
-        "120px",
         "120px"
       ]
     },
@@ -4382,11 +2812,10 @@
       "generatedPath": "design-system/tokens/shadows.css",
       "selectors": [
         ":root",
-        ":root[data-theme='light']",
-        ":root[data-theme='dark'],\n:root:not([data-theme])"
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
       ],
       "values": [
-        "0 1px 3px var(--uf-color-black-10), 0 1px 2px var(--uf-color-black-6)",
         "0 1px 3px var(--uf-color-black-10), 0 1px 2px var(--uf-color-black-6)",
         "0 1px 3px var(--uf-color-black-40), 0 1px 2px var(--uf-color-black-30)"
       ]
@@ -4398,11 +2827,10 @@
       "generatedPath": "design-system/tokens/shadows.css",
       "selectors": [
         ":root",
-        ":root[data-theme='light']",
-        ":root[data-theme='dark'],\n:root:not([data-theme])"
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
       ],
       "values": [
-        "0 10px 15px var(--uf-color-black-10), 0 4px 6px var(--uf-color-black-6)",
         "0 10px 15px var(--uf-color-black-10), 0 4px 6px var(--uf-color-black-6)",
         "0 10px 15px var(--uf-color-black-50), 0 4px 6px var(--uf-color-black-40)"
       ]
@@ -4414,11 +2842,10 @@
       "generatedPath": "design-system/tokens/shadows.css",
       "selectors": [
         ":root",
-        ":root[data-theme='light']",
-        ":root[data-theme='dark'],\n:root:not([data-theme])"
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
       ],
       "values": [
-        "0 4px 6px var(--uf-color-black-10), 0 2px 4px var(--uf-color-black-6)",
         "0 4px 6px var(--uf-color-black-10), 0 2px 4px var(--uf-color-black-6)",
         "0 4px 6px var(--uf-color-black-40), 0 2px 4px var(--uf-color-black-30)"
       ]
@@ -4442,13 +2869,12 @@
       "generatedPath": "design-system/tokens/shadows.css",
       "selectors": [
         ":root",
-        ":root[data-theme='light']",
-        ":root[data-theme='dark'],\n:root:not([data-theme])"
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
       ],
       "values": [
-        "0 1px 2px var(--uf-color-black-6)",
-        "0 1px 2px var(--uf-color-black-6)",
-        "0 1px 2px var(--uf-color-black-30)"
+        "0 1px 2px var(--uf-color-black-30)",
+        "0 1px 2px var(--uf-color-black-6)"
       ]
     },
     {
@@ -4458,11 +2884,10 @@
       "generatedPath": "design-system/tokens/shadows.css",
       "selectors": [
         ":root",
-        ":root[data-theme='light']",
-        ":root[data-theme='dark'],\n:root:not([data-theme])"
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
       ],
       "values": [
-        "0 20px 25px var(--uf-color-black-10), 0 10px 10px var(--uf-color-black-4)",
         "0 20px 25px var(--uf-color-black-10), 0 10px 10px var(--uf-color-black-4)",
         "0 20px 25px var(--uf-color-black-50), 0 10px 10px var(--uf-color-black-40)"
       ]
@@ -4513,6 +2938,1217 @@
       ],
       "values": [
         "2400"
+      ]
+    },
+    {
+      "name": "uf-button-ring-color",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-border)"
+      ]
+    },
+    {
+      "name": "uf-color-accent",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-accent-fg",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-background)"
+      ]
+    },
+    {
+      "name": "uf-color-accent-hover",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-88)",
+        "var(--uf-color-white-88)"
+      ]
+    },
+    {
+      "name": "uf-color-active",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-8)",
+        "var(--uf-color-white-12)"
+      ]
+    },
+    {
+      "name": "uf-color-active-bg",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-active)"
+      ]
+    },
+    {
+      "name": "uf-color-cta",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-cta-contrast",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-background)"
+      ]
+    },
+    {
+      "name": "uf-color-cta-hover",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-accent-hover)"
+      ]
+    },
+    {
+      "name": "uf-color-disabled-opacity",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0.6"
+      ]
+    },
+    {
+      "name": "uf-color-hover",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-6)",
+        "var(--uf-color-white-8)"
+      ]
+    },
+    {
+      "name": "uf-color-hover-bg",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-hover)"
+      ]
+    },
+    {
+      "name": "uf-color-primary-hover-bg",
+      "sheet": "semantic-action",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-88)",
+        "var(--uf-color-white-88)"
+      ]
+    },
+    {
+      "name": "uf-color-active-text",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-fg",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-fg-muted",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-text-secondary)"
+      ]
+    },
+    {
+      "name": "uf-color-foreground",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-88)",
+        "var(--uf-color-white-92)"
+      ]
+    },
+    {
+      "name": "uf-color-primary",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-primary-fg",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-text-code",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-text-primary",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-text-secondary",
+      "sheet": "semantic-content",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-48)",
+        "var(--uf-color-white-54)"
+      ]
+    },
+    {
+      "name": "uf-color-destructive",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-error)"
+      ]
+    },
+    {
+      "name": "uf-color-destructive-fg",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-error-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-destructive-soft",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-error-soft)"
+      ]
+    },
+    {
+      "name": "uf-color-error",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-88)",
+        "var(--uf-color-white-88)"
+      ]
+    },
+    {
+      "name": "uf-color-error-foreground",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-error-soft",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-16)",
+        "var(--uf-color-white-20)"
+      ]
+    },
+    {
+      "name": "uf-color-info",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-60)",
+        "var(--uf-color-white-60)"
+      ]
+    },
+    {
+      "name": "uf-color-info-foreground",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-info-soft",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-10)",
+        "var(--uf-color-white-12)"
+      ]
+    },
+    {
+      "name": "uf-color-new",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-on-error",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-error-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-on-info",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-info-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-on-success",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-success-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-on-warning",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-warning-foreground)"
+      ]
+    },
+    {
+      "name": "uf-color-success",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-success-foreground",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-success-soft",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-12)",
+        "var(--uf-color-white-16)"
+      ]
+    },
+    {
+      "name": "uf-color-warning",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-72)",
+        "var(--uf-color-white-72)"
+      ]
+    },
+    {
+      "name": "uf-color-warning-foreground",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-100)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-warning-soft",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-12)",
+        "var(--uf-color-white-14)"
+      ]
+    },
+    {
+      "name": "uf-progress-indicator-bg",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-fg)"
+      ]
+    },
+    {
+      "name": "uf-progress-indicator-destructive-bg",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-destructive)"
+      ]
+    },
+    {
+      "name": "uf-progress-indicator-positive-bg",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-success)"
+      ]
+    },
+    {
+      "name": "uf-progress-indicator-warning-bg",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-warning)"
+      ]
+    },
+    {
+      "name": "uf-progress-track-bg",
+      "sheet": "semantic-feedback",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-hover-bg)"
+      ]
+    },
+    {
+      "name": "uf-color-background",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-96)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-bg",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-background)"
+      ]
+    },
+    {
+      "name": "uf-color-bg-code",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-96)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-border",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-12)",
+        "var(--uf-color-white-20)"
+      ]
+    },
+    {
+      "name": "uf-color-border-hover",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-24)",
+        "var(--uf-color-white-24)"
+      ]
+    },
+    {
+      "name": "uf-color-border-subtle",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-6)",
+        "var(--uf-color-white-8)"
+      ]
+    },
+    {
+      "name": "uf-color-glyph-line",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-42)",
+        "var(--uf-color-white-40)"
+      ]
+    },
+    {
+      "name": "uf-color-header",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-background)"
+      ]
+    },
+    {
+      "name": "uf-color-input",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-background)"
+      ]
+    },
+    {
+      "name": "uf-color-panel",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-96)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-color-props-panel",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-background)",
+        "var(--uf-color-white-12)"
+      ]
+    },
+    {
+      "name": "uf-color-ring",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-88)",
+        "var(--uf-color-white-88)"
+      ]
+    },
+    {
+      "name": "uf-color-strip-edge",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "0.02"
+      ]
+    },
+    {
+      "name": "uf-color-strip-l",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "name": "uf-color-strip-s",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "name": "uf-overlay-backdrop-bg",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-0)"
+      ]
+    },
+    {
+      "name": "uf-overlay-header-background",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-overlay-header-bg)"
+      ]
+    },
+    {
+      "name": "uf-overlay-header-bg",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-0)"
+      ]
+    },
+    {
+      "name": "uf-overlay-surface-background",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg)"
+      ]
+    },
+    {
+      "name": "uf-overlay-surface-bg",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-surface-sidebar, var(--uf-color-white-14))",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-overlay-surface-border",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-border)"
+      ]
+    },
+    {
+      "name": "uf-overlay-surface-underlay-bg",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-black-96)",
+        "var(--uf-color-white-100)"
+      ]
+    },
+    {
+      "name": "uf-tooltip-background",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-100)",
+        "linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-96)"
+      ]
+    },
+    {
+      "name": "uf-tooltip-bg",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-surface-sidebar, var(--uf-color-white-10))",
+        "var(--uf-color-surface-sidebar, var(--uf-color-white-14))"
+      ]
+    },
+    {
+      "name": "uf-tooltip-border",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-white-20)"
+      ]
+    },
+    {
+      "name": "uf-tooltip-fg",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-white-92)"
+      ]
+    },
+    {
+      "name": "uf-border-default",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border)"
+      ]
+    },
+    {
+      "name": "uf-border-focus",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-border-width-base) var(--uf-border-style-solid) var(--uf-color-ring)"
+      ]
+    },
+    {
+      "name": "uf-border-style-dashed",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "dashed"
+      ]
+    },
+    {
+      "name": "uf-border-style-dotted",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "dotted"
+      ]
+    },
+    {
+      "name": "uf-border-style-solid",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "solid"
+      ]
+    },
+    {
+      "name": "uf-border-subtle",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border-subtle)"
+      ]
+    },
+    {
+      "name": "uf-border-width-base",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "2px"
+      ]
+    },
+    {
+      "name": "uf-border-width-none",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "name": "uf-border-width-thick",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "4px"
+      ]
+    },
+    {
+      "name": "uf-border-width-thin",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "1px"
+      ]
+    },
+    {
+      "name": "uf-membrane",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "1px"
+      ]
+    },
+    {
+      "name": "uf-radius",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "6px"
+      ]
+    },
+    {
+      "name": "uf-radius-base",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-radius)"
+      ]
+    },
+    {
+      "name": "uf-radius-full",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "9999px"
+      ]
+    },
+    {
+      "name": "uf-radius-lg",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-radius-md",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "8px"
+      ]
+    },
+    {
+      "name": "uf-radius-none",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0"
+      ]
+    },
+    {
+      "name": "uf-radius-sm",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "4px"
+      ]
+    },
+    {
+      "name": "uf-radius-xl",
+      "sheet": "shape",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/borders.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "16px"
       ]
     },
     {
@@ -4789,6 +4425,354 @@
       ],
       "values": [
         "32px"
+      ]
+    },
+    {
+      "name": "uf-content-inset",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-control-font-size",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "14px"
+      ]
+    },
+    {
+      "name": "uf-control-gap",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "8px"
+      ]
+    },
+    {
+      "name": "uf-control-height",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "32px"
+      ]
+    },
+    {
+      "name": "uf-control-line-height",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "20px"
+      ]
+    },
+    {
+      "name": "uf-control-pad-icon",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "6px"
+      ]
+    },
+    {
+      "name": "uf-control-pad-left",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-control-pad-text)"
+      ]
+    },
+    {
+      "name": "uf-control-pad-right",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-control-pad-text)"
+      ]
+    },
+    {
+      "name": "uf-control-pad-text",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "8px"
+      ]
+    },
+    {
+      "name": "uf-control-pad-y",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "6px"
+      ]
+    },
+    {
+      "name": "uf-hidden-input-offset",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "-1px"
+      ]
+    },
+    {
+      "name": "uf-hidden-input-size",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "1px"
+      ]
+    },
+    {
+      "name": "uf-icon-only-size",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "32px"
+      ]
+    },
+    {
+      "name": "uf-icon-size",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "20px"
+      ]
+    },
+    {
+      "name": "uf-interactive-weight",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "500"
+      ]
+    },
+    {
+      "name": "uf-option-indent",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1))"
+      ]
+    },
+    {
+      "name": "uf-text-body-line-height",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "20px"
+      ]
+    },
+    {
+      "name": "uf-text-body-size",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "14px"
+      ]
+    },
+    {
+      "name": "uf-text-pad-y",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0px"
+      ]
+    },
+    {
+      "name": "uf-text-section-line-height",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "16px"
+      ]
+    },
+    {
+      "name": "uf-text-section-size",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "2px"
+      ]
+    },
+    {
+      "name": "uf-topbar-control-height",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "32px"
+      ]
+    },
+    {
+      "name": "uf-topbar-pad-bottom",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-topbar-pad-left",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-topbar-pad-right",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-topbar-pad-top",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "12px"
+      ]
+    },
+    {
+      "name": "uf-topbar-slot-pad-y",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "0px"
+      ]
+    },
+    {
+      "name": "uf-workspace-resize-line-active-color",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-color-border-hover)"
+      ]
+    },
+    {
+      "name": "uf-workspace-resize-line-color",
+      "sheet": "themes",
+      "profile": "design-system",
+      "generatedPath": "design-system/themes/default.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-color-border)"
       ]
     },
     {
@@ -5200,66 +5184,6 @@
       ]
     },
     {
-      "name": "uf-text-caption-color",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-color-text-secondary)"
-      ]
-    },
-    {
-      "name": "uf-text-caption-font-size",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-font-size-base)"
-      ]
-    },
-    {
-      "name": "uf-text-caption-line-height",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "16px"
-      ]
-    },
-    {
-      "name": "uf-text-caption-min-height",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-spacing-6)"
-      ]
-    },
-    {
-      "name": "uf-text-caption-pad-y",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-spacing-1)"
-      ]
-    },
-    {
       "name": "uf-text-color",
       "sheet": "typography",
       "profile": "design-system",
@@ -5448,7 +5372,7 @@
         ":root"
       ],
       "values": [
-        "var(--uf-font-size-sm)"
+        "var(--uf-font-size-base)"
       ]
     },
     {
@@ -5460,7 +5384,31 @@
         ":root"
       ],
       "values": [
-        "18px"
+        "16px"
+      ]
+    },
+    {
+      "name": "uf-text-label-min-height",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-6)"
+      ]
+    },
+    {
+      "name": "uf-text-label-pad-y",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-1)"
       ]
     },
     {

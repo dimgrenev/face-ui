@@ -478,7 +478,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "var(--uf-font-size-sm)"
+          "value": "var(--uf-font-size-base)"
         }
       ]
     },
@@ -488,33 +488,13 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "18px"
-        }
-      ]
-    },
-    {
-      "sheet": "typography",
-      "name": "--uf-text-caption-font-size",
-      "variants": [
-        {
-          "selector": ":root",
-          "value": "var(--uf-font-size-base)"
-        }
-      ]
-    },
-    {
-      "sheet": "typography",
-      "name": "--uf-text-caption-line-height",
-      "variants": [
-        {
-          "selector": ":root",
           "value": "16px"
         }
       ]
     },
     {
       "sheet": "typography",
-      "name": "--uf-text-caption-min-height",
+      "name": "--uf-text-label-min-height",
       "variants": [
         {
           "selector": ":root",
@@ -524,21 +504,11 @@
     },
     {
       "sheet": "typography",
-      "name": "--uf-text-caption-pad-y",
+      "name": "--uf-text-label-pad-y",
       "variants": [
         {
           "selector": ":root",
           "value": "var(--uf-spacing-1)"
-        }
-      ]
-    },
-    {
-      "sheet": "typography",
-      "name": "--uf-text-caption-color",
-      "variants": [
-        {
-          "selector": ":root",
-          "value": "var(--uf-color-text-secondary)"
         }
       ]
     },

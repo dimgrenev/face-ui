@@ -48,13 +48,10 @@
   --uf-text-body-line-height: var(--uf-control-line-height);
   --uf-text-section-size: var(--uf-control-font-size);
   --uf-text-section-line-height: var(--uf-control-line-height);
-  --uf-text-label-font-size: var(--uf-font-size-sm);
-  --uf-text-label-line-height: 18px;
-  --uf-text-caption-font-size: var(--uf-font-size-base);
-  --uf-text-caption-line-height: 16px;
-  --uf-text-caption-min-height: var(--uf-spacing-6);
-  --uf-text-caption-pad-y: var(--uf-spacing-1);
-  --uf-text-caption-color: var(--uf-color-text-secondary);
+  --uf-text-label-font-size: var(--uf-font-size-base);
+  --uf-text-label-line-height: 16px;
+  --uf-text-label-min-height: var(--uf-spacing-6);
+  --uf-text-label-pad-y: var(--uf-spacing-1);
   --uf-text-heading-font-size: var(--uf-font-size-xl);
   --uf-text-heading-font-weight: var(--uf-font-weight-semibold);
   --uf-text-size-font-size: var(--uf-font-size);

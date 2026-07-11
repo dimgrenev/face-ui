@@ -37,7 +37,6 @@ export type TextVariant =
   | 'h5'
   | 'h6'
   | 'label'
-  | 'caption'
   | 'kbd'
   | 'code'
   | 'markdown'
@@ -95,11 +94,14 @@ function defaultElement(variant: TextVariant): TextElement {
     case 'label': return 'label'
     case 'kbd': return 'kbd'
     case 'code': return 'code'
-    case 'caption': return 'small'
     case 'blockquote': return 'div'
     case 'default': return 'div'
     default: return 'p'
   }
+}
+
+function normalizeTextVariant(variant: TextVariant | string): TextVariant {
+  return variant === 'caption' ? 'label' : (variant as TextVariant)
 }
 
 // ---------------------------------------------------------------------------
@@ -127,12 +129,14 @@ export const Text = forwardRef<HTMLElement, TextProps>(
       ...rest
     } = props
 
-    const normalizedVariant = variant === 'default' ? 'body' : variant
+    const legacyCaptionVariant = String(variant) === 'caption'
+    const resolvedVariant = normalizeTextVariant(variant)
+    const normalizedVariant = resolvedVariant === 'default' ? 'body' : resolvedVariant
     // `control` remains the default for every variant. Explicit `none` must be
     // honored for labels embedded in full-surface controls.
     const effectiveInset: TextProps['inset'] = inset
     const effectiveMembrane = membrane
-    const selectedElement = as ?? defaultElement(variant)
+    const selectedElement = as ?? (legacyCaptionVariant ? 'small' : defaultElement(resolvedVariant))
     const Element = selectedElement as ElementType
     const hasIcon = icon != null
     const content = children ?? text
@@ -141,10 +145,10 @@ export const Text = forwardRef<HTMLElement, TextProps>(
     const textClasses = cn(
       'uf-text',
       // Components-compat class contract (keep while also exposing data-* attrs).
-      variant === 'label' ? 'uf-text-section'
-        : (variant === 'h1' || variant === 'h2' || variant === 'h3' || variant === 'h4' || variant === 'h5' || variant === 'h6') ? 'uf-text-heading'
+      resolvedVariant === 'label' ? 'uf-text-section'
+        : (resolvedVariant === 'h1' || resolvedVariant === 'h2' || resolvedVariant === 'h3' || resolvedVariant === 'h4' || resolvedVariant === 'h5' || resolvedVariant === 'h6') ? 'uf-text-heading'
         : 'uf-text-body',
-      `uf-text--${variant}`,
+      `uf-text--${resolvedVariant}`,
       `uf-text--align-${align}`,
       effectiveInset === 'none' ? 'uf-text--inset-none' : 'uf-text--inset-control',
       hasIcon && 'uf-text--withIcon',

@@ -499,12 +499,12 @@ export const Date = forwardRef<HTMLDivElement, DateProps>(function Date(props, r
       </div>
 
       {description ? (
-        <Text as="div" variant="caption" className="uf-date__description">
+        <Text as="div" variant="label" className="uf-date__description">
           {description}
         </Text>
       ) : null}
       {error ? (
-        <Text as="div" variant="caption" className="uf-date__error">
+        <Text as="div" variant="label" className="uf-date__error">
           {error}
         </Text>
       ) : null}

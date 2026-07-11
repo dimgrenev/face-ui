@@ -24,7 +24,6 @@
         "h5",
         "h6",
         "label",
-        "caption",
         "kbd",
         "code",
         "markdown",
@@ -169,13 +168,6 @@
       }
     },
     {
-      "name": "Caption",
-      "props": {
-        "text": "Caption text",
-        "variant": "caption"
-      }
-    },
-    {
       "name": "Kbd",
       "props": {
         "text": "⌘K",
@@ -268,13 +260,10 @@
       "--uf-text-color",
       "--uf-text-label-font-size",
       "--uf-text-label-line-height",
+      "--uf-text-label-min-height",
+      "--uf-text-label-pad-y",
       "--uf-text-heading-font-size",
       "--uf-text-heading-font-weight",
-      "--uf-text-caption-font-size",
-      "--uf-text-caption-line-height",
-      "--uf-text-caption-min-height",
-      "--uf-text-caption-pad-y",
-      "--uf-text-caption-color",
       "--uf-text-kbd-height",
       "--uf-text-kbd-pad-x",
       "--uf-text-h1-delta",
@@ -311,7 +300,7 @@
     "whenToUse": [
       "All visible text content",
       "Headings and paragraphs",
-      "Labels and captions",
+      "Labels and compact supporting text",
       "Inline code and keyboard shortcuts"
     ],
     "whenNotToUse": [

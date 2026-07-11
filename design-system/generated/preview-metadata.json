@@ -31,8 +31,8 @@
       "tokenCount": 22,
       "selectors": [
         ":root",
-        ":root[data-theme='light']",
-        ":root[data-theme='dark'],\n:root:not([data-theme])"
+        ":root[data-theme='dark'],\n:root:not([data-theme])",
+        ":root[data-theme='light']"
       ],
       "sampleTokens": [
         "uf-shadow-none",
@@ -51,9 +51,9 @@
       "previewKind": "semantic",
       "tokenCount": 13,
       "selectors": [
+        ":root",
         ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']",
-        ":root"
+        ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "sampleTokens": [
         "uf-color-active",
@@ -90,18 +90,18 @@
       "title": "Semantic / Feedback",
       "generatedPath": "design-system/tokens/colors.css",
       "previewKind": "semantic",
-      "tokenCount": 21,
+      "tokenCount": 25,
       "selectors": [
         ":root,\n[data-theme='dark']",
         ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "sampleTokens": [
         "uf-color-success",
+        "uf-color-success-soft",
         "uf-color-success-foreground",
         "uf-color-on-success",
         "uf-color-error",
-        "uf-color-error-foreground",
-        "uf-color-on-error"
+        "uf-color-error-soft"
       ]
     },
     {
@@ -110,7 +110,7 @@
       "title": "Semantic / Surface",
       "generatedPath": "design-system/tokens/colors.css",
       "previewKind": "semantic",
-      "tokenCount": 21,
+      "tokenCount": 26,
       "selectors": [
         ":root,\n[data-theme='dark']",
         ":root[data-theme='light'],\n[data-theme='light']"
@@ -167,7 +167,7 @@
       "profile": "design-system",
       "title": "Themes",
       "generatedPath": "design-system/themes/default.css",
-      "previewKind": "theme",
+      "previewKind": "theme-state",
       "tokenCount": 29,
       "selectors": [
         ":root"
@@ -187,7 +187,7 @@
       "title": "Typography",
       "generatedPath": "design-system/tokens/typography.css",
       "previewKind": "typography",
-      "tokenCount": 65,
+      "tokenCount": 64,
       "selectors": [
         ":root"
       ],
