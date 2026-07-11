@@ -1,0 +1,148 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Popover / AI Citation",
+  "description": "AI Citation product scenario for the Popover component.",
+  "framework": "react",
+  "root": {
+    "type": "Popover",
+    "props": {
+      "interactive": {
+        "$ref": "props.interactive"
+      },
+      "content": {
+        "$ref": "props.content"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "children": {
+        "$ref": "props.children"
+      },
+      "open": {
+        "$ref": "props.open"
+      },
+      "openDelay": {
+        "$ref": "props.openDelay"
+      },
+      "closeDelay": {
+        "$ref": "props.closeDelay"
+      },
+      "side": {
+        "$ref": "props.side"
+      },
+      "align": {
+        "$ref": "props.align"
+      },
+      "sideOffset": {
+        "$ref": "props.sideOffset"
+      },
+      "onOpenChange": {
+        "$ref": "props.onOpenChange"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "children": "Source 3",
+      "content": "Authentication guide, section 4.2: Session renewal.",
+      "interactive": true,
+      "side": "right",
+      "align": "center",
+      "sideOffset": 6,
+      "open": true
+    }
+  },
+  "controls": [
+    {
+      "name": "interactive",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the popover content is interactive (focusable).",
+      "defaultValue": true
+    },
+    {
+      "name": "content",
+      "type": "string",
+      "required": false,
+      "description": "Content rendered inside the floating surface."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Trigger element (the anchor)."
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state."
+    },
+    {
+      "name": "openDelay",
+      "type": "number",
+      "required": false,
+      "description": "Delay before opening (ms)."
+    },
+    {
+      "name": "closeDelay",
+      "type": "number",
+      "required": false,
+      "description": "Delay before closing (ms)."
+    },
+    {
+      "name": "side",
+      "type": "select",
+      "required": false,
+      "description": "Preferred side placement.",
+      "options": [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ]
+    },
+    {
+      "name": "align",
+      "type": "select",
+      "required": false,
+      "description": "Alignment along the side.",
+      "options": [
+        "start",
+        "center",
+        "end"
+      ]
+    },
+    {
+      "name": "sideOffset",
+      "type": "number",
+      "required": false,
+      "description": "Offset from the trigger along the side axis (px)."
+    },
+    {
+      "name": "onOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    }
+  ],
+  "meta": {
+    "name": "AI Citation",
+    "component": "Popover",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Popover/Popover.tsx",
+    "contract": "Popover/Popover.json"
+  }
+}

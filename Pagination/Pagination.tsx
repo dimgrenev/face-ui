@@ -95,18 +95,32 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
           className="uf-pagination-nav uf-pagination-navPrev"
         />
 
-        <span className={cn('uf-pagination-currentSlot', membrane && 'uf-membrane')}>
-          <Text
-            as="span"
-            membrane={false}
-            fullWidth={false}
-            variant="label"
-            className="uf-pagination-current"
-            aria-current="page"
-            title={`Page ${api.page} of ${api.totalPages}`}
-          >
-            {api.page}
-          </Text>
+        <span className="uf-pagination-pages">
+          {api.range.map((rangeItem, index) => (
+            rangeItem === -1 ? (
+              <Text
+                key={`ellipsis-${index}`}
+                as="span"
+                {...api.getEllipsisProps()}
+                membrane={false}
+                fullWidth={false}
+                variant="label"
+                className="uf-pagination-ellipsis"
+              >
+                …
+              </Text>
+            ) : (
+              <Button
+                key={rangeItem}
+                {...api.getPageProps(rangeItem)}
+                text={String(rangeItem)}
+                fullWidth={false}
+                membrane={membrane}
+                variant="ghost"
+                className="uf-pagination-page"
+              />
+            )
+          ))}
         </span>
 
         <span className="uf-pagination-trailing">
@@ -123,6 +137,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
             surfaceTitle={surfaceTitle}
             className="uf-pagination-pagePicker"
             onSelect={(details) => {
+              if (disabled) return
               const nextPage = Number(details.value)
               if (!Number.isFinite(nextPage)) return
               send({ type: 'SET_PAGE', page: nextPage })

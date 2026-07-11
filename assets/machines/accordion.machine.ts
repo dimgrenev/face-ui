@@ -301,11 +301,8 @@ export function connectAccordion(state: MachineSnapshot<AccordionSchema>, send: 
               event.preventDefault()
               send({ type: 'FOCUS_LAST' })
               break
-            case 'Enter':
-            case ' ':
-              event.preventDefault()
-              send({ type: 'TOGGLE', value: props.value })
-              break
+            // Enter and Space are handled by the native button click. Sending
+            // TOGGLE here as well makes keyboard activation toggle twice.
           }
         },
       }

@@ -489,7 +489,6 @@ describe('responsive overlay surfaces', () => {
 
   it('Select click selection keeps multiselect open and emits value callbacks', async () => {
     const handleValueChange = vi.fn()
-    const handleChange = vi.fn()
     const handleOpenChange = vi.fn()
 
     await act(async () => {
@@ -503,7 +502,6 @@ describe('responsive overlay surfaces', () => {
           ]}
           placeholder="Pick"
           onValueChange={handleValueChange}
-          onChange={handleChange}
           onOpenChange={handleOpenChange}
         />,
       )
@@ -527,7 +525,6 @@ describe('responsive overlay surfaces', () => {
     expect(container.querySelector('[role="listbox"]')).not.toBeNull()
     expect(trigger?.textContent).toContain('Regular')
     expect(handleValueChange).toHaveBeenLastCalledWith({ value: ['regular'] })
-    expect(handleChange).toHaveBeenLastCalledWith(['regular'])
   })
 
   it('Date switches auto surfaces to a bottom sheet on compact viewports', async () => {
@@ -935,7 +932,7 @@ describe('responsive overlay surfaces', () => {
     expect(membrane?.classList.contains('uf-membrane')).toBe(true)
     expect(membrane?.classList.contains('uf-membrane--full')).toBe(true)
     expect(panel?.getAttribute('data-scope')).toBe('card')
-    expect(panel?.getAttribute('data-card-variant')).toBe('floating')
+    expect(panel?.getAttribute('data-card-variant')).toBe('default')
     expect(panel?.getAttribute('data-padding')).toBe('membrane')
     expect(panel?.hasAttribute('data-full-width')).toBe(true)
 
@@ -1353,7 +1350,7 @@ describe('responsive overlay surfaces', () => {
 
   it('Panel switches auto surfaces to a left drawer on compact viewports', async () => {
     await act(async () => {
-      root.render(<Panel items={[]} previewPreset="workspace" />)
+      root.render(<Panel items={[]} />)
     })
 
     const trigger = container.querySelector('.uf-sidebar-sheetTrigger button') as HTMLButtonElement | null

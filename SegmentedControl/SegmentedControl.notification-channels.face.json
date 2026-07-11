@@ -1,0 +1,154 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "SegmentedControl / Notification Channels",
+  "description": "Notification Channels product scenario for the SegmentedControl component.",
+  "framework": "react",
+  "root": {
+    "type": "SegmentedControl",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "selectionMode": {
+        "$ref": "props.selectionMode"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      },
+      "ariaLabel": {
+        "$ref": "props.ariaLabel"
+      },
+      "onValueChange": {
+        "$ref": "props.onValueChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "selectionMode": "multiple",
+      "orientation": "horizontal",
+      "defaultValue": [
+        "email",
+        "slack"
+      ],
+      "ariaLabel": "Notification channels",
+      "membrane": true,
+      "items": [
+        {
+          "value": "email",
+          "label": "Email"
+        },
+        {
+          "value": "slack",
+          "label": "Slack"
+        },
+        {
+          "value": "push",
+          "label": "Push"
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Segment options."
+    },
+    {
+      "name": "value",
+      "type": "array",
+      "required": false,
+      "description": "Currently selected segment values."
+    },
+    {
+      "name": "defaultValue",
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial selected segment values."
+    },
+    {
+      "name": "selectionMode",
+      "type": "select",
+      "required": false,
+      "description": "Selection mode: single or multiple.",
+      "options": [
+        "single",
+        "multiple"
+      ],
+      "defaultValue": "single"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state for the entire group.",
+      "defaultValue": false
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Layout orientation.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "defaultValue": "horizontal"
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name for the segmented group."
+    },
+    {
+      "name": "onValueChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when selected segment values change."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper around each segment item.",
+      "defaultValue": true
+    }
+  ],
+  "meta": {
+    "name": "Notification Channels",
+    "component": "SegmentedControl",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "SegmentedControl/SegmentedControl.tsx",
+    "contract": "SegmentedControl/SegmentedControl.json"
+  }
+}

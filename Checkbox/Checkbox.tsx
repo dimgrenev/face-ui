@@ -5,7 +5,7 @@
  * `<Checkbox checked disabled />`
  */
 
-import { forwardRef, useEffect, useMemo, useRef, type ChangeEvent, type ReactNode } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { checkboxMachine, connectCheckbox } from '../assets/machines/checkbox.machine'
 import { cn } from '../assets/utils'
@@ -28,10 +28,6 @@ export interface CheckboxProps extends FormControlProps {
   onCheckedChange?: (details: { checked: boolean | 'indeterminate' }) => void
 }
 
-interface CheckboxLegacyProps {
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
-}
-
 function initialCheckboxState(checked: boolean | 'indeterminate'): 'unchecked' | 'checked' | 'indeterminate' {
   if (checked === 'indeterminate') return 'indeterminate'
   return checked ? 'checked' : 'unchecked'
@@ -43,7 +39,6 @@ function initialCheckboxState(checked: boolean | 'indeterminate'): 'unchecked' |
 
 export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
   function Checkbox(props, ref) {
-    const legacyProps = props as CheckboxProps & CheckboxLegacyProps
     const {
       checked,
       defaultChecked = false,
@@ -71,7 +66,7 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
       required,
       name,
       onCheckedChange: ((details: { checked: boolean | 'indeterminate' }) => {
-        try { onCheckedChange?.(details) } catch {}
+        onCheckedChange?.(details)
       }) as any,
     })
 
@@ -123,7 +118,6 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
           readOnly
           onClick={(event) => {
             event.preventDefault()
-            try { legacyProps.onChange?.(event as unknown as ChangeEvent<HTMLInputElement>) } catch {}
           }}
         />
         {hasLabel && (

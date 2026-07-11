@@ -1,0 +1,218 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Panel / Admin Sidebar",
+  "description": "Admin Sidebar product scenario for the Panel component.",
+  "framework": "react",
+  "root": {
+    "type": "Panel",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "collapsed": {
+        "$ref": "props.collapsed"
+      },
+      "defaultCollapsed": {
+        "$ref": "props.defaultCollapsed"
+      },
+      "onCollapsedChange": {
+        "$ref": "props.onCollapsedChange"
+      },
+      "selectedId": {
+        "$ref": "props.selectedId"
+      },
+      "defaultSelectedId": {
+        "$ref": "props.defaultSelectedId"
+      },
+      "onSelectedChange": {
+        "$ref": "props.onSelectedChange"
+      },
+      "width": {
+        "$ref": "props.width"
+      },
+      "collapsedWidth": {
+        "$ref": "props.collapsedWidth"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "surface": {
+        "$ref": "props.surface"
+      },
+      "surfaceBreakpoint": {
+        "$ref": "props.surfaceBreakpoint"
+      },
+      "open": {
+        "$ref": "props.open"
+      },
+      "defaultOpen": {
+        "$ref": "props.defaultOpen"
+      },
+      "onOpenChange": {
+        "$ref": "props.onOpenChange"
+      },
+      "trigger": {
+        "$ref": "props.trigger"
+      },
+      "surfaceTitle": {
+        "$ref": "props.surfaceTitle"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "surface": "inline",
+      "width": 280,
+      "defaultSelectedId": "members",
+      "items": [
+        {
+          "id": "overview",
+          "label": "Overview",
+          "icon": "layout-sidebar-left-open"
+        },
+        {
+          "id": "members",
+          "label": "Members",
+          "icon": "account"
+        },
+        {
+          "id": "billing",
+          "label": "Billing",
+          "icon": "file"
+        },
+        {
+          "id": "security",
+          "label": "Security",
+          "icon": "settings"
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Panel item definitions (supports nested groups)."
+    },
+    {
+      "name": "collapsed",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the panel is collapsed."
+    },
+    {
+      "name": "defaultCollapsed",
+      "type": "boolean",
+      "required": false,
+      "description": "Uncontrolled initial collapsed state.",
+      "defaultValue": false
+    },
+    {
+      "name": "onCollapsedChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when collapsed state changes."
+    },
+    {
+      "name": "selectedId",
+      "type": "string",
+      "required": false,
+      "description": "Currently selected item ID."
+    },
+    {
+      "name": "defaultSelectedId",
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial selected item ID."
+    },
+    {
+      "name": "onSelectedChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when selected item changes."
+    },
+    {
+      "name": "width",
+      "type": "number",
+      "required": false,
+      "description": "Width when expanded.",
+      "defaultValue": 260
+    },
+    {
+      "name": "collapsedWidth",
+      "type": "number",
+      "required": false,
+      "description": "Width when collapsed.",
+      "defaultValue": 60
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    {
+      "name": "surface",
+      "type": "select",
+      "required": false,
+      "description": "Surface behavior on compact viewports.",
+      "options": [
+        "auto",
+        "inline",
+        "sheet"
+      ],
+      "defaultValue": "auto"
+    },
+    {
+      "name": "surfaceBreakpoint",
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch to sheet mode."
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled drawer state for sheet mode."
+    },
+    {
+      "name": "defaultOpen",
+      "type": "boolean",
+      "required": false,
+      "description": "Uncontrolled initial drawer state for sheet mode.",
+      "defaultValue": false
+    },
+    {
+      "name": "onOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when drawer state changes."
+    },
+    {
+      "name": "trigger",
+      "type": "string",
+      "required": false,
+      "description": "Optional trigger for sheet mode."
+    },
+    {
+      "name": "surfaceTitle",
+      "type": "string",
+      "required": false,
+      "description": "Optional title used in compact sheet header."
+    }
+  ],
+  "meta": {
+    "name": "Admin Sidebar",
+    "component": "Panel",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Panel/Panel.tsx",
+    "contract": "Panel/Panel.json"
+  }
+}

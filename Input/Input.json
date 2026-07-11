@@ -12,7 +12,7 @@
     "defaultValue": {
       "type": "string",
       "required": false,
-      "description": "components API compatibility: uncontrolled initial value."
+      "description": "Uncontrolled initial input value."
     },
     "type": {
       "type": "enum",

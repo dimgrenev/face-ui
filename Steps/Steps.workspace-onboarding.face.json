@@ -1,0 +1,116 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Steps / Workspace Onboarding",
+  "description": "Workspace Onboarding product scenario for the Steps component.",
+  "framework": "react",
+  "root": {
+    "type": "Steps",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "step": {
+        "$ref": "props.step"
+      },
+      "defaultStep": {
+        "$ref": "props.defaultStep"
+      },
+      "linear": {
+        "$ref": "props.linear"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "onStepChange": {
+        "$ref": "props.onStepChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "defaultStep": 1,
+      "linear": true,
+      "items": [
+        {
+          "label": "Workspace",
+          "content": "Choose a name and region."
+        },
+        {
+          "label": "Team",
+          "content": "Invite owners and collaborators."
+        },
+        {
+          "label": "Integrations",
+          "content": "Connect source control and notifications."
+        },
+        {
+          "label": "Review",
+          "content": "Confirm configuration before launch."
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Step definitions."
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "description": "Current step index (0-based)."
+    },
+    {
+      "name": "defaultStep",
+      "type": "number",
+      "required": false,
+      "description": "Uncontrolled initial step index.",
+      "defaultValue": 0
+    },
+    {
+      "name": "linear",
+      "type": "boolean",
+      "required": false,
+      "description": "Linear mode: prevents skipping steps.",
+      "defaultValue": true
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire steps navigation.",
+      "defaultValue": false
+    },
+    {
+      "name": "onStepChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when the active step changes."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  ],
+  "meta": {
+    "name": "Workspace Onboarding",
+    "component": "Steps",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Steps/Steps.tsx",
+    "contract": "Steps/Steps.json"
+  }
+}

@@ -21,6 +21,8 @@ import { Media } from '../Media/Media'
 export interface CarouselProps {
   /** Slide elements. Each child becomes one slide. */
   children?: ReactNode | ReactNode[]
+  /** Data-driven image slides. Composed children take precedence when both are provided. */
+  slides?: CarouselMediaSlide[]
   /** Enable infinite looping. */
   loop?: boolean
   /** Enable automatic slide advancement. */
@@ -37,35 +39,27 @@ export interface CarouselProps {
   defaultIndex?: number
   /** Callback when the active slide changes. */
   onIndexChange?: (details: { index: number }) => void
+  /** Accessible name for the carousel region. */
+  ariaLabel?: string
   className?: string
 }
 
-type CarouselMediaSlide = {
+export interface CarouselMediaSlide {
   src: string
   alt?: string
 }
 
 type CarouselSlideInput = ReactNode | CarouselMediaSlide
 
+function isCarouselMediaSlide(slide: CarouselSlideInput): slide is CarouselMediaSlide {
+  if (slide == null || typeof slide !== 'object' || isValidElement(slide)) return false
+  return 'src' in slide && typeof (slide as unknown as { src?: unknown }).src === 'string'
+}
+
 function preserveButtonScope<T extends { 'data-scope'?: string }>(props: T): Omit<T, 'data-scope'> {
   const { 'data-scope': _scope, ...rest } = props
   return rest
 }
-
-const fallbackSlides: CarouselMediaSlide[] = [
-  {
-    src: '/assets/media/examples/office-core/lobby-day.webp',
-    alt: 'Bright office lobby with glass-block wall, seating, and plants',
-  },
-  {
-    src: '/assets/media/examples/office-core/lobby-glass-blocks.webp',
-    alt: 'Office lobby with glass-block wall, seating, and a person standing by the window',
-  },
-  {
-    src: '/assets/media/examples/office-core/skyline-window-day.webp',
-    alt: 'Two people looking out from a high-rise office window during the day',
-  },
-]
 
 // ---------------------------------------------------------------------------
 // Component
@@ -75,6 +69,7 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
   function Carousel(props, ref) {
     const {
       children,
+      slides: mediaSlides = [],
       loop = false,
       autoPlay = false,
       autoPlayInterval = 3000,
@@ -83,13 +78,14 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
       index,
       defaultIndex = 0,
       onIndexChange,
+      ariaLabel = 'Carousel',
       className,
     } = props
 
     const providedSlides = Children.toArray(children)
     const slides: CarouselSlideInput[] = providedSlides.length > 0
       ? providedSlides as CarouselSlideInput[]
-      : fallbackSlides
+      : Array.isArray(mediaSlides) ? mediaSlides : []
     const total = slides.length
     const clampedSlidesPerView = Math.max(1, Math.floor(slidesPerView))
     const machineIndex = useControllableMachineProp(
@@ -118,8 +114,8 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
 
     const renderSlide = (slide: CarouselSlideInput, slideIndex: number) => {
       if (isValidElement(slide)) return slide
-      if (slide && typeof slide === 'object' && 'src' in (slide as Record<string, unknown>)) {
-        const mediaSlide = slide as { src: string; alt?: string }
+      if (isCarouselMediaSlide(slide)) {
+        const mediaSlide = slide
         return (
           <Media
             src={mediaSlide.src}
@@ -144,7 +140,13 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
     }
 
     return (
-      <div ref={ref} {...api.getRootProps()} style={rootStyle} className={cn('uf-carousel', className)}>
+      <div
+        ref={ref}
+        {...api.getRootProps()}
+        aria-label={ariaLabel}
+        style={rootStyle}
+        className={cn('uf-carousel', className)}
+      >
         <div {...api.getViewportProps()}>
           <div className="uf-carousel-track" style={{ transform: trackTransform }}>
             {slides.map((slide, i) => (

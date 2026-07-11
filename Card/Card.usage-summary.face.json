@@ -1,0 +1,183 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Card / Usage Summary",
+  "description": "Usage Summary product scenario for the Card component.",
+  "framework": "react",
+  "root": {
+    "type": "Card",
+    "props": {
+      "title": {
+        "$ref": "props.title"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "content": {
+        "$ref": "props.content"
+      },
+      "footer": {
+        "$ref": "props.footer"
+      },
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "padding": {
+        "$ref": "props.padding"
+      },
+      "radius": {
+        "$ref": "props.radius"
+      },
+      "border": {
+        "$ref": "props.border"
+      },
+      "interactive": {
+        "$ref": "props.interactive"
+      },
+      "fullWidth": {
+        "$ref": "props.fullWidth"
+      },
+      "footerLayout": {
+        "$ref": "props.footerLayout"
+      },
+      "children": {
+        "$ref": "props.children"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "title": "API usage",
+      "content": "1.8M of 2M monthly tokens used across production agents.",
+      "padding": "spacious",
+      "radius": "lg",
+      "border": true,
+      "footerLayout": "between",
+      "footer": {
+        "__componentName__": "Button",
+        "text": "View usage",
+        "icon": "arrow-right",
+        "iconPosition": "right",
+        "fullWidth": false
+      }
+    }
+  },
+  "controls": [
+    {
+      "name": "title",
+      "type": "any",
+      "required": false,
+      "description": "Convenience title slot rendered through Card.Title and Face UI Text."
+    },
+    {
+      "name": "description",
+      "type": "any",
+      "required": false,
+      "description": "Convenience description slot rendered through Card.Description and Face UI Text."
+    },
+    {
+      "name": "content",
+      "type": "any",
+      "required": false,
+      "description": "Convenience body slot rendered through Card.Content; primitive values use Face UI Text."
+    },
+    {
+      "name": "footer",
+      "type": "object",
+      "required": false,
+      "description": "Convenience footer slot. Use React content or a structured component descriptor.",
+      "controlType": "object"
+    },
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "Surface preset for the container's role in the system.",
+      "options": [
+        "default",
+        "code",
+        "showcase",
+        "plain"
+      ],
+      "controlType": "select"
+    },
+    {
+      "name": "padding",
+      "type": "select",
+      "required": false,
+      "description": "Internal surface inset. Default is the Face UI 7px contained-surface rhythm.",
+      "options": [
+        "default",
+        "none",
+        "membrane",
+        "control",
+        "spacious"
+      ],
+      "controlType": "select"
+    },
+    {
+      "name": "radius",
+      "type": "select",
+      "required": false,
+      "description": "Surface corner radius.",
+      "options": [
+        "none",
+        "base",
+        "sm",
+        "md",
+        "lg",
+        "xl"
+      ],
+      "controlType": "select"
+    },
+    {
+      "name": "border",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the surface draws the membrane/border stroke."
+    },
+    {
+      "name": "interactive",
+      "type": "boolean",
+      "required": false,
+      "description": "Applies interactive hover surface behavior without making the card itself a button."
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the card stretches to the available inline size. When disabled, the card keeps intrinsic width and centers in the available inline space."
+    },
+    {
+      "name": "footerLayout",
+      "type": "select",
+      "required": false,
+      "description": "Layout used by the convenience footer slot. Compound usage configures Card.Footer directly.",
+      "options": [
+        "start",
+        "end",
+        "between",
+        "split"
+      ],
+      "controlType": "select"
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Compound children or custom content escape hatch."
+    }
+  ],
+  "meta": {
+    "name": "Usage Summary",
+    "component": "Card",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Card/Card.tsx",
+    "contract": "Card/Card.json"
+  }
+}

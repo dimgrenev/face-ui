@@ -9,6 +9,11 @@
       "required": false,
       "description": "Slide elements. Each child becomes one slide."
     },
+    "slides": {
+      "type": "array",
+      "required": false,
+      "description": "Data-driven image slides. Composed children take precedence when both are provided."
+    },
     "loop": {
       "type": "boolean",
       "required": false,
@@ -59,6 +64,12 @@
       "required": false,
       "description": "Callback when the active slide changes."
     },
+    "ariaLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name for the carousel region.",
+      "default": "Carousel"
+    },
     "className": {
       "type": "string",
       "required": false,
@@ -74,7 +85,22 @@
         "autoPlayInterval": 3000,
         "orientation": "horizontal",
         "slidesPerView": 1,
-        "defaultIndex": 0
+        "defaultIndex": 0,
+        "ariaLabel": "Office gallery",
+        "slides": [
+          {
+            "src": "/assets/media/examples/office-core/lobby-day.webp",
+            "alt": "Bright office lobby with glass-block wall, seating, and plants"
+          },
+          {
+            "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
+            "alt": "Office lobby with glass-block wall, seating, and a person by the window"
+          },
+          {
+            "src": "/assets/media/examples/office-core/skyline-window-day.webp",
+            "alt": "Two people looking out from a high-rise office window"
+          }
+        ]
       }
     },
     {

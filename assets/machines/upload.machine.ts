@@ -28,14 +28,25 @@ export const uploadAnatomy = createAnatomy('upload').parts(
 // Shared types
 // ---------------------------------------------------------------------------
 
-export interface UploadFile {
+export type UploadRejectReason = 'type' | 'size' | 'count' | 'multiple'
+
+export interface UploadSourceFile {
   id: string
   name: string
   size: number
   type: string
+  /** Original browser file, when selection originated from an input or drop. */
+  source?: File
+}
+
+export interface UploadFile extends UploadSourceFile {
   progress: number
   status: 'pending' | 'uploading' | 'complete' | 'error'
   error?: string
+}
+
+export interface UploadRejectedFile extends UploadSourceFile {
+  reason: UploadRejectReason
 }
 
 // ---------------------------------------------------------------------------
@@ -51,14 +62,14 @@ export interface UploadSchema extends MachineSchema {
     maxFiles: number
     disabled: boolean
     onFilesChange: ((details: { files: UploadFile[] }) => void) | null
-    onReject: ((details: { files: { name: string; size: number; type: string }[]; reason: string }) => void) | null
+    onReject: ((details: { files: UploadRejectedFile[] }) => void) | null
   }
   state: 'idle' | 'dragging'
   event:
     | { type: 'DRAG_ENTER' }
     | { type: 'DRAG_LEAVE' }
-    | { type: 'DROP'; items: { id: string; name: string; size: number; type: string }[] }
-    | { type: 'ADD_FILES'; items: { id: string; name: string; size: number; type: string }[] }
+    | { type: 'DROP'; items: UploadSourceFile[] }
+    | { type: 'ADD_FILES'; items: UploadSourceFile[] }
     | { type: 'REMOVE_FILE'; id: string }
     | { type: 'SET_PROGRESS'; id: string; progress: number }
     | { type: 'SET_STATUS'; id: string; status: 'pending' | 'uploading' | 'complete' | 'error'; error?: string }
@@ -68,74 +79,77 @@ export interface UploadSchema extends MachineSchema {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function matchesAccept(fileType: string, accept: string): boolean {
+function matchesAccept(fileName: string, fileType: string, accept: string): boolean {
   if (!accept) return true
-  const patterns = accept.split(',').map((p) => p.trim())
+  const normalizedName = fileName.toLowerCase()
+  const normalizedType = fileType.toLowerCase()
+  const patterns = accept
+    .split(',')
+    .map((pattern) => pattern.trim().toLowerCase())
+    .filter(Boolean)
+
   for (const pattern of patterns) {
     if (pattern.startsWith('.')) {
-      // Extension match (simplified — checks if type contains the extension category)
+      if (normalizedName.endsWith(pattern)) return true
       continue
     }
     if (pattern.endsWith('/*')) {
-      const category = pattern.slice(0, pattern.indexOf('/'))
-      if (fileType.startsWith(category + '/')) return true
-    } else if (pattern === fileType) {
+      const category = pattern.slice(0, -1)
+      if (normalizedType.startsWith(category)) return true
+    } else if (pattern === normalizedType) {
       return true
     }
   }
-  // Also check raw extension patterns against file type
-  return patterns.some((p) => p.startsWith('.') && fileType.length > 0)
+
+  return false
 }
 
 function validateFiles(
-  items: { id: string; name: string; size: number; type: string }[],
+  items: UploadSourceFile[],
   ctx: UploadSchema['context'],
-): { accepted: UploadFile[]; rejected: { name: string; size: number; type: string }[]; reason: string } {
-  const rejected: { name: string; size: number; type: string }[] = []
+): { accepted: UploadFile[]; rejected: UploadRejectedFile[] } {
+  const rejected: UploadRejectedFile[] = []
   const accepted: UploadFile[] = []
-  let reason = ''
 
-  for (const item of items) {
-    if (ctx.accept && !matchesAccept(item.type, ctx.accept)) {
-      rejected.push(item)
-      reason = 'File type not accepted'
+  for (const [index, item] of items.entries()) {
+    if (!ctx.multiple && index > 0) {
+      rejected.push({ ...item, reason: 'multiple' })
+      continue
+    }
+    if (ctx.accept && !matchesAccept(item.name, item.type, ctx.accept)) {
+      rejected.push({ ...item, reason: 'type' })
       continue
     }
     if (ctx.maxSize > 0 && item.size > ctx.maxSize) {
-      rejected.push(item)
-      reason = 'File exceeds maximum size'
+      rejected.push({ ...item, reason: 'size' })
       continue
     }
     accepted.push({
-      id: item.id,
-      name: item.name,
-      size: item.size,
-      type: item.type,
+      ...item,
       progress: 0,
       status: 'pending',
     })
   }
 
-  if (ctx.maxFiles > 0 && ctx.files.length + accepted.length > ctx.maxFiles) {
+  if (ctx.multiple && ctx.maxFiles > 0 && ctx.files.length + accepted.length > ctx.maxFiles) {
     const overCount = ctx.files.length + accepted.length - ctx.maxFiles
     const removed = accepted.splice(accepted.length - overCount, overCount)
     for (const r of removed) {
-      rejected.push({ name: r.name, size: r.size, type: r.type })
+      rejected.push({ ...r, reason: 'count' })
     }
-    reason = reason || 'Maximum number of files exceeded'
   }
 
-  return { accepted, rejected, reason }
+  return { accepted, rejected }
 }
 
 function addFilesToContext(
   ctx: UploadSchema['context'],
-  items: { id: string; name: string; size: number; type: string }[],
+  items: UploadSourceFile[],
 ): void {
-  const { accepted, rejected, reason } = validateFiles(items, ctx)
+  const { accepted, rejected } = validateFiles(items, ctx)
 
   if (rejected.length > 0 && ctx.onReject) {
-    ctx.onReject({ files: rejected, reason })
+    ctx.onReject({ files: rejected })
   }
 
   if (accepted.length > 0) {
@@ -192,13 +206,14 @@ export const uploadMachine = createMachine<UploadSchema>({
             guard: (ctx) => !ctx.disabled,
             actions: [
               (ctx, event) => {
-                const e = event as { type: 'ADD_FILES'; items: { id: string; name: string; size: number; type: string }[] }
+                const e = event as { type: 'ADD_FILES'; items: UploadSourceFile[] }
                 addFilesToContext(ctx, e.items)
               },
             ],
           },
         ],
         REMOVE_FILE: {
+          guard: (ctx) => !ctx.disabled,
           actions: [
             (ctx, event) => {
               const e = event as { type: 'REMOVE_FILE'; id: string }
@@ -238,7 +253,7 @@ export const uploadMachine = createMachine<UploadSchema>({
           target: 'idle',
           actions: [
             (ctx, event) => {
-              const e = event as { type: 'DROP'; items: { id: string; name: string; size: number; type: string }[] }
+              const e = event as { type: 'DROP'; items: UploadSourceFile[] }
               addFilesToContext(ctx, e.items)
             },
           ],
@@ -299,7 +314,7 @@ export function connectUpload(
           event.stopPropagation()
           if (!disabled) send({ type: 'DRAG_LEAVE' })
         },
-        onDrop(event: { preventDefault: () => void; stopPropagation: () => void; dataTransfer: { files: ArrayLike<{ name: string; size: number; type: string }> } }) {
+        onDrop(event: { preventDefault: () => void; stopPropagation: () => void; dataTransfer: { files: ArrayLike<File> } }) {
           event.preventDefault()
           event.stopPropagation()
           if (disabled) return
@@ -309,6 +324,7 @@ export function connectUpload(
             name: f.name,
             size: f.size,
             type: f.type,
+            source: f,
           }))
           send({ type: 'DROP', items })
         },
@@ -346,7 +362,7 @@ export function connectUpload(
           whiteSpace: 'nowrap' as const,
           border: '0',
         },
-        onChange(event: { target: { files: ArrayLike<{ name: string; size: number; type: string }> | null } }) {
+        onChange(event: { target: { files: ArrayLike<File> | null } }) {
           if (!event.target.files) return
           const selectedFiles = Array.from(event.target.files)
           const items = selectedFiles.map((f) => ({
@@ -354,6 +370,7 @@ export function connectUpload(
             name: f.name,
             size: f.size,
             type: f.type,
+            source: f,
           }))
           send({ type: 'ADD_FILES', items })
         },
@@ -399,6 +416,7 @@ export function connectUpload(
         'data-file-id': id,
         disabled,
         onClick() {
+          if (disabled) return
           send({ type: 'REMOVE_FILE', id })
         },
       }

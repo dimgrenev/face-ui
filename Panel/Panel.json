@@ -57,14 +57,6 @@
       "required": false,
       "description": "Additional class name on the root element."
     },
-    "previewPreset": {
-      "type": "enum",
-      "required": false,
-      "description": "Showcase-only built-in layout preset.",
-      "options": [
-        "workspace"
-      ]
-    },
     "surface": {
       "type": "enum",
       "required": false,
@@ -112,32 +104,92 @@
     {
       "name": "Default",
       "props": {
-        "defaultCollapsed": false,
-        "width": 260,
-        "collapsedWidth": 60,
-        "surface": "auto",
-        "defaultOpen": false,
-        "items": [],
-        "previewPreset": "workspace",
-        "defaultSelectedId": "overview"
+        "items": [
+          {
+            "id": "overview",
+            "label": "Overview",
+            "icon": "layout-sidebar-left-open"
+          },
+          {
+            "id": "projects",
+            "label": "Projects",
+            "icon": "folder"
+          },
+          {
+            "id": "automations",
+            "label": "Automations",
+            "icon": "component"
+          },
+          {
+            "id": "settings",
+            "label": "Settings",
+            "icon": "settings"
+          }
+        ],
+        "defaultSelectedId": "overview",
+        "surface": "inline",
+        "width": 260
       }
     },
     {
       "name": "Collapsed",
       "props": {
-        "items": [],
-        "previewPreset": "workspace",
-        "defaultSelectedId": "overview",
-        "collapsed": true
+        "items": [
+          {
+            "id": "overview",
+            "label": "Overview",
+            "icon": "layout-sidebar-left-open"
+          },
+          {
+            "id": "projects",
+            "label": "Projects",
+            "icon": "folder"
+          },
+          {
+            "id": "automations",
+            "label": "Automations",
+            "icon": "component"
+          },
+          {
+            "id": "settings",
+            "label": "Settings",
+            "icon": "settings"
+          }
+        ],
+        "defaultSelectedId": "projects",
+        "surface": "inline",
+        "defaultCollapsed": true
       }
     },
     {
-      "name": "Custom Width",
+      "name": "Responsive Sheet",
       "props": {
-        "items": [],
-        "previewPreset": "workspace",
-        "defaultSelectedId": "overview",
-        "width": 300
+        "items": [
+          {
+            "id": "overview",
+            "label": "Overview",
+            "icon": "layout-sidebar-left-open"
+          },
+          {
+            "id": "projects",
+            "label": "Projects",
+            "icon": "folder"
+          },
+          {
+            "id": "automations",
+            "label": "Automations",
+            "icon": "component"
+          },
+          {
+            "id": "settings",
+            "label": "Settings",
+            "icon": "settings"
+          }
+        ],
+        "defaultSelectedId": "automations",
+        "surface": "sheet",
+        "defaultOpen": true,
+        "surfaceTitle": "Workspace"
       }
     }
   ],
@@ -183,9 +235,6 @@
   },
   "tokenMapping": {
     "component": [
-      "--uf-sidebar-preview-inset",
-      "--uf-sidebar-preview-section-gap",
-      "--uf-sidebar-preview-title-gap",
       "--uf-sidebar-bg",
       "--uf-sidebar-fg",
       "--uf-sidebar-muted",

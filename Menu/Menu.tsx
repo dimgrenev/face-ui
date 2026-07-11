@@ -391,7 +391,6 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
       >
         <span className="uf-membrane uf-membrane--full uf-menu-contentMembrane">
           <Card
-            variant="floating"
             padding="membrane"
             radius="md"
             fullWidth

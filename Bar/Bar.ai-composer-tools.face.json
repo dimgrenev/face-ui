@@ -1,0 +1,79 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Bar / AI Composer Tools",
+  "description": "AI Composer Tools product scenario for the Bar component.",
+  "framework": "react",
+  "root": {
+    "type": "Bar",
+    "props": {
+      "children": {
+        "$ref": "props.children"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "orientation": "horizontal",
+      "children": [
+        {
+          "__componentName__": "Button",
+          "icon": "plus",
+          "iconOnly": true,
+          "fullWidth": false,
+          "aria-label": "Attach file"
+        },
+        {
+          "__componentName__": "Text",
+          "text": "Agent mode",
+          "variant": "muted",
+          "truncate": true
+        },
+        {
+          "__componentName__": "Bar.Right",
+          "children": [
+            {
+              "__componentName__": "Button",
+              "text": "Run",
+              "variant": "accent",
+              "fullWidth": false
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Bar content (typically BarSection elements)."
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Layout direction.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ]
+    }
+  ],
+  "meta": {
+    "name": "AI Composer Tools",
+    "component": "Bar",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Bar/Bar.tsx",
+    "contract": "Bar/Bar.json"
+  }
+}

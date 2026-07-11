@@ -53,13 +53,13 @@
     "withLine": {
       "type": "boolean",
       "required": false,
-      "description": "components API compatibility (visual variants are styled via classes).",
+      "description": "Render the active-tab indicator line.",
       "default": false
     },
     "wrap": {
       "type": "boolean",
       "required": false,
-      "description": "Allow tabs list wrapping",
+      "description": "Allow tab triggers to wrap onto multiple rows.",
       "default": false
     },
     "membrane": {

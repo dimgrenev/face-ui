@@ -1,0 +1,78 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Icon / Status Symbol",
+  "description": "Status Symbol product scenario for the Icon component.",
+  "framework": "react",
+  "root": {
+    "type": "Icon",
+    "props": {
+      "name": {
+        "$ref": "props.name"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "style": {
+        "$ref": "props.style"
+      },
+      "label": {
+        "$ref": "props.label"
+      },
+      "title": {
+        "$ref": "props.title"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "name": "radio-on",
+      "label": "Online",
+      "title": "Service is online"
+    }
+  },
+  "controls": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "Built-in Face UI icon name. Unknown names render the notdef glyph."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    },
+    {
+      "name": "style",
+      "type": "object",
+      "required": false,
+      "description": "style prop"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible label. If omitted, icon is decorative."
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Optional title element for inline SVG."
+    }
+  ],
+  "meta": {
+    "name": "Status Symbol",
+    "component": "Icon",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Icon/Icon.tsx",
+    "contract": "Icon/Icon.json"
+  }
+}

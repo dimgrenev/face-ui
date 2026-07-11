@@ -1,0 +1,121 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Markdown / Release Notes",
+  "description": "Release Notes product scenario for the Markdown component.",
+  "framework": "react",
+  "root": {
+    "type": "Markdown",
+    "props": {
+      "content": {
+        "$ref": "props.content"
+      },
+      "gfm": {
+        "$ref": "props.gfm"
+      },
+      "safeMode": {
+        "$ref": "props.safeMode"
+      },
+      "allowRawHtml": {
+        "$ref": "props.allowRawHtml"
+      },
+      "linkTarget": {
+        "$ref": "props.linkTarget"
+      },
+      "linkRel": {
+        "$ref": "props.linkRel"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "fullWidth": {
+        "$ref": "props.fullWidth"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "content": "# Version 2.4\n\n- Added workspace templates\n- Improved audit logs\n- Fixed SSO session renewal\n\n[Read the upgrade guide](https://example.com/upgrade).",
+      "gfm": true,
+      "safeMode": true,
+      "linkTarget": "_blank",
+      "linkRel": "noopener noreferrer",
+      "membrane": false,
+      "fullWidth": true
+    }
+  },
+  "controls": [
+    {
+      "name": "content",
+      "type": "string",
+      "required": false,
+      "description": "Markdown source text.",
+      "defaultValue": ""
+    },
+    {
+      "name": "gfm",
+      "type": "boolean",
+      "required": false,
+      "description": "Enable GitHub Flavored Markdown extensions.",
+      "defaultValue": true
+    },
+    {
+      "name": "safeMode",
+      "type": "boolean",
+      "required": false,
+      "description": "Strict sanitization mode for product-safe rendering.",
+      "defaultValue": true
+    },
+    {
+      "name": "allowRawHtml",
+      "type": "boolean",
+      "required": false,
+      "description": "Allow raw HTML blocks from markdown source (still sanitized).",
+      "defaultValue": false
+    },
+    {
+      "name": "linkTarget",
+      "type": "select",
+      "required": false,
+      "description": "Link target behavior for rendered anchors.",
+      "options": [
+        "_self",
+        "_blank"
+      ],
+      "defaultValue": "_self"
+    },
+    {
+      "name": "linkRel",
+      "type": "string",
+      "required": false,
+      "description": "Link rel value for rendered anchors.",
+      "defaultValue": "noopener noreferrer"
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper around component geometry.",
+      "defaultValue": true
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Expand component to full width.",
+      "defaultValue": true
+    }
+  ],
+  "meta": {
+    "name": "Release Notes",
+    "component": "Markdown",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Markdown/Markdown.tsx",
+    "contract": "Markdown/Markdown.json"
+  }
+}

@@ -72,9 +72,7 @@
       "--face-gallery-surface-pad",
       "--face-gallery-frame-min-height",
       "--face-gallery-date-min-height",
-      "--face-gallery-sidebar-min-height",
-      "--face-gallery-modal-min-height",
-      "--face-gallery-toast-min-height"
+      "--face-gallery-modal-min-height"
     ],
     "semanticFallbacks": [
       "--uf-spacing-1",

@@ -32,8 +32,7 @@
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state for the entire group.",
-      "default": false
+      "description": "Disabled state for the entire group."
     },
     "orientation": {
       "type": "enum",
@@ -42,8 +41,7 @@
       "options": [
         "horizontal",
         "vertical"
-      ],
-      "default": "horizontal"
+      ]
     },
     "onValueChange": {
       "type": "function",
@@ -58,8 +56,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each toggle item.",
-      "default": true
+      "description": "Outer membrane wrapper around each toggle item."
     }
   },
   "states": [

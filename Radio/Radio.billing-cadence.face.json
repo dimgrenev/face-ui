@@ -1,0 +1,177 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Radio / Billing Cadence",
+  "description": "Billing Cadence product scenario for the Radio component.",
+  "framework": "react",
+  "root": {
+    "type": "Radio",
+    "props": {
+      "options": {
+        "$ref": "props.options"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      },
+      "onValueChange": {
+        "$ref": "props.onValueChange"
+      },
+      "ariaLabel": {
+        "$ref": "props.ariaLabel"
+      },
+      "ariaLabelledBy": {
+        "$ref": "props.ariaLabelledBy"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "required": {
+        "$ref": "props.required"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "orientation": "horizontal",
+      "defaultValue": "annual",
+      "name": "billing-cadence",
+      "membrane": true,
+      "ariaLabel": "Billing cadence",
+      "options": [
+        {
+          "value": "monthly",
+          "label": "Monthly"
+        },
+        {
+          "value": "annual",
+          "label": "Annual - save 20%"
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "options",
+      "type": "array",
+      "required": false,
+      "description": "Radio options to render.",
+      "defaultValue": [
+        {
+          "value": "one",
+          "label": "Option one"
+        },
+        {
+          "value": "two",
+          "label": "Option two"
+        },
+        {
+          "value": "three",
+          "label": "Option three",
+          "disabled": true
+        }
+      ]
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Currently selected value."
+    },
+    {
+      "name": "defaultValue",
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial selected value.",
+      "defaultValue": "one"
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Layout orientation.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "defaultValue": "vertical"
+    },
+    {
+      "name": "onValueChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when value changes."
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the radio group (role=\"radiogroup\" requires a name)."
+    },
+    {
+      "name": "ariaLabelledBy",
+      "type": "string",
+      "required": false,
+      "description": "ID of an element that labels the radio group."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state for the entire group.",
+      "defaultValue": false
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Mark as required.",
+      "defaultValue": false
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Form field name."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper around control geometry.",
+      "defaultValue": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  ],
+  "meta": {
+    "name": "Billing Cadence",
+    "component": "Radio",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Radio/Radio.tsx",
+    "contract": "Radio/Radio.json"
+  }
+}

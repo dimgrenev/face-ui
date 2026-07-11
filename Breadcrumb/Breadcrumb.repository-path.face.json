@@ -1,0 +1,109 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Breadcrumb / Repository Path",
+  "description": "Repository Path product scenario for the Breadcrumb component.",
+  "framework": "react",
+  "root": {
+    "type": "Breadcrumb",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "separator": {
+        "$ref": "props.separator"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "allowNavigation": {
+        "$ref": "props.allowNavigation"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "collapseAfter": {
+        "$ref": "props.collapseAfter"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "separator": "/",
+      "membrane": true,
+      "collapseAfter": 4,
+      "allowNavigation": false,
+      "items": [
+        {
+          "label": "workspace"
+        },
+        {
+          "label": "apps"
+        },
+        {
+          "label": "dashboard"
+        },
+        {
+          "label": "components"
+        },
+        {
+          "label": "Button.tsx"
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Breadcrumb entries, from root to current page."
+    },
+    {
+      "name": "separator",
+      "type": "string",
+      "required": false,
+      "description": "Custom separator between items. Defaults to \"/\".",
+      "defaultValue": "/"
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Wrap breadcrumb options (link/current) with membrane spacing.",
+      "defaultValue": true
+    },
+    {
+      "name": "allowNavigation",
+      "type": "boolean",
+      "required": false,
+      "description": "Allow real browser navigation on link click. Defaults to false for sandbox/demo safety.",
+      "defaultValue": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    {
+      "name": "collapseAfter",
+      "type": "number",
+      "required": false,
+      "description": "Collapse middle crumbs after this many visible entries.",
+      "defaultValue": 4
+    }
+  ],
+  "meta": {
+    "name": "Repository Path",
+    "component": "Breadcrumb",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Breadcrumb/Breadcrumb.tsx",
+    "contract": "Breadcrumb/Breadcrumb.json"
+  }
+}

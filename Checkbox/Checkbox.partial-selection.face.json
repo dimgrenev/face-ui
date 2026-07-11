@@ -1,0 +1,131 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Checkbox / Partial Selection",
+  "description": "Partial Selection product scenario for the Checkbox component.",
+  "framework": "react",
+  "root": {
+    "type": "Checkbox",
+    "props": {
+      "checked": {
+        "$ref": "props.checked"
+      },
+      "defaultChecked": {
+        "$ref": "props.defaultChecked"
+      },
+      "label": {
+        "$ref": "props.label"
+      },
+      "onCheckedChange": {
+        "$ref": "props.onCheckedChange"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "required": {
+        "$ref": "props.required"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "label": "Select all team members",
+      "checked": "indeterminate",
+      "name": "members",
+      "membrane": true
+    }
+  },
+  "controls": [
+    {
+      "name": "checked",
+      "type": "any",
+      "required": false,
+      "description": "Controlled checked state. Accepts boolean or \"indeterminate\".",
+      "options": [
+        true,
+        false,
+        "indeterminate"
+      ],
+      "defaultValue": null
+    },
+    {
+      "name": "defaultChecked",
+      "type": "any",
+      "required": false,
+      "description": "Uncontrolled initial checked state. Accepts boolean or \"indeterminate\".",
+      "options": [
+        true,
+        false,
+        "indeterminate"
+      ],
+      "defaultValue": false
+    },
+    {
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible label content rendered through Face UI Text."
+    },
+    {
+      "name": "onCheckedChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback fired with { checked } when the machine state changes."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable pointer and keyboard interaction.",
+      "defaultValue": false
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Mark the hidden native input as required.",
+      "defaultValue": false
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native form field name for the hidden input.",
+      "defaultValue": ""
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Wrap the control in the standard one-token membrane.",
+      "defaultValue": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional className on the root label."
+    }
+  ],
+  "meta": {
+    "name": "Partial Selection",
+    "component": "Checkbox",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Checkbox/Checkbox.tsx",
+    "contract": "Checkbox/Checkbox.json"
+  }
+}

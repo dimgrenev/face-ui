@@ -201,32 +201,13 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
   const branchProps = { ...(api.getBranchProps({ id: node.id, disabled: node.disabled, depth }) as any) }
   branchProps.className = cn('uf-tree-branch', branchProps.className)
   const branchTriggerProps = { ...(api.getBranchTriggerProps({ id: node.id, disabled: node.disabled, depth }) as any) }
-  const branchSelectProps = api.getItemProps({ id: node.id, disabled: node.disabled, depth }) as any
-  const branchTriggerOnClick = branchTriggerProps.onClick
   delete branchTriggerProps['data-scope']
   delete branchTriggerProps['data-part']
-  delete branchTriggerProps.onClick
-  delete branchTriggerProps.onFocus
-  delete branchTriggerProps.onBlur
-  branchTriggerProps['aria-level'] = depth + 1
 
   return (
     <div {...branchProps}>
       {renderDefaultRow({
         ...branchTriggerProps,
-        role: branchSelectProps.role,
-        tabIndex: branchProps.tabIndex,
-        onFocus: branchSelectProps.onFocus,
-        onBlur: branchSelectProps.onBlur,
-        'data-value': node.id,
-        'aria-selected': branchSelectProps['aria-selected'],
-        'data-selected': branchSelectProps['data-selected'],
-        'data-focused': branchProps['data-focused'],
-        'data-disabled': branchProps['data-disabled'],
-        onClick: () => {
-          try { branchTriggerOnClick?.() } catch {}
-          try { branchSelectProps.onClick?.() } catch {}
-        },
       }, 'uf-tree-branch-button')}
       <div {...api.getBranchContentProps({ id: node.id, disabled: node.disabled, depth })} className="uf-tree-branch-content">
         {node.children!.map((child) => (
@@ -267,7 +248,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
     const selectedChangeHandler = typeof onSelectedChange === 'function' ? onSelectedChange : undefined
 
     const controlledExpandedIds = normalizeIdArray(expandedIds)
-    const isExpandedControlled = controlledExpandedIds !== undefined && expandedChangeHandler !== undefined
+    const isExpandedControlled = controlledExpandedIds !== undefined
     const initialExpandedIds = controlledExpandedIds ?? normalizeIdArray(defaultExpandedIds) ?? []
     const machineExpandedIds = useControllableMachineProp(
       isExpandedControlled ? controlledExpandedIds : undefined,
@@ -275,7 +256,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
     )
 
     const controlledSelectedId = selectedId !== undefined ? String(selectedId) : undefined
-    const isSelectedControlled = controlledSelectedId !== undefined && selectedChangeHandler !== undefined
+    const isSelectedControlled = controlledSelectedId !== undefined
     const initialSelectedId = controlledSelectedId ?? (defaultSelectedId ? String(defaultSelectedId) : null)
     const machineSelectedId = useControllableMachineProp<string | null>(
       isSelectedControlled ? controlledSelectedId : undefined,

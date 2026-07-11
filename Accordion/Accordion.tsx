@@ -14,7 +14,6 @@ import { useControllableMachineProp } from '../assets/adapters/react/use-control
 import { accordionMachine, connectAccordion } from '../assets/machines/accordion.machine'
 import { cn } from '../assets/utils'
 import { RightIcon } from '../assets/icons'
-import { Button } from '../Button/Button'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 
@@ -51,57 +50,12 @@ export interface AccordionProps {
   className?: string
 }
 
-interface AccordionLegacyProps {
-  legacyItems?: Array<{ id?: string; summary: ReactNode; content: ReactNode; isOpen?: boolean; disabled?: boolean }>
-  onChange?: (expandedIds: string[]) => void
-}
-
-function buildDefaultItems(): AccordionItem[] {
-  return [
-    {
-      value: 'getting-started',
-      label: 'Getting Started',
-      content: (
-        <>
-          <Button text="Install package" variant="default" align="left" stretchText fullWidth membrane />
-          <Button text="Quick start" variant="default" align="left" stretchText fullWidth membrane />
-          <Button text="Delete setup" variant="delete" align="left" stretchText fullWidth membrane />
-        </>
-      ),
-    },
-    {
-      value: 'usage',
-      label: 'Usage Guide',
-      content: (
-        <>
-          <Button text="Basic usage" variant="default" align="left" stretchText fullWidth membrane />
-          <Button text="Advanced usage" variant="default" align="left" stretchText fullWidth membrane />
-        </>
-      ),
-    },
-    {
-      value: 'api',
-      label: 'API Reference',
-      content: (
-        <>
-          <Button text="Props" variant="default" align="left" stretchText fullWidth membrane />
-          <Button text="Events" variant="default" align="left" stretchText fullWidth membrane />
-        </>
-      ),
-    },
-  ]
-}
-
 function flattenAccordionContent(content: ReactNode): ReactNode[] {
-  try {
-    if (content == null) return []
-    if (isValidElement(content) && content.type === Fragment) {
-      return Children.toArray((content as any).props?.children)
-    }
-    return Children.toArray(content)
-  } catch {
-    return []
+  if (content == null) return []
+  if (isValidElement<{ children?: ReactNode }>(content) && content.type === Fragment) {
+    return Children.toArray(content.props.children)
   }
+  return Children.toArray(content)
 }
 
 function renderAccordionContentNode(node: ReactNode): ReactNode {
@@ -127,7 +81,6 @@ function getAccordionDomId(instanceId: string, part: 'trigger' | 'content', valu
 
 export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
   function Accordion(props, ref) {
-    const legacyProps = props as AccordionProps & AccordionLegacyProps
     const {
       items: rawItems,
       icon,
@@ -139,19 +92,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
       onExpandedChange,
       className,
     } = props
-    const legacyItems = legacyProps.legacyItems
-    const legacyOnChange = legacyProps.onChange
-
-    const legacySource = Array.isArray(legacyItems) ? legacyItems : []
-    const fromLegacy: AccordionItem[] = legacySource.map((item, index) => ({
-        value: String(item.id ?? index),
-        label: item.summary,
-        content: item.content,
-        disabled: item.disabled,
-      }))
-    const items = Array.isArray(rawItems) && rawItems.length > 0
-      ? rawItems
-      : (fromLegacy.length > 0 ? fromLegacy : buildDefaultItems())
+    const items = Array.isArray(rawItems) ? rawItems : []
     const isControlledExpanded = Array.isArray(expandedIds)
     const controlledExpandedSig = isControlledExpanded
       ? (expandedIds as any[]).map((id) => String(id)).join('\u0001')
@@ -164,10 +105,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
       ? controlledExpanded
       : Array.isArray(defaultExpandedIds) && defaultExpandedIds.length > 0
         ? defaultExpandedIds.map((id) => String(id))
-      : legacySource
-        .map((item, index) => ({ item, index }))
-        .filter(({ item }) => item.isOpen)
-        .map(({ item, index }) => String(item.id ?? index))
+        : []
     const machineExpandedIds = useControllableMachineProp(
       isControlledExpanded ? controlledExpanded : undefined,
       initialExpanded,
@@ -179,8 +117,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
       collapsible,
       disabled,
       onExpandedChange: ((details: { expandedIds: string[] }) => {
-        try { onExpandedChange?.(details) } catch {}
-        try { legacyOnChange?.(details.expandedIds) } catch {}
+        onExpandedChange?.(details)
       }) as any,
     }
     const { state, send } = useMachine(accordionMachine, machineOptions)

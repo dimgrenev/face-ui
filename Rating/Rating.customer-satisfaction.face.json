@@ -1,0 +1,121 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Rating / Customer Satisfaction",
+  "description": "Customer Satisfaction product scenario for the Rating component.",
+  "framework": "react",
+  "root": {
+    "type": "Rating",
+    "props": {
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "max": {
+        "$ref": "props.max"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "allowHalf": {
+        "$ref": "props.allowHalf"
+      },
+      "label": {
+        "$ref": "props.label"
+      },
+      "ariaLabel": {
+        "$ref": "props.ariaLabel"
+      },
+      "onValueChange": {
+        "$ref": "props.onValueChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "defaultValue": 4,
+      "max": 5,
+      "allowHalf": false,
+      "label": "How helpful was this answer?",
+      "ariaLabel": "Answer helpfulness rating"
+    }
+  },
+  "controls": [
+    {
+      "name": "value",
+      "type": "number",
+      "required": false,
+      "description": "Current rating value."
+    },
+    {
+      "name": "defaultValue",
+      "type": "number",
+      "required": false,
+      "description": "Uncontrolled initial rating value.",
+      "defaultValue": 0
+    },
+    {
+      "name": "max",
+      "type": "number",
+      "required": false,
+      "description": "Maximum number of stars.",
+      "defaultValue": 5
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "defaultValue": false
+    },
+    {
+      "name": "allowHalf",
+      "type": "boolean",
+      "required": false,
+      "description": "Allow half-star increments.",
+      "defaultValue": false
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Label content."
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name used when no visible label is provided.",
+      "defaultValue": "Rating"
+    },
+    {
+      "name": "onValueChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when value changes."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  ],
+  "meta": {
+    "name": "Customer Satisfaction",
+    "component": "Rating",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Rating/Rating.tsx",
+    "contract": "Rating/Rating.json"
+  }
+}

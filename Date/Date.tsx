@@ -264,7 +264,6 @@ export const Date = forwardRef<HTMLDivElement, DateProps>(function Date(props, r
   const minutes = getMinuteGrid(5)
   const contentPanel = (
     <Card
-      variant="floating"
       padding="membrane"
       radius="base"
       fullWidth={resolvedSurface === 'sheet'}

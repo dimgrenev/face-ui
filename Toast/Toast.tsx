@@ -9,9 +9,16 @@
  * subscribe/getSnapshot compatible with `useSyncExternalStore`.
  */
 
-import { forwardRef, useRef, useSyncExternalStore, useCallback, useEffect, type HTMLAttributes } from 'react'
-import { connectToast, createToaster } from '../assets/machines/toast.machine'
-import type { ToastAction, ToastItem, Toaster as ToasterType, ToastSchema } from '../assets/machines/toast.machine'
+import { forwardRef, useSyncExternalStore, useCallback, type HTMLAttributes, type ReactNode } from 'react'
+import { connectToast, createToaster, toastAnatomy } from '../assets/machines/toast.machine'
+import type {
+  ToastAction,
+  ToastItem,
+  ToastOptions,
+  ToastTone,
+  Toaster as ToasterType,
+  ToastSchema,
+} from '../assets/machines/toast.machine'
 import type { MachineSnapshot } from '../assets/types'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
@@ -25,6 +32,39 @@ import { Text } from '../Text/Text'
 
 export interface ToasterProps extends HTMLAttributes<HTMLDivElement> {
   /** Additional class name for the toast group container. */
+  className?: string
+  /** Viewport edge and alignment used by the toast stack. */
+  placement?: ToastPlacement
+  /** Render the internal icon-only dismiss button. */
+  dismissible?: boolean
+  /** Accessible label for the internal dismiss button. */
+  closeLabel?: string
+}
+
+export type ToastPlacement =
+  | 'bottom-left'
+  | 'bottom-center'
+  | 'bottom-right'
+  | 'top-left'
+  | 'top-center'
+  | 'top-right'
+
+export interface ToastProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  /** Primary notification text. */
+  title?: ReactNode
+  /** Supporting notification text. */
+  description?: ReactNode
+  /** Optional action button. Invoking it also requests dismissal. */
+  action?: ToastAction
+  /** Semantic notification tone. */
+  tone?: ToastTone
+  /** Render the icon-only dismiss button. */
+  dismissible?: boolean
+  /** Accessible label for the dismiss button. */
+  closeLabel?: string
+  /** Called when the close button or action requests dismissal. */
+  onDismiss?: () => void
+  /** Additional class name on the notification surface. */
   className?: string
 }
 
@@ -40,6 +80,100 @@ export interface ToastContextValue {
   useToast: () => UseToastReturn
   Toaster: React.ForwardRefExoticComponent<ToasterProps & React.RefAttributes<HTMLDivElement>>
 }
+
+// ---------------------------------------------------------------------------
+// Notification surface
+// ---------------------------------------------------------------------------
+
+export const Toast = forwardRef<HTMLDivElement, ToastProps>(
+  function Toast(props, ref) {
+    const {
+      title,
+      description,
+      action,
+      tone = 'neutral',
+      dismissible = true,
+      closeLabel = 'Close notification',
+      onDismiss,
+      className,
+      ...rest
+    } = props
+
+    return (
+      <Card
+        ref={ref}
+        {...toastAnatomy.getPartAttrs('root')}
+        role="status"
+        aria-atomic="true"
+        data-state="active"
+        data-tone={tone}
+        padding="default"
+        radius="md"
+        className={cn('uf-toast', className)}
+        {...rest}
+      >
+        <div className="uf-toast-body">
+          <Bar className="uf-toast-bar">
+            <Bar.LeftEllipsis>
+              {title != null ? (
+                <Text
+                  {...(toastAnatomy.getPartAttrs('title') as any)}
+                  as="div"
+                  variant="label"
+                  className="uf-toast-title"
+                >
+                  {title}
+                </Text>
+              ) : <span />}
+            </Bar.LeftEllipsis>
+            {dismissible ? (
+              <Bar.Right>
+                <Button
+                  {...toastAnatomy.getPartAttrs('close')}
+                  aria-label={closeLabel}
+                  icon="close"
+                  iconOnly
+                  variant="ghost"
+                  fullWidth={false}
+                  className="uf-toast-close"
+                  onClick={onDismiss}
+                />
+              </Bar.Right>
+            ) : null}
+          </Bar>
+          {description != null ? (
+            <Text
+              {...(toastAnatomy.getPartAttrs('description') as any)}
+              as="div"
+              variant="muted"
+              className="uf-toast-description"
+            >
+              {description}
+            </Text>
+          ) : null}
+          {action?.label ? (
+            <div className="uf-toast-actionRow">
+              <Button
+                {...toastAnatomy.getPartAttrs('action')}
+                text={action.label}
+                variant="ghost"
+                fullWidth={false}
+                className="uf-toast-action"
+                onClick={() => {
+                  try {
+                    action.onClick?.()
+                  } finally {
+                    onDismiss?.()
+                  }
+                }}
+              />
+            </div>
+          ) : null}
+        </div>
+      </Card>
+    )
+  },
+)
 
 // ---------------------------------------------------------------------------
 // Factory
@@ -60,7 +194,13 @@ export function createToastContext(options?: {
 
   const ToasterComponent = forwardRef<HTMLDivElement, ToasterProps>(
     function Toaster(props, ref) {
-      const { className, ...rest } = props
+      const {
+        className,
+        placement = 'bottom-center',
+        dismissible = true,
+        closeLabel = 'Close notification',
+        ...rest
+      } = props
 
       // Subscribe to the toaster service snapshot
       const subscribe = useCallback(
@@ -89,76 +229,23 @@ export function createToastContext(options?: {
         <div
           ref={ref}
           {...api.getGroupProps()}
+          data-placement={placement}
+          data-membrane=""
           className={cn('uf-toaster', className)}
           {...rest}
         >
           {visibleToasts.map((toast) => (
-            <Card
+            <Toast
               key={toast.id}
               {...api.getToastProps(toast)}
-              variant="floating"
-              padding="compact"
-              radius="md"
-              data-tone={toast.variant}
-              className={cn('uf-toast')}
-            >
-              <div className="uf-toast-body">
-                <Bar className="uf-toast-bar">
-                  <Bar.LeftEllipsis>
-                    {toast.title ? (
-                      <Text
-                        {...(api.getTitleProps() as any)}
-                        as="div"
-                        variant="label"
-                        className={cn('uf-toast-title')}
-                      >
-                        {toast.title}
-                      </Text>
-                    ) : (
-                      <span />
-                    )}
-                  </Bar.LeftEllipsis>
-                  <Bar.Right>
-                    <Button
-                      {...api.getCloseProps(toast.id)}
-                      icon="close"
-                      iconOnly
-                      variant="ghost"
-                      fullWidth={false}
-                      className={cn('uf-toast-close')}
-                    />
-                  </Bar.Right>
-                </Bar>
-                {toast.description && (
-                  <Text
-                    {...(api.getDescriptionProps() as any)}
-                    as="div"
-                    variant="muted"
-                    className={cn('uf-toast-description')}
-                  >
-                    {toast.description}
-                  </Text>
-                )}
-                {toast.action?.label ? (
-                  <div className="uf-toast-actionRow">
-                    <Button
-                      {...api.getActionProps()}
-                      text={toast.action.label}
-                      variant="ghost"
-                      fullWidth={false}
-                      className={cn('uf-toast-action')}
-                      onClick={() => {
-                        try {
-                          toast.action?.onClick?.()
-                        } finally {
-                          toaster.dismiss(toast.id)
-                        }
-                      }}
-                    />
-                  </div>
-                ) : null}
-              </div>
-            </Card>
+              title={toast.title}
+              description={toast.description}
+              action={toast.action}
+              tone={toast.tone}
+              dismissible={dismissible}
+              closeLabel={closeLabel}
+              onDismiss={() => toaster.dismiss(toast.id)}
+            />
           ))}
         </div>
       )
@@ -184,61 +271,4 @@ export const useToast = defaultContext.useToast
 /** Renders visible toasts from the default toaster. */
 export const Toaster = defaultContext.Toaster
 
-// ---------------------------------------------------------------------------
-// Playground-friendly default export wrapper
-// ---------------------------------------------------------------------------
-
-/**
- * Toast — demo wrapper that renders the Toaster and shows a sample toast.
- * Useful for playground preview where we need a single renderable component.
- */
-export interface ToastDemoProps {
-  className?: string
-  /** Show explicit trigger button in preview/demo wrapper. */
-  showTrigger?: boolean
-  /** Automatically show one sample toast after mount. */
-  autoShow?: boolean
-}
-
-export type { ToastAction }
-
-export const Toast = forwardRef<HTMLDivElement, ToastDemoProps>(
-  function Toast(props, ref) {
-    const { className, showTrigger = true, autoShow = false } = props
-    const { toast } = defaultContext.useToast()
-
-    // Show a sample toast only once after mount.
-    // Avoid side effects during render (important for StrictMode and deterministic previews).
-    const shownRef = useRef(false)
-    useEffect(() => {
-      if (!autoShow) return
-      if (shownRef.current) return
-      shownRef.current = true
-      const timer = window.setTimeout(() => {
-        toast({ title: 'Notification', description: 'This is a toast message.' })
-      }, 100)
-      return () => window.clearTimeout(timer)
-    }, [toast, autoShow])
-
-    const showSampleToast = useCallback(() => {
-      toast({ title: 'Notification', description: 'This is a toast message.' })
-    }, [toast])
-
-    return (
-      <div ref={ref} className={cn('uf-toast-demo', className)}>
-        {showTrigger && (
-          <div className="uf-toast-demo-trigger">
-            <Button
-              text="Show toast"
-              variant="default"
-              align="left"
-              className="uf-toast-trigger"
-              onClick={showSampleToast}
-            />
-          </div>
-        )}
-        <defaultContext.Toaster />
-      </div>
-    )
-  },
-)
+export type { ToastAction, ToastOptions, ToastTone }

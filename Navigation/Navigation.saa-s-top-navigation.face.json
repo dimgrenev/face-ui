@@ -1,0 +1,194 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Navigation / SaaS Top Navigation",
+  "description": "SaaS Top Navigation product scenario for the Navigation component.",
+  "framework": "react",
+  "root": {
+    "type": "Navigation",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "activeId": {
+        "$ref": "props.activeId"
+      },
+      "defaultActiveId": {
+        "$ref": "props.defaultActiveId"
+      },
+      "onActiveChange": {
+        "$ref": "props.onActiveChange"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "surface": {
+        "$ref": "props.surface"
+      },
+      "surfaceBreakpoint": {
+        "$ref": "props.surfaceBreakpoint"
+      },
+      "open": {
+        "$ref": "props.open"
+      },
+      "defaultOpen": {
+        "$ref": "props.defaultOpen"
+      },
+      "onOpenChange": {
+        "$ref": "props.onOpenChange"
+      },
+      "trigger": {
+        "$ref": "props.trigger"
+      },
+      "surfaceTitle": {
+        "$ref": "props.surfaceTitle"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "orientation": "horizontal",
+      "surface": "inline",
+      "defaultActiveId": "dashboard",
+      "items": [
+        {
+          "id": "dashboard",
+          "label": "Dashboard",
+          "href": "#dashboard"
+        },
+        {
+          "id": "projects",
+          "label": "Projects",
+          "items": [
+            {
+              "id": "active",
+              "label": "Active projects"
+            },
+            {
+              "id": "archived",
+              "label": "Archived projects"
+            }
+          ]
+        },
+        {
+          "id": "analytics",
+          "label": "Analytics",
+          "href": "#analytics"
+        },
+        {
+          "id": "settings",
+          "label": "Settings",
+          "href": "#settings"
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Navigation item definitions (supports nested dropdowns)."
+    },
+    {
+      "name": "activeId",
+      "type": "string",
+      "required": false,
+      "description": "Currently active item ID."
+    },
+    {
+      "name": "defaultActiveId",
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial active item ID.",
+      "defaultValue": null
+    },
+    {
+      "name": "onActiveChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when active item changes."
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Orientation of the navigation bar.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "defaultValue": "horizontal"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    {
+      "name": "surface",
+      "type": "select",
+      "required": false,
+      "description": "Surface behavior on compact viewports.",
+      "options": [
+        "auto",
+        "inline",
+        "sheet"
+      ],
+      "defaultValue": "auto"
+    },
+    {
+      "name": "surfaceBreakpoint",
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch to sheet mode."
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled sheet state for compact mode."
+    },
+    {
+      "name": "defaultOpen",
+      "type": "boolean",
+      "required": false,
+      "description": "Uncontrolled initial sheet state for compact mode.",
+      "defaultValue": false
+    },
+    {
+      "name": "onOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when sheet state changes."
+    },
+    {
+      "name": "trigger",
+      "type": "string",
+      "required": false,
+      "description": "Optional trigger for compact mode."
+    },
+    {
+      "name": "surfaceTitle",
+      "type": "string",
+      "required": false,
+      "description": "Optional title used in compact sheet header."
+    }
+  ],
+  "meta": {
+    "name": "SaaS Top Navigation",
+    "component": "Navigation",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Navigation/Navigation.tsx",
+    "contract": "Navigation/Navigation.json"
+  }
+}

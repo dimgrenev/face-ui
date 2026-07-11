@@ -2,55 +2,105 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Toast",
-  "description": "Notification system with toaster singleton and factory",
+  "description": "Composable notification surface shared by the declarative Toast and imperative Toaster APIs",
   "props": {
+    "title": {
+      "type": "string",
+      "required": false,
+      "description": "Primary notification text."
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "description": "Supporting notification text."
+    },
+    "action": {
+      "type": "object",
+      "required": false,
+      "description": "Optional action button. Invoking it also requests dismissal."
+    },
+    "tone": {
+      "type": "enum",
+      "required": false,
+      "description": "Semantic notification tone.",
+      "options": [
+        "neutral",
+        "positive",
+        "warning",
+        "destructive"
+      ],
+      "default": "neutral"
+    },
+    "dismissible": {
+      "type": "boolean",
+      "required": false,
+      "description": "Render the icon-only dismiss button.",
+      "default": true
+    },
+    "closeLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the dismiss button.",
+      "default": "Close notification"
+    },
+    "onDismiss": {
+      "type": "function",
+      "required": false,
+      "description": "Called when the close button or action requests dismissal."
+    },
     "className": {
       "type": "string",
       "required": false,
-      "description": "Additional class name for the toast group container."
-    },
-    "showTrigger": {
-      "type": "boolean",
-      "required": false,
-      "description": "Show explicit trigger button in preview/demo wrapper.",
-      "default": true
-    },
-    "autoShow": {
-      "type": "boolean",
-      "required": false,
-      "description": "Automatically show one sample toast after mount.",
-      "default": false
+      "description": "Additional class name on the notification surface."
     }
   },
   "states": [
     {
-      "name": "Default (Trigger Button)",
+      "name": "Default",
       "props": {
-        "showTrigger": true,
-        "autoShow": false
+        "title": "Workspace updated",
+        "description": "Your changes are available to collaborators.",
+        "tone": "neutral",
+        "dismissible": true
       }
     },
     {
-      "name": "Auto Show",
+      "name": "Positive",
       "props": {
-        "showTrigger": false,
-        "autoShow": true
+        "title": "Deployment completed",
+        "description": "Production is healthy and serving the new release.",
+        "tone": "positive",
+        "dismissible": true
+      }
+    },
+    {
+      "name": "Warning",
+      "props": {
+        "title": "Usage is near the limit",
+        "description": "This workspace has used 82% of its monthly quota.",
+        "tone": "warning",
+        "dismissible": true
+      }
+    },
+    {
+      "name": "Destructive",
+      "props": {
+        "title": "Deployment failed",
+        "description": "Review the build log before retrying.",
+        "tone": "destructive",
+        "dismissible": true
       }
     }
   ],
   "behavior": {
-    "dismissOnEscape": true,
+    "dismissOnEscape": false,
     "autoFocusOnOpen": "none"
   },
-  "keyboard": {
-    "Escape": {
-      "action": "dismissAll"
-    }
-  },
+  "keyboard": {},
   "aria": {
     "role": "status",
     "live": "polite",
-    "variantRolePolicy": "All toast variants stay non-blocking polite status messages. Use Modal or alertdialog for blocking alerts."
+    "toneRolePolicy": "All toast tones stay non-blocking polite status messages. Use Modal or alertdialog for blocking alerts."
   },
   "composition": {
     "required": [
@@ -98,9 +148,10 @@
   "tokenMapping": {
     "component": [
       "--uf-toast-container-max-width",
-      "--uf-toast-surface-pad",
       "--uf-toast-border-width",
-      "--uf-toast-compact-inset"
+      "--uf-toast-compact-inset",
+      "--uf-toast-viewport-inset",
+      "--uf-z-toast"
     ],
     "semanticFallbacks": [
       "--uf-control-height",
@@ -109,6 +160,9 @@
       "--uf-font-size-sm",
       "--uf-font-weight-bold",
       "--uf-color-fg-muted",
+      "--uf-color-success",
+      "--uf-color-warning",
+      "--uf-color-destructive",
       "--uf-overlay-surface-bg",
       "--uf-overlay-surface-border",
       "--uf-overlay-surface-blur",
@@ -116,8 +170,8 @@
     ],
     "notes": [
       "Toast content uses Text and Bar/Button primitives internally; do not create toast-local typography classes for new copy.",
-      "Toast surfaces use the shared overlay/dropdown background and border tokens so notifications match Menu, Select, Popover and Tooltip surfaces.",
-      "The toaster z-index remains an implementation detail until a global layer token is introduced."
+      "Toast surfaces use the shared overlay/dropdown background while semantic tones map the full border to monochrome feedback tokens.",
+      "Toaster renders the same public Toast surface and uses the shared --uf-z-toast layer token."
     ]
   },
   "platform": {},

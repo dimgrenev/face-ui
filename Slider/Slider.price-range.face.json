@@ -1,0 +1,234 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Slider / Price Range",
+  "description": "Price Range product scenario for the Slider component.",
+  "framework": "react",
+  "root": {
+    "type": "Slider",
+    "props": {
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "min": {
+        "$ref": "props.min"
+      },
+      "max": {
+        "$ref": "props.max"
+      },
+      "step": {
+        "$ref": "props.step"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      },
+      "label": {
+        "$ref": "props.label"
+      },
+      "onValueChange": {
+        "$ref": "props.onValueChange"
+      },
+      "leading": {
+        "$ref": "props.leading"
+      },
+      "leadingIcon": {
+        "$ref": "props.leadingIcon"
+      },
+      "leadingText": {
+        "$ref": "props.leadingText"
+      },
+      "crop": {
+        "$ref": "props.crop"
+      },
+      "defaultCropRange": {
+        "$ref": "props.defaultCropRange"
+      },
+      "cropRange": {
+        "$ref": "props.cropRange"
+      },
+      "cropLocksValue": {
+        "$ref": "props.cropLocksValue"
+      },
+      "onCropChange": {
+        "$ref": "props.onCropChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "variant": "simple",
+      "label": "Monthly price",
+      "defaultValue": [
+        40,
+        180
+      ],
+      "min": 0,
+      "max": 250,
+      "step": 10,
+      "orientation": "horizontal"
+    }
+  },
+  "controls": [
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "Standard track/thumb presentation or enhanced value-thumb presentation.",
+      "options": [
+        "simple",
+        "advanced"
+      ],
+      "defaultValue": "simple"
+    },
+    {
+      "name": "value",
+      "type": "array",
+      "required": false,
+      "description": "Current value(s). Single thumb = [n], range = [min, max]."
+    },
+    {
+      "name": "defaultValue",
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial value(s)."
+    },
+    {
+      "name": "min",
+      "type": "number",
+      "required": false,
+      "description": "Minimum value.",
+      "defaultValue": 0
+    },
+    {
+      "name": "max",
+      "type": "number",
+      "required": false,
+      "description": "Maximum value.",
+      "defaultValue": 100
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "description": "Step increment.",
+      "defaultValue": 1
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "defaultValue": false
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Orientation.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "defaultValue": "horizontal"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Label content."
+    },
+    {
+      "name": "onValueChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when value changes."
+    },
+    {
+      "name": "leading",
+      "type": "select",
+      "required": false,
+      "description": "Leading content mode for the advanced slider.",
+      "options": [
+        "none",
+        "icon",
+        "text",
+        "iconText"
+      ],
+      "defaultValue": "none"
+    },
+    {
+      "name": "leadingIcon",
+      "type": "string",
+      "required": false,
+      "description": "Leading icon name for the advanced slider."
+    },
+    {
+      "name": "leadingText",
+      "type": "string",
+      "required": false,
+      "description": "Leading text for the advanced slider."
+    },
+    {
+      "name": "crop",
+      "type": "boolean",
+      "required": false,
+      "description": "Enable crop handles in the advanced slider.",
+      "defaultValue": false
+    },
+    {
+      "name": "defaultCropRange",
+      "type": "object",
+      "required": false,
+      "description": "Uncontrolled initial crop range for the advanced slider."
+    },
+    {
+      "name": "cropRange",
+      "type": "object",
+      "required": false,
+      "description": "Controlled crop range for the advanced slider."
+    },
+    {
+      "name": "cropLocksValue",
+      "type": "boolean",
+      "required": false,
+      "description": "Clamp the value to the crop range.",
+      "defaultValue": true
+    },
+    {
+      "name": "onCropChange",
+      "type": "function",
+      "required": false,
+      "description": "Called when the crop range changes."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  ],
+  "meta": {
+    "name": "Price Range",
+    "component": "Slider",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Slider/Slider.tsx",
+    "contract": "Slider/Slider.json"
+  }
+}

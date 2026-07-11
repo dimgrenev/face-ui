@@ -1,0 +1,116 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Steps / Deployment Pipeline",
+  "description": "Deployment Pipeline product scenario for the Steps component.",
+  "framework": "react",
+  "root": {
+    "type": "Steps",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "step": {
+        "$ref": "props.step"
+      },
+      "defaultStep": {
+        "$ref": "props.defaultStep"
+      },
+      "linear": {
+        "$ref": "props.linear"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "onStepChange": {
+        "$ref": "props.onStepChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "step": 2,
+      "linear": false,
+      "items": [
+        {
+          "label": "Build",
+          "content": "Application bundle created."
+        },
+        {
+          "label": "Test",
+          "content": "Unit and integration checks passed."
+        },
+        {
+          "label": "Deploy",
+          "content": "Production rollout is in progress."
+        },
+        {
+          "label": "Verify",
+          "content": "Health checks will confirm the release."
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Step definitions."
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "description": "Current step index (0-based)."
+    },
+    {
+      "name": "defaultStep",
+      "type": "number",
+      "required": false,
+      "description": "Uncontrolled initial step index.",
+      "defaultValue": 0
+    },
+    {
+      "name": "linear",
+      "type": "boolean",
+      "required": false,
+      "description": "Linear mode: prevents skipping steps.",
+      "defaultValue": true
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire steps navigation.",
+      "defaultValue": false
+    },
+    {
+      "name": "onStepChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when the active step changes."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  ],
+  "meta": {
+    "name": "Deployment Pipeline",
+    "component": "Steps",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Steps/Steps.tsx",
+    "contract": "Steps/Steps.json"
+  }
+}

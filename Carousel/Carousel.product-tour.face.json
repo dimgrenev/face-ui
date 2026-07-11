@@ -1,0 +1,168 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Carousel / Product Tour",
+  "description": "Product Tour product scenario for the Carousel component.",
+  "framework": "react",
+  "root": {
+    "type": "Carousel",
+    "props": {
+      "children": {
+        "$ref": "props.children"
+      },
+      "slides": {
+        "$ref": "props.slides"
+      },
+      "loop": {
+        "$ref": "props.loop"
+      },
+      "autoPlay": {
+        "$ref": "props.autoPlay"
+      },
+      "autoPlayInterval": {
+        "$ref": "props.autoPlayInterval"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      },
+      "slidesPerView": {
+        "$ref": "props.slidesPerView"
+      },
+      "index": {
+        "$ref": "props.index"
+      },
+      "defaultIndex": {
+        "$ref": "props.defaultIndex"
+      },
+      "onIndexChange": {
+        "$ref": "props.onIndexChange"
+      },
+      "ariaLabel": {
+        "$ref": "props.ariaLabel"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "ariaLabel": "Product tour",
+      "loop": true,
+      "autoPlay": true,
+      "autoPlayInterval": 5000,
+      "slidesPerView": 1,
+      "slides": [
+        {
+          "src": "/assets/media/examples/office-core/lobby-day.webp",
+          "alt": "Workspace overview"
+        },
+        {
+          "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
+          "alt": "Team collaboration view"
+        },
+        {
+          "src": "/assets/media/examples/office-core/skyline-window-day.webp",
+          "alt": "Analytics overview"
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "children",
+      "type": "array",
+      "required": false,
+      "description": "Slide elements. Each child becomes one slide."
+    },
+    {
+      "name": "slides",
+      "type": "array",
+      "required": false,
+      "description": "Data-driven image slides. Composed children take precedence when both are provided."
+    },
+    {
+      "name": "loop",
+      "type": "boolean",
+      "required": false,
+      "description": "Enable infinite looping.",
+      "defaultValue": false
+    },
+    {
+      "name": "autoPlay",
+      "type": "boolean",
+      "required": false,
+      "description": "Enable automatic slide advancement.",
+      "defaultValue": false
+    },
+    {
+      "name": "autoPlayInterval",
+      "type": "number",
+      "required": false,
+      "description": "Interval in ms between auto-play transitions.",
+      "defaultValue": 3000
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Slide orientation.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "defaultValue": "horizontal"
+    },
+    {
+      "name": "slidesPerView",
+      "type": "number",
+      "required": false,
+      "description": "Number of slides visible at once.",
+      "defaultValue": 1
+    },
+    {
+      "name": "index",
+      "type": "number",
+      "required": false,
+      "description": "Controlled current slide index."
+    },
+    {
+      "name": "defaultIndex",
+      "type": "number",
+      "required": false,
+      "description": "Uncontrolled initial slide index.",
+      "defaultValue": 0
+    },
+    {
+      "name": "onIndexChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when the active slide changes."
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name for the carousel region.",
+      "defaultValue": "Carousel"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  ],
+  "meta": {
+    "name": "Product Tour",
+    "component": "Carousel",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Carousel/Carousel.tsx",
+    "contract": "Carousel/Carousel.json"
+  }
+}

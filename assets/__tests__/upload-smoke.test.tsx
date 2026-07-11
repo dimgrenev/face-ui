@@ -90,7 +90,7 @@ describe('Upload smoke', () => {
     expect(remove).not.toBeNull()
     expect(remove?.tagName).toBe('BUTTON')
     expect(remove?.getAttribute('type')).toBe('button')
-    expect(remove?.getAttribute('aria-label')).toBe('Remove file')
+    expect(remove?.getAttribute('aria-label')).toBe('Remove brief.pdf')
     expect(remove?.disabled).toBe(true)
     expect(remove?.textContent).toBe('Remove')
     expect(remove?.querySelector('[data-scope="button"][data-part="text"]')?.textContent).toBe('Remove')
@@ -128,7 +128,7 @@ describe('Upload smoke', () => {
     expect(remove?.tagName).toBe('BUTTON')
     expect(remove?.classList.contains('uf-button')).toBe(true)
     expect(remove?.getAttribute('type')).toBe('button')
-    expect(remove?.getAttribute('aria-label')).toBe('Remove file')
+    expect(remove?.getAttribute('aria-label')).toBe('Remove brief.pdf')
     expect(remove?.textContent).toBe('Remove')
     expect(remove?.querySelector('[data-scope="button"][data-part="text"]')?.textContent).toBe('Remove')
     expect(remove?.closest('.uf-membrane')).toBeNull()
@@ -138,6 +138,54 @@ describe('Upload smoke', () => {
     })
 
     expect(handleFilesChange).toHaveBeenLastCalledWith({ files: [] })
+    expect(container.querySelector('[data-scope="upload"][data-part="fileName"]')).toBeNull()
+  })
+
+  it('keeps uncontrolled selections and exposes the original browser File', async () => {
+    const handleFilesChange = vi.fn()
+
+    await act(async () => {
+      root.render(<Upload onFilesChange={handleFilesChange} />)
+    })
+
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]')
+    const source = new File(['report'], 'report.pdf', { type: 'application/pdf' })
+    Object.defineProperty(input, 'files', { configurable: true, value: [source] })
+
+    await act(async () => {
+      input?.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+
+    expect(handleFilesChange).toHaveBeenLastCalledWith({
+      files: [expect.objectContaining({ name: 'report.pdf', source })],
+    })
+    expect(container.querySelector('[data-scope="upload"][data-part="fileName"]')?.textContent).toBe('report.pdf')
+
+    await act(async () => {
+      root.render(<Upload onFilesChange={handleFilesChange} />)
+    })
+
+    expect(container.querySelector('[data-scope="upload"][data-part="fileName"]')?.textContent).toBe('report.pdf')
+  })
+
+  it('validates extension patterns against the filename', async () => {
+    const handleReject = vi.fn()
+
+    await act(async () => {
+      root.render(<Upload accept=".pdf" onReject={handleReject} />)
+    })
+
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]')
+    const source = new File(['image'], 'photo.jpg', { type: 'image/jpeg' })
+    Object.defineProperty(input, 'files', { configurable: true, value: [source] })
+
+    await act(async () => {
+      input?.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+
+    expect(handleReject).toHaveBeenCalledWith({
+      files: [expect.objectContaining({ name: 'photo.jpg', reason: 'type', source })],
+    })
     expect(container.querySelector('[data-scope="upload"][data-part="fileName"]')).toBeNull()
   })
 })

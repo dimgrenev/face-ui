@@ -1,0 +1,176 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Menu / Canvas Context Menu",
+  "description": "Canvas Context Menu product scenario for the Menu component.",
+  "framework": "react",
+  "root": {
+    "type": "Menu",
+    "props": {
+      "trigger": {
+        "$ref": "props.trigger"
+      },
+      "items": {
+        "$ref": "props.items"
+      },
+      "children": {
+        "$ref": "props.children"
+      },
+      "onSelect": {
+        "$ref": "props.onSelect"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "onOpenChange": {
+        "$ref": "props.onOpenChange"
+      },
+      "surface": {
+        "$ref": "props.surface"
+      },
+      "surfaceBreakpoint": {
+        "$ref": "props.surfaceBreakpoint"
+      },
+      "align": {
+        "$ref": "props.align"
+      },
+      "sideOffset": {
+        "$ref": "props.sideOffset"
+      },
+      "surfaceTitle": {
+        "$ref": "props.surfaceTitle"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "trigger": "context",
+      "children": "Right-click canvas",
+      "surface": "popover",
+      "align": "start",
+      "sideOffset": 2,
+      "items": [
+        {
+          "value": "duplicate",
+          "label": "Duplicate"
+        },
+        {
+          "value": "rename",
+          "label": "Rename"
+        },
+        {
+          "value": "archive",
+          "label": "Archive"
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "trigger",
+      "type": "select",
+      "required": false,
+      "description": "How the menu is triggered.",
+      "options": [
+        "click",
+        "context"
+      ],
+      "defaultValue": "click"
+    },
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Menu item definitions."
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Trigger element (the anchor)."
+    },
+    {
+      "name": "onSelect",
+      "type": "function",
+      "required": false,
+      "description": "Called when a menu item is selected."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire menu.",
+      "defaultValue": false
+    },
+    {
+      "name": "onOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    },
+    {
+      "name": "surface",
+      "type": "select",
+      "required": false,
+      "description": "Preferred content surface. Auto switches to bottom sheet on compact viewports.",
+      "options": [
+        "auto",
+        "popover",
+        "sheet"
+      ],
+      "defaultValue": "auto"
+    },
+    {
+      "name": "surfaceBreakpoint",
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch from popover to sheet."
+    },
+    {
+      "name": "align",
+      "type": "select",
+      "required": false,
+      "description": "Popover alignment relative to the trigger.",
+      "options": [
+        "start",
+        "center",
+        "end"
+      ],
+      "defaultValue": "end"
+    },
+    {
+      "name": "sideOffset",
+      "type": "number",
+      "required": false,
+      "description": "Popover distance from the trigger in pixels.",
+      "defaultValue": 4
+    },
+    {
+      "name": "surfaceTitle",
+      "type": "string",
+      "required": false,
+      "description": "Optional title used for the mobile sheet header."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
+    }
+  ],
+  "meta": {
+    "name": "Canvas Context Menu",
+    "component": "Menu",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Menu/Menu.tsx",
+    "contract": "Menu/Menu.json"
+  }
+}

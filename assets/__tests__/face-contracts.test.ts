@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { collectFaceJsonContracts } from '../contracts/sync-face-json'
+import { PRODUCT_SCENARIOS } from '../contracts/product-scenarios'
+import { collectFaceJsonContracts, collectProductScenarioContracts } from '../contracts/sync-face-json'
 import { FELD_GALLERY_META } from '../../utils/__generated__/render_gallery.meta.generated'
 
 describe('face-ui-react contracts', () => {
@@ -18,8 +19,10 @@ describe('face-ui-react contracts', () => {
       'maxFiles',
       'disabled',
       'files',
+      'defaultFiles',
       'onFilesChange',
       'onReject',
+      'labels',
       'className',
     ]
 
@@ -27,8 +30,8 @@ describe('face-ui-react contracts', () => {
     if (!upload) throw new Error('Upload contract was not found')
 
     expect(upload.changed).toBe(false)
-    expect(Object.keys(upload.currentContract.props)).toEqual(expectedProps)
-    expect(Object.keys(upload.nextContract.props)).toEqual(expectedProps)
+    expect(Object.keys(upload.currentContract.props).sort()).toEqual([...expectedProps].sort())
+    expect(Object.keys(upload.nextContract.props).sort()).toEqual([...expectedProps].sort())
     expect(upload.currentContract.props).not.toHaveProperty('size')
     expect(upload.currentContract.props).not.toHaveProperty('type')
     expect(upload.currentContract.props).not.toHaveProperty('reason')
@@ -83,6 +86,40 @@ describe('face-ui-react contracts', () => {
     }
 
     expect(offenders).toEqual([])
+  })
+
+  it('publishes exactly two standalone product face contracts for every component', () => {
+    const contracts = collectFaceJsonContracts()
+    const productContracts = collectProductScenarioContracts()
+
+    expect(Object.keys(PRODUCT_SCENARIOS).sort()).toEqual(
+      contracts.map((entry) => entry.componentName).sort(),
+    )
+    expect(productContracts).toHaveLength(contracts.length * 2)
+    expect(new Set(productContracts.map((entry) => entry.contractPath)).size).toBe(productContracts.length)
+
+    for (const entry of contracts) {
+      const componentProductContracts = productContracts
+        .filter((productContract) => productContract.componentName === entry.componentName)
+
+      expect(
+        (entry.currentContract.states || []).filter((state) => state.name.startsWith('Product / ')),
+        `${entry.componentName} should not hide product contracts inside states`,
+      ).toEqual([])
+      expect(componentProductContracts, entry.componentName).toHaveLength(2)
+      expect(new Set(componentProductContracts.map((contract) => contract.scenarioName)).size, entry.componentName).toBe(2)
+
+      for (const contract of componentProductContracts) {
+        expect(contract.changed, `${entry.componentName}: ${contract.scenarioName}`).toBe(false)
+        expect(contract.currentContract, `${entry.componentName}: ${contract.scenarioName}`).not.toBeNull()
+        expect(contract.contractPath).toMatch(/\.face\.json$/)
+        expect(contract.currentContract?.schema).toBe('face')
+        expect(contract.currentContract?.['schema-version']).toBe(1)
+        expect(contract.currentContract?.root.type).toBe(entry.componentName)
+        expect(contract.currentContract?.meta.kind).toBe('product-scenario')
+        expect(Object.keys(contract.currentContract?.currentState.props || {})).not.toHaveLength(0)
+      }
+    }
   })
 
   it('keeps gallery samples on public component contracts', () => {

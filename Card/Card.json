@@ -5,25 +5,25 @@
   "description": "Composable contained surface for cards, modal bodies, drawers, popovers, toasts, and grouped content.",
   "props": {
     "title": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Legacy title slot. Rendered through Card.Title and Text."
+      "description": "Convenience title slot rendered through Card.Title and Face UI Text."
     },
     "description": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Legacy description slot below title. Rendered through Card.Description and Text."
+      "description": "Convenience description slot rendered through Card.Description and Face UI Text."
     },
     "content": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Legacy body slot. Strings render through Text with default control inset."
+      "description": "Convenience body slot rendered through Card.Content; primitive values use Face UI Text."
     },
     "footer": {
       "type": "object",
       "controlType": "object",
       "required": false,
-      "description": "Card footer slot. Use a structured component descriptor, for example Button."
+      "description": "Convenience footer slot. Use React content or a structured component descriptor."
     },
     "variant": {
       "type": "enum",
@@ -31,8 +31,6 @@
       "required": false,
       "options": [
         "default",
-        "floating",
-        "dialog",
         "code",
         "showcase",
         "plain"
@@ -44,11 +42,9 @@
       "controlType": "select",
       "required": false,
       "options": [
-        "membrane",
         "default",
-        "showcase",
         "none",
-        "compact",
+        "membrane",
         "control",
         "spacious"
       ],
@@ -59,7 +55,6 @@
       "controlType": "select",
       "required": false,
       "options": [
-        "showcase",
         "none",
         "base",
         "sm",
@@ -94,12 +89,7 @@
         "between",
         "split"
       ],
-      "description": "Legacy footer layout. Compound usage can set Card.Footer layout directly."
-    },
-    "membrane": {
-      "type": "boolean",
-      "required": false,
-      "description": "Membrane spacing state for the root surface."
+      "description": "Layout used by the convenience footer slot. Compound usage configures Card.Footer directly."
     },
     "children": {
       "type": "string",
@@ -124,9 +114,8 @@
       }
     },
     {
-      "name": "Modal Surface",
+      "name": "Dialog Geometry",
       "props": {
-        "variant": "dialog",
         "radius": "lg",
         "footerLayout": "between",
         "title": "Confirm publish",
@@ -150,22 +139,11 @@
       }
     },
     {
-      "name": "Floating Surface",
+      "name": "Floating Geometry",
       "props": {
-        "variant": "floating",
         "padding": "membrane",
         "radius": "base",
         "content": "Compact overlay surface for menus, selects and date pickers."
-      }
-    },
-    {
-      "name": "Compact Floating Surface",
-      "props": {
-        "variant": "floating",
-        "padding": "control",
-        "radius": "base",
-        "fullWidth": false,
-        "content": "Tooltip surface with control-like padding."
       }
     },
     {
@@ -182,8 +160,6 @@
       "name": "Showcase Surface",
       "props": {
         "variant": "showcase",
-        "padding": "showcase",
-        "radius": "showcase",
         "border": false,
         "content": "Gallery preview surface"
       }
@@ -195,7 +171,7 @@
         "padding": "none",
         "radius": "none",
         "border": false,
-        "content": "Unframed card content for composition inside another surface."
+        "content": "Unframed content for composition inside another surface."
       }
     },
     {
@@ -203,15 +179,7 @@
       "props": {
         "interactive": true,
         "title": "Deploy preview",
-        "content": "Interactive surfaces can react to hover while still leaving click behavior to their children.",
-        "footer": {
-          "__componentName__": "Button",
-          "text": "Inspect",
-          "icon": "arrow-right",
-          "iconPosition": "right",
-          "membrane": true,
-          "fullWidth": false
-        }
+        "content": "Interactive surfaces can react to hover while click behavior stays with their children."
       }
     }
   ],

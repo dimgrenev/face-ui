@@ -29,7 +29,7 @@ export type InputLabelOrientation = 'vertical' | 'horizontal'
 export interface InputProps extends FormControlProps {
   /** Current input value. */
   value?: string
-  /** components API compatibility: uncontrolled initial value. */
+  /** Uncontrolled initial input value. */
   defaultValue?: string
   /** Native input id. When omitted, a stable React id is generated. */
   id?: string

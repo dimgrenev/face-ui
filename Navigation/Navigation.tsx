@@ -240,7 +240,6 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
             onClick={() => setSheetOpen(false)}
           />
           <Card
-            variant="dialog"
             padding="default"
             radius="lg"
             className="uf-responsive-panel uf-navigation-sheet"
@@ -289,7 +288,6 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
                     </Button>
                     <Card
                       {...api.getContentProps({ id: item.id, hasItems, disabled: item.disabled })}
-                      variant="floating"
                       padding="membrane"
                       radius="md"
                       fullWidth={false}

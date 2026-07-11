@@ -1,0 +1,136 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Toggle / Editor Mode",
+  "description": "Editor Mode product scenario for the Toggle component.",
+  "framework": "react",
+  "root": {
+    "type": "Toggle",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "type": {
+        "$ref": "props.type"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      },
+      "onValueChange": {
+        "$ref": "props.onValueChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "type": "single",
+      "orientation": "horizontal",
+      "defaultValue": [
+        "visual"
+      ],
+      "membrane": true,
+      "items": [
+        {
+          "value": "visual",
+          "label": "Visual"
+        },
+        {
+          "value": "code",
+          "label": "Code"
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Toggle items to render."
+    },
+    {
+      "name": "value",
+      "type": "array",
+      "required": false,
+      "description": "Currently selected values."
+    },
+    {
+      "name": "defaultValue",
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial selected values."
+    },
+    {
+      "name": "type",
+      "type": "select",
+      "required": false,
+      "description": "Selection mode: single or multiple.",
+      "options": [
+        "single",
+        "multiple"
+      ],
+      "defaultValue": "multiple"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state for the entire group."
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Layout orientation.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ]
+    },
+    {
+      "name": "onValueChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when value changes."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper around each toggle item."
+    }
+  ],
+  "meta": {
+    "name": "Editor Mode",
+    "component": "Toggle",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Toggle/Toggle.tsx",
+    "contract": "Toggle/Toggle.json"
+  }
+}

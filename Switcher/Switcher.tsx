@@ -43,8 +43,6 @@ export interface SwitcherProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onC
   textWrap?: SwitcherTextWrap
   /** Callback when checked state changes. */
   onCheckedChange?: (details: { checked: boolean }) => void
-  /** Legacy callback alias that receives the plain checked state. */
-  onChange?: (checked: boolean) => void
   /** Additional CSS class. */
   className?: string
   /** Outer membrane wrapper around control geometry. */
@@ -69,7 +67,6 @@ export const Switcher = forwardRef<HTMLDivElement, SwitcherProps>(
       withText = true,
       textWrap = 'truncate',
       onCheckedChange,
-      onChange,
       className,
       membrane = true,
       ...rest
@@ -93,8 +90,7 @@ export const Switcher = forwardRef<HTMLDivElement, SwitcherProps>(
       value,
       onCheckedChange: ((details: { checked: boolean }) => {
         if (isControlled && details.checked === checked) return
-        try { onCheckedChange?.(details) } catch {}
-        try { onChange?.(details.checked) } catch {}
+        onCheckedChange?.(details)
       }) as any,
     })
 

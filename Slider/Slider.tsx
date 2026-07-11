@@ -21,14 +21,12 @@ import {
 export type SliderVariant = 'simple' | 'advanced'
 
 export interface SliderProps {
-  /** Simple machine-driven slider or advanced slider from the legacy components library. */
+  /** Standard track/thumb presentation or enhanced value-thumb presentation. */
   variant?: SliderVariant
   /** Current value(s). Single thumb = [n], range = [min, max]. */
   value?: number[] | number
   /** Uncontrolled initial value(s). */
   defaultValue?: number[] | number
-  /** Legacy scalar value for the advanced slider. */
-  scalarValue?: number
   /** Minimum value. */
   min?: number
   /** Maximum value. */
@@ -45,8 +43,6 @@ export interface SliderProps {
   'aria-label'?: string
   /** Callback when value changes. */
   onValueChange?: (details: { value: number[] }) => void
-  /** Legacy scalar callback for the advanced slider. */
-  onChange?: (value: number) => void
   /** Leading content mode for the advanced slider. */
   leading?: SliderLeading
   /** Leading icon for the advanced slider. */
@@ -101,7 +97,6 @@ interface SliderSimpleProps extends SliderProps {
 function SliderSimple({
   value,
   defaultValue,
-  scalarValue,
   min = 0,
   max = 100,
   step = 1,
@@ -110,14 +105,12 @@ function SliderSimple({
   label,
   'aria-label': ariaLabel,
   onValueChange,
-  onChange,
   className,
   forwardedRef,
 }: SliderSimpleProps) {
   const controlledValue = normalizeValues(value)
 
-  const initialValue = normalizeValues(defaultValue)
-    ?? (typeof scalarValue === 'number' && Number.isFinite(scalarValue) ? [scalarValue] : [0])
+  const initialValue = normalizeValues(defaultValue) ?? [min]
   const isControlled = controlledValue !== undefined
   const machineValue = useControllableMachineProp(
     isControlled ? controlledValue : undefined,
@@ -125,105 +118,102 @@ function SliderSimple({
   )
 
   const handleValueChange = (details: { value: number[] }) => {
-      if (isControlled && sliderValuesEqual(details.value, controlledValue)) return
-      try { onValueChange?.(details) } catch {}
-      if (typeof onChange === 'function') {
-        try { onChange(Number(details?.value?.[0] ?? 0)) } catch {}
-      }
-    }
+    if (isControlled && sliderValuesEqual(details.value, controlledValue)) return
+    onValueChange?.(details)
+  }
 
-    const { state, send } = useMachine(sliderMachine, {
-      value: machineValue,
-      min,
-      max,
-      step,
-      disabled,
-      orientation,
-      onValueChange: handleValueChange,
-    })
+  const { state, send } = useMachine(sliderMachine, {
+    value: machineValue,
+    min,
+    max,
+    step,
+    disabled,
+    orientation,
+    onValueChange: handleValueChange,
+  })
 
-    const api = connectSlider(state, send)
-    const trackRef = useRef<HTMLDivElement | null>(null)
-    const isDragging = state.matches('dragging')
-    const renderedValues = state.context.value.length > 0 ? state.context.value : initialValue
-    const thumbLabelBase = typeof ariaLabel === 'string' && ariaLabel.trim()
-      ? ariaLabel
-      : (typeof label === 'string' && label.trim() ? label : 'Slider')
+  const api = connectSlider(state, send)
+  const trackRef = useRef<HTMLDivElement | null>(null)
+  const isDragging = state.matches('dragging')
+  const renderedValues = state.context.value.length > 0 ? state.context.value : initialValue
+  const thumbLabelBase = typeof ariaLabel === 'string' && ariaLabel.trim()
+    ? ariaLabel
+    : (typeof label === 'string' && label.trim() ? label : 'Slider')
 
-    useEffect(() => {
-      if (controlledValue !== undefined) return
-      if (state.context.value.length > 0) return
-      if (!Array.isArray(initialValue) || initialValue.length === 0) return
-      send({ type: 'SET_VALUE', value: initialValue })
-    }, [controlledValue, initialValue, send, state.context.value.length])
+  useEffect(() => {
+    if (controlledValue !== undefined) return
+    if (state.context.value.length > 0) return
+    if (initialValue.length === 0) return
+    send({ type: 'SET_VALUE', value: initialValue })
+  }, [controlledValue, initialValue, send, state.context.value.length])
 
-    const getValueFromPointer = useCallback((event: PointerEvent | { clientX: number; clientY: number }) => {
-      const el = trackRef.current
-      if (!el) return min
-      const rect = el.getBoundingClientRect()
-      if (rect.width <= 0 || rect.height <= 0) return min
-      const ratio = orientation === 'horizontal'
-        ? (event.clientX - rect.left) / rect.width
-        : (rect.bottom - event.clientY) / rect.height
-      const clamped = Math.min(1, Math.max(0, ratio))
-      return min + clamped * (max - min)
-    }, [max, min, orientation])
+  const getValueFromPointer = useCallback((event: PointerEvent | { clientX: number; clientY: number }) => {
+    const el = trackRef.current
+    if (!el) return min
+    const rect = el.getBoundingClientRect()
+    if (rect.width <= 0 || rect.height <= 0) return min
+    const ratio = orientation === 'horizontal'
+      ? (event.clientX - rect.left) / rect.width
+      : (rect.bottom - event.clientY) / rect.height
+    const clamped = Math.min(1, Math.max(0, ratio))
+    return min + clamped * (max - min)
+  }, [max, min, orientation])
 
-    useEffect(() => {
-      if (!isDragging || disabled) return undefined
+  useEffect(() => {
+    if (!isDragging || disabled) return undefined
 
-      const onPointerMove = (event: PointerEvent) => {
-        const nextValue = getValueFromPointer(event)
-        send({ type: 'DRAG', value: nextValue })
-      }
-      const onPointerUp = () => {
-        send({ type: 'DRAG_END' })
-      }
-
-      document.addEventListener('pointermove', onPointerMove)
-      document.addEventListener('pointerup', onPointerUp)
-      return () => {
-        document.removeEventListener('pointermove', onPointerMove)
-        document.removeEventListener('pointerup', onPointerUp)
-      }
-    }, [disabled, getValueFromPointer, isDragging, send])
-
-    const handleTrackPointerDown = (event: { clientX: number; clientY: number }) => {
-      if (disabled) return
-      const currentValues = renderedValues
+    const onPointerMove = (event: PointerEvent) => {
       const nextValue = getValueFromPointer(event)
-      const nearestIndex = currentValues
-        .map((current, index) => ({ index, distance: Math.abs(current - nextValue) }))
-        .sort((left, right) => left.distance - right.distance)[0]?.index ?? 0
-      send({ type: 'DRAG_START', index: nearestIndex })
       send({ type: 'DRAG', value: nextValue })
     }
+    const onPointerUp = () => {
+      send({ type: 'DRAG_END' })
+    }
 
-    return (
-      <div ref={forwardedRef} {...api.getRootProps()} className={cn('uf-slider', className)}>
-        {label != null && (
-          <Text {...(api.getLabelProps() as any)} as="label" variant="label">
-            {label}
-          </Text>
-        )}
-        <div
-          {...api.getTrackProps()}
-          ref={trackRef}
-          onPointerDown={handleTrackPointerDown}
-          className={cn('uf-slider-trackHitArea')}
-        >
-          <div {...api.getRangeProps()} />
-          {renderedValues.map((_, index) => {
-            const ariaLabel = renderedValues.length > 1
-              ? `${thumbLabelBase} ${index + 1}`
-              : thumbLabelBase
-            return (
-              <div key={index} {...api.getThumbProps(index)} aria-label={ariaLabel} />
-            )
-          })}
-        </div>
+    document.addEventListener('pointermove', onPointerMove)
+    document.addEventListener('pointerup', onPointerUp)
+    return () => {
+      document.removeEventListener('pointermove', onPointerMove)
+      document.removeEventListener('pointerup', onPointerUp)
+    }
+  }, [disabled, getValueFromPointer, isDragging, send])
+
+  const handleTrackPointerDown = (event: { clientX: number; clientY: number }) => {
+    if (disabled) return
+    const currentValues = renderedValues
+    const nextValue = getValueFromPointer(event)
+    const nearestIndex = currentValues
+      .map((current, index) => ({ index, distance: Math.abs(current - nextValue) }))
+      .sort((left, right) => left.distance - right.distance)[0]?.index ?? 0
+    send({ type: 'DRAG_START', index: nearestIndex })
+    send({ type: 'DRAG', value: nextValue })
+  }
+
+  return (
+    <div ref={forwardedRef} {...api.getRootProps()} className={cn('uf-slider', className)}>
+      {label != null && (
+        <Text {...(api.getLabelProps() as any)} as="label" variant="label">
+          {label}
+        </Text>
+      )}
+      <div
+        {...api.getTrackProps()}
+        ref={trackRef}
+        onPointerDown={handleTrackPointerDown}
+        className={cn('uf-slider-trackHitArea')}
+      >
+        <div {...api.getRangeProps()} />
+        {renderedValues.map((_, index) => {
+          const ariaLabel = renderedValues.length > 1
+            ? `${thumbLabelBase} ${index + 1}`
+            : thumbLabelBase
+          return (
+            <div key={index} {...api.getThumbProps(index)} aria-label={ariaLabel} />
+          )
+        })}
       </div>
-    )
+    </div>
+  )
 }
 
 /**
@@ -235,8 +225,6 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
   function Slider(props, ref) {
     const {
       variant = 'simple',
-      scalarValue,
-      onChange,
       orientation = 'horizontal',
       leading = 'none',
       leadingIcon,
@@ -252,8 +240,6 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
 
     const advancedFeaturesRequested =
       variant === 'advanced' ||
-      scalarValue !== undefined ||
-      typeof onChange === 'function' ||
       leading !== 'none' ||
       leadingIcon != null ||
       leadingText != null ||
@@ -272,7 +258,6 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           rootRef={ref}
           value={controlledValue}
           defaultValue={defaultValues}
-          scalarValue={scalarValue}
           min={props.min ?? 0}
           max={props.max ?? 100}
           step={props.step ?? 1}
@@ -280,7 +265,6 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           label={props.label}
           aria-label={props['aria-label']}
           onValueChange={props.onValueChange}
-          onChange={onChange}
           leading={leading}
           leadingIcon={leadingIcon}
           leadingText={leadingText}

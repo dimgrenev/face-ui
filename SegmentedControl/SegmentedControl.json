@@ -6,7 +6,7 @@
     "items": {
       "type": "array",
       "required": false,
-      "description": "Segment options inherited from Toggle."
+      "description": "Segment options."
     },
     "value": {
       "type": "array",
@@ -21,7 +21,7 @@
     "selectionMode": {
       "type": "enum",
       "required": false,
-      "description": "selectionMode prop",
+      "description": "Selection mode: single or multiple.",
       "options": [
         "single",
         "multiple"
@@ -31,16 +31,23 @@
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state inherited from Toggle."
+      "description": "Disabled state for the entire group.",
+      "default": false
     },
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Layout orientation inherited from Toggle.",
+      "description": "Layout orientation.",
       "options": [
         "horizontal",
         "vertical"
-      ]
+      ],
+      "default": "horizontal"
+    },
+    "ariaLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name for the segmented group."
     },
     "onValueChange": {
       "type": "function",
@@ -55,7 +62,8 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each segment item."
+      "description": "Outer membrane wrapper around each segment item.",
+      "default": true
     }
   },
   "states": [

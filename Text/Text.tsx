@@ -128,9 +128,9 @@ export const Text = forwardRef<HTMLElement, TextProps>(
     } = props
 
     const normalizedVariant = variant === 'default' ? 'body' : variant
-    const isLabelVariant = variant === 'label'
-    // Label defaults keep control rhythm, but callers can opt out for full-surface labels.
-    const effectiveInset: TextProps['inset'] = isLabelVariant ? 'control' : inset
+    // `control` remains the default for every variant. Explicit `none` must be
+    // honored for labels embedded in full-surface controls.
+    const effectiveInset: TextProps['inset'] = inset
     const effectiveMembrane = membrane
     const selectedElement = as ?? defaultElement(variant)
     const Element = selectedElement as ElementType
@@ -170,13 +170,13 @@ export const Text = forwardRef<HTMLElement, TextProps>(
         {...rest}
       >
         {hasIcon && iconPosition === 'left' && (
-          <span className="uf-text__icon">{typeof icon === 'string' ? <Icon name={icon as any} /> : icon}</span>
+          <span className="uf-text__icon">{typeof icon === 'string' ? <Icon name={icon} /> : icon}</span>
         )}
         {hasContent && (
           <span className="uf-text__content">{content}</span>
         )}
         {hasIcon && iconPosition === 'right' && (
-          <span className="uf-text__icon">{typeof icon === 'string' ? <Icon name={icon as any} /> : icon}</span>
+          <span className="uf-text__icon">{typeof icon === 'string' ? <Icon name={icon} /> : icon}</span>
         )}
       </Element>
     )

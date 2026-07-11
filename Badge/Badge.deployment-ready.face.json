@@ -1,0 +1,82 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Badge / Deployment Ready",
+  "description": "Deployment Ready product scenario for the Badge component.",
+  "framework": "react",
+  "root": {
+    "type": "Badge",
+    "props": {
+      "text": {
+        "$ref": "props.text"
+      },
+      "appearance": {
+        "$ref": "props.appearance"
+      },
+      "tone": {
+        "$ref": "props.tone"
+      },
+      "children": {
+        "$ref": "props.children"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "text": "Ready to deploy",
+      "appearance": "fill",
+      "tone": "positive"
+    }
+  },
+  "controls": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "Badge text content"
+    },
+    {
+      "name": "appearance",
+      "type": "select",
+      "required": false,
+      "description": "Fill or outline appearance",
+      "options": [
+        "fill",
+        "outline"
+      ],
+      "defaultValue": "outline"
+    },
+    {
+      "name": "tone",
+      "type": "select",
+      "required": false,
+      "description": "Semantic status tone. Combines with fill or outline appearance.",
+      "options": [
+        "neutral",
+        "accent",
+        "positive",
+        "warning",
+        "destructive"
+      ],
+      "defaultValue": "neutral"
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Custom children content (overrides text)"
+    }
+  ],
+  "meta": {
+    "name": "Deployment Ready",
+    "component": "Badge",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Badge/Badge.tsx",
+    "contract": "Badge/Badge.json"
+  }
+}

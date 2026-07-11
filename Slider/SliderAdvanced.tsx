@@ -25,7 +25,6 @@ export interface SliderAdvancedProps {
   rootRef?: Ref<HTMLDivElement>
   value?: number[]
   defaultValue?: number[]
-  scalarValue?: number
   min?: number
   max?: number
   step?: number
@@ -40,7 +39,6 @@ export interface SliderAdvancedProps {
   defaultCropRange?: SliderCropRange
   cropRange?: SliderCropRange
   cropLocksValue?: boolean
-  onChange?: (value: number) => void
   onValueChange?: (details: { value: number[] }) => void
   onCropChange?: (range: SliderCropRange) => void
 }
@@ -68,7 +66,6 @@ export function SliderAdvanced({
   rootRef,
   value,
   defaultValue,
-  scalarValue,
   min = 0,
   max = 100,
   step = 1,
@@ -83,7 +80,6 @@ export function SliderAdvanced({
   defaultCropRange,
   cropRange,
   cropLocksValue = true,
-  onChange,
   onValueChange,
   onCropChange,
 }: SliderAdvancedProps) {
@@ -96,7 +92,7 @@ export function SliderAdvanced({
     return clamp(snapped, mn, mx)
   }
 
-  const controlledValue = resolveScalar(scalarValue ?? value)
+  const controlledValue = resolveScalar(value)
   const defaultScalar = resolveScalar(defaultValue) ?? mn
   const isControlled = controlledValue !== undefined
 
@@ -137,14 +133,19 @@ export function SliderAdvanced({
   const lastDragValueRef = useRef<number | null>(null)
   const lastDragCropRef = useRef<SliderCropRange | null>(null)
   const optimisticValueRef = useRef<number | null>(null)
+  const optimisticBaseValueRef = useRef<number | null>(null)
 
   const clearOptimisticValue = () => {
     optimisticValueRef.current = null
+    optimisticBaseValueRef.current = null
     setOptimisticValue(null)
   }
 
   const setOptimisticControlledValue = (next: number) => {
     if (!isControlled) return
+    if (optimisticValueRef.current == null) {
+      optimisticBaseValueRef.current = controlledValue as number
+    }
     optimisticValueRef.current = next
     setOptimisticValue(next)
   }
@@ -158,9 +159,10 @@ export function SliderAdvanced({
     const next = snapToStep(controlledValue as number)
     if (!draggingRef.current) setInternalValue(next)
     if (optimisticValueRef.current == null) return
-    if (optimisticValueRef.current === next || !draggingRef.current) {
-      clearOptimisticValue()
-    }
+
+    const parentAcknowledged = optimisticValueRef.current === next
+    const parentOverrode = optimisticBaseValueRef.current != null && optimisticBaseValueRef.current !== next
+    if (parentAcknowledged || parentOverrode) clearOptimisticValue()
   }, [controlledValue, isControlled, mn, mx, safeStep])
 
   useEffect(() => {
@@ -201,9 +203,8 @@ export function SliderAdvanced({
     const normalized = normalizeValueToCrop(committedValue, committedCrop)
     if (!Number.isFinite(normalized) || normalized === committedValue) return
     if (!isControlled) setInternalValue(normalized)
-    onChange?.(normalized)
     onValueChange?.({ value: [normalized] })
-  }, [cropLocks, committedValue, committedCrop.min, committedCrop.max, isControlled, onChange, onValueChange])
+  }, [cropLocks, committedValue, committedCrop.min, committedCrop.max, isControlled, onValueChange])
 
   const decimals = useMemo(() => {
     const match = String(safeStep).match(/\.(\d+)/)
@@ -320,7 +321,6 @@ export function SliderAdvanced({
     } else if (options.commit !== false) {
       setInternalValue(normalized)
     }
-    onChange?.(normalized)
     onValueChange?.({ value: [normalized] })
   }
 

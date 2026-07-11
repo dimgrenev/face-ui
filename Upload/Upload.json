@@ -39,6 +39,11 @@
       "required": false,
       "description": "Controlled file list."
     },
+    "defaultFiles": {
+      "type": "array",
+      "required": false,
+      "description": "Initial file list for uncontrolled usage."
+    },
     "onFilesChange": {
       "type": "function",
       "required": false,
@@ -48,6 +53,11 @@
       "type": "function",
       "required": false,
       "description": "Callback when files are rejected."
+    },
+    "labels": {
+      "type": "object",
+      "required": false,
+      "description": "Localized interface labels."
     },
     "className": {
       "type": "string",

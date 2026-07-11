@@ -1,0 +1,277 @@
+/**
+ * Face UI - Component Runtime Tokens
+ *
+ * Component-owned defaults that do not belong to the design-system
+ * foundation or theme layers. This file is an input for tokens.css.
+ */
+
+:root {
+  /* Compatibility aliases retained for existing consumers. */
+  --background: var(--uf-color-background);
+  --foreground: var(--uf-color-foreground);
+  --border: var(--uf-color-border);
+  --panel-bg: var(--uf-color-panel);
+  --header-bg: var(--uf-color-header);
+  --input-bg: var(--uf-color-input);
+  --active-bg: var(--uf-color-active);
+  --active-text: var(--uf-color-active-text);
+  --secondary-text: var(--uf-color-text-secondary);
+  --hover-bg: var(--uf-color-hover);
+  --uf-spacing-xs: var(--uf-spacing-1);
+  --uf-spacing-sm: var(--uf-spacing-2);
+  --uf-spacing-md: var(--uf-spacing-4);
+  --uf-spacing-lg: var(--uf-spacing-6);
+  --uf-spacing-xl: var(--uf-spacing-10);
+  --uf-spacing-2xl: var(--uf-spacing-16);
+  --uf-spacing-panel: var(--uf-spacing-5);
+  --uf-spacing-section: var(--uf-spacing-8);
+  --uf-spacing-container: var(--uf-spacing-10);
+
+  /* ---------------------------------------------------------------
+   * Component defaults
+   * --------------------------------------------------------------- */
+  --uf-button-outline-width: var(--uf-border-width-thin);
+  --uf-button-focus-ring-width: var(--uf-border-width-base);
+  --uf-tile-bg: var(--uf-color-black-0);
+  --uf-tile-fg: var(--uf-color-fg);
+  --uf-tile-hover-bg: var(--uf-color-hover-bg);
+  --uf-tile-pad: calc(var(--uf-membrane) * 3);
+  --uf-tile-pad-y: var(--uf-tile-pad);
+  --uf-tile-pad-x: var(--uf-tile-pad);
+  --uf-tile-level-compensation: calc(var(--uf-membrane) * 6);
+  --uf-tile-action-size: calc(var(--uf-control-height) - (var(--uf-tile-pad) * 2) - (var(--uf-membrane) * 2));
+  --uf-tile-focus-ring-width: var(--uf-border-width-base);
+  --uf-card-bg: var(--uf-overlay-surface-bg);
+  --uf-card-background: linear-gradient(var(--uf-card-bg), var(--uf-card-bg)), var(--uf-overlay-surface-underlay-bg);
+  --uf-card-padding-default: var(--uf-panel-pad-x);
+  --uf-badge-bg: var(--uf-color-hover-bg);
+  --uf-badge-fg: var(--uf-color-fg);
+  --uf-badge-border: var(--uf-color-border);
+  --uf-badge-outline-width: var(--uf-border-width-thin);
+  --uf-checkbox-control-size: 20px;
+  --uf-radio-indicator-size: 10px;
+  --uf-switcher-control-size: 32px;
+  --uf-switcher-thumb-size: 16px;
+  --uf-switcher-thumb-left: 2px;
+  --uf-switcher-thumb-top: 2px;
+  --uf-switcher-thumb-translate-x: 12px;
+  --uf-switcher-track-inset-block: 4px;
+  --uf-switcher-track-inset-inline: 4px;
+  --uf-switcher-track-radius: var(--uf-radius-full);
+  --uf-toggle-border-width: var(--uf-border-width-thin);
+  --uf-input-icon-size: 20px;
+  --uf-input-required-gap: 4px;
+  --uf-separator-line-width: var(--uf-border-width-thin);
+  --uf-spinner-size: 20px;
+  --uf-spinner-size-sm: 14px;
+  --uf-spinner-border-width: 2px;
+  --uf-spinner-border-width-sm: 2px;
+  --uf-progress-track-height: var(--uf-spacing-1);
+  --uf-progress-label-min-width: 36px;
+  --uf-progress-circle-size: var(--uf-control-height);
+  --uf-rating-gap: 4px;
+  --uf-slider-line-size: 4px;
+  --uf-slider-track-hit-size: 20px;
+  --uf-slider-thumb-size: 16px;
+  --uf-slider-row-gap: 8px;
+  --uf-slider-leading-gap: 8px;
+  --uf-slider-edge-gap: 8px;
+  --uf-slider-body-basis: 160px;
+  --uf-slider-thumb-w-fallback: var(--uf-slider-thumb-size);
+  --uf-slider-crop-thumb-pad-fallback: 4px;
+  --uf-slider-crop-marker-w: 20px;
+  --uf-slider-crop-marker-h: 20px;
+  --uf-slider-crop-allowed-expand: 8px;
+  --uf-calendar-cell-size: 32px;
+  --uf-calendar-nav-size: 32px;
+  --uf-calendar-weekday-height: 24px;
+  --uf-date-panel-pad: var(--uf-spacing-3);
+  --uf-date-sheet-gap: var(--uf-spacing-2);
+  --uf-date-sheet-inset: var(--uf-spacing-3);
+  --uf-date-sheet-enter-y: 8px;
+  --uf-date-content-max-width: 320px;
+  --uf-date-content-max-height: 420px;
+  --uf-date-content-viewport-gap: var(--uf-spacing-3);
+  --uf-menu-min-w: 180px;
+  --uf-menu-border-width: var(--uf-border-width-thin);
+  --uf-menu-separator-h: var(--uf-border-width-thin);
+  --uf-menu-sheet-gap: var(--uf-spacing-2);
+  --uf-menu-sheet-inset: var(--uf-spacing-2);
+  --uf-menu-sheet-enter-y: 6px;
+  --uf-selector-indicator-gap: var(--uf-spacing-1);
+  --uf-selector-indicator-offset-inline-start: calc(var(--uf-membrane) * -2);
+  --uf-selector-indicator-edge-gap: var(--uf-spacing-1);
+  --uf-selector-indicator-size: var(--uf-icon-size);
+  --uf-select-content-max-height: 320px;
+  --uf-select-indicator-gap: var(--uf-selector-indicator-gap);
+  --uf-select-indicator-edge-gap: var(--uf-selector-indicator-edge-gap);
+  --uf-select-indicator-size: var(--uf-selector-indicator-size);
+  --uf-select-panel-pad: var(--uf-spacing-2);
+  --uf-select-sheet-gap: var(--uf-spacing-2);
+  --uf-select-sheet-inset: var(--uf-spacing-2);
+  --uf-select-sheet-enter-y: 6px;
+  --uf-command-border-width: var(--uf-border-width-thin);
+  --uf-command-list-max-height: 320px;
+  --uf-command-dialog-inset: var(--uf-spacing-4);
+  --uf-command-dialog-enter-y: 8px;
+  --uf-command-dialog-viewport-gap: var(--uf-spacing-4);
+  --uf-command-dialog-list-viewport-gap: var(--uf-spacing-3);
+  --uf-modal-pad: var(--uf-spacing-4);
+  --uf-modal-max-w: 520px;
+  --uf-modal-enter-y: 10px;
+  --uf-modal-viewport-gap: var(--uf-spacing-4);
+  --uf-modal-sheet-gap: var(--uf-spacing-3);
+  --uf-modal-sheet-inset: var(--uf-spacing-3);
+  --uf-modal-side-w-default: 420px;
+  --uf-modal-side-enter-x: 16px;
+  --uf-modal-stack-h-default: 420px;
+  --uf-modal-zero-blur: 0px;
+  --uf-overlay-content-border-width: var(--uf-border-width-thin);
+  --uf-overlay-content-max-w: 420px;
+  --uf-responsive-panel-pad: var(--uf-spacing-4);
+  --uf-responsive-panel-inset: var(--uf-spacing-3);
+  --uf-responsive-panel-enter-y: 10px;
+  --uf-responsive-panel-border-width: var(--uf-border-width-thin);
+  --uf-responsive-overlay-zero-blur: 0px;
+  --uf-sidebar-sheet-w-default: 320px;
+  --uf-sidebar-sheet-viewport-gap: var(--uf-spacing-3);
+  --uf-sidebar-inset: var(--uf-panel-pad-x);
+  --uf-resizable-handle-size: var(--uf-workspace-resize-line-width, 1px);
+  --uf-resizable-handle-hit-size: var(--uf-workspace-resize-hit-size, 20px);
+  --uf-resizable-handle-hit-offset: calc((var(--uf-resizable-handle-hit-size) - var(--uf-resizable-handle-size)) / -2);
+  --uf-resizable-handle-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-color-border-hover));
+  --uf-navigation-content-min-width: 220px;
+  --uf-navigation-nested-inset: var(--uf-spacing-3);
+  --uf-navigation-sheet-viewport-gap: var(--uf-spacing-3);
+  --uf-table-divider-width: var(--uf-border-width-thin);
+  --uf-table-row-number-width: 44px;
+  --uf-table-sort-icon-gap: 4px;
+  --uf-table-resize-hit-width: var(--uf-workspace-resize-hit-size, 20px);
+  --uf-table-resize-line-width: var(--uf-workspace-resize-line-width, 1px);
+  --uf-table-resize-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-color-border-hover));
+  --uf-table-resize-line-offset-x: calc(var(--uf-table-resize-hit-width) - var(--uf-table-resize-line-width));
+  --uf-table-resize-line-inset-y: 6px;
+  --uf-table-membrane-cell-pad-x: var(--uf-spacing-2);
+  --uf-tabs-rail-h: 32px;
+  --uf-tabs-indicator-h: 2px;
+  --uf-tabs-line-gap: var(--uf-spacing-2);
+  --uf-toast-border-width: var(--uf-membrane);
+  --uf-toast-compact-inset: var(--uf-spacing-1);
+  --uf-toast-viewport-inset: calc(var(--uf-spacing-2) + (var(--uf-spacing-1) / 2));
+  --uf-toast-container-max-width: calc((var(--uf-spacing-12) * 8) - var(--uf-spacing-1));
+  --uf-toc-rail-w: 2px;
+  --uf-toc-indicator-w: 2px;
+  --uf-toc-line-gap: var(--uf-spacing-2);
+  --uf-toc-line-inset: var(--uf-spacing-2);
+  --uf-tree-branch-indicator-size: 16px;
+  --uf-breadcrumb-separator-w: 12px;
+  --uf-breadcrumb-separator-h: 12px;
+  --uf-carousel-viewport-pad: var(--uf-spacing-2);
+  --uf-carousel-controls-inset: var(--uf-spacing-2);
+  --uf-carousel-preview-min-height: 400px;
+  --uf-media-fallback-size: 160px;
+  --uf-scroll-card-inset: var(--uf-card-padding-default);
+  --uf-gallery-inset: var(--uf-panel-pad-x);
+  --uf-code-header-pad: var(--uf-spacing-3);
+  --uf-code-line-number-width: 44px;
+  --uf-code-scroll-max-height: 420px;
+  --uf-code-fade-h: 24px;
+  --uf-code-fade-height: var(--uf-code-fade-h);
+  --uf-markdown-block-gap: var(--uf-spacing-3);
+  --uf-markdown-heading-gap: var(--uf-spacing-2);
+  --uf-markdown-list-indent: var(--uf-spacing-5);
+  --uf-markdown-list-item-gap: var(--uf-spacing-1);
+  --uf-markdown-task-gap: var(--uf-spacing-2);
+  --uf-markdown-code-pad-x: 6px;
+  --uf-markdown-code-pad-y: 2px;
+  --uf-markdown-table-pad-x: var(--uf-spacing-2);
+  --uf-markdown-table-pad-y: var(--uf-spacing-2);
+  --uf-markdown-table-border-width: var(--uf-border-width-thin);
+  --uf-markdown-blockquote-border-width: var(--uf-border-width-thick);
+  --uf-markdown-checkbox-size: 16px;
+  --uf-markdown-underline-offset: 2px;
+  --uf-markdown-h1-size: 2em;
+  --uf-markdown-h2-size: 1.5em;
+  --uf-markdown-h3-size: 1.25em;
+  --uf-markdown-h4-size: 1.1em;
+  --uf-markdown-h5-size: 1em;
+
+  /* ---------------------------------------------------------------
+   * Z-index layers
+   * --------------------------------------------------------------- */
+  --uf-z-dropdown: 2300;
+  --uf-z-overlay: 1900;
+  --uf-z-modal: 2100;
+  --uf-z-toast: 2400;
+
+  /* ---------------------------------------------------------------
+   * Extended motion
+   * --------------------------------------------------------------- */
+  --uf-motion-duration-fast: 120ms;
+  --uf-motion-duration-short: 150ms;
+  --uf-motion-duration-control: 200ms;
+  --uf-motion-duration-medium: 250ms;
+  --uf-motion-duration-emphasis: 400ms;
+  --uf-motion-duration-spin: 1000ms;
+  --uf-motion-duration-loading: 1500ms;
+  --uf-motion-duration-skeleton: 2000ms;
+  --uf-motion-duration-reduced: 0.01ms;
+  --uf-motion-iteration-indefinite: infinite;
+  --uf-motion-ease-standard: ease;
+  --uf-motion-ease-out: ease-out;
+  --uf-motion-ease-in-out: ease-in-out;
+  --uf-motion-ease-linear: linear;
+  --uf-motion-ease-emphasized: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --uf-motion-fast: var(--uf-motion-duration-fast);
+  --uf-motion-snappy: var(--uf-motion-duration-short);
+  --uf-motion-normal: var(--uf-motion-duration-control);
+  --uf-motion-slow: var(--uf-motion-duration-medium);
+  --uf-ease-standard: var(--uf-motion-ease-standard);
+  --uf-ease-out: var(--uf-motion-ease-out);
+  --uf-ease-in-out: var(--uf-motion-ease-in-out);
+  --uf-duration-enter: 300ms;
+  --uf-duration-exit: 200ms;
+  --uf-ease-enter: cubic-bezier(0.32, 0.72, 0, 1);
+  --uf-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --uf-motion-duration-fast: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-short: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-control: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-medium: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-emphasis: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-spin: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-loading: var(--uf-motion-duration-reduced);
+    --uf-motion-duration-skeleton: var(--uf-motion-duration-reduced);
+    --uf-motion-iteration-indefinite: 1;
+    --uf-duration-enter: var(--uf-motion-duration-reduced);
+    --uf-duration-exit: var(--uf-motion-duration-reduced);
+  }
+}
+
+/* ---------------------------------------------------------------
+ * Size containers (compact / large)
+ * --------------------------------------------------------------- */
+.uf-compact {
+  --uf-control-height: 28px;
+  --uf-control-font-size: 13px;
+  --uf-control-line-height: 18px;
+  --uf-control-pad-y: 5px;
+  --uf-control-pad-text: 10px;
+  --uf-control-pad-icon: 5px;
+  --uf-control-gap: 8px;
+  --uf-content-inset: 10px;
+}
+
+.uf-large {
+  --uf-control-height: 40px;
+  --uf-control-font-size: 16px;
+  --uf-control-line-height: 24px;
+  --uf-control-pad-y: 8px;
+  --uf-control-pad-text: 16px;
+  --uf-control-pad-icon: 8px;
+  --uf-control-gap: 12px;
+  --uf-content-inset: 16px;
+}

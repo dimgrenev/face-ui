@@ -13,6 +13,7 @@
 import { forwardRef, useId, useCallback, useEffect, useState, type MutableRefObject, type ReactNode, type HTMLAttributes, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import { useMachine } from '../assets/adapters/react/use-machine'
+import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
 import {
   DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
   useIsCompactViewport,
@@ -36,7 +37,7 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   open?: boolean
   /** Visual placement variant. */
   variant?: ModalVariant
-  /** components API compatibility: overlay click behavior. */
+  /** Close the modal when its backdrop is clicked. */
   closeOnOverlayClick?: boolean
   /** Whether the modal can be closed via Escape / backdrop click. */
   closable?: boolean
@@ -66,6 +67,8 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   surfaceBreakpoint?: number
   /** Move focus into the modal when it opens. Disable for bounded previews that render open modals inline. */
   autoFocusOnOpen?: boolean
+  /** Lock body scroll while the modal is open. Opt-in; off by default. */
+  scrollLock?: boolean
   /** Render overlay into document.body. Disable for bounded component previews. */
   portal?: boolean
   /** Additional class name for the content element. */
@@ -76,18 +79,12 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   positionerClassName?: string
 }
 
-interface ModalLegacyProps {
-  isOpen?: boolean
-  onClose?: () => void
-}
-
 // ---------------------------------------------------------------------------
 // Modal
 // ---------------------------------------------------------------------------
 
 export const Modal = forwardRef<HTMLDivElement, ModalProps>(
   function Modal(props, ref) {
-    const legacyProps = props as ModalProps & ModalLegacyProps
     const {
       open,
       variant = 'right',
@@ -104,6 +101,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       surface = 'auto',
       surfaceBreakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
       autoFocusOnOpen = true,
+      scrollLock = false,
       portal = true,
       className,
       backdropClassName,
@@ -130,23 +128,21 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       setPortalTarget(document.body)
     }, [])
 
-    const resolvedOpen = typeof open === 'boolean' ? open : legacyProps.isOpen
     const { state, send } = useMachine<ModalSchema>(modalMachine, {
-      open: resolvedOpen,
+      open,
       variant: effectiveVariant,
       closable,
       autoFocusOnOpen,
       titleId,
       descriptionId,
       onOpenChange: ((details: { open: boolean }) => {
-        try { onOpenChange?.(details) } catch {}
-        if (!details?.open) {
-          try { legacyProps.onClose?.() } catch {}
-        }
+        onOpenChange?.(details)
       }) as any,
     })
-    const controlledOpen = typeof resolvedOpen === 'boolean' ? resolvedOpen : null
+    const controlledOpen = typeof open === 'boolean' ? open : null
     const isMachineOpen = state.matches('open')
+
+    useBodyScrollLock(isMachineOpen && scrollLock)
 
     useEffect(() => {
       if (controlledOpen === null || controlledOpen === isMachineOpen) return
@@ -158,7 +154,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
     const isPrimitiveTrigger = typeof trigger === 'string' || typeof trigger === 'number'
     const backdropProps = api.getBackdropProps() as any
     if (!closeOnOverlayClick) {
-      try { delete backdropProps.onClick } catch {}
+      delete backdropProps.onClick
     }
 
     const handleRef = useCallback(
@@ -193,7 +189,6 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
             ref={handleRef}
             {...api.getContentProps()}
             data-surface={resolvedSurface}
-            variant="dialog"
             padding="default"
             radius={contentRadius}
             border={contentBorder}

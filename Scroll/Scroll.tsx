@@ -2,7 +2,7 @@
  * Scroll — native scroll area.
  *
  * `<Scroll>{content}</Scroll>`
- * `<Scroll type="always" orientation="both">{content}</Scroll>`
+ * `<Scroll orientation="both">{content}</Scroll>`
  */
 
 import { forwardRef, type ReactNode } from 'react'
@@ -21,13 +21,9 @@ export const scrollAnatomy = createAnatomy('scroll').parts('root', 'viewport')
 // Types
 // ---------------------------------------------------------------------------
 
-export type ScrollbarVisibility = 'auto' | 'always' | 'hover' | 'scroll'
-
 export interface ScrollProps {
   /** Content to make scrollable. */
   children?: ReactNode
-  /** Legacy visibility hint. Native scrollbar rendering is browser-owned. */
-  type?: ScrollbarVisibility
   /** Which axes can scroll. */
   orientation?: 'vertical' | 'horizontal' | 'both'
   /** Additional class name on the root element. */
@@ -60,7 +56,6 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(
   function Scroll(props, ref) {
     const {
       children,
-      type = 'auto',
       orientation = 'vertical',
       className,
       height = 240,
@@ -86,7 +81,6 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(
         variant="code"
         padding="none"
         radius="base"
-        data-type={type}
         data-orientation={orientation}
         className={cn('uf-scroll', className)}
         style={{ height }}

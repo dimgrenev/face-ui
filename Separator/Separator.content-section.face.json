@@ -1,0 +1,67 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Separator / Content Section",
+  "description": "Content Section product scenario for the Separator component.",
+  "framework": "react",
+  "root": {
+    "type": "Separator",
+    "props": {
+      "orientation": {
+        "$ref": "props.orientation"
+      },
+      "decorative": {
+        "$ref": "props.decorative"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "orientation": "horizontal",
+      "decorative": false,
+      "membrane": true
+    }
+  },
+  "controls": [
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Separator direction",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "defaultValue": "horizontal"
+    },
+    {
+      "name": "decorative",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the separator is purely decorative",
+      "defaultValue": true
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing",
+      "defaultValue": true
+    }
+  ],
+  "meta": {
+    "name": "Content Section",
+    "component": "Separator",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Separator/Separator.tsx",
+    "contract": "Separator/Separator.json"
+  }
+}

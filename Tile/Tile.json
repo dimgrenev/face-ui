@@ -20,8 +20,7 @@
       "description": "Visual variant.",
       "options": [
         "default",
-        "ghost",
-        "accent"
+        "ghost"
       ],
       "default": "default"
     },
@@ -42,10 +41,9 @@
     "density": {
       "type": "enum",
       "required": false,
-      "description": "Internal spacing density. Default follows Button text padding; compact tightens tree/sidebar rows; spacious gives inspection rows more breathing room.",
+      "description": "Internal spacing density. Default follows the shared control rhythm; spacious gives inspection rows more breathing room.",
       "options": [
         "default",
-        "compact",
         "spacious"
       ],
       "default": "default"
@@ -225,7 +223,6 @@
       "name": "Tree Row",
       "props": {
         "intent": "tree",
-        "density": "compact",
         "text": "src/components/Button.tsx",
         "icon": "file",
         "level": 2

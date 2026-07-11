@@ -38,6 +38,12 @@
       "required": false,
       "description": "Label content."
     },
+    "ariaLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name used when no visible label is provided.",
+      "default": "Rating"
+    },
     "onValueChange": {
       "type": "function",
       "required": false,

@@ -42,7 +42,7 @@ describe('Tabs a11y and keyboard baseline', () => {
   }
 
   function getPanel(value: string): HTMLElement {
-    const panel = container.querySelector<HTMLElement>(`#tabs\\:content\\:${value}`)
+    const panel = container.querySelector<HTMLElement>(`[role="tabpanel"][data-value="${value}"]`)
     expect(panel).not.toBeNull()
     return panel as HTMLElement
   }
@@ -69,7 +69,7 @@ describe('Tabs a11y and keyboard baseline', () => {
 
     expect(tablist).not.toBeNull()
     expect(tablist?.getAttribute('aria-orientation')).toBe('vertical')
-    expect(overviewTab.id).toBe('tabs:trigger:overview')
+    expect(overviewTab.id).toMatch(/^tabs:[^:]+:trigger:overview$/)
     expect(overviewTab.getAttribute('aria-selected')).toBe('true')
     expect(overviewTab.getAttribute('aria-controls')).toBe(overviewPanel.id)
     expect(overviewTab.getAttribute('data-orientation')).toBe('vertical')

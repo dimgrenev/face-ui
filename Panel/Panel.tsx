@@ -19,12 +19,9 @@ import { useControllableOpenState } from '../assets/adapters/react/use-controlla
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
 import { sidebarMachine, connectSidebar } from '../assets/machines/sidebar.machine'
 import { cn } from '../assets/utils'
-import { Bar } from '../Bar/Bar'
 import { Button } from '../Button/Button'
 import { Card } from '../Card/Card'
 import { Icon } from '../Icon/Icon'
-import { Text } from '../Text/Text'
-import { Tree } from '../Tree/Tree'
 import type { NavItemBase } from '../assets/nav-item'
 
 // ---------------------------------------------------------------------------
@@ -59,8 +56,6 @@ export interface PanelProps {
   collapsedWidth?: number | string
   /** Additional class name on the root element. */
   className?: string
-  /** Showcase-only built-in layout preset. */
-  previewPreset?: 'workspace'
   /** Surface behavior on compact viewports. */
   surface?: 'auto' | 'inline' | 'sheet'
   /** Breakpoint where auto surfaces switch to sheet mode. */
@@ -91,7 +86,8 @@ interface PanelItemRendererProps {
 function PanelItemRenderer(props: PanelItemRendererProps) {
   const { item, api, collapsed, level = 0 } = props
   const hasChildren = Array.isArray(item.items) && item.items.length > 0
-  const iconNode = item.icon && <span data-scope="sidebar" data-part="itemIcon">{item.icon}</span>
+  const resolvedIcon = typeof item.icon === 'string' ? <Icon name={item.icon} /> : item.icon
+  const iconNode = resolvedIcon && <span data-scope="sidebar" data-part="itemIcon">{resolvedIcon}</span>
 
   if (!hasChildren) {
     const itemProps = api.getItemProps({ id: item.id, disabled: item.disabled })
@@ -214,7 +210,6 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
       width = 260,
       collapsedWidth = 60,
       className,
-      previewPreset,
       surface = 'auto',
       surfaceBreakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
       open,
@@ -258,129 +253,6 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
       }
 
       return { toggleButtonProps, toggleClassName }
-    }
-
-    const previewSections = [
-      {
-        title: 'Workspace',
-        items: [
-          { id: 'overview', label: 'Overview', icon: 'layout-sidebar-left-open' as const },
-          { id: 'components', label: 'Components', icon: 'component' as const },
-          { id: 'tokens', label: 'Tokens', icon: 'props' as const },
-        ],
-      },
-      {
-        title: 'Tools',
-        items: [
-          { id: 'search', label: 'Search', icon: 'search' as const },
-          { id: 'themes', label: 'Themes', icon: 'theme' as const },
-          { id: 'settings', label: 'Settings', icon: 'settings' as const },
-        ],
-      },
-    ]
-
-    const renderWorkspacePreview = (showHeaderBar: boolean) => {
-      const { toggleButtonProps, toggleClassName } = getToggleButtonProps()
-      return (
-        <div className="uf-sidebar-preview">
-          {showHeaderBar ? (
-            <Bar className="uf-sidebar-preview-bar">
-              <Bar.LeftEllipsis>
-                <Text as="span" variant="label" fullWidth membrane truncate>
-                  {isCollapsed ? 'UF' : 'FaceUI React'}
-                </Text>
-              </Bar.LeftEllipsis>
-              <Bar.Right>
-                <Button
-                  {...toggleButtonProps}
-                  icon={<Icon name={isCollapsed ? 'layout-sidebar-left' : 'layout-sidebar-left-open'} />}
-                  iconOnly
-                  fullWidth={false}
-                  variant="default"
-                  membrane
-                  className={cn('uf-sidebar-preview-toggle', toggleClassName)}
-                  aria-label={isCollapsed ? 'Expand panel' : 'Collapse panel'}
-                />
-              </Bar.Right>
-            </Bar>
-          ) : null}
-
-          <div className="uf-sidebar-preview-body">
-            {previewSections.map((section) => (
-              <section key={section.title} className="uf-sidebar-preview-section">
-                {!isCollapsed ? (
-                  <Text
-                    as="div"
-                    variant="label"
-                    fullWidth
-                    membrane
-                    truncate
-                    className="uf-sidebar-preview-sectionTitle"
-                  >
-                    {section.title}
-                  </Text>
-                ) : null}
-                <div className="uf-sidebar-preview-items">
-                  {section.items.map((item) => {
-                    const isSelected = api.selectedId === item.id
-                    return (
-                      <Button
-                        key={item.id}
-                        icon={<Icon name={item.icon} />}
-                        iconOnly={isCollapsed}
-                        text={isCollapsed ? undefined : item.label}
-                        fullWidth
-                        align="left"
-                        stretchText
-                        membrane
-                        variant="default"
-                        data-selected={isSelected ? '' : undefined}
-                        className="uf-sidebar-preview-item"
-                        onClick={() => {
-                          send({ type: 'SELECT', id: item.id })
-                          if (isSheetSurface) setSheetOpen(false)
-                        }}
-                      />
-                    )
-                  })}
-                </div>
-              </section>
-            ))}
-
-            {!isCollapsed ? (
-              <section className="uf-sidebar-preview-section uf-sidebar-preview-section--tree">
-                <Text
-                  as="div"
-                  variant="label"
-                  fullWidth
-                  membrane
-                  truncate
-                  className="uf-sidebar-preview-sectionTitle"
-                >
-                  Structure
-                </Text>
-                <Tree
-                  className="uf-sidebar-preview-tree"
-                  defaultExpandedIds={['workspace']}
-                  items={[
-                    {
-                      id: 'workspace',
-                      label: 'Workspace',
-                      icon: 'folder',
-                      kind: 'tile',
-                      children: [
-                        { id: 'overview-screen', label: 'Overview', icon: 'layout-sidebar-left-open' },
-                        { id: 'components-screen', label: 'Components', icon: 'component' },
-                        { id: 'tokens-screen', label: 'Tokens', icon: 'props' },
-                      ],
-                    },
-                  ]}
-                />
-              </section>
-            ) : null}
-          </div>
-        </div>
-      )
     }
 
     const renderPanelItems = () => {
@@ -450,19 +322,11 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>(
               title={surfaceTitle ?? 'Panel'}
               onClose={() => setSheetOpen(false)}
             />
-            <nav className={cn('uf-sidebar', previewPreset === 'workspace' && 'uf-sidebar--workspace')}>
-              {previewPreset === 'workspace' ? renderWorkspacePreview(false) : renderPanelItems()}
+            <nav className="uf-sidebar">
+              {renderPanelItems()}
             </nav>
           </Card>
         </div>
-      )
-    }
-
-    if (previewPreset === 'workspace') {
-      return (
-        <nav ref={ref} {...api.getRootProps()} className={cn('uf-sidebar', 'uf-sidebar--workspace', className)}>
-          {renderWorkspacePreview(true)}
-        </nav>
       )
     }
 

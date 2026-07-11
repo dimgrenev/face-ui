@@ -1,0 +1,87 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Scroll / Wide Data Preview",
+  "description": "Wide Data Preview product scenario for the Scroll component.",
+  "framework": "react",
+  "root": {
+    "type": "Scroll",
+    "props": {
+      "children": {
+        "$ref": "props.children"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "height": {
+        "$ref": "props.height"
+      },
+      "ariaLabel": {
+        "$ref": "props.ariaLabel"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "orientation": "both",
+      "height": 180,
+      "ariaLabel": "Dataset preview",
+      "children": "timestamp,workspace,agent,model,input_tokens,output_tokens,latency_ms,status\n2026-07-10T09:41:00Z,production,research,gpt-5,2840,612,1842,completed"
+    }
+  },
+  "controls": [
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Content to make scrollable."
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Which axes can scroll.",
+      "options": [
+        "vertical",
+        "horizontal",
+        "both"
+      ],
+      "defaultValue": "vertical"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    {
+      "name": "height",
+      "type": "number",
+      "required": false,
+      "description": "Viewport height.",
+      "defaultValue": 240
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the scrollable region.",
+      "defaultValue": "Scrollable text"
+    }
+  ],
+  "meta": {
+    "name": "Wide Data Preview",
+    "component": "Scroll",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Scroll/Scroll.tsx",
+    "contract": "Scroll/Scroll.json"
+  }
+}

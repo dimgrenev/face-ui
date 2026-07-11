@@ -47,7 +47,6 @@ export const tileAnatomy = createAnatomy('tile').parts(
 export type TileVariant =
   | 'default'
   | 'ghost'
-  | 'accent'
 
 export type TileIntent =
   | 'option'
@@ -59,7 +58,6 @@ export type TileIntent =
 
 export type TileDensity =
   | 'default'
-  | 'compact'
   | 'spacious'
 
 export type TileTone =

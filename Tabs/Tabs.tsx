@@ -7,7 +7,7 @@
  * `<Tabs items={[{ value: 'a', label: 'Alpha', content: <p>Alpha</p> }]} value="a" />`
  */
 
-import { forwardRef, useEffect, useMemo, useRef, type MouseEvent, type ReactNode } from 'react'
+import { forwardRef, useEffect, useId, useRef, type MouseEvent, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { tabsMachine, connectTabs } from '../assets/machines/tabs.machine'
@@ -46,13 +46,6 @@ export interface TabItem {
   onAction?: (details: { value: string; event: MouseEvent<HTMLButtonElement> }) => void
 }
 
-interface LegacyTabItem {
-  id: string
-  label: ReactNode
-  content: ReactNode
-  disabled?: boolean
-}
-
 function renderTabIcon(icon: ReactNode): ReactNode {
   if (icon == null) return null
   if (typeof icon === 'string') return <Icon name={icon} />
@@ -62,16 +55,10 @@ function renderTabIcon(icon: ReactNode): ReactNode {
 export interface TabsProps {
   /** Tab definitions. Each item supports value, label, content, disabled, panelId, leadingIcon, trailingIcon, and an optional overlay action via actionIcon, actionLabel, actionVisibility, actionPosition, and onAction. */
   items?: TabItem[]
-  /** Legacy tabs alias. */
-  tabs?: LegacyTabItem[]
   /** Currently selected tab value. */
   value?: string
-  /** Legacy active tab alias. */
-  activeTab?: string
   /** Uncontrolled initial tab value. */
   defaultValue?: string
-  /** Legacy default active tab alias. */
-  defaultActiveTab?: string
   /** Orientation of the tab list. */
   orientation?: 'horizontal' | 'vertical'
   /** Activation mode: automatic selects on focus, manual requires click/Enter. */
@@ -80,10 +67,9 @@ export interface TabsProps {
   disabled?: boolean
   /** Callback when the selected tab changes. */
   onValueChange?: (details: { value: string }) => void
-  /** Legacy onChange alias. */
-  onChange?: (id: string) => void
-  /** components API compatibility (visual variants are styled via classes). */
+  /** Render the active-tab indicator line. */
   withLine?: boolean
+  /** Allow tab triggers to wrap onto multiple rows. */
   wrap?: boolean
   /** Outer membrane wrapper around each tab trigger. */
   membrane?: boolean
@@ -113,26 +99,16 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       renderPanels = true,
       className,
     } = props
-    const rawTabs = props.tabs
-    const legacyOnChange = props.onChange
-
-    const itemsFromTabs: TabItem[] = Array.isArray(rawTabs)
-      ? rawTabs.map((item) => ({
-        value: String(item.id),
-        label: item.label,
-        content: item.content,
-        disabled: item.disabled,
-      }))
-      : []
-    const items = Array.isArray(rawItems) && rawItems.length > 0 ? rawItems : itemsFromTabs
-    const controlledValue = typeof props.activeTab === 'string' ? props.activeTab : value
+    const items = Array.isArray(rawItems) ? rawItems : []
+    const controlledValue = value
     const itemOrder = items.map((item) => item.value)
     const disabledValues = items.filter((item) => item.disabled).map((item) => item.value)
     const firstEnabledValue = items.find((item) => !item.disabled)?.value ?? ''
-    const defaultMachineValue = defaultValue ?? props.defaultActiveTab ?? firstEnabledValue
+    const defaultMachineValue = defaultValue ?? firstEnabledValue
     const isControlled = controlledValue !== undefined
     const machineValue = useControllableMachineProp(controlledValue, defaultMachineValue)
-    const itemOrderSignature = useMemo(() => itemOrder.join('\u0001'), [itemOrder])
+    const itemOrderSignature = itemOrder.join('\u0001')
+    const disabledValuesSignature = disabledValues.join('\u0001')
 
     const { state, send } = useMachine(tabsMachine, {
       value: machineValue,
@@ -145,8 +121,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
         if (isControlled && details.value === controlledValue) {
           return
         }
-        try { onValueChange?.(details) } catch {}
-        try { legacyOnChange?.(details.value) } catch {}
+        onValueChange?.(details)
       }) as any,
     })
 
@@ -159,7 +134,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       const currentValue = state.context.value
       if (itemOrder.includes(currentValue) && !disabledValues.includes(currentValue)) return
       send({ type: 'SET_VALUE', value: firstEnabledValue })
-    }, [disabledValues, firstEnabledValue, isControlled, itemOrder, itemOrderSignature, send, state.context.value])
+    }, [disabledValuesSignature, firstEnabledValue, isControlled, itemOrderSignature, send, state.context.value])
 
     useEffect(() => {
       const targetValue = state.context.focusedValue
@@ -176,6 +151,8 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
         break
       }
     }, [state.context.focusedValue])
+
+    const instanceId = useId().replace(/:/g, '')
 
     return (
       <div
@@ -196,11 +173,14 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
             const actionVisibility = item.actionVisibility === 'always' ? 'always' : 'hover'
             const actionPosition = item.actionPosition === 'left-overlay' ? 'left-overlay' : 'right'
             const triggerProps = api.getTriggerProps({ value: item.value, disabled: item.disabled })
+            const triggerId = `tabs:${instanceId}:trigger:${item.value}`
+            const panelId = item.panelId || `tabs:${instanceId}:content:${item.value}`
             const tabNode = (
               <button
                 key={item.value}
                 {...triggerProps}
-                aria-controls={item.panelId || triggerProps['aria-controls']}
+                id={triggerId}
+                aria-controls={panelId}
                 className={cn('uf-tabs-tab')}
                 data-action-overlay={hasAction ? '' : undefined}
                 data-action-position={hasAction ? actionPosition : undefined}
@@ -269,11 +249,14 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
         {renderPanels
           ? items.map((item) => {
             const contentProps = api.getContentProps({ value: item.value })
+            const triggerId = `tabs:${instanceId}:trigger:${item.value}`
+            const panelId = item.panelId || `tabs:${instanceId}:content:${item.value}`
             return (
               <div
                 key={item.value}
                 {...contentProps}
-                id={item.panelId || contentProps.id}
+                id={panelId}
+                aria-labelledby={triggerId}
                 className={cn('uf-tabs-content')}
               >
                 {(typeof item.content === 'string' || typeof item.content === 'number')

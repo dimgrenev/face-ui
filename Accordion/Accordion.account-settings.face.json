@@ -1,0 +1,140 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Accordion / Account Settings",
+  "description": "Account Settings product scenario for the Accordion component.",
+  "framework": "react",
+  "root": {
+    "type": "Accordion",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "icon": {
+        "$ref": "props.icon"
+      },
+      "expandedIds": {
+        "$ref": "props.expandedIds"
+      },
+      "defaultExpandedIds": {
+        "$ref": "props.defaultExpandedIds"
+      },
+      "multiple": {
+        "$ref": "props.multiple"
+      },
+      "collapsible": {
+        "$ref": "props.collapsible"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "onExpandedChange": {
+        "$ref": "props.onExpandedChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "multiple": true,
+      "collapsible": true,
+      "defaultExpandedIds": [
+        "profile",
+        "security"
+      ],
+      "items": [
+        {
+          "value": "profile",
+          "label": "Profile and workspace",
+          "icon": "account",
+          "content": "Company details, workspace identity, and member preferences."
+        },
+        {
+          "value": "security",
+          "label": "Security",
+          "icon": "settings",
+          "content": "Single sign-on, sessions, and recovery policies."
+        },
+        {
+          "value": "billing",
+          "label": "Billing",
+          "icon": "file",
+          "content": "Plan, invoices, and payment methods."
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Accordion item definitions. Each item can include icon, matching Button icon input semantics."
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "required": false,
+      "description": "Default left icon for item triggers. Individual items can override it with item.icon."
+    },
+    {
+      "name": "expandedIds",
+      "type": "array",
+      "required": false,
+      "description": "Currently expanded item IDs (controlled)."
+    },
+    {
+      "name": "defaultExpandedIds",
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial expanded item IDs."
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "required": false,
+      "description": "Allow multiple items to be expanded simultaneously.",
+      "defaultValue": true
+    },
+    {
+      "name": "collapsible",
+      "type": "boolean",
+      "required": false,
+      "description": "Allow collapsing the last open item.",
+      "defaultValue": true
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire accordion.",
+      "defaultValue": false
+    },
+    {
+      "name": "onExpandedChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when expanded items change."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  ],
+  "meta": {
+    "name": "Account Settings",
+    "component": "Accordion",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Accordion/Accordion.tsx",
+    "contract": "Accordion/Accordion.json"
+  }
+}

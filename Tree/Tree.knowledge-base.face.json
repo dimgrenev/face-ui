@@ -1,0 +1,156 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Tree / Knowledge Base",
+  "description": "Knowledge Base product scenario for the Tree component.",
+  "framework": "react",
+  "root": {
+    "type": "Tree",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "expandedIds": {
+        "$ref": "props.expandedIds"
+      },
+      "defaultExpandedIds": {
+        "$ref": "props.defaultExpandedIds"
+      },
+      "selectedId": {
+        "$ref": "props.selectedId"
+      },
+      "defaultSelectedId": {
+        "$ref": "props.defaultSelectedId"
+      },
+      "onExpandedChange": {
+        "$ref": "props.onExpandedChange"
+      },
+      "onSelectedChange": {
+        "$ref": "props.onSelectedChange"
+      },
+      "renderNode": {
+        "$ref": "props.renderNode"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "defaultExpandedIds": [
+        "company",
+        "engineering"
+      ],
+      "defaultSelectedId": "runbooks",
+      "items": [
+        {
+          "id": "company",
+          "label": "Company wiki",
+          "icon": "folder",
+          "kind": "tile",
+          "children": [
+            {
+              "id": "policies",
+              "label": "Policies",
+              "icon": "folder",
+              "children": [
+                {
+                  "id": "security-policy",
+                  "label": "Security policy",
+                  "icon": "file"
+                }
+              ]
+            },
+            {
+              "id": "engineering",
+              "label": "Engineering",
+              "icon": "folder",
+              "children": [
+                {
+                  "id": "runbooks",
+                  "label": "Runbooks",
+                  "icon": "file",
+                  "rightText": "8"
+                },
+                {
+                  "id": "architecture",
+                  "label": "Architecture",
+                  "icon": "file"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Recursive tree nodes. Nodes may use kind \"button\", \"tile\", or \"custom\", plus icon, rightText, actions, content, or render."
+    },
+    {
+      "name": "expandedIds",
+      "type": "array",
+      "required": false,
+      "description": "Currently expanded node IDs."
+    },
+    {
+      "name": "defaultExpandedIds",
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial expanded node IDs."
+    },
+    {
+      "name": "selectedId",
+      "type": "string",
+      "required": false,
+      "description": "Currently selected node ID."
+    },
+    {
+      "name": "defaultSelectedId",
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial selected node ID."
+    },
+    {
+      "name": "onExpandedChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when expanded nodes change."
+    },
+    {
+      "name": "onSelectedChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when selected node changes."
+    },
+    {
+      "name": "renderNode",
+      "type": "function",
+      "required": false,
+      "description": "Global render override for custom node bodies. Tree still owns nesting, expansion, focus, and selection."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  ],
+  "meta": {
+    "name": "Knowledge Base",
+    "component": "Tree",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Tree/Tree.tsx",
+    "contract": "Tree/Tree.json"
+  }
+}

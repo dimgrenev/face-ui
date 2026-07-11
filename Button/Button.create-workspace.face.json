@@ -1,0 +1,232 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Button / Create Workspace",
+  "description": "Create Workspace product scenario for the Button component.",
+  "framework": "react",
+  "root": {
+    "type": "Button",
+    "props": {
+      "text": {
+        "$ref": "props.text"
+      },
+      "rightText": {
+        "$ref": "props.rightText"
+      },
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "icon": {
+        "$ref": "props.icon"
+      },
+      "iconPosition": {
+        "$ref": "props.iconPosition"
+      },
+      "iconOnly": {
+        "$ref": "props.iconOnly"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "loading": {
+        "$ref": "props.loading"
+      },
+      "stretchText": {
+        "$ref": "props.stretchText"
+      },
+      "selector": {
+        "$ref": "props.selector"
+      },
+      "selectorOpen": {
+        "$ref": "props.selectorOpen"
+      },
+      "selectorDirection": {
+        "$ref": "props.selectorDirection"
+      },
+      "fullWidth": {
+        "$ref": "props.fullWidth"
+      },
+      "align": {
+        "$ref": "props.align"
+      },
+      "level": {
+        "$ref": "props.level"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "copyText": {
+        "$ref": "props.copyText"
+      },
+      "onCopied": {
+        "$ref": "props.onCopied"
+      },
+      "children": {
+        "$ref": "props.children"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "text": "Create workspace",
+      "icon": "plus",
+      "variant": "accent",
+      "fullWidth": false,
+      "align": "left",
+      "membrane": true
+    }
+  },
+  "controls": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "Button label text."
+    },
+    {
+      "name": "rightText",
+      "type": "string",
+      "required": false,
+      "description": "Optional secondary text, rendered at the far right inside the text area."
+    },
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "Visual style variant",
+      "options": [
+        "default",
+        "primary",
+        "secondary",
+        "accent",
+        "outline",
+        "ghost",
+        "destructive",
+        "suggestion"
+      ],
+      "defaultValue": "default"
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "required": false,
+      "description": "Icon (string from registry, ReactNode, or SVG element)."
+    },
+    {
+      "name": "iconPosition",
+      "type": "select",
+      "required": false,
+      "description": "Icon position relative to text.",
+      "options": [
+        "left",
+        "right"
+      ]
+    },
+    {
+      "name": "iconOnly",
+      "type": "boolean",
+      "required": false,
+      "description": "Icon-only mode (no text, square button)."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state."
+    },
+    {
+      "name": "loading",
+      "type": "boolean",
+      "required": false,
+      "description": "Loading state (shows spinner, dims text)."
+    },
+    {
+      "name": "stretchText",
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch text area (flex:1)."
+    },
+    {
+      "name": "selector",
+      "type": "boolean",
+      "required": false,
+      "description": "Render a compact selector indicator after the label."
+    },
+    {
+      "name": "selectorOpen",
+      "type": "boolean",
+      "required": false,
+      "description": "Open state for the selector indicator."
+    },
+    {
+      "name": "selectorDirection",
+      "type": "select",
+      "required": false,
+      "description": "Direction of the selector indicator. Use side for side-panel selectors.",
+      "options": [
+        "vertical",
+        "side"
+      ]
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Full width button.",
+      "defaultValue": false
+    },
+    {
+      "name": "align",
+      "type": "select",
+      "required": false,
+      "description": "Text alignment.",
+      "options": [
+        "left",
+        "right",
+        "center"
+      ]
+    },
+    {
+      "name": "level",
+      "type": "number",
+      "required": false,
+      "description": "Nesting level for option-like rows: 0..9"
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around the button."
+    },
+    {
+      "name": "copyText",
+      "type": "string",
+      "required": false,
+      "description": "Copy text to clipboard on click (Clipboard integration)."
+    },
+    {
+      "name": "onCopied",
+      "type": "function",
+      "required": false,
+      "description": "Callback when copy succeeds."
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Custom children (overrides text/icon rendering)."
+    }
+  ],
+  "meta": {
+    "name": "Create Workspace",
+    "component": "Button",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Button/Button.tsx",
+    "contract": "Button/Button.json"
+  }
+}

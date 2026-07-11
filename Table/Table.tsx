@@ -24,8 +24,6 @@ export interface TableColumn<T = any> {
   id: string
   /** Header content (face-ui-react native). */
   header?: ReactNode
-  /** Header content alias (components API compatibility). */
-  title?: ReactNode
   /** Data accessor — string key or function returning cell content. */
   accessor?: string | ((row: T) => ReactNode)
   /** Whether this column is sortable. */
@@ -71,8 +69,6 @@ export interface TableProps<T = any> {
   showDividers?: boolean
   /** Additional CSS class. */
   className?: string
-  /** Legacy components API alias. Prefer rowKey for new code. */
-  getRowId?: (row: T, index: number) => string
   /** Callback fired while a resizable column is dragged. */
   onColumnResize?: (columnId: string, width: number) => void
   /** Enable column resizing and fixed table layout. */
@@ -105,11 +101,7 @@ function normalizeRowId(value: unknown, index: number): string {
 
 function getRowId<T>(row: T, rowKey: string | ((row: T) => string) | undefined, index: number): string {
   if (typeof rowKey === 'function') {
-    try {
-      return normalizeRowId(rowKey(row), index)
-    } catch {
-      return String(index)
-    }
+    return normalizeRowId(rowKey(row), index)
   }
   if (typeof rowKey === 'string') {
     const val = (row as Record<string, unknown>)[rowKey]
@@ -178,7 +170,6 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
       columns: rawColumns,
       rows: rawRows,
       rowKey,
-      getRowId: getRowIdProp,
       sortColumn = null,
       sortDirection = 'asc',
       onSortChange,
@@ -202,7 +193,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
 
     const columns = (Array.isArray(rawColumns) ? rawColumns : []).map((col) => {
       const c = col as TableColumn<any>
-      const normalizedHeader = c.header ?? c.title ?? c.id
+      const normalizedHeader = c.header ?? c.id
       const fallbackAccessor = (typeof (c as any).accessor === 'string' || typeof (c as any).accessor === 'function')
         ? (c as any).accessor
         : c.id
@@ -214,12 +205,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
     })
     const rows = Array.isArray(rawRows) ? rawRows : []
 
-    const resolvedGetRowId = (row: any, i: number) => {
-      if (typeof getRowIdProp === 'function') {
-        try { return normalizeRowId(getRowIdProp(row, i), i) } catch {}
-      }
-      return getRowId(row, rowKey, i)
-    }
+    const resolvedGetRowId = (row: any, i: number) => getRowId(row, rowKey, i)
 
     const allRowIds = rows.map((row, i) => resolvedGetRowId(row, i))
 
@@ -282,13 +268,13 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
             [drag.id]: width,
             [drag.nextId as string]: nextWidth,
           }))
-          try { onColumnResize?.(drag.id, width) } catch {}
-          try { onColumnResize?.(drag.nextId, nextWidth) } catch {}
+          onColumnResize?.(drag.id, width)
+          onColumnResize?.(drag.nextId, nextWidth)
           return
         }
 
         setResizedWidths((prev) => ({ ...prev, [drag.id]: width }))
-        try { onColumnResize?.(drag.id, width) } catch {}
+        onColumnResize?.(drag.id, width)
       }
       const onPointerUp = () => {
         resizeStateRef.current = null

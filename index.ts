@@ -15,7 +15,7 @@ export type { SeparatorProps } from './Separator/Separator'
 
 // Data Display (no machine)
 export { Badge, badgeAnatomy } from './Badge/Badge'
-export type { BadgeProps, BadgeVariant } from './Badge/Badge'
+export type { BadgeProps, BadgeAppearance, BadgeTone } from './Badge/Badge'
 
 export { Card, cardAnatomy } from './Card/Card'
 export type {
@@ -81,8 +81,15 @@ export type { PopoverProps } from './Popover/Popover'
 export { Menu } from './Menu/Menu'
 export type { MenuProps } from './Menu/Menu'
 
-export { Toaster, useToast, createToastContext } from './Toast/Toast'
-export type { ToastAction, ToasterProps } from './Toast/Toast'
+export { Toast, Toaster, useToast, createToastContext } from './Toast/Toast'
+export type {
+  ToastAction,
+  ToastOptions,
+  ToastPlacement,
+  ToastProps,
+  ToastTone,
+  ToasterProps,
+} from './Toast/Toast'
 
 // Navigation
 export { Tabs } from './Tabs/Tabs'
@@ -99,7 +106,7 @@ export type { StepsProps } from './Steps/Steps'
 
 // Data Display (with machine)
 export { Progress } from './Progress/Progress'
-export type { ProgressProps } from './Progress/Progress'
+export type { ProgressProps, ProgressShape, ProgressTone } from './Progress/Progress'
 
 export { Avatar } from './Avatar/Avatar'
 export type { AvatarProps } from './Avatar/Avatar'
@@ -125,7 +132,13 @@ export type { CommandProps, CommandItem, CommandGroup } from './Command/Command'
 
 // Upload / Table / Calendar / Date
 export { Upload } from './Upload/Upload'
-export type { UploadProps } from './Upload/Upload'
+export type { UploadLabels, UploadProps } from './Upload/Upload'
+export type {
+  UploadFile,
+  UploadRejectedFile,
+  UploadRejectReason,
+  UploadSourceFile,
+} from './assets/machines/upload.machine'
 
 export { Table } from './Table/Table'
 export type { TableProps, TableColumn } from './Table/Table'

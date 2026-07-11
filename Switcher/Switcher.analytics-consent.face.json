@@ -1,0 +1,166 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Switcher / Analytics Consent",
+  "description": "Analytics Consent product scenario for the Switcher component.",
+  "framework": "react",
+  "root": {
+    "type": "Switcher",
+    "props": {
+      "checked": {
+        "$ref": "props.checked"
+      },
+      "defaultChecked": {
+        "$ref": "props.defaultChecked"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "required": {
+        "$ref": "props.required"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "label": {
+        "$ref": "props.label"
+      },
+      "text": {
+        "$ref": "props.text"
+      },
+      "withText": {
+        "$ref": "props.withText"
+      },
+      "textWrap": {
+        "$ref": "props.textWrap"
+      },
+      "onCheckedChange": {
+        "$ref": "props.onCheckedChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "label": "Product analytics",
+      "text": "Share anonymous usage data to improve recommendations and reliability.",
+      "withText": true,
+      "textWrap": "wrap",
+      "defaultChecked": false,
+      "name": "analytics",
+      "value": "allowed",
+      "membrane": true
+    }
+  },
+  "controls": [
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": false,
+      "description": "Checked state (controlled)."
+    },
+    {
+      "name": "defaultChecked",
+      "type": "boolean",
+      "required": false,
+      "description": "Initial checked state (uncontrolled)."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "defaultValue": false
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Mark as required.",
+      "defaultValue": false
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Form field name.",
+      "defaultValue": ""
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Hidden input value when checked.",
+      "defaultValue": "on"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Label content (ReactNode)."
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "Text content (string shorthand, used when `withText` is true)."
+    },
+    {
+      "name": "withText",
+      "type": "boolean",
+      "required": false,
+      "description": "Show text label alongside the switch.",
+      "defaultValue": true
+    },
+    {
+      "name": "textWrap",
+      "type": "select",
+      "required": false,
+      "description": "Label text overflow: 'truncate' clips with ellipsis, 'wrap' wraps full text.",
+      "options": [
+        "truncate",
+        "wrap"
+      ],
+      "defaultValue": "truncate"
+    },
+    {
+      "name": "onCheckedChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when checked state changes."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper around control geometry.",
+      "defaultValue": true
+    }
+  ],
+  "meta": {
+    "name": "Analytics Consent",
+    "component": "Switcher",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Switcher/Switcher.tsx",
+    "contract": "Switcher/Switcher.json"
+  }
+}

@@ -2,12 +2,11 @@
  * Progress — data display indicator.
  *
  * Shows loading progress as a linear bar or circular ring with track + indicator.
- * Pass value=-1 for indeterminate state.
  *
  * `<Progress value={50} max={100} />`
- * `<Progress value={50} shape="circle" showLabel />`
- * `<Progress value={-1} label="Loading..." />`
- * `<Progress value={75} variant="success" showLabel />`
+ * `<Progress value={50} shape="circle" showValue />`
+ * `<Progress indeterminate label="Loading..." />`
+ * `<Progress value={75} tone="positive" showValue />`
  */
 
 import { forwardRef, useId, type CSSProperties, type ReactNode } from 'react'
@@ -20,24 +19,26 @@ import { Text } from '../Text/Text'
 // Types
 // ---------------------------------------------------------------------------
 
-export type ProgressVariant = 'default' | 'success' | 'warning' | 'error'
+export type ProgressTone = 'neutral' | 'positive' | 'warning' | 'destructive'
 export type ProgressShape = 'linear' | 'circle'
 
 export interface ProgressProps {
-  /** Current value. Pass -1 for indeterminate. */
+  /** Current value. Values outside 0..max are clamped for rendering and accessibility. */
   value?: number
   /** Maximum value (default 100). */
   max?: number
-  /** Color variant. */
-  variant?: ProgressVariant
+  /** Renders an unknown-duration progress state without exposing aria-valuenow. */
+  indeterminate?: boolean
+  /** Semantic feedback tone. */
+  tone?: ProgressTone
   /** Visual progress shape. */
   shape?: ProgressShape
-  /** Show percentage label in the header for linear progress or beside the ring for circular progress. */
-  showLabel?: boolean
+  /** Show the computed percentage in the header or beside a circular ring. */
+  showValue?: boolean
   /** Optional label rendered in the header for linear progress or beside the ring for circular progress. */
   label?: ReactNode
   /** Accessible label for the progressbar when no visible label is rendered. */
-  'aria-label'?: string
+  ariaLabel?: string
   className?: string
 }
 
@@ -50,17 +51,19 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
     const {
       value = 0,
       max = 100,
-      variant = 'default',
+      indeterminate = false,
+      tone = 'neutral',
       shape = 'linear',
-      showLabel = false,
+      showValue = false,
       label,
-      'aria-label': ariaLabel,
+      ariaLabel,
       className,
     } = props
 
     const { state, send } = useMachine(progressMachine, {
       value,
       max,
+      indeterminate,
     })
     const api = connectProgress(state, send)
     const generatedLabelId = useId()
@@ -83,7 +86,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         {label}
       </Text>
     ) : null
-    const valueNode = showLabel ? (
+    const valueNode = showValue && !api.isIndeterminate ? (
       <Text as="span" inset="none" membrane={false} className="uf-progress-label">
         {displayPercent}%
       </Text>
@@ -98,9 +101,9 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       <div
         ref={ref}
         {...api.getRootProps()}
-        aria-label={ariaLabel}
+        aria-label={labelId ? undefined : ariaLabel}
         aria-labelledby={labelId}
-        data-variant={variant}
+        data-tone={tone}
         data-shape={shape}
         className={cn('uf-progress', className)}
       >

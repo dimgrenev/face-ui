@@ -1,0 +1,413 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Date / Schedule Campaign",
+  "description": "Schedule Campaign product scenario for the Date component.",
+  "framework": "react",
+  "root": {
+    "type": "Date",
+    "props": {
+      "mode": {
+        "$ref": "props.mode"
+      },
+      "selection": {
+        "$ref": "props.selection"
+      },
+      "views": {
+        "$ref": "props.views"
+      },
+      "openTo": {
+        "$ref": "props.openTo"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "onValueChange": {
+        "$ref": "props.onValueChange"
+      },
+      "onOpenChange": {
+        "$ref": "props.onOpenChange"
+      },
+      "valueFormat": {
+        "$ref": "props.valueFormat"
+      },
+      "locale": {
+        "$ref": "props.locale"
+      },
+      "timezone": {
+        "$ref": "props.timezone"
+      },
+      "weekStartsOn": {
+        "$ref": "props.weekStartsOn"
+      },
+      "format": {
+        "$ref": "props.format"
+      },
+      "min": {
+        "$ref": "props.min"
+      },
+      "max": {
+        "$ref": "props.max"
+      },
+      "disabledDates": {
+        "$ref": "props.disabledDates"
+      },
+      "disabledTime": {
+        "$ref": "props.disabledTime"
+      },
+      "closeOnSelect": {
+        "$ref": "props.closeOnSelect"
+      },
+      "showNow": {
+        "$ref": "props.showNow"
+      },
+      "showClear": {
+        "$ref": "props.showClear"
+      },
+      "showPresets": {
+        "$ref": "props.showPresets"
+      },
+      "presets": {
+        "$ref": "props.presets"
+      },
+      "surface": {
+        "$ref": "props.surface"
+      },
+      "surfaceBreakpoint": {
+        "$ref": "props.surfaceBreakpoint"
+      },
+      "surfaceTitle": {
+        "$ref": "props.surfaceTitle"
+      },
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "error": {
+        "$ref": "props.error"
+      },
+      "required": {
+        "$ref": "props.required"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "readOnly": {
+        "$ref": "props.readOnly"
+      },
+      "placeholder": {
+        "$ref": "props.placeholder"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "fullWidth": {
+        "$ref": "props.fullWidth"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "mode": "datetime",
+      "selection": "single",
+      "defaultValue": "2026-08-12T09:30:00.000Z",
+      "valueFormat": "iso",
+      "locale": "en-US",
+      "timezone": "UTC",
+      "label": "Launch time",
+      "placeholder": "Choose date and time",
+      "surface": "popover",
+      "showNow": true,
+      "showClear": true,
+      "membrane": true,
+      "fullWidth": true
+    }
+  },
+  "controls": [
+    {
+      "name": "mode",
+      "type": "select",
+      "required": false,
+      "description": "Picker mode: date, datetime, time, week, month or year",
+      "options": [
+        "date",
+        "datetime",
+        "time",
+        "week",
+        "month",
+        "year"
+      ],
+      "defaultValue": "date"
+    },
+    {
+      "name": "selection",
+      "type": "select",
+      "required": false,
+      "description": "Selection model: single or range",
+      "options": [
+        "single",
+        "range"
+      ],
+      "defaultValue": "single"
+    },
+    {
+      "name": "views",
+      "type": "array",
+      "required": false,
+      "description": "Allowed views order"
+    },
+    {
+      "name": "openTo",
+      "type": "select",
+      "required": false,
+      "description": "Initial opened view",
+      "options": [
+        "month",
+        "year",
+        "day",
+        "hours",
+        "minutes"
+      ]
+    },
+    {
+      "name": "value",
+      "type": "any",
+      "required": false,
+      "description": "Controlled value (iso/date/range)"
+    },
+    {
+      "name": "defaultValue",
+      "type": "any",
+      "required": false,
+      "description": "defaultValue prop",
+      "defaultValue": null
+    },
+    {
+      "name": "onValueChange",
+      "type": "function",
+      "required": false,
+      "description": "onValueChange prop"
+    },
+    {
+      "name": "onOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "onOpenChange prop"
+    },
+    {
+      "name": "valueFormat",
+      "type": "select",
+      "required": false,
+      "description": "Value emission format: iso or date",
+      "options": [
+        "date",
+        "iso"
+      ],
+      "defaultValue": "iso"
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "required": false,
+      "description": "Formatting locale",
+      "defaultValue": "en-US"
+    },
+    {
+      "name": "timezone",
+      "type": "string",
+      "required": false,
+      "description": "Formatting timezone",
+      "defaultValue": "UTC"
+    },
+    {
+      "name": "weekStartsOn",
+      "type": "select",
+      "required": false,
+      "description": "Week start day index",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "defaultValue": 1
+    },
+    {
+      "name": "format",
+      "type": "string",
+      "required": false,
+      "description": "format prop"
+    },
+    {
+      "name": "min",
+      "type": "any",
+      "required": false,
+      "description": "min prop",
+      "defaultValue": null
+    },
+    {
+      "name": "max",
+      "type": "any",
+      "required": false,
+      "description": "max prop",
+      "defaultValue": null
+    },
+    {
+      "name": "disabledDates",
+      "type": "array",
+      "required": false,
+      "description": "disabledDates prop"
+    },
+    {
+      "name": "disabledTime",
+      "type": "object",
+      "required": false,
+      "description": "disabledTime prop"
+    },
+    {
+      "name": "closeOnSelect",
+      "type": "boolean",
+      "required": false,
+      "description": "Close panel after completing selection"
+    },
+    {
+      "name": "showNow",
+      "type": "boolean",
+      "required": false,
+      "description": "Show Now action in footer",
+      "defaultValue": true
+    },
+    {
+      "name": "showClear",
+      "type": "boolean",
+      "required": false,
+      "description": "Show Clear action in footer",
+      "defaultValue": true
+    },
+    {
+      "name": "showPresets",
+      "type": "boolean",
+      "required": false,
+      "description": "Show preset quick actions",
+      "defaultValue": false
+    },
+    {
+      "name": "presets",
+      "type": "array",
+      "required": false,
+      "description": "presets prop"
+    },
+    {
+      "name": "surface",
+      "type": "select",
+      "required": false,
+      "description": "surface prop",
+      "options": [
+        "auto",
+        "popover",
+        "sheet"
+      ],
+      "defaultValue": "auto"
+    },
+    {
+      "name": "surfaceBreakpoint",
+      "type": "number",
+      "required": false,
+      "description": "surfaceBreakpoint prop"
+    },
+    {
+      "name": "surfaceTitle",
+      "type": "string",
+      "required": false,
+      "description": "surfaceTitle prop"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Control label"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "Helper text below control"
+    },
+    {
+      "name": "error",
+      "type": "string",
+      "required": false,
+      "description": "Error message below control"
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "required prop",
+      "defaultValue": false
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable interactions",
+      "defaultValue": false
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "description": "Read-only mode",
+      "defaultValue": false
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "Trigger placeholder text"
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Enable membrane wrapper around trigger",
+      "defaultValue": true
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch control to container width",
+      "defaultValue": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    }
+  ],
+  "meta": {
+    "name": "Schedule Campaign",
+    "component": "Date",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Date/Date.tsx",
+    "contract": "Date/Date.json"
+  }
+}

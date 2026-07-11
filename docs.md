@@ -856,9 +856,9 @@ content: <Text variant="muted">Detailed explanation here.</Text>
 **Props (Toaster):**
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `placement` | placement | — | Toast position |
-| `maxVisible` | number | — | Max visible toasts |
-| `duration` | number | — | Default duration |
+| `placement` | placement | `'bottom-center'` | Toast stack position |
+| `membrane` | boolean | `true` | Use Face UI membrane spacing on toast surfaces |
+| `dismissible` | boolean | `true` | Show the internal icon-only close button |
 
 ---
 
@@ -1075,10 +1075,14 @@ content: <Text variant="muted">Detailed explanation here.</Text>
 **Props:**
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `value` | number | — | Current value (-1 for indeterminate) |
+| `value` | number | 0 | Current value, clamped to `0..max` |
 | `max` | number | 100 | Maximum |
-| `variant` | `'default'\|'success'\|'warning'\|'error'` | `'default'` | Visual variant |
-| `showLabel` | boolean | — | Show percentage label |
+| `indeterminate` | boolean | false | Unknown-duration progress state |
+| `tone` | `'neutral'\|'positive'\|'warning'\|'destructive'` | `'neutral'` | Semantic feedback tone |
+| `shape` | `'linear'\|'circle'` | `'linear'` | Progress geometry |
+| `showValue` | boolean | false | Show computed percentage |
+| `label` | ReactNode | — | Visible progress label |
+| `ariaLabel` | string | — | Accessible label when no visible label is rendered |
 
 ---
 

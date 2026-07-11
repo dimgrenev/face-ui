@@ -45,7 +45,7 @@
     "closeOnOverlayClick": {
       "type": "boolean",
       "required": false,
-      "description": "components API compatibility: overlay click behavior."
+      "description": "Close the modal when its backdrop is clicked."
     },
     "closable": {
       "type": "boolean",
@@ -92,6 +92,11 @@
       "required": false,
       "description": "Move focus into the modal when it opens. Disable for bounded previews that render open modals inline."
     },
+    "scrollLock": {
+      "type": "boolean",
+      "required": false,
+      "description": "Lock body scroll while the modal is open. Opt-in; off by default."
+    },
     "portal": {
       "type": "boolean",
       "required": false,
@@ -135,7 +140,7 @@
   "description": "Mobile-first bottom/top sheet overlay with drag-to-dismiss and focus trap",
   "behavior": {
     "focusTrap": true,
-    "scrollLock": true,
+    "scrollLock": false,
     "dismissOnEscape": true,
     "dismissOnClickOutside": true,
     "returnFocusOnClose": true,

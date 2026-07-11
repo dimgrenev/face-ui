@@ -1,25 +1,22 @@
 /**
- * Toggle — unified Toggle + ToggleGroup.
+ * Toggle — deprecated compatibility wrapper over SegmentedControl.
+ *
+ * Prefer `SegmentedControl` (the canonical engine). Toggle maps its legacy
+ * `type` prop onto SegmentedControl's `selectionMode` and is kept only for
+ * backward compatibility (see compat.ts).
  *
  * Single mode: `<Toggle type="single" items={[...]} />`
  * Multiple mode: `<Toggle type="multiple" items={[...]} />`
  */
 
-import { forwardRef, type ReactNode } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
-import { toggleMachine, connectToggle } from '../assets/machines/toggle.machine'
-import { cn } from '../assets/utils'
+import { forwardRef } from 'react'
+import { SegmentedControl, type SegmentedControlItem } from '../SegmentedControl/SegmentedControl'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface ToggleItem {
-  value: string
-  label: ReactNode
-  disabled?: boolean
-}
+export interface ToggleItem extends SegmentedControlItem {}
 
 export interface ToggleProps {
   /** Toggle items to render. */
@@ -46,70 +43,9 @@ export interface ToggleProps {
 // Component
 // ---------------------------------------------------------------------------
 
-function normalizeToggleValue(value: unknown): string[] | undefined {
-  return Array.isArray(value) ? value.map((item) => String(item)) : undefined
-}
-
-function toggleValuesEqual(left: string[] | undefined, right: string[] | undefined): boolean {
-  if (left === right) return true
-  if (!left || !right) return false
-  if (left.length !== right.length) return false
-  return left.every((item, index) => item === right[index])
-}
-
 export const Toggle = forwardRef<HTMLDivElement, ToggleProps>(
   function Toggle(props, ref) {
-    const {
-      items: rawItems,
-      value,
-      defaultValue,
-      type = 'multiple',
-      disabled = false,
-      orientation = 'horizontal',
-      onValueChange,
-      className,
-      membrane = true,
-    } = props
-
-    const items = Array.isArray(rawItems) ? rawItems : []
-    const controlledValue = normalizeToggleValue(value)
-    const isControlled = controlledValue !== undefined
-    const machineValue = useControllableMachineProp(controlledValue, normalizeToggleValue(defaultValue) ?? [])
-
-    const { state, send } = useMachine(toggleMachine, {
-      value: machineValue,
-      type,
-      disabled,
-      orientation,
-      onValueChange: ((details: { value: string[] }) => {
-        if (isControlled && toggleValuesEqual(details.value, controlledValue)) return
-        try { onValueChange?.(details) } catch {}
-      }) as any,
-    })
-
-    const api = connectToggle(state, send)
-
-    return (
-      <div ref={ref} {...api.getRootProps()} className={cn('uf-toggle', className)}>
-        {items.map((item) => {
-          const itemNode = (
-            <button
-              key={item.value}
-              type="button"
-              {...api.getItemProps({ value: item.value, disabled: item.disabled })}
-              className={cn('uf-toggle-item', 'uf-option', 'uf-control')}
-            >
-              {item.label}
-            </button>
-          )
-          if (!membrane) return itemNode
-          return (
-            <span key={`toggle-membrane:${item.value}`} className="uf-membrane" data-membrane-interactive="">
-              {itemNode}
-            </span>
-          )
-        })}
-      </div>
-    )
+    const { type = 'multiple', ...rest } = props
+    return <SegmentedControl ref={ref} selectionMode={type} {...rest} />
   },
 )

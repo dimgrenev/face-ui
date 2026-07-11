@@ -1,0 +1,72 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Bar / Workspace Header",
+  "description": "Workspace Header product scenario for the Bar component.",
+  "framework": "react",
+  "root": {
+    "type": "Bar",
+    "props": {
+      "children": {
+        "$ref": "props.children"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "orientation": "horizontal",
+      "children": [
+        {
+          "__componentName__": "Text",
+          "text": "Acme Workspace",
+          "variant": "label",
+          "truncate": true
+        },
+        {
+          "__componentName__": "Bar.Right",
+          "children": [
+            {
+              "__componentName__": "Button",
+              "text": "Invite",
+              "icon": "plus",
+              "fullWidth": false
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Bar content (typically BarSection elements)."
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Layout direction.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ]
+    }
+  ],
+  "meta": {
+    "name": "Workspace Header",
+    "component": "Bar",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Bar/Bar.tsx",
+    "contract": "Bar/Bar.json"
+  }
+}

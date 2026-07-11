@@ -1,0 +1,457 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Input / AI Prompt",
+  "description": "AI Prompt product scenario for the Input component.",
+  "framework": "react",
+  "root": {
+    "type": "Input",
+    "props": {
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "type": {
+        "$ref": "props.type"
+      },
+      "textLayout": {
+        "$ref": "props.textLayout"
+      },
+      "autoGrow": {
+        "$ref": "props.autoGrow"
+      },
+      "readOnly": {
+        "$ref": "props.readOnly"
+      },
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "error": {
+        "$ref": "props.error"
+      },
+      "labelOrientation": {
+        "$ref": "props.labelOrientation"
+      },
+      "placeholder": {
+        "$ref": "props.placeholder"
+      },
+      "ariaLabel": {
+        "$ref": "props.ariaLabel"
+      },
+      "controlRole": {
+        "$ref": "props.controlRole"
+      },
+      "ariaControls": {
+        "$ref": "props.ariaControls"
+      },
+      "ariaActiveDescendant": {
+        "$ref": "props.ariaActiveDescendant"
+      },
+      "ariaAutoComplete": {
+        "$ref": "props.ariaAutoComplete"
+      },
+      "ariaExpanded": {
+        "$ref": "props.ariaExpanded"
+      },
+      "ariaHasPopup": {
+        "$ref": "props.ariaHasPopup"
+      },
+      "spellCheck": {
+        "$ref": "props.spellCheck"
+      },
+      "icon": {
+        "$ref": "props.icon"
+      },
+      "iconPosition": {
+        "$ref": "props.iconPosition"
+      },
+      "stretchText": {
+        "$ref": "props.stretchText"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "autoComplete": {
+        "$ref": "props.autoComplete"
+      },
+      "min": {
+        "$ref": "props.min"
+      },
+      "max": {
+        "$ref": "props.max"
+      },
+      "step": {
+        "$ref": "props.step"
+      },
+      "minLength": {
+        "$ref": "props.minLength"
+      },
+      "maxLength": {
+        "$ref": "props.maxLength"
+      },
+      "pattern": {
+        "$ref": "props.pattern"
+      },
+      "onValueChange": {
+        "$ref": "props.onValueChange"
+      },
+      "onChange": {
+        "$ref": "props.onChange"
+      },
+      "onBlur": {
+        "$ref": "props.onBlur"
+      },
+      "onFocus": {
+        "$ref": "props.onFocus"
+      },
+      "onKeyDown": {
+        "$ref": "props.onKeyDown"
+      },
+      "controlRef": {
+        "$ref": "props.controlRef"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "required": {
+        "$ref": "props.required"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "type": "default",
+      "label": "System instruction",
+      "placeholder": "Describe how the assistant should behave...",
+      "textLayout": "wrap",
+      "autoGrow": true,
+      "maxLength": 4000,
+      "stretchText": true,
+      "membrane": true
+    }
+  },
+  "controls": [
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Current input value."
+    },
+    {
+      "name": "defaultValue",
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial input value."
+    },
+    {
+      "name": "type",
+      "type": "select",
+      "required": false,
+      "description": "Input type. 'default' renders a textarea-like free text. Others render <input type=\"...\">.",
+      "options": [
+        "number",
+        "default",
+        "text",
+        "email",
+        "date",
+        "password"
+      ],
+      "defaultValue": "default"
+    },
+    {
+      "name": "textLayout",
+      "type": "select",
+      "required": false,
+      "description": "Text layout for type=\"default\": 'scroll' (single-line) or 'wrap' (multi-line auto-grow).",
+      "options": [
+        "scroll",
+        "wrap"
+      ],
+      "defaultValue": "scroll"
+    },
+    {
+      "name": "autoGrow",
+      "type": "boolean",
+      "required": false,
+      "description": "Auto-grow textarea height in wrap mode.",
+      "defaultValue": true
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "description": "Make the input read-only.",
+      "defaultValue": false
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Label rendered above/beside the input."
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "Description/help text shown below the input."
+    },
+    {
+      "name": "error",
+      "type": "string",
+      "required": false,
+      "description": "Error message shown below the input.",
+      "defaultValue": ""
+    },
+    {
+      "name": "labelOrientation",
+      "type": "select",
+      "required": false,
+      "description": "Label placement relative to the control.",
+      "options": [
+        "vertical",
+        "horizontal"
+      ],
+      "defaultValue": "vertical"
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "Placeholder text."
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible label when no visible label is provided."
+    },
+    {
+      "name": "controlRole",
+      "type": "string",
+      "required": false,
+      "description": "Role applied to the native input or textarea control."
+    },
+    {
+      "name": "ariaControls",
+      "type": "string",
+      "required": false,
+      "description": "Native control aria-controls relationship."
+    },
+    {
+      "name": "ariaActiveDescendant",
+      "type": "string",
+      "required": false,
+      "description": "Native control aria-activedescendant relationship."
+    },
+    {
+      "name": "ariaAutoComplete",
+      "type": "select",
+      "required": false,
+      "description": "Native control aria-autocomplete mode.",
+      "options": [
+        "list",
+        "none",
+        "inline",
+        "both"
+      ]
+    },
+    {
+      "name": "ariaExpanded",
+      "type": "select",
+      "required": false,
+      "description": "Native control aria-expanded state.",
+      "options": [
+        "true",
+        "false"
+      ]
+    },
+    {
+      "name": "ariaHasPopup",
+      "type": "select",
+      "required": false,
+      "description": "Native control aria-haspopup state.",
+      "options": [
+        "dialog",
+        "grid",
+        "listbox",
+        "menu",
+        "tree",
+        "true",
+        "false"
+      ]
+    },
+    {
+      "name": "spellCheck",
+      "type": "boolean",
+      "required": false,
+      "description": "Enable/disable spellcheck."
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "required": false,
+      "description": "Optional icon inside the control."
+    },
+    {
+      "name": "iconPosition",
+      "type": "select",
+      "required": false,
+      "description": "Icon side inside the control. Default: left.",
+      "options": [
+        "left",
+        "right"
+      ],
+      "defaultValue": "left"
+    },
+    {
+      "name": "stretchText",
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch the input text area so right-side icons pin to the edge.",
+      "defaultValue": false
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Auto-focus on mount."
+    },
+    {
+      "name": "autoComplete",
+      "type": "string",
+      "required": false,
+      "description": "Native browser autocomplete hint."
+    },
+    {
+      "name": "min",
+      "type": "any",
+      "required": false,
+      "description": "Min value (for type=\"number\")."
+    },
+    {
+      "name": "max",
+      "type": "any",
+      "required": false,
+      "description": "Max value (for type=\"number\")."
+    },
+    {
+      "name": "step",
+      "type": "any",
+      "required": false,
+      "description": "Step value (for type=\"number\")."
+    },
+    {
+      "name": "minLength",
+      "type": "number",
+      "required": false,
+      "description": "Minimum text length for native validation."
+    },
+    {
+      "name": "maxLength",
+      "type": "number",
+      "required": false,
+      "description": "Maximum text length for native validation."
+    },
+    {
+      "name": "pattern",
+      "type": "string",
+      "required": false,
+      "description": "Native validation pattern for single-line inputs."
+    },
+    {
+      "name": "onValueChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when the value changes (machine-based)."
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": false,
+      "description": "Native onChange handler."
+    },
+    {
+      "name": "onBlur",
+      "type": "function",
+      "required": false,
+      "description": "Native onBlur handler."
+    },
+    {
+      "name": "onFocus",
+      "type": "function",
+      "required": false,
+      "description": "Native onFocus handler."
+    },
+    {
+      "name": "onKeyDown",
+      "type": "any",
+      "required": false,
+      "description": "Native onKeyDown handler."
+    },
+    {
+      "name": "controlRef",
+      "type": "ReactRef",
+      "required": false,
+      "description": "Ref to the native input or textarea control."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "defaultValue": false
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Show the required indicator (*).",
+      "defaultValue": false
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Form field name."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper around control geometry.",
+      "defaultValue": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  ],
+  "meta": {
+    "name": "AI Prompt",
+    "component": "Input",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Input/Input.tsx",
+    "contract": "Input/Input.json"
+  }
+}

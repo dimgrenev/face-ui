@@ -7,7 +7,7 @@
     "value": {
       "type": "number",
       "required": false,
-      "description": "Current value. Pass -1 for indeterminate.",
+      "description": "Current value. Values outside 0..max are clamped for rendering and accessibility.",
       "default": 0
     },
     "max": {
@@ -16,17 +16,23 @@
       "description": "Maximum value (default 100).",
       "default": 100
     },
-    "variant": {
+    "indeterminate": {
+      "type": "boolean",
+      "required": false,
+      "description": "Renders an unknown-duration progress state without exposing aria-valuenow.",
+      "default": false
+    },
+    "tone": {
       "type": "enum",
       "required": false,
-      "description": "Color variant.",
+      "description": "Semantic feedback tone.",
       "options": [
-        "default",
-        "success",
+        "neutral",
+        "positive",
         "warning",
-        "error"
+        "destructive"
       ],
-      "default": "default"
+      "default": "neutral"
     },
     "shape": {
       "type": "enum",
@@ -38,16 +44,21 @@
       ],
       "default": "linear"
     },
-    "showLabel": {
+    "showValue": {
       "type": "boolean",
       "required": false,
-      "description": "Show percentage label in the header for linear progress or beside the ring for circular progress.",
+      "description": "Show the computed percentage in the header or beside a circular ring.",
       "default": false
     },
     "label": {
       "type": "string",
       "required": false,
       "description": "Optional label rendered in the header for linear progress or beside the ring for circular progress."
+    },
+    "ariaLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the progressbar when no visible label is rendered."
     },
     "className": {
       "type": "string",
@@ -61,23 +72,45 @@
       "props": {
         "value": 28,
         "max": 100,
-        "variant": "default",
+        "tone": "neutral",
         "shape": "linear",
-        "showLabel": true,
+        "showValue": true,
         "label": "Typography"
       }
     },
     {
       "name": "Complete",
       "props": {
-        "value": 100
+        "value": 100,
+        "showValue": true,
+        "label": "Deployment"
       }
     },
     {
-      "name": "With Label",
+      "name": "Positive",
       "props": {
-        "value": 75,
-        "label": "Uploading..."
+        "value": 100,
+        "tone": "positive",
+        "showValue": true,
+        "label": "Checks passed"
+      }
+    },
+    {
+      "name": "Warning",
+      "props": {
+        "value": 82,
+        "tone": "warning",
+        "showValue": true,
+        "label": "Storage used"
+      }
+    },
+    {
+      "name": "Destructive",
+      "props": {
+        "value": 96,
+        "tone": "destructive",
+        "showValue": true,
+        "label": "Quota used"
       }
     },
     {
@@ -85,14 +118,15 @@
       "props": {
         "value": 28,
         "shape": "circle",
-        "showLabel": true
+        "showValue": true,
+        "ariaLabel": "Context progress"
       }
     },
     {
       "name": "Indeterminate",
       "props": {
-        "value": -1,
-        "label": "Loading..."
+        "indeterminate": true,
+        "label": "Loading assets"
       }
     }
   ],
@@ -142,9 +176,9 @@
       "--uf-progress-circle-size",
       "--uf-progress-track-bg",
       "--uf-progress-indicator-bg",
-      "--uf-progress-indicator-success-bg",
+      "--uf-progress-indicator-positive-bg",
       "--uf-progress-indicator-warning-bg",
-      "--uf-progress-indicator-error-bg"
+      "--uf-progress-indicator-destructive-bg"
     ],
     "semanticFallbacks": [
       "--uf-membrane",
@@ -180,7 +214,7 @@
       "Loading state with known duration"
     ],
     "whenNotToUse": [
-      "Indeterminate loading (use Skeleton)",
+      "Content-shaped loading placeholders (use Skeleton)",
       "Step-by-step wizard (use Steps)"
     ],
     "alternatives": [

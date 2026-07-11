@@ -1,0 +1,118 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Toast / Save Confirmation",
+  "description": "Save Confirmation product scenario for the Toast component.",
+  "framework": "react",
+  "root": {
+    "type": "Toast",
+    "props": {
+      "title": {
+        "$ref": "props.title"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "action": {
+        "$ref": "props.action"
+      },
+      "tone": {
+        "$ref": "props.tone"
+      },
+      "dismissible": {
+        "$ref": "props.dismissible"
+      },
+      "closeLabel": {
+        "$ref": "props.closeLabel"
+      },
+      "onDismiss": {
+        "$ref": "props.onDismiss"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "title": "Workspace saved",
+      "description": "Your changes are now visible to all collaborators.",
+      "tone": "positive",
+      "dismissible": true,
+      "action": {
+        "label": "View changes"
+      }
+    }
+  },
+  "controls": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Primary notification text."
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "Supporting notification text."
+    },
+    {
+      "name": "action",
+      "type": "object",
+      "required": false,
+      "description": "Optional action button. Invoking it also requests dismissal."
+    },
+    {
+      "name": "tone",
+      "type": "select",
+      "required": false,
+      "description": "Semantic notification tone.",
+      "options": [
+        "neutral",
+        "positive",
+        "warning",
+        "destructive"
+      ],
+      "defaultValue": "neutral"
+    },
+    {
+      "name": "dismissible",
+      "type": "boolean",
+      "required": false,
+      "description": "Render the icon-only dismiss button.",
+      "defaultValue": true
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the dismiss button.",
+      "defaultValue": "Close notification"
+    },
+    {
+      "name": "onDismiss",
+      "type": "function",
+      "required": false,
+      "description": "Called when the close button or action requests dismissal."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the notification surface."
+    }
+  ],
+  "meta": {
+    "name": "Save Confirmation",
+    "component": "Toast",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Toast/Toast.tsx",
+    "contract": "Toast/Toast.json"
+  }
+}

@@ -6,7 +6,7 @@
  * `<Media type="audio" src="/track.mp3" controls />`
  */
 
-import { forwardRef, useState, type ReactNode } from 'react'
+import { forwardRef, useEffect, useState, type ReactNode } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
 
@@ -36,11 +36,11 @@ export interface MediaProps {
   src: string
   /** Alt text (for images). */
   alt?: string
-  /** components API compatibility: image variant. */
+  /** Image presentation variant. */
   variant?: MediaVariant
-  /** components API compatibility aliases for image loading hints. */
-  lazy?: boolean
+  /** Browser loading strategy for images. */
   loading?: MediaLoading
+  /** Browser decoding strategy for images. */
   decoding?: MediaDecoding
   /** Poster image (for video). */
   poster?: string
@@ -68,13 +68,11 @@ export interface MediaProps {
   className?: string
   /** Membrane spacing around media. */
   membrane?: boolean
-  /** Wrapper-level compatibility attrs from components API. */
+  /** Native attributes applied to the root wrapper. */
   id?: string
   role?: string
   /** Accessible label for the wrapper role. Sets aria-label. */
   ariaLabel?: string
-  /** DOM aria-label alias for the wrapper role. */
-  'aria-label'?: string
   title?: string
   tabIndex?: number
   style?: React.CSSProperties
@@ -91,7 +89,6 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
       src,
       alt = '',
       variant = 'default',
-      lazy = false,
       loading,
       decoding,
       poster,
@@ -110,13 +107,16 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
       id,
       role,
       ariaLabel,
-      'aria-label': ariaLabelAttribute,
       title,
       tabIndex,
       style,
     } = props
 
     const [hasError, setHasError] = useState(false)
+
+    useEffect(() => {
+      setHasError(false)
+    }, [src, type])
 
     const handleError = () => {
       setHasError(true)
@@ -193,8 +193,8 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
               style={sizeStyle}
               onError={handleError}
               onLoad={onLoad}
-              loading={(loading as any) ?? (lazy ? 'lazy' : undefined)}
-              decoding={(decoding as any) ?? 'async'}
+              loading={loading}
+              decoding={decoding ?? 'async'}
               className={cn('uf-image', `uf-image--${variant}`)}
               title={title}
             />
@@ -211,7 +211,7 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
         className={cn('uf-media', className)}
         id={id}
         role={role}
-        aria-label={ariaLabelAttribute ?? ariaLabel}
+        aria-label={ariaLabel}
         title={title}
         tabIndex={tabIndex}
         style={wrapperStyle}

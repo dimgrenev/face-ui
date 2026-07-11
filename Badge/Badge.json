@@ -9,17 +9,6 @@
       "required": false,
       "description": "Badge text content"
     },
-    "variant": {
-      "type": "enum",
-      "required": false,
-      "description": "Structural badge variant. Combine with tone for semantic status color.",
-      "options": [
-        "default",
-        "primary",
-        "secondary"
-      ],
-      "default": "default"
-    },
     "appearance": {
       "type": "enum",
       "required": false,
@@ -57,18 +46,9 @@
       }
     },
     {
-      "name": "Primary Fill",
+      "name": "Neutral Fill",
       "props": {
-        "text": "Primary",
-        "variant": "primary",
-        "appearance": "fill"
-      }
-    },
-    {
-      "name": "Secondary Fill",
-      "props": {
-        "text": "Secondary",
-        "variant": "secondary",
+        "text": "Neutral",
         "appearance": "fill"
       }
     },

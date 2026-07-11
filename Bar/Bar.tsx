@@ -74,7 +74,12 @@ function renderSlot(node: any): React.ReactNode {
   const { __componentName__, ...slotProps } = node as FeldChildDescriptor
   switch (name) {
     case 'Text': return <Text {...slotProps} />
-    case 'Icon': return <Icon {...slotProps} />
+    case 'Icon': {
+      const { name: iconName, ...iconProps } = slotProps
+      return typeof iconName === 'string' && iconName.length > 0
+        ? <Icon name={iconName} {...iconProps} />
+        : null
+    }
     case 'Button': return <Button {...slotProps} />
     default:
       return (

@@ -1,0 +1,285 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Media / Customer Portrait",
+  "description": "Customer Portrait product scenario for the Media component.",
+  "framework": "react",
+  "root": {
+    "type": "Media",
+    "props": {
+      "type": {
+        "$ref": "props.type"
+      },
+      "src": {
+        "$ref": "props.src"
+      },
+      "alt": {
+        "$ref": "props.alt"
+      },
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "loading": {
+        "$ref": "props.loading"
+      },
+      "decoding": {
+        "$ref": "props.decoding"
+      },
+      "poster": {
+        "$ref": "props.poster"
+      },
+      "controls": {
+        "$ref": "props.controls"
+      },
+      "autoPlay": {
+        "$ref": "props.autoPlay"
+      },
+      "loop": {
+        "$ref": "props.loop"
+      },
+      "muted": {
+        "$ref": "props.muted"
+      },
+      "width": {
+        "$ref": "props.width"
+      },
+      "height": {
+        "$ref": "props.height"
+      },
+      "objectFit": {
+        "$ref": "props.objectFit"
+      },
+      "fallback": {
+        "$ref": "props.fallback"
+      },
+      "onError": {
+        "$ref": "props.onError"
+      },
+      "onLoad": {
+        "$ref": "props.onLoad"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "role": {
+        "$ref": "props.role"
+      },
+      "ariaLabel": {
+        "$ref": "props.ariaLabel"
+      },
+      "title": {
+        "$ref": "props.title"
+      },
+      "tabIndex": {
+        "$ref": "props.tabIndex"
+      },
+      "style": {
+        "$ref": "props.style"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "type": "image",
+      "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
+      "alt": "Customer profile portrait",
+      "variant": "circle",
+      "loading": "lazy",
+      "objectFit": "cover",
+      "width": 96,
+      "height": 96,
+      "membrane": true
+    }
+  },
+  "controls": [
+    {
+      "name": "type",
+      "type": "select",
+      "required": false,
+      "description": "Media type. Defaults to \"image\".",
+      "options": [
+        "image",
+        "video",
+        "audio"
+      ],
+      "defaultValue": "image"
+    },
+    {
+      "name": "src",
+      "type": "string",
+      "required": true,
+      "description": "Source URL."
+    },
+    {
+      "name": "alt",
+      "type": "string",
+      "required": false,
+      "description": "Alt text (for images).",
+      "defaultValue": ""
+    },
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "Image presentation variant.",
+      "options": [
+        "default",
+        "rounded",
+        "circle",
+        "thumbnail"
+      ],
+      "defaultValue": "default"
+    },
+    {
+      "name": "loading",
+      "type": "select",
+      "required": false,
+      "description": "Browser loading strategy for images.",
+      "options": [
+        "eager",
+        "lazy"
+      ]
+    },
+    {
+      "name": "decoding",
+      "type": "select",
+      "required": false,
+      "description": "Browser decoding strategy for images.",
+      "options": [
+        "async",
+        "sync",
+        "auto"
+      ]
+    },
+    {
+      "name": "poster",
+      "type": "string",
+      "required": false,
+      "description": "Poster image (for video)."
+    },
+    {
+      "name": "controls",
+      "type": "boolean",
+      "required": false,
+      "description": "Show native controls (for video/audio)."
+    },
+    {
+      "name": "autoPlay",
+      "type": "boolean",
+      "required": false,
+      "description": "Auto-play media."
+    },
+    {
+      "name": "loop",
+      "type": "boolean",
+      "required": false,
+      "description": "Loop playback."
+    },
+    {
+      "name": "muted",
+      "type": "boolean",
+      "required": false,
+      "description": "Start muted."
+    },
+    {
+      "name": "width",
+      "type": "string",
+      "required": false,
+      "description": "Explicit width."
+    },
+    {
+      "name": "height",
+      "type": "string",
+      "required": false,
+      "description": "Explicit height."
+    },
+    {
+      "name": "objectFit",
+      "type": "select",
+      "required": false,
+      "description": "CSS object-fit for images/video.",
+      "options": [
+        "cover",
+        "contain",
+        "fill",
+        "none"
+      ]
+    },
+    {
+      "name": "fallback",
+      "type": "string",
+      "required": false,
+      "description": "Fallback content shown on error."
+    },
+    {
+      "name": "onError",
+      "type": "function",
+      "required": false,
+      "description": "Called when the media fails to load."
+    },
+    {
+      "name": "onLoad",
+      "type": "function",
+      "required": false,
+      "description": "Called when the media finishes loading."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around media.",
+      "defaultValue": false
+    },
+    {
+      "name": "role",
+      "type": "string",
+      "required": false,
+      "description": "role prop"
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the wrapper role. Sets aria-label."
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "title prop"
+    },
+    {
+      "name": "tabIndex",
+      "type": "number",
+      "required": false,
+      "description": "tabIndex prop"
+    },
+    {
+      "name": "style",
+      "type": "object",
+      "required": false,
+      "description": "style prop"
+    }
+  ],
+  "meta": {
+    "name": "Customer Portrait",
+    "component": "Media",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Media/Media.tsx",
+    "contract": "Media/Media.json"
+  }
+}

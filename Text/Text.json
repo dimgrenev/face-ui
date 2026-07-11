@@ -272,6 +272,8 @@
       "--uf-text-heading-font-weight",
       "--uf-text-caption-font-size",
       "--uf-text-caption-line-height",
+      "--uf-text-caption-min-height",
+      "--uf-text-caption-pad-y",
       "--uf-text-caption-color",
       "--uf-text-kbd-height",
       "--uf-text-kbd-pad-x",

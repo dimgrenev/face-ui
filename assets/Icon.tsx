@@ -1,40 +1,8 @@
 import React from 'react';
 
-export type IconSource =
-  | string
-  | React.ReactElement
-  | React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>
-  | {
-      content: React.ReactNode;
-      viewBox?: string;
-      nativeSize?: number;
-      nativeWidth?: number;
-      nativeHeight?: number;
-    };
-
-export interface IconProviderProps {
-  children: React.ReactNode;
-  /** Compatibility-only. Face UI icons always render at 20x20. */
-  size?: number;
-  /** Compatibility-only. Face UI icons always render at 20x20. */
-  square?: boolean;
-  /** Deprecated compatibility hook. External icon registries resolve to notdef. */
-  registry?: Record<string, IconSource>;
-  /** Deprecated compatibility hook. External icon registries resolve to notdef. */
-  resolveIcon?: (name: string) => IconSource | null | undefined;
-}
-
 export interface IconProps {
-  /** Registry icon name (backward-compatible). */
-  name?: IconName | string;
-  /** Compatibility input. String names resolve to Face UI icons; custom sources render notdef. */
-  icon?: IconSource;
-  /** Deprecated compatibility input. External URLs render notdef. */
-  src?: string;
-  /** Compatibility-only. Face UI icons always render at 20x20. */
-  size?: number;
-  /** Compatibility-only. Face UI icons always render at 20x20. */
-  square?: boolean;
+  /** Built-in Face UI icon name. Unknown names render the notdef glyph. */
+  name: IconName | string;
   className?: string;
   style?: React.CSSProperties;
   /** Accessible label. If omitted, icon is decorative. */
@@ -785,58 +753,13 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
   'warning': "0 0 20 20"
 };
 
-interface IconContextValue {
-  size?: number;
-  square: boolean;
-  registry: Record<string, IconSource>;
-  resolveIcon?: (name: string) => IconSource | null | undefined;
-}
-
-const IconContext = React.createContext<IconContextValue>({
-  size: undefined,
-  square: true,
-  registry: {},
-  resolveIcon: undefined,
-});
-
-const LEGACY_BUILTIN_ICON_FALLBACK: IconName = 'notdef';
-const LEGACY_BUILTIN_ICON_NAMES = new Set<string>(['git']);
-
-export const IconProvider: React.FC<IconProviderProps> = ({
-  children,
-  size,
-  square = true,
-  registry,
-  resolveIcon,
-}) => {
-  const parent = React.useContext(IconContext);
-  const value = React.useMemo<IconContextValue>(() => ({
-    size: size ?? parent.size,
-    square: square ?? parent.square,
-    registry: {
-      ...parent.registry,
-      ...(registry || {}),
-    },
-    resolveIcon: resolveIcon ?? parent.resolveIcon,
-  }), [parent, size, square, registry, resolveIcon]);
-
-  return (
-    <IconContext.Provider value={value}>
-      {children}
-    </IconContext.Provider>
-  );
-};
-
-function looksLikeUrl(input: string): boolean {
-  return /^(https?:\/\/|data:image\/|\/|\.\/|\.\.\/)/.test(input) || /\.svg(\?.*)?$/i.test(input);
-}
+const BUILTIN_ICON_FALLBACK: IconName = 'notdef';
 
 function resolveBuiltinIconName(requestedName: string | undefined): IconName | undefined {
   if (!requestedName) return undefined;
-  if (LEGACY_BUILTIN_ICON_NAMES.has(requestedName)) return LEGACY_BUILTIN_ICON_FALLBACK;
   return (icons as Record<string, React.ReactNode>)[requestedName]
     ? requestedName as IconName
-    : LEGACY_BUILTIN_ICON_FALLBACK;
+    : BUILTIN_ICON_FALLBACK;
 }
 
 /**
@@ -845,20 +768,13 @@ function resolveBuiltinIconName(requestedName: string | undefined): IconName | u
  */
 export const Icon: React.FC<IconProps> = ({
   name,
-  icon,
-  src,
   className = '',
   style = {},
   label,
   title,
 }) => {
-  const iconStringName = typeof icon === 'string' && !looksLikeUrl(icon.trim()) && icon.trim().length > 0
-    ? icon.trim()
-    : undefined;
-  const requestedName = (typeof name === 'string' && name.trim().length > 0) ? name.trim() : iconStringName;
-  const hasExplicitUnsupportedSource = src != null || (icon != null && iconStringName == null);
-  const builtinName = resolveBuiltinIconName(requestedName)
-    ?? (hasExplicitUnsupportedSource ? LEGACY_BUILTIN_ICON_FALLBACK : undefined);
+  const requestedName = typeof name === 'string' && name.trim().length > 0 ? name.trim() : undefined;
+  const builtinName = resolveBuiltinIconName(requestedName);
 
   const builtinEntry = builtinName
     ? {

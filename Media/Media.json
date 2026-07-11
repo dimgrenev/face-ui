@@ -29,7 +29,7 @@
     "variant": {
       "type": "enum",
       "required": false,
-      "description": "components API compatibility: image variant.",
+      "description": "Image presentation variant.",
       "options": [
         "default",
         "rounded",
@@ -38,25 +38,19 @@
       ],
       "default": "default"
     },
-    "lazy": {
-      "type": "boolean",
-      "required": false,
-      "description": "components API compatibility aliases for image loading hints.",
-      "default": false
-    },
     "loading": {
       "type": "enum",
       "required": false,
-      "description": "Image loading hint",
+      "description": "Browser loading strategy for images.",
       "options": [
-        "lazy",
-        "eager"
+        "eager",
+        "lazy"
       ]
     },
     "decoding": {
       "type": "enum",
       "required": false,
-      "description": "Image decoding hint",
+      "description": "Browser decoding strategy for images.",
       "options": [
         "async",
         "sync",
@@ -168,7 +162,6 @@
         "type": "image",
         "alt": "Bright office lobby with glass-block wall, seating, and plants",
         "variant": "default",
-        "lazy": false,
         "membrane": false,
         "src": "/assets/media/examples/office-core/lobby-day.webp"
       }

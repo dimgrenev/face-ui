@@ -50,12 +50,12 @@
       "required": false,
       "description": "Callback when value changes."
     },
-    "aria-label": {
+    "ariaLabel": {
       "type": "string",
       "required": false,
       "description": "Accessible label for the radio group (role=\"radiogroup\" requires a name)."
     },
-    "aria-labelledby": {
+    "ariaLabelledBy": {
       "type": "string",
       "required": false,
       "description": "ID of an element that labels the radio group."

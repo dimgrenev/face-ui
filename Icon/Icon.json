@@ -6,28 +6,8 @@
   "props": {
     "name": {
       "type": "string",
-      "required": false,
-      "description": "Registry icon name (backward-compatible)."
-    },
-    "icon": {
-      "type": "any",
-      "required": false,
-      "description": "Compatibility input. String names resolve to Face UI icons; custom sources render notdef."
-    },
-    "src": {
-      "type": "string",
-      "required": false,
-      "description": "Deprecated compatibility input. External URLs render notdef."
-    },
-    "size": {
-      "type": "number",
-      "required": false,
-      "description": "Compatibility-only. Face UI icons always render at 20x20."
-    },
-    "square": {
-      "type": "boolean",
-      "required": false,
-      "description": "Compatibility-only. Face UI icons always render at 20x20."
+      "required": true,
+      "description": "Built-in Face UI icon name. Unknown names render the notdef glyph."
     },
     "className": {
       "type": "string",
@@ -54,36 +34,32 @@
     {
       "name": "Default",
       "props": {
-        "name": "settings",
-        "size": 20
-      }
-    },
-    {
-      "name": "Compatibility Size Ignored",
-      "props": {
-        "name": "settings",
-        "size": 20
+        "name": "settings"
       }
     },
     {
       "name": "Direction Left",
       "props": {
-        "name": "left",
-        "size": 20
+        "name": "left"
       }
     },
     {
       "name": "Direction Right",
       "props": {
-        "name": "right",
-        "size": 20
+        "name": "right"
       }
     },
     {
-      "name": "Compatibility Small Size Ignored",
+      "name": "Unknown Fallback",
       "props": {
-        "name": "legend",
-        "size": 20
+        "name": "unknown-icon"
+      }
+    },
+    {
+      "name": "Accessible",
+      "props": {
+        "name": "account",
+        "label": "Account"
       }
     }
   ],

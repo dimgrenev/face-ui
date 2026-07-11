@@ -79,11 +79,6 @@
       "required": false,
       "description": "Additional CSS class."
     },
-    "getRowId": {
-      "type": "function",
-      "required": false,
-      "description": "Legacy components API alias. Prefer rowKey for new code."
-    },
     "onColumnResize": {
       "type": "function",
       "required": false,

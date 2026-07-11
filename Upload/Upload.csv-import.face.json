@@ -1,0 +1,139 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Upload / CSV Import",
+  "description": "CSV Import product scenario for the Upload component.",
+  "framework": "react",
+  "root": {
+    "type": "Upload",
+    "props": {
+      "accept": {
+        "$ref": "props.accept"
+      },
+      "multiple": {
+        "$ref": "props.multiple"
+      },
+      "maxSize": {
+        "$ref": "props.maxSize"
+      },
+      "maxFiles": {
+        "$ref": "props.maxFiles"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "files": {
+        "$ref": "props.files"
+      },
+      "defaultFiles": {
+        "$ref": "props.defaultFiles"
+      },
+      "onFilesChange": {
+        "$ref": "props.onFilesChange"
+      },
+      "onReject": {
+        "$ref": "props.onReject"
+      },
+      "labels": {
+        "$ref": "props.labels"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "accept": ".csv,text/csv",
+      "multiple": false,
+      "maxSize": 10485760,
+      "maxFiles": 1,
+      "disabled": false
+    }
+  },
+  "controls": [
+    {
+      "name": "accept",
+      "type": "string",
+      "required": false,
+      "description": "Accepted file types (e.g. \"image/*\", \".pdf,.doc\").",
+      "defaultValue": ""
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "required": false,
+      "description": "Allow multiple file selection.",
+      "defaultValue": false
+    },
+    {
+      "name": "maxSize",
+      "type": "number",
+      "required": false,
+      "description": "Maximum file size in bytes. 0 = unlimited.",
+      "defaultValue": 0
+    },
+    {
+      "name": "maxFiles",
+      "type": "number",
+      "required": false,
+      "description": "Maximum number of files. 0 = unlimited.",
+      "defaultValue": 0
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "defaultValue": false
+    },
+    {
+      "name": "files",
+      "type": "array",
+      "required": false,
+      "description": "Controlled file list."
+    },
+    {
+      "name": "defaultFiles",
+      "type": "array",
+      "required": false,
+      "description": "Initial file list for uncontrolled usage."
+    },
+    {
+      "name": "onFilesChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when files change."
+    },
+    {
+      "name": "onReject",
+      "type": "function",
+      "required": false,
+      "description": "Callback when files are rejected."
+    },
+    {
+      "name": "labels",
+      "type": "object",
+      "required": false,
+      "description": "Localized interface labels."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  ],
+  "meta": {
+    "name": "CSV Import",
+    "component": "Upload",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Upload/Upload.tsx",
+    "contract": "Upload/Upload.json"
+  }
+}

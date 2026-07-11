@@ -158,7 +158,6 @@ export function connectRating(
       return {
         ...ratingAnatomy.getPartAttrs('root'),
         role: 'radiogroup' as const,
-        'aria-label': 'Rating',
         'data-disabled': disabled || undefined,
         'data-hovering': isHovering || undefined,
         onMouseLeave() {

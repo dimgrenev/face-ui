@@ -1,0 +1,237 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Drawer / Record Inspector",
+  "description": "Record Inspector product scenario for the Drawer component.",
+  "framework": "react",
+  "root": {
+    "type": "Drawer",
+    "props": {
+      "side": {
+        "$ref": "props.side"
+      },
+      "edge": {
+        "$ref": "props.edge"
+      },
+      "title": {
+        "$ref": "props.title"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "children": {
+        "$ref": "props.children"
+      },
+      "open": {
+        "$ref": "props.open"
+      },
+      "closeOnOverlayClick": {
+        "$ref": "props.closeOnOverlayClick"
+      },
+      "closable": {
+        "$ref": "props.closable"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "actions": {
+        "$ref": "props.actions"
+      },
+      "trigger": {
+        "$ref": "props.trigger"
+      },
+      "width": {
+        "$ref": "props.width"
+      },
+      "height": {
+        "$ref": "props.height"
+      },
+      "onOpenChange": {
+        "$ref": "props.onOpenChange"
+      },
+      "surfaceBreakpoint": {
+        "$ref": "props.surfaceBreakpoint"
+      },
+      "autoFocusOnOpen": {
+        "$ref": "props.autoFocusOnOpen"
+      },
+      "scrollLock": {
+        "$ref": "props.scrollLock"
+      },
+      "portal": {
+        "$ref": "props.portal"
+      },
+      "backdropClassName": {
+        "$ref": "props.backdropClassName"
+      },
+      "positionerClassName": {
+        "$ref": "props.positionerClassName"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "side": "right",
+      "edge": "flush",
+      "open": true,
+      "portal": false,
+      "title": "Customer details",
+      "description": "Account health and recent activity",
+      "width": 420,
+      "closable": true,
+      "closeOnOverlayClick": true,
+      "actions": [
+        {
+          "label": "Edit customer",
+          "variant": "accent"
+        }
+      ],
+      "children": "Plan: Enterprise. Last active 12 minutes ago."
+    }
+  },
+  "controls": [
+    {
+      "name": "side",
+      "type": "select",
+      "required": false,
+      "description": "Side from which the drawer slides in.",
+      "options": [
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
+      "defaultValue": "right"
+    },
+    {
+      "name": "edge",
+      "type": "select",
+      "required": false,
+      "description": "Visual edge treatment. Inset keeps sheet-like screen spacing and rounded corners; flush attaches the drawer to the viewport edge without rounding.",
+      "options": [
+        "inset",
+        "flush"
+      ]
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Title content rendered inside the modal."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Body content."
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state."
+    },
+    {
+      "name": "closeOnOverlayClick",
+      "type": "boolean",
+      "required": false,
+      "description": "Close the modal when its backdrop is clicked."
+    },
+    {
+      "name": "closable",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the modal can be closed via Escape / backdrop click."
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "Description content rendered below the title."
+    },
+    {
+      "name": "actions",
+      "type": "array",
+      "required": false,
+      "description": "Optional footer actions."
+    },
+    {
+      "name": "trigger",
+      "type": "string",
+      "required": false,
+      "description": "Trigger element that toggles the modal open."
+    },
+    {
+      "name": "width",
+      "type": "number",
+      "required": false,
+      "description": "Width in px for left/right variants."
+    },
+    {
+      "name": "height",
+      "type": "number",
+      "required": false,
+      "description": "Height in px for top/bottom variants."
+    },
+    {
+      "name": "onOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    },
+    {
+      "name": "surfaceBreakpoint",
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch to sheet mode."
+    },
+    {
+      "name": "autoFocusOnOpen",
+      "type": "boolean",
+      "required": false,
+      "description": "Move focus into the modal when it opens. Disable for bounded previews that render open modals inline."
+    },
+    {
+      "name": "scrollLock",
+      "type": "boolean",
+      "required": false,
+      "description": "Lock body scroll while the modal is open. Opt-in; off by default."
+    },
+    {
+      "name": "portal",
+      "type": "boolean",
+      "required": false,
+      "description": "Render overlay into document.body. Disable for bounded component previews."
+    },
+    {
+      "name": "backdropClassName",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the backdrop element."
+    },
+    {
+      "name": "positionerClassName",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the positioner element."
+    }
+  ],
+  "meta": {
+    "name": "Record Inspector",
+    "component": "Drawer",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Drawer/Drawer.tsx",
+    "contract": "Drawer/Drawer.json"
+  }
+}

@@ -5,7 +5,7 @@
  * `<Rating value={2.5} allowHalf max={10} />`
  */
 
-import { forwardRef, useState, type ReactNode } from 'react'
+import { forwardRef, useId, useState, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { ratingMachine, connectRating } from '../assets/machines/rating.machine'
 import { cn } from '../assets/utils'
@@ -29,6 +29,8 @@ export interface RatingProps {
   allowHalf?: boolean
   /** Label content. */
   label?: ReactNode
+  /** Accessible name used when no visible label is provided. */
+  ariaLabel?: string
   /** Callback when value changes. */
   onValueChange?: (details: { value: number }) => void
   /** Additional CSS class. */
@@ -56,6 +58,7 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(
       disabled = false,
       allowHalf = false,
       label,
+      ariaLabel = 'Rating',
       onValueChange,
       className,
     } = props
@@ -72,18 +75,25 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(
       onValueChange: ((details: { value: number }) => {
         if (!isControlled) setUncontrolledValue(details.value)
         if (isControlled && details.value === value) return
-        try { onValueChange?.(details) } catch {}
+        onValueChange?.(details)
       }) as any,
     })
 
     const api = connectRating(state, send)
+    const labelId = useId()
 
     const items = Array.from({ length: max }, (_, i) => i + 1)
 
     return (
-      <div ref={ref} {...api.getRootProps()} className={cn('uf-rating', className)}>
+      <div
+        ref={ref}
+        {...api.getRootProps()}
+        aria-label={label == null ? ariaLabel : undefined}
+        aria-labelledby={label != null ? labelId : undefined}
+        className={cn('uf-rating', className)}
+      >
         {label != null && (
-          <Text {...(api.getLabelProps() as any)} as="label" variant="label">
+          <Text {...(api.getLabelProps() as any)} id={labelId} as="label" variant="label">
             {label}
           </Text>
         )}

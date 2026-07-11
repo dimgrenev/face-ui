@@ -1,0 +1,331 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Tile / Collapsible Workspace",
+  "description": "Collapsible Workspace product scenario for the Tile component.",
+  "framework": "react",
+  "root": {
+    "type": "Tile",
+    "props": {
+      "text": {
+        "$ref": "props.text"
+      },
+      "rightText": {
+        "$ref": "props.rightText"
+      },
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "intent": {
+        "$ref": "props.intent"
+      },
+      "density": {
+        "$ref": "props.density"
+      },
+      "tone": {
+        "$ref": "props.tone"
+      },
+      "actionVisibility": {
+        "$ref": "props.actionVisibility"
+      },
+      "icon": {
+        "$ref": "props.icon"
+      },
+      "iconPosition": {
+        "$ref": "props.iconPosition"
+      },
+      "leading": {
+        "$ref": "props.leading"
+      },
+      "meta": {
+        "$ref": "props.meta"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "busy": {
+        "$ref": "props.busy"
+      },
+      "active": {
+        "$ref": "props.active"
+      },
+      "selectedDescendant": {
+        "$ref": "props.selectedDescendant"
+      },
+      "interactive": {
+        "$ref": "props.interactive"
+      },
+      "stretchText": {
+        "$ref": "props.stretchText"
+      },
+      "selector": {
+        "$ref": "props.selector"
+      },
+      "selectorOpen": {
+        "$ref": "props.selectorOpen"
+      },
+      "fullWidth": {
+        "$ref": "props.fullWidth"
+      },
+      "align": {
+        "$ref": "props.align"
+      },
+      "level": {
+        "$ref": "props.level"
+      },
+      "truncate": {
+        "$ref": "props.truncate"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "actions": {
+        "$ref": "props.actions"
+      },
+      "children": {
+        "$ref": "props.children"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "text": "Customer success",
+      "rightText": "12",
+      "intent": "disclosure",
+      "tone": "neutral",
+      "icon": "folder",
+      "selector": true,
+      "selectorOpen": false,
+      "selectedDescendant": true,
+      "fullWidth": true,
+      "align": "left",
+      "actionVisibility": "reveal",
+      "membrane": true
+    }
+  },
+  "controls": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "Primary label."
+    },
+    {
+      "name": "rightText",
+      "type": "string",
+      "required": false,
+      "description": "Optional secondary text at the far right of the label area."
+    },
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "Visual variant.",
+      "options": [
+        "default",
+        "ghost"
+      ],
+      "defaultValue": "default"
+    },
+    {
+      "name": "intent",
+      "type": "select",
+      "required": false,
+      "description": "Semantic row intent. Use option for generic rows, navigation for selected app routes, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.",
+      "options": [
+        "option",
+        "navigation",
+        "disclosure",
+        "tree",
+        "tab",
+        "section"
+      ],
+      "defaultValue": "option"
+    },
+    {
+      "name": "density",
+      "type": "select",
+      "required": false,
+      "description": "Internal spacing density. Default follows the shared control rhythm; spacious gives inspection rows more breathing room.",
+      "options": [
+        "default",
+        "spacious"
+      ],
+      "defaultValue": "default"
+    },
+    {
+      "name": "tone",
+      "type": "select",
+      "required": false,
+      "description": "Semantic visual tone for row foreground and hover treatment.",
+      "options": [
+        "neutral",
+        "muted",
+        "accent",
+        "positive",
+        "warning",
+        "destructive"
+      ],
+      "defaultValue": "neutral"
+    },
+    {
+      "name": "actionVisibility",
+      "type": "select",
+      "required": false,
+      "description": "How the actions slot is exposed: reveal on hover/focus/active, hover only, always visible, or hidden.",
+      "options": [
+        "reveal",
+        "hover",
+        "always",
+        "hidden"
+      ],
+      "defaultValue": "reveal"
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "required": false,
+      "description": "Icon (string from registry or ReactNode)."
+    },
+    {
+      "name": "iconPosition",
+      "type": "select",
+      "required": false,
+      "description": "Icon position relative to text.",
+      "options": [
+        "left",
+        "right"
+      ],
+      "defaultValue": "left"
+    },
+    {
+      "name": "leading",
+      "type": "any",
+      "required": false,
+      "description": "Isolated leading slot for nested controls. Use icon for decorative icons and leading for actionable controls."
+    },
+    {
+      "name": "meta",
+      "type": "any",
+      "required": false,
+      "description": "Trailing non-interactive metadata rendered before actions."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disabled state.",
+      "defaultValue": false
+    },
+    {
+      "name": "busy",
+      "type": "boolean",
+      "required": false,
+      "description": "Marks the row busy with data-busy and aria-busy without disabling it by itself.",
+      "defaultValue": false
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "required": false,
+      "description": "Active / selected state.",
+      "defaultValue": false
+    },
+    {
+      "name": "selectedDescendant",
+      "type": "boolean",
+      "required": false,
+      "description": "Marks parent rows that contain the selected descendant, commonly while collapsed.",
+      "defaultValue": false
+    },
+    {
+      "name": "interactive",
+      "type": "boolean",
+      "required": false,
+      "description": "Override interactive semantics. Set false for section/header rows that should not expose button behavior."
+    },
+    {
+      "name": "stretchText",
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch text area (flex:1)."
+    },
+    {
+      "name": "selector",
+      "type": "boolean",
+      "required": false,
+      "description": "Render a compact selector indicator after the label.",
+      "defaultValue": false
+    },
+    {
+      "name": "selectorOpen",
+      "type": "boolean",
+      "required": false,
+      "description": "Open state for the selector indicator.",
+      "defaultValue": false
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Full width tile.",
+      "defaultValue": true
+    },
+    {
+      "name": "align",
+      "type": "select",
+      "required": false,
+      "description": "Text alignment.",
+      "options": [
+        "left",
+        "right",
+        "center"
+      ],
+      "defaultValue": "left"
+    },
+    {
+      "name": "level",
+      "type": "number",
+      "required": false,
+      "description": "Nesting level for option-like rows: 0..9"
+    },
+    {
+      "name": "truncate",
+      "type": "boolean",
+      "required": false,
+      "description": "Truncate overflowing text content with ellipsis.",
+      "defaultValue": true
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around the tile.",
+      "defaultValue": true
+    },
+    {
+      "name": "actions",
+      "type": "string",
+      "required": false,
+      "description": "Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile."
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Custom children (overrides text/icon rendering)."
+    }
+  ],
+  "meta": {
+    "name": "Collapsible Workspace",
+    "component": "Tile",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Tile/Tile.tsx",
+    "contract": "Tile/Tile.json"
+  }
+}

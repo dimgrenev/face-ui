@@ -265,8 +265,6 @@ export default function faceUiReact(props: FeldGalleryProps) {
               <div className="uf-gallery-itemPreview">
                 <Card
                   variant="showcase"
-                  padding="showcase"
-                  radius="showcase"
                   border={false}
                   className="uf-gallery-itemSurface"
                 >

@@ -34,14 +34,10 @@ export interface RadioProps extends FormControlProps {
   orientation?: 'horizontal' | 'vertical'
   /** Callback when value changes. */
   onValueChange?: (details: { value: string }) => void
-  /** Legacy callback alias that receives the plain selected value. */
-  onChange?: (value: string) => void
-  /** Legacy orientation alias. */
-  flow?: 'horizontal' | 'vertical'
   /** Accessible label for the radio group (role="radiogroup" requires a name). */
-  'aria-label'?: string
+  ariaLabel?: string
   /** ID of an element that labels the radio group. */
-  'aria-labelledby'?: string
+  ariaLabelledBy?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -58,12 +54,14 @@ export const Radio = forwardRef<HTMLDivElement, RadioProps>(
       disabled = false,
       required = false,
       orientation,
+      ariaLabel,
+      ariaLabelledBy,
       onValueChange,
       className,
       membrane = true,
     } = props
 
-    const effectiveOrientation = orientation ?? props.flow ?? 'vertical'
+    const effectiveOrientation = orientation ?? 'vertical'
     const options = Array.isArray(rawOptions) ? rawOptions : []
     const itemOrder = options.map((option) => option.value)
     const disabledValues = options.filter((option) => option.disabled).map((option) => option.value)
@@ -81,8 +79,7 @@ export const Radio = forwardRef<HTMLDivElement, RadioProps>(
       orientation: effectiveOrientation,
       onValueChange: ((details: { value: string }) => {
         if (isControlled && details.value === value) return
-        try { onValueChange?.(details) } catch {}
-        try { props.onChange?.(details.value) } catch {}
+        onValueChange?.(details)
       }) as any,
     })
 
@@ -112,8 +109,8 @@ export const Radio = forwardRef<HTMLDivElement, RadioProps>(
           else if (ref) (ref as any).current = node
         }}
         {...api.getRootProps()}
-        aria-label={props['aria-label']}
-        aria-labelledby={props['aria-labelledby']}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
         data-orientation={effectiveOrientation}
         data-disabled={disabled ? '' : undefined}
         className={cn('uf-radio', className)}

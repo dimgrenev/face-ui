@@ -28,12 +28,23 @@ export interface ProgressSchema extends MachineSchema {
   context: {
     value: number
     max: number
+    indeterminate: boolean
     onValueChange: ((details: { value: number; percent: number }) => void) | null
   }
   state: 'idle'
   event:
     | { type: 'SET_VALUE'; value: number }
     | { type: 'SET_MAX'; max: number }
+    | { type: 'SET_INDETERMINATE'; indeterminate: boolean }
+}
+
+function normalizeMax(max: number): number {
+  return Number.isFinite(max) && max > 0 ? max : 1
+}
+
+function normalizeValue(value: number, max: number): number {
+  if (!Number.isFinite(value)) return 0
+  return Math.min(Math.max(value, 0), normalizeMax(max))
 }
 
 // ---------------------------------------------------------------------------
@@ -47,6 +58,7 @@ export const progressMachine = createMachine<ProgressSchema>({
   context: {
     value: 0,
     max: 100,
+    indeterminate: false,
     onValueChange: null,
   },
 
@@ -57,7 +69,7 @@ export const progressMachine = createMachine<ProgressSchema>({
           actions: [
             (ctx, event) => {
               const e = event as ProgressSchema['event'] & { type: 'SET_VALUE' }
-              ctx.value = e.value
+              ctx.value = normalizeValue(e.value, ctx.max)
             },
           ],
         },
@@ -65,7 +77,16 @@ export const progressMachine = createMachine<ProgressSchema>({
           actions: [
             (ctx, event) => {
               const e = event as ProgressSchema['event'] & { type: 'SET_MAX' }
-              ctx.max = Math.max(e.max, 0)
+              ctx.max = normalizeMax(e.max)
+              ctx.value = normalizeValue(ctx.value, ctx.max)
+            },
+          ],
+        },
+        SET_INDETERMINATE: {
+          actions: [
+            (ctx, event) => {
+              const e = event as ProgressSchema['event'] & { type: 'SET_INDETERMINATE' }
+              ctx.indeterminate = e.indeterminate
             },
           ],
         },
@@ -74,19 +95,21 @@ export const progressMachine = createMachine<ProgressSchema>({
   },
 
   computed: {
-    percent: (ctx) => {
-      if (ctx.value < 0) return 0
-      const clamped = Math.min(Math.max(ctx.value / ctx.max, 0), 1)
-      return clamped * 100
-    },
-    isIndeterminate: (ctx) => ctx.value < 0,
-    isComplete: (ctx) => ctx.value >= ctx.max,
+    normalizedMax: (ctx) => normalizeMax(ctx.max),
+    normalizedValue: (ctx) => normalizeValue(ctx.value, ctx.max),
+    percent: (ctx) => ctx.indeterminate
+      ? 0
+      : (normalizeValue(ctx.value, ctx.max) / normalizeMax(ctx.max)) * 100,
+    isIndeterminate: (ctx) => ctx.indeterminate,
+    isComplete: (ctx) => !ctx.indeterminate && normalizeValue(ctx.value, ctx.max) >= normalizeMax(ctx.max),
   },
 
   watch: {
     value: (ctx) => {
-      const percent = Math.min(Math.max(ctx.value / ctx.max, 0), 1) * 100
-      ctx.onValueChange?.({ value: ctx.value, percent })
+      if (ctx.indeterminate) return
+      const value = normalizeValue(ctx.value, ctx.max)
+      const percent = (value / normalizeMax(ctx.max)) * 100
+      ctx.onValueChange?.({ value, percent })
     },
   },
 })
@@ -116,6 +139,8 @@ export function connectProgress(
   const { context: ctx, computed } = state
   const percent = computed['percent'] as number
   const isIndeterminate = computed['isIndeterminate'] as boolean
+  const normalizedValue = computed['normalizedValue'] as number
+  const normalizedMax = computed['normalizedMax'] as number
   const dataState = isIndeterminate
     ? 'indeterminate'
     : (computed['isComplete'] as boolean)
@@ -127,9 +152,9 @@ export function connectProgress(
       return {
         ...progressAnatomy.getPartAttrs('root'),
         role: 'progressbar',
-        'aria-valuenow': isIndeterminate ? undefined : ctx.value,
+        'aria-valuenow': isIndeterminate ? undefined : normalizedValue,
         'aria-valuemin': 0,
-        'aria-valuemax': ctx.max,
+        'aria-valuemax': normalizedMax,
         'aria-valuetext': isIndeterminate
           ? undefined
           : `${Math.round(percent)}%`,
@@ -167,6 +192,9 @@ export function connectProgress(
     },
     setMax(max: number) {
       send({ type: 'SET_MAX', max })
+    },
+    setIndeterminate(indeterminate: boolean) {
+      send({ type: 'SET_INDETERMINATE', indeterminate })
     },
 
     /** Computed accessors */

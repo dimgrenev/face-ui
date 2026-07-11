@@ -1,0 +1,252 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Modal / Create Project",
+  "description": "Create Project product scenario for the Modal component.",
+  "framework": "react",
+  "root": {
+    "type": "Modal",
+    "props": {
+      "open": {
+        "$ref": "props.open"
+      },
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "closeOnOverlayClick": {
+        "$ref": "props.closeOnOverlayClick"
+      },
+      "closable": {
+        "$ref": "props.closable"
+      },
+      "title": {
+        "$ref": "props.title"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "children": {
+        "$ref": "props.children"
+      },
+      "actions": {
+        "$ref": "props.actions"
+      },
+      "trigger": {
+        "$ref": "props.trigger"
+      },
+      "width": {
+        "$ref": "props.width"
+      },
+      "height": {
+        "$ref": "props.height"
+      },
+      "onOpenChange": {
+        "$ref": "props.onOpenChange"
+      },
+      "surface": {
+        "$ref": "props.surface"
+      },
+      "surfaceBreakpoint": {
+        "$ref": "props.surfaceBreakpoint"
+      },
+      "autoFocusOnOpen": {
+        "$ref": "props.autoFocusOnOpen"
+      },
+      "scrollLock": {
+        "$ref": "props.scrollLock"
+      },
+      "portal": {
+        "$ref": "props.portal"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "backdropClassName": {
+        "$ref": "props.backdropClassName"
+      },
+      "positionerClassName": {
+        "$ref": "props.positionerClassName"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "open": true,
+      "portal": false,
+      "variant": "center",
+      "surface": "dialog",
+      "title": "Create project",
+      "description": "Start from a blank workspace or a template.",
+      "width": 520,
+      "height": 360,
+      "closable": true,
+      "closeOnOverlayClick": true,
+      "actions": [
+        {
+          "label": "Cancel",
+          "variant": "outline"
+        },
+        {
+          "label": "Create project",
+          "variant": "accent"
+        }
+      ],
+      "children": "Project name, region, and environment settings."
+    }
+  },
+  "controls": [
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state."
+    },
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "Visual placement variant.",
+      "options": [
+        "center",
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ],
+      "defaultValue": "right"
+    },
+    {
+      "name": "closeOnOverlayClick",
+      "type": "boolean",
+      "required": false,
+      "description": "Close the modal when its backdrop is clicked.",
+      "defaultValue": true
+    },
+    {
+      "name": "closable",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the modal can be closed via Escape / backdrop click.",
+      "defaultValue": true
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Title content rendered inside the modal."
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "Description content rendered below the title."
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Body content."
+    },
+    {
+      "name": "actions",
+      "type": "array",
+      "required": false,
+      "description": "Optional footer actions."
+    },
+    {
+      "name": "trigger",
+      "type": "string",
+      "required": false,
+      "description": "Trigger element that toggles the modal open."
+    },
+    {
+      "name": "width",
+      "type": "number",
+      "required": false,
+      "description": "Width in px for left/right variants.",
+      "defaultValue": 400
+    },
+    {
+      "name": "height",
+      "type": "number",
+      "required": false,
+      "description": "Height in px for top/bottom variants.",
+      "defaultValue": 420
+    },
+    {
+      "name": "onOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    },
+    {
+      "name": "surface",
+      "type": "select",
+      "required": false,
+      "description": "Surface behavior on compact viewports.",
+      "options": [
+        "auto",
+        "dialog",
+        "sheet"
+      ],
+      "defaultValue": "auto"
+    },
+    {
+      "name": "surfaceBreakpoint",
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch to sheet mode."
+    },
+    {
+      "name": "autoFocusOnOpen",
+      "type": "boolean",
+      "required": false,
+      "description": "Move focus into the modal when it opens. Disable for bounded previews that render open modals inline.",
+      "defaultValue": true
+    },
+    {
+      "name": "scrollLock",
+      "type": "boolean",
+      "required": false,
+      "description": "Lock body scroll while the modal is open. Opt-in; off by default.",
+      "defaultValue": false
+    },
+    {
+      "name": "portal",
+      "type": "boolean",
+      "required": false,
+      "description": "Render overlay into document.body. Disable for bounded component previews.",
+      "defaultValue": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
+    },
+    {
+      "name": "backdropClassName",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the backdrop element."
+    },
+    {
+      "name": "positionerClassName",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the positioner element."
+    }
+  ],
+  "meta": {
+    "name": "Create Project",
+    "component": "Modal",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Modal/Modal.tsx",
+    "contract": "Modal/Modal.json"
+  }
+}

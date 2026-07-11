@@ -37,8 +37,6 @@ export interface ToggleSchema extends MachineSchema {
     | { type: 'TOGGLE'; value: string }
     | { type: 'FOCUS' }
     | { type: 'BLUR' }
-    | { type: 'FOCUS_NEXT' }
-    | { type: 'FOCUS_PREV' }
     | { type: 'SET_VALUE'; value: string[] }
 }
 
@@ -119,12 +117,6 @@ export const toggleMachine = createMachine<ToggleSchema>({
         BLUR: {
           target: 'idle',
         },
-        FOCUS_NEXT: {
-          actions: [],
-        },
-        FOCUS_PREV: {
-          actions: [],
-        },
         SET_VALUE: {
           actions: [
             (ctx, e) => {
@@ -152,7 +144,7 @@ export function connectToggle(
     getRootProps() {
       return {
         ...toggleAnatomy.getPartAttrs('root'),
-        role: 'group' as const,
+        role: type === 'single' ? ('radiogroup' as const) : ('group' as const),
         'aria-orientation': orientation,
         'data-orientation': orientation,
         'data-disabled': disabled || undefined,
@@ -161,7 +153,7 @@ export function connectToggle(
       }
     },
 
-    getItemProps(props: { value: string; disabled?: boolean }) {
+    getItemProps(props: { value: string; disabled?: boolean; tabIndex?: number }) {
       const itemDisabled = disabled || props.disabled
       const isPressed = value.includes(props.value)
 
@@ -169,12 +161,11 @@ export function connectToggle(
         ...toggleAnatomy.getPartAttrs('item'),
         role: type === 'single' ? ('radio' as const) : ('checkbox' as const),
         'aria-checked': isPressed,
-        'aria-pressed': isPressed,
         'aria-disabled': itemDisabled || undefined,
         'data-state': isPressed ? 'on' : 'off',
         'data-disabled': itemDisabled || undefined,
         'data-orientation': orientation,
-        tabIndex: itemDisabled ? -1 : 0,
+        tabIndex: itemDisabled ? -1 : props.tabIndex ?? 0,
         onClick() {
           if (!itemDisabled) {
             send({ type: 'TOGGLE', value: props.value })
@@ -185,24 +176,6 @@ export function connectToggle(
         },
         onBlur() {
           send({ type: 'BLUR' })
-        },
-        onKeyDown(event: { key: string; preventDefault: () => void }) {
-          if (itemDisabled) return
-
-          const isVertical = orientation === 'vertical'
-          const nextKey = isVertical ? 'ArrowDown' : 'ArrowRight'
-          const prevKey = isVertical ? 'ArrowUp' : 'ArrowLeft'
-
-          if (event.key === nextKey) {
-            event.preventDefault()
-            send({ type: 'FOCUS_NEXT' })
-          } else if (event.key === prevKey) {
-            event.preventDefault()
-            send({ type: 'FOCUS_PREV' })
-          } else if (event.key === ' ' || event.key === 'Enter') {
-            event.preventDefault()
-            send({ type: 'TOGGLE', value: props.value })
-          }
         },
       }
     },

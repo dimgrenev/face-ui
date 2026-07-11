@@ -4,10 +4,10 @@
  * `<Upload accept="image/*" multiple />`
  */
 
-import { forwardRef, useRef } from 'react'
+import { forwardRef, useCallback, useRef, useState } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { uploadMachine, connectUpload } from '../assets/machines/upload.machine'
-import type { UploadFile } from '../assets/machines/upload.machine'
+import type { UploadFile, UploadRejectedFile } from '../assets/machines/upload.machine'
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
 import { Button } from '../Button/Button'
@@ -15,6 +15,13 @@ import { Button } from '../Button/Button'
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
+
+export interface UploadLabels {
+  idle: string
+  dragging: string
+  trigger: string
+  remove: string
+}
 
 export interface UploadProps {
   /** Accepted file types (e.g. "image/*", ".pdf,.doc"). */
@@ -29,12 +36,23 @@ export interface UploadProps {
   disabled?: boolean
   /** Controlled file list. */
   files?: UploadFile[]
+  /** Initial file list for uncontrolled usage. */
+  defaultFiles?: UploadFile[]
   /** Callback when files change. */
   onFilesChange?: (details: { files: UploadFile[] }) => void
   /** Callback when files are rejected. */
-  onReject?: (details: { files: { name: string; size: number; type: string }[]; reason: string }) => void
+  onReject?: (details: { files: UploadRejectedFile[] }) => void
+  /** Localized interface labels. */
+  labels?: Partial<UploadLabels>
   /** Additional CSS class. */
   className?: string
+}
+
+const DEFAULT_LABELS: UploadLabels = {
+  idle: 'Drop files here or choose from system',
+  dragging: 'Drop files here',
+  trigger: 'Choose files',
+  remove: 'Remove',
 }
 
 // ---------------------------------------------------------------------------
@@ -62,21 +80,32 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
       maxFiles = 0,
       disabled = false,
       files,
+      defaultFiles = [],
       onFilesChange,
       onReject,
+      labels,
       className,
     } = props
 
     const inputRef = useRef<HTMLInputElement>(null)
+    const isControlled = files !== undefined
+    const [uncontrolledFiles, setUncontrolledFiles] = useState<UploadFile[]>(() => [...defaultFiles])
+    const resolvedFiles = isControlled ? files : uncontrolledFiles
+    const resolvedLabels = { ...DEFAULT_LABELS, ...labels }
+
+    const handleFilesChange = useCallback((details: { files: UploadFile[] }) => {
+      if (!isControlled) setUncontrolledFiles(details.files)
+      onFilesChange?.(details)
+    }, [isControlled, onFilesChange])
 
     const { state, send } = useMachine(uploadMachine, {
-      files: files ?? [],
+      files: resolvedFiles,
       accept,
       multiple,
       maxSize,
       maxFiles,
       disabled,
-      onFilesChange: onFilesChange ?? null,
+      onFilesChange: handleFilesChange,
       onReject: onReject ?? null,
     })
 
@@ -97,11 +126,11 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
         <div {...api.getDropzoneProps()}>
           <input ref={inputRef} {...api.getHiddenInputProps()} />
           <Text as="div" className="uf-upload-dropHint" variant="muted">
-            {api.isDragging ? 'Drop files here' : 'Drop files here or choose from system'}
+            {api.isDragging ? resolvedLabels.dragging : resolvedLabels.idle}
           </Text>
           <Button
             {...triggerProps}
-            text="Choose files"
+            text={resolvedLabels.trigger}
             variant="default"
             align="left"
             className="uf-upload-trigger"
@@ -121,7 +150,8 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
                 </Text>
                 <Button
                   {...(api.getFileRemoveProps(file.id) as any)}
-                  text="Remove"
+                  aria-label={`${resolvedLabels.remove} ${file.name}`}
+                  text={resolvedLabels.remove}
                   fullWidth={false}
                   membrane={false}
                 />

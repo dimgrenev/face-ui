@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { getAdvancedPropParser, type ParsedProp } from './lib/advancedPropParser'
+import { PRODUCT_SCENARIOS, type ProductScenario } from './product-scenarios'
 import { extractReactTsPropsFromSource, type ExtractedProp } from './lib/tsPropExtractor'
 import { getTypeEnricher, type EnrichedProp } from './lib/typeEnricher'
 
@@ -23,6 +24,32 @@ export interface FaceJsonContract {
   props: Record<string, FaceJsonProp>
   states?: Array<{ name: string; props: Record<string, unknown> }>
   [key: string]: unknown
+}
+
+export interface ProductScenarioFaceContract {
+  schema: 'face'
+  'schema-version': 1
+  name: string
+  description: string
+  framework: 'react'
+  root: {
+    type: string
+    props: Record<string, { $ref: string }>
+    children: []
+  }
+  currentState: { props: Record<string, unknown> }
+  controls: Array<Record<string, unknown>>
+  meta: {
+    name: string
+    component: string
+    kind: 'product-scenario'
+  }
+  generated: true
+  generatedBy: typeof PRODUCT_SCENARIO_GENERATOR
+  source: {
+    path: string
+    contract: string
+  }
 }
 
 interface PropAnalysis {
@@ -61,13 +88,22 @@ interface ContractSyncResult {
   changed: boolean
 }
 
+export interface ProductScenarioContractSyncResult {
+  componentName: string
+  scenarioName: string
+  contractPath: string
+  nextContract: ProductScenarioFaceContract
+  currentContract: ProductScenarioFaceContract | null
+  changed: boolean
+}
+
 const THIS_FILE = fileURLToPath(import.meta.url)
 const CONTRACTS_DIR = path.dirname(THIS_FILE)
 const FACE_UI_ROOT = path.resolve(CONTRACTS_DIR, '../..')
+const PRODUCT_SCENARIO_GENERATOR = 'face-ui-product-scenario@1' as const
 
 const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   Accordion: {
-    omitProps: ['legacyItems', 'onChange'],
     patchProps: {
       items: {
         description: 'Accordion item definitions. Each item can include icon, matching Button icon input semantics.',
@@ -79,6 +115,26 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     },
     patchStates: (states) => {
+      const demoItems = [
+        {
+          value: 'getting-started',
+          label: 'Getting Started',
+          icon: 'folder',
+          content: 'Install the package, configure the provider, and begin with the default components.',
+        },
+        {
+          value: 'usage',
+          label: 'Usage Guide',
+          icon: 'folder',
+          content: 'Composition and controlled-state guidance for production interfaces.',
+        },
+        {
+          value: 'api',
+          label: 'API Reference',
+          icon: 'file',
+          content: 'Props, events, keyboard behavior, and accessibility contracts.',
+        },
+      ]
       const withIconsState = {
         name: 'With Icons',
         props: {
@@ -106,16 +162,13 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         },
       }
       const normalizedStates = states.map((state) => {
-        if (state.name === 'Default') {
-          return {
-            ...state,
-            props: {
-              ...state.props,
-              icon: 'folder',
-            },
-          }
+        return {
+          ...state,
+          props: {
+            items: demoItems,
+            ...state.props,
+          },
         }
-        return state
       })
       return normalizedStates.some((state) => state.name === withIconsState.name)
         ? normalizedStates.map((state) => state.name === withIconsState.name ? withIconsState : state)
@@ -124,12 +177,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   },
   Badge: {
     patchProps: {
-      variant: {
-        type: 'enum',
-        default: 'default',
-        options: ['default', 'primary', 'secondary'],
-        description: 'Structural badge variant. Combine with tone for semantic status color.',
-      },
       appearance: {
         type: 'enum',
         default: 'outline',
@@ -145,8 +192,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
     },
     patchStates: () => [
       { name: 'Default', props: { text: 'Badge' } },
-      { name: 'Primary Fill', props: { text: 'Primary', variant: 'primary', appearance: 'fill' } },
-      { name: 'Secondary Fill', props: { text: 'Secondary', variant: 'secondary', appearance: 'fill' } },
+      { name: 'Neutral Fill', props: { text: 'Neutral', appearance: 'fill' } },
       { name: 'Accent Outline', props: { text: 'Accent', tone: 'accent' } },
       { name: 'Positive Outline', props: { text: 'Positive', tone: 'positive' } },
       { name: 'Warning Outline', props: { text: 'Warning', tone: 'warning' } },
@@ -203,16 +249,141 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   },
   Card: {
     patchProps: {
+      title: {
+        type: 'ReactNode',
+        required: false,
+        description: 'Convenience title slot rendered through Card.Title and Face UI Text.',
+      },
+      description: {
+        type: 'ReactNode',
+        required: false,
+        description: 'Convenience description slot rendered through Card.Description and Face UI Text.',
+      },
+      content: {
+        type: 'ReactNode',
+        required: false,
+        description: 'Convenience body slot rendered through Card.Content; primitive values use Face UI Text.',
+      },
       footer: {
         type: 'object',
         required: false,
         controlType: 'object',
-        description: 'Card footer slot. Use a structured component descriptor, for example Button.',
+        description: 'Convenience footer slot. Use React content or a structured component descriptor.',
+      },
+      footerLayout: {
+        description: 'Layout used by the convenience footer slot. Compound usage configures Card.Footer directly.',
       },
     },
+    patchStates: () => [
+      {
+        name: 'Default',
+        props: {
+          title: 'Card Title',
+          content: 'Workspace settings and recent activity stay grouped in one place',
+          footer: {
+            __componentName__: 'Button',
+            text: 'Open',
+            icon: 'arrow-right',
+            iconPosition: 'right',
+            membrane: true,
+            fullWidth: false,
+          },
+        },
+      },
+      {
+        name: 'Dialog Geometry',
+        props: {
+          radius: 'lg',
+          footerLayout: 'between',
+          title: 'Confirm publish',
+          content: 'Review the final settings before sending this workspace live.',
+          footer: [
+            { __componentName__: 'Button', text: 'Cancel', variant: 'outline', membrane: true, fullWidth: false },
+            { __componentName__: 'Button', text: 'Publish', variant: 'accent', membrane: true, fullWidth: false },
+          ],
+        },
+      },
+      {
+        name: 'Floating Geometry',
+        props: {
+          padding: 'membrane',
+          radius: 'base',
+          content: 'Compact overlay surface for menus, selects and date pickers.',
+        },
+      },
+      {
+        name: 'Code Surface',
+        props: {
+          variant: 'code',
+          padding: 'none',
+          radius: 'md',
+          border: false,
+          content: "const surface = 'code'",
+        },
+      },
+      {
+        name: 'Showcase Surface',
+        props: {
+          variant: 'showcase',
+          border: false,
+          content: 'Gallery preview surface',
+        },
+      },
+      {
+        name: 'Plain',
+        props: {
+          variant: 'plain',
+          padding: 'none',
+          radius: 'none',
+          border: false,
+          content: 'Unframed content for composition inside another surface.',
+        },
+      },
+      {
+        name: 'Interactive',
+        props: {
+          interactive: true,
+          title: 'Deploy preview',
+          content: 'Interactive surfaces can react to hover while click behavior stays with their children.',
+        },
+      },
+    ],
+  },
+  Carousel: {
+    patchStates: (states) => states.map((state) => state.name === 'Default'
+      ? {
+          ...state,
+          props: {
+            ...state.props,
+            ariaLabel: 'Office gallery',
+            slides: [
+              {
+                src: '/assets/media/examples/office-core/lobby-day.webp',
+                alt: 'Bright office lobby with glass-block wall, seating, and plants',
+              },
+              {
+                src: '/assets/media/examples/office-core/lobby-glass-blocks.webp',
+                alt: 'Office lobby with glass-block wall, seating, and a person by the window',
+              },
+              {
+                src: '/assets/media/examples/office-core/skyline-window-day.webp',
+                alt: 'Two people looking out from a high-rise office window',
+              },
+            ],
+          },
+        }
+      : state),
+  },
+  Icon: {
+    patchStates: () => [
+      { name: 'Default', props: { name: 'settings' } },
+      { name: 'Direction Left', props: { name: 'left' } },
+      { name: 'Direction Right', props: { name: 'right' } },
+      { name: 'Unknown Fallback', props: { name: 'unknown-icon' } },
+      { name: 'Accessible', props: { name: 'account', label: 'Account' } },
+    ],
   },
   Checkbox: {
-    omitProps: ['onChange'],
     patchProps: {
       checked: {
         type: 'union',
@@ -253,13 +424,53 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
     },
   },
   Modal: {
-    omitProps: ['isOpen', 'onClose', 'disabled', 'label'],
+    omitProps: ['disabled', 'label'],
     patchProps: {
       actions: {
         type: 'array',
         required: false,
         description: 'Optional footer actions.',
       },
+    },
+  },
+  Panel: {
+    patchStates: () => {
+      const items = [
+        { id: 'overview', label: 'Overview', icon: 'layout-sidebar-left-open' },
+        { id: 'projects', label: 'Projects', icon: 'folder' },
+        { id: 'automations', label: 'Automations', icon: 'component' },
+        { id: 'settings', label: 'Settings', icon: 'settings' },
+      ]
+      return [
+        {
+          name: 'Default',
+          props: {
+            items,
+            defaultSelectedId: 'overview',
+            surface: 'inline',
+            width: 260,
+          },
+        },
+        {
+          name: 'Collapsed',
+          props: {
+            items,
+            defaultSelectedId: 'projects',
+            surface: 'inline',
+            defaultCollapsed: true,
+          },
+        },
+        {
+          name: 'Responsive Sheet',
+          props: {
+            items,
+            defaultSelectedId: 'automations',
+            surface: 'sheet',
+            defaultOpen: true,
+            surfaceTitle: 'Workspace',
+          },
+        },
+      ]
     },
   },
   Separator: {
@@ -297,8 +508,46 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     },
   },
+  Progress: {
+    patchStates: () => [
+      {
+        name: 'Default',
+        props: {
+          value: 28,
+          max: 100,
+          tone: 'neutral',
+          shape: 'linear',
+          showValue: true,
+          label: 'Typography',
+        },
+      },
+      {
+        name: 'Complete',
+        props: { value: 100, showValue: true, label: 'Deployment' },
+      },
+      {
+        name: 'Positive',
+        props: { value: 100, tone: 'positive', showValue: true, label: 'Checks passed' },
+      },
+      {
+        name: 'Warning',
+        props: { value: 82, tone: 'warning', showValue: true, label: 'Storage used' },
+      },
+      {
+        name: 'Destructive',
+        props: { value: 96, tone: 'destructive', showValue: true, label: 'Quota used' },
+      },
+      {
+        name: 'Circle',
+        props: { value: 28, shape: 'circle', showValue: true, ariaLabel: 'Context progress' },
+      },
+      {
+        name: 'Indeterminate',
+        props: { indeterminate: true, label: 'Loading assets' },
+      },
+    ],
+  },
   Radio: {
-    omitProps: ['flow', 'onChange'],
     patchProps: {
       options: {
         type: 'array',
@@ -365,9 +614,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     ],
   },
-  Select: {
-    omitProps: ['onChange'],
-  },
   Slider: {
     patchProps: {
       variant: {
@@ -375,17 +621,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         required: false,
         default: 'simple',
         options: ['simple', 'advanced'],
-        description: 'Simple machine-driven slider or the advanced legacy slider.',
-      },
-      scalarValue: {
-        type: 'number',
-        required: false,
-        description: 'Legacy scalar value for the advanced slider.',
-      },
-      onChange: {
-        type: 'function',
-        required: false,
-        description: 'Legacy scalar callback for the advanced slider.',
+        description: 'Standard track/thumb presentation or enhanced value-thumb presentation.',
       },
       leading: {
         type: 'enum',
@@ -479,12 +715,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     ],
   },
-  Switcher: {
-    omitProps: ['onChange'],
-  },
-  Tabs: {
-    omitProps: ['tabs', 'activeTab', 'defaultActiveTab', 'onChange'],
-  },
   Tile: {
     patchProps: {
       intent: {
@@ -498,8 +728,8 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         type: 'enum',
         required: false,
         default: 'default',
-        options: ['default', 'compact', 'spacious'],
-        description: 'Internal spacing density. Default follows Button text padding; compact tightens tree/sidebar rows; spacious gives inspection rows more breathing room.',
+        options: ['default', 'spacious'],
+        description: 'Internal spacing density. Default follows the shared control rhythm; spacious gives inspection rows more breathing room.',
       },
       tone: {
         type: 'enum',
@@ -576,7 +806,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         name: 'Tree Row',
         props: {
           intent: 'tree',
-          density: 'compact',
           text: 'src/components/Button.tsx',
           icon: 'file',
           level: 2,
@@ -614,8 +843,45 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     ],
   },
-  Toc: {
-    omitProps: ['onChange'],
+  Toast: {
+    patchStates: () => [
+      {
+        name: 'Default',
+        props: {
+          title: 'Workspace updated',
+          description: 'Your changes are available to collaborators.',
+          tone: 'neutral',
+          dismissible: true,
+        },
+      },
+      {
+        name: 'Positive',
+        props: {
+          title: 'Deployment completed',
+          description: 'Production is healthy and serving the new release.',
+          tone: 'positive',
+          dismissible: true,
+        },
+      },
+      {
+        name: 'Warning',
+        props: {
+          title: 'Usage is near the limit',
+          description: 'This workspace has used 82% of its monthly quota.',
+          tone: 'warning',
+          dismissible: true,
+        },
+      },
+      {
+        name: 'Destructive',
+        props: {
+          title: 'Deployment failed',
+          description: 'Review the build log before retrying.',
+          tone: 'destructive',
+          dismissible: true,
+        },
+      },
+    ],
   },
   Tree: {
     patchProps: {
@@ -714,6 +980,7 @@ const UNCONTROLLED_PROP_PAIRS: Array<[string, string]> = [
   ['index', 'defaultIndex'],
   ['activeId', 'defaultActiveId'],
   ['cropRange', 'defaultCropRange'],
+  ['files', 'defaultFiles'],
 ]
 
 function readJson<T>(filePath: string): T {
@@ -1007,6 +1274,178 @@ function applyOverrides(componentName: string, props: Record<string, FaceJsonPro
   return next
 }
 
+function normalizeContractStates(
+  componentName: string,
+  currentStates: NonNullable<FaceJsonContract['states']>,
+  props: Record<string, FaceJsonProp>,
+): NonNullable<FaceJsonContract['states']> {
+  const knownProps = new Set(Object.keys(props))
+  const canonicalStates = currentStates.map((state) => ({
+    ...state,
+    props: Object.fromEntries(
+      Object.entries(state.props ?? {}).filter(([propName]) => knownProps.has(propName)),
+    ),
+  }))
+  const patchedStates = CONTRACT_OVERRIDES[componentName]?.patchStates?.(canonicalStates) ?? canonicalStates
+  const normalizedStates = patchedStates.filter((state) => !state.name.startsWith('Product / '))
+
+  for (const state of normalizedStates) {
+    for (const [propName, value] of Object.entries(state.props ?? {})) {
+      if (!knownProps.has(propName)) {
+        throw new Error(`${componentName} contract state "${state.name}" uses unknown prop "${propName}"`)
+      }
+      const options = props[propName]?.options
+      if (
+        Array.isArray(options)
+        && options.length > 0
+        && (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')
+        && !options.some((option) => Object.is(option, value) || String(option) === String(value))
+      ) {
+        throw new Error(
+          `${componentName} contract state "${state.name}" uses invalid value ${JSON.stringify(value)} for "${propName}"; expected one of ${options.map((option) => JSON.stringify(option)).join(', ')}`,
+        )
+      }
+    }
+  }
+
+  return normalizedStates
+}
+
+function productScenarioDisplayName(scenarioName: string): string {
+  return scenarioName.replace(/^Product\s*\/\s*/i, '').trim()
+}
+
+function productScenarioSlug(scenarioName: string): string {
+  const slug = productScenarioDisplayName(scenarioName)
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase()
+  if (!slug) throw new Error(`Unable to build a file name for product scenario: ${scenarioName}`)
+  return slug
+}
+
+function productScenarioContractPath(entry: ComponentContractEntry, scenario: ProductScenario): string {
+  return path.join(entry.componentDir, `${entry.componentName}.${productScenarioSlug(scenario.name)}.face.json`)
+}
+
+function productScenarioControlType(prop: FaceJsonProp): string {
+  if (prop.type === 'enum') return 'select'
+  if (prop.type === 'ReactNode' || prop.type === 'node' || prop.type === 'union') return 'any'
+  return prop.type
+}
+
+function buildProductScenarioControl(name: string, prop: FaceJsonProp): Record<string, unknown> {
+  const control: Record<string, unknown> = {
+    name,
+    type: productScenarioControlType(prop),
+    required: Boolean(prop.required),
+  }
+  if (prop.description) control.description = prop.description
+  if (Array.isArray(prop.options) && prop.options.length > 0) control.options = structuredClone(prop.options)
+  if (Object.prototype.hasOwnProperty.call(prop, 'default')) control.defaultValue = structuredClone(prop.default)
+  for (const key of ['controlType', 'min', 'max', 'step', 'suggestions']) {
+    if (Object.prototype.hasOwnProperty.call(prop, key)) control[key] = structuredClone(prop[key])
+  }
+  return control
+}
+
+function buildProductScenarioFaceContract(
+  entry: ComponentContractEntry,
+  scenario: ProductScenario,
+  componentContract: FaceJsonContract,
+): ProductScenarioFaceContract {
+  const displayName = productScenarioDisplayName(scenario.name)
+  const propNames = Object.keys(componentContract.props)
+  const sourcePath = path.relative(FACE_UI_ROOT, entry.sourcePath).replace(/\\/g, '/')
+  const contractPath = path.relative(FACE_UI_ROOT, entry.contractPath).replace(/\\/g, '/')
+
+  return {
+    schema: 'face',
+    'schema-version': 1,
+    name: `${entry.componentName} / ${displayName}`,
+    description: `${displayName} product scenario for the ${entry.componentName} component.`,
+    framework: 'react',
+    root: {
+      type: entry.componentName,
+      props: Object.fromEntries(propNames.map((propName) => [propName, { $ref: `props.${propName}` }])),
+      children: [],
+    },
+    currentState: {
+      props: structuredClone(scenario.props),
+    },
+    controls: Object.entries(componentContract.props)
+      .map(([propName, prop]) => buildProductScenarioControl(propName, prop)),
+    meta: {
+      name: displayName,
+      component: entry.componentName,
+      kind: 'product-scenario',
+    },
+    generated: true,
+    generatedBy: PRODUCT_SCENARIO_GENERATOR,
+    source: {
+      path: sourcePath,
+      contract: contractPath,
+    },
+  }
+}
+
+function readProductScenarioContract(filePath: string): ProductScenarioFaceContract | null {
+  if (!fs.existsSync(filePath)) return null
+  try {
+    return readJson<ProductScenarioFaceContract>(filePath)
+  } catch {
+    return null
+  }
+}
+
+function listGeneratedProductScenarioContractPaths(entries: ComponentContractEntry[]): string[] {
+  return entries.flatMap((entry) => fs.readdirSync(entry.componentDir)
+    .filter((fileName) => fileName.endsWith('.face.json'))
+    .map((fileName) => path.join(entry.componentDir, fileName))
+    .filter((filePath) => readProductScenarioContract(filePath)?.generatedBy === PRODUCT_SCENARIO_GENERATOR))
+}
+
+function validateProductScenarioCatalog(entries: ComponentContractEntry[]) {
+  const componentNames = new Set(entries.map((entry) => entry.componentName))
+  const scenarioComponentNames = new Set(Object.keys(PRODUCT_SCENARIOS))
+  const missing = [...componentNames].filter((name) => !scenarioComponentNames.has(name))
+  const extra = [...scenarioComponentNames].filter((name) => !componentNames.has(name))
+
+  if (missing.length > 0 || extra.length > 0) {
+    throw new Error(
+      `Product scenario catalog coverage mismatch. Missing: ${missing.join(', ') || 'none'}. Extra: ${extra.join(', ') || 'none'}.`,
+    )
+  }
+
+  for (const [componentName, scenarios] of Object.entries(PRODUCT_SCENARIOS)) {
+    if (scenarios.length !== 2) {
+      throw new Error(`${componentName} must define exactly two product scenarios; received ${scenarios.length}`)
+    }
+    const names = new Set<string>()
+    const slugs = new Set<string>()
+    for (const scenario of scenarios) {
+      if (!scenario.name.startsWith('Product / ')) {
+        throw new Error(`${componentName} product scenario name must start with "Product / ": ${scenario.name}`)
+      }
+      if (names.has(scenario.name)) {
+        throw new Error(`${componentName} has duplicate product scenario name: ${scenario.name}`)
+      }
+      const slug = productScenarioSlug(scenario.name)
+      if (slugs.has(slug)) {
+        throw new Error(`${componentName} has product scenarios with the same file slug: ${slug}`)
+      }
+      if (Object.keys(scenario.props).length < 2) {
+        throw new Error(`${componentName} product scenario "${scenario.name}" must combine at least two props`)
+      }
+      names.add(scenario.name)
+      slugs.add(slug)
+    }
+  }
+}
+
 export function buildFaceJsonContract(entry: ComponentContractEntry): FaceJsonContract {
   const code = fs.readFileSync(entry.sourcePath, 'utf8')
   const current = readJson<FaceJsonContract>(entry.contractPath)
@@ -1024,17 +1463,23 @@ export function buildFaceJsonContract(entry: ComponentContractEntry): FaceJsonCo
     delete nextProps[controlledKey].default
   }
 
+  const props = applyOverrides(entry.componentName, nextProps)
+
   return {
     ...current,
     name: current.name || entry.componentName,
     description: current.description || extractSummary(code) || `${entry.componentName} component`,
-    props: applyOverrides(entry.componentName, nextProps),
-    states: CONTRACT_OVERRIDES[entry.componentName]?.patchStates?.(Array.isArray(current.states) ? current.states : [])
-      ?? (Array.isArray(current.states) ? current.states : []),
+    props,
+    states: normalizeContractStates(
+      entry.componentName,
+      Array.isArray(current.states) ? current.states : [],
+      props,
+    ),
   }
 }
 
 export function collectFaceJsonContracts(componentName?: string): ContractSyncResult[] {
+  validateProductScenarioCatalog(listComponentContracts())
   return listComponentContracts(componentName).map((entry) => {
     const currentContract = readJson<FaceJsonContract>(entry.contractPath)
     const nextContract = buildFaceJsonContract(entry)
@@ -1045,6 +1490,27 @@ export function collectFaceJsonContracts(componentName?: string): ContractSyncRe
       nextContract,
       changed: JSON.stringify(currentContract) !== JSON.stringify(nextContract),
     }
+  })
+}
+
+export function collectProductScenarioContracts(componentName?: string): ProductScenarioContractSyncResult[] {
+  const entries = listComponentContracts(componentName)
+  validateProductScenarioCatalog(listComponentContracts())
+  return entries.flatMap((entry) => {
+    const componentContract = buildFaceJsonContract(entry)
+    return (PRODUCT_SCENARIOS[entry.componentName] ?? []).map((scenario) => {
+      const contractPath = productScenarioContractPath(entry, scenario)
+      const currentContract = readProductScenarioContract(contractPath)
+      const nextContract = buildProductScenarioFaceContract(entry, scenario, componentContract)
+      return {
+        componentName: entry.componentName,
+        scenarioName: scenario.name,
+        contractPath,
+        currentContract,
+        nextContract,
+        changed: JSON.stringify(currentContract) !== JSON.stringify(nextContract),
+      }
+    })
   })
 }
 
@@ -1066,17 +1532,41 @@ function printSummary(results: ContractSyncResult[], mode: 'check' | 'write') {
 
 export function runContractSync(options?: { write?: boolean; componentName?: string }): number {
   const results = collectFaceJsonContracts(options?.componentName)
+  const productResults = collectProductScenarioContracts(options?.componentName)
+  const componentEntries = listComponentContracts(options?.componentName)
+  const expectedProductPaths = new Set(productResults.map((result) => result.contractPath))
+  const staleProductPaths = listGeneratedProductScenarioContractPaths(componentEntries)
+    .filter((filePath) => !expectedProductPaths.has(filePath))
   if (options?.write) {
     for (const result of results) {
       if (!result.changed) continue
       writeJson(result.contractPath, result.nextContract)
     }
+    for (const result of productResults) {
+      if (!result.changed) continue
+      writeJson(result.contractPath, result.nextContract)
+    }
+    for (const filePath of staleProductPaths) fs.rmSync(filePath)
     printSummary(results, 'write')
+    const changedProductResults = productResults.filter((result) => result.changed)
+    console.log(`face-ui-react product scenario contracts synced (${productResults.length} contracts, ${changedProductResults.length} updated, ${staleProductPaths.length} removed)`)
     return 0
   }
 
   printSummary(results, 'check')
-  return results.some((result) => result.changed) ? 1 : 0
+  const changedProductResults = productResults.filter((result) => result.changed)
+  if (changedProductResults.length === 0 && staleProductPaths.length === 0) {
+    console.log(`face-ui-react product scenario contracts are in sync (${productResults.length} contracts)`)
+  } else {
+    for (const result of changedProductResults) {
+      console.log(`drift ${result.componentName} / ${result.scenarioName}: ${path.relative(process.cwd(), result.contractPath)}`)
+    }
+    for (const filePath of staleProductPaths) {
+      console.log(`stale product scenario contract: ${path.relative(process.cwd(), filePath)}`)
+    }
+    console.error(`face-ui-react product scenario contracts drifted (${changedProductResults.length} changed, ${staleProductPaths.length} stale)`)
+  }
+  return results.some((result) => result.changed) || changedProductResults.length > 0 || staleProductPaths.length > 0 ? 1 : 0
 }
 
 function main() {

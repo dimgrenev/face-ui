@@ -1,0 +1,145 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Calendar / Booking Range",
+  "description": "Booking Range product scenario for the Calendar component.",
+  "framework": "react",
+  "root": {
+    "type": "Calendar",
+    "props": {
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "selection": {
+        "$ref": "props.selection"
+      },
+      "min": {
+        "$ref": "props.min"
+      },
+      "max": {
+        "$ref": "props.max"
+      },
+      "disabledDates": {
+        "$ref": "props.disabledDates"
+      },
+      "locale": {
+        "$ref": "props.locale"
+      },
+      "weekStartsOn": {
+        "$ref": "props.weekStartsOn"
+      },
+      "onValueChange": {
+        "$ref": "props.onValueChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "selection": "range",
+      "defaultValue": {
+        "start": "2026-07-14",
+        "end": "2026-07-18"
+      },
+      "min": "2026-07-01",
+      "max": "2026-08-31",
+      "locale": "en-US",
+      "weekStartsOn": 1
+    }
+  },
+  "controls": [
+    {
+      "name": "value",
+      "type": "object",
+      "required": false,
+      "description": "Selected date."
+    },
+    {
+      "name": "defaultValue",
+      "type": "object",
+      "required": false,
+      "description": "Default selected date (uncontrolled)."
+    },
+    {
+      "name": "selection",
+      "type": "select",
+      "required": false,
+      "description": "Selection model.",
+      "options": [
+        "single",
+        "range"
+      ],
+      "defaultValue": "single"
+    },
+    {
+      "name": "min",
+      "type": "object",
+      "required": false,
+      "description": "Minimum selectable date."
+    },
+    {
+      "name": "max",
+      "type": "object",
+      "required": false,
+      "description": "Maximum selectable date."
+    },
+    {
+      "name": "disabledDates",
+      "type": "array",
+      "required": false,
+      "description": "Array of dates that cannot be selected."
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "required": false,
+      "description": "Locale for month and weekday names.",
+      "defaultValue": "en-US"
+    },
+    {
+      "name": "weekStartsOn",
+      "type": "select",
+      "required": false,
+      "description": "First day of the week: 0=Sunday, 1=Monday, etc.",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "defaultValue": 0
+    },
+    {
+      "name": "onValueChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when the selected date changes."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    }
+  ],
+  "meta": {
+    "name": "Booking Range",
+    "component": "Calendar",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Calendar/Calendar.tsx",
+    "contract": "Calendar/Calendar.json"
+  }
+}

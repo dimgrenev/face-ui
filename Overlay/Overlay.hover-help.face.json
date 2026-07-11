@@ -1,0 +1,165 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Overlay / Hover Help",
+  "description": "Hover Help product scenario for the Overlay component.",
+  "framework": "react",
+  "root": {
+    "type": "Overlay",
+    "props": {
+      "trigger": {
+        "$ref": "props.trigger"
+      },
+      "interactive": {
+        "$ref": "props.interactive"
+      },
+      "content": {
+        "$ref": "props.content"
+      },
+      "children": {
+        "$ref": "props.children"
+      },
+      "open": {
+        "$ref": "props.open"
+      },
+      "openDelay": {
+        "$ref": "props.openDelay"
+      },
+      "closeDelay": {
+        "$ref": "props.closeDelay"
+      },
+      "side": {
+        "$ref": "props.side"
+      },
+      "align": {
+        "$ref": "props.align"
+      },
+      "sideOffset": {
+        "$ref": "props.sideOffset"
+      },
+      "onOpenChange": {
+        "$ref": "props.onOpenChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "trigger": "hover",
+      "children": "API limits",
+      "content": "Limits reset at the start of each billing cycle.",
+      "side": "top",
+      "align": "center",
+      "sideOffset": 4,
+      "openDelay": 250
+    }
+  },
+  "controls": [
+    {
+      "name": "trigger",
+      "type": "select",
+      "required": false,
+      "description": "How the overlay is triggered.",
+      "options": [
+        "hover",
+        "click"
+      ],
+      "defaultValue": "hover"
+    },
+    {
+      "name": "interactive",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether content is interactive (keeps open on hover).",
+      "defaultValue": false
+    },
+    {
+      "name": "content",
+      "type": "string",
+      "required": false,
+      "description": "Content rendered inside the floating surface."
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Trigger element (the anchor)."
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state."
+    },
+    {
+      "name": "openDelay",
+      "type": "number",
+      "required": false,
+      "description": "Delay before opening (ms)."
+    },
+    {
+      "name": "closeDelay",
+      "type": "number",
+      "required": false,
+      "description": "Delay before closing (ms)."
+    },
+    {
+      "name": "side",
+      "type": "select",
+      "required": false,
+      "description": "Preferred side placement.",
+      "options": [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ],
+      "defaultValue": "top"
+    },
+    {
+      "name": "align",
+      "type": "select",
+      "required": false,
+      "description": "Alignment along the side.",
+      "options": [
+        "start",
+        "center",
+        "end"
+      ],
+      "defaultValue": "center"
+    },
+    {
+      "name": "sideOffset",
+      "type": "number",
+      "required": false,
+      "description": "Offset from the trigger along the side axis (px).",
+      "defaultValue": 2
+    },
+    {
+      "name": "onOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "Called when the open state changes."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name for the content element."
+    }
+  ],
+  "meta": {
+    "name": "Hover Help",
+    "component": "Overlay",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Overlay/Overlay.tsx",
+    "contract": "Overlay/Overlay.json"
+  }
+}

@@ -498,7 +498,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "var(--uf-font-size-xs)"
+          "value": "var(--uf-font-size-base)"
         }
       ]
     },
@@ -509,6 +509,26 @@
         {
           "selector": ":root",
           "value": "16px"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-caption-min-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-6)"
+        }
+      ]
+    },
+    {
+      "sheet": "typography",
+      "name": "--uf-text-caption-pad-y",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-spacing-1)"
         }
       ]
     },

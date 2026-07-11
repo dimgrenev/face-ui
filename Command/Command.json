@@ -121,7 +121,9 @@
     "rovingFocus": true,
     "typeahead": true,
     "dismissOnEscape": true,
-    "autoFocusOnOpen": "first-focusable"
+    "autoFocusOnOpen": "first-focusable",
+    "focusTrap": true,
+    "scrollLock": true
   },
   "keyboard": {
     "ArrowDown": {

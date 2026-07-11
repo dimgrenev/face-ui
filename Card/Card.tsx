@@ -18,13 +18,11 @@ export const cardAnatomy = createAnatomy('card').parts(
 
 export type CardVariant =
   | 'default'
-  | 'floating'
-  | 'dialog'
   | 'code'
   | 'showcase'
   | 'plain'
-export type CardPadding = 'none' | 'membrane' | 'compact' | 'control' | 'default' | 'spacious' | 'showcase'
-export type CardRadius = 'none' | 'base' | 'sm' | 'md' | 'lg' | 'xl' | 'showcase'
+export type CardPadding = 'none' | 'membrane' | 'control' | 'default' | 'spacious'
+export type CardRadius = 'none' | 'base' | 'sm' | 'md' | 'lg' | 'xl'
 export type CardHeaderLayout = 'stack' | 'bar'
 export type CardFooterLayout = 'start' | 'end' | 'between' | 'split'
 export type CardActionAlign = 'start' | 'end' | 'between'
@@ -41,7 +39,6 @@ export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'content
   interactive?: boolean
   fullWidth?: boolean
   footerLayout?: CardFooterLayout
-  membrane?: boolean
   children?: ReactNode
 }
 
@@ -103,7 +100,12 @@ function renderCardDescriptor(node: CardChildDescriptor): ReactNode {
   switch (__componentName__) {
     case 'Text': return <Text fullWidth {...withDefaultMembrane(slotProps)} />
     case 'Button': return <Button {...withDefaultMembrane(slotProps)} />
-    case 'Icon': return <Icon {...slotProps} />
+    case 'Icon': {
+      const { name: iconName, ...iconProps } = slotProps
+      return typeof iconName === 'string' && iconName.length > 0
+        ? <Icon name={iconName} {...iconProps} />
+        : null
+    }
     case 'Card.Header': return renderCardSlotDescriptor(CardHeader, slotProps)
     case 'Card.Title': return renderCardSlotDescriptor(CardTitle, slotProps)
     case 'Card.Description': return renderCardSlotDescriptor(CardDescription, slotProps)
@@ -307,7 +309,6 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
       interactive = false,
       fullWidth = true,
       footerLayout = 'end',
-      membrane = true,
       children,
       className,
       ...rest
@@ -328,7 +329,6 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
         data-border={border ? 'true' : 'false'}
         data-interactive={interactive ? '' : undefined}
         data-full-width={fullWidth ? '' : undefined}
-        data-membrane={membrane ? '' : undefined}
         className={cn('uf-card', className)}
         {...rest}
       >

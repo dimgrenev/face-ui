@@ -1,0 +1,177 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Tabs / Settings Sections",
+  "description": "Settings Sections product scenario for the Tabs component.",
+  "framework": "react",
+  "root": {
+    "type": "Tabs",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      },
+      "activationMode": {
+        "$ref": "props.activationMode"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "onValueChange": {
+        "$ref": "props.onValueChange"
+      },
+      "withLine": {
+        "$ref": "props.withLine"
+      },
+      "wrap": {
+        "$ref": "props.wrap"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "renderPanels": {
+        "$ref": "props.renderPanels"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "orientation": "vertical",
+      "activationMode": "manual",
+      "defaultValue": "general",
+      "withLine": false,
+      "wrap": true,
+      "membrane": true,
+      "renderPanels": true,
+      "items": [
+        {
+          "value": "general",
+          "label": "General",
+          "content": "Workspace identity and defaults."
+        },
+        {
+          "value": "security",
+          "label": "Security",
+          "content": "Authentication and session policies."
+        },
+        {
+          "value": "billing",
+          "label": "Billing",
+          "content": "Plan and invoice settings."
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Tab definitions. Each item supports value, label, content, disabled, panelId, leadingIcon, trailingIcon, and an optional overlay action via actionIcon, actionLabel, actionVisibility, actionPosition, and onAction."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Currently selected tab value."
+    },
+    {
+      "name": "defaultValue",
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial tab value."
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Orientation of the tab list.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ],
+      "defaultValue": "horizontal"
+    },
+    {
+      "name": "activationMode",
+      "type": "select",
+      "required": false,
+      "description": "Activation mode: automatic selects on focus, manual requires click/Enter.",
+      "options": [
+        "automatic",
+        "manual"
+      ],
+      "defaultValue": "automatic"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire tab group.",
+      "defaultValue": false
+    },
+    {
+      "name": "onValueChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when the selected tab changes."
+    },
+    {
+      "name": "withLine",
+      "type": "boolean",
+      "required": false,
+      "description": "Render the active-tab indicator line.",
+      "defaultValue": false
+    },
+    {
+      "name": "wrap",
+      "type": "boolean",
+      "required": false,
+      "description": "Allow tab triggers to wrap onto multiple rows.",
+      "defaultValue": false
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper around each tab trigger.",
+      "defaultValue": true
+    },
+    {
+      "name": "renderPanels",
+      "type": "boolean",
+      "required": false,
+      "description": "Render internal content panels. Set false when panels are rendered outside Tabs.",
+      "defaultValue": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  ],
+  "meta": {
+    "name": "Settings Sections",
+    "component": "Tabs",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Tabs/Tabs.tsx",
+    "contract": "Tabs/Tabs.json"
+  }
+}

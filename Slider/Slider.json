@@ -7,7 +7,7 @@
     "variant": {
       "type": "enum",
       "required": false,
-      "description": "Simple machine-driven slider or the advanced legacy slider.",
+      "description": "Standard track/thumb presentation or enhanced value-thumb presentation.",
       "options": [
         "simple",
         "advanced"
@@ -23,11 +23,6 @@
       "type": "array",
       "required": false,
       "description": "Uncontrolled initial value(s)."
-    },
-    "scalarValue": {
-      "type": "number",
-      "required": false,
-      "description": "Legacy scalar value for the advanced slider."
     },
     "min": {
       "type": "number",
@@ -72,11 +67,6 @@
       "type": "function",
       "required": false,
       "description": "Callback when value changes."
-    },
-    "onChange": {
-      "type": "function",
-      "required": false,
-      "description": "Legacy scalar callback for the advanced slider."
     },
     "leading": {
       "type": "enum",

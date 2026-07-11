@@ -1,0 +1,100 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Avatar / Team Member",
+  "description": "Team Member product scenario for the Avatar component.",
+  "framework": "react",
+  "root": {
+    "type": "Avatar",
+    "props": {
+      "src": {
+        "$ref": "props.src"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "icon": {
+        "$ref": "props.icon"
+      },
+      "fallback": {
+        "$ref": "props.fallback"
+      },
+      "children": {
+        "$ref": "props.children"
+      },
+      "fallbackDelayMs": {
+        "$ref": "props.fallbackDelayMs"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
+      "name": "Maya Chen",
+      "fallback": "MC",
+      "fallbackDelayMs": 150
+    }
+  },
+  "controls": [
+    {
+      "name": "src",
+      "type": "string",
+      "required": false,
+      "description": "Image source URL.",
+      "defaultValue": ""
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "User name (used for initials fallback and alt text).",
+      "defaultValue": ""
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "required": false,
+      "description": "Icon content shown when no image is available."
+    },
+    {
+      "name": "fallback",
+      "type": "string",
+      "required": false,
+      "description": "Custom fallback content when image is unavailable."
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Custom media content. Rendered inside the clipped avatar circle when no image is available."
+    },
+    {
+      "name": "fallbackDelayMs",
+      "type": "number",
+      "required": false,
+      "description": "Delay in ms before showing fallback (gives image time to load).",
+      "defaultValue": 0
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    }
+  ],
+  "meta": {
+    "name": "Team Member",
+    "component": "Avatar",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Avatar/Avatar.tsx",
+    "contract": "Avatar/Avatar.json"
+  }
+}

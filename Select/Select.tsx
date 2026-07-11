@@ -76,8 +76,6 @@ export interface SelectProps {
   stretchText?: boolean
   /** Callback when value changes. */
   onValueChange?: (details: { value: string | string[] | null }) => void
-  /** Legacy value-change alias. */
-  onChange?: (value: string | string[] | null) => void
   /** Callback when open state changes. */
   onOpenChange?: (details: { open: boolean }) => void
   /** Preferred content surface. Auto switches to bottom sheet on compact viewports. */
@@ -166,6 +164,8 @@ const SELECT_SIDE_MAX_HEIGHT = 480
 const SELECT_SIDE_VIEWPORT_INSET = 4
 const SELECT_SIDE_GAP = 4
 const SELECT_SIDE_MIN_HEIGHT = 80
+const SELECT_SIDE_VISIBLE_OPTION_COUNT = 5
+const SELECT_SIDE_OPTION_SELECTOR = '[data-part="option"]'
 const SELECT_SIDE_ACTIVE_OPTION_SELECTOR = [
   '[data-part="option"][aria-selected="true"]',
   '[data-part="option"][data-state="selected"]',
@@ -190,6 +190,26 @@ export interface SelectSidePosition {
   left: number
   width: number
   maxHeight: number
+  initialScrollTop: number
+}
+
+export function computeSelectSideOptionViewportHeight(params: {
+  contentHeight: number
+  optionBottomOffsets: number[]
+  visibleOptionLimit?: number
+}): number {
+  const contentHeight = Math.max(0, params.contentHeight)
+  const optionBottomOffsets = params.optionBottomOffsets
+    .filter((value) => Number.isFinite(value) && value > 0)
+  const visibleOptionLimit = Math.max(1, Math.floor(
+    params.visibleOptionLimit ?? SELECT_SIDE_VISIBLE_OPTION_COUNT,
+  ))
+  if (optionBottomOffsets.length <= visibleOptionLimit) return contentHeight
+
+  const lastOptionBottom = optionBottomOffsets[optionBottomOffsets.length - 1] || contentHeight
+  const visibleOptionsBottom = optionBottomOffsets[visibleOptionLimit - 1] || contentHeight
+  const trailingInset = Math.max(0, contentHeight - lastOptionBottom)
+  return Math.min(contentHeight, visibleOptionsBottom + trailingInset)
 }
 
 export function computeSelectSidePosition(params: {
@@ -249,32 +269,68 @@ export function computeSelectSidePosition(params: {
     ? anchorRight - panelWidth - gap
     : anchorLeft + gap
   const triggerCenter = triggerRect.top + triggerRect.height / 2
-  const desiredTop = typeof activeOptionCenterOffset === 'number' && Number.isFinite(activeOptionCenterOffset)
+  const hasActiveOptionOffset = typeof activeOptionCenterOffset === 'number' && Number.isFinite(activeOptionCenterOffset)
+  const desiredTop = hasActiveOptionOffset
     ? triggerCenter - activeOptionCenterOffset
     : triggerRect.top
 
+  const top = clamp(desiredTop, verticalMin, verticalMax - panelHeight)
+  const maxScrollTop = Math.max(0, contentHeight - panelHeight)
+  const scrollTop = hasActiveOptionOffset
+    ? clamp(top + activeOptionCenterOffset - triggerCenter, 0, maxScrollTop)
+    : 0
+
   return {
-    top: Math.round(clamp(desiredTop, verticalMin, verticalMax - panelHeight)),
+    top: Math.round(top),
     left: Math.round(clamp(desiredLeft, viewportLeft, viewportRight - panelWidth)),
     width: Math.round(panelWidth),
-    maxHeight: Math.round(panelHeight),
+    maxHeight: Math.max(1, Math.round(panelHeight)),
+    initialScrollTop: Math.round(scrollTop),
   }
 }
 
-function readSelectActiveOptionCenterOffset(contentEl: HTMLElement): number | null {
+function readSelectSideContentMetrics(contentEl: HTMLElement): {
+  contentHeight: number
+  maxVisibleHeight: number
+  activeOptionCenterOffset: number | null
+  scrollViewport: HTMLElement
+} {
+  const scrollViewport = (
+    contentEl.querySelector('.uf-select__contentPanel') as HTMLElement | null
+  ) || contentEl
+  const viewportRect = scrollViewport.getBoundingClientRect()
+  const scrollTop = scrollViewport.scrollTop
+  const contentHeight = Math.max(scrollViewport.scrollHeight, viewportRect.height)
+  const options = Array.from(
+    contentEl.querySelectorAll(SELECT_SIDE_OPTION_SELECTOR),
+  ) as HTMLElement[]
+  const optionBottomOffsets = options.map((option) => {
+    const optionRect = option.getBoundingClientRect()
+    return optionRect.bottom - viewportRect.top + scrollTop
+  })
+  const maxVisibleHeight = computeSelectSideOptionViewportHeight({
+    contentHeight,
+    optionBottomOffsets,
+  })
   const activeOption = contentEl.querySelector(SELECT_SIDE_ACTIVE_OPTION_SELECTOR) as HTMLElement | null
-  if (!activeOption || typeof activeOption.getBoundingClientRect !== 'function') return null
-  const contentRect = contentEl.getBoundingClientRect()
+  if (!activeOption || typeof activeOption.getBoundingClientRect !== 'function') {
+    return { contentHeight, maxVisibleHeight, activeOptionCenterOffset: null, scrollViewport }
+  }
   const optionRect = activeOption.getBoundingClientRect()
   if (
-    !Number.isFinite(contentRect.top) ||
+    !Number.isFinite(viewportRect.top) ||
     !Number.isFinite(optionRect.top) ||
     !Number.isFinite(optionRect.height) ||
     optionRect.height <= 0
   ) {
-    return null
+    return { contentHeight, maxVisibleHeight, activeOptionCenterOffset: null, scrollViewport }
   }
-  return optionRect.top - contentRect.top + optionRect.height / 2
+  return {
+    contentHeight,
+    maxVisibleHeight,
+    activeOptionCenterOffset: optionRect.top - viewportRect.top + scrollTop + optionRect.height / 2,
+    scrollViewport,
+  }
 }
 
 function resolveSideBoundary(triggerEl: HTMLElement | null) {
@@ -288,22 +344,23 @@ function useSelectSidePosition(options: {
 }) {
   const { open, triggerRef, contentRef } = options
   const [style, setStyle] = useState<CSSProperties>(sideInitialStyle)
+  const initialScrollSyncedRef = useRef(false)
 
-  const update = useCallback(() => {
+  const update = useCallback((updateOptions?: { syncInitialScroll?: boolean }) => {
     if (typeof window === 'undefined') return
     const triggerEl = triggerRef.current
     const contentEl = contentRef.current
     if (!triggerEl || !contentEl) return
 
     const triggerRect = triggerEl.getBoundingClientRect()
-    const contentRect = contentEl.getBoundingClientRect()
     const boundaryRect = resolveSideBoundary(triggerEl)?.getBoundingClientRect()
-    const activeOptionCenterOffset = readSelectActiveOptionCenterOffset(contentEl)
+    const contentMetrics = readSelectSideContentMetrics(contentEl)
     const position = computeSelectSidePosition({
       triggerRect,
       boundaryRect,
-      contentHeight: contentRect.height,
-      activeOptionCenterOffset,
+      contentHeight: contentMetrics.contentHeight,
+      requestedMaxHeight: contentMetrics.maxVisibleHeight,
+      activeOptionCenterOffset: contentMetrics.activeOptionCenterOffset,
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
     })
@@ -318,19 +375,36 @@ function useSelectSidePosition(options: {
       maxWidth: `calc(100vw - ${SELECT_SIDE_VIEWPORT_INSET * 2}px)`,
       maxHeight: position.maxHeight,
       '--uf-select-content-max-height': `${position.maxHeight}px`,
-      overflowY: 'auto',
+      overflowY: 'visible',
     } as CSSProperties)
+    if (updateOptions?.syncInitialScroll && !initialScrollSyncedRef.current) {
+      if (contentMetrics.scrollViewport.scrollTop !== position.initialScrollTop) {
+        contentMetrics.scrollViewport.scrollTop = position.initialScrollTop
+      }
+      initialScrollSyncedRef.current = true
+    }
   }, [contentRef, triggerRef])
 
   useEffect(() => {
     if (!open) {
+      initialScrollSyncedRef.current = false
       setStyle(sideInitialStyle)
       return
     }
 
-    update()
-    const rafId = window.requestAnimationFrame(update)
+    update({ syncInitialScroll: true })
+    const rafId = window.requestAnimationFrame(() => update({ syncInitialScroll: true }))
     const handleWindowChange = () => update()
+    const handleWindowScroll = (event: Event) => {
+      const target = event.target
+      if (
+        target instanceof Node &&
+        contentRef.current?.contains(target)
+      ) {
+        return
+      }
+      update()
+    }
     const resizeObserver =
       typeof ResizeObserver !== 'undefined'
         ? new ResizeObserver(handleWindowChange)
@@ -341,13 +415,13 @@ function useSelectSidePosition(options: {
     const boundaryEl = resolveSideBoundary(triggerRef.current)
     if (boundaryEl) resizeObserver?.observe(boundaryEl)
     window.addEventListener('resize', handleWindowChange)
-    window.addEventListener('scroll', handleWindowChange, true)
+    window.addEventListener('scroll', handleWindowScroll, true)
 
     return () => {
       window.cancelAnimationFrame(rafId)
       resizeObserver?.disconnect()
       window.removeEventListener('resize', handleWindowChange)
-      window.removeEventListener('scroll', handleWindowChange, true)
+      window.removeEventListener('scroll', handleWindowScroll, true)
     }
   }, [contentRef, open, triggerRef, update])
 
@@ -411,10 +485,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       type,
       onValueChange: ((details: { value: string | string[] | null }) => {
         if (value !== undefined && selectValuesEqual(details?.value, value)) return
-        try { onValueChange?.(details) } catch {}
-        if (typeof props.onChange === 'function') {
-          try { props.onChange(details?.value ?? null) } catch {}
-        }
+        onValueChange?.(details)
       }) as any,
       onOpenChange,
     })
@@ -480,6 +551,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     const computedDisplay = getDisplayValue(state.context.value, options)
     const triggerLabel = displayValueOverride ?? computedDisplay ?? placeholder ?? 'Select…'
     const isPlaceholder = computedDisplay == null && !displayValueOverride
+    const isSideScrollable = isSideVariant && options.length > SELECT_SIDE_VISIBLE_OPTION_COUNT
     const triggerId = `uf-select:${selectId}:trigger`
     const labelId = label != null ? `uf-select:${selectId}:label` : undefined
     const contentId = `uf-select:${selectId}:listbox`
@@ -546,7 +618,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     )
     const contentNode = (
       <Card
-        variant="floating"
         padding="membrane"
         radius="base"
         className="uf-select__contentPanel"
@@ -602,6 +673,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         className={cn('uf-select__content', (contentProps as { className?: string }).className, contentClassName)}
         data-surface={resolvedSurface}
         data-select-variant={variant}
+        data-uf-select-scrollable={isSideScrollable ? '' : undefined}
         data-uf-select-side-boundary={isSideVariant ? '' : undefined}
         data-uf-select-side-panel={isSideVariant ? '' : undefined}
         style={contentStyle}

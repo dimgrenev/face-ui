@@ -92,23 +92,14 @@ function isAllowedMonochromeColorLiteral(literal: string): boolean {
   return Math.abs(Math.round(percent) - percent) < 0.0001 && Math.round(percent) % 2 === 0
 }
 
-// Semantic feedback tokens are intentionally chromatic (success/error/warning/
-// info + their -soft/-foreground pairs); everything else stays monochrome.
-const SEMANTIC_FEEDBACK_TOKEN_DECL = /--uf-color-(success|error|warning|info)(-soft|-foreground|-fg)?\s*:/
-
 function findNonMonochromeColorLiterals(source: string): string[] {
   const colorLiteralPattern = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]+\)|hsla?\([^)]+\)|hsl\([^)]+\)|oklch\([^)]+\)|color\([^)]+\)/g
   return source.split('\n').flatMap((line) => {
-    if (SEMANTIC_FEEDBACK_TOKEN_DECL.test(line)) return []
     const literals = line.match(colorLiteralPattern) || []
     return literals.filter((literal) => !isAllowedMonochromeColorLiteral(literal))
   })
 }
 
-// The semantic-feedback shard is the ONE designated chromatic source. Chromatic
-// values are allowed only on the feedback token names; any other token there
-// going chromatic is still an offender.
-const FEEDBACK_TOKEN_NAME = /^--uf-color-(success|error|warning|info)(-soft)?$/
 function findFeedbackSourceOffenders(jsoncSource: string): string[] {
   let parsed: { tokens?: Array<{ name?: string; variants?: Array<{ value?: string }> }> }
   try { parsed = JSON.parse(jsoncSource) } catch { return ['semantic-feedback.jsonc: unparseable'] }
@@ -116,7 +107,7 @@ function findFeedbackSourceOffenders(jsoncSource: string): string[] {
   for (const tok of parsed.tokens ?? []) {
     for (const variant of tok.variants ?? []) {
       const chromatic = findNonMonochromeColorLiterals(String(variant.value ?? ''))
-      if (chromatic.length && !FEEDBACK_TOKEN_NAME.test(String(tok.name ?? ''))) {
+      if (chromatic.length) {
         out.push(`semantic-feedback.jsonc: ${tok.name}=${variant.value}`)
       }
     }
@@ -194,7 +185,7 @@ describe('taxonomy and governance', () => {
     expect(componentsCss).toContain('border-radius: var(--uf-radius);')
   })
 
-  it('keeps runtime and design-system colors monochrome except semantic feedback tokens', () => {
+  it('keeps every runtime and design-system color on the monochrome 2% atom scale', () => {
     const sources = {
       'assets/styles/tokens.css': tokensCss,
       'design-system/tokens/colors.css': designSystemColorCss,
@@ -204,8 +195,6 @@ describe('taxonomy and governance', () => {
       ...Object.entries(sources).flatMap(([sourceName, source]) =>
         findNonMonochromeColorLiterals(source).map((literal) => `${sourceName}: ${literal}`),
       ),
-      // semantic-feedback.jsonc is the designated chromatic feedback palette:
-      // only its feedback token names may carry chromatic values.
       ...findFeedbackSourceOffenders(semanticFeedbackSource),
     ]
 
@@ -384,22 +373,75 @@ describe('taxonomy and governance', () => {
             <Text key={size} text={size} size={size} />
           ))}
           <Text text="Markdown text" variant="markdown" />
+          <Text text="Caption text" variant="caption" />
         </div>,
       )
     })
 
     expect(textMeta.props?.size?.options).toEqual(textSizeOptions)
     expect(textMeta.props?.variant?.options).toContain('markdown')
+    expect(textMeta.props?.variant?.options).toContain('caption')
     expect(textMeta.tokenMapping?.component).toContain('--uf-text-size-font-size')
+    expect(textMeta.tokenMapping?.component).toContain('--uf-text-caption-font-size')
+    expect(textMeta.tokenMapping?.component).toContain('--uf-text-caption-line-height')
+    expect(textMeta.tokenMapping?.component).toContain('--uf-text-caption-min-height')
+    expect(textMeta.tokenMapping?.component).toContain('--uf-text-caption-pad-y')
     expect(componentsCss).toContain('font-size: var(--uf-text-font-size, var(--uf-text-size-font-size,')
     expect(componentsCss).toContain('.uf-text[data-scope][data-variant="markdown"]')
     expect(componentsCss).toContain('--uf-text-markdown-line-height: 24px;')
     expect(componentsCss).toContain('.uf-text[data-scope][data-variant="markdown"] .uf-text__content')
     expect(componentsCss).toContain('line-height: inherit;')
     expect(componentsCss).toContain('calc(var(--uf-text-pad-y, var(--uf-control-pad-y)) - 2px)')
+    expect(tokensCss).toContain('--uf-text-caption-font-size: var(--uf-font-size-base);')
+    expect(tokensCss).toContain('--uf-text-caption-line-height: 16px;')
+    expect(tokensCss).toContain('--uf-text-caption-min-height: var(--uf-spacing-6);')
+    expect(tokensCss).toContain('--uf-text-caption-pad-y: var(--uf-spacing-1);')
+    expectCssBlockContains(
+      componentsCss,
+      '.uf-text[data-scope][data-variant="caption"]',
+      '--uf-text-font-size: var(--uf-text-caption-font-size, 12px);',
+    )
+    expectCssBlockContains(
+      componentsCss,
+      '.uf-text[data-scope][data-variant="caption"]',
+      '--uf-text-line-height: var(--uf-text-caption-line-height, 16px);',
+    )
+    expectCssBlockContains(
+      componentsCss,
+      '.uf-text[data-scope][data-variant="caption"]',
+      'font-size: var(--uf-text-font-size);',
+    )
+    expectCssBlockContains(
+      componentsCss,
+      '.uf-text[data-scope][data-variant="caption"]',
+      'line-height: var(--uf-text-line-height);',
+    )
+    expectCssBlockContains(
+      componentsCss,
+      '.uf-text[data-scope][data-variant="caption"]:not([data-inset="none"])',
+      'box-sizing: border-box;',
+    )
+    expectCssBlockContains(
+      componentsCss,
+      '.uf-text[data-scope][data-variant="caption"]:not([data-inset="none"])',
+      'min-height: var(--uf-text-caption-min-height, var(--uf-spacing-6));',
+    )
+    expectCssBlockContains(
+      componentsCss,
+      '.uf-text[data-scope][data-variant="caption"]:not([data-inset="none"])',
+      'padding-top: var(--uf-text-caption-pad-y, var(--uf-spacing-1));',
+    )
+    expectCssBlockContains(
+      componentsCss,
+      '.uf-text[data-scope][data-variant="caption"]:not([data-inset="none"])',
+      'padding-bottom: var(--uf-text-caption-pad-y, var(--uf-spacing-1));',
+    )
 
     const markdownNode = container.querySelector<HTMLElement>('.uf-text[data-scope="text"][data-variant="markdown"]')
     expect(markdownNode).not.toBeNull()
+    const captionNode = container.querySelector<HTMLElement>('.uf-text[data-scope="text"][data-variant="caption"]')
+    expect(captionNode).not.toBeNull()
+    expect(captionNode?.tagName).toBe('SMALL')
 
     for (const size of textSizeOptions) {
       const token = textSizeTokenMap[size]
@@ -448,7 +490,7 @@ describe('taxonomy and governance', () => {
     expect(tokensCss).toContain('--uf-tooltip-border: var(--uf-color-white-20);')
     expect(designSystemColorCss).toContain('--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
     expect(designSystemColorCss).toContain('--uf-tooltip-fg: var(--uf-color-white-92);')
-    expect(componentsCss).toContain('.uf-card[data-scope][data-card-variant="floating"]')
+    expect(componentsCss).toContain('.uf-card[data-scope][data-card-variant="code"]')
     expect(componentsCss).toContain('--uf-card-bg: var(--uf-tooltip-bg);')
     expect(componentsCss).toContain('--uf-card-background: var(--uf-tooltip-background);')
     expect(componentsCss).toContain('--uf-card-border: var(--uf-tooltip-border);')
@@ -520,6 +562,29 @@ describe('taxonomy and governance', () => {
 
     expect(buttons[0]?.getAttribute('data-state')).toBe('off')
     expect(buttons[1]?.getAttribute('data-state')).toBe('on')
+    expect(buttons[0]?.getAttribute('tabindex')).toBe('-1')
+    expect(buttons[1]?.getAttribute('tabindex')).toBe('0')
+
+    await act(async () => {
+      buttons[1]?.focus()
+      buttons[1]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+    })
+
+    expect(document.activeElement).toBe(buttons[0])
+    expect(buttons[0]?.getAttribute('data-state')).toBe('on')
+    expect(buttons[1]?.getAttribute('data-state')).toBe('off')
+    expect(buttons[0]?.getAttribute('tabindex')).toBe('0')
+    expect(buttons[1]?.getAttribute('tabindex')).toBe('-1')
     expect(container.textContent).toContain('Date')
+  })
+
+  it('honors an explicit flush inset for label text', async () => {
+    await act(async () => {
+      root.render(<Text as="span" variant="label" inset="none" text="Flush label" />)
+    })
+
+    const label = container.querySelector<HTMLElement>('[data-scope="text"]')
+    expect(label?.getAttribute('data-inset')).toBe('none')
+    expect(label?.classList.contains('uf-text--inset-none')).toBe(true)
   })
 })

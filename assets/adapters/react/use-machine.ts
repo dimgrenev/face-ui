@@ -5,7 +5,7 @@
  * Second argument is flat Partial<TSchema['context']> — no wrapping.
  */
 
-import { useSyncExternalStore, useRef, useEffect, useMemo } from 'react'
+import { useSyncExternalStore, useRef, useEffect, useLayoutEffect, useMemo } from 'react'
 import { interpret, areContextValuesEqual } from '../../create-machine'
 import type { MachineSchema, MachineConfig, MachineSnapshot, SendFn } from '../../types'
 
@@ -15,6 +15,8 @@ export interface UseMachineReturn<S extends MachineSchema> {
   state: MachineSnapshot<S>
   send: SendFn<S>
 }
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export function useMachine<S extends MachineSchema>(
   config: MachineConfig<S>,
@@ -30,7 +32,9 @@ export function useMachine<S extends MachineSchema>(
 
   const service = serviceRef.current
 
-  useEffect(() => {
+  // Controlled context must be restored before paint. A passive effect leaves a
+  // visible frame where an optimistic machine value can flash in the UI.
+  useIsomorphicLayoutEffect(() => {
     if (!options || !serviceRef.current) return
     const svc = serviceRef.current
     const current = svc.getSnapshot().context as Record<string, unknown>

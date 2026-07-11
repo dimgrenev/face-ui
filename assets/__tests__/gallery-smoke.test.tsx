@@ -106,11 +106,11 @@ describe('face-ui-react gallery smoke', () => {
     expect(firstPreview).not.toBeNull()
     expect(firstSurface).not.toBeNull()
     expect(firstSurface?.getAttribute('data-card-variant')).toBe('showcase')
-    expect(firstSurface?.getAttribute('data-padding')).toBe('showcase')
-    expect(firstSurface?.getAttribute('data-radius')).toBe('showcase')
+    expect(firstSurface?.getAttribute('data-padding')).toBe('default')
+    expect(firstSurface?.getAttribute('data-radius')).toBe('md')
     expect(firstSurface?.getAttribute('data-border')).toBe('false')
     expect(componentStyles).toContain('.uf-gallery {')
-    expect(componentStyles).toContain('--face-gallery-inset: 7px;')
+    expect(componentStyles).toContain('--face-gallery-inset: var(--uf-gallery-inset);')
     expect(componentStyles).toContain('--face-gallery-header-action-gap: 0px;')
     expect(componentStyles).toContain('--face-gallery-grid-pad-top: 0px;')
     expect(componentStyles).toContain('--face-gallery-surface-radius: var(--uf-radius-lg);')
@@ -211,7 +211,7 @@ describe('face-ui-react gallery smoke', () => {
     await act(async () => {
       nextPage?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
-    const pageTwoButton = paginationCard.querySelector('.uf-pagination-current[data-scope="text"]') as HTMLElement | null
+    const pageTwoButton = paginationCard.querySelector('.uf-pagination-page[aria-current="page"]') as HTMLElement | null
     expect(pageTwoButton?.getAttribute('aria-current')).toBe('page')
     expect(pageTwoButton?.textContent).toBe('7')
 
@@ -246,7 +246,7 @@ describe('face-ui-react gallery smoke', () => {
 
     const tabsCard = getGalleryCard(container, 'Tabs')
     const tabB = tabsCard.querySelector('[role="tab"][data-value="b"]') as HTMLButtonElement | null
-    const tabBPanel = tabsCard.querySelector('#tabs\\:content\\:b') as HTMLElement | null
+    const tabBPanel = tabsCard.querySelector('[role="tabpanel"][data-value="b"]') as HTMLElement | null
     await act(async () => {
       tabB?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
@@ -287,7 +287,7 @@ describe('face-ui-react gallery smoke', () => {
     expect(treeChild?.getAttribute('data-selected')).toBe('')
   })
 
-  it('does not let the panel showcase steal focus or preview-only geometry', async () => {
+  it('renders the Panel gallery state through the production items API without stealing focus', async () => {
     await act(async () => {
       root.render(<FaceUiReact />)
     })
@@ -303,17 +303,13 @@ describe('face-ui-react gallery smoke', () => {
     const panelCard = getGalleryCard(container, 'Panel')
     expect(panelCard.contains(document.activeElement)).toBe(false)
 
-    const previewButtons = Array.from(panelCard.querySelectorAll<HTMLButtonElement>('.uf-sidebar-preview-item[data-scope="button"]'))
-    expect(previewButtons.length).toBeGreaterThan(0)
-    expect(previewButtons.every((button) => button.getAttribute('data-variant') === 'default')).toBe(true)
-    expect(previewButtons.some((button) => button.hasAttribute('data-selected'))).toBe(true)
-    expect(panelCard.querySelector('.uf-sidebar-preview-separator')).toBeNull()
-    expect(panelCard.textContent).toContain('Workspace')
-    expect(panelCard.textContent).toContain('Tools')
-    expect(panelCard.textContent).toContain('Structure')
-
-    const panelTreeSelected = panelCard.querySelector('.uf-sidebar-preview-tree [aria-selected="true"]') as HTMLElement | null
-    expect(panelTreeSelected).toBeNull()
+    const panelButtons = Array.from(panelCard.querySelectorAll<HTMLButtonElement>('.uf-sidebar-itemButton[data-scope="button"]'))
+    expect(panelButtons).toHaveLength(4)
+    expect(panelButtons.every((button) => button.getAttribute('data-variant') === 'default')).toBe(true)
+    expect(panelButtons.some((button) => button.hasAttribute('data-selected'))).toBe(true)
+    expect(panelCard.textContent).toContain('Overview')
+    expect(panelCard.textContent).toContain('Projects')
+    expect(panelCard.textContent).toContain('Automations')
 
     outside.remove()
   })

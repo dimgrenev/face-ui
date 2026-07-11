@@ -1,0 +1,227 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Text / Dashboard Heading",
+  "description": "Dashboard Heading product scenario for the Text component.",
+  "framework": "react",
+  "root": {
+    "type": "Text",
+    "props": {
+      "text": {
+        "$ref": "props.text"
+      },
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "size": {
+        "$ref": "props.size"
+      },
+      "as": {
+        "$ref": "props.as"
+      },
+      "icon": {
+        "$ref": "props.icon"
+      },
+      "iconPosition": {
+        "$ref": "props.iconPosition"
+      },
+      "inset": {
+        "$ref": "props.inset"
+      },
+      "stretchText": {
+        "$ref": "props.stretchText"
+      },
+      "fullWidth": {
+        "$ref": "props.fullWidth"
+      },
+      "align": {
+        "$ref": "props.align"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "truncate": {
+        "$ref": "props.truncate"
+      },
+      "children": {
+        "$ref": "props.children"
+      },
+      "htmlFor": {
+        "$ref": "props.htmlFor"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "text": "Revenue overview",
+      "variant": "h2",
+      "size": "xl",
+      "as": "h2",
+      "inset": "control",
+      "fullWidth": true,
+      "align": "left",
+      "membrane": true
+    }
+  },
+  "controls": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "Text content."
+    },
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "Visual variant.",
+      "options": [
+        "default",
+        "body",
+        "heading",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "label",
+        "caption",
+        "kbd",
+        "code",
+        "markdown",
+        "muted",
+        "blockquote"
+      ],
+      "defaultValue": "default"
+    },
+    {
+      "name": "size",
+      "type": "select",
+      "required": false,
+      "description": "Text size.",
+      "options": [
+        "xs",
+        "sm",
+        "md",
+        "lg",
+        "xl"
+      ]
+    },
+    {
+      "name": "as",
+      "type": "select",
+      "required": false,
+      "description": "HTML element to render. Auto-detected from variant if not specified.",
+      "options": [
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "label",
+        "kbd",
+        "code",
+        "p",
+        "span",
+        "div",
+        "strong",
+        "em",
+        "small"
+      ]
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "required": false,
+      "description": "Icon element (ReactNode)."
+    },
+    {
+      "name": "iconPosition",
+      "type": "select",
+      "required": false,
+      "description": "Icon position relative to text.",
+      "options": [
+        "left",
+        "right"
+      ],
+      "defaultValue": "left"
+    },
+    {
+      "name": "inset",
+      "type": "select",
+      "required": false,
+      "description": "Padding/height behavior. `control` matches buttons; `none` is flush (no inner padding).",
+      "options": [
+        "control",
+        "none"
+      ],
+      "defaultValue": "control"
+    },
+    {
+      "name": "stretchText",
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch text area (flex:1).",
+      "defaultValue": false
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Full width.",
+      "defaultValue": false
+    },
+    {
+      "name": "align",
+      "type": "select",
+      "required": false,
+      "description": "Text alignment.",
+      "options": [
+        "left",
+        "right",
+        "center"
+      ],
+      "defaultValue": "left"
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing.",
+      "defaultValue": true
+    },
+    {
+      "name": "truncate",
+      "type": "boolean",
+      "required": false,
+      "description": "Truncate text with ellipsis when it overflows.",
+      "defaultValue": false
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Custom children (overrides text)."
+    },
+    {
+      "name": "htmlFor",
+      "type": "string",
+      "required": false,
+      "description": "For label variant: htmlFor attribute."
+    }
+  ],
+  "meta": {
+    "name": "Dashboard Heading",
+    "component": "Text",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Text/Text.tsx",
+    "contract": "Text/Text.json"
+  }
+}

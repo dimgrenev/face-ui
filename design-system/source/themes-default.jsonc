@@ -98,7 +98,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "12px"
+          "value": "2px"
         }
       ]
     },

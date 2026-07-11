@@ -1,0 +1,66 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Skeleton / User Avatar Loading",
+  "description": "User Avatar Loading product scenario for the Skeleton component.",
+  "framework": "react",
+  "root": {
+    "type": "Skeleton",
+    "props": {
+      "width": {
+        "$ref": "props.width"
+      },
+      "height": {
+        "$ref": "props.height"
+      },
+      "variant": {
+        "$ref": "props.variant"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "variant": "circle",
+      "width": 40,
+      "height": 40
+    }
+  },
+  "controls": [
+    {
+      "name": "width",
+      "type": "string",
+      "required": false,
+      "description": "Explicit width"
+    },
+    {
+      "name": "height",
+      "type": "string",
+      "required": false,
+      "description": "Explicit height"
+    },
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "Shape variant",
+      "options": [
+        "text",
+        "circle",
+        "rect"
+      ],
+      "defaultValue": "text"
+    }
+  ],
+  "meta": {
+    "name": "User Avatar Loading",
+    "component": "Skeleton",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Skeleton/Skeleton.tsx",
+    "contract": "Skeleton/Skeleton.json"
+  }
+}

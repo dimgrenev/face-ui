@@ -40,17 +40,12 @@ export interface TocProps {
   className?: string
 }
 
-interface TocLegacyProps {
-  onChange?: (id: string) => void
-}
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 export const Toc = forwardRef<HTMLElement, TocProps>(
   function Toc(props, ref) {
-    const legacyProps = props as TocProps & TocLegacyProps
     const {
       items: rawItems,
       activeId,
@@ -72,8 +67,7 @@ export const Toc = forwardRef<HTMLElement, TocProps>(
       items,
       activeId: resolvedActiveId,
       onActiveChange: ((details: { id: string }) => {
-        try { onActiveChange?.(details) } catch {}
-        try { legacyProps.onChange?.(details.id) } catch {}
+        onActiveChange?.(details)
       }) as any,
     })
 

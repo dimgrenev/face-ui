@@ -1,0 +1,87 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Scroll / Activity Feed",
+  "description": "Activity Feed product scenario for the Scroll component.",
+  "framework": "react",
+  "root": {
+    "type": "Scroll",
+    "props": {
+      "children": {
+        "$ref": "props.children"
+      },
+      "orientation": {
+        "$ref": "props.orientation"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "height": {
+        "$ref": "props.height"
+      },
+      "ariaLabel": {
+        "$ref": "props.ariaLabel"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "orientation": "vertical",
+      "height": 240,
+      "ariaLabel": "Recent workspace activity",
+      "children": "09:42 Deployment completed\n09:38 Smoke tests passed\n09:31 Build started\n09:27 Pull request approved\n09:16 Security scan passed\n09:04 Database backup completed\n08:55 Release candidate created"
+    }
+  },
+  "controls": [
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Content to make scrollable."
+    },
+    {
+      "name": "orientation",
+      "type": "select",
+      "required": false,
+      "description": "Which axes can scroll.",
+      "options": [
+        "vertical",
+        "horizontal",
+        "both"
+      ],
+      "defaultValue": "vertical"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    {
+      "name": "height",
+      "type": "number",
+      "required": false,
+      "description": "Viewport height.",
+      "defaultValue": 240
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the scrollable region.",
+      "defaultValue": "Scrollable text"
+    }
+  ],
+  "meta": {
+    "name": "Activity Feed",
+    "component": "Scroll",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Scroll/Scroll.tsx",
+    "contract": "Scroll/Scroll.json"
+  }
+}

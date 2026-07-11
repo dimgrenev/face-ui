@@ -7,7 +7,7 @@
  * `<Command items={[{ id: 'copy', label: 'Copy', keywords: ['clipboard'] }]} />`
  */
 
-import { forwardRef, useEffect, useMemo, useRef, type ReactNode } from 'react'
+import { forwardRef, useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { useControllableOpenState } from '../assets/adapters/react/use-controllable-open-state'
@@ -16,6 +16,7 @@ import {
   useResponsiveOverlaySurface,
 } from '../assets/adapters/react/use-responsive-overlay-surface'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
+import { useFocusTrap } from '../assets/adapters/react/use-focus-trap'
 import { commandMachine, connectCommand } from '../assets/machines/command.machine'
 import type { CommandItemDef, CommandGroupDef } from '../assets/machines/command.machine'
 import { cn } from '../assets/utils'
@@ -129,6 +130,12 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
     const isDialogSurface = resolvedSurface === 'dialog'
     const [dialogOpen, setDialogOpen] = useControllableOpenState(open, defaultOpen, onOpenChange)
     const inputRef = useRef<HTMLInputElement | null>(null)
+    const paletteRef = useRef<HTMLDivElement | null>(null)
+    const setPaletteRef = useCallback((node: HTMLDivElement | null) => {
+      paletteRef.current = node
+      if (typeof ref === 'function') ref(node)
+      else if (ref) (ref as { current: HTMLDivElement | null }).current = node
+    }, [ref])
 
     const { state, send } = useMachine(commandMachine, {
       items: machineItems,
@@ -143,6 +150,8 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
       }),
     })
     useBodyScrollLock(isDialogSurface && dialogOpen)
+    // Modal palette (dialog surface) traps focus; inline surface does not.
+    useFocusTrap(paletteRef, isDialogSurface && dialogOpen)
 
     // Sync items when they change (stable dependency via itemsKey)
     useEffect(() => {
@@ -195,9 +204,8 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
     const triggerLabel = api.query || placeholder
     const commandBody = (
       <Card
-        ref={showPalette ? ref : null}
+        ref={showPalette ? setPaletteRef : null}
         {...api.getRootProps()}
-        variant="floating"
         padding={isDialogSurface ? 'none' : 'membrane'}
         radius="md"
         fullWidth

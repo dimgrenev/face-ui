@@ -1,0 +1,285 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Table / Invoice Ledger",
+  "description": "Invoice Ledger product scenario for the Table component.",
+  "framework": "react",
+  "root": {
+    "type": "Table",
+    "props": {
+      "columns": {
+        "$ref": "props.columns"
+      },
+      "rows": {
+        "$ref": "props.rows"
+      },
+      "rowKey": {
+        "$ref": "props.rowKey"
+      },
+      "sortColumn": {
+        "$ref": "props.sortColumn"
+      },
+      "sortDirection": {
+        "$ref": "props.sortDirection"
+      },
+      "onSortChange": {
+        "$ref": "props.onSortChange"
+      },
+      "selectedRows": {
+        "$ref": "props.selectedRows"
+      },
+      "onSelectedRowsChange": {
+        "$ref": "props.onSelectedRowsChange"
+      },
+      "selectable": {
+        "$ref": "props.selectable"
+      },
+      "showRowNumbers": {
+        "$ref": "props.showRowNumbers"
+      },
+      "stickyHeader": {
+        "$ref": "props.stickyHeader"
+      },
+      "showDividers": {
+        "$ref": "props.showDividers"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "onColumnResize": {
+        "$ref": "props.onColumnResize"
+      },
+      "resizable": {
+        "$ref": "props.resizable"
+      },
+      "stickyLastColumn": {
+        "$ref": "props.stickyLastColumn"
+      },
+      "onRowClick": {
+        "$ref": "props.onRowClick"
+      },
+      "onRowMouseEnter": {
+        "$ref": "props.onRowMouseEnter"
+      },
+      "onRowMouseLeave": {
+        "$ref": "props.onRowMouseLeave"
+      },
+      "activeRowId": {
+        "$ref": "props.activeRowId"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "ariaLabel": {
+        "$ref": "props.ariaLabel"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "sortColumn": "date",
+      "sortDirection": "desc",
+      "showRowNumbers": true,
+      "stickyHeader": true,
+      "showDividers": true,
+      "resizable": true,
+      "ariaLabel": "Invoice ledger",
+      "rowKey": "id",
+      "columns": [
+        {
+          "id": "invoice",
+          "header": "Invoice",
+          "accessor": "invoice",
+          "width": 160
+        },
+        {
+          "id": "date",
+          "header": "Date",
+          "accessor": "date",
+          "sortable": true,
+          "width": 140
+        },
+        {
+          "id": "amount",
+          "header": "Amount",
+          "accessor": "amount",
+          "align": "right",
+          "width": 120
+        }
+      ],
+      "rows": [
+        {
+          "id": "i1",
+          "invoice": "INV-2048",
+          "date": "2026-07-01",
+          "amount": "$420.00"
+        },
+        {
+          "id": "i2",
+          "invoice": "INV-2017",
+          "date": "2026-06-01",
+          "amount": "$420.00"
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "columns",
+      "type": "array",
+      "required": false,
+      "description": "Column definitions."
+    },
+    {
+      "name": "rows",
+      "type": "array",
+      "required": false,
+      "description": "Row data."
+    },
+    {
+      "name": "rowKey",
+      "type": "string",
+      "required": false,
+      "description": "Key field on each row, or a function returning a unique key."
+    },
+    {
+      "name": "sortColumn",
+      "type": "string",
+      "required": false,
+      "description": "Controlled sort column.",
+      "defaultValue": null
+    },
+    {
+      "name": "sortDirection",
+      "type": "select",
+      "required": false,
+      "description": "Controlled sort direction.",
+      "options": [
+        "asc",
+        "desc"
+      ],
+      "defaultValue": "asc"
+    },
+    {
+      "name": "onSortChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when sort changes."
+    },
+    {
+      "name": "selectedRows",
+      "type": "array",
+      "required": false,
+      "description": "Controlled selected row IDs."
+    },
+    {
+      "name": "onSelectedRowsChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when selection changes."
+    },
+    {
+      "name": "selectable",
+      "type": "boolean",
+      "required": false,
+      "description": "Enable row selection.",
+      "defaultValue": false
+    },
+    {
+      "name": "showRowNumbers",
+      "type": "boolean",
+      "required": false,
+      "description": "Show row number column.",
+      "defaultValue": false
+    },
+    {
+      "name": "stickyHeader",
+      "type": "boolean",
+      "required": false,
+      "description": "Make header sticky on scroll.",
+      "defaultValue": true
+    },
+    {
+      "name": "showDividers",
+      "type": "boolean",
+      "required": false,
+      "description": "Show divider lines between rows.",
+      "defaultValue": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional CSS class."
+    },
+    {
+      "name": "onColumnResize",
+      "type": "function",
+      "required": false,
+      "description": "Callback fired while a resizable column is dragged."
+    },
+    {
+      "name": "resizable",
+      "type": "boolean",
+      "required": false,
+      "description": "Enable column resizing and fixed table layout.",
+      "defaultValue": false
+    },
+    {
+      "name": "stickyLastColumn",
+      "type": "boolean",
+      "required": false,
+      "description": "Keep the last column visually sticky for dense action tables.",
+      "defaultValue": false
+    },
+    {
+      "name": "onRowClick",
+      "type": "function",
+      "required": false,
+      "description": "Callback when a row is clicked."
+    },
+    {
+      "name": "onRowMouseEnter",
+      "type": "function",
+      "required": false,
+      "description": "Callback when mouse enters a row."
+    },
+    {
+      "name": "onRowMouseLeave",
+      "type": "function",
+      "required": false,
+      "description": "Callback when mouse leaves a row."
+    },
+    {
+      "name": "activeRowId",
+      "type": "string",
+      "required": false,
+      "description": "Row ID to highlight as active (applies `data-active` attribute)."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Enable membrane (tile-like) row styles: rounded corners, hover bg, padding.",
+      "defaultValue": false
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible label for the table when there is no visible caption."
+    }
+  ],
+  "meta": {
+    "name": "Invoice Ledger",
+    "component": "Table",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Table/Table.tsx",
+    "contract": "Table/Table.json"
+  }
+}

@@ -3836,7 +3836,7 @@
       ]
     },
     {
-      "name": "uf-progress-indicator-error-bg",
+      "name": "uf-progress-indicator-destructive-bg",
       "sheet": "semantic-feedback",
       "profile": "design-system",
       "generatedPath": "design-system/tokens/colors.css",
@@ -3850,7 +3850,7 @@
       ]
     },
     {
-      "name": "uf-progress-indicator-success-bg",
+      "name": "uf-progress-indicator-positive-bg",
       "sheet": "semantic-feedback",
       "profile": "design-system",
       "generatedPath": "design-system/tokens/colors.css",
@@ -5220,7 +5220,7 @@
         ":root"
       ],
       "values": [
-        "var(--uf-font-size-xs)"
+        "var(--uf-font-size-base)"
       ]
     },
     {
@@ -5233,6 +5233,30 @@
       ],
       "values": [
         "16px"
+      ]
+    },
+    {
+      "name": "uf-text-caption-min-height",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-6)"
+      ]
+    },
+    {
+      "name": "uf-text-caption-pad-y",
+      "sheet": "typography",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/typography.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-spacing-1)"
       ]
     },
     {

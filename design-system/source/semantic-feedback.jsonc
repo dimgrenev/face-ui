@@ -8,11 +8,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#3fb950"
+          "value": "var(--uf-color-white-100)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#1a7f37"
+          "value": "var(--uf-color-black-100)"
         }
       ]
     },
@@ -22,11 +22,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "rgba(63, 185, 80, 0.16)"
+          "value": "var(--uf-color-white-16)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "rgba(26, 127, 55, 0.12)"
+          "value": "var(--uf-color-black-12)"
         }
       ]
     },
@@ -36,11 +36,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-background)"
+          "value": "var(--uf-color-black-100)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-background)"
+          "value": "var(--uf-color-white-100)"
         }
       ]
     },
@@ -64,11 +64,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#f85149"
+          "value": "var(--uf-color-white-88)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#cf222e"
+          "value": "var(--uf-color-black-88)"
         }
       ]
     },
@@ -78,11 +78,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "rgba(248, 81, 73, 0.16)"
+          "value": "var(--uf-color-white-20)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "rgba(207, 34, 46, 0.12)"
+          "value": "var(--uf-color-black-16)"
         }
       ]
     },
@@ -92,11 +92,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-background)"
+          "value": "var(--uf-color-black-100)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-background)"
+          "value": "var(--uf-color-white-100)"
         }
       ]
     },
@@ -120,11 +120,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#d29922"
+          "value": "var(--uf-color-white-72)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#9a6700"
+          "value": "var(--uf-color-black-72)"
         }
       ]
     },
@@ -134,11 +134,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "rgba(210, 153, 34, 0.16)"
+          "value": "var(--uf-color-white-14)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "rgba(154, 103, 0, 0.12)"
+          "value": "var(--uf-color-black-12)"
         }
       ]
     },
@@ -148,11 +148,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-background)"
+          "value": "var(--uf-color-black-100)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-background)"
+          "value": "var(--uf-color-white-100)"
         }
       ]
     },
@@ -176,11 +176,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "#58a6ff"
+          "value": "var(--uf-color-white-60)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "#0969da"
+          "value": "var(--uf-color-black-60)"
         }
       ]
     },
@@ -190,11 +190,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "rgba(88, 166, 255, 0.16)"
+          "value": "var(--uf-color-white-12)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "rgba(9, 105, 218, 0.12)"
+          "value": "var(--uf-color-black-10)"
         }
       ]
     },
@@ -204,11 +204,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-background)"
+          "value": "var(--uf-color-black-100)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-background)"
+          "value": "var(--uf-color-white-100)"
         }
       ]
     },
@@ -312,7 +312,7 @@
     },
     {
       "sheet": "semantic-feedback",
-      "name": "--uf-progress-indicator-success-bg",
+      "name": "--uf-progress-indicator-positive-bg",
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
@@ -340,7 +340,7 @@
     },
     {
       "sheet": "semantic-feedback",
-      "name": "--uf-progress-indicator-error-bg",
+      "name": "--uf-progress-indicator-destructive-bg",
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",

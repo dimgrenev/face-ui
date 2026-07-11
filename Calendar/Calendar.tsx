@@ -51,27 +51,19 @@ export interface CalendarRangeValue {
 // Date <-> ISO helpers
 // ---------------------------------------------------------------------------
 
-function dateToISO(d: Date | string | unknown): string {
-  // Accept Date objects, ISO strings, or anything parseable
+function dateToISO(d: Date | string | unknown): string | null {
+  // Runtime contracts can hydrate ISO strings even though the typed API uses Date.
   if (typeof d === 'string') {
-    // Already an ISO-like string — validate and return
     const parsed = new Date(d)
-    if (!isNaN(parsed.getTime())) {
+    if (!Number.isNaN(parsed.getTime())) {
       const y = String(parsed.getFullYear()).padStart(4, '0')
       const m = String(parsed.getMonth() + 1).padStart(2, '0')
       const day = String(parsed.getDate()).padStart(2, '0')
       return `${y}-${m}-${day}`
     }
-    return d // return as-is if unparseable
+    return null
   }
-  if (!(d instanceof Date) || isNaN((d as Date).getTime())) {
-    // Fallback: try to create a Date from whatever we got
-    const fallback = new Date()
-    const y = String(fallback.getFullYear()).padStart(4, '0')
-    const m = String(fallback.getMonth() + 1).padStart(2, '0')
-    const day = String(fallback.getDate()).padStart(2, '0')
-    return `${y}-${m}-${day}`
-  }
+  if (!(d instanceof Date) || Number.isNaN(d.getTime())) return null
   const y = String(d.getFullYear()).padStart(4, '0')
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
@@ -117,8 +109,8 @@ function getViewDate(value?: Date | CalendarRangeValue | null, defaultValue?: Da
   if (valueRange.end) return valueRange.end.slice(0, 7) + '-01'
   if (defaultRange.start) return defaultRange.start.slice(0, 7) + '-01'
   if (defaultRange.end) return defaultRange.end.slice(0, 7) + '-01'
-  const now = new Date()
-  return dateToISO(now).slice(0, 7) + '-01'
+  const now = dateToISO(new Date())
+  return `${now?.slice(0, 7) ?? '1970-01'}-01`
 }
 
 // ---------------------------------------------------------------------------
@@ -165,9 +157,9 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
       value: selectedISO ?? undefined,
       viewDate: viewDate ?? undefined,
       focusedDate: focusedDate ?? undefined,
-      min: min ? dateToISO(min) : undefined,
-      max: max ? dateToISO(max) : undefined,
-      disabledDates: disabledDates.map(dateToISO),
+      min: min ? dateToISO(min) ?? undefined : undefined,
+      max: max ? dateToISO(max) ?? undefined : undefined,
+      disabledDates: disabledDates.map(dateToISO).filter((date): date is string => date != null),
       locale,
       weekStartsOn,
       onValueChange: handleValueChange,

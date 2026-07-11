@@ -8,7 +8,6 @@
 
 export {
   Icon,
-  IconProvider,
   ICON_NAMES,
 } from '../assets/Icon'
 
@@ -16,7 +15,5 @@ export { Icon as default } from '../assets/Icon'
 
 export type {
   IconName,
-  IconSource,
   IconProps,
-  IconProviderProps,
 } from '../assets/Icon'

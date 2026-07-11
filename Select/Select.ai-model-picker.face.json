@@ -1,0 +1,287 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Select / AI Model Picker",
+  "description": "AI Model Picker product scenario for the Select component.",
+  "framework": "react",
+  "root": {
+    "type": "Select",
+    "props": {
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "options": {
+        "$ref": "props.options"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "placeholder": {
+        "$ref": "props.placeholder"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "type": {
+        "$ref": "props.type"
+      },
+      "label": {
+        "$ref": "props.label"
+      },
+      "labelOrientation": {
+        "$ref": "props.labelOrientation"
+      },
+      "ariaLabel": {
+        "$ref": "props.ariaLabel"
+      },
+      "displayValue": {
+        "$ref": "props.displayValue"
+      },
+      "stretchText": {
+        "$ref": "props.stretchText"
+      },
+      "onValueChange": {
+        "$ref": "props.onValueChange"
+      },
+      "onOpenChange": {
+        "$ref": "props.onOpenChange"
+      },
+      "surface": {
+        "$ref": "props.surface"
+      },
+      "surfaceBreakpoint": {
+        "$ref": "props.surfaceBreakpoint"
+      },
+      "surfaceTitle": {
+        "$ref": "props.surfaceTitle"
+      },
+      "contentMinWidth": {
+        "$ref": "props.contentMinWidth"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "triggerClassName": {
+        "$ref": "props.triggerClassName"
+      },
+      "valueClassName": {
+        "$ref": "props.valueClassName"
+      },
+      "contentClassName": {
+        "$ref": "props.contentClassName"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "variant": "side",
+      "type": "select",
+      "label": "Model",
+      "placeholder": "Choose model",
+      "defaultValue": "balanced",
+      "ariaLabel": "AI model",
+      "surface": "popover",
+      "surfaceTitle": "Choose model",
+      "stretchText": true,
+      "membrane": true,
+      "options": [
+        {
+          "value": "fast",
+          "label": "Fast"
+        },
+        {
+          "value": "balanced",
+          "label": "Balanced"
+        },
+        {
+          "value": "reasoning",
+          "label": "Reasoning"
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "Visual/behavioral variant.",
+      "options": [
+        "default",
+        "side",
+        "iconOnly"
+      ],
+      "defaultValue": "default"
+    },
+    {
+      "name": "options",
+      "type": "array",
+      "required": false,
+      "description": "Available options."
+    },
+    {
+      "name": "value",
+      "type": "array",
+      "required": false,
+      "description": "Current selected value. String for single, string[] for multiselect."
+    },
+    {
+      "name": "defaultValue",
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial selected value."
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "Placeholder text when no value is selected.",
+      "defaultValue": "Select option"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the select.",
+      "defaultValue": false
+    },
+    {
+      "name": "type",
+      "type": "select",
+      "required": false,
+      "description": "Selection mode.",
+      "options": [
+        "select",
+        "multiselect"
+      ],
+      "defaultValue": "select"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Label rendered above/beside the select."
+    },
+    {
+      "name": "labelOrientation",
+      "type": "select",
+      "required": false,
+      "description": "Label placement relative to the control.",
+      "options": [
+        "vertical",
+        "horizontal"
+      ],
+      "defaultValue": "vertical"
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible label (aria-label)."
+    },
+    {
+      "name": "displayValue",
+      "type": "string",
+      "required": false,
+      "description": "Optional override for the content shown in the trigger."
+    },
+    {
+      "name": "stretchText",
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch the value area so the arrow pins to the right edge.",
+      "defaultValue": false
+    },
+    {
+      "name": "onValueChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when value changes."
+    },
+    {
+      "name": "onOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when open state changes."
+    },
+    {
+      "name": "surface",
+      "type": "select",
+      "required": false,
+      "description": "Preferred content surface. Auto switches to bottom sheet on compact viewports.",
+      "options": [
+        "auto",
+        "popover",
+        "sheet"
+      ],
+      "defaultValue": "auto"
+    },
+    {
+      "name": "surfaceBreakpoint",
+      "type": "number",
+      "required": false,
+      "description": "Breakpoint where auto surfaces switch from popover to sheet."
+    },
+    {
+      "name": "surfaceTitle",
+      "type": "string",
+      "required": false,
+      "description": "Optional title used for the mobile sheet header."
+    },
+    {
+      "name": "contentMinWidth",
+      "type": "string",
+      "required": false,
+      "description": "Minimum width for popover content. Useful when the trigger is compact."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper around trigger/option geometry.",
+      "defaultValue": true
+    },
+    {
+      "name": "triggerClassName",
+      "type": "string",
+      "required": false,
+      "description": "Class applied directly to the trigger button."
+    },
+    {
+      "name": "valueClassName",
+      "type": "string",
+      "required": false,
+      "description": "Class applied directly to the trigger value node."
+    },
+    {
+      "name": "contentClassName",
+      "type": "string",
+      "required": false,
+      "description": "Class applied directly to the floating content node."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "className prop"
+    }
+  ],
+  "meta": {
+    "name": "AI Model Picker",
+    "component": "Select",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Select/Select.tsx",
+    "contract": "Select/Select.json"
+  }
+}

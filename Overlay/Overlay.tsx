@@ -196,7 +196,6 @@ export const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
           data-side={contentProps['data-side']}
           data-align={contentProps['data-align']}
           data-trigger={trigger}
-          variant="floating"
           padding="control"
           radius="base"
           fullWidth={false}

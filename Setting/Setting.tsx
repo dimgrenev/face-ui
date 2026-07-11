@@ -94,7 +94,12 @@ function renderSettingDescriptor(node: SettingChildDescriptor): ReactNode {
     case 'Button': return <Button {...slotProps} />
     case 'Input': return <Input {...slotProps} />
     case 'Badge': return <Badge {...slotProps} />
-    case 'Icon': return <Icon {...slotProps} />
+    case 'Icon': {
+      const { name: iconName, ...iconProps } = slotProps
+      return typeof iconName === 'string' && iconName.length > 0
+        ? <Icon name={iconName} {...iconProps} />
+        : null
+    }
     case 'Text': return <Text {...slotProps} />
     default: return null
   }

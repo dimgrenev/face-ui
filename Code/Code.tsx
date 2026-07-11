@@ -59,7 +59,7 @@ export interface CodeProps {
   collapsedHeight?: number
   /** Additional class name on the root element. */
   className?: string
-  /** Wrapper attributes compatibility. */
+  /** Native attributes applied to the root wrapper. */
   id?: string
   role?: string
   titleAttr?: string
@@ -88,10 +88,15 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
       style,
     } = props
 
-    const canToggle = (String(code || '').split('\n').length > 8) || (String(code || '').length > 240)
+    const tokenizedText = useMemo(
+      () => tokenLines?.map((line) => line.map((token) => token.content).join('')).join('\n'),
+      [tokenLines],
+    )
+    const sourceText = code != null ? code : (tokenizedText ?? '')
+    const lines = useMemo(() => sourceText.split('\n'), [sourceText])
+    const canToggle = lines.length > 8 || sourceText.length > 240
     const [collapsed, setCollapsed] = useState(Boolean(defaultCollapsed) && canToggle)
 
-    const lines = useMemo(() => (code || '').split('\n'), [code])
     const highlightSet = useMemo(
       () => new Set(Array.isArray(highlight) ? highlight : []),
       [highlight],
@@ -101,7 +106,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
     const hasHeader = hasTitle || canToggle
 
     const onCopy = useCallback(async () => {
-      const text = String(code ?? '')
+      const text = sourceText
       const canUseNavigatorClipboard =
         typeof window !== 'undefined' &&
         typeof navigator !== 'undefined' &&
@@ -134,7 +139,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
       } catch {
         // ignore
       }
-    }, [code])
+    }, [sourceText])
 
     const onToggle = useCallback(() => setCollapsed((v) => !v), [])
 

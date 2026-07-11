@@ -27,11 +27,19 @@ export const toastAnatomy = createAnatomy('toast').parts(
 // Toast Item
 // ---------------------------------------------------------------------------
 
-type ToastVariant = 'default' | 'success' | 'error' | 'warning'
+export type ToastTone = 'neutral' | 'positive' | 'warning' | 'destructive'
 
 export interface ToastAction {
   label: string
   onClick?: () => void
+}
+
+export interface ToastOptions {
+  title: string
+  description?: string
+  action?: ToastAction
+  tone?: ToastTone
+  duration?: number
 }
 
 export interface ToastItem {
@@ -39,7 +47,7 @@ export interface ToastItem {
   title: string
   description?: string
   action?: ToastAction
-  variant: ToastVariant
+  tone: ToastTone
   duration?: number
   createdAt: number
 }
@@ -257,7 +265,7 @@ export function connectToast(
         role: 'status',
         'aria-atomic': true,
         'data-state': 'active',
-        'data-variant': toast.variant,
+        'data-tone': toast.tone,
         'data-toast-id': toast.id,
 
         onPointerEnter() {
@@ -312,13 +320,7 @@ export function connectToast(
 let toasterCounter = 0
 
 export interface Toaster {
-  toast: (opts: {
-    title: string
-    description?: string
-    action?: ToastAction
-    variant?: ToastVariant
-    duration?: number
-  }) => string
+  toast: (opts: ToastOptions) => string
   dismiss: (id: string) => void
   subscribe: MachineService<ToastSchema>['subscribe']
   getSnapshot: MachineService<ToastSchema>['getSnapshot']
@@ -344,7 +346,7 @@ export function createToaster(options?: {
         title: opts.title,
         description: opts.description,
         action: opts.action,
-        variant: opts.variant ?? 'default',
+        tone: opts.tone ?? 'neutral',
         duration: opts.duration,
       }
       service.send({ type: 'ADD', toast: toastItem } as ToastEvent)

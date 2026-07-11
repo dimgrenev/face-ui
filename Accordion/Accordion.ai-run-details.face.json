@@ -1,0 +1,139 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Accordion / AI Run Details",
+  "description": "AI Run Details product scenario for the Accordion component.",
+  "framework": "react",
+  "root": {
+    "type": "Accordion",
+    "props": {
+      "items": {
+        "$ref": "props.items"
+      },
+      "icon": {
+        "$ref": "props.icon"
+      },
+      "expandedIds": {
+        "$ref": "props.expandedIds"
+      },
+      "defaultExpandedIds": {
+        "$ref": "props.defaultExpandedIds"
+      },
+      "multiple": {
+        "$ref": "props.multiple"
+      },
+      "collapsible": {
+        "$ref": "props.collapsible"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "onExpandedChange": {
+        "$ref": "props.onExpandedChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "multiple": false,
+      "collapsible": true,
+      "defaultExpandedIds": [
+        "reasoning"
+      ],
+      "items": [
+        {
+          "value": "reasoning",
+          "label": "Reasoning summary",
+          "icon": "component",
+          "content": "The agent compared three implementation paths before selecting the safest migration."
+        },
+        {
+          "value": "tools",
+          "label": "Tool activity",
+          "icon": "props",
+          "content": "Search, code inspection, and verification calls used for this run."
+        },
+        {
+          "value": "sources",
+          "label": "Sources",
+          "icon": "link",
+          "content": "Documentation and repository references used in the answer."
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Accordion item definitions. Each item can include icon, matching Button icon input semantics."
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "required": false,
+      "description": "Default left icon for item triggers. Individual items can override it with item.icon."
+    },
+    {
+      "name": "expandedIds",
+      "type": "array",
+      "required": false,
+      "description": "Currently expanded item IDs (controlled)."
+    },
+    {
+      "name": "defaultExpandedIds",
+      "type": "array",
+      "required": false,
+      "description": "Uncontrolled initial expanded item IDs."
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "required": false,
+      "description": "Allow multiple items to be expanded simultaneously.",
+      "defaultValue": true
+    },
+    {
+      "name": "collapsible",
+      "type": "boolean",
+      "required": false,
+      "description": "Allow collapsing the last open item.",
+      "defaultValue": true
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire accordion.",
+      "defaultValue": false
+    },
+    {
+      "name": "onExpandedChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when expanded items change."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    }
+  ],
+  "meta": {
+    "name": "AI Run Details",
+    "component": "Accordion",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Accordion/Accordion.tsx",
+    "contract": "Accordion/Accordion.json"
+  }
+}

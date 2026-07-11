@@ -44,7 +44,7 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   /** Optional secondary text, rendered at the far right inside the text area. */
   rightText?: ReactNode
   /** Visual variant. */
-  variant?: ButtonVariant | 'delete'
+  variant?: ButtonVariant
   /** Icon (string from registry, ReactNode, or SVG element). */
   icon?: ReactNode
   /** Icon position relative to text. */
@@ -116,7 +116,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const {
       text,
       rightText,
-      variant: rawVariant = 'default',
+      variant = 'default',
       icon,
       iconPosition = 'left',
       iconOnly = false,
@@ -139,8 +139,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       type = 'button',
       ...rest
     } = props
-
-    const variant = rawVariant === 'delete' ? 'destructive' : rawVariant
 
     const clampedLevel = (level != null && Number.isFinite(Number(level)))
       ? Math.max(0, Math.min(9, Number(level)))

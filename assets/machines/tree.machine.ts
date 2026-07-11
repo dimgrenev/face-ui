@@ -46,6 +46,7 @@ interface TreeContext {
 type TreeState = 'idle' | 'focused'
 
 type TreeEvent =
+  | { type: 'ACTIVATE_BRANCH'; id: string }
   | { type: 'TOGGLE_EXPAND'; id: string }
   | { type: 'SELECT'; id: string }
   | { type: 'FOCUS'; id: string }
@@ -83,6 +84,16 @@ const toggleExpand = (ctx: TreeContext, event: TreeEvent): void => {
   } else {
     ctx.expandedIds = [...ctx.expandedIds, id]
   }
+}
+
+const activateBranch = (ctx: TreeContext, event: TreeEvent): void => {
+  const e = event as { type: 'ACTIVATE_BRANCH'; id: string }
+  const id = e.id
+  ctx.expandedIds = ctx.expandedIds.includes(id)
+    ? ctx.expandedIds.filter((value) => value !== id)
+    : [...ctx.expandedIds, id]
+  ctx.selectedId = id
+  ctx.focusedId = id
 }
 
 const selectItem = (ctx: TreeContext, event: TreeEvent): void => {
@@ -175,6 +186,10 @@ export const treeMachine = createMachine<TreeSchema>({
   states: {
     idle: {
       on: {
+        ACTIVATE_BRANCH: {
+          guard: isNotDisabled,
+          actions: [activateBranch],
+        },
         TOGGLE_EXPAND: {
           guard: isNotDisabled,
           actions: [toggleExpand],
@@ -198,6 +213,10 @@ export const treeMachine = createMachine<TreeSchema>({
     },
     focused: {
       on: {
+        ACTIVATE_BRANCH: {
+          guard: isNotDisabled,
+          actions: [activateBranch],
+        },
         TOGGLE_EXPAND: {
           guard: isNotDisabled,
           actions: [toggleExpand],
@@ -363,31 +382,37 @@ export function connectTree(state: MachineSnapshot<TreeSchema>, send: SendFn<Tre
 
       return {
         ...attrs('branch'),
-        role: 'treeitem' as const,
-        'aria-expanded': isExpanded,
+        role: 'none' as const,
         'data-state': isExpanded ? 'open' : 'closed',
         'data-focused': isFocused ? '' : undefined,
         'data-disabled': isDisabled ? '' : undefined,
         'data-value': props.id,
         'data-depth': props.depth,
-        tabIndex: tabStopId === props.id ? 0 : -1,
       }
     },
 
     getBranchTriggerProps(props: BranchConnectProps) {
       const isExpanded = ctx.expandedIds.includes(props.id)
+      const isSelected = ctx.selectedId === props.id
+      const isFocused = ctx.focusedId === props.id
       const isDisabled = ctx.disabled || props.disabled
 
       return {
         ...attrs('branchTrigger'),
+        role: 'treeitem' as const,
         'aria-expanded': isExpanded,
+        'aria-selected': isSelected,
+        'aria-level': (props.depth ?? 0) + 1,
         'data-state': isExpanded ? 'open' : 'closed',
+        'data-selected': isSelected ? '' : undefined,
+        'data-focused': isFocused ? '' : undefined,
         'data-disabled': isDisabled ? '' : undefined,
         'data-value': props.id,
+        'data-depth': props.depth,
+        tabIndex: tabStopId === props.id ? 0 : -1,
         onClick() {
           if (!isDisabled) {
-            send({ type: 'TOGGLE_EXPAND', id: props.id })
-            send({ type: 'FOCUS', id: props.id })
+            send({ type: 'ACTIVATE_BRANCH', id: props.id })
           }
         },
         onFocus() {

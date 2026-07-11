@@ -1,0 +1,144 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Setting / Experimental Feature",
+  "description": "Experimental Feature product scenario for the Setting component.",
+  "framework": "react",
+  "root": {
+    "type": "Setting",
+    "props": {
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "badge": {
+        "$ref": "props.badge"
+      },
+      "warning": {
+        "$ref": "props.warning"
+      },
+      "control": {
+        "$ref": "props.control"
+      },
+      "layout": {
+        "$ref": "props.layout"
+      },
+      "align": {
+        "$ref": "props.align"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "highlighted": {
+        "$ref": "props.highlighted"
+      },
+      "children": {
+        "$ref": "props.children"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "label": "Computer use beta",
+      "description": "Allow selected agents to interact with approved browser sessions.",
+      "warning": "Review permissions before enabling this feature in production.",
+      "layout": "stack",
+      "align": "start",
+      "highlighted": true,
+      "control": {
+        "__componentName__": "Switcher",
+        "defaultChecked": false,
+        "withText": true,
+        "text": "Enable beta"
+      }
+    }
+  },
+  "controls": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Primary label of the row."
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "Muted supporting copy under the label."
+    },
+    {
+      "name": "badge",
+      "type": "string",
+      "required": false,
+      "description": "Badge next to the label (string renders a Face UI Badge, e.g. \"Beta\")."
+    },
+    {
+      "name": "warning",
+      "type": "string",
+      "required": false,
+      "description": "Cautionary copy rendered with a warning icon under the description."
+    },
+    {
+      "name": "control",
+      "type": "string",
+      "required": false,
+      "description": "Control slot rendered at the end of the row (toggle, select, buttons…)."
+    },
+    {
+      "name": "layout",
+      "type": "select",
+      "required": false,
+      "description": "'row' keeps the control inline at the end; 'stack' renders it full-width below the info block.",
+      "options": [
+        "row",
+        "stack"
+      ],
+      "defaultValue": "row"
+    },
+    {
+      "name": "align",
+      "type": "select",
+      "required": false,
+      "description": "Vertical alignment of info vs control in row layout.",
+      "options": [
+        "center",
+        "start"
+      ],
+      "defaultValue": "center"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Dim the row and disable pointer interactions.",
+      "defaultValue": false
+    },
+    {
+      "name": "highlighted",
+      "type": "boolean",
+      "required": false,
+      "description": "Highlight the row (deep-link target emphasis).",
+      "defaultValue": false
+    },
+    {
+      "name": "children",
+      "type": "string",
+      "required": false,
+      "description": "Nested full-width content under the row (previews, expanded editors…)."
+    }
+  ],
+  "meta": {
+    "name": "Experimental Feature",
+    "component": "Setting",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Setting/Setting.tsx",
+    "contract": "Setting/Setting.json"
+  }
+}

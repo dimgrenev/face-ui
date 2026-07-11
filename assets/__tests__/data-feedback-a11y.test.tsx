@@ -47,13 +47,14 @@ describe('data and feedback a11y characterization', () => {
     expect(progress?.getAttribute('aria-labelledby')).toBe(label?.id)
 
     await act(async () => {
-      root.render(<Progress value={-1} aria-label="Loading assets" />)
+      root.render(<Progress indeterminate ariaLabel="Loading assets" />)
     })
 
     const labelledProgress = container.querySelector<HTMLElement>('[data-scope="progress"][data-part="root"]')
     expect(labelledProgress?.getAttribute('aria-label')).toBe('Loading assets')
     expect(labelledProgress?.getAttribute('aria-labelledby')).toBeNull()
     expect(labelledProgress?.getAttribute('aria-valuenow')).toBeNull()
+    expect(labelledProgress?.getAttribute('data-state')).toBe('indeterminate')
   })
 
   it('exposes Toast live region, status item, title, description, action, and close semantics', async () => {
@@ -81,6 +82,8 @@ describe('data and feedback a11y characterization', () => {
     expect(group?.getAttribute('aria-label')).toBe('Notifications')
     expect(group?.getAttribute('aria-live')).toBe('polite')
     expect(group?.getAttribute('data-count')).toBe('1')
+    expect(group?.getAttribute('data-placement')).toBe('bottom-center')
+    expect(group?.hasAttribute('data-membrane')).toBe(true)
 
     const toast = container.querySelector<HTMLElement>('.uf-toast')
     expect(toast).not.toBeNull()
@@ -122,7 +125,7 @@ describe('data and feedback a11y characterization', () => {
       toastContext.toaster.toast({
         title: 'Render failed',
         description: 'The preview kept the last stable frame.',
-        variant: 'error',
+        tone: 'destructive',
         duration: 0,
       })
     })
@@ -134,9 +137,24 @@ describe('data and feedback a11y characterization', () => {
     expect(toast).not.toBeNull()
     expect(toast?.getAttribute('role')).toBe('status')
     expect(toast?.getAttribute('aria-atomic')).toBe('true')
-    expect(toast?.getAttribute('data-variant')).toBe('error')
+    expect(toast?.getAttribute('data-tone')).toBe('destructive')
     expect(toast?.textContent).toContain('Render failed')
     expect(toast?.textContent).toContain('The preview kept the last stable frame.')
+  })
+
+  it('allows the internal Toast dismiss button to be disabled', async () => {
+    const toastContext = createToastContext({ defaultDuration: 0 })
+
+    await act(async () => {
+      root.render(<toastContext.Toaster dismissible={false} />)
+    })
+
+    await act(async () => {
+      toastContext.toaster.toast({ title: 'Background task unavailable', duration: 0 })
+    })
+
+    expect(container.querySelector('.uf-toast')).not.toBeNull()
+    expect(container.querySelector('[data-scope="toast"][data-part="close"]')).toBeNull()
   })
 
   it('keeps Table native table semantics, labels, sortable header button, and row selection contract', async () => {
@@ -270,11 +288,9 @@ describe('data and feedback a11y characterization', () => {
     expect(items).toHaveLength(3)
     expect(items[0]?.getAttribute('role')).toBe('checkbox')
     expect(items[0]?.getAttribute('aria-checked')).toBe('true')
-    expect(items[0]?.getAttribute('aria-pressed')).toBe('true')
     expect(items[0]?.getAttribute('data-orientation')).toBe('vertical')
 
     expect(items[1]?.getAttribute('aria-checked')).toBe('false')
-    expect(items[1]?.getAttribute('aria-pressed')).toBe('false')
 
     expect(items[2]?.getAttribute('aria-disabled')).toBe('true')
     expect(items[2]?.tabIndex).toBe(-1)
@@ -285,6 +301,5 @@ describe('data and feedback a11y characterization', () => {
 
     expect(handleValueChange).toHaveBeenLastCalledWith({ value: ['bold', 'italic'] })
     expect(items[1]?.getAttribute('aria-checked')).toBe('true')
-    expect(items[1]?.getAttribute('aria-pressed')).toBe('true')
   })
 })

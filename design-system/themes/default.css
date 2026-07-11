@@ -16,7 +16,7 @@
   --uf-topbar-control-height: 32px;
   --uf-topbar-pad-top: 12px;
   --uf-topbar-pad-right: 12px;
-  --uf-topbar-pad-bottom: 12px;
+  --uf-topbar-pad-bottom: 2px;
   --uf-topbar-pad-left: 12px;
   --uf-topbar-slot-pad-y: 0px;
   --uf-control-pad-left: var(--uf-control-pad-text);

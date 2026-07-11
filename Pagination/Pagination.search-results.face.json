@@ -1,0 +1,130 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Pagination / Search Results",
+  "description": "Search Results product scenario for the Pagination component.",
+  "framework": "react",
+  "root": {
+    "type": "Pagination",
+    "props": {
+      "page": {
+        "$ref": "props.page"
+      },
+      "defaultPage": {
+        "$ref": "props.defaultPage"
+      },
+      "total": {
+        "$ref": "props.total"
+      },
+      "pageSize": {
+        "$ref": "props.pageSize"
+      },
+      "siblingCount": {
+        "$ref": "props.siblingCount"
+      },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "onPageChange": {
+        "$ref": "props.onPageChange"
+      },
+      "className": {
+        "$ref": "props.className"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "surfaceTitle": {
+        "$ref": "props.surfaceTitle"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "defaultPage": 4,
+      "total": 248,
+      "pageSize": 20,
+      "siblingCount": 2,
+      "membrane": true,
+      "surfaceTitle": "Choose results page"
+    }
+  },
+  "controls": [
+    {
+      "name": "page",
+      "type": "number",
+      "required": false,
+      "description": "Current page number (1-indexed)."
+    },
+    {
+      "name": "defaultPage",
+      "type": "number",
+      "required": false,
+      "description": "Uncontrolled initial page number (1-indexed)."
+    },
+    {
+      "name": "total",
+      "type": "number",
+      "required": false,
+      "description": "Total number of items."
+    },
+    {
+      "name": "pageSize",
+      "type": "number",
+      "required": false,
+      "description": "Number of items per page."
+    },
+    {
+      "name": "siblingCount",
+      "type": "number",
+      "required": false,
+      "description": "Number of sibling pages shown around the current page.",
+      "defaultValue": 1
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable the entire pagination.",
+      "defaultValue": false
+    },
+    {
+      "name": "onPageChange",
+      "type": "function",
+      "required": false,
+      "description": "Callback when the page changes."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "Additional class name on the root element."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Outer membrane wrapper around each pagination button.",
+      "defaultValue": true
+    },
+    {
+      "name": "surfaceTitle",
+      "type": "string",
+      "required": false,
+      "description": "Title used for the page picker sheet on compact viewports.",
+      "defaultValue": "Choose page"
+    }
+  ],
+  "meta": {
+    "name": "Search Results",
+    "component": "Pagination",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Pagination/Pagination.tsx",
+    "contract": "Pagination/Pagination.json"
+  }
+}

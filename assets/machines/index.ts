@@ -33,7 +33,7 @@ export { menuMachine, menuAnatomy, connectMenu } from './menu.machine'
 export type { MenuSchema } from './menu.machine'
 
 export { toastMachine, toastAnatomy, connectToast, createToaster } from './toast.machine'
-export type { ToastSchema, ToastItem, Toaster } from './toast.machine'
+export type { ToastAction, ToastItem, ToastOptions, ToastSchema, ToastTone, Toaster } from './toast.machine'
 
 export { tabsMachine, tabsAnatomy, connectTabs } from './tabs.machine'
 export type { TabsSchema } from './tabs.machine'
@@ -72,7 +72,13 @@ export { commandMachine, commandAnatomy, connectCommand } from './command.machin
 export type { CommandSchema, CommandItemDef, CommandGroupDef } from './command.machine'
 
 export { uploadMachine, uploadAnatomy, connectUpload } from './upload.machine'
-export type { UploadSchema, UploadFile } from './upload.machine'
+export type {
+  UploadSchema,
+  UploadFile,
+  UploadRejectedFile,
+  UploadRejectReason,
+  UploadSourceFile,
+} from './upload.machine'
 
 export { tableMachine, tableAnatomy, connectTable } from './table.machine'
 export type { TableSchema } from './table.machine'
