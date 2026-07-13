@@ -93,7 +93,7 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(
         className={cn('uf-rating', className)}
       >
         {label != null && (
-          <Text {...(api.getLabelProps() as any)} id={labelId} as="label" variant="label">
+          <Text {...(api.getLabelProps() as any)} id={labelId} as="label" >
             {label}
           </Text>
         )}

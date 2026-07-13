@@ -22,7 +22,7 @@ import type { FormControlProps } from '../assets/form-control-props'
 // Types
 // ---------------------------------------------------------------------------
 
-export type InputType = 'default' | 'text' | 'email' | 'number' | 'date' | 'password'
+export type InputType = 'text' | 'email' | 'number' | 'date' | 'password'
 export type InputTextLayout = 'scroll' | 'wrap'
 export type InputLabelOrientation = 'vertical' | 'horizontal'
 
@@ -33,9 +33,9 @@ export interface InputProps extends FormControlProps {
   defaultValue?: string
   /** Native input id. When omitted, a stable React id is generated. */
   id?: string
-  /** Input type. 'default' renders a textarea-like free text. Others render <input type="...">. */
+  /** Native input type. Text inputs can switch between single-line and wrapping layouts. */
   type?: InputType
-  /** Text layout for type="default": 'scroll' (single-line) or 'wrap' (multi-line auto-grow). */
+  /** Text layout for type="text": 'scroll' (single-line) or 'wrap' (multi-line auto-grow). */
   textLayout?: InputTextLayout
   /** Auto-grow textarea height in wrap mode. */
   autoGrow?: boolean
@@ -114,7 +114,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
       defaultValue,
       id,
       name,
-      type = 'default',
+      type = 'text',
       textLayout = 'scroll',
       autoGrow = true,
       disabled = false,
@@ -165,7 +165,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
     }), [])
 
     const { state, send } = useMachine(inputMachineConfig, {
-      type: type === 'default' ? 'text' : type,
+      type,
       disabled,
       readOnly,
       onValueChange,
@@ -190,7 +190,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
 
     // Auto-grow textarea in wrap mode
     const resizeToContent = useCallback(() => {
-      if (type !== 'default') return
+      if (type !== 'text') return
       if (textLayout !== 'wrap') return
       if (!autoGrow) return
       const el = inputRef.current
@@ -205,7 +205,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
     }, [autoGrow, type, textLayout])
 
     useEffect(() => {
-      if (type !== 'default') return
+      if (type !== 'text') return
       const el = inputRef.current
       if (!el || !(el instanceof HTMLTextAreaElement)) return
       if (textLayout === 'scroll' || !autoGrow) {
@@ -223,8 +223,8 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
       if (el) try { el.focus() } catch {}
     }, [autoFocus, type])
 
-    const isTextarea = type === 'default'
-    const htmlType = type === 'default' ? undefined : type
+    const isTextarea = type === 'text' && textLayout === 'wrap'
+    const htmlType = type
     const generatedInputId = useId()
     const inputId = id ?? generatedInputId
     const descriptionId = description != null ? `${inputId}-description` : undefined
@@ -242,7 +242,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
       </span>
     ) : null
 
-    const controlEl = isTextarea && textLayout === 'wrap' ? (
+    const controlEl = isTextarea ? (
       <textarea
         ref={setControlRef as React.Ref<HTMLTextAreaElement>}
         {...(inputProps as any)}
@@ -313,7 +313,7 @@ export const Input = forwardRef<HTMLDivElement, InputProps>(
         minLength={minLength}
         maxLength={maxLength}
         pattern={pattern}
-        data-text-layout={isTextarea ? 'scroll' : undefined}
+        data-text-layout={type === 'text' ? 'scroll' : undefined}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           inputProps.onChange(e)
           onChange?.(e)

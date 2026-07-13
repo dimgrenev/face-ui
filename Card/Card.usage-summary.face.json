@@ -50,7 +50,7 @@
     "props": {
       "title": "API usage",
       "content": "1.8M of 2M monthly tokens used across production agents.",
-      "padding": "spacious",
+      "padding": "default",
       "radius": "lg",
       "border": true,
       "footerLayout": "between",
@@ -93,12 +93,11 @@
       "name": "variant",
       "type": "select",
       "required": false,
-      "description": "Surface preset for the container's role in the system.",
+      "description": "Meaningful surface role: standard contained surface, unframed composition, or code canvas.",
       "options": [
         "default",
-        "code",
-        "showcase",
-        "plain"
+        "plain",
+        "code"
       ],
       "controlType": "select"
     },
@@ -106,13 +105,12 @@
       "name": "padding",
       "type": "select",
       "required": false,
-      "description": "Internal surface inset. Default is the Face UI 7px contained-surface rhythm.",
+      "description": "Internal surface inset, from the standard 7px rhythm down to a flush composition.",
       "options": [
         "default",
-        "none",
-        "membrane",
         "control",
-        "spacious"
+        "membrane",
+        "none"
       ],
       "controlType": "select"
     },
@@ -120,14 +118,11 @@
       "name": "radius",
       "type": "select",
       "required": false,
-      "description": "Surface corner radius.",
+      "description": "Corner geometry for contained, compact, dialog, or flush surfaces.",
       "options": [
-        "none",
-        "base",
-        "sm",
         "md",
         "lg",
-        "xl"
+        "none"
       ],
       "controlType": "select"
     },
@@ -153,12 +148,11 @@
       "name": "footerLayout",
       "type": "select",
       "required": false,
-      "description": "Layout used by the convenience footer slot. Compound usage configures Card.Footer directly.",
+      "description": "Alignment used by the convenience footer slot. Compound usage configures Card.Footer directly.",
       "options": [
         "start",
         "end",
-        "between",
-        "split"
+        "between"
       ],
       "controlType": "select"
     },

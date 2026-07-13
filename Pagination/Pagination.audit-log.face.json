@@ -25,12 +25,6 @@
       "disabled": {
         "$ref": "props.disabled"
       },
-      "onPageChange": {
-        "$ref": "props.onPageChange"
-      },
-      "className": {
-        "$ref": "props.className"
-      },
       "membrane": {
         "$ref": "props.membrane"
       },
@@ -88,18 +82,6 @@
       "required": false,
       "description": "Disable the entire pagination.",
       "defaultValue": false
-    },
-    {
-      "name": "onPageChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when the page changes."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     },
     {
       "name": "membrane",

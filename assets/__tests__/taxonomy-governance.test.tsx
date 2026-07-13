@@ -7,9 +7,9 @@ import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import {
   Date as DateField,
-  Drawer,
   getFaceUiComponentMeta,
   isDeprecatedFaceUiComponent,
+  Modal,
   Popover,
   SegmentedControl,
   Text,
@@ -29,6 +29,7 @@ function readCssNumberToken(source: string, tokenName: string): number {
 }
 
 const componentsCss = readFixture('../styles/components.css')
+const baseCss = readFixture('../styles/base.css')
 const animationsCss = readFixture('../styles/animations.css')
 const tokensCss = readFixture('../styles/tokens.css')
 const designSystemColorCss = readFixture('../../design-system/tokens/colors.css')
@@ -137,25 +138,28 @@ describe('taxonomy and governance', () => {
   it('exposes governance metadata and deprecated aliases', () => {
     expect(isDeprecatedFaceUiComponent('Overlay')).toBe(true)
     expect(isDeprecatedFaceUiComponent('Toggle')).toBe(true)
-    expect(isDeprecatedFaceUiComponent('Sheet')).toBe(true)
     expect(isDeprecatedFaceUiComponent('Date')).toBe(false)
     expect(getFaceUiComponentMeta('Sidebar')?.status).toBe('stable')
     expect(getFaceUiComponentMeta('Sidebar')?.aliases).toContain('Sidebar')
     expect(getFaceUiComponentMeta('Overlay')?.replacedBy).toEqual(['Tooltip', 'Popover'])
-    expect(getFaceUiComponentMeta('Sheet')?.replacedBy).toEqual(['Drawer'])
+    expect(getFaceUiComponentMeta('Drawer')).toBeNull()
+    expect(getFaceUiComponentMeta('Sheet')).toBeNull()
   })
 
   it('keeps deprecated aliases governed by the public and compat barrels', () => {
     expect('Overlay' in faceUiIndex).toBe(false)
     expect('Toggle' in faceUiIndex).toBe(false)
     expect('Sidebar' in faceUiIndex).toBe(false)
+    expect('Drawer' in faceUiIndex).toBe(false)
     expect('Sheet' in faceUiIndex).toBe(false)
+    expect('Modal' in faceUiIndex).toBe(true)
     expect('Date' in faceUiIndex).toBe(true)
 
     expect('Overlay' in faceUiCompat).toBe(true)
     expect('Toggle' in faceUiCompat).toBe(true)
     expect('Sidebar' in faceUiCompat).toBe(true)
-    expect('Sheet' in faceUiCompat).toBe(true)
+    expect('Drawer' in faceUiCompat).toBe(false)
+    expect('Sheet' in faceUiCompat).toBe(false)
   })
 
   it('routes component motion through tokens and reduced-motion overrides', () => {
@@ -183,6 +187,14 @@ describe('taxonomy and governance', () => {
     expect(tokensCss).toContain('--uf-button-ring-color: var(--uf-color-border);')
     expect(componentsCss).toContain('padding: var(--uf-membrane);')
     expect(componentsCss).toContain('border-radius: var(--uf-radius);')
+  })
+
+  it('does not double-inset controls that own an explicit membrane wrapper', () => {
+    const rootMembraneOverrides = readCssBlock(baseCss, '[data-scope="card"][data-part="root"],\n[data-scope="button"][data-part="root"],\n[data-scope="text"][data-part="root"],\n[data-scope="bar"][data-part="root"],\n[data-scope="sidebar"][data-part="root"],\n[data-scope="input"][data-part="root"],\n[data-scope="select"][data-part="root"],\n[data-scope="resizable"][data-part="root"]')
+
+    expect(rootMembraneOverrides).toContain('padding: 0;')
+    expect(baseCss).toContain('[data-scope="input"][data-part="root"]')
+    expect(baseCss).toContain('[data-scope="select"][data-part="root"]')
   })
 
   it('keeps every runtime and design-system color on the monochrome 2% atom scale', () => {
@@ -311,7 +323,9 @@ describe('taxonomy and governance', () => {
     expect(readCssBlock(componentsCss, '.uf-code[data-scope] pre'))
       .toContain('overflow-x: auto;')
     expect(readCssBlock(componentsCss, '.uf-code[data-scope] code'))
-      .toContain('min-inline-size: max-content;')
+      .toContain('min-inline-size: 100%;')
+    expect(readCssBlock(componentsCss, '.uf-code[data-scope] code'))
+      .toContain('width: max-content;')
     expect(readCssBlock(componentsCss, '[data-scope="code"] [data-part="line"]'))
       .toContain('min-inline-size: max-content;')
   })
@@ -374,7 +388,6 @@ describe('taxonomy and governance', () => {
           ))}
           <Text text="Markdown text" variant="markdown" />
           <Text text="Label text" variant="label" />
-          <Text text="Legacy caption text" variant={'caption' as 'label'} />
         </div>,
       )
     })
@@ -382,6 +395,7 @@ describe('taxonomy and governance', () => {
     expect(textMeta.props?.size?.options).toEqual(textSizeOptions)
     expect(textMeta.props?.variant?.options).toContain('markdown')
     expect(textMeta.props?.variant?.options).toContain('label')
+    expect(textMeta.props?.variant?.options).not.toContain('default')
     expect(textMeta.props?.variant?.options).not.toContain('caption')
     expect(textMeta.tokenMapping?.component).toContain('--uf-text-size-font-size')
     expect(textMeta.tokenMapping?.component).toContain('--uf-text-label-font-size')
@@ -444,11 +458,6 @@ describe('taxonomy and governance', () => {
     const labelNode = container.querySelector<HTMLElement>('.uf-text[data-scope="text"][data-variant="label"]')
     expect(labelNode).not.toBeNull()
     expect(labelNode?.tagName).toBe('LABEL')
-    const legacyCaptionNode = Array.from(container.querySelectorAll<HTMLElement>('.uf-text[data-scope="text"][data-variant="label"]'))
-      .find((node) => node.textContent === 'Legacy caption text')
-    expect(legacyCaptionNode).not.toBeNull()
-    expect(legacyCaptionNode?.tagName).toBe('SMALL')
-
     for (const size of textSizeOptions) {
       const token = textSizeTokenMap[size]
       const node = container.querySelector<HTMLElement>(`.uf-text[data-scope="text"][data-size="${size}"]`)
@@ -504,14 +513,14 @@ describe('taxonomy and governance', () => {
     expect(componentsCss).toContain('color: var(--uf-tooltip-fg);')
   })
 
-  it('Drawer renders the modal primitive with directional variants and compat Sheet aliases to it', async () => {
+  it('Modal composes centered and edge-aligned surfaces through placement and edge', async () => {
     await act(async () => {
       root.render(
         <div>
-          <faceUiCompat.Sheet open title="Drawer" side="bottom">Content</faceUiCompat.Sheet>
-          <Drawer open title="Drawer" side="left">Content</Drawer>
-          <Drawer open title="Drawer" side="top">Content</Drawer>
-          <Drawer open title="Drawer" side="right" edge="inset">Content</Drawer>
+          <Modal open portal={false} title="Bottom" placement="bottom">Content</Modal>
+          <Modal open portal={false} title="Left" placement="left" edge="flush">Content</Modal>
+          <Modal open portal={false} title="Top" placement="top">Content</Modal>
+          <Modal open portal={false} title="Right" placement="right">Content</Modal>
         </div>,
       )
     })
@@ -519,27 +528,29 @@ describe('taxonomy and governance', () => {
     const modals = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-modal[data-scope]'))
     const positioners = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-modal-positioner[data-scope]'))
     expect(modals).toHaveLength(4)
-    expect(modals[0]?.getAttribute('data-surface')).toBe('sheet')
     expect(modals[0]?.getAttribute('data-variant')).toBe('bottom')
-    expect(modals[0]?.classList.contains('uf-drawer--inset')).toBe(true)
-    expect(positioners[0]?.classList.contains('uf-drawer-positioner--inset')).toBe(true)
+    expect(modals[0]?.getAttribute('data-edge')).toBe('inset')
+    expect(modals[0]?.classList.contains('uf-modal--edge-inset')).toBe(true)
+    expect(positioners[0]?.classList.contains('uf-modal-positioner--edge-inset')).toBe(true)
     expect(modals[1]?.getAttribute('data-variant')).toBe('left')
-    expect(modals[1]?.classList.contains('uf-drawer')).toBe(true)
-    expect(modals[1]?.classList.contains('uf-drawer--flush')).toBe(true)
-    expect(positioners[1]?.classList.contains('uf-drawer-positioner--flush')).toBe(true)
-    expect(modals[2]?.getAttribute('data-surface')).toBe('sheet')
+    expect(modals[1]?.getAttribute('data-edge')).toBe('flush')
+    expect(modals[1]?.classList.contains('uf-modal--edge-flush')).toBe(true)
+    expect(positioners[1]?.classList.contains('uf-modal-positioner--edge-flush')).toBe(true)
     expect(modals[2]?.getAttribute('data-variant')).toBe('top')
-    expect(modals[2]?.classList.contains('uf-drawer--inset')).toBe(true)
+    expect(modals[2]?.classList.contains('uf-modal--edge-inset')).toBe(true)
     expect(modals[3]?.getAttribute('data-variant')).toBe('right')
-    expect(modals[3]?.classList.contains('uf-drawer--inset')).toBe(true)
+    expect(modals[3]?.classList.contains('uf-modal--edge-inset')).toBe(true)
     expect(modals[0]?.getAttribute('data-border')).toBe('true')
     expect(modals[1]?.getAttribute('data-border')).toBe('false')
     expect(modals[2]?.getAttribute('data-border')).toBe('true')
     expect(modals[3]?.getAttribute('data-border')).toBe('true')
-    expect(componentsCss).not.toMatch(/\.uf-modal\[data-scope\]\.uf-drawer\s*\{[^}]*border\s*:\s*0\s*;?[^}]*\}/)
-    expect(componentsCss).toContain('.uf-modal-positioner[data-scope].uf-drawer-positioner--inset[data-variant="top"]')
-    expect(componentsCss).toContain('.uf-modal[data-scope].uf-drawer--flush:is([data-variant="top"], [data-variant="bottom"])')
-    expect(componentsCss).toContain('.uf-modal[data-scope].uf-drawer--inset:is([data-variant="top"], [data-variant="bottom"])')
+    expect(modals[0]?.getAttribute('data-radius')).toBe('lg')
+    expect(modals[1]?.getAttribute('data-radius')).toBe('none')
+    expect(modals[2]?.getAttribute('data-radius')).toBe('lg')
+    expect(modals[3]?.getAttribute('data-radius')).toBe('lg')
+    expect(componentsCss).toContain('.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="top"]')
+    expect(componentsCss).toContain('.uf-modal[data-scope].uf-modal--edge-flush:is([data-variant="top"], [data-variant="bottom"])')
+    expect(componentsCss).toContain('.uf-modal[data-scope].uf-modal--edge-inset:is([data-variant="top"], [data-variant="bottom"])')
   })
 
   it('SegmentedControl defaults to single selection and Date renders date field behavior', async () => {

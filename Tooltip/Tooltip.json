@@ -9,11 +9,6 @@
       "required": false,
       "description": "Content rendered inside the floating surface."
     },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the content element."
-    },
     "children": {
       "type": "string",
       "required": false,
@@ -59,11 +54,6 @@
       "type": "number",
       "required": false,
       "description": "Offset from the trigger along the side axis (px)."
-    },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "Called when the open state changes."
     }
   },
   "states": [

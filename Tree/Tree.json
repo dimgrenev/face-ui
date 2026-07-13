@@ -28,26 +28,6 @@
       "type": "string",
       "required": false,
       "description": "Uncontrolled initial selected node ID."
-    },
-    "onExpandedChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when expanded nodes change."
-    },
-    "onSelectedChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when selected node changes."
-    },
-    "renderNode": {
-      "type": "function",
-      "required": false,
-      "description": "Global render override for custom node bodies. Tree still owns nesting, expansion, focus, and selection."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     }
   },
   "states": [

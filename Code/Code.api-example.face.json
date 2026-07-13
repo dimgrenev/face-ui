@@ -30,18 +30,6 @@
       },
       "collapsedHeight": {
         "$ref": "props.collapsedHeight"
-      },
-      "className": {
-        "$ref": "props.className"
-      },
-      "role": {
-        "$ref": "props.role"
-      },
-      "titleAttr": {
-        "$ref": "props.titleAttr"
-      },
-      "style": {
-        "$ref": "props.style"
       }
     },
     "children": []
@@ -109,30 +97,6 @@
       "required": false,
       "description": "Maximum height when collapsed (px).",
       "defaultValue": 160
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
-    },
-    {
-      "name": "role",
-      "type": "string",
-      "required": false,
-      "description": "role prop"
-    },
-    {
-      "name": "titleAttr",
-      "type": "string",
-      "required": false,
-      "description": "titleAttr prop"
-    },
-    {
-      "name": "style",
-      "type": "object",
-      "required": false,
-      "description": "style prop"
     }
   ],
   "meta": {

@@ -19,12 +19,11 @@ export const cardAnatomy = createAnatomy('card').parts(
 export type CardVariant =
   | 'default'
   | 'code'
-  | 'showcase'
   | 'plain'
-export type CardPadding = 'none' | 'membrane' | 'control' | 'default' | 'spacious'
-export type CardRadius = 'none' | 'base' | 'sm' | 'md' | 'lg' | 'xl'
+export type CardPadding = 'none' | 'membrane' | 'control' | 'default'
+export type CardRadius = 'none' | 'md' | 'lg'
 export type CardHeaderLayout = 'stack' | 'bar'
-export type CardFooterLayout = 'start' | 'end' | 'between' | 'split'
+export type CardFooterLayout = 'start' | 'end' | 'between'
 export type CardActionAlign = 'start' | 'end' | 'between'
 
 export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'content' | 'title'> {

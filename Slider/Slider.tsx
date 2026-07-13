@@ -3,7 +3,7 @@
  *
  * `<Slider value={[50]} />`
  * `<Slider value={[20, 80]} label="Price range" />`
- * `<Slider variant="advanced" defaultValue={[42]} crop leading="iconText" leadingIcon="crop" leadingText="Crop" />`
+ * `<Slider variant="advanced" defaultValue={[42]} crop leadingIcon="crop" leadingText="Crop" />`
  */
 
 import React, { forwardRef, useCallback, useEffect, useRef, type ReactNode } from 'react'
@@ -15,7 +15,6 @@ import { Text } from '../Text/Text'
 import {
   SliderAdvanced,
   type SliderCropRange,
-  type SliderLeading,
 } from './SliderAdvanced'
 
 export type SliderVariant = 'simple' | 'advanced'
@@ -43,11 +42,9 @@ export interface SliderProps {
   'aria-label'?: string
   /** Callback when value changes. */
   onValueChange?: (details: { value: number[] }) => void
-  /** Leading content mode for the advanced slider. */
-  leading?: SliderLeading
-  /** Leading icon for the advanced slider. */
+  /** Optional leading icon for the advanced slider. */
   leadingIcon?: ReactNode
-  /** Leading text for the advanced slider. */
+  /** Optional leading text for the advanced slider. */
   leadingText?: string
   /** Enables crop handles for the advanced slider. */
   crop?: boolean
@@ -192,7 +189,7 @@ function SliderSimple({
   return (
     <div ref={forwardedRef} {...api.getRootProps()} className={cn('uf-slider', className)}>
       {label != null && (
-        <Text {...(api.getLabelProps() as any)} as="label" variant="label">
+        <Text {...(api.getLabelProps() as any)} as="label" >
           {label}
         </Text>
       )}
@@ -225,8 +222,6 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
   function Slider(props, ref) {
     const {
       variant = 'simple',
-      orientation = 'horizontal',
-      leading = 'none',
       leadingIcon,
       leadingText,
       crop = false,
@@ -238,21 +233,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const controlledValue = normalizeValues(props.value)
     const defaultValues = normalizeValues(props.defaultValue)
 
-    const advancedFeaturesRequested =
-      variant === 'advanced' ||
-      leading !== 'none' ||
-      leadingIcon != null ||
-      leadingText != null ||
-      crop ||
-      defaultCropRange != null ||
-      cropRange != null ||
-      cropLocksValue !== true
-
-    const canRenderAdvanced =
-      orientation === 'horizontal' &&
-      (controlledValue?.length ?? defaultValues?.length ?? 1) <= 1
-
-    if (advancedFeaturesRequested && canRenderAdvanced) {
+    if (variant === 'advanced') {
       return (
         <SliderAdvanced
           rootRef={ref}
@@ -265,7 +246,6 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           label={props.label}
           aria-label={props['aria-label']}
           onValueChange={props.onValueChange}
-          leading={leading}
           leadingIcon={leadingIcon}
           leadingText={leadingText}
           crop={crop}
@@ -284,5 +264,4 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
 
 export type {
   SliderCropRange,
-  SliderLeading,
 }

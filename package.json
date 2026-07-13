@@ -146,12 +146,6 @@
       "import": "./dist/esm/Date/*.js",
       "require": "./dist/cjs/Date/*.js"
     },
-    "./Drawer/*.json": "./dist/esm/Drawer/*.json",
-    "./Drawer/*": {
-      "types": "./dist/types/Drawer/*.d.ts",
-      "import": "./dist/esm/Drawer/*.js",
-      "require": "./dist/cjs/Drawer/*.js"
-    },
     "./Icon/*.json": "./dist/esm/Icon/*.json",
     "./Icon/*": {
       "types": "./dist/types/Icon/*.d.ts",
@@ -259,12 +253,6 @@
       "types": "./dist/types/Separator/*.d.ts",
       "import": "./dist/esm/Separator/*.js",
       "require": "./dist/cjs/Separator/*.js"
-    },
-    "./Sheet/*.json": "./dist/esm/Sheet/*.json",
-    "./Sheet/*": {
-      "types": "./dist/types/Sheet/*.d.ts",
-      "import": "./dist/esm/Sheet/*.js",
-      "require": "./dist/cjs/Sheet/*.js"
     },
     "./Skeleton/*.json": "./dist/esm/Skeleton/*.json",
     "./Skeleton/*": {

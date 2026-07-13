@@ -30,12 +30,6 @@
       },
       "weekStartsOn": {
         "$ref": "props.weekStartsOn"
-      },
-      "onValueChange": {
-        "$ref": "props.onValueChange"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -116,18 +110,6 @@
         "6"
       ],
       "defaultValue": 0
-    },
-    {
-      "name": "onValueChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when the selected date changes."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   ],
   "meta": {

@@ -77,12 +77,15 @@ label[data-scope] {
   box-sizing: border-box;
 }
 
-/* Container components disable their own membrane */
+/* Components with an explicit membrane wrapper must not also inherit the
+   generic root membrane. Otherwise their visible control is inset twice. */
 [data-scope="card"][data-part="root"],
 [data-scope="button"][data-part="root"],
 [data-scope="text"][data-part="root"],
 [data-scope="bar"][data-part="root"],
 [data-scope="sidebar"][data-part="root"],
+[data-scope="input"][data-part="root"],
+[data-scope="select"][data-part="root"],
 [data-scope="resizable"][data-part="root"] {
   padding: 0;
 }

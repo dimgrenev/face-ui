@@ -15,11 +15,6 @@
       "required": false,
       "description": "Content rendered inside the floating surface."
     },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the content element."
-    },
     "children": {
       "type": "string",
       "required": false,
@@ -65,11 +60,6 @@
       "type": "number",
       "required": false,
       "description": "Offset from the trigger along the side axis (px)."
-    },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "Called when the open state changes."
     }
   },
   "states": [
@@ -168,12 +158,12 @@
     "whenNotToUse": [
       "Full dialog (use Modal)",
       "Simple text hint (use Tooltip)",
-      "Side panel (use Drawer)"
+      "Persistent side navigation (use Panel)"
     ],
     "alternatives": [
       "Tooltip",
       "Modal",
-      "Drawer"
+      "Panel"
     ],
     "context": "app"
   }

@@ -10,9 +10,6 @@
       "content": {
         "$ref": "props.content"
       },
-      "className": {
-        "$ref": "props.className"
-      },
       "children": {
         "$ref": "props.children"
       },
@@ -33,9 +30,6 @@
       },
       "sideOffset": {
         "$ref": "props.sideOffset"
-      },
-      "onOpenChange": {
-        "$ref": "props.onOpenChange"
       }
     },
     "children": []
@@ -58,12 +52,6 @@
       "type": "string",
       "required": false,
       "description": "Content rendered inside the floating surface."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the content element."
     },
     {
       "name": "children",
@@ -117,12 +105,6 @@
       "type": "number",
       "required": false,
       "description": "Offset from the trigger along the side axis (px)."
-    },
-    {
-      "name": "onOpenChange",
-      "type": "function",
-      "required": false,
-      "description": "Called when the open state changes."
     }
   ],
   "meta": {

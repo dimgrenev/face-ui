@@ -28,17 +28,8 @@
       "defaultFiles": {
         "$ref": "props.defaultFiles"
       },
-      "onFilesChange": {
-        "$ref": "props.onFilesChange"
-      },
-      "onReject": {
-        "$ref": "props.onReject"
-      },
       "labels": {
         "$ref": "props.labels"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -107,28 +98,10 @@
       "description": "Initial file list for uncontrolled usage."
     },
     {
-      "name": "onFilesChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when files change."
-    },
-    {
-      "name": "onReject",
-      "type": "function",
-      "required": false,
-      "description": "Callback when files are rejected."
-    },
-    {
       "name": "labels",
       "type": "object",
       "required": false,
       "description": "Localized interface labels."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   ],
   "meta": {

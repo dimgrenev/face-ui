@@ -36,16 +36,6 @@
       "description": "Disable the entire pagination.",
       "default": false
     },
-    "onPageChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when the page changes."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
-    },
     "membrane": {
       "type": "boolean",
       "required": false,
@@ -170,7 +160,7 @@
     ],
     "notes": [
       "Pagination uses Button for previous/next and page-picker controls and Text for the current-page indicator.",
-      "Compact page-picker sheet behavior inherits Sheet/Modal tokens rather than defining pagination-local overlay tokens."
+      "Compact page-picker behavior inherits shared Modal overlay tokens rather than defining pagination-local tokens."
     ]
   },
   "platform": {},

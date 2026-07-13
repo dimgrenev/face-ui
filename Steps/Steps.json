@@ -31,16 +31,6 @@
       "required": false,
       "description": "Disable the entire steps navigation.",
       "default": false
-    },
-    "onStepChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when the active step changes."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     }
   },
   "states": [

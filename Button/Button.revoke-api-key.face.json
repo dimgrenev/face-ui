@@ -58,9 +58,6 @@
       "copyText": {
         "$ref": "props.copyText"
       },
-      "onCopied": {
-        "$ref": "props.onCopied"
-      },
       "children": {
         "$ref": "props.children"
       }
@@ -102,8 +99,7 @@
         "accent",
         "outline",
         "ghost",
-        "destructive",
-        "suggestion"
+        "destructive"
       ],
       "defaultValue": "default"
     },
@@ -204,12 +200,6 @@
       "type": "string",
       "required": false,
       "description": "Copy text to clipboard on click (Clipboard integration)."
-    },
-    {
-      "name": "onCopied",
-      "type": "function",
-      "required": false,
-      "description": "Callback when copy succeeds."
     },
     {
       "name": "children",

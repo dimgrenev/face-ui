@@ -19,14 +19,8 @@
       "orientation": {
         "$ref": "props.orientation"
       },
-      "onValueChange": {
-        "$ref": "props.onValueChange"
-      },
       "ariaLabel": {
         "$ref": "props.ariaLabel"
-      },
-      "ariaLabelledBy": {
-        "$ref": "props.ariaLabelledBy"
       },
       "disabled": {
         "$ref": "props.disabled"
@@ -39,9 +33,6 @@
       },
       "membrane": {
         "$ref": "props.membrane"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -116,22 +107,10 @@
       "defaultValue": "vertical"
     },
     {
-      "name": "onValueChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when value changes."
-    },
-    {
       "name": "ariaLabel",
       "type": "string",
       "required": false,
       "description": "Accessible label for the radio group (role=\"radiogroup\" requires a name)."
-    },
-    {
-      "name": "ariaLabelledBy",
-      "type": "string",
-      "required": false,
-      "description": "ID of an element that labels the radio group."
     },
     {
       "name": "disabled",
@@ -159,12 +138,6 @@
       "required": false,
       "description": "Outer membrane wrapper around control geometry.",
       "defaultValue": true
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   ],
   "meta": {

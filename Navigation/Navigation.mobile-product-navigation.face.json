@@ -16,14 +16,8 @@
       "defaultActiveId": {
         "$ref": "props.defaultActiveId"
       },
-      "onActiveChange": {
-        "$ref": "props.onActiveChange"
-      },
       "orientation": {
         "$ref": "props.orientation"
-      },
-      "className": {
-        "$ref": "props.className"
       },
       "surface": {
         "$ref": "props.surface"
@@ -36,9 +30,6 @@
       },
       "defaultOpen": {
         "$ref": "props.defaultOpen"
-      },
-      "onOpenChange": {
-        "$ref": "props.onOpenChange"
       },
       "trigger": {
         "$ref": "props.trigger"
@@ -97,12 +88,6 @@
       "defaultValue": null
     },
     {
-      "name": "onActiveChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when active item changes."
-    },
-    {
       "name": "orientation",
       "type": "select",
       "required": false,
@@ -112,12 +97,6 @@
         "vertical"
       ],
       "defaultValue": "horizontal"
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     },
     {
       "name": "surface",
@@ -149,12 +128,6 @@
       "required": false,
       "description": "Uncontrolled initial sheet state for compact mode.",
       "defaultValue": false
-    },
-    {
-      "name": "onOpenChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when sheet state changes."
     },
     {
       "name": "trigger",

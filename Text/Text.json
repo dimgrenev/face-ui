@@ -12,9 +12,8 @@
     "variant": {
       "type": "enum",
       "required": false,
-      "description": "Visual variant.",
+      "description": "Semantic typography role. Body is the canonical default.",
       "options": [
-        "default",
         "body",
         "heading",
         "h1",
@@ -30,7 +29,7 @@
         "muted",
         "blockquote"
       ],
-      "default": "default"
+      "default": "body"
     },
     "size": {
       "type": "enum",
@@ -141,7 +140,7 @@
     {
       "name": "Default (Body)",
       "props": {
-        "variant": "default",
+        "variant": "body",
         "iconPosition": "left",
         "inset": "control",
         "stretchText": false,

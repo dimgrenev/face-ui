@@ -124,11 +124,13 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
     }
 
     const sizeStyle = {
-      ...(objectFit ? { objectFit } : {}),
+      ...((objectFit || (type === 'image' && variant === 'circle'))
+        ? { objectFit: objectFit ?? 'cover' }
+        : {}),
       ...(type === 'image'
         ? {
             width: '100%',
-            height: height != null ? '100%' : 'auto',
+            height: height != null || variant === 'circle' ? '100%' : 'auto',
             display: 'block',
           }
         : {}),
@@ -195,7 +197,7 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
               onLoad={onLoad}
               loading={loading}
               decoding={decoding ?? 'async'}
-              className={cn('uf-image', `uf-image--${variant}`)}
+              className="uf-image"
               title={title}
             />
           )
@@ -207,6 +209,7 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
         ref={ref}
         {...mediaAnatomy.getPartAttrs('root')}
         data-type={type}
+        data-variant={type === 'image' ? variant : undefined}
         data-error={hasError || undefined}
         className={cn('uf-media', className)}
         id={id}

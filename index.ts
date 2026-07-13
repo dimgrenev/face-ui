@@ -38,9 +38,6 @@ export type {
 export { Skeleton, skeletonAnatomy } from './Skeleton/Skeleton'
 export type { SkeletonProps } from './Skeleton/Skeleton'
 
-export { Setting, settingAnatomy } from './Setting/Setting'
-export type { SettingProps, SettingGroupProps, SettingLayout, SettingAlign, SettingGroupVariant } from './Setting/Setting'
-
 // Form Controls
 export type { FormControlProps } from './assets/form-control-props'
 
@@ -70,7 +67,7 @@ export type { SelectProps } from './Select/Select'
 
 // Overlays
 export { Modal } from './Modal/Modal'
-export type { ModalProps } from './Modal/Modal'
+export type { ModalAction, ModalEdge, ModalPlacement, ModalProps } from './Modal/Modal'
 
 export { Tooltip } from './Tooltip/Tooltip'
 export type { TooltipProps } from './Tooltip/Tooltip'
@@ -148,9 +145,6 @@ export type { CalendarProps } from './Calendar/Calendar'
 
 export { Date } from './Date/Date'
 export type { DateProps, DatePreset } from './Date/Date'
-
-export { Drawer } from './Drawer/Drawer'
-export type { DrawerProps } from './Drawer/Drawer'
 
 // Toc / Bar / Breadcrumb / Code / Media / Scroll
 export { Toc } from './Toc/Toc'

@@ -27,12 +27,6 @@
       },
       "ariaLabel": {
         "$ref": "props.ariaLabel"
-      },
-      "onValueChange": {
-        "$ref": "props.onValueChange"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -94,18 +88,6 @@
       "required": false,
       "description": "Accessible name used when no visible label is provided.",
       "defaultValue": "Rating"
-    },
-    {
-      "name": "onValueChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when value changes."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   ],
   "meta": {

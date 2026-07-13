@@ -59,16 +59,6 @@
         "6"
       ],
       "default": 0
-    },
-    "onValueChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when the selected date changes."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   },
   "states": [

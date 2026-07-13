@@ -104,7 +104,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
                 {...api.getEllipsisProps()}
                 membrane={false}
                 fullWidth={false}
-                variant="label"
+
                 className="uf-pagination-ellipsis"
               >
                 …

@@ -75,9 +75,8 @@
       "name": "variant",
       "type": "select",
       "required": false,
-      "description": "Visual variant.",
+      "description": "Semantic typography role. Body is the canonical default.",
       "options": [
-        "default",
         "body",
         "heading",
         "h1",
@@ -93,7 +92,7 @@
         "muted",
         "blockquote"
       ],
-      "defaultValue": "default"
+      "defaultValue": "body"
     },
     {
       "name": "size",

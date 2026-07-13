@@ -13,9 +13,6 @@
       "orientation": {
         "$ref": "props.orientation"
       },
-      "className": {
-        "$ref": "props.className"
-      },
       "height": {
         "$ref": "props.height"
       },
@@ -51,12 +48,6 @@
         "both"
       ],
       "defaultValue": "vertical"
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     },
     {
       "name": "height",

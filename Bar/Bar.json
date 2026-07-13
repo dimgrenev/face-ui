@@ -27,7 +27,6 @@
           {
             "__componentName__": "Text",
             "text": "Workspace",
-            "variant": "label",
             "membrane": false
           },
           {

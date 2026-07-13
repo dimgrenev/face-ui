@@ -2,17 +2,12 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Modal",
-  "description": "Overlay surface component unifying dialog, drawer, and alert dialog",
+  "description": "Centered dialog surface for focused decisions and workflows",
   "props": {
-    "open": {
-      "type": "boolean",
-      "required": false,
-      "description": "Controlled open state."
-    },
-    "variant": {
+    "placement": {
       "type": "enum",
       "required": false,
-      "description": "Visual placement variant.",
+      "description": "Viewport placement of the modal surface.",
       "options": [
         "center",
         "left",
@@ -20,24 +15,49 @@
         "top",
         "bottom"
       ],
-      "default": "right"
+      "default": "center"
+    },
+    "edge": {
+      "type": "enum",
+      "required": false,
+      "description": "Inset adds the system viewport gap, radius, and border; flush attaches the surface to its placement edge.",
+      "options": [
+        "inset",
+        "flush"
+      ],
+      "default": "inset"
+    },
+    "width": {
+      "type": "number",
+      "required": false,
+      "description": "Preferred surface width in pixels, constrained by the viewport."
+    },
+    "height": {
+      "type": "number",
+      "required": false,
+      "description": "Preferred surface height in pixels, constrained by the viewport."
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state."
     },
     "closeOnOverlayClick": {
       "type": "boolean",
       "required": false,
-      "description": "Close the modal when its backdrop is clicked.",
+      "description": "Close the surface when its backdrop is clicked.",
       "default": true
     },
     "closable": {
       "type": "boolean",
       "required": false,
-      "description": "Whether the modal can be closed via Escape / backdrop click.",
+      "description": "Whether the surface can be closed via Escape / backdrop click.",
       "default": true
     },
     "title": {
       "type": "string",
       "required": false,
-      "description": "Title content rendered inside the modal."
+      "description": "Title content rendered inside the surface."
     },
     "description": {
       "type": "string",
@@ -59,43 +79,10 @@
       "required": false,
       "description": "Trigger element that toggles the modal open."
     },
-    "width": {
-      "type": "number",
-      "required": false,
-      "description": "Width in px for left/right variants.",
-      "default": 400
-    },
-    "height": {
-      "type": "number",
-      "required": false,
-      "description": "Height in px for top/bottom variants.",
-      "default": 420
-    },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "Called when the open state changes."
-    },
-    "surface": {
-      "type": "enum",
-      "required": false,
-      "description": "Surface behavior on compact viewports.",
-      "options": [
-        "auto",
-        "dialog",
-        "sheet"
-      ],
-      "default": "auto"
-    },
-    "surfaceBreakpoint": {
-      "type": "number",
-      "required": false,
-      "description": "Breakpoint where auto surfaces switch to sheet mode."
-    },
     "autoFocusOnOpen": {
       "type": "boolean",
       "required": false,
-      "description": "Move focus into the modal when it opens. Disable for bounded previews that render open modals inline.",
+      "description": "Move focus into the surface when it opens. Disable for bounded previews that render it inline.",
       "default": true
     },
     "scrollLock": {
@@ -109,38 +96,20 @@
       "required": false,
       "description": "Render overlay into document.body. Disable for bounded component previews.",
       "default": true
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the content element."
-    },
-    "backdropClassName": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the backdrop element."
-    },
-    "positionerClassName": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the positioner element."
     }
   },
   "states": [
     {
-      "name": "Default (Center)",
+      "name": "Default",
       "props": {
-        "variant": "center",
-        "closeOnOverlayClick": true,
-        "closable": true,
-        "width": 400,
-        "height": 420,
-        "surface": "dialog",
-        "autoFocusOnOpen": true,
-        "portal": false,
         "open": true,
+        "portal": false,
+        "autoFocusOnOpen": false,
+        "placement": "center",
+        "edge": "inset",
         "title": "Modal",
         "description": "Focused work surface",
+        "children": "Review the workspace details before creating it.",
         "actions": [
           {
             "label": "Cancel",
@@ -150,44 +119,27 @@
             "label": "Create",
             "variant": "accent"
           }
-        ],
-        "children": "Short modal copy aligned to the left edge of the content area."
+        ]
       }
     },
     {
-      "name": "Drawer Left",
+      "name": "Right edge workspace",
       "props": {
         "open": true,
         "portal": false,
-        "variant": "left",
-        "title": "Left Drawer"
-      }
-    },
-    {
-      "name": "Drawer Right",
-      "props": {
-        "open": true,
-        "portal": false,
-        "variant": "right",
-        "title": "Right Drawer"
-      }
-    },
-    {
-      "name": "Sheet Bottom",
-      "props": {
-        "open": true,
-        "portal": false,
-        "variant": "bottom",
-        "title": "Bottom Sheet"
-      }
-    },
-    {
-      "name": "Alert (Non-Closable)",
-      "props": {
-        "open": true,
-        "portal": false,
-        "closable": false,
-        "title": "Are you sure?"
+        "autoFocusOnOpen": false,
+        "placement": "right",
+        "edge": "flush",
+        "width": 420,
+        "title": "Customer details",
+        "description": "Account health and recent activity",
+        "children": "Plan: Enterprise. Last active 12 minutes ago.",
+        "actions": [
+          {
+            "label": "Edit customer",
+            "variant": "accent"
+          }
+        ]
       }
     }
   ],
@@ -264,17 +216,11 @@
   "tokenMapping": {
     "component": [
       "--uf-modal-zero-blur",
-      "--uf-modal-sheet-inset",
-      "--uf-modal-sheet-gap",
       "--uf-modal-pad",
       "--uf-modal-max-w",
       "--uf-modal-viewport-gap",
       "--uf-modal-enter-y",
-      "--uf-modal-side-enter-x",
-      "--uf-modal-side-w-default",
-      "--uf-modal-stack-h-default",
-      "--face-runtime-modal-w",
-      "--face-runtime-modal-h"
+      "--face-runtime-modal-w"
     ],
     "semanticFallbacks": [
       "--uf-content-inset",
@@ -294,8 +240,8 @@
       "--uf-overlay-surface-shadow"
     ],
     "notes": [
-      "Modal variants control placement; surface color, blur and motion come from overlay semantic tokens.",
-      "Width/height props write private runtime custom properties while default sizing remains in the modal token namespace."
+      "placement selects centered or edge-aligned dialog geometry; edge selects inset or flush attachment independently.",
+      "width and height write private runtime custom properties while default sizing remains in the modal token namespace."
     ]
   },
   "platform": {
@@ -310,11 +256,11 @@
     ],
     "whenNotToUse": [
       "Displaying additional info (use Popover)",
-      "Side panel content (use Drawer)",
+      "Persistent page navigation (use Panel)",
       "Non-blocking notification (use Toaster)"
     ],
     "alternatives": [
-      "Drawer",
+      "Panel",
       "Popover",
       "Toaster"
     ],

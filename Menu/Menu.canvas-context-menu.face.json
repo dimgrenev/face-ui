@@ -16,14 +16,8 @@
       "children": {
         "$ref": "props.children"
       },
-      "onSelect": {
-        "$ref": "props.onSelect"
-      },
       "disabled": {
         "$ref": "props.disabled"
-      },
-      "onOpenChange": {
-        "$ref": "props.onOpenChange"
       },
       "surface": {
         "$ref": "props.surface"
@@ -39,9 +33,6 @@
       },
       "surfaceTitle": {
         "$ref": "props.surfaceTitle"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -94,23 +85,11 @@
       "description": "Trigger element (the anchor)."
     },
     {
-      "name": "onSelect",
-      "type": "function",
-      "required": false,
-      "description": "Called when a menu item is selected."
-    },
-    {
       "name": "disabled",
       "type": "boolean",
       "required": false,
       "description": "Disable the entire menu.",
       "defaultValue": false
-    },
-    {
-      "name": "onOpenChange",
-      "type": "function",
-      "required": false,
-      "description": "Called when the open state changes."
     },
     {
       "name": "surface",
@@ -154,12 +133,6 @@
       "type": "string",
       "required": false,
       "description": "Optional title used for the mobile sheet header."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the content element."
     }
   ],
   "meta": {

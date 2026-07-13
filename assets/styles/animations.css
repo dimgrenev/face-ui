@@ -100,7 +100,7 @@
   animation: uf-scale-in var(--uf-duration-enter) var(--uf-ease-enter);
 }
 
-/* Drawer variants */
+/* Edge placement variants */
 .uf-animated .uf-modal[data-variant="right"][data-state="open"] {
   animation: uf-slide-in-right var(--uf-duration-enter) var(--uf-ease-enter);
 }

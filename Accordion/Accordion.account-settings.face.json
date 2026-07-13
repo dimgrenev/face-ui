@@ -27,12 +27,6 @@
       },
       "disabled": {
         "$ref": "props.disabled"
-      },
-      "onExpandedChange": {
-        "$ref": "props.onExpandedChange"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -112,18 +106,6 @@
       "required": false,
       "description": "Disable the entire accordion.",
       "defaultValue": false
-    },
-    {
-      "name": "onExpandedChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when expanded items change."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     }
   ],
   "meta": {

@@ -43,12 +43,6 @@
       "stretchText": {
         "$ref": "props.stretchText"
       },
-      "onValueChange": {
-        "$ref": "props.onValueChange"
-      },
-      "onOpenChange": {
-        "$ref": "props.onOpenChange"
-      },
       "surface": {
         "$ref": "props.surface"
       },
@@ -63,18 +57,6 @@
       },
       "membrane": {
         "$ref": "props.membrane"
-      },
-      "triggerClassName": {
-        "$ref": "props.triggerClassName"
-      },
-      "valueClassName": {
-        "$ref": "props.valueClassName"
-      },
-      "contentClassName": {
-        "$ref": "props.contentClassName"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -200,18 +182,6 @@
       "defaultValue": false
     },
     {
-      "name": "onValueChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when value changes."
-    },
-    {
-      "name": "onOpenChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when open state changes."
-    },
-    {
       "name": "surface",
       "type": "select",
       "required": false,
@@ -247,30 +217,6 @@
       "required": false,
       "description": "Outer membrane wrapper around trigger/option geometry.",
       "defaultValue": true
-    },
-    {
-      "name": "triggerClassName",
-      "type": "string",
-      "required": false,
-      "description": "Class applied directly to the trigger button."
-    },
-    {
-      "name": "valueClassName",
-      "type": "string",
-      "required": false,
-      "description": "Class applied directly to the trigger value node."
-    },
-    {
-      "name": "contentClassName",
-      "type": "string",
-      "required": false,
-      "description": "Class applied directly to the floating content node."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "className prop"
     }
   ],
   "meta": {

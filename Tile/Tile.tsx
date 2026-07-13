@@ -49,8 +49,7 @@ export type TileVariant =
   | 'ghost'
 
 export type TileIntent =
-  | 'option'
-  | 'navigation'
+  | 'default'
   | 'disclosure'
   | 'tree'
   | 'tab'
@@ -139,7 +138,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
       text,
       rightText,
       variant = 'default',
-      intent = 'option',
+      intent = 'default',
       density = 'default',
       tone = 'neutral',
       actionVisibility = 'reveal',

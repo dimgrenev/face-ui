@@ -20,11 +20,6 @@
       ],
       "default": "vertical"
     },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
-    },
     "height": {
       "type": "number",
       "required": false,

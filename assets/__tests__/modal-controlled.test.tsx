@@ -64,8 +64,6 @@ describe('Modal controlled a11y baseline', () => {
           open
           title="Account settings"
           description="Update workspace preferences."
-          variant="center"
-          surface="dialog"
         >
           <button type="button">Secondary action</button>
         </Modal>,
@@ -99,7 +97,6 @@ describe('Modal controlled a11y baseline', () => {
           trigger="Open settings"
           title="Settings"
           description="Edit settings."
-          surface="dialog"
           onOpenChange={onOpenChange}
         >
           <button type="button">Inside action</button>
@@ -142,7 +139,6 @@ describe('Modal controlled a11y baseline', () => {
         <Modal
           open
           title="Focus test"
-          surface="dialog"
           actions={[
             { label: 'Cancel', variant: 'outline' },
             { label: 'Save', variant: 'accent' },
@@ -176,6 +172,37 @@ describe('Modal controlled a11y baseline', () => {
     expect(document.activeElement).toBe(lastButton)
   })
 
+  it('renders primitive body copy through Text and keeps footer actions grouped at the end', async () => {
+    await act(async () => {
+      root.render(
+        <Modal
+          open
+          title="Create workspace"
+          actions={[
+            { label: 'Cancel', variant: 'outline' },
+            { label: 'Create', variant: 'accent' },
+          ]}
+        >
+          Review the workspace details before creating it.
+        </Modal>,
+      )
+    })
+
+    const content = getContent()
+    const body = content.querySelector<HTMLElement>('.uf-modal-body')
+    const bodyText = body?.querySelector<HTMLElement>('[data-scope="text"]')
+    const footer = content.querySelector<HTMLElement>('.uf-modal-actionsBar')
+    const actions = footer?.querySelector<HTMLElement>('[data-part="actions"]')
+    const buttons = Array.from(actions?.querySelectorAll<HTMLButtonElement>('button[data-scope="button"][data-part="root"]') ?? [])
+
+    expect(bodyText?.textContent).toContain('Review the workspace details')
+    expect(bodyText?.getAttribute('data-membrane')).not.toBeNull()
+    expect(bodyText?.getAttribute('data-inset')).toBe('control')
+    expect(footer?.getAttribute('data-layout')).toBe('end')
+    expect(actions?.getAttribute('data-align')).toBe('end')
+    expect(buttons.map((button) => button.getAttribute('data-variant'))).toEqual(['outline', 'accent'])
+  })
+
   it('keeps non-closable alertdialog open on Escape and backdrop click', async () => {
     const onOpenChange = vi.fn()
 
@@ -186,7 +213,6 @@ describe('Modal controlled a11y baseline', () => {
           title="Delete locked project"
           description="Owner approval is required."
           closable={false}
-          surface="dialog"
           onOpenChange={onOpenChange}
         >
           <button type="button">Acknowledge</button>

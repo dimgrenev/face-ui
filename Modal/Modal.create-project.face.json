@@ -7,11 +7,20 @@
   "root": {
     "type": "Modal",
     "props": {
+      "placement": {
+        "$ref": "props.placement"
+      },
+      "edge": {
+        "$ref": "props.edge"
+      },
+      "width": {
+        "$ref": "props.width"
+      },
+      "height": {
+        "$ref": "props.height"
+      },
       "open": {
         "$ref": "props.open"
-      },
-      "variant": {
-        "$ref": "props.variant"
       },
       "closeOnOverlayClick": {
         "$ref": "props.closeOnOverlayClick"
@@ -34,21 +43,6 @@
       "trigger": {
         "$ref": "props.trigger"
       },
-      "width": {
-        "$ref": "props.width"
-      },
-      "height": {
-        "$ref": "props.height"
-      },
-      "onOpenChange": {
-        "$ref": "props.onOpenChange"
-      },
-      "surface": {
-        "$ref": "props.surface"
-      },
-      "surfaceBreakpoint": {
-        "$ref": "props.surfaceBreakpoint"
-      },
       "autoFocusOnOpen": {
         "$ref": "props.autoFocusOnOpen"
       },
@@ -57,15 +51,6 @@
       },
       "portal": {
         "$ref": "props.portal"
-      },
-      "className": {
-        "$ref": "props.className"
-      },
-      "backdropClassName": {
-        "$ref": "props.backdropClassName"
-      },
-      "positionerClassName": {
-        "$ref": "props.positionerClassName"
       }
     },
     "children": []
@@ -74,12 +59,11 @@
     "props": {
       "open": true,
       "portal": false,
-      "variant": "center",
-      "surface": "dialog",
+      "placement": "center",
+      "edge": "inset",
       "title": "Create project",
       "description": "Start from a blank workspace or a template.",
       "width": 520,
-      "height": 360,
       "closable": true,
       "closeOnOverlayClick": true,
       "actions": [
@@ -97,16 +81,10 @@
   },
   "controls": [
     {
-      "name": "open",
-      "type": "boolean",
-      "required": false,
-      "description": "Controlled open state."
-    },
-    {
-      "name": "variant",
+      "name": "placement",
       "type": "select",
       "required": false,
-      "description": "Visual placement variant.",
+      "description": "Viewport placement of the modal surface.",
       "options": [
         "center",
         "left",
@@ -114,27 +92,56 @@
         "top",
         "bottom"
       ],
-      "defaultValue": "right"
+      "defaultValue": "center"
+    },
+    {
+      "name": "edge",
+      "type": "select",
+      "required": false,
+      "description": "Inset adds the system viewport gap, radius, and border; flush attaches the surface to its placement edge.",
+      "options": [
+        "inset",
+        "flush"
+      ],
+      "defaultValue": "inset"
+    },
+    {
+      "name": "width",
+      "type": "number",
+      "required": false,
+      "description": "Preferred surface width in pixels, constrained by the viewport."
+    },
+    {
+      "name": "height",
+      "type": "number",
+      "required": false,
+      "description": "Preferred surface height in pixels, constrained by the viewport."
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled open state."
     },
     {
       "name": "closeOnOverlayClick",
       "type": "boolean",
       "required": false,
-      "description": "Close the modal when its backdrop is clicked.",
+      "description": "Close the surface when its backdrop is clicked.",
       "defaultValue": true
     },
     {
       "name": "closable",
       "type": "boolean",
       "required": false,
-      "description": "Whether the modal can be closed via Escape / backdrop click.",
+      "description": "Whether the surface can be closed via Escape / backdrop click.",
       "defaultValue": true
     },
     {
       "name": "title",
       "type": "string",
       "required": false,
-      "description": "Title content rendered inside the modal."
+      "description": "Title content rendered inside the surface."
     },
     {
       "name": "description",
@@ -161,48 +168,10 @@
       "description": "Trigger element that toggles the modal open."
     },
     {
-      "name": "width",
-      "type": "number",
-      "required": false,
-      "description": "Width in px for left/right variants.",
-      "defaultValue": 400
-    },
-    {
-      "name": "height",
-      "type": "number",
-      "required": false,
-      "description": "Height in px for top/bottom variants.",
-      "defaultValue": 420
-    },
-    {
-      "name": "onOpenChange",
-      "type": "function",
-      "required": false,
-      "description": "Called when the open state changes."
-    },
-    {
-      "name": "surface",
-      "type": "select",
-      "required": false,
-      "description": "Surface behavior on compact viewports.",
-      "options": [
-        "auto",
-        "dialog",
-        "sheet"
-      ],
-      "defaultValue": "auto"
-    },
-    {
-      "name": "surfaceBreakpoint",
-      "type": "number",
-      "required": false,
-      "description": "Breakpoint where auto surfaces switch to sheet mode."
-    },
-    {
       "name": "autoFocusOnOpen",
       "type": "boolean",
       "required": false,
-      "description": "Move focus into the modal when it opens. Disable for bounded previews that render open modals inline.",
+      "description": "Move focus into the surface when it opens. Disable for bounded previews that render it inline.",
       "defaultValue": true
     },
     {
@@ -218,24 +187,6 @@
       "required": false,
       "description": "Render overlay into document.body. Disable for bounded component previews.",
       "defaultValue": true
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the content element."
-    },
-    {
-      "name": "backdropClassName",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the backdrop element."
-    },
-    {
-      "name": "positionerClassName",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the positioner element."
     }
   ],
   "meta": {

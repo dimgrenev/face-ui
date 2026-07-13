@@ -16,9 +16,6 @@
       "label": {
         "$ref": "props.label"
       },
-      "onCheckedChange": {
-        "$ref": "props.onCheckedChange"
-      },
       "disabled": {
         "$ref": "props.disabled"
       },
@@ -30,9 +27,6 @@
       },
       "membrane": {
         "$ref": "props.membrane"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -77,12 +71,6 @@
       "description": "Visible label content rendered through Face UI Text."
     },
     {
-      "name": "onCheckedChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback fired with { checked } when the machine state changes."
-    },
-    {
       "name": "disabled",
       "type": "boolean",
       "required": false,
@@ -109,12 +97,6 @@
       "required": false,
       "description": "Wrap the control in the standard one-token membrane.",
       "defaultValue": true
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional className on the root label."
     }
   ],
   "meta": {

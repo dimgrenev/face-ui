@@ -16,7 +16,7 @@ export function ResponsiveSheetHeader(props: ResponsiveSheetHeaderProps) {
       <Bar.LeftEllipsis>
         <Text
           as="span"
-          variant="label"
+
           fullWidth
           className="uf-responsive-sheetTitle"
         >

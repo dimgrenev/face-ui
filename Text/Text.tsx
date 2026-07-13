@@ -27,7 +27,6 @@ export const textAnatomy = createAnatomy('text').parts('root')
 // ---------------------------------------------------------------------------
 
 export type TextVariant =
-  | 'default'
   | 'body'
   | 'heading'
   | 'h1'
@@ -95,13 +94,8 @@ function defaultElement(variant: TextVariant): TextElement {
     case 'kbd': return 'kbd'
     case 'code': return 'code'
     case 'blockquote': return 'div'
-    case 'default': return 'div'
     default: return 'p'
   }
-}
-
-function normalizeTextVariant(variant: TextVariant | string): TextVariant {
-  return variant === 'caption' ? 'label' : (variant as TextVariant)
 }
 
 // ---------------------------------------------------------------------------
@@ -112,7 +106,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(
   function Text(props, ref) {
     const {
       text,
-      variant = 'default',
+      variant = 'body',
       size,
       as,
       icon,
@@ -129,14 +123,12 @@ export const Text = forwardRef<HTMLElement, TextProps>(
       ...rest
     } = props
 
-    const legacyCaptionVariant = String(variant) === 'caption'
-    const resolvedVariant = normalizeTextVariant(variant)
-    const normalizedVariant = resolvedVariant === 'default' ? 'body' : resolvedVariant
+    const resolvedVariant = variant
     // `control` remains the default for every variant. Explicit `none` must be
     // honored for labels embedded in full-surface controls.
     const effectiveInset: TextProps['inset'] = inset
     const effectiveMembrane = membrane
-    const selectedElement = as ?? (legacyCaptionVariant ? 'small' : defaultElement(resolvedVariant))
+    const selectedElement = as ?? defaultElement(resolvedVariant)
     const Element = selectedElement as ElementType
     const hasIcon = icon != null
     const content = children ?? text
@@ -160,7 +152,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(
       <Element
         ref={ref}
         {...textAnatomy.getPartAttrs('root')}
-        data-variant={normalizedVariant}
+        data-variant={resolvedVariant}
         data-size={size}
         data-inset={effectiveInset}
         data-icon-position={hasIcon ? iconPosition : undefined}

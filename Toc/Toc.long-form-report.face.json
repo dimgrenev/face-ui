@@ -21,12 +21,6 @@
       },
       "lineSide": {
         "$ref": "props.lineSide"
-      },
-      "onActiveChange": {
-        "$ref": "props.onActiveChange"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -96,18 +90,6 @@
         "right"
       ],
       "defaultValue": "left"
-    },
-    {
-      "name": "onActiveChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when the active section changes."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     }
   ],
   "meta": {

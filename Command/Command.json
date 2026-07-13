@@ -31,16 +31,6 @@
       "description": "Uncontrolled initial search input value.",
       "default": ""
     },
-    "onValueChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when search value changes."
-    },
-    "onSelect": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when an item is selected."
-    },
     "surface": {
       "type": "enum",
       "required": false,
@@ -68,21 +58,11 @@
       "description": "Uncontrolled initial dialog open state (used in dialog surface).",
       "default": false
     },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when dialog open state changes."
-    },
     "emptyContent": {
       "type": "string",
       "required": false,
       "description": "Content to display when no results match.",
       "default": "No results found."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     }
   },
   "states": [

@@ -27,16 +27,15 @@
     "intent": {
       "type": "enum",
       "required": false,
-      "description": "Semantic row intent. Use option for generic rows, navigation for selected app routes, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.",
+      "description": "Semantic row intent. Use default for generic and navigation rows, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.",
       "options": [
-        "option",
-        "navigation",
+        "default",
         "disclosure",
         "tree",
         "tab",
         "section"
       ],
-      "default": "option"
+      "default": "default"
     },
     "density": {
       "type": "enum",
@@ -201,7 +200,7 @@
     {
       "name": "Navigation Active",
       "props": {
-        "intent": "navigation",
+        "intent": "default",
         "text": "Current page",
         "icon": "file",
         "active": true

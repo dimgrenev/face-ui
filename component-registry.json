@@ -100,18 +100,6 @@
         "Media"
       ]
     },
-    "Setting": {
-      "category": "pattern",
-      "status": "beta",
-      "a11yReviewed": false,
-      "mobileReviewed": false,
-      "related": [
-        "Card",
-        "Switcher",
-        "Select",
-        "SegmentedControl"
-      ]
-    },
     "Skeleton": {
       "category": "display",
       "status": "stable",
@@ -344,36 +332,9 @@
       "status": "stable",
       "a11yReviewed": true,
       "mobileReviewed": true,
-      "responsiveSurface": "auto->sheet",
       "related": [
-        "Drawer",
+        "Card",
         "Command"
-      ]
-    },
-    "Sheet": {
-      "category": "overlay",
-      "status": "deprecated",
-      "a11yReviewed": true,
-      "mobileReviewed": true,
-      "related": [
-        "Modal",
-        "Drawer"
-      ],
-      "replacedBy": [
-        "Drawer"
-      ]
-    },
-    "Drawer": {
-      "category": "overlay",
-      "status": "stable",
-      "a11yReviewed": true,
-      "mobileReviewed": true,
-      "aliases": [
-        "Sheet"
-      ],
-      "related": [
-        "Modal",
-        "Panel"
       ]
     },
     "Toast": {
@@ -463,11 +424,11 @@
       "aliases": [
         "Sidebar"
       ],
-      "responsiveSurface": "auto->drawer",
+      "responsiveSurface": "auto->modal",
       "related": [
         "Navigation",
         "Tree",
-        "Drawer"
+        "Modal"
       ]
     },
     "Tree": {

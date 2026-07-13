@@ -59,21 +59,11 @@
       "description": "Uncontrolled initial slide index.",
       "default": 0
     },
-    "onIndexChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when the active slide changes."
-    },
     "ariaLabel": {
       "type": "string",
       "required": false,
       "description": "Accessible name for the carousel region.",
       "default": "Carousel"
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   },
   "states": [

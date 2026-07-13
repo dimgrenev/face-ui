@@ -108,31 +108,11 @@
       "required": false,
       "description": "Fallback content shown on error."
     },
-    "onError": {
-      "type": "function",
-      "required": false,
-      "description": "Called when the media fails to load."
-    },
-    "onLoad": {
-      "type": "function",
-      "required": false,
-      "description": "Called when the media finishes loading."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
-    },
     "membrane": {
       "type": "boolean",
       "required": false,
       "description": "Membrane spacing around media.",
       "default": false
-    },
-    "role": {
-      "type": "string",
-      "required": false,
-      "description": "role prop"
     },
     "ariaLabel": {
       "type": "string",
@@ -143,16 +123,6 @@
       "type": "string",
       "required": false,
       "description": "title prop"
-    },
-    "tabIndex": {
-      "type": "number",
-      "required": false,
-      "description": "tabIndex prop"
-    },
-    "style": {
-      "type": "object",
-      "required": false,
-      "description": "style prop"
     }
   },
   "states": [

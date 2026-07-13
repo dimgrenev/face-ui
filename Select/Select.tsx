@@ -619,7 +619,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     const contentNode = (
       <Card
         padding="membrane"
-        radius="base"
+        radius="md"
         className="uf-select__contentPanel"
       >
         {resolvedSurface === 'sheet' ? (

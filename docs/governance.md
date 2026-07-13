@@ -16,8 +16,7 @@
 - `Tooltip` and `Popover` are public. `Overlay` is internal/deprecated.
 - `SegmentedControl` is public. `Toggle` is a compatibility alias.
 - `Panel` is public. `Sidebar` is a compatibility alias.
-- `Drawer` is the public directional edge surface built on `Modal`.
-- `Sheet` is a compatibility alias for bottom/top `Drawer`.
+- `Modal` is the single public modal surface for centered and edge-aligned workflows.
 - `Date` is the single public date selection component.
 
 ## Public Surface Rules

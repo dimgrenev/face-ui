@@ -25,12 +25,6 @@
       "orientation": {
         "$ref": "props.orientation"
       },
-      "onValueChange": {
-        "$ref": "props.onValueChange"
-      },
-      "className": {
-        "$ref": "props.className"
-      },
       "membrane": {
         "$ref": "props.membrane"
       }
@@ -102,18 +96,6 @@
         "horizontal",
         "vertical"
       ]
-    },
-    {
-      "name": "onValueChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when value changes."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     },
     {
       "name": "membrane",

@@ -36,7 +36,7 @@ What this means:
 - Every heading → `<Text variant="h1">`, `<Text variant="h2">`, etc.
 - Every paragraph → `<Text>` or `<Text variant="body">`
 - Every label → `<Text variant="label">`
-- Every caption → `<Text variant="caption">`
+- Every caption or metadata line → `<Text variant="muted" size="xs">`
 - Every muted helper text → `<Text variant="muted">`
 - Every inline code → `<Text variant="code">`
 - Every keyboard shortcut → `<Text variant="kbd">`
@@ -117,7 +117,7 @@ For all other text content — headings, descriptions, paragraphs, metadata, sta
 <Text variant="label" htmlFor="email">Email address</Text>
 
 // Caption / metadata
-<Text variant="caption">Created on 2026-03-15 by @grenev</Text>
+<Text variant="muted" size="xs">Created on 2026-03-15 by @grenev</Text>
 
 // Keyboard shortcut
 <Text variant="kbd">⌘K</Text>
@@ -189,7 +189,7 @@ Membranes are the 1px outer spacing contract used by the library.
 ### 2.6 Responsive Overlays
 
 These components have first-class responsive surface behavior:
-`Select`, `Date`, `Menu`, `Command`, `Modal`, `Drawer`, `Panel`, `Navigation`.
+`Select`, `Date`, `Menu`, `Command`, `Modal`, `Panel`, `Navigation`.
 
 Default rule:
 - Desktop/wide viewport: keep contextual surface behavior.
@@ -201,7 +201,7 @@ Default rule:
 Use these names in new code:
 - `Panel`, not `Sidebar`
 - `SegmentedControl`, not `Toggle`
-- `Drawer`, not `Sheet`
+- `Modal` for both centered and edge-aligned modal surfaces
 - `Date`
 - `Tooltip` or `Popover`, not `Overlay`
 
@@ -280,8 +280,8 @@ Before composing UI, use this matrix to choose the right component.
 | Non-interactive hint | `Tooltip` | `Overlay` (deprecated) |
 | Small interactive popup | `Popover` | |
 | Action menu | `Menu` | |
-| Focused dialog | `Modal` | |
-| Edge slide-in panel | `Drawer` | `Sheet` (deprecated) |
+| Focused dialog | `Modal placement="center"` | |
+| Edge slide-in panel | `Modal placement="left\|right\|top\|bottom"` | |
 | Search/command palette | `Command` | |
 | Notifications | `Toaster` + `useToast()` | alert() |
 
@@ -315,7 +315,7 @@ Before composing UI, use this matrix to choose the right component.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `text` | string | — | Text content |
-| `variant` | TextVariant | `'default'` | Typography style (see §2.2) |
+| `variant` | TextVariant | `'body'` | Typography style (see §2.2) |
 | `size` | `'xs'\|'sm'\|'md'\|'lg'\|'xl'` | — | Size override |
 | `as` | TextElement | auto | HTML element override |
 | `icon` | ReactNode \| string | — | Optional icon |
@@ -350,14 +350,14 @@ Before composing UI, use this matrix to choose the right component.
 <Text variant="label" htmlFor="name">Full name</Text>
 
 // Caption / fine print
-<Text variant="caption">* Required fields</Text>
+<Text variant="muted" size="xs">* Required fields</Text>
 
 // Landing page (no control padding)
 <Text variant="h1" inset="none" membrane={false}>Hero Title</Text>
 ```
 
 **Agent rules:**
-- Default to `variant="body"` or `variant="default"` for regular text.
+- Default to `variant="body"` for regular text.
 - Use specific heading variants (`h1`–`h6`) instead of generic `heading` when document structure matters.
 - Do NOT center text unless the design explicitly requires it.
 - When `Text` sits inside `Accordion`, `Card`, `Tabs` content, or any container — still use `<Text>`, not bare strings.
@@ -754,7 +754,8 @@ content: <Text variant="muted">Detailed explanation here.</Text>
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `open` | boolean | — | Controlled open state |
-| `variant` | `'center'\|'left'\|'right'\|'top'\|'bottom'` | `'center'` | Position |
+| `placement` | `'center'\|'left'\|'right'\|'top'\|'bottom'` | `'center'` | Viewport placement |
+| `edge` | `'inset'\|'flush'` | `'inset'` | Inset card or flush viewport-edge treatment |
 | `closeOnOverlayClick` | boolean | `true` | Close on backdrop click |
 | `closable` | boolean | `true` | Show close button |
 | `title` | string | — | Title |
@@ -762,27 +763,15 @@ content: <Text variant="muted">Detailed explanation here.</Text>
 | `children` | ReactNode | — | Body content |
 | `actions` | `{label, variant?, disabled?}[]` | — | Action buttons |
 | `trigger` | ReactNode | — | Trigger content |
-| `width` / `height` | string | — | Size |
-| `surface` | surface mode | — | Responsive surface |
+| `width` / `height` | number | — | Surface size in pixels, capped by the viewport |
 | `onOpenChange` | function | — | Open state callback |
 
 **Agent rules:**
-- Use `Modal` for centered dialog semantics. Use `Drawer` when directionality matters.
+- Use `placement` for geometry and `edge` for viewport treatment. Both axes are valid for every modal workflow.
 
 ---
 
-### 4.20 Drawer
-
-**Purpose:** Directional edge surface. Canonical replacement for deprecated `Sheet`.
-
-**Props:** Same as `Modal` plus:
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `side` | `'left'\|'right'\|'top'\|'bottom'` | `'right'` | Slide direction |
-
----
-
-### 4.21 Tooltip
+### 4.20 Tooltip
 
 **Purpose:** Short, non-interactive contextual explanation.
 
@@ -1216,7 +1205,6 @@ Do NOT use in new code:
 | `Overlay` | `Tooltip` or `Popover` |
 | `Toggle` | `SegmentedControl` |
 | `Sidebar` | `Panel` |
-| `Sheet` | `Drawer` |
 
 ---
 
@@ -1245,7 +1233,7 @@ Do NOT use in new code:
 - `Bar` for filters/actions
 - `Table` for desktop comparison
 - `Pagination` for page stepping
-- `Drawer` or `Modal` for row detail/edit flows
+- `Modal` with the placement appropriate for row detail/edit flows
 
 ### Landing / marketing page
 - `Text` with `inset="none" membrane={false}` for all typography

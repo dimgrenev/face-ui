@@ -14,8 +14,6 @@ import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 import { cn } from '../assets/utils'
 
-export type SliderLeading = 'none' | 'icon' | 'text' | 'iconText'
-
 export interface SliderCropRange {
   min: number
   max: number
@@ -32,7 +30,6 @@ export interface SliderAdvancedProps {
   label?: ReactNode
   'aria-label'?: string
   className?: string
-  leading?: SliderLeading
   leadingIcon?: ReactNode
   leadingText?: string
   crop?: boolean
@@ -73,7 +70,6 @@ export function SliderAdvanced({
   label,
   'aria-label': ariaLabel,
   className,
-  leading = 'none',
   leadingIcon,
   leadingText,
   crop = false,
@@ -534,16 +530,15 @@ export function SliderAdvanced({
     : leadingIcon
 
   const leadingNode = (() => {
-    if (leading === 'none') return null
     const iconNode = resolvedLeadingIcon ? <span className="uf-slider-leadingIcon">{resolvedLeadingIcon}</span> : null
     const textNode = leadingText ? (
       <Text membrane={false} variant="body" className="uf-slider-leadingText">
         {leadingText}
       </Text>
     ) : null
-    if (leading === 'icon') return iconNode
-    if (leading === 'text') return textNode
     if (!iconNode && !textNode) return null
+    if (!iconNode) return textNode
+    if (!textNode) return iconNode
     return (
       <span className="uf-slider-leadingIconText">
         {iconNode}
@@ -562,7 +557,7 @@ export function SliderAdvanced({
       data-disabled={disabled || undefined}
     >
       {label != null && (
-        <Text as="label" variant="label">
+        <Text as="label" >
           {label}
         </Text>
       )}

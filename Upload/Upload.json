@@ -44,25 +44,10 @@
       "required": false,
       "description": "Initial file list for uncontrolled usage."
     },
-    "onFilesChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when files change."
-    },
-    "onReject": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when files are rejected."
-    },
     "labels": {
       "type": "object",
       "required": false,
       "description": "Localized interface labels."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   },
   "states": [

@@ -119,7 +119,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(
                 <Text
                   {...(toastAnatomy.getPartAttrs('title') as any)}
                   as="div"
-                  variant="label"
+
                   className="uf-toast-title"
                 >
                   {title}

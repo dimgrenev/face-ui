@@ -83,16 +83,6 @@
       "description": "Stretch the value area so the arrow pins to the right edge.",
       "default": false
     },
-    "onValueChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when value changes."
-    },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when open state changes."
-    },
     "surface": {
       "type": "enum",
       "required": false,
@@ -124,26 +114,6 @@
       "required": false,
       "description": "Outer membrane wrapper around trigger/option geometry.",
       "default": true
-    },
-    "triggerClassName": {
-      "type": "string",
-      "required": false,
-      "description": "Class applied directly to the trigger button."
-    },
-    "valueClassName": {
-      "type": "string",
-      "required": false,
-      "description": "Class applied directly to the trigger value node."
-    },
-    "contentClassName": {
-      "type": "string",
-      "required": false,
-      "description": "Class applied directly to the floating content node."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "className prop"
     }
   },
   "states": [

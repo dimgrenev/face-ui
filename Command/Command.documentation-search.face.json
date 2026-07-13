@@ -22,12 +22,6 @@
       "defaultValue": {
         "$ref": "props.defaultValue"
       },
-      "onValueChange": {
-        "$ref": "props.onValueChange"
-      },
-      "onSelect": {
-        "$ref": "props.onSelect"
-      },
       "surface": {
         "$ref": "props.surface"
       },
@@ -40,14 +34,8 @@
       "defaultOpen": {
         "$ref": "props.defaultOpen"
       },
-      "onOpenChange": {
-        "$ref": "props.onOpenChange"
-      },
       "emptyContent": {
         "$ref": "props.emptyContent"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -120,18 +108,6 @@
       "defaultValue": ""
     },
     {
-      "name": "onValueChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when search value changes."
-    },
-    {
-      "name": "onSelect",
-      "type": "function",
-      "required": false,
-      "description": "Callback when an item is selected."
-    },
-    {
       "name": "surface",
       "type": "select",
       "required": false,
@@ -163,23 +139,11 @@
       "defaultValue": false
     },
     {
-      "name": "onOpenChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when dialog open state changes."
-    },
-    {
       "name": "emptyContent",
       "type": "string",
       "required": false,
       "description": "Content to display when no results match.",
       "defaultValue": "No results found."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     }
   ],
   "meta": {

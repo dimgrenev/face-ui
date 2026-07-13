@@ -17,21 +17,20 @@
     "type": {
       "type": "enum",
       "required": false,
-      "description": "Input type. 'default' renders a textarea-like free text. Others render <input type=\"...\">.",
+      "description": "Native input type. Text inputs can switch between single-line and wrapping layouts.",
       "options": [
         "number",
-        "default",
         "text",
         "email",
         "date",
         "password"
       ],
-      "default": "default"
+      "default": "text"
     },
     "textLayout": {
       "type": "enum",
       "required": false,
-      "description": "Text layout for type=\"default\": 'scroll' (single-line) or 'wrap' (multi-line auto-grow).",
+      "description": "Text layout for type=\"text\": 'scroll' (single-line) or 'wrap' (multi-line auto-grow).",
       "options": [
         "scroll",
         "wrap"
@@ -85,55 +84,6 @@
       "type": "string",
       "required": false,
       "description": "Accessible label when no visible label is provided."
-    },
-    "controlRole": {
-      "type": "string",
-      "required": false,
-      "description": "Role applied to the native input or textarea control."
-    },
-    "ariaControls": {
-      "type": "string",
-      "required": false,
-      "description": "Native control aria-controls relationship."
-    },
-    "ariaActiveDescendant": {
-      "type": "string",
-      "required": false,
-      "description": "Native control aria-activedescendant relationship."
-    },
-    "ariaAutoComplete": {
-      "type": "enum",
-      "required": false,
-      "description": "Native control aria-autocomplete mode.",
-      "options": [
-        "list",
-        "none",
-        "inline",
-        "both"
-      ]
-    },
-    "ariaExpanded": {
-      "type": "enum",
-      "required": false,
-      "description": "Native control aria-expanded state.",
-      "options": [
-        "true",
-        "false"
-      ]
-    },
-    "ariaHasPopup": {
-      "type": "enum",
-      "required": false,
-      "description": "Native control aria-haspopup state.",
-      "options": [
-        "dialog",
-        "grid",
-        "listbox",
-        "menu",
-        "tree",
-        "true",
-        "false"
-      ]
     },
     "spellCheck": {
       "type": "boolean",
@@ -201,36 +151,6 @@
       "required": false,
       "description": "Native validation pattern for single-line inputs."
     },
-    "onValueChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when the value changes (machine-based)."
-    },
-    "onChange": {
-      "type": "function",
-      "required": false,
-      "description": "Native onChange handler."
-    },
-    "onBlur": {
-      "type": "function",
-      "required": false,
-      "description": "Native onBlur handler."
-    },
-    "onFocus": {
-      "type": "function",
-      "required": false,
-      "description": "Native onFocus handler."
-    },
-    "onKeyDown": {
-      "type": "any",
-      "required": false,
-      "description": "Native onKeyDown handler."
-    },
-    "controlRef": {
-      "type": "ReactRef",
-      "required": false,
-      "description": "Ref to the native input or textarea control."
-    },
     "disabled": {
       "type": "boolean",
       "required": false,
@@ -253,18 +173,13 @@
       "required": false,
       "description": "Outer membrane wrapper around control geometry.",
       "default": false
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "type": "default",
+        "type": "text",
         "textLayout": "scroll",
         "disabled": false,
         "readOnly": false,

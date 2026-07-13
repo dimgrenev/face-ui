@@ -259,12 +259,11 @@ export default function faceUiReact(props: FeldGalleryProps) {
             : baseSampleProps;
           return (
             <div key={card?.id || rawName} className="uf-gallery-item">
-              <Text as="div" variant="label" className="uf-gallery-itemTitle" fullWidth truncate membrane>
+              <Text as="div" className="uf-gallery-itemTitle" fullWidth truncate membrane>
                 {String(card?.title || cleanLeafName)}
               </Text>
               <div className="uf-gallery-itemPreview">
                 <Card
-                  variant="showcase"
                   border={false}
                   className="uf-gallery-itemSurface"
                 >

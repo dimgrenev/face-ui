@@ -56,16 +56,6 @@
       "description": "defaultValue prop",
       "default": null
     },
-    "onValueChange": {
-      "type": "function",
-      "required": false,
-      "description": "onValueChange prop"
-    },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "onOpenChange prop"
-    },
     "valueFormat": {
       "type": "enum",
       "required": false,
@@ -228,11 +218,6 @@
       "required": false,
       "description": "Stretch control to container width",
       "default": true
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "className prop"
     }
   },
   "states": [

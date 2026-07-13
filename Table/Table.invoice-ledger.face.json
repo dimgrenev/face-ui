@@ -22,14 +22,8 @@
       "sortDirection": {
         "$ref": "props.sortDirection"
       },
-      "onSortChange": {
-        "$ref": "props.onSortChange"
-      },
       "selectedRows": {
         "$ref": "props.selectedRows"
-      },
-      "onSelectedRowsChange": {
-        "$ref": "props.onSelectedRowsChange"
       },
       "selectable": {
         "$ref": "props.selectable"
@@ -43,26 +37,11 @@
       "showDividers": {
         "$ref": "props.showDividers"
       },
-      "className": {
-        "$ref": "props.className"
-      },
-      "onColumnResize": {
-        "$ref": "props.onColumnResize"
-      },
       "resizable": {
         "$ref": "props.resizable"
       },
       "stickyLastColumn": {
         "$ref": "props.stickyLastColumn"
-      },
-      "onRowClick": {
-        "$ref": "props.onRowClick"
-      },
-      "onRowMouseEnter": {
-        "$ref": "props.onRowMouseEnter"
-      },
-      "onRowMouseLeave": {
-        "$ref": "props.onRowMouseLeave"
       },
       "activeRowId": {
         "$ref": "props.activeRowId"
@@ -162,22 +141,10 @@
       "defaultValue": "asc"
     },
     {
-      "name": "onSortChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when sort changes."
-    },
-    {
       "name": "selectedRows",
       "type": "array",
       "required": false,
       "description": "Controlled selected row IDs."
-    },
-    {
-      "name": "onSelectedRowsChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when selection changes."
     },
     {
       "name": "selectable",
@@ -208,18 +175,6 @@
       "defaultValue": true
     },
     {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
-    },
-    {
-      "name": "onColumnResize",
-      "type": "function",
-      "required": false,
-      "description": "Callback fired while a resizable column is dragged."
-    },
-    {
       "name": "resizable",
       "type": "boolean",
       "required": false,
@@ -232,24 +187,6 @@
       "required": false,
       "description": "Keep the last column visually sticky for dense action tables.",
       "defaultValue": false
-    },
-    {
-      "name": "onRowClick",
-      "type": "function",
-      "required": false,
-      "description": "Callback when a row is clicked."
-    },
-    {
-      "name": "onRowMouseEnter",
-      "type": "function",
-      "required": false,
-      "description": "Callback when mouse enters a row."
-    },
-    {
-      "name": "onRowMouseLeave",
-      "type": "function",
-      "required": false,
-      "description": "Callback when mouse leaves a row."
     },
     {
       "name": "activeRowId",

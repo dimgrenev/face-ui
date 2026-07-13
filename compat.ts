@@ -9,6 +9,3 @@ export type { OverlayProps } from './Overlay/Overlay'
 
 export { Panel as Sidebar } from './Panel/Panel'
 export type { PanelProps as SidebarProps, PanelItem as SidebarItem } from './Panel/Panel'
-
-export { Sheet } from './Sheet/Sheet'
-export type { SheetProps } from './Sheet/Sheet'

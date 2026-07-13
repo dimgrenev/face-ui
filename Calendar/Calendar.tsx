@@ -189,7 +189,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
             {...api.getTitleProps()}
             as="div"
             text={api.monthLabel}
-            variant="label"
+
             align="center"
             fullWidth
             className="uf-calendar-titleText"
@@ -213,7 +213,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                     <Text
                       as="span"
                       text={firstLetter}
-                      variant="label"
+
                       inset="none"
                       className="uf-calendar-weekdayText"
                     />

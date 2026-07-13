@@ -1,71 +1,57 @@
 /**
  * Modal — overlay surface component.
  *
- * Unifies: Dialog + Drawer + AlertDialog into a single component.
+ * One modal surface for centered dialogs and viewport-edge workflows.
  *
- * - variant='center'                     -> classic dialog
- * - variant='left'|'right'|'top'|'bottom' -> drawer / sheet
- * - closable=false                       -> alertdialog (no Escape, no backdrop dismiss)
- *
- * `<Modal open title="Settings" variant="right" width={400} />`
+ * `<Modal open title="Settings" />`
  */
 
-import { forwardRef, useId, useCallback, useEffect, useState, type MutableRefObject, type ReactNode, type HTMLAttributes, type CSSProperties } from 'react'
+import { forwardRef, useId, useCallback, useEffect, useState, type MutableRefObject, type ReactNode, type HTMLAttributes, type CSSProperties, type MouseEventHandler } from 'react'
 import { createPortal } from 'react-dom'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
-import {
-  DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
-  useIsCompactViewport,
-} from '../assets/adapters/react/use-responsive-overlay-surface'
 import { modalMachine, connectModal } from '../assets/machines/modal.machine'
 import type { ModalSchema } from '../assets/machines/modal.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
 import type { ButtonVariant } from '../Button/Button'
 import { Card } from '../Card/Card'
+import { Text } from '../Text/Text'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export type ModalVariant = 'center' | 'left' | 'right' | 'top' | 'bottom'
-export type ModalSurface = 'auto' | 'dialog' | 'sheet'
+export type ModalPlacement = 'center' | 'left' | 'right' | 'top' | 'bottom'
+export type ModalEdge = 'inset' | 'flush'
 
-export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'content'> {
+export interface ModalAction {
+  label: ReactNode
+  variant?: ButtonVariant
+  disabled?: boolean
+  onClick?: MouseEventHandler<HTMLButtonElement>
+}
+
+interface ModalSharedProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'content'> {
   /** Controlled open state. */
   open?: boolean
-  /** Visual placement variant. */
-  variant?: ModalVariant
-  /** Close the modal when its backdrop is clicked. */
+  /** Close the surface when its backdrop is clicked. */
   closeOnOverlayClick?: boolean
-  /** Whether the modal can be closed via Escape / backdrop click. */
+  /** Whether the surface can be closed via Escape / backdrop click. */
   closable?: boolean
-  /** Title content rendered inside the modal. */
+  /** Title content rendered inside the surface. */
   title?: ReactNode
   /** Description content rendered below the title. */
   description?: ReactNode
   /** Body content. */
   children?: ReactNode
   /** Optional footer actions. */
-  actions?: Array<{
-    label: ReactNode
-    variant?: ButtonVariant
-    disabled?: boolean
-  }>
+  actions?: ModalAction[]
   /** Trigger element that toggles the modal open. */
   trigger?: ReactNode
-  /** Width in px for left/right variants. */
-  width?: number
-  /** Height in px for top/bottom variants. */
-  height?: number
   /** Called when the open state changes. */
   onOpenChange?: (details: { open: boolean }) => void
-  /** Surface behavior on compact viewports. */
-  surface?: ModalSurface
-  /** Breakpoint where auto surfaces switch to sheet mode. */
-  surfaceBreakpoint?: number
-  /** Move focus into the modal when it opens. Disable for bounded previews that render open modals inline. */
+  /** Move focus into the surface when it opens. Disable for bounded previews that render it inline. */
   autoFocusOnOpen?: boolean
   /** Lock body scroll while the modal is open. Opt-in; off by default. */
   scrollLock?: boolean
@@ -79,6 +65,26 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   positionerClassName?: string
 }
 
+export interface ModalProps extends ModalSharedProps {
+  /** Where the modal is anchored in the viewport. */
+  placement?: ModalPlacement
+  /** Inset surfaces use the system viewport gap, radius, and border. */
+  edge?: ModalEdge
+  /** Surface width in px, capped by the available viewport width. */
+  width?: number
+  /** Surface height in px, capped by the available viewport height. */
+  height?: number
+}
+
+function renderModalBody(children: ReactNode): ReactNode {
+  if (typeof children !== 'string' && typeof children !== 'number') return children
+  return (
+    <Text as="div" variant="body" fullWidth membrane>
+      {String(children)}
+    </Text>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Modal
 // ---------------------------------------------------------------------------
@@ -87,7 +93,8 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
   function Modal(props, ref) {
     const {
       open,
-      variant = 'right',
+      placement = 'center',
+      edge = 'inset',
       closeOnOverlayClick = true,
       closable = true,
       title,
@@ -95,29 +102,18 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       children,
       actions = [],
       trigger,
-      width = 400,
-      height = 420,
+      width,
+      height,
       onOpenChange,
-      surface = 'auto',
-      surfaceBreakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
       autoFocusOnOpen = true,
       scrollLock = false,
       portal = true,
       className,
       backdropClassName,
       positionerClassName,
+      style,
       ...rest
     } = props
-
-    const isCompactViewport = useIsCompactViewport(surfaceBreakpoint)
-    const resolvedSurface: Exclude<ModalSurface, 'auto'> = surface === 'auto'
-      ? (isCompactViewport ? 'sheet' : 'dialog')
-      : surface
-    const effectiveVariant: ModalVariant = (
-      resolvedSurface === 'sheet' && variant === 'center'
-        ? 'bottom'
-        : variant
-    )
 
     const titleId = useId()
     const descriptionId = useId()
@@ -130,13 +126,13 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
     const { state, send } = useMachine<ModalSchema>(modalMachine, {
       open,
-      variant: effectiveVariant,
+      variant: placement,
       closable,
       autoFocusOnOpen,
       titleId,
       descriptionId,
       onOpenChange: ((details: { open: boolean }) => {
-        onOpenChange?.(details)
+        if (typeof onOpenChange === 'function') onOpenChange(details)
       }) as any,
     })
     const controlledOpen = typeof open === 'boolean' ? open : null
@@ -166,36 +162,32 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       [ref, send],
     )
 
-    // Build inline style for width/height CSS custom properties (only on matching variants)
-    const isHorizontal = effectiveVariant === 'left' || effectiveVariant === 'right'
-    const isVertical = effectiveVariant === 'top' || effectiveVariant === 'bottom'
-    const contentRadius = isHorizontal ? 'none' : 'lg'
-    const drawerEdge = (rest as { 'data-drawer-edge'?: unknown })['data-drawer-edge']
-    const contentBorder = !(drawerEdge === 'flush' && contentRadius === 'none')
-    const contentStyle: CSSProperties | undefined =
-      (isHorizontal && width != null) || (isVertical && height != null)
-        ? {
-          ...(isHorizontal && width != null ? { '--face-runtime-modal-w': `${width}px` } as CSSProperties : {}),
-          ...(isVertical && height != null ? { '--face-runtime-modal-h': `${height}px` } as CSSProperties : {}),
-        }
-        : undefined
+    const contentStyle: CSSProperties = {
+      ...style,
+      ...(width != null ? { '--face-runtime-modal-w': `${width}px` } as CSSProperties : {}),
+      ...(height != null ? { '--face-runtime-modal-h': `${height}px` } as CSSProperties : {}),
+    }
 
     const overlay = (
       <>
         <div {...backdropProps} data-portal={portal ? 'true' : 'false'} className={cn('uf-modal-backdrop', backdropClassName)} />
 
-        <div {...api.getPositionerProps()} data-portal={portal ? 'true' : 'false'} className={cn('uf-modal-positioner', positionerClassName)}>
+        <div
+          {...api.getPositionerProps()}
+          data-edge={edge}
+          data-portal={portal ? 'true' : 'false'}
+          className={cn('uf-modal-positioner', `uf-modal-positioner--edge-${edge}`, positionerClassName)}
+        >
           <Card
             ref={handleRef}
-            {...api.getContentProps()}
-            data-surface={resolvedSurface}
-            padding="default"
-            radius={contentRadius}
-            border={contentBorder}
-            footerLayout="between"
-            className={cn('uf-modal', className)}
-            style={contentStyle}
             {...rest}
+            {...api.getContentProps()}
+            data-edge={edge}
+            padding="default"
+            radius={edge === 'flush' ? 'none' : 'lg'}
+            border={edge === 'inset'}
+            className={cn('uf-modal', `uf-modal--edge-${edge}`, className)}
+            style={contentStyle}
           >
             {(title != null || closable) && (
               <Card.Header layout="bar" className="uf-modal-bar">
@@ -242,19 +234,20 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
             {children != null ? (
               <Card.Content className="uf-modal-body">
-                {children}
+                {renderModalBody(children)}
               </Card.Content>
             ) : null}
 
             {actions.length > 0 ? (
-              <Card.Footer className="uf-modal-actionsBar" layout="between">
-                <Card.Actions align="between">
+              <Card.Footer className="uf-modal-actionsBar" layout="end">
+                <Card.Actions align="end">
                   {actions.map((action, index) => (
                     <Button
                       key={`modal-action:${index}`}
                       text={typeof action.label === 'string' || typeof action.label === 'number' ? String(action.label) : undefined}
                       variant={action.variant ?? (index === actions.length - 1 ? 'accent' : 'outline')}
                       disabled={action.disabled}
+                      onClick={action.onClick}
                       fullWidth={false}
                     >
                       {typeof action.label === 'string' || typeof action.label === 'number' ? undefined : action.label}

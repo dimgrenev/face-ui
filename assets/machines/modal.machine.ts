@@ -1,10 +1,10 @@
 /**
  * @face-ui/core — Modal Machine
  *
- * Unifies Dialog + Drawer + AlertDialog into a single FSM.
+ * Unifies centered and edge-aligned modal behavior into a single FSM.
  *
  * - variant='center'                     -> classic dialog
- * - variant='left'|'right'|'top'|'bottom' -> drawer / sheet
+ * - variant='left'|'right'|'top'|'bottom' -> edge-aligned surface
  * - closable=false                       -> alertdialog (no Escape, no backdrop dismiss)
  */
 

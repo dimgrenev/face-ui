@@ -87,21 +87,11 @@
       "required": false,
       "description": "Trigger element (the anchor)."
     },
-    "onSelect": {
-      "type": "function",
-      "required": false,
-      "description": "Called when a menu item is selected."
-    },
     "disabled": {
       "type": "boolean",
       "required": false,
       "description": "Disable the entire menu.",
       "default": false
-    },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "Called when the open state changes."
     },
     "surface": {
       "type": "enum",
@@ -140,11 +130,6 @@
       "type": "string",
       "required": false,
       "description": "Optional title used for the mobile sheet header."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the content element."
     }
   },
   "states": [
@@ -298,7 +283,7 @@
     ],
     "notes": [
       "Menu items reuse option/control anatomy and should not introduce parallel button typography.",
-      "Sheet and popover presentations share overlay surface tokens with Select and Popover."
+      "Compact and popover presentations share overlay surface tokens with Select and Popover."
     ]
   },
   "platform": {

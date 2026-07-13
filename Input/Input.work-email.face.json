@@ -43,24 +43,6 @@
       "ariaLabel": {
         "$ref": "props.ariaLabel"
       },
-      "controlRole": {
-        "$ref": "props.controlRole"
-      },
-      "ariaControls": {
-        "$ref": "props.ariaControls"
-      },
-      "ariaActiveDescendant": {
-        "$ref": "props.ariaActiveDescendant"
-      },
-      "ariaAutoComplete": {
-        "$ref": "props.ariaAutoComplete"
-      },
-      "ariaExpanded": {
-        "$ref": "props.ariaExpanded"
-      },
-      "ariaHasPopup": {
-        "$ref": "props.ariaHasPopup"
-      },
       "spellCheck": {
         "$ref": "props.spellCheck"
       },
@@ -97,24 +79,6 @@
       "pattern": {
         "$ref": "props.pattern"
       },
-      "onValueChange": {
-        "$ref": "props.onValueChange"
-      },
-      "onChange": {
-        "$ref": "props.onChange"
-      },
-      "onBlur": {
-        "$ref": "props.onBlur"
-      },
-      "onFocus": {
-        "$ref": "props.onFocus"
-      },
-      "onKeyDown": {
-        "$ref": "props.onKeyDown"
-      },
-      "controlRef": {
-        "$ref": "props.controlRef"
-      },
       "disabled": {
         "$ref": "props.disabled"
       },
@@ -126,9 +90,6 @@
       },
       "membrane": {
         "$ref": "props.membrane"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -162,22 +123,21 @@
       "name": "type",
       "type": "select",
       "required": false,
-      "description": "Input type. 'default' renders a textarea-like free text. Others render <input type=\"...\">.",
+      "description": "Native input type. Text inputs can switch between single-line and wrapping layouts.",
       "options": [
         "number",
-        "default",
         "text",
         "email",
         "date",
         "password"
       ],
-      "defaultValue": "default"
+      "defaultValue": "text"
     },
     {
       "name": "textLayout",
       "type": "select",
       "required": false,
-      "description": "Text layout for type=\"default\": 'scroll' (single-line) or 'wrap' (multi-line auto-grow).",
+      "description": "Text layout for type=\"text\": 'scroll' (single-line) or 'wrap' (multi-line auto-grow).",
       "options": [
         "scroll",
         "wrap"
@@ -239,61 +199,6 @@
       "type": "string",
       "required": false,
       "description": "Accessible label when no visible label is provided."
-    },
-    {
-      "name": "controlRole",
-      "type": "string",
-      "required": false,
-      "description": "Role applied to the native input or textarea control."
-    },
-    {
-      "name": "ariaControls",
-      "type": "string",
-      "required": false,
-      "description": "Native control aria-controls relationship."
-    },
-    {
-      "name": "ariaActiveDescendant",
-      "type": "string",
-      "required": false,
-      "description": "Native control aria-activedescendant relationship."
-    },
-    {
-      "name": "ariaAutoComplete",
-      "type": "select",
-      "required": false,
-      "description": "Native control aria-autocomplete mode.",
-      "options": [
-        "list",
-        "none",
-        "inline",
-        "both"
-      ]
-    },
-    {
-      "name": "ariaExpanded",
-      "type": "select",
-      "required": false,
-      "description": "Native control aria-expanded state.",
-      "options": [
-        "true",
-        "false"
-      ]
-    },
-    {
-      "name": "ariaHasPopup",
-      "type": "select",
-      "required": false,
-      "description": "Native control aria-haspopup state.",
-      "options": [
-        "dialog",
-        "grid",
-        "listbox",
-        "menu",
-        "tree",
-        "true",
-        "false"
-      ]
     },
     {
       "name": "spellCheck",
@@ -374,42 +279,6 @@
       "description": "Native validation pattern for single-line inputs."
     },
     {
-      "name": "onValueChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when the value changes (machine-based)."
-    },
-    {
-      "name": "onChange",
-      "type": "function",
-      "required": false,
-      "description": "Native onChange handler."
-    },
-    {
-      "name": "onBlur",
-      "type": "function",
-      "required": false,
-      "description": "Native onBlur handler."
-    },
-    {
-      "name": "onFocus",
-      "type": "function",
-      "required": false,
-      "description": "Native onFocus handler."
-    },
-    {
-      "name": "onKeyDown",
-      "type": "any",
-      "required": false,
-      "description": "Native onKeyDown handler."
-    },
-    {
-      "name": "controlRef",
-      "type": "ReactRef",
-      "required": false,
-      "description": "Ref to the native input or textarea control."
-    },
-    {
       "name": "disabled",
       "type": "boolean",
       "required": false,
@@ -435,12 +304,6 @@
       "required": false,
       "description": "Outer membrane wrapper around control geometry.",
       "defaultValue": false
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   ],
   "meta": {

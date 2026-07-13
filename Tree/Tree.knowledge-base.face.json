@@ -21,18 +21,6 @@
       },
       "defaultSelectedId": {
         "$ref": "props.defaultSelectedId"
-      },
-      "onExpandedChange": {
-        "$ref": "props.onExpandedChange"
-      },
-      "onSelectedChange": {
-        "$ref": "props.onSelectedChange"
-      },
-      "renderNode": {
-        "$ref": "props.renderNode"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -116,30 +104,6 @@
       "type": "string",
       "required": false,
       "description": "Uncontrolled initial selected node ID."
-    },
-    {
-      "name": "onExpandedChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when expanded nodes change."
-    },
-    {
-      "name": "onSelectedChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when selected node changes."
-    },
-    {
-      "name": "renderNode",
-      "type": "function",
-      "required": false,
-      "description": "Global render override for custom node bodies. Tree still owns nesting, expansion, focus, and selection."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     }
   ],
   "meta": {

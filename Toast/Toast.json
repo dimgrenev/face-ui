@@ -42,16 +42,6 @@
       "required": false,
       "description": "Accessible label for the dismiss button.",
       "default": "Close notification"
-    },
-    "onDismiss": {
-      "type": "function",
-      "required": false,
-      "description": "Called when the close button or action requests dismissal."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the notification surface."
     }
   },
   "states": [

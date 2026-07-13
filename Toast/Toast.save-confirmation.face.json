@@ -24,12 +24,6 @@
       },
       "closeLabel": {
         "$ref": "props.closeLabel"
-      },
-      "onDismiss": {
-        "$ref": "props.onDismiss"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -90,18 +84,6 @@
       "required": false,
       "description": "Accessible label for the dismiss button.",
       "defaultValue": "Close notification"
-    },
-    {
-      "name": "onDismiss",
-      "type": "function",
-      "required": false,
-      "description": "Called when the close button or action requests dismissal."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the notification surface."
     }
   ],
   "meta": {

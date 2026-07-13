@@ -20,11 +20,6 @@
       "description": "Uncontrolled initial active item ID.",
       "default": null
     },
-    "onActiveChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when active item changes."
-    },
     "orientation": {
       "type": "enum",
       "required": false,
@@ -34,11 +29,6 @@
         "vertical"
       ],
       "default": "horizontal"
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     },
     "surface": {
       "type": "enum",
@@ -66,11 +56,6 @@
       "required": false,
       "description": "Uncontrolled initial sheet state for compact mode.",
       "default": false
-    },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when sheet state changes."
     },
     "trigger": {
       "type": "string",

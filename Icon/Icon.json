@@ -9,16 +9,6 @@
       "required": true,
       "description": "Built-in Face UI icon name. Unknown names render the notdef glyph."
     },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "className prop"
-    },
-    "style": {
-      "type": "object",
-      "required": false,
-      "description": "style prop"
-    },
     "label": {
       "type": "string",
       "required": false,

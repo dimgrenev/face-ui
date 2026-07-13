@@ -11,7 +11,6 @@
 - `Popover`
 - `Menu`
 - `Modal`
-- `Drawer`
 - `Command`
 
 ## Navigation
@@ -46,4 +45,3 @@
 - `Overlay` -> use `Tooltip` or `Popover`
 - `Toggle` -> use `SegmentedControl`
 - `Sidebar` -> use `Panel`
-- `Sheet` -> use `Drawer` with `side="bottom"` or `side="top"`

@@ -46,26 +46,6 @@
       "required": false,
       "description": "Maximum height when collapsed (px).",
       "default": 160
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
-    },
-    "role": {
-      "type": "string",
-      "required": false,
-      "description": "role prop"
-    },
-    "titleAttr": {
-      "type": "string",
-      "required": false,
-      "description": "titleAttr prop"
-    },
-    "style": {
-      "type": "object",
-      "required": false,
-      "description": "style prop"
     }
   },
   "states": [

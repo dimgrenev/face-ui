@@ -28,12 +28,6 @@
       "ariaLabel": {
         "$ref": "props.ariaLabel"
       },
-      "onValueChange": {
-        "$ref": "props.onValueChange"
-      },
-      "className": {
-        "$ref": "props.className"
-      },
       "membrane": {
         "$ref": "props.membrane"
       }
@@ -118,18 +112,6 @@
       "type": "string",
       "required": false,
       "description": "Accessible name for the segmented group."
-    },
-    {
-      "name": "onValueChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when selected segment values change."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     },
     {
       "name": "membrane",

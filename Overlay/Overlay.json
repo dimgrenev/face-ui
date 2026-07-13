@@ -73,16 +73,6 @@
       "required": false,
       "description": "Offset from the trigger along the side axis (px).",
       "default": 2
-    },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "Called when the open state changes."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the content element."
     }
   },
   "states": [
@@ -206,12 +196,11 @@
       "Click-outside dismiss layer"
     ],
     "whenNotToUse": [
-      "Content display (use Modal or Drawer)",
+      "Blocking or viewport-edge content (use Modal)",
       "Tooltip (use Tooltip)"
     ],
     "alternatives": [
-      "Modal",
-      "Drawer"
+      "Modal"
     ],
     "context": "app"
   }

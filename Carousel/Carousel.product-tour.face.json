@@ -34,14 +34,8 @@
       "defaultIndex": {
         "$ref": "props.defaultIndex"
       },
-      "onIndexChange": {
-        "$ref": "props.onIndexChange"
-      },
       "ariaLabel": {
         "$ref": "props.ariaLabel"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -135,23 +129,11 @@
       "defaultValue": 0
     },
     {
-      "name": "onIndexChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when the active slide changes."
-    },
-    {
       "name": "ariaLabel",
       "type": "string",
       "required": false,
       "description": "Accessible name for the carousel region.",
       "defaultValue": "Carousel"
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   ],
   "meta": {

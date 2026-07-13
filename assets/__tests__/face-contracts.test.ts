@@ -20,10 +20,7 @@ describe('face-ui-react contracts', () => {
       'disabled',
       'files',
       'defaultFiles',
-      'onFilesChange',
-      'onReject',
       'labels',
-      'className',
     ]
 
     expect(upload).toBeDefined()
@@ -37,18 +34,18 @@ describe('face-ui-react contracts', () => {
     expect(upload.currentContract.props).not.toHaveProperty('reason')
   })
 
-  it('keeps wrapper component contracts aligned to inherited public props', () => {
+  it('keeps composed component contracts aligned to inherited public props', () => {
     const contracts = new Map(
       collectFaceJsonContracts()
         .map((entry) => [entry.componentName, entry.currentContract] as const),
     )
 
-    for (const componentName of ['Drawer', 'Sheet']) {
+    for (const componentName of ['Modal']) {
       const contract = contracts.get(componentName)
       expect(contract, `${componentName} contract should exist`).toBeDefined()
       if (!contract) throw new Error(`${componentName} contract was not found`)
 
-      for (const propName of ['trigger', 'title', 'description', 'children', 'open', 'closable', 'onOpenChange']) {
+      for (const propName of ['trigger', 'title', 'description', 'children', 'open', 'closable', 'placement', 'edge']) {
         expect(contract.props, `${componentName} should expose ${propName}`).toHaveProperty(propName)
       }
 
@@ -63,7 +60,7 @@ describe('face-ui-react contracts', () => {
     expect(popover).toBeDefined()
     if (!popover) throw new Error('Popover contract was not found')
 
-    for (const propName of ['children', 'content', 'open', 'openDelay', 'closeDelay', 'side', 'align', 'sideOffset', 'onOpenChange']) {
+    for (const propName of ['children', 'content', 'open', 'openDelay', 'closeDelay', 'side', 'align', 'sideOffset']) {
       expect(popover.props, `Popover should expose ${propName}`).toHaveProperty(propName)
     }
 
@@ -127,7 +124,7 @@ describe('face-ui-react contracts', () => {
       collectFaceJsonContracts()
         .map((entry) => [entry.componentName, entry.currentContract] as const),
     )
-    const deprecatedComponents = new Set(['Overlay', 'Sheet', 'Toggle'])
+    const deprecatedComponents = new Set(['Overlay', 'Toggle'])
     const activeContractNames = Array.from(contracts.keys())
       .filter((name) => !deprecatedComponents.has(name))
       .sort((left, right) => left.localeCompare(right))
@@ -137,6 +134,8 @@ describe('face-ui-react contracts', () => {
 
     expect(galleryNames).toEqual(activeContractNames)
     expect(galleryNames).not.toContain('Overlay')
+    expect(galleryNames).toContain('Modal')
+    expect(galleryNames).not.toContain('Drawer')
     expect(galleryNames).not.toContain('Sheet')
     expect(galleryNames).not.toContain('Toggle')
     expect(galleryNames).toContain('Date')
@@ -153,5 +152,58 @@ describe('face-ui-react contracts', () => {
         ).toHaveProperty(propName)
       }
     }
+  })
+
+  it('keeps implementation escape hatches and removed aliases out of public contracts', () => {
+    const hiddenProps = [
+      'className',
+      'style',
+      'id',
+      'role',
+      'titleAttr',
+      'backdropClassName',
+      'positionerClassName',
+      'controlRef',
+      'controlRole',
+      'ariaControls',
+      'ariaActiveDescendant',
+      'ariaAutoComplete',
+      'ariaExpanded',
+      'ariaHasPopup',
+      'ariaLabelledBy',
+      'tabIndex',
+    ]
+
+    for (const entry of collectFaceJsonContracts()) {
+      for (const propName of hiddenProps) {
+        expect(entry.currentContract.props, `${entry.componentName} publishes ${propName}`).not.toHaveProperty(propName)
+      }
+      for (const [propName, prop] of Object.entries(entry.currentContract.props)) {
+        expect(prop.type, `${entry.componentName}.${propName} exposes a non-editable callback`).not.toBe('function')
+        expect(propName, `${entry.componentName}.${propName} exposes an event handler`).not.toMatch(/^on[A-Z]/)
+        expect(propName, `${entry.componentName}.${propName} exposes an implementation ref/class escape hatch`).not.toMatch(/(?:ClassName|Ref)$/)
+      }
+    }
+
+    const contracts = new Map(
+      collectFaceJsonContracts().map((entry) => [entry.componentName, entry.currentContract] as const),
+    )
+    expect(contracts.get('Card')?.props.variant?.options).toEqual(['default', 'plain', 'code'])
+    expect(contracts.get('Card')?.props.padding?.options).toEqual(['default', 'control', 'membrane', 'none'])
+    expect(contracts.get('Card')?.props.radius?.options).toEqual(['md', 'lg', 'none'])
+    expect(contracts.get('Card')?.props.footerLayout?.options).toEqual(['start', 'end', 'between'])
+    expect(contracts.get('Button')?.props.variant?.options).not.toContain('suggestion')
+    expect(contracts.get('Text')?.props.variant?.options).not.toContain('default')
+    expect(contracts.get('Tile')?.props.intent?.options).toEqual(['default', 'disclosure', 'tree', 'tab', 'section'])
+    expect(contracts.get('Modal')?.props).not.toHaveProperty('variant')
+    expect(contracts.get('Modal')?.props.placement?.options).toEqual(['center', 'left', 'right', 'top', 'bottom'])
+    expect(contracts.get('Modal')?.props.edge?.options).toEqual(['inset', 'flush'])
+    expect(contracts.get('Modal')?.props.edge?.default).toBe('inset')
+    expect(contracts.get('Modal')?.props.height?.type).toBe('number')
+    expect(contracts.get('Modal')?.props).not.toHaveProperty('surface')
+    expect(contracts.get('Modal')?.props).not.toHaveProperty('surfaceBreakpoint')
+    expect(contracts.has('Drawer')).toBe(false)
+    expect(contracts.has('Sheet')).toBe(false)
+    expect(contracts.get('Slider')?.props).not.toHaveProperty('leading')
   })
 })

@@ -70,7 +70,7 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       props: {
         orientation: 'horizontal',
         children: [
-          { __componentName__: 'Text', text: 'Acme Workspace', variant: 'label', truncate: true },
+          { __componentName__: 'Text', text: 'Acme Workspace', truncate: true },
           { __componentName__: 'Bar.Right', children: [{ __componentName__: 'Button', text: 'Invite', icon: 'plus', fullWidth: false }] },
         ],
       },
@@ -159,7 +159,7 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       props: {
         title: 'API usage',
         content: '1.8M of 2M monthly tokens used across production agents.',
-        padding: 'spacious',
+        padding: 'default',
         radius: 'lg',
         border: true,
         footerLayout: 'between',
@@ -172,7 +172,7 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         title: 'Approve database migration?',
         description: 'Production change',
         content: 'The agent will add one index and backfill 24,600 records.',
-        radius: 'xl',
+        radius: 'lg',
         interactive: true,
         footerLayout: 'end',
         footer: [
@@ -312,39 +312,6 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       },
     },
   ],
-  Drawer: [
-    {
-      name: 'Product / Record Inspector',
-      props: {
-        side: 'right',
-        edge: 'flush',
-        open: true,
-        portal: false,
-        title: 'Customer details',
-        description: 'Account health and recent activity',
-        width: 420,
-        closable: true,
-        closeOnOverlayClick: true,
-        actions: [{ label: 'Edit customer', variant: 'accent' }],
-        children: 'Plan: Enterprise. Last active 12 minutes ago.',
-      },
-    },
-    {
-      name: 'Product / Mobile Filters',
-      props: {
-        side: 'bottom',
-        edge: 'inset',
-        open: true,
-        portal: false,
-        title: 'Filter results',
-        description: 'Narrow 248 matching records',
-        height: 360,
-        closable: true,
-        actions: [{ label: 'Reset', variant: 'outline' }, { label: 'Show results', variant: 'accent' }],
-        children: 'Status, owner, date range, and workspace filters.',
-      },
-    },
-  ],
   Icon: [
     {
       name: 'Product / Accessible Action',
@@ -372,7 +339,7 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
     {
       name: 'Product / AI Prompt',
       props: {
-        type: 'default',
+        type: 'text',
         label: 'System instruction',
         placeholder: 'Describe how the assistant should behave...',
         textLayout: 'wrap',
@@ -480,12 +447,11 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       props: {
         open: true,
         portal: false,
-        variant: 'center',
-        surface: 'dialog',
+        placement: 'center',
+        edge: 'inset',
         title: 'Create project',
         description: 'Start from a blank workspace or a template.',
         width: 520,
-        height: 360,
         closable: true,
         closeOnOverlayClick: true,
         actions: [{ label: 'Cancel', variant: 'outline' }, { label: 'Create project', variant: 'accent' }],
@@ -493,20 +459,19 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       },
     },
     {
-      name: 'Product / Confirm Destructive Action',
+      name: 'Product / Record Inspector',
       props: {
         open: true,
         portal: false,
-        variant: 'center',
-        surface: 'dialog',
-        title: 'Delete production environment?',
-        description: 'This action cannot be undone.',
-        width: 440,
-        height: 280,
+        placement: 'right',
+        edge: 'flush',
+        title: 'Customer details',
+        description: 'Account health and recent activity',
+        width: 420,
         closable: true,
-        closeOnOverlayClick: false,
-        actions: [{ label: 'Keep environment', variant: 'outline' }, { label: 'Delete', variant: 'destructive' }],
-        children: 'All deployments, secrets, and logs in this environment will be removed.',
+        closeOnOverlayClick: true,
+        actions: [{ label: 'Edit customer', variant: 'accent' }],
+        children: 'Plan: Enterprise. Last active 12 minutes ago.',
       },
     },
   ],
@@ -739,60 +704,6 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       props: { orientation: 'vertical', decorative: true, membrane: true },
     },
   ],
-  Setting: [
-    {
-      name: 'Product / Completion Alerts',
-      props: {
-        label: 'Completion alerts',
-        description: 'Notify workspace members when a long-running agent finishes.',
-        badge: 'Recommended',
-        layout: 'row',
-        align: 'center',
-        control: { __componentName__: 'Switcher', defaultChecked: true, withText: false },
-      },
-    },
-    {
-      name: 'Product / Experimental Feature',
-      props: {
-        label: 'Computer use beta',
-        description: 'Allow selected agents to interact with approved browser sessions.',
-        warning: 'Review permissions before enabling this feature in production.',
-        layout: 'stack',
-        align: 'start',
-        highlighted: true,
-        control: { __componentName__: 'Switcher', defaultChecked: false, withText: true, text: 'Enable beta' },
-      },
-    },
-  ],
-  Sheet: [
-    {
-      name: 'Product / Mobile Search Filters',
-      props: {
-        side: 'bottom',
-        edge: 'inset',
-        open: true,
-        portal: false,
-        title: 'Search filters',
-        description: 'Filter by owner, status, and updated date.',
-        height: 380,
-        actions: [{ label: 'Clear', variant: 'outline' }, { label: 'Apply filters', variant: 'accent' }],
-        children: 'Filter controls appear in this mobile-first surface.',
-      },
-    },
-    {
-      name: 'Product / Command History',
-      props: {
-        side: 'top',
-        edge: 'flush',
-        open: true,
-        portal: false,
-        title: 'Command history',
-        description: 'Recent commands in this workspace.',
-        height: 320,
-        children: 'Deploy production, run tests, inspect logs, and summarize failures.',
-      },
-    },
-  ],
   Skeleton: [
     {
       name: 'Product / User Avatar Loading',
@@ -810,7 +721,7 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
     },
     {
       name: 'Product / AI Creativity',
-      props: { variant: 'advanced', label: 'Creativity', defaultValue: [62], min: 0, max: 100, step: 1, leading: 'iconText', leadingIcon: 'component', leadingText: 'Creative' },
+      props: { variant: 'advanced', label: 'Creativity', defaultValue: [62], min: 0, max: 100, step: 1, leadingIcon: 'component', leadingText: 'Creative' },
     },
   ],
   Steps: [
@@ -946,7 +857,7 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Tile: [
     {
       name: 'Product / Active Project',
-      props: { text: 'Production API', rightText: 'Healthy', intent: 'navigation', tone: 'positive', icon: 'folder', active: true, fullWidth: true, align: 'left', actionVisibility: 'hover', membrane: true },
+      props: { text: 'Production API', rightText: 'Healthy', intent: 'default', tone: 'positive', icon: 'folder', active: true, fullWidth: true, align: 'left', actionVisibility: 'hover', membrane: true },
     },
     {
       name: 'Product / Collapsible Workspace',

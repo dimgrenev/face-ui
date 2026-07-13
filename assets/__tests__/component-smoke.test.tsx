@@ -15,7 +15,6 @@ import { Carousel } from '../../Carousel/Carousel'
 import { Checkbox } from '../../Checkbox/Checkbox'
 import { Code } from '../../Code/Code'
 import { Command } from '../../Command/Command'
-import { Drawer } from '../../Drawer/Drawer'
 import { Icon } from '../../Icon/Icon'
 import { Input } from '../../Input/Input'
 import { Markdown } from '../../Markdown/Markdown'
@@ -30,7 +29,6 @@ import { Rating } from '../../Rating/Rating'
 import { Scroll } from '../../Scroll/Scroll'
 import { Separator } from '../../Separator/Separator'
 import { Select } from '../../Select/Select'
-import { Sheet } from '../../Sheet/Sheet'
 import { Slider } from '../../Slider/Slider'
 import { Steps } from '../../Steps/Steps'
 import { Switcher } from '../../Switcher/Switcher'
@@ -166,6 +164,16 @@ describe('component smoke', () => {
     expect(membrane?.classList.contains('uf-membrane--full')).toBe(true)
   })
 
+  it('Accordion keeps opened content out of the root intrinsic width calculation', () => {
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toMatch(
+      /\[data-scope="accordion"\] \[data-part="content"\],[\s\S]*?contain:\s*inline-size;/,
+    )
+    expect(componentStyles).toMatch(
+      /\[data-scope="accordion"\] \[data-part="content"\],[\s\S]*?overflow-wrap:\s*anywhere;/,
+    )
+  })
+
   it('Accordion resolves item icons through the shared Icon renderer', async () => {
     await act(async () => {
       root.render(
@@ -210,6 +218,13 @@ describe('component smoke', () => {
 
     const icon = container.querySelector('[data-part="icon"] svg')
     expect(icon).not.toBeNull()
+  })
+
+  it('Button outline variant keeps its resting surface transparent', () => {
+    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
+    expect(componentStyles).toMatch(
+      /\.uf-button\[data-scope="button"\]\[data-variant="outline"\]\s*\{[^}]*--uf-button-bg:\s*var\(--uf-color-black-0\);/s,
+    )
   })
 
   it('Button selector mode renders a compact system indicator', async () => {
@@ -277,6 +292,7 @@ describe('component smoke', () => {
     const icon = avatar?.querySelector<SVGElement>('.uf-avatar__content > svg[data-icon="user"]')
     expect(avatar).not.toBeNull()
     expect(icon).not.toBeNull()
+    expect(avatar?.querySelector('[data-part="image"]')).toBeNull()
 
     const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
     expect(componentStyles).toContain('block-size: var(--uf-control-height);')
@@ -347,7 +363,7 @@ describe('component smoke', () => {
     )
     expect(getCardVariantBlock('plain')).not.toContain('--uf-card-border-width')
     expect(getCardVariantBlock('code')).not.toContain('--uf-card-border-width')
-    expect(getCardVariantBlock('showcase')).not.toContain('--uf-card-border-width')
+    expect(componentStyles).not.toContain('[data-card-variant="showcase"]')
     expect(componentStyles).toMatch(
       /\.uf-card\[data-scope\]:not\(\[data-full-width\]\) \{[\s\S]*?inline-size: max-content;[\s\S]*?margin-inline: auto;[\s\S]*?align-self: center;[\s\S]*?justify-self: center;[\s\S]*?\}/,
     )
@@ -872,7 +888,7 @@ describe('component smoke', () => {
     expect(componentStyles).toMatch(
       /\.uf-separator\[data-scope\]\[data-orientation="vertical"\] \{[\s\S]*?width: var\(--uf-separator-line-width\);[\s\S]*?border-left: none;[\s\S]*?background: var\(--uf-color-border\);[\s\S]*?\}/,
     )
-    expect(componentStyles).toContain('padding: var(--uf-membrane) var(--uf-control-pad-text);')
+    expect(componentStyles).toContain('padding: 0 var(--uf-control-pad-text);')
     expect(componentStyles).toContain('flex: 1 1 100%;')
     expect(componentStyles).toContain('justify-self: stretch;')
     expect(componentStyles).not.toContain('.uf-gallery-itemSurface:has(> .uf-separator-membrane),')
@@ -881,7 +897,7 @@ describe('component smoke', () => {
     expect(galleryMetaSource).toContain('sampleProps: {"orientation":"horizontal","decorative":true,"membrane":true}')
     expect(runtimeSource).toContain("maxWidth: '100%'")
     expect(runtimeSource).toContain("fullFrameComponents: ['face-ui-react']")
-    expect(runtimeSource).toContain("fullWidthComponents: ['face-ui-react', 'Card', 'Carousel', 'Media', 'Modal', 'Progress', 'Scroll', 'Separator', 'Table', 'Toc']")
+    expect(runtimeSource).toContain("fullWidthComponents: ['face-ui-react', 'Accordion', 'Card', 'Carousel', 'Code', 'Media', 'Modal', 'Progress', 'Scroll', 'Separator', 'Slider', 'Table', 'Toc', 'Tree']")
   })
 
   it('Scroll exposes a focusable labelled region with a contextual aria label', async () => {
@@ -1423,14 +1439,12 @@ describe('component smoke', () => {
     expect(content?.hidden).toBe(true)
   })
 
-  it('Modal lets open override the legacy isOpen alias', async () => {
+  it('Modal renders as a bounded open dialog without compatibility aliases', async () => {
     await act(async () => {
       root.render(
         <Modal
-          {...({ isOpen: false } as any)}
           open
           portal={false}
-          variant="center"
           title="Preview modal"
         >
           Visible preview content
@@ -1445,46 +1459,46 @@ describe('component smoke', () => {
     expect(content?.classList.contains('uf-card')).toBe(true)
     expect(content?.getAttribute('data-card-variant')).toBe('default')
     expect(content?.getAttribute('data-border')).toBe('true')
+    expect(content?.getAttribute('data-radius')).toBe('lg')
     expect(container.textContent).toContain('Preview modal')
     expect(container.textContent).toContain('Visible preview content')
     expect(runtimeSource).toContain("'Modal'")
   })
 
-  it('Sheet keeps the composed drawer Card border enabled by default', async () => {
+  it('Modal keeps inset edge surfaces rounded and bordered', async () => {
     await act(async () => {
       root.render(
-        <Sheet open portal={false} side="bottom" title="Bottom sheet">
-          Drawer content
-        </Sheet>,
+        <Modal open portal={false} placement="bottom" title="Bottom modal">
+          Modal content
+        </Modal>,
       )
     })
 
     const content = container.querySelector('[data-scope="modal"][data-part="content"]') as HTMLElement | null
-    const componentStyles = readFileSync(join(process.cwd(), 'assets/styles/components.css'), 'utf8')
     expect(content).not.toBeNull()
     expect(content?.classList.contains('uf-card')).toBe(true)
-    expect(content?.classList.contains('uf-drawer')).toBe(true)
-    expect(content?.getAttribute('data-surface')).toBe('sheet')
+    expect(content?.classList.contains('uf-modal--edge-inset')).toBe(true)
+    expect(content?.getAttribute('data-edge')).toBe('inset')
     expect(content?.getAttribute('data-card-variant')).toBe('default')
     expect(content?.getAttribute('data-border')).toBe('true')
-    expect(componentStyles).not.toMatch(/\.uf-modal\[data-scope\]\.uf-drawer\s*\{[^}]*border\s*:\s*0\s*;?[^}]*\}/)
+    expect(content?.getAttribute('data-radius')).toBe('lg')
   })
 
-  it('Drawer disables the composed Card border for flush square edge surfaces', async () => {
+  it('Modal disables the Card border for flush square edge surfaces', async () => {
     await act(async () => {
       root.render(
-        <Drawer open portal={false} side="right" edge="flush" title="Right drawer">
-          Drawer content
-        </Drawer>,
+        <Modal open portal={false} placement="right" edge="flush" title="Right modal">
+          Modal content
+        </Modal>,
       )
     })
 
     const content = container.querySelector('[data-scope="modal"][data-part="content"]') as HTMLElement | null
     expect(content).not.toBeNull()
     expect(content?.classList.contains('uf-card')).toBe(true)
-    expect(content?.classList.contains('uf-drawer--flush')).toBe(true)
+    expect(content?.classList.contains('uf-modal--edge-flush')).toBe(true)
     expect(content?.getAttribute('data-radius')).toBe('none')
-    expect(content?.getAttribute('data-drawer-edge')).toBe('flush')
+    expect(content?.getAttribute('data-edge')).toBe('flush')
     expect(content?.getAttribute('data-border')).toBe('false')
   })
 
@@ -1897,7 +1911,6 @@ describe('component smoke', () => {
           max={100}
           step={1}
           defaultValue={[40]}
-          leading="iconText"
           leadingIcon="crop"
           leadingText="Crop"
           crop
@@ -1918,7 +1931,6 @@ describe('component smoke', () => {
         max={100}
         step={1}
         defaultValue={[40]}
-        leading="iconText"
         leadingIcon="crop"
         leadingText="Crop"
         crop
@@ -1990,6 +2002,37 @@ describe('component smoke', () => {
     // jsdom does not provide stable pointer geometry for the crop markers, so
     // the interaction contract is covered by the preview-props regression test.
     expect(handleCropChange).not.toHaveBeenCalled()
+  })
+
+  it('Slider variant is the only switch between simple and advanced presentations', async () => {
+    await act(async () => {
+      root.render(
+        <Slider
+          defaultValue={[40]}
+          crop
+          leadingIcon="crop"
+          leadingText="Crop"
+        />,
+      )
+    })
+
+    expect(container.querySelector('.uf-slider--advanced')).toBeNull()
+    expect(container.querySelector('[data-part="track"]')).not.toBeNull()
+
+    await act(async () => {
+      root.render(
+        <Slider
+          variant="advanced"
+          defaultValue={[40]}
+          leadingIcon="crop"
+          leadingText="Crop"
+        />,
+      )
+    })
+
+    expect(container.querySelector('.uf-slider--advanced')).not.toBeNull()
+    expect(container.querySelector('.uf-slider-leadingIcon')).not.toBeNull()
+    expect(container.querySelector('.uf-slider-leadingText')?.textContent).toBe('Crop')
   })
 
   it('Slider advanced keeps thumb measurement stable while value text changes', async () => {

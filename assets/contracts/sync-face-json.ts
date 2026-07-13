@@ -101,6 +101,30 @@ const THIS_FILE = fileURLToPath(import.meta.url)
 const CONTRACTS_DIR = path.dirname(THIS_FILE)
 const FACE_UI_ROOT = path.resolve(CONTRACTS_DIR, '../..')
 const PRODUCT_SCENARIO_GENERATOR = 'face-ui-product-scenario@1' as const
+const GLOBAL_CONTRACT_OMIT_PROPS = new Set([
+  'className',
+  'style',
+  'id',
+  'role',
+  'titleAttr',
+  'backdropClassName',
+  'positionerClassName',
+  'controlRole',
+  'ariaControls',
+  'ariaActiveDescendant',
+  'ariaAutoComplete',
+  'ariaExpanded',
+  'ariaHasPopup',
+  'ariaLabelledBy',
+  'tabIndex',
+])
+
+function isPlaygroundImplementationProp(propName: string, prop: FaceJsonProp): boolean {
+  if (GLOBAL_CONTRACT_OMIT_PROPS.has(propName)) return true
+  if (prop.type === 'function') return true
+  if (/^on[A-Z]/.test(propName)) return true
+  return /(?:ClassName|Ref)$/.test(propName)
+}
 
 const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   Accordion: {
@@ -205,7 +229,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       variant: {
         type: 'enum',
         default: 'default',
-        options: ['default', 'primary', 'secondary', 'accent', 'outline', 'ghost', 'destructive', 'suggestion'],
+        options: ['default', 'primary', 'secondary', 'accent', 'outline', 'ghost', 'destructive'],
         description: 'Visual style variant',
       },
       fullWidth: {
@@ -270,8 +294,21 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         controlType: 'object',
         description: 'Convenience footer slot. Use React content or a structured component descriptor.',
       },
+      variant: {
+        options: ['default', 'plain', 'code'],
+        description: 'Meaningful surface role: standard contained surface, unframed composition, or code canvas.',
+      },
+      padding: {
+        options: ['default', 'control', 'membrane', 'none'],
+        description: 'Internal surface inset, from the standard 7px rhythm down to a flush composition.',
+      },
+      radius: {
+        options: ['md', 'lg', 'none'],
+        description: 'Corner geometry for contained, compact, dialog, or flush surfaces.',
+      },
       footerLayout: {
-        description: 'Layout used by the convenience footer slot. Compound usage configures Card.Footer directly.',
+        options: ['start', 'end', 'between'],
+        description: 'Alignment used by the convenience footer slot. Compound usage configures Card.Footer directly.',
       },
     },
     patchStates: () => [
@@ -291,27 +328,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         },
       },
       {
-        name: 'Dialog Geometry',
-        props: {
-          radius: 'lg',
-          footerLayout: 'between',
-          title: 'Confirm publish',
-          content: 'Review the final settings before sending this workspace live.',
-          footer: [
-            { __componentName__: 'Button', text: 'Cancel', variant: 'outline', membrane: true, fullWidth: false },
-            { __componentName__: 'Button', text: 'Publish', variant: 'accent', membrane: true, fullWidth: false },
-          ],
-        },
-      },
-      {
-        name: 'Floating Geometry',
-        props: {
-          padding: 'membrane',
-          radius: 'base',
-          content: 'Compact overlay surface for menus, selects and date pickers.',
-        },
-      },
-      {
         name: 'Code Surface',
         props: {
           variant: 'code',
@@ -319,14 +335,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           radius: 'md',
           border: false,
           content: "const surface = 'code'",
-        },
-      },
-      {
-        name: 'Showcase Surface',
-        props: {
-          variant: 'showcase',
-          border: false,
-          content: 'Gallery preview surface',
         },
       },
       {
@@ -426,12 +434,70 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   Modal: {
     omitProps: ['disabled', 'label'],
     patchProps: {
+      placement: {
+        type: 'enum',
+        required: false,
+        default: 'center',
+        options: ['center', 'left', 'right', 'top', 'bottom'],
+        description: 'Viewport placement of the modal surface.',
+      },
+      edge: {
+        type: 'enum',
+        required: false,
+        default: 'inset',
+        options: ['inset', 'flush'],
+        description: 'Inset adds the system viewport gap, radius, and border; flush attaches the surface to its placement edge.',
+      },
+      width: {
+        type: 'number',
+        required: false,
+        description: 'Preferred surface width in pixels, constrained by the viewport.',
+      },
+      height: {
+        type: 'number',
+        required: false,
+        description: 'Preferred surface height in pixels, constrained by the viewport.',
+      },
       actions: {
         type: 'array',
         required: false,
         description: 'Optional footer actions.',
       },
     },
+    patchStates: () => [
+      {
+        name: 'Default',
+        props: {
+          open: true,
+          portal: false,
+          autoFocusOnOpen: false,
+          placement: 'center',
+          edge: 'inset',
+          title: 'Modal',
+          description: 'Focused work surface',
+          children: 'Review the workspace details before creating it.',
+          actions: [
+            { label: 'Cancel', variant: 'outline' },
+            { label: 'Create', variant: 'accent' },
+          ],
+        },
+      },
+      {
+        name: 'Right edge workspace',
+        props: {
+          open: true,
+          portal: false,
+          autoFocusOnOpen: false,
+          placement: 'right',
+          edge: 'flush',
+          width: 420,
+          title: 'Customer details',
+          description: 'Account health and recent activity',
+          children: 'Plan: Enterprise. Last active 12 minutes ago.',
+          actions: [{ label: 'Edit customer', variant: 'accent' }],
+        },
+      },
+    ],
   },
   Panel: {
     patchStates: () => {
@@ -461,7 +527,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           },
         },
         {
-          name: 'Responsive Sheet',
+          name: 'Compact overlay',
           props: {
             items,
             defaultSelectedId: 'automations',
@@ -507,6 +573,12 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         description: 'Show the required indicator (*).',
       },
     },
+    patchStates: (states) => states.map((state) => ({
+      ...state,
+      props: state.props?.type === 'default'
+        ? { ...state.props, type: 'text' }
+        : state.props,
+    })),
   },
   Progress: {
     patchStates: () => [
@@ -623,13 +695,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         options: ['simple', 'advanced'],
         description: 'Standard track/thumb presentation or enhanced value-thumb presentation.',
       },
-      leading: {
-        type: 'enum',
-        required: false,
-        default: 'none',
-        options: ['none', 'icon', 'text', 'iconText'],
-        description: 'Leading content mode for the advanced slider.',
-      },
       leadingIcon: {
         type: 'string',
         required: false,
@@ -689,7 +754,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           variant: 'advanced',
           label: 'Zoom',
           defaultValue: [42],
-          leading: 'text',
           leadingText: 'Zoom',
         },
       },
@@ -702,7 +766,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           crop: true,
           defaultCropRange: { min: 20, max: 80 },
           cropLocksValue: true,
-          leading: 'text',
           leadingText: 'Crop',
         },
       },
@@ -720,9 +783,9 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       intent: {
         type: 'enum',
         required: false,
-        default: 'option',
-        options: ['option', 'navigation', 'disclosure', 'tree', 'tab', 'section'],
-        description: 'Semantic row intent. Use option for generic rows, navigation for selected app routes, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.',
+        default: 'default',
+        options: ['default', 'disclosure', 'tree', 'tab', 'section'],
+        description: 'Semantic row intent. Use default for generic and navigation rows, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.',
       },
       density: {
         type: 'enum',
@@ -784,7 +847,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Navigation Active',
         props: {
-          intent: 'navigation',
+          intent: 'default',
           text: 'Current page',
           icon: 'file',
           active: true,
@@ -842,6 +905,18 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         },
       },
     ],
+  },
+  Text: {
+    patchProps: {
+      variant: {
+        options: ['body', 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label', 'kbd', 'code', 'markdown', 'muted', 'blockquote'],
+        default: 'body',
+        description: 'Semantic typography role. Body is the canonical default.',
+      },
+    },
+    patchStates: (states) => states.map((state) => state.name === 'Default (Body)'
+      ? { ...state, props: { ...state.props, variant: 'body' } }
+      : state),
   },
   Toast: {
     patchStates: () => [
@@ -1255,14 +1330,13 @@ function toFaceProp(prop: PropAnalysis, existing?: FaceJsonProp): FaceJsonProp {
 }
 
 function applyOverrides(componentName: string, props: Record<string, FaceJsonProp>): Record<string, FaceJsonProp> {
-  const override = CONTRACT_OVERRIDES[componentName]
-  if (!override) return props
+  const override = CONTRACT_OVERRIDES[componentName] ?? {}
 
   const omitProps = new Set(override.omitProps ?? [])
   const next: Record<string, FaceJsonProp> = {}
 
   for (const [propName, propDef] of Object.entries(props)) {
-    if (omitProps.has(propName)) continue
+    if (isPlaygroundImplementationProp(propName, propDef) || omitProps.has(propName)) continue
     next[propName] = { ...propDef, ...(override.patchProps?.[propName] ?? {}) }
   }
 
@@ -1361,6 +1435,23 @@ function buildProductScenarioFaceContract(
   const propNames = Object.keys(componentContract.props)
   const sourcePath = path.relative(FACE_UI_ROOT, entry.sourcePath).replace(/\\/g, '/')
   const contractPath = path.relative(FACE_UI_ROOT, entry.contractPath).replace(/\\/g, '/')
+
+  for (const [propName, value] of Object.entries(scenario.props)) {
+    const prop = componentContract.props[propName]
+    if (!prop) {
+      throw new Error(`${entry.componentName} product scenario "${scenario.name}" uses unknown prop "${propName}"`)
+    }
+    if (
+      Array.isArray(prop.options)
+      && prop.options.length > 0
+      && (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')
+      && !prop.options.some((option) => Object.is(option, value) || String(option) === String(value))
+    ) {
+      throw new Error(
+        `${entry.componentName} product scenario "${scenario.name}" uses invalid value ${JSON.stringify(value)} for "${propName}"; expected one of ${prop.options.map((option) => JSON.stringify(option)).join(', ')}`,
+      )
+    }
+  }
 
   return {
     schema: 'face',

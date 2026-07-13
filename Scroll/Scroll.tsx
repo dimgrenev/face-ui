@@ -80,7 +80,7 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(
         {...scrollAnatomy.getPartAttrs('root')}
         variant="code"
         padding="none"
-        radius="base"
+        radius="md"
         data-orientation={orientation}
         className={cn('uf-scroll', className)}
         style={{ height }}

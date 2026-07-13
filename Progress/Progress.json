@@ -59,11 +59,6 @@
       "type": "string",
       "required": false,
       "description": "Accessible label for the progressbar when no visible label is rendered."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "className prop"
     }
   },
   "states": [

@@ -45,11 +45,6 @@
       "description": "Disable the entire tab group.",
       "default": false
     },
-    "onValueChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when the selected tab changes."
-    },
     "withLine": {
       "type": "boolean",
       "required": false,
@@ -73,11 +68,6 @@
       "required": false,
       "description": "Render internal content panels. Set false when panels are rendered outside Tabs.",
       "default": true
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     }
   },
   "states": [

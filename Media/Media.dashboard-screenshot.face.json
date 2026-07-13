@@ -52,32 +52,14 @@
       "fallback": {
         "$ref": "props.fallback"
       },
-      "onError": {
-        "$ref": "props.onError"
-      },
-      "onLoad": {
-        "$ref": "props.onLoad"
-      },
-      "className": {
-        "$ref": "props.className"
-      },
       "membrane": {
         "$ref": "props.membrane"
-      },
-      "role": {
-        "$ref": "props.role"
       },
       "ariaLabel": {
         "$ref": "props.ariaLabel"
       },
       "title": {
         "$ref": "props.title"
-      },
-      "tabIndex": {
-        "$ref": "props.tabIndex"
-      },
-      "style": {
-        "$ref": "props.style"
       }
     },
     "children": []
@@ -217,35 +199,11 @@
       "description": "Fallback content shown on error."
     },
     {
-      "name": "onError",
-      "type": "function",
-      "required": false,
-      "description": "Called when the media fails to load."
-    },
-    {
-      "name": "onLoad",
-      "type": "function",
-      "required": false,
-      "description": "Called when the media finishes loading."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
-    },
-    {
       "name": "membrane",
       "type": "boolean",
       "required": false,
       "description": "Membrane spacing around media.",
       "defaultValue": false
-    },
-    {
-      "name": "role",
-      "type": "string",
-      "required": false,
-      "description": "role prop"
     },
     {
       "name": "ariaLabel",
@@ -258,18 +216,6 @@
       "type": "string",
       "required": false,
       "description": "title prop"
-    },
-    {
-      "name": "tabIndex",
-      "type": "number",
-      "required": false,
-      "description": "tabIndex prop"
-    },
-    {
-      "name": "style",
-      "type": "object",
-      "required": false,
-      "description": "style prop"
     }
   ],
   "meta": {

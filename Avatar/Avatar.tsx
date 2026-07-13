@@ -41,6 +41,7 @@ export interface AvatarProps {
 export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
   function Avatar(props, ref) {
     const { src = '', name = '', icon, fallback, children, fallbackDelayMs = 0, className } = props
+    const hasImageSource = src.trim().length > 0
 
     const { state, send } = useMachine(avatarMachine, {
       src,
@@ -55,7 +56,7 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
 
     return (
       <span ref={ref} {...api.getRootProps()} className={cn('uf-avatar', className)}>
-        <img key="image" {...api.getImageProps()} />
+        {hasImageSource ? <img key="image" {...api.getImageProps()} /> : null}
         <span key="fallback" {...api.getFallbackProps()}>
           <span className="uf-avatar__content">
             {fallbackContent}

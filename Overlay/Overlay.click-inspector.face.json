@@ -36,12 +36,6 @@
       },
       "sideOffset": {
         "$ref": "props.sideOffset"
-      },
-      "onOpenChange": {
-        "$ref": "props.onOpenChange"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -138,18 +132,6 @@
       "required": false,
       "description": "Offset from the trigger along the side axis (px).",
       "defaultValue": 2
-    },
-    {
-      "name": "onOpenChange",
-      "type": "function",
-      "required": false,
-      "description": "Called when the open state changes."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name for the content element."
     }
   ],
   "meta": {

@@ -1,5 +1,9 @@
 # Face UI — Deep Production Audit (master)
 
+> Historical snapshot: this audit records the pre-consolidation API. Public
+> `Drawer` and `Sheet` were removed after the audit; their centered and edge
+> surface use cases now belong to `Modal` through `placement` and `edge`.
+
 > Date: 2026-07-09 · Scope: `@userface/face-ui-react` (48 components, design-system, runtime CSS) + how `userface-app` consumes it.
 > Goal: bring the library to enterprise/production grade — remove legacy, systematize props/states/variants/styles — **without breaking the app**.
 > This is the index + synthesis. Per-area detail lives in the sibling files (`01`…`08`).

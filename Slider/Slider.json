@@ -63,23 +63,6 @@
       "required": false,
       "description": "Label content."
     },
-    "onValueChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when value changes."
-    },
-    "leading": {
-      "type": "enum",
-      "required": false,
-      "description": "Leading content mode for the advanced slider.",
-      "options": [
-        "none",
-        "icon",
-        "text",
-        "iconText"
-      ],
-      "default": "none"
-    },
     "leadingIcon": {
       "type": "string",
       "required": false,
@@ -111,16 +94,6 @@
       "required": false,
       "description": "Clamp the value to the crop range.",
       "default": true
-    },
-    "onCropChange": {
-      "type": "function",
-      "required": false,
-      "description": "Called when the crop range changes."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   },
   "states": [
@@ -151,7 +124,6 @@
         "defaultValue": [
           42
         ],
-        "leading": "text",
         "leadingText": "Zoom"
       }
     },
@@ -169,7 +141,6 @@
           "max": 80
         },
         "cropLocksValue": true,
-        "leading": "text",
         "leadingText": "Crop"
       }
     },

@@ -34,12 +34,6 @@
       "label": {
         "$ref": "props.label"
       },
-      "onValueChange": {
-        "$ref": "props.onValueChange"
-      },
-      "leading": {
-        "$ref": "props.leading"
-      },
       "leadingIcon": {
         "$ref": "props.leadingIcon"
       },
@@ -57,12 +51,6 @@
       },
       "cropLocksValue": {
         "$ref": "props.cropLocksValue"
-      },
-      "onCropChange": {
-        "$ref": "props.onCropChange"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -77,7 +65,6 @@
       "min": 0,
       "max": 100,
       "step": 1,
-      "leading": "iconText",
       "leadingIcon": "component",
       "leadingText": "Creative"
     }
@@ -152,25 +139,6 @@
       "description": "Label content."
     },
     {
-      "name": "onValueChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when value changes."
-    },
-    {
-      "name": "leading",
-      "type": "select",
-      "required": false,
-      "description": "Leading content mode for the advanced slider.",
-      "options": [
-        "none",
-        "icon",
-        "text",
-        "iconText"
-      ],
-      "defaultValue": "none"
-    },
-    {
       "name": "leadingIcon",
       "type": "string",
       "required": false,
@@ -207,18 +175,6 @@
       "required": false,
       "description": "Clamp the value to the crop range.",
       "defaultValue": true
-    },
-    {
-      "name": "onCropChange",
-      "type": "function",
-      "required": false,
-      "description": "Called when the crop range changes."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   ],
   "meta": {

@@ -191,7 +191,7 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
         if (hasItems) {
           return (
             <div key={item.id} className="uf-navigation-sheetGroup">
-              <Text as="div" variant="label" className="uf-navigation-sheetGroupTitle">
+              <Text as="div" className="uf-navigation-sheetGroupTitle">
                 {item.label}
               </Text>
               <div className="uf-navigation-sheetGroupItems">
@@ -241,7 +241,7 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
           />
           <Card
             padding="default"
-            radius="lg"
+            radius="md"
             className="uf-responsive-panel uf-navigation-sheet"
             data-state={sheetOpen ? 'open' : 'closed'}
           >

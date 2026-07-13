@@ -1391,14 +1391,14 @@ describe('responsive overlay surfaces', () => {
     expect(container.textContent).toContain('Typefaces')
   })
 
-  it('Modal compact drawers contain focus and restore trigger focus', async () => {
+  it('Modal edge placement contains focus and restores trigger focus', async () => {
     await act(async () => {
       root.render(
         <Modal
-          trigger="Open drawer"
-          title="Responsive drawer"
-          surface="auto"
-          variant="right"
+          trigger="Open inspector"
+          title="Responsive inspector"
+          placement="right"
+          edge="flush"
           actions={[
             { label: 'Cancel', variant: 'outline' },
             { label: 'Save', variant: 'accent' },
@@ -1410,7 +1410,7 @@ describe('responsive overlay surfaces', () => {
     })
 
     const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button'))
-      .find((button) => button.textContent?.includes('Open drawer')) ?? null
+      .find((button) => button.textContent?.includes('Open inspector')) ?? null
     expect(trigger).not.toBeNull()
 
     trigger?.focus()
@@ -1428,7 +1428,7 @@ describe('responsive overlay surfaces', () => {
     const close = dialog?.querySelector<HTMLButtonElement>('[data-part="close"]') ?? null
 
     expect(dialog?.hidden).toBe(false)
-    expect(dialog?.getAttribute('data-surface')).toBe('sheet')
+    expect(dialog?.getAttribute('data-edge')).toBe('flush')
     expect(positioner?.getAttribute('data-variant')).toBe('right')
     expect(dialog?.contains(document.activeElement)).toBe(true)
     expect(close).toBe(first)
@@ -1467,14 +1467,12 @@ describe('responsive overlay surfaces', () => {
     expect(document.activeElement).toBe(trigger)
   })
 
-  it('Modal switches auto center surfaces to a bottom sheet on compact viewports', async () => {
+  it('keeps center placement centered on compact viewports', async () => {
     await act(async () => {
       root.render(
         <Modal
           trigger="Open modal"
           title="Responsive modal"
-          surface="auto"
-          variant="center"
         >
           Body
         </Modal>,
@@ -1489,6 +1487,6 @@ describe('responsive overlay surfaces', () => {
     })
 
     const positioner = document.body.querySelector('[data-scope="modal"][data-part="positioner"]') as HTMLElement | null
-    expect(positioner?.getAttribute('data-variant')).toBe('bottom')
+    expect(positioner?.getAttribute('data-variant')).toBe('center')
   })
 })

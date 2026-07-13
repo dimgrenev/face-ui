@@ -25,12 +25,6 @@
       "defaultValue": {
         "$ref": "props.defaultValue"
       },
-      "onValueChange": {
-        "$ref": "props.onValueChange"
-      },
-      "onOpenChange": {
-        "$ref": "props.onOpenChange"
-      },
       "valueFormat": {
         "$ref": "props.valueFormat"
       },
@@ -108,9 +102,6 @@
       },
       "fullWidth": {
         "$ref": "props.fullWidth"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -190,18 +181,6 @@
       "required": false,
       "description": "defaultValue prop",
       "defaultValue": null
-    },
-    {
-      "name": "onValueChange",
-      "type": "function",
-      "required": false,
-      "description": "onValueChange prop"
-    },
-    {
-      "name": "onOpenChange",
-      "type": "function",
-      "required": false,
-      "description": "onOpenChange prop"
     },
     {
       "name": "valueFormat",
@@ -391,12 +370,6 @@
       "required": false,
       "description": "Stretch control to container width",
       "defaultValue": true
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "className prop"
     }
   ],
   "meta": {

@@ -37,12 +37,6 @@
       "textWrap": {
         "$ref": "props.textWrap"
       },
-      "onCheckedChange": {
-        "$ref": "props.onCheckedChange"
-      },
-      "className": {
-        "$ref": "props.className"
-      },
       "membrane": {
         "$ref": "props.membrane"
       }
@@ -130,18 +124,6 @@
         "wrap"
       ],
       "defaultValue": "truncate"
-    },
-    {
-      "name": "onCheckedChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when checked state changes."
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     },
     {
       "name": "membrane",

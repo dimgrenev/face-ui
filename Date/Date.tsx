@@ -265,7 +265,7 @@ export const Date = forwardRef<HTMLDivElement, DateProps>(function Date(props, r
   const contentPanel = (
     <Card
       padding="membrane"
-      radius="base"
+      radius="md"
       fullWidth={resolvedSurface === 'sheet'}
       className="uf-date__contentPanel"
     >
@@ -440,7 +440,7 @@ export const Date = forwardRef<HTMLDivElement, DateProps>(function Date(props, r
       data-full-width={fullWidth ? '' : undefined}
     >
       {label != null ? (
-        <Text as="label" variant="label" className="uf-date__label">
+        <Text as="label" className="uf-date__label">
           {label}
           {required ? ' *' : null}
         </Text>
@@ -499,12 +499,12 @@ export const Date = forwardRef<HTMLDivElement, DateProps>(function Date(props, r
       </div>
 
       {description ? (
-        <Text as="div" variant="label" className="uf-date__description">
+        <Text as="div" className="uf-date__description">
           {description}
         </Text>
       ) : null}
       {error ? (
-        <Text as="div" variant="label" className="uf-date__error">
+        <Text as="div" className="uf-date__error">
           {error}
         </Text>
       ) : null}

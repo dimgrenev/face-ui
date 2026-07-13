@@ -35,20 +35,10 @@
       ],
       "default": "asc"
     },
-    "onSortChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when sort changes."
-    },
     "selectedRows": {
       "type": "array",
       "required": false,
       "description": "Controlled selected row IDs."
-    },
-    "onSelectedRowsChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when selection changes."
     },
     "selectable": {
       "type": "boolean",
@@ -74,16 +64,6 @@
       "description": "Show divider lines between rows.",
       "default": true
     },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
-    },
-    "onColumnResize": {
-      "type": "function",
-      "required": false,
-      "description": "Callback fired while a resizable column is dragged."
-    },
     "resizable": {
       "type": "boolean",
       "required": false,
@@ -95,21 +75,6 @@
       "required": false,
       "description": "Keep the last column visually sticky for dense action tables.",
       "default": false
-    },
-    "onRowClick": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when a row is clicked."
-    },
-    "onRowMouseEnter": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when mouse enters a row."
-    },
-    "onRowMouseLeave": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when mouse leaves a row."
     },
     "activeRowId": {
       "type": "string",

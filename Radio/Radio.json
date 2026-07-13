@@ -45,20 +45,10 @@
       ],
       "default": "vertical"
     },
-    "onValueChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when value changes."
-    },
     "ariaLabel": {
       "type": "string",
       "required": false,
       "description": "Accessible label for the radio group (role=\"radiogroup\" requires a name)."
-    },
-    "ariaLabelledBy": {
-      "type": "string",
-      "required": false,
-      "description": "ID of an element that labels the radio group."
     },
     "disabled": {
       "type": "boolean",
@@ -82,11 +72,6 @@
       "required": false,
       "description": "Outer membrane wrapper around control geometry.",
       "default": true
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
     }
   },
   "states": [

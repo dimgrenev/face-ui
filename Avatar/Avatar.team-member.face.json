@@ -24,9 +24,6 @@
       },
       "fallbackDelayMs": {
         "$ref": "props.fallbackDelayMs"
-      },
-      "className": {
-        "$ref": "props.className"
       }
     },
     "children": []
@@ -78,12 +75,6 @@
       "required": false,
       "description": "Delay in ms before showing fallback (gives image time to load).",
       "defaultValue": 0
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "className prop"
     }
   ],
   "meta": {

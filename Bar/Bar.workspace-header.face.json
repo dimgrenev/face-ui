@@ -23,7 +23,6 @@
         {
           "__componentName__": "Text",
           "text": "Acme Workspace",
-          "variant": "label",
           "truncate": true
         },
         {

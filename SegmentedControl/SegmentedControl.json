@@ -49,16 +49,6 @@
       "required": false,
       "description": "Accessible name for the segmented group."
     },
-    "onValueChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when selected segment values change."
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional CSS class."
-    },
     "membrane": {
       "type": "boolean",
       "required": false,

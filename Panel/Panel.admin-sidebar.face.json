@@ -16,26 +16,17 @@
       "defaultCollapsed": {
         "$ref": "props.defaultCollapsed"
       },
-      "onCollapsedChange": {
-        "$ref": "props.onCollapsedChange"
-      },
       "selectedId": {
         "$ref": "props.selectedId"
       },
       "defaultSelectedId": {
         "$ref": "props.defaultSelectedId"
       },
-      "onSelectedChange": {
-        "$ref": "props.onSelectedChange"
-      },
       "width": {
         "$ref": "props.width"
       },
       "collapsedWidth": {
         "$ref": "props.collapsedWidth"
-      },
-      "className": {
-        "$ref": "props.className"
       },
       "surface": {
         "$ref": "props.surface"
@@ -48,9 +39,6 @@
       },
       "defaultOpen": {
         "$ref": "props.defaultOpen"
-      },
-      "onOpenChange": {
-        "$ref": "props.onOpenChange"
       },
       "trigger": {
         "$ref": "props.trigger"
@@ -111,12 +99,6 @@
       "defaultValue": false
     },
     {
-      "name": "onCollapsedChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when collapsed state changes."
-    },
-    {
       "name": "selectedId",
       "type": "string",
       "required": false,
@@ -127,12 +109,6 @@
       "type": "string",
       "required": false,
       "description": "Uncontrolled initial selected item ID."
-    },
-    {
-      "name": "onSelectedChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when selected item changes."
     },
     {
       "name": "width",
@@ -147,12 +123,6 @@
       "required": false,
       "description": "Width when collapsed.",
       "defaultValue": 60
-    },
-    {
-      "name": "className",
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     },
     {
       "name": "surface",
@@ -184,12 +154,6 @@
       "required": false,
       "description": "Uncontrolled initial drawer state for sheet mode.",
       "defaultValue": false
-    },
-    {
-      "name": "onOpenChange",
-      "type": "function",
-      "required": false,
-      "description": "Callback when drawer state changes."
     },
     {
       "name": "trigger",

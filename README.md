@@ -54,7 +54,7 @@ import { Button } from '@userface/face-ui-react/Button/Button';
 Compatibility aliases live outside the primary barrel:
 
 ```tsx
-import { Sheet, Toggle } from '@userface/face-ui-react/compat';
+import { Toggle } from '@userface/face-ui-react/compat';
 ```
 
 ## Public Surface
@@ -63,7 +63,7 @@ Primitives: `Button`, `Text`, `Icon`, `Separator`, `Tile`.
 
 Forms: `Input`, `Checkbox`, `Radio`, `Switcher`, `SegmentedControl`, `Slider`, `Rating`, `Select`, `Date`, `Calendar`, `Upload`.
 
-Overlays: `Tooltip`, `Popover`, `Menu`, `Modal`, `Drawer`, `Command`.
+Overlays: `Tooltip`, `Popover`, `Menu`, `Modal`, `Command`.
 
 Navigation: `Tabs`, `Accordion`, `Breadcrumb`, `Pagination`, `Steps`, `Navigation`, `Panel`, `Tree`, `Toc`.
 
@@ -76,7 +76,6 @@ Deprecated compatibility names are still shipped for migration, but new code sho
 | `Overlay` | `Tooltip` or `Popover` |
 | `Toggle` | `SegmentedControl` |
 | `Sidebar` | `Panel` |
-| `Sheet` | `Drawer` |
 
 ## Contracts
 

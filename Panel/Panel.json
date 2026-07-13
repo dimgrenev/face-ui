@@ -20,11 +20,6 @@
       "description": "Uncontrolled initial collapsed state.",
       "default": false
     },
-    "onCollapsedChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when collapsed state changes."
-    },
     "selectedId": {
       "type": "string",
       "required": false,
@@ -34,11 +29,6 @@
       "type": "string",
       "required": false,
       "description": "Uncontrolled initial selected item ID."
-    },
-    "onSelectedChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when selected item changes."
     },
     "width": {
       "type": "number",
@@ -51,11 +41,6 @@
       "required": false,
       "description": "Width when collapsed.",
       "default": 60
-    },
-    "className": {
-      "type": "string",
-      "required": false,
-      "description": "Additional class name on the root element."
     },
     "surface": {
       "type": "enum",
@@ -83,11 +68,6 @@
       "required": false,
       "description": "Uncontrolled initial drawer state for sheet mode.",
       "default": false
-    },
-    "onOpenChange": {
-      "type": "function",
-      "required": false,
-      "description": "Callback when drawer state changes."
     },
     "trigger": {
       "type": "string",
@@ -162,7 +142,7 @@
       }
     },
     {
-      "name": "Responsive Sheet",
+      "name": "Compact overlay",
       "props": {
         "items": [
           {
@@ -267,8 +247,8 @@
       "--uf-color-border"
     ],
     "notes": [
-      "Panel uses Button, Icon and Text for item rendering and responsive sheet triggers.",
-      "width and collapsedWidth are layout inputs; sheet width is bridged through --face-runtime-sidebar-sheet-w.",
+      "Panel uses Button, Icon and Text for item rendering and compact-overlay triggers.",
+      "width and collapsedWidth are layout inputs; compact-overlay width is bridged through --face-runtime-sidebar-sheet-w.",
       "Panel remains a higher-risk navigation primitive; behavior refactors require baseline coverage.",
       "Resizable panel handles use --uf-resizable-handle-size for the shared resizable machine CSS."
     ]
@@ -281,12 +261,11 @@
       "Collapsible side section"
     ],
     "whenNotToUse": [
-      "Overlay content (use Modal/Drawer)",
+      "Overlay content (use Modal)",
       "Simple content block (use Card)"
     ],
     "alternatives": [
       "Card",
-      "Drawer",
       "Modal"
     ],
     "context": "app"

@@ -34,7 +34,6 @@ export type ButtonVariant =
   | 'outline'
   | 'ghost'
   | 'destructive'
-  | 'suggestion'
 
 export type ButtonSelectorDirection = 'vertical' | 'side'
 
