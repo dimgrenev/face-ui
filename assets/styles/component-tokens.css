@@ -44,6 +44,10 @@
   --uf-card-bg: var(--uf-overlay-surface-bg);
   --uf-card-background: linear-gradient(var(--uf-card-bg), var(--uf-card-bg)), var(--uf-overlay-surface-underlay-bg);
   --uf-card-padding-default: var(--uf-panel-pad-x);
+  --uf-dropdown-surface-padding: var(--uf-membrane);
+  --uf-dropdown-surface-radius: var(--uf-radius-md);
+  --uf-dropdown-surface-border-width: var(--uf-membrane);
+  --uf-dropdown-option-gap: 0px;
   --uf-badge-bg: var(--uf-color-hover-bg);
   --uf-badge-fg: var(--uf-color-fg);
   --uf-badge-border: var(--uf-color-border);

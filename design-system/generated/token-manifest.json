@@ -2674,6 +2674,32 @@
       ]
     },
     {
+      "name": "uf-dropdown-surface-blur",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/shadows.css",
+      "selectors": [
+        ":root"
+      ],
+      "values": [
+        "var(--uf-overlay-surface-blur)"
+      ]
+    },
+    {
+      "name": "uf-dropdown-surface-shadow",
+      "sheet": "effects",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/shadows.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "none",
+        "var(--uf-shadow-lg)"
+      ]
+    },
+    {
       "name": "uf-elevation-0",
       "sheet": "effects",
       "profile": "design-system",
@@ -3774,6 +3800,60 @@
       ],
       "values": [
         "0"
+      ]
+    },
+    {
+      "name": "uf-dropdown-surface-background",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "linear-gradient(var(--uf-dropdown-surface-bg), var(--uf-dropdown-surface-bg)), var(--uf-dropdown-surface-underlay-bg)"
+      ]
+    },
+    {
+      "name": "uf-dropdown-surface-bg",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-white-100)",
+        "var(--uf-overlay-surface-bg)"
+      ]
+    },
+    {
+      "name": "uf-dropdown-surface-border",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-overlay-surface-border)"
+      ]
+    },
+    {
+      "name": "uf-dropdown-surface-underlay-bg",
+      "sheet": "semantic-surface",
+      "profile": "design-system",
+      "generatedPath": "design-system/tokens/colors.css",
+      "selectors": [
+        ":root,\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']"
+      ],
+      "values": [
+        "var(--uf-color-white-100)",
+        "var(--uf-overlay-surface-underlay-bg)"
       ]
     },
     {

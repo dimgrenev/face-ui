@@ -491,7 +491,7 @@ describe('taxonomy and governance', () => {
     expect(contents[1]?.getAttribute('data-trigger')).toBe('click')
   })
 
-  it('keeps Tooltip colors theme-invariant while overlay surfaces can theme', () => {
+  it('keeps dropdown and overlay surfaces theme-aware while Tooltip colors stay invariant', () => {
     expect(tokensCss).toContain('--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
     expect(tokensCss).toContain('--uf-overlay-surface-bg: var(--uf-color-white-100);')
     expect(designSystemColorCss).toContain('--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
@@ -499,6 +499,13 @@ describe('taxonomy and governance', () => {
     expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-black-96);')
     expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-white-100);')
     expect(tokensCss).toContain('--uf-overlay-surface-background: linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg);')
+    expect(tokensCss).toContain('--uf-dropdown-surface-bg: var(--uf-overlay-surface-bg);')
+    expect(tokensCss).toContain('--uf-dropdown-surface-bg: var(--uf-color-white-100);')
+    expect(tokensCss).toContain('--uf-dropdown-surface-underlay-bg: var(--uf-overlay-surface-underlay-bg);')
+    expect(tokensCss).toContain('--uf-dropdown-surface-underlay-bg: var(--uf-color-white-100);')
+    expect(tokensCss).toContain('--uf-dropdown-surface-background: linear-gradient(var(--uf-dropdown-surface-bg), var(--uf-dropdown-surface-bg)), var(--uf-dropdown-surface-underlay-bg);')
+    expect(designSystemColorCss).toContain('--uf-dropdown-surface-bg: var(--uf-overlay-surface-bg);')
+    expect(designSystemColorCss).toContain('--uf-dropdown-surface-bg: var(--uf-color-white-100);')
     expect(tokensCss).toContain('--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
     expect(tokensCss).toContain('--uf-tooltip-background: linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-96);')
     expect(tokensCss).toContain('--uf-tooltip-fg: var(--uf-color-white-92);')

@@ -252,6 +252,30 @@
     },
     {
       "sheet": "effects",
+      "name": "--uf-dropdown-surface-blur",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-overlay-surface-blur)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
+      "name": "--uf-dropdown-surface-shadow",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "none"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-shadow-lg)"
+        }
+      ]
+    },
+    {
+      "sheet": "effects",
       "name": "--uf-overlay-enter-y",
       "variants": [
         {

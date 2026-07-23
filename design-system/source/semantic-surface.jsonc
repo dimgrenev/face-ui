@@ -270,6 +270,62 @@
     },
     {
       "sheet": "semantic-surface",
+      "name": "--uf-dropdown-surface-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-overlay-surface-bg)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-white-100)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-dropdown-surface-underlay-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-overlay-surface-underlay-bg)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-color-white-100)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-dropdown-surface-background",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "linear-gradient(var(--uf-dropdown-surface-bg), var(--uf-dropdown-surface-bg)), var(--uf-dropdown-surface-underlay-bg)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "linear-gradient(var(--uf-dropdown-surface-bg), var(--uf-dropdown-surface-bg)), var(--uf-dropdown-surface-underlay-bg)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
+      "name": "--uf-dropdown-surface-border",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='dark']",
+          "value": "var(--uf-overlay-surface-border)"
+        },
+        {
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
+          "value": "var(--uf-overlay-surface-border)"
+        }
+      ]
+    },
+    {
+      "sheet": "semantic-surface",
       "name": "--uf-tooltip-bg",
       "variants": [
         {

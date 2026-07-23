@@ -28,11 +28,13 @@
       "title": "Effects",
       "generatedPath": "design-system/tokens/shadows.css",
       "previewKind": "effects",
-      "tokenCount": 22,
+      "tokenCount": 24,
       "selectors": [
         ":root",
+        ":root,\n[data-theme='dark']",
         ":root[data-theme='dark'],\n:root:not([data-theme])",
-        ":root[data-theme='light']"
+        ":root[data-theme='light']",
+        ":root[data-theme='light'],\n[data-theme='light']"
       ],
       "sampleTokens": [
         "uf-shadow-none",
@@ -110,7 +112,7 @@
       "title": "Semantic / Surface",
       "generatedPath": "design-system/tokens/colors.css",
       "previewKind": "semantic",
-      "tokenCount": 26,
+      "tokenCount": 30,
       "selectors": [
         ":root,\n[data-theme='dark']",
         ":root[data-theme='light'],\n[data-theme='light']"
