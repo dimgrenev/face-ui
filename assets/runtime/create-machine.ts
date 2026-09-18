@@ -1,5 +1,5 @@
 /**
- * @face-ui/core — State Machine Runtime
+ * Face UI — State Machine Runtime
  *
  * Framework-agnostic finite state machine.
  * ~330 LOC, zero dependencies.

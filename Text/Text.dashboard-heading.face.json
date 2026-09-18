@@ -78,7 +78,7 @@
       "name": "variant",
       "type": "select",
       "required": false,
-      "description": "Semantic typography role. Body is the canonical default.",
+      "description": "Typography treatment. `markdown` supplies paragraph rhythm; it does not parse Markdown.",
       "options": [
         "body",
         "heading",

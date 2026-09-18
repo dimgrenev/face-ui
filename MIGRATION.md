@@ -17,6 +17,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `UseDismissOutsideOptions` from `assets/adapters/react/use-dismiss-outside` | The options of `useLayer` from `assets/adapters/react/use-layer` | manual |
 | `useFocusTrap` from `assets/adapters/react/use-focus-trap` | `useLayer` from `assets/adapters/react/use-layer` | manual |
 | `installMembraneInteractions` from `assets/membrane-interactions` | Remove the call; each component owns its membrane | manual |
+| `FormControlProps` | `FieldProps` for label, description, error and labelPosition; each control declares disabled, required, name, membrane and className itself | manual |
 
 ### Avatar
 
@@ -113,6 +114,12 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `InputTextLayout` | The boolean `multiline` prop | manual |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the native input or textarea; `className` and `style` still style the outer layout | — |
 
+### Menu
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| The `.uf-menu` root was a `<div>` | It is a `<span>`, so a Menu is valid inside a `<p>`; select it by class | — |
+
 ### Modal
 
 | Before | After | Codemod |
@@ -167,6 +174,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `computeSelectSideOptionViewportHeight` from `Select/Select` | `computeSelectSideOptionViewportHeight` from `Select/select-side-position` | auto |
 | `SelectSidePosition` from `Select/Select` | `SelectSidePosition` from `Select/select-side-position` | auto |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the native trigger `<button>` | — |
+| The `.uf-select` root and `.uf-select-wrapper` were `<div>`s | Both are `<span>`s, so a Select is valid inside a `<p>`; select them by class | — |
 
 ### Slider
 

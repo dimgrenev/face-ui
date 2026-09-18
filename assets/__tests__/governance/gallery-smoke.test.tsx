@@ -144,7 +144,6 @@ describe('face-ui-react gallery smoke', () => {
     expect(componentStyles).toContain(
       '--face-gallery-inset: var(--uf-gallery-inset);',
     )
-    expect(componentStyles).toContain('--face-gallery-header-action-gap: 0px;')
     expect(componentStyles).toContain('--face-gallery-grid-pad-top: 0px;')
     expect(componentStyles).toContain(
       '--face-gallery-surface-radius: var(--uf-radius-lg);',

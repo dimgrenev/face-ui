@@ -16,6 +16,8 @@ const dom = (name: string) => ({
 })
 
 export default defineConfig({
+  // Pin the root so `include`/`setupFiles` resolve from the repo, not the cwd.
+  root: import.meta.dirname,
   oxc: { jsx: { runtime: 'automatic' } },
   test: {
     exclude: ['**/node_modules/**', '**/.claude/**'],

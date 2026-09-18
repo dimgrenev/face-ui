@@ -1,5 +1,5 @@
 /**
- * @face-ui/core — Anatomy
+ * Face UI — Anatomy
  *
  * Generates data-scope/data-part attributes for CSS targeting.
  * Example: createAnatomy('checkbox').parts('root', 'control', 'indicator')

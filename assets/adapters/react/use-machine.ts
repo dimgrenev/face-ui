@@ -1,7 +1,7 @@
 /**
  * React adapter — useMachine hook
  *
- * Connects a @face-ui/core machine to React via useSyncExternalStore.
+ * Connects a Face UI state machine to React via useSyncExternalStore.
  * Second argument is flat Partial<TSchema['context']> — no wrapping.
  */
 

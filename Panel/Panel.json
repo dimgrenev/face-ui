@@ -224,8 +224,7 @@
       "--uf-sidebar-section-gap",
       "--face-runtime-sidebar-sheet-w",
       "--uf-sidebar-sheet-w-default",
-      "--uf-sidebar-sheet-viewport-gap",
-      "--uf-resizable-handle-size"
+      "--uf-sidebar-sheet-viewport-gap"
     ],
     "semanticFallbacks": [
       "--uf-content-inset",
@@ -249,8 +248,7 @@
     "notes": [
       "Panel uses Button, Icon and Text for item rendering and compact-overlay triggers.",
       "width and collapsedWidth are layout inputs; compact-overlay width is bridged through --face-runtime-sidebar-sheet-w.",
-      "Panel remains a higher-risk navigation primitive; behavior refactors require baseline coverage.",
-      "Resizable panel handles use --uf-resizable-handle-size for the shared resizable machine CSS."
+      "Panel remains a higher-risk navigation primitive; behavior refactors require baseline coverage."
     ]
   },
   "platform": {},

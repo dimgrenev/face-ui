@@ -40,7 +40,7 @@
       "name": "appearance",
       "type": "select",
       "required": false,
-      "description": "Fill or outline appearance",
+      "description": "Fill or outline treatment.",
       "options": [
         "fill",
         "outline"
@@ -51,7 +51,7 @@
       "name": "tone",
       "type": "select",
       "required": false,
-      "description": "Semantic status tone. Combines with fill or outline appearance.",
+      "description": "Semantic status tone, independent from appearance.",
       "options": [
         "neutral",
         "accent",

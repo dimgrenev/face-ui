@@ -38,6 +38,12 @@
       "codemod": "manual"
     },
     {
+      "kind": "export",
+      "from": "FormControlProps",
+      "to": "`FieldProps` for label, description, error and labelPosition; each control declares disabled, required, name, membrane and className itself",
+      "codemod": "manual"
+    },
+    {
       "kind": "remove-prop",
       "component": "Avatar",
       "prop": "icon",
@@ -403,6 +409,12 @@
     },
     {
       "kind": "behavior",
+      "component": "Menu",
+      "before": "The `.uf-menu` root was a `<div>`",
+      "after": "It is a `<span>`, so a Menu is valid inside a `<p>`; select it by class"
+    },
+    {
+      "kind": "behavior",
       "component": "Modal",
       "before": "`scrollLock` defaulted to `false`",
       "after": "`scrollLock` defaults to `portal`: a portaled modal locks page scroll unless `scrollLock={false}`"
@@ -545,6 +557,12 @@
       "component": "Select",
       "before": "`ref` pointed to the wrapper `<div>`",
       "after": "`ref` points to the native trigger `<button>`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "The `.uf-select` root and `.uf-select-wrapper` were `<div>`s",
+      "after": "Both are `<span>`s, so a Select is valid inside a `<p>`; select them by class"
     },
     {
       "kind": "remove-prop",

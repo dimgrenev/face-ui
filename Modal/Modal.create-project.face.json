@@ -87,7 +87,7 @@
       "name": "placement",
       "type": "select",
       "required": false,
-      "description": "Viewport placement of the modal surface.",
+      "description": "Where the modal is anchored in the viewport.",
       "options": [
         "center",
         "left",
@@ -101,7 +101,7 @@
       "name": "edge",
       "type": "select",
       "required": false,
-      "description": "Inset adds the system viewport gap, radius, and border; flush attaches the surface to its placement edge.",
+      "description": "Inset surfaces use the system viewport gap, radius, and border.",
       "options": [
         "inset",
         "flush"
@@ -112,13 +112,13 @@
       "name": "width",
       "type": "number",
       "required": false,
-      "description": "Preferred surface width in pixels, constrained by the viewport."
+      "description": "Surface width in px, capped by the available viewport width."
     },
     {
       "name": "height",
       "type": "number",
       "required": false,
-      "description": "Preferred surface height in pixels, constrained by the viewport."
+      "description": "Surface height in px, capped by the available viewport height."
     },
     {
       "name": "open",

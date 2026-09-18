@@ -27,7 +27,7 @@
     "density": {
       "type": "enum",
       "required": false,
-      "description": "Internal spacing density. Default follows the shared control rhythm; spacious gives inspection rows more breathing room.",
+      "description": "Density adjusts internal padding while keeping the shared control rhythm.",
       "options": [
         "default",
         "spacious"
@@ -37,7 +37,7 @@
     "tone": {
       "type": "enum",
       "required": false,
-      "description": "Semantic visual tone for row foreground and hover treatment.",
+      "description": "Semantic visual tone for muted, accent, status, or destructive rows.",
       "options": [
         "neutral",
         "muted",
@@ -51,7 +51,7 @@
     "actionVisibility": {
       "type": "enum",
       "required": false,
-      "description": "Reveal on hover/focus/active; hover on hover/focus; always; hidden. Hoverless devices expose reveal/hover actions.",
+      "description": "Controls how the actions slot is revealed.",
       "options": [
         "reveal",
         "hover",
@@ -78,12 +78,12 @@
     "leading": {
       "type": "ReactNode",
       "required": false,
-      "description": "Isolated leading slot for nested controls. Use icon for decorative icons and leading for actionable controls."
+      "description": "Isolated leading slot for nested controls such as disclosure or file action buttons."
     },
     "meta": {
       "type": "ReactNode",
       "required": false,
-      "description": "Trailing non-interactive metadata rendered before actions."
+      "description": "Non-interactive trailing metadata rendered before actions."
     },
     "disabled": {
       "type": "boolean",
@@ -100,7 +100,7 @@
     "interactive": {
       "type": "boolean",
       "required": false,
-      "description": "Override interactive semantics. Set false for section/header rows that should not expose button behavior."
+      "description": "Enable a primary action; inferred from onClick or an explicit button/tab role."
     },
     "stretchText": {
       "type": "boolean",
@@ -123,7 +123,7 @@
     "aria-expanded": {
       "type": "boolean",
       "required": false,
-      "description": "Native disclosure state; also orients chevron.",
+      "description": "Expanded state of the controlled region; also orients chevron.",
       "options": [
         "false",
         "true"
@@ -132,7 +132,7 @@
     "aria-busy": {
       "type": "boolean",
       "required": false,
-      "description": "Native row-region busy state; changes cursor without disabling.",
+      "description": "Busy state of the row region, reflected by the wait cursor.",
       "options": [
         "false",
         "true"
@@ -205,6 +205,7 @@
         "text": "Project",
         "icon": "folder",
         "chevron": "down",
+        "interactive": true,
         "aria-expanded": true,
         "actionVisibility": "hover",
         "actions": "[Button icon=plus]"

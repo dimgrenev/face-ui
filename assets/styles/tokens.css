@@ -845,9 +845,6 @@
   --uf-sidebar-sheet-w-default: 320px;
   --uf-sidebar-sheet-viewport-gap: var(--uf-spacing-3);
   --uf-sidebar-inset: var(--uf-panel-pad-x);
-  --uf-resizable-handle-size: var(--uf-workspace-resize-line-width, 1px);
-  --uf-resizable-handle-hit-size: var(--uf-workspace-resize-hit-size, 20px);
-  --uf-resizable-handle-hit-offset: calc((var(--uf-resizable-handle-hit-size) - var(--uf-resizable-handle-size)) / -2);
   --uf-navigation-content-min-width: 220px;
   --uf-navigation-nested-inset: var(--uf-spacing-3);
   --uf-navigation-sheet-viewport-gap: var(--uf-spacing-3);
@@ -991,6 +988,5 @@
   --uf-badge-bg: var(--uf-color-hover-bg);
   --uf-badge-fg: var(--uf-color-fg);
   --uf-badge-border: var(--uf-color-border);
-  --uf-resizable-handle-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-color-border-hover));
   --uf-table-resize-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-color-border-hover));
 }

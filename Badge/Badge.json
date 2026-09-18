@@ -12,7 +12,7 @@
     "appearance": {
       "type": "enum",
       "required": false,
-      "description": "Fill or outline appearance",
+      "description": "Fill or outline treatment.",
       "options": [
         "fill",
         "outline"
@@ -22,7 +22,7 @@
     "tone": {
       "type": "enum",
       "required": false,
-      "description": "Semantic status tone. Combines with fill or outline appearance.",
+      "description": "Semantic status tone, independent from appearance.",
       "options": [
         "neutral",
         "accent",

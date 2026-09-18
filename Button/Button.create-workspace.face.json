@@ -88,7 +88,7 @@
       "name": "variant",
       "type": "select",
       "required": false,
-      "description": "Visual style variant",
+      "description": "Visual variant.",
       "options": [
         "default",
         "primary",
@@ -158,7 +158,7 @@
       "name": "aria-expanded",
       "type": "boolean",
       "required": false,
-      "description": "Standard expanded state; reverses the disclosure chevron when true.",
+      "description": "Standard expanded state, also used to orient the disclosure chevron.",
       "options": [
         "false",
         "true"

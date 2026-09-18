@@ -61,7 +61,7 @@
       "name": "tokenizedLines",
       "type": "array",
       "required": false,
-      "description": "Pre-tokenized lines from a syntax highlighter (e.g. Shiki).\nWhen provided, renders colored tokens instead of plain text.\nEach entry is an array of tokens for that line."
+      "description": "Pre-tokenized lines from a syntax highlighter (e.g. Shiki). When provided, renders colored tokens instead of plain text. Each entry is an array of tokens for that line."
     },
     {
       "name": "title",

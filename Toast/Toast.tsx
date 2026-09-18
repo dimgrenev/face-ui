@@ -5,7 +5,7 @@
  * - `createToastContext()` — factory returning a toaster + hook + component triple
  * - Default singleton: `useToast` hook + `Toaster` component
  *
- * Uses `createToaster()` from `@face-ui/core` which provides its own
+ * Uses `createToaster()` from `assets/machines/toast.machine`, which provides its own
  * subscribe/getSnapshot compatible with `useSyncExternalStore`.
  */
 

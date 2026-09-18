@@ -7,9 +7,7 @@
     "../../*.ts",
     "../../*.tsx",
     "../contracts/**/*.ts",
-    "../../scripts/migrations/*.ts",
-    "../../scripts/browser/**/*.ts",
-    "../../scripts/browser/**/*.tsx"
+    "../../scripts/migrations/*.ts"
   ],
   "exclude": ["./react-19/node_modules"]
 }

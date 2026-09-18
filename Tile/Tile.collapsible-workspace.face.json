@@ -89,6 +89,7 @@
       "tone": "neutral",
       "icon": "folder",
       "chevron": "down",
+      "interactive": true,
       "aria-expanded": false,
       "active": true,
       "fullWidth": true,
@@ -125,7 +126,7 @@
       "name": "density",
       "type": "select",
       "required": false,
-      "description": "Internal spacing density. Default follows the shared control rhythm; spacious gives inspection rows more breathing room.",
+      "description": "Density adjusts internal padding while keeping the shared control rhythm.",
       "options": [
         "default",
         "spacious"
@@ -136,7 +137,7 @@
       "name": "tone",
       "type": "select",
       "required": false,
-      "description": "Semantic visual tone for row foreground and hover treatment.",
+      "description": "Semantic visual tone for muted, accent, status, or destructive rows.",
       "options": [
         "neutral",
         "muted",
@@ -151,7 +152,7 @@
       "name": "actionVisibility",
       "type": "select",
       "required": false,
-      "description": "Reveal on hover/focus/active; hover on hover/focus; always; hidden. Hoverless devices expose reveal/hover actions.",
+      "description": "Controls how the actions slot is revealed.",
       "options": [
         "reveal",
         "hover",
@@ -181,13 +182,13 @@
       "name": "leading",
       "type": "any",
       "required": false,
-      "description": "Isolated leading slot for nested controls. Use icon for decorative icons and leading for actionable controls."
+      "description": "Isolated leading slot for nested controls such as disclosure or file action buttons."
     },
     {
       "name": "meta",
       "type": "any",
       "required": false,
-      "description": "Trailing non-interactive metadata rendered before actions."
+      "description": "Non-interactive trailing metadata rendered before actions."
     },
     {
       "name": "disabled",
@@ -207,7 +208,7 @@
       "name": "interactive",
       "type": "boolean",
       "required": false,
-      "description": "Override interactive semantics. Set false for section/header rows that should not expose button behavior."
+      "description": "Enable a primary action; inferred from onClick or an explicit button/tab role."
     },
     {
       "name": "stretchText",
@@ -229,7 +230,7 @@
       "name": "aria-expanded",
       "type": "boolean",
       "required": false,
-      "description": "Native disclosure state; also orients chevron.",
+      "description": "Expanded state of the controlled region; also orients chevron.",
       "options": [
         "false",
         "true"
@@ -239,7 +240,7 @@
       "name": "aria-busy",
       "type": "boolean",
       "required": false,
-      "description": "Native row-region busy state; changes cursor without disabling.",
+      "description": "Busy state of the row region, reflected by the wait cursor.",
       "options": [
         "false",
         "true"

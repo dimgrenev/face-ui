@@ -79,7 +79,7 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Recursive tree nodes. Nodes may use kind \"button\", \"tile\", or \"custom\", plus icon, rightText, actions, content, or render."
+      "description": "Tree node definitions (recursive)."
     },
     {
       "name": "expandedIds",
