@@ -205,7 +205,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       const withIconsState = {
         name: 'With Icons',
         props: {
-          defaultExpandedIds: ['docs'],
+          defaultExpanded: ['docs'],
           items: [
             {
               value: 'docs',
@@ -915,6 +915,7 @@ const UNCONTROLLED_PROP_PAIRS: Array<[string, string]> = [
   ['collapsed', 'defaultCollapsed'],
   ['selectedId', 'defaultSelectedId'],
   ['expandedIds', 'defaultExpandedIds'],
+  ['expanded', 'defaultExpanded'],
   ['page', 'defaultPage'],
   ['step', 'defaultStep'],
   ['sizes', 'defaultSizes'],

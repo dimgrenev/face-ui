@@ -139,7 +139,7 @@ async function scenarioReports(name: string): Promise<string[]> {
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
   'hostile props': [
-    'Accordion', 'Avatar', 'Breadcrumb', 'Calendar', 'Code', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
+    'Avatar', 'Breadcrumb', 'Calendar', 'Code', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
     'Overlay', 'Pagination', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps', 'Table',
     'Tabs', 'Toc', 'Toggle', 'Tooltip', 'Tree', 'Upload',
   ],

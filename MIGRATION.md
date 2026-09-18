@@ -19,6 +19,15 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `installMembraneInteractions` from `assets/membrane-interactions` | Remove the call; each component owns its membrane | manual |
 | `FormControlProps` | `FieldProps` for label, description, error and labelPosition; each control declares disabled, required, name, membrane and className itself | manual |
 
+### Accordion
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `expandedIds` | `expanded` | auto |
+| `defaultExpandedIds` | `defaultExpanded` | auto |
+| `onExpandedChange`: `details.expandedIds` | `details.expanded` | manual |
+| Malformed `items`, `expandedIds` or `headingLevel` threw during render | The accordion renders with the value normalized and reports it once in development | — |
+
 ### Avatar
 
 | Before | After | Codemod |

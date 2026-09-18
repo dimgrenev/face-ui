@@ -13,11 +13,11 @@
       "icon": {
         "$ref": "props.icon"
       },
-      "expandedIds": {
-        "$ref": "props.expandedIds"
+      "expanded": {
+        "$ref": "props.expanded"
       },
-      "defaultExpandedIds": {
-        "$ref": "props.defaultExpandedIds"
+      "defaultExpanded": {
+        "$ref": "props.defaultExpanded"
       },
       "multiple": {
         "$ref": "props.multiple"
@@ -38,7 +38,7 @@
     "props": {
       "multiple": true,
       "collapsible": true,
-      "defaultExpandedIds": [
+      "defaultExpanded": [
         "profile",
         "security"
       ],
@@ -69,52 +69,52 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Ordered section definitions with unique string values."
+      "description": "Sections in order; an item without a string `value`, or repeating one, is dropped."
     },
     {
       "name": "icon",
       "type": "string",
       "required": false,
-      "description": "Default decorative icon at the start of each trigger; item.icon overrides it."
+      "description": "Decorative icon (an icon name or a node) at the start of every trigger; `item.icon` overrides it."
     },
     {
-      "name": "expandedIds",
+      "name": "expanded",
       "type": "array",
       "required": false,
-      "description": "Controlled section values; absent items are retained for asynchronous lists."
+      "description": "Values of the open sections (controlled); values without a section are kept for items that arrive later."
     },
     {
-      "name": "defaultExpandedIds",
+      "name": "defaultExpanded",
       "type": "array",
       "required": false,
-      "description": "Initial uncontrolled section values; later changes are ignored."
+      "description": "Values of the sections open on mount (uncontrolled); later changes are ignored."
     },
     {
       "name": "multiple",
       "type": "boolean",
       "required": false,
-      "description": "Allow multiple open sections; false displays the first available expanded value.",
+      "description": "Lets several sections stay open; when false, opening one closes the other and only the first open value shows.",
       "defaultValue": true
     },
     {
       "name": "collapsible",
       "type": "boolean",
       "required": false,
-      "description": "Allow users to collapse the last visible open section; does not auto-open a section.",
+      "description": "Lets the user close the last open section; when false its trigger is `aria-disabled` while open.",
       "defaultValue": true
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable all disclosure triggers; panel contents keep their own interactivity.",
+      "description": "Disables every trigger; panel contents keep their own interactivity.",
       "defaultValue": false
     },
     {
       "name": "headingLevel",
       "type": "select",
       "required": false,
-      "description": "Heading level for section triggers in the containing document.",
+      "description": "The `aria-level` of every trigger's heading, an integer from 1 to 6.",
       "options": [
         1,
         2,
