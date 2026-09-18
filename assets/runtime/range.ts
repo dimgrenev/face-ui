@@ -1,5 +1,5 @@
-/** Decimal grid anchored at min. Integer arithmetic avoids rounding away small
- * increments at large offsets, and overflow in (max - min) / step. */
+import { invalidProp } from './props'
+
 const ZERO = BigInt(0)
 const ONE = BigInt(1)
 const TEN = BigInt(10)
@@ -14,13 +14,23 @@ function decimal(value: number) {
 function units(value: ReturnType<typeof decimal>, exponent: number) {
   return value.integer * TEN ** BigInt(value.exponent - exponent)
 }
+/**
+ * Slider's decimal grid anchored at min. Integer arithmetic avoids rounding away
+ * small increments at large offsets, and overflow in (max - min) / step.
+ * Non-finite or crossed bounds become 0..100 (min == max is legal) and a step
+ * that is not positive and finite becomes 1; both are reported.
+ */
 export function createRange(min: number, max: number, step: number) {
-  if (!Number.isFinite(min) || !Number.isFinite(max) || min > max)
-    throw new RangeError(
-      'Slider bounds must be finite and min must not exceed max',
-    )
-  if (!Number.isFinite(step) || step <= 0)
-    throw new RangeError('Slider step must be positive and finite')
+  if (!(Number.isFinite(min) && Number.isFinite(max) && min <= max)) {
+    const prop = Number.isFinite(min) ? 'max' : 'min'
+    invalidProp('Slider', prop, prop === 'min' ? min : max, 'using 0..100')
+    min = 0
+    max = 100
+  }
+  if (!(Number.isFinite(step) && step > 0)) {
+    invalidProp('Slider', 'step', step, 'using 1')
+    step = 1
+  }
   const a = decimal(min),
     b = decimal(max),
     s = decimal(step)
@@ -34,9 +44,7 @@ export function createRange(min: number, max: number, step: number) {
       `${start + (index < ZERO ? ZERO : index > last ? last : index) * stride}e${exponent}`,
     )
   const index = (value: number) => {
-    if (!Number.isFinite(value))
-      throw new RangeError('Slider values must be finite numbers')
-    if (value <= min) return ZERO
+    if (!(value > min)) return ZERO // NaN included
     if (value >= max) return last
     const entry = decimal(value)
     const precision = Math.min(exponent, entry.exponent)
@@ -50,8 +58,11 @@ export function createRange(min: number, max: number, step: number) {
   }
   const upper = at(last)
   if (last > ZERO && (at(ONE) === min || at(last - ONE) === upper))
-    throw new RangeError(
-      'Slider step must change representable values throughout the range',
+    invalidProp(
+      'Slider',
+      'step',
+      step,
+      'keeping it, though some steps cannot change the value',
     )
   return {
     min,

@@ -9,9 +9,9 @@ import {
 import type { Root } from 'react-dom/client'
 import { renderToString } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
-import { Progress, type ProgressProps } from '../../Progress/Progress'
+import { Progress } from '../../Progress/Progress'
 import { Meter } from '../../Meter/Meter'
-import { hydrate, mount } from './harness'
+import { expectDevError, hydrate, mount } from './harness'
 let host: HTMLDivElement, root: Root
 const render = (node: ReactNode) => act(async () => root.render(node))
 beforeEach(() => {
@@ -188,29 +188,56 @@ for (const [name, Component, role] of [
     expect(host.textContent).toBe('99%')
     expect(indicator().dataset.state).not.toMatch(/complete|full/)
   })
-  for (const props of [
-    { value: NaN },
-    { value: Infinity },
-    { max: 0 },
-    { max: -1 },
-    { max: Infinity },
-  ])
-    it(`${name}: invalid numeric input ${JSON.stringify(props)} is rejected instead of inventing a measurement`, () => {
-      expect(() => renderToString(<Component {...props} />)).toThrow(RangeError)
+  for (const [props, message, now] of [
+    [{ value: NaN }, /invalid value NaN; using 0/, '0'],
+    [{ value: Infinity }, /invalid value Infinity; using 0/, '0'],
+    [{ value: 40, max: 0 }, /invalid max 0; using 0\.\.100/, '40'],
+    [{ value: 40, max: -1 }, /invalid max -1; using 0\.\.100/, '40'],
+    [
+      { value: 40, max: Infinity },
+      /invalid max Infinity; using 0\.\.100/,
+      '40',
+    ],
+  ] as const)
+    it(`${name}: invalid numeric input ${JSON.stringify(props)} renders normalized and is reported`, async () => {
+      await expectDevError(
+        () => render(<Component {...props} aria-label="Transfer" />),
+        new RegExp(`^Face UI ${name}: ${message.source}\\.$`),
+      )
+      expect(indicator().getAttribute('aria-valuemin')).toBe('0')
+      expect(indicator().getAttribute('aria-valuemax')).toBe('100')
+      expect(indicator().getAttribute('aria-valuenow')).toBe(now)
+      expect(indicator().getAttribute('aria-valuetext')).toBe(`${now}%`)
     })
-  for (const props of [
-    { tone: 'unknown' },
-    { shape: 'unknown' },
-    { formatValue: false },
-    { formatValue: () => '' },
-    { formatValue: () => '  ' },
-    { formatValue: () => 2 },
-  ])
-    it(`${name}: invalid presentation input ${String(Object.keys(props))} fails at boundary`, () => {
-      expect(() =>
-        renderToString(<Component {...(props as ProgressProps)} />),
-      ).toThrow()
+  for (const result of ['', '  '])
+    it(`${name}: blank formatValue text ${JSON.stringify(result)} falls back to the percentage silently`, async () => {
+      await render(
+        <Component
+          value={70}
+          formatValue={() => result}
+          showValue
+          aria-label="Transfer"
+        />,
+      )
+      expect(indicator().getAttribute('aria-valuetext')).toBe('70%')
+      expect(host.textContent).toBe('70%')
     })
+  it(`${name}: non-text formatValue result falls back to the percentage and is reported`, async () => {
+    await expectDevError(
+      () =>
+        render(
+          <Component
+            value={70}
+            formatValue={(() => 2) as never}
+            aria-label="Transfer"
+          />,
+        ),
+      new RegExp(
+        `^Face UI ${name}: invalid formatValue\\(\\) 2; using "70%"\\.$`,
+      ),
+    )
+    expect(indicator().getAttribute('aria-valuetext')).toBe('70%')
+  })
 }
 it('Progress unknown state hides numeric text, skips formatting, and returns to the latest known value', async () => {
   const formatValue = vi.fn(({ value }) => String(value))
@@ -247,14 +274,22 @@ it('Meter supports nonzero and negative ranges, including opposite finite extrem
     expect(host.textContent).toBe('Reading50%')
   }
 })
-for (const props of [
-  { min: 10, max: 10 },
-  { min: 20, max: 10 },
-  { min: NaN },
-  { min: -Infinity },
-])
-  it(`Meter rejects invalid min ${JSON.stringify(props)}`, () => {
-    expect(() => renderToString(<Meter {...props} />)).toThrow(RangeError)
+for (const [props, message] of [
+  [{ min: 10, max: 10 }, /invalid max 10; using 0\.\.100/],
+  [{ min: 20, max: 10 }, /invalid max 10; using 0\.\.100/],
+  [{ min: NaN }, /invalid min NaN; using 0\.\.100/],
+  [{ min: -Infinity }, /invalid min -Infinity; using 0\.\.100/],
+] as const)
+  it(`Meter renders 0..100 for invalid bounds ${JSON.stringify(props)} and reports them`, async () => {
+    await expectDevError(
+      () => render(<Meter {...props} value={30} aria-label="Reading" />),
+      new RegExp(`^Face UI Meter: ${message.source}\\.$`),
+    )
+    const meter = host.querySelector('[role="meter"]')!
+    expect(meter.getAttribute('aria-valuemin')).toBe('0')
+    expect(meter.getAttribute('aria-valuemax')).toBe('100')
+    expect(meter.getAttribute('aria-valuenow')).toBe('30')
+    expect((meter as HTMLElement).dataset.state).toBe('partial')
   })
 it('Progress and Meter keep IDs and server markup during StrictMode hydration', async () => {
   await act(async () => root.unmount())

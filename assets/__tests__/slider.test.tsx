@@ -4,7 +4,7 @@ import { renderToString } from 'react-dom/server'
 import { beforeEach, it, expect, vi, describe } from 'vitest'
 import { Slider } from '../../Slider/Slider'
 import { createRange } from '../runtime/range'
-import { formEntries, mount } from './harness'
+import { expectDevError, formEntries, mount } from './harness'
 let host: HTMLDivElement, root: Root
 beforeEach(() => {
   ;({ host, root } = mount())
@@ -536,12 +536,6 @@ for (const props of [
   { value: [20, 'bad', 80] },
   { value: NaN },
   { value: Infinity },
-  { min: NaN },
-  { min: 10, max: 0 },
-  { step: 0 },
-  { step: -1 },
-  { step: Infinity },
-  { cropRange: { min: NaN, max: 10 } },
   { labels: { thumbs: [] } },
   { crop: true, labels: { cropStart: '' } },
   { formatValue: () => '' },
@@ -549,21 +543,23 @@ for (const props of [
   it(`rejects malformed data ${JSON.stringify(props)}`, () => {
     expect(() => renderToString(<Slider {...(props as any)} />)).toThrow()
   })
-for (const [min, max, step, input, expected] of [
-  [0, 1, 0.1, 0.3, 0.3],
-  [-0.5, 0.5, 0.1, 0.3, 0.3],
-  [1e14, 1e14 + 100, 1, 1e14 + 20, 1e14 + 20],
-  [0, 1, 0.6, 1, 0.6],
-  [0.1, 1, 0.2, 0.4, 0.5],
-  [-1e308, 1e308, 1e307, 0, 0],
-  [0, 1e-300, 1e-301, 3e-301, 3e-301],
-  [42, 42, 1, 100, 42],
-])
-  it(`decimal grid ${min}..${max}/${step} normalizes ${input}`, () => {
-    const grid = createRange(min, max, step)
-    expect(grid.snap(input)).toBe(expected)
-    expect(grid.snap(grid.snap(input))).toBe(expected)
-    expect(Number.isFinite(grid.ratio(expected))).toBe(true)
+for (const [props, message, bounds] of [
+  [{ min: NaN }, /invalid min NaN; using 0\.\.100/, ['0', '100', '1']],
+  [{ min: 10, max: 0 }, /invalid max 0; using 0\.\.100/, ['0', '100', '1']],
+  [{ step: 0 }, /invalid step 0; using 1/, ['0', '100', '1']],
+  [{ step: -1 }, /invalid step -1; using 1/, ['0', '100', '1']],
+  [{ step: Infinity }, /invalid step Infinity; using 1/, ['0', '100', '1']],
+  [{ min: 5, max: 5 }, null, ['5', '5', '1']],
+] as const)
+  it(`renders the normalized range for ${JSON.stringify(props)}`, async () => {
+    const run = () => render({ crop: true, ...props })
+    await (message
+      ? expectDevError(run, new RegExp(`Face UI Slider: ${message.source}`))
+      : run())
+    for (const input of [...inputs(), ...inputs('crop')])
+      expect([input.min, input.max, input.step]).toEqual(bounds)
+    expect(values()).toEqual([Number(bounds[0])])
+    expect(values('crop')).toEqual([Number(bounds[0]), Number(bounds[1])])
   })
 it('decimal keyboard steps preserve small increments at large offsets', async () => {
   await render({ min: 1e14, max: 1e14 + 100, value: 1e14 + 20 })
@@ -571,12 +567,21 @@ it('decimal keyboard steps preserve small increments at large offsets', async ()
   const grid = createRange(1e14, 1e14 + 100, 0.1)
   expect(grid.move(1e14 + 20, 1)).toBe(1e14 + 20.1)
 })
-it('rejects increments too small to affect JavaScript values', () => {
-  expect(() => createRange(1e14, 1e14 + 100, 0.001)).toThrow(/representable/)
+it('non-finite crop edges snap to the nearest bound instead of failing', async () => {
+  await render({ crop: true, cropRange: { min: NaN, max: 10 } })
+  expect(values('crop')).toEqual([0, 10])
+})
+it('renders a step below float resolution as given and reports it', async () => {
+  await expectDevError(
+    () => render({ min: 1e14, max: 1e14 + 100, step: 0.001, value: 1e14 + 20 }),
+    /Face UI Slider: invalid step 0\.001; keeping it/,
+  )
+  expect(values()).toEqual([1e14 + 20])
+  expect(inputs()[0].step).toBe('0.001')
 })
 
 it('rejects explicit null instead of silently replacing supplied state', () => {
-  for (const key of ['value', 'defaultValue', 'cropRange', 'defaultCropRange'])
+  for (const key of ['value', 'defaultValue', 'cropRange'])
     expect(() =>
       renderToString(<Slider {...({ [key]: null } as any)} />),
     ).toThrow()

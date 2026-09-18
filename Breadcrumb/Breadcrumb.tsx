@@ -116,7 +116,8 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
     const resolvedOverflowLabel = resolveLabel(
       overflowLabel,
       'Show path',
-      'Breadcrumb overflowLabel',
+      'Breadcrumb',
+      'overflowLabel',
     )
     const shouldCollapse = maxItems !== null && items.length > maxItems
     const tailStart = shouldCollapse ? items.length - (maxItems! - 2) : 1

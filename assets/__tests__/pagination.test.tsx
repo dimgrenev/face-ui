@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi, describe } from 'vitest'
 import { Pagination, type PaginationProps } from '../../Pagination/Pagination'
 import { Modal } from '../../Modal/Modal'
-import { mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 let host: HTMLDivElement, root: Root
 beforeEach(() => {
@@ -403,16 +403,29 @@ it('page-name templates permit the number before or after localized text', async
 })
 
 it.each([
-  null,
-  [],
-  { nextPage: 42 },
-  { page: 'Page' },
-  { page: '{page} {page}' },
-])('rejects malformed label dictionaries or templates: %j', (labels) => {
-  expect(() =>
-    renderToStaticMarkup(<Pagination labels={labels as any} />),
-  ).toThrow(RangeError)
-})
+  [null, /invalid labels null; using defaults/],
+  [[], /invalid labels array; using defaults/],
+  [{ nextPage: 42 }, /invalid labels\.nextPage 42; using "Next page"/],
+])(
+  'malformed label dictionary %j renders the defaults and is reported',
+  async (labels, message) => {
+    await expectDevError(
+      () => render({ labels }),
+      new RegExp(`^Face UI Pagination: ${message.source}\\.$`),
+    )
+    for (const name of ['Previous page', 'Next page'])
+      expect(host.querySelector(`button[aria-label="${name}"]`)).not.toBeNull()
+  },
+)
+
+it.each([{ page: 'Page' }, { page: '{page} {page}' }])(
+  'rejects page templates without exactly one {page}: %j',
+  (labels) => {
+    expect(() => renderToStaticMarkup(<Pagination labels={labels} />)).toThrow(
+      RangeError,
+    )
+  },
+)
 
 it('surfaceTitle names the picker independently and falls back to the localized trigger name', async () => {
   await render({
@@ -455,10 +468,19 @@ it.each([undefined, 'Закрыть', ' '])(
   },
 )
 
-it('Modal refuses a non-string close label instead of losing the control name', () => {
-  expect(() =>
-    renderToStaticMarkup(<Modal closeLabel={false as any} />),
-  ).toThrow(RangeError)
+it('Modal keeps its default close name for a non-string close label and reports it', async () => {
+  await expectDevError(
+    () =>
+      act(async () =>
+        root.render(<Modal open title="Pages" closeLabel={false as never} />),
+      ),
+    /^Face UI Modal: invalid closeLabel false; using "Close modal"\.$/,
+  )
+  expect(
+    document
+      .querySelector('.uf-modal-closeButton')
+      ?.getAttribute('aria-label'),
+  ).toBe('Close modal')
 })
 
 describe('component smoke', () => {

@@ -146,7 +146,8 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
     const pickerTitle = resolveLabel(
       surfaceTitle,
       resolvedLabels.choosePage,
-      'Pagination surfaceTitle',
+      'Pagination',
+      'surfaceTitle',
     )
 
     const { state, send } = useMachine(paginationMachine, {

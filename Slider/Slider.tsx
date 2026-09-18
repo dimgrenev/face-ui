@@ -193,9 +193,11 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       return [grid.snap(range.min), grid.snap(range.max)].sort((a, b) => a - b)
     }
     const [initial] = useState(() => ({
-      value: [...numbers(defaultValue === undefined ? min : defaultValue)],
+      value: [...numbers(defaultValue === undefined ? grid.min : defaultValue)],
       crop:
-        defaultCropRange === undefined ? { min, max } : { ...defaultCropRange },
+        defaultCropRange === undefined
+          ? { min: grid.min, max: grid.max }
+          : { ...defaultCropRange },
     }))
     const [internal, setInternal] = useState(initial.value)
     const [internalCrop, setInternalCrop] = useState(initial.crop)
@@ -213,9 +215,9 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const hasLabel = hasSlotContent(label, { trimText: true })
     const labelId = hasLabel ? `${id}-label` : undefined
     const explicitLabel =
-      resolveLabel(ariaLabel, '', 'Slider aria-label') || undefined
+      resolveLabel(ariaLabel, '', 'Slider', 'aria-label') || undefined
     const labelledby =
-      resolveLabel(ariaLabelledby, '', 'Slider aria-labelledby') ||
+      resolveLabel(ariaLabelledby, '', 'Slider', 'aria-labelledby') ||
       (!explicitLabel ? labelId : undefined)
     if (
       labels?.thumbs &&
@@ -623,7 +625,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       const customName =
         custom === undefined
           ? undefined
-          : resolveLabel(custom, '', 'Slider control label')
+          : resolveLabel(custom, '', 'Slider', 'control label')
       if (custom !== undefined && !customName)
         throw new TypeError('Slider control labels must be nonempty')
       const suffixId = `${id}-${kind}-${index}-name`
@@ -660,7 +662,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 form={form}
                 min={low}
                 max={high}
-                step={step}
+                step={grid.step}
                 value={n}
                 disabled={disabled}
                 title={showValue && !isCrop ? text : undefined}
