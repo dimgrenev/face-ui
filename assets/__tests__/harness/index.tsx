@@ -1,3 +1,4 @@
+import { format } from 'node:util'
 import { act, type ReactElement } from 'react'
 import { createRoot, hydrateRoot, type Root } from 'react-dom/client'
 import { renderToString } from 'react-dom/server'
@@ -49,4 +50,54 @@ export const formEntries = (form: HTMLFormElement) =>
  */
 export function allowConsoleError(...patterns: RegExp[]) {
   allowedConsoleErrors.push(...patterns)
+}
+
+/**
+ * Runs `run` (sync, or async like `act`) and fails unless it logged a console.error matching
+ * `pattern`, such as an `invalidProp` report; matching output is swallowed, anything else still
+ * fails the test. Returns what `run` returns.
+ */
+export function expectDevError<R>(run: () => R, pattern: RegExp): R {
+  const previous = console.error
+  let matched = false
+  console.error = (...args: unknown[]) => {
+    if (pattern.test(format(...args))) matched = true
+    else previous(...args)
+  }
+  const settle = () => {
+    console.error = previous
+    if (!matched)
+      throw new Error(
+        `Expected a console.error matching ${pattern} (Face UI reports each distinct message once per test).`,
+      )
+  }
+  let result: R
+  try {
+    result = run()
+  } catch (error) {
+    console.error = previous
+    throw error
+  }
+  const thenable = result as PromiseLike<unknown> | null | undefined
+  if (typeof thenable?.then !== 'function') {
+    settle()
+    return result
+  }
+  // Subscribe synchronously: React's act() thenable warns unless awaited in the same tick.
+  return new Promise((resolve, reject) =>
+    thenable.then(
+      (value) => {
+        try {
+          settle()
+          resolve(value)
+        } catch (error) {
+          reject(error)
+        }
+      },
+      (error) => {
+        console.error = previous
+        reject(error)
+      },
+    ),
+  ) as R
 }

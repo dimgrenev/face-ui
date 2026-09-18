@@ -1,6 +1,7 @@
 import { format } from 'node:util'
 import { act } from 'react'
 import { afterEach, beforeEach } from 'vitest'
+import { resetInvalidPropReports } from '../../runtime/props'
 import { allowedConsoleErrors, views } from './index'
 
 // Every console.error fails the test unless the test declared it with
@@ -34,6 +35,7 @@ afterEach(async () => {
     host.remove()
   }
   allowedConsoleErrors.length = 0
+  resetInvalidPropReports()
   if (unexpected.length)
     throw new Error(
       `Unexpected console.error (declare expected output with allowConsoleError):\n${unexpected.splice(0).join('\n---\n')}`,
