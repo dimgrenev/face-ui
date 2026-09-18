@@ -7,8 +7,20 @@
   "root": {
     "type": "Radio",
     "props": {
-      "options": {
-        "$ref": "props.options"
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "error": {
+        "$ref": "props.error"
+      },
+      "labelPosition": {
+        "$ref": "props.labelPosition"
+      },
+      "items": {
+        "$ref": "props.items"
       },
       "value": {
         "$ref": "props.value"
@@ -52,8 +64,8 @@
       "defaultValue": "annual",
       "name": "billing-cadence",
       "membrane": true,
-      "aria-label": "Billing cadence",
-      "options": [
+      "label": "Billing cadence",
+      "items": [
         {
           "value": "monthly",
           "label": "Monthly"
@@ -67,16 +79,44 @@
   },
   "controls": [
     {
-      "name": "options",
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    {
+      "name": "description",
+      "type": "any",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    {
+      "name": "error",
+      "type": "any",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    {
+      "name": "labelPosition",
+      "type": "select",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
+    },
+    {
+      "name": "items",
       "type": "array",
       "required": false,
-      "description": "Visible options in navigation order. Empty or missing options render an empty group."
+      "description": "Choices in navigation order; an item repeating an earlier value is dropped."
     },
     {
       "name": "value",
       "type": "string",
       "required": false,
-      "description": "Controlled selection; null means no selection. Parent updates do not emit a change."
+      "description": "Controlled selection; `null`, or a value missing from `items`, checks nothing."
     },
     {
       "name": "defaultValue",
@@ -88,7 +128,7 @@
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Visual arrangement and ARIA orientation. Both arrow pairs remain available.",
+      "description": "Stacks the items in a column or a row and sets aria-orientation; all four arrows move either way.",
       "options": [
         "horizontal",
         "vertical"
@@ -99,39 +139,39 @@
       "name": "autoFocus",
       "type": "boolean",
       "required": false,
-      "description": "Focus the selected enabled option, or the first enabled option, on mount.",
+      "description": "Focuses the selected enabled item, else the first enabled one, on mount.",
       "defaultValue": false
     },
     {
       "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Accessible group name when there is no external visible heading."
+      "description": "Names the group when there is no visible `label`."
     },
     {
       "name": "aria-labelledby",
       "type": "string",
       "required": false,
-      "description": "Ids of visible headings that name this group."
+      "description": "Ids of the elements that name the group; wins over `label` and `aria-label`."
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable every option; native inputs leave focus navigation and form submission.",
+      "description": "Disables every item; native inputs leave the tab order and form submission.",
       "defaultValue": false
     },
     {
       "name": "form",
       "type": "string",
       "required": false,
-      "description": "Id of an external native form that owns all options."
+      "description": "Id of an external native form that owns every input."
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Shared outer spacing around each option; preserves native controls when toggled.",
+      "description": "Shared outer spacing around each item; toggling it keeps the native inputs.",
       "defaultValue": true
     },
     {

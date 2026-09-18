@@ -1,68 +1,93 @@
-/** Radio — a flat group of native controls for one mutually exclusive choice. */
+/** Radio — a field of native radio inputs for one choice among visible items. */
 import {
   forwardRef,
   useEffect,
   useRef,
   type HTMLAttributes,
   type InputHTMLAttributes,
-  type KeyboardEvent,
-  type ReactNode,
 } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
-import {
-  radioMachine,
-  connectRadio,
-  getRadioNavigationValue,
-} from '../assets/machines/radio.machine'
-import { cn } from '../assets/utils'
-import { useFormReset } from '../assets/adapters/react/use-form-reset'
-import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
-import { Text } from '../Text/Text'
-import { RadioOnIcon, RadioOffIcon } from '../assets/icons'
+import { composeHandlers } from '../assets/adapters/react/merge-props'
 import { Membrane } from '../assets/adapters/react/Membrane'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useFormReset } from '../assets/adapters/react/use-form-reset'
+import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
+import { createAnatomy } from '../assets/anatomy'
+import { RadioOffIcon, RadioOnIcon } from '../assets/icons'
+import {
+  FieldLayout,
+  idList,
+  useField,
+  type FieldProps,
+} from '../assets/internal/field'
+import type { CollectionItem } from '../assets/internal/item'
+import { readCollection } from '../assets/runtime/collection'
+import { resolveLabel } from '../assets/runtime/labels'
+import { cn } from '../assets/utils'
+import { Text } from '../Text/Text'
 
-export interface RadioOption extends Pick<
-  InputHTMLAttributes<HTMLInputElement>,
-  'id' | 'aria-label' | 'aria-labelledby' | 'aria-describedby'
-> {
-  /** Unique submission value within this group. An empty string is a valid choice. */
+const { getPartAttrs: part } = createAnatomy('radio').parts(
+  'root',
+  'list',
+  'item',
+  'input',
+  'indicator',
+  'label',
+)
+
+/** Keeps the native input focusable and submitted without showing it. */
+const VISUALLY_HIDDEN = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  overflow: 'hidden',
+  clip: 'rect(0,0,0,0)',
+  whiteSpace: 'nowrap',
+  borderWidth: 0,
+} as const
+
+/** One choice of a Radio group; `id` and the naming ARIA attributes go to its native input. */
+export interface RadioItem
+  extends Omit<CollectionItem, 'icon' | 'textValue'>,
+    Pick<
+      InputHTMLAttributes<HTMLInputElement>,
+      'id' | 'aria-label' | 'aria-labelledby' | 'aria-describedby'
+    > {
+  /** Submission value, unique within the group; an empty string is a valid choice. */
   value: string
-  /** Visible label; native option ARIA attributes can supply an alternate name or description. */
-  label: ReactNode
-  /** Prevent choosing this option while retaining an existing selection. */
-  disabled?: boolean
 }
-interface RadioBaseProps extends Omit<
-  HTMLAttributes<HTMLDivElement>,
-  | 'children'
-  | 'dangerouslySetInnerHTML'
-  | 'defaultValue'
-  | 'defaultChecked'
-  | 'role'
-  | 'aria-orientation'
-> {
-  /** Visible options in navigation order. Empty or missing options render an empty group. */
-  options?: ReadonlyArray<RadioOption>
-  /** Controlled selection; null means no selection. Parent updates do not emit a change. */
+
+interface RadioBaseProps
+  extends FieldProps,
+    Omit<
+      HTMLAttributes<HTMLDivElement>,
+      | 'children'
+      | 'dangerouslySetInnerHTML'
+      | 'defaultValue'
+      | 'defaultChecked'
+      | 'role'
+      | 'aria-orientation'
+    > {
+  /** Choices in navigation order; an item repeating an earlier value is dropped. */
+  items?: readonly RadioItem[]
+  /** Controlled selection; `null`, or a value missing from `items`, checks nothing. */
   value?: string | null
   /** Uncontrolled initial selection, restored by form reset. */
   defaultValue?: string
-  /** Visual arrangement and ARIA orientation. Both arrow pairs remain available. */
+  /** Stacks the items in a column or a row and sets aria-orientation; all four arrows move either way. */
   orientation?: 'horizontal' | 'vertical'
-  /** Notify once for a user selection; reselecting, parent updates and reset are silent. */
+  /** Called once per user selection; parent updates, form reset and reselecting are silent. */
   onValueChange?: (details: { value: string }) => void
-  /** Focus the selected enabled option, or the first enabled option, on mount. */
+  /** Focuses the selected enabled item, else the first enabled one, on mount. */
   autoFocus?: boolean
-  /** Accessible group name when there is no external visible heading. */
+  /** Names the group when there is no visible `label`. */
   'aria-label'?: string
-  /** Ids of visible headings that name this group. */
+  /** Ids of the elements that name the group; wins over `label` and `aria-label`. */
   'aria-labelledby'?: string
-  /** Disable every option; native inputs leave focus navigation and form submission. */
+  /** Disables every item; native inputs leave the tab order and form submission. */
   disabled?: boolean
-  /** Id of an external native form that owns all options. */
+  /** Id of an external native form that owns every input. */
   form?: string
-  /** Shared outer spacing around each option; preserves native controls when toggled. */
+  /** Shared outer spacing around each item; toggling it keeps the native inputs. */
   membrane?: boolean
 }
 export type RadioProps = RadioBaseProps &
@@ -74,202 +99,197 @@ export type RadioProps = RadioBaseProps &
         required?: boolean
       }
     | {
-        /** Omit to keep the group out of FormData. */
+        /** Nonempty native group and FormData key; use a distinct name for each independent group in a form. */
         name?: undefined
-        /** A required native radio group must have a nonempty name. */
+        /** Require a selection before submission. Native group validation requires a nonempty name. */
         required?: false
       }
   )
 
-export const Radio = forwardRef<HTMLDivElement, RadioProps>(
-  function Radio(props, ref) {
-    const {
-      options: rawOptions,
-      value,
-      defaultValue,
-      name,
-      form,
-      disabled = false,
-      required = false,
-      autoFocus = false,
-      orientation = 'vertical',
-      onValueChange,
-      className,
-      membrane = true,
-      ...nativeProps
-    } = props
-    const options = Array.isArray(rawOptions) ? rawOptions : []
-    const machineValue = useControllableMachineProp(value, defaultValue ?? null)
-    const { state, send, syncContext } = useMachine(radioMachine, {
-      value: machineValue,
-      itemOrder: options.map((option) => option.value),
-      disabledValues: options
-        .filter((option) => option.disabled)
-        .map((option) => option.value),
-      disabled,
-      orientation,
-      onValueChange,
-    })
-    const api = connectRadio(state, send)
-    const rootRef = useRef<HTMLDivElement>(null)
-    const composedRef = useComposedRefs(rootRef, ref)
-    const formInputRef = useRef<HTMLInputElement>(null)
-    const resetValue = useRef(defaultValue ?? null)
-    useFormReset(formInputRef, () => {
-      const next = value !== undefined ? value : resetValue.current
-      syncContext({ value: next })
-      rootRef.current
-        ?.querySelectorAll<HTMLInputElement>('input[type="radio"]')
-        .forEach((input) => {
-          input.checked = input.value === next
-        })
-    })
-    useEffect(() => {
-      if (!form || !required) return
-      // Firefox can cache an empty required group's validity before an external
-      // form later in the DOM is connected. Refresh after the complete commit.
-      rootRef.current
-        ?.querySelectorAll<HTMLInputElement>('input[type="radio"]')
-        .forEach((input) => {
-          input.required = false
-          input.required = true
-        })
-    }, [form, required, options])
-
-    const navigate = (event: KeyboardEvent<HTMLDivElement>) => {
-      nativeProps.onKeyDown?.(event)
-      if (
-        event.defaultPrevented ||
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey
-      )
-        return
-      const control = event.target as HTMLInputElement
-      if (
-        control.tagName !== 'INPUT' ||
-        control.type !== 'radio' ||
-        control.disabled ||
-        control.closest('[data-scope="radio"][data-part="root"]') !==
-          rootRef.current
-      )
-        return
-      const rtl =
-        control.ownerDocument.defaultView?.getComputedStyle(control)
-          .direction === 'rtl'
-      const direction =
-        event.key === 'ArrowDown'
-          ? 1
-          : event.key === 'ArrowUp'
-            ? -1
-            : event.key === 'ArrowRight'
-              ? rtl
-                ? -1
-                : 1
-              : event.key === 'ArrowLeft'
-                ? rtl
-                  ? 1
-                  : -1
-                : null
-      if (direction === null) return
-      event.preventDefault()
-      const nextValue = getRadioNavigationValue(
-        state.context,
-        control.value,
-        direction,
-      )
-      if (nextValue === undefined) return
-      const next = [
-        ...(rootRef.current?.querySelectorAll<HTMLInputElement>(
-          'input[type="radio"]',
-        ) ?? []),
-      ].find((input) => input.value === nextValue)
-      // Native activation keeps keyboard and pointer on one change/event path.
-      // Space and Enter retain their browser behavior.
-      next?.focus()
-      next?.click()
-    }
-
-    return (
-      <div
-        {...nativeProps}
-        {...api.getRootProps()}
-        ref={composedRef}
-        onKeyDown={navigate}
-        aria-disabled={nativeProps['aria-disabled'] ?? (disabled || undefined)}
-        aria-required={nativeProps['aria-required'] ?? (required || undefined)}
-        className={cn('uf-radio', className)}
-      >
-        {options.map((option, index) => {
-          const {
-            value: optionValue,
-            label,
-            disabled: optionDisabled,
-            ...optionNativeProps
-          } = option
-          const item = { value: optionValue, disabled: optionDisabled }
-          const inputProps = api.getInputProps(item)
-          return (
-            <Membrane
-              key={optionValue}
-              enabled={membrane}
-              fullWidth={orientation === 'vertical'}
-              interactive
-              target="input"
-            >
-              <label
-                {...api.getItemProps(item)}
-                data-icon-left=""
-                className="uf-radio-option uf-option uf-control"
-              >
-                <input
-                  {...optionNativeProps}
-                  {...inputProps}
-                  ref={index === 0 ? formInputRef : undefined}
-                  type="radio"
-                  name={name}
-                  form={form}
-                  value={optionValue}
-                  checked={state.context.value === optionValue}
-                  disabled={disabled || optionDisabled}
-                  required={required}
-                  onKeyDown={undefined}
-                  autoFocus={autoFocus && inputProps.tabIndex === 0}
-                  style={{
-                    position: 'absolute',
-                    width: 1,
-                    height: 1,
-                    overflow: 'hidden',
-                    clip: 'rect(0,0,0,0)',
-                    whiteSpace: 'nowrap',
-                    borderWidth: 0,
-                  }}
-                />
-                <span
-                  className="uf-radio-indicator"
-                  {...api.getIndicatorProps()}
-                  aria-hidden="true"
-                >
-                  {state.context.value === optionValue ? (
-                    <RadioOnIcon />
-                  ) : (
-                    <RadioOffIcon />
-                  )}
-                </span>
-                <Text
-                  {...api.getLabelProps(item)}
-                  as="span"
-                  inset="none"
-                  membrane={false}
-                  className="uf-radio-text"
-                >
-                  {label}
-                </Text>
-              </label>
-            </Membrane>
-          )
-        })}
-      </div>
-    )
+/** A field of native radio inputs for one choice among visible items. */
+export const Radio = forwardRef<HTMLDivElement, RadioProps>(function Radio(
+  {
+    items,
+    value,
+    defaultValue,
+    name,
+    form,
+    disabled = false,
+    required = false,
+    autoFocus = false,
+    orientation = 'vertical',
+    onValueChange,
+    membrane = true,
+    label,
+    description,
+    error,
+    labelPosition,
+    id,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledby,
+    'aria-describedby': ariaDescribedby,
+    'aria-invalid': ariaInvalid,
+    className,
+    onKeyDown,
+    onFocus,
+    onBlur,
+    ...nativeProps
   },
-)
+  ref,
+) {
+  const collection = readCollection<RadioItem>(items, {
+    component: 'Radio',
+    key: (item) => item.value,
+  })
+  const [current, setValue, replaceValue] = useControllableState<
+    string | null
+  >({
+    value,
+    defaultValue: defaultValue ?? null,
+    onChange: (next) => next !== null && onValueChange?.({ value: next }),
+    name: ['Radio', 'value'],
+  })
+  const selected = collection.get(current)?.key ?? null
+  const roving = useRovingFocus({
+    keys: collection.keys,
+    disabled: (key) => disabled || !!collection.get(key)?.disabled,
+    active: selected,
+    orientation: 'both',
+    activateOnMove: true,
+    autoFocus,
+  })
+  const field = useField({
+    id,
+    label,
+    description,
+    error,
+    labelPosition,
+    required,
+    labelable: false,
+    'aria-label': resolveLabel(ariaLabel, '', 'Radio', 'aria-label') || undefined,
+    'aria-labelledby': ariaLabelledby,
+    'aria-describedby': ariaDescribedby,
+    'aria-invalid': ariaInvalid,
+  })
+
+  const listRef = useRef<HTMLDivElement>(null)
+  const firstInput = useRef<HTMLInputElement | null>(null)
+  const inputs = () => [
+    ...(listRef.current?.querySelectorAll<HTMLInputElement>('input') ?? []),
+  ]
+  useEffect(() => {
+    firstInput.current = inputs()[0] ?? null
+  })
+  useFormReset(firstInput, () => {
+    // The browser restored each input's mount-time state, and React rewrites only inputs whose props change.
+    for (const input of inputs()) input.checked = input.value === selected
+    replaceValue()
+  })
+  useEffect(() => {
+    if (!form || !required) return
+    // Firefox can cache an empty required group's validity before an external
+    // form later in the DOM is connected. Refresh after the complete commit.
+    for (const input of inputs()) {
+      input.required = false
+      input.required = true
+    }
+  }, [form, required, items])
+
+  return (
+    <div
+      {...nativeProps}
+      {...field.controlProps}
+      {...field.rootProps}
+      {...part('root')}
+      ref={ref}
+      role="radiogroup"
+      aria-orientation={orientation}
+      aria-invalid={field.invalid || undefined}
+      aria-disabled={nativeProps['aria-disabled'] ?? (disabled || undefined)}
+      aria-required={nativeProps['aria-required'] ?? (required || undefined)}
+      data-orientation={orientation}
+      data-disabled={disabled ? '' : undefined}
+      className={cn('uf-field uf-radio', className)}
+      onKeyDown={composeHandlers(onKeyDown, roving.root.onKeyDown)}
+      onFocus={composeHandlers(onFocus, roving.root.onFocus)}
+      onBlur={composeHandlers(onBlur, roving.root.onBlur)}
+    >
+      <FieldLayout field={field}>
+        <div
+          {...part('list')}
+          ref={listRef}
+          data-orientation={orientation}
+          className="uf-radio__list"
+        >
+          {collection.keys.map((key) => {
+            const { item, disabled: itemDisabled } = collection.get(key)!
+            const off = disabled || itemDisabled
+            const checked = key === selected
+            const stop = roving.item(key)
+            return (
+              <Membrane
+                key={key}
+                enabled={membrane}
+                fullWidth={orientation === 'vertical'}
+                interactive
+                target="input"
+              >
+                <label
+                  {...part('item')}
+                  data-state={checked ? 'checked' : 'unchecked'}
+                  data-disabled={off ? '' : undefined}
+                  data-value={key}
+                  data-icon-left=""
+                  className="uf-radio-option uf-option uf-control"
+                >
+                  <input
+                    {...part('input')}
+                    {...stop}
+                    id={item.id}
+                    aria-label={item['aria-label']}
+                    aria-labelledby={item['aria-labelledby']}
+                    aria-describedby={idList(
+                      item['aria-describedby'],
+                      field.describedBy,
+                    )}
+                    type="radio"
+                    name={name}
+                    form={form}
+                    value={key}
+                    checked={checked}
+                    disabled={off}
+                    required={required}
+                    data-autofocus={
+                      autoFocus && stop.tabIndex === 0 ? '' : undefined
+                    }
+                    // A consumer's preventDefault() on the click cancels the selection, as it cancels the native one.
+                    onChange={(event) => {
+                      if (!event.nativeEvent.defaultPrevented) setValue(key)
+                    }}
+                    style={VISUALLY_HIDDEN}
+                  />
+                  <span
+                    {...part('indicator')}
+                    className="uf-radio-indicator"
+                    aria-hidden="true"
+                  >
+                    {checked ? <RadioOnIcon /> : <RadioOffIcon />}
+                  </span>
+                  <Text
+                    {...part('label')}
+                    as="span"
+                    inset="none"
+                    membrane={false}
+                    className="uf-radio-text"
+                  >
+                    {item.label}
+                  </Text>
+                </label>
+              </Membrane>
+            )
+          })}
+        </div>
+      </FieldLayout>
+    </div>
+  )
+})

@@ -7,7 +7,7 @@ const errors = new WeakMap<Page, string[]>()
 test.afterEach(async ({ page }) => {
   expect(errors.get(page) ?? []).toEqual([])
 })
-const options = [
+const items = [
   { value: 'a', label: 'Alpha' },
   { value: '', label: 'Empty' },
   { value: 'b', label: 'Beta' },
@@ -27,7 +27,7 @@ test('autoFocus, inherited direction and a narrow long label retain usable nativ
     autoFocus: true,
     defaultValue: 'b',
     style: { width: 180 },
-    options: [
+    items: [
       { value: 'a', label: 'Alpha' },
       { value: 'b', label: 'Identifier'.repeat(20) },
       { value: 'c', label: 'Gamma' },
@@ -53,7 +53,7 @@ test('autoFocus, inherited direction and a narrow long label retain usable nativ
         orientation,
         membrane,
         style: { width: 180 },
-        options: [{ value: 'a', label: 'Identifier'.repeat(20) }],
+        items: [{ value: 'a', label: 'Identifier'.repeat(20) }],
       })
       expect(await group.evaluate((n) => n.scrollWidth)).toBeLessThanOrEqual(
         180,
@@ -64,7 +64,7 @@ test('empty value participates in focus, selection, wrapping and form data', { t
   page,
 }) => {
   await render(page, {
-    options,
+    items,
     name: 'choice',
     defaultValue: 'a',
     'aria-label': 'Choice',
@@ -216,14 +216,14 @@ for (const controlled of [false, true, 'change'] as const)
     )
   })
 
-test('options and disabled changes preserve values silently and retain one tab stop', { tag: ['@focus', '@native'] }, async ({
+test('items and disabled changes preserve values silently and retain one tab stop', { tag: ['@focus', '@native'] }, async ({
   page,
 }) => {
   const base = {
     'aria-label': 'Choice',
     name: 'choice',
     defaultValue: '',
-    options,
+    items,
   }
   await render(page, base)
   const inputs = page.locator('[data-radio-fixture] input')
@@ -238,7 +238,7 @@ test('options and disabled changes preserve values silently and retain one tab s
   await expect(inputs.nth(1)).toBeFocused()
   await render(page, {
     ...base,
-    options: [options[2], options[1], { ...options[0], disabled: true }],
+    items: [items[2], items[1], { ...items[0], disabled: true }],
   })
   await expect(inputs.nth(1)).toBeFocused()
   await expect(inputs.nth(1)).toBeChecked()
@@ -336,7 +336,7 @@ for (const theme of ['light', 'dark'])
     )
     const props = {
       'aria-label': 'Choice',
-      options: [
+      items: [
         { value: 'a', label: 'Alpha choice' },
         { value: 'b', label: 'A longer choice that wraps on a narrow surface' },
         { value: 'c', label: 'Unavailable choice', disabled: true },
@@ -390,4 +390,126 @@ for (const theme of ['light', 'dark'])
     expect(violations).toEqual([])
     await render(page, { ...props, hidden: true })
     await expect(group).toBeHidden()
+  })
+
+test('with a shared name the browser never moves the selection by itself', { tag: ['@native', '@focus'] }, async ({
+  page,
+}) => {
+  const radios = page.locator('[data-radio-fixture] input'),
+    checked = page.locator('[data-radio-fixture] input:checked'),
+    submitted = () =>
+      page.evaluate(() =>
+        new FormData(document.querySelector<HTMLFormElement>('#form')!).get(
+          'choice',
+        ),
+      ),
+    values = () =>
+      page.evaluate(() =>
+        (window as any).radioEvents
+          .filter((e: any) => e.type === 'value')
+          .map((e: any) => e.value),
+      )
+  // A parent that refuses every change: arrows move focus, the selection stays.
+  await render(
+    page,
+    { name: 'choice', defaultValue: 'a', 'aria-label': 'Choice' },
+    'refuse',
+  )
+  await radios.nth(0).focus()
+  await page.keyboard.press('ArrowDown')
+  await expect(radios.nth(1)).toBeFocused()
+  await page.keyboard.press('ArrowRight')
+  await expect(radios.nth(2)).toBeFocused()
+  await page.keyboard.press('Space')
+  await expect(checked).toHaveCount(1)
+  await expect(checked).toHaveValue('a')
+  expect(await submitted()).toBe('a')
+  expect(await values()).toEqual(['b', 'c', 'c'])
+  // A canceled click cancels the keyboard selection as it cancels the pointer one.
+  await render(page, { name: 'choice', defaultValue: 'a', 'aria-label': 'Choice' }, false, 'canceled')
+  await page.evaluate(() =>
+    document
+      .querySelector('[data-radio-fixture]')!
+      .addEventListener('click', (event) => event.preventDefault(), true),
+  )
+  await radios.nth(0).focus()
+  await page.keyboard.press('ArrowUp')
+  await expect(radios.nth(2)).toBeFocused()
+  await page.locator('[data-radio-fixture] label').nth(1).click()
+  await expect(checked).toHaveValue('a')
+  expect(await submitted()).toBe('a')
+  // Accepted: exactly one step per arrow, never a second native one.
+  await render(page, { name: 'choice', defaultValue: 'a', 'aria-label': 'Choice' }, false, 'accepted')
+  await radios.nth(0).focus()
+  await page.keyboard.press('ArrowDown')
+  await expect(checked).toHaveValue('b')
+  await page.keyboard.press('ArrowLeft')
+  await expect(checked).toHaveValue('a')
+  expect(await submitted()).toBe('a')
+})
+
+test('submit sends the selection, required blocks an empty group, reset restores the default', { tag: ['@native'] }, async ({
+  page,
+}) => {
+  await render(page, { name: 'choice', required: true, 'aria-label': 'Choice' })
+  const submits = () =>
+    page.evaluate(() =>
+      (window as any).radioEvents
+        .filter((e: any) => e.type === 'submit')
+        .map((e: any) => e.value),
+    )
+  const submit = () =>
+    page.evaluate(() =>
+      document.querySelector<HTMLFormElement>('#form')!.requestSubmit(),
+    )
+  await submit()
+  expect(await submits()).toEqual([])
+  await page.locator('[data-radio-fixture] label').nth(1).click()
+  await submit()
+  expect(await submits()).toEqual(['choice=b'])
+  await page.getByRole('button', { name: 'Reset', exact: true }).click()
+  await expect(page.locator('[data-radio-fixture] input:checked')).toHaveCount(0)
+  await submit()
+  expect(await submits()).toEqual(['choice=b'])
+})
+
+for (const dir of ['ltr', 'rtl'] as const)
+  test(`field label, description and error name and describe the group (${dir})`, { tag: ['@layout', '@a11y'] }, async ({
+    page,
+  }) => {
+    await render(page, {
+      dir,
+      name: 'plan',
+      required: true,
+      label: 'Plan',
+      description: 'Billed monthly',
+      error: 'Choose a plan',
+      labelPosition: 'start',
+    })
+    const group = page.getByRole('radiogroup', { name: 'Plan' })
+    await expect(group).toHaveAccessibleDescription('Billed monthly Choose a plan')
+    await expect(group).toHaveAttribute('aria-invalid', 'true')
+    for (const radio of await group.getByRole('radio').all())
+      await expect(radio).toHaveAccessibleDescription(
+        'Billed monthly Choose a plan',
+      )
+    const label = (await group
+      .locator('[data-scope="field"][data-part="label"]')
+      .boundingBox())!
+    const list = (await group
+      .locator('[data-scope="radio"][data-part="list"]')
+      .boundingBox())!
+    // Beside the list, at its inline start, centered on the first item's line.
+    if (dir === 'ltr') expect(label.x + label.width).toBeLessThanOrEqual(list.x + 1)
+    else expect(list.x + list.width).toBeLessThanOrEqual(label.x + 1)
+    const first = (await page.locator('[data-radio-fixture] label').first().boundingBox())!
+    expect(
+      Math.abs(label.y + label.height / 2 - (first.y + first.height / 2)),
+    ).toBeLessThanOrEqual(2)
+    await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') })
+    const violations = await page.evaluate(async () => {
+      const result = await (window as any).axe.run('[data-radio-fixture]')
+      return result.violations.map((v: any) => v.id)
+    })
+    expect(violations).toEqual([])
   })

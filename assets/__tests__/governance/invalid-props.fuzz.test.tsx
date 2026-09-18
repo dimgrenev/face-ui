@@ -140,7 +140,7 @@ async function scenarioReports(name: string): Promise<string[]> {
 const PENDING = {
   'hostile props': [
     'Accordion', 'Avatar', 'Breadcrumb', 'Calendar', 'Code', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
-    'Overlay', 'Pagination', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps', 'Table',
+    'Overlay', 'Pagination', 'Panel', 'Popover', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps', 'Table',
     'Tabs', 'Toc', 'Toggle', 'Tooltip', 'Tree', 'Upload',
   ],
   'scenario reports': [],

@@ -8,8 +8,8 @@ export default [
       defaultValue: 'annual',
       name: 'billing-cadence',
       membrane: true,
-      'aria-label': 'Billing cadence',
-      options: [
+      label: 'Billing cadence',
+      items: [
         { value: 'monthly', label: 'Monthly' },
         { value: 'annual', label: 'Annual - save 20%' },
       ],
@@ -22,8 +22,9 @@ export default [
       defaultValue: 'balanced',
       name: 'model-quality',
       membrane: true,
-      'aria-label': 'Model quality',
-      options: [
+      label: 'Model quality',
+      description: 'Higher quality answers take longer.',
+      items: [
         { value: 'fast', label: 'Fast' },
         { value: 'balanced', label: 'Balanced' },
         { value: 'quality', label: 'Highest quality' },

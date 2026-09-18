@@ -75,7 +75,7 @@ const cases = {
     <Radio
       membrane={membrane}
       aria-label="Plan"
-      options={[{ value: 'a', label: 'A' }]}
+      items={[{ value: 'a', label: 'A' }]}
     />
   ),
   SegmentedControl: (membrane: boolean) => (

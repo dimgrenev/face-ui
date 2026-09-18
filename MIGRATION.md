@@ -173,6 +173,11 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | --- | --- | --- |
 | `ariaLabel` | `aria-label` | auto |
 | `ariaLabelledBy` | `aria-labelledby` | auto |
+| `options` | `items` | auto |
+| `RadioOption` | `RadioItem` | auto |
+| Options sat directly in the radiogroup root | Items sit in `[data-part="list"]`; the root is a field (`uf-field`) that also holds `label`, `description` and `error` | — |
+| An option repeating a value rendered twice under one React key | The first item with a value wins; later ones are dropped with a development report | — |
+| Home and End did nothing | Home and End focus and select the first and last enabled item | — |
 
 ### Rating
 

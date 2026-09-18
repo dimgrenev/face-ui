@@ -1,65 +1,113 @@
-import React, { act, createRef, StrictMode } from 'react'
-import type { Root } from 'react-dom/client'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { Radio } from '../../Radio/Radio'
+import React, { act, createRef, StrictMode, type ComponentProps } from 'react'
+import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
+import { Radio, type RadioProps } from '../../Radio/Radio'
 import contract from '../../Radio/Radio.json'
-import { installMatchMedia, type MatchMediaRestore } from './harness/match-media'
-import { interpret } from '../create-machine'
-import { radioMachine } from '../machines/radio.machine'
-import { mount } from './harness'
-let root: Root, host: HTMLDivElement
-const options = [
+import {
+  allowConsoleError,
+  expectDevError,
+  formEntries,
+  mount,
+  type View,
+} from './harness'
+import { describeControlled } from './harness/controlled'
+import { describeField } from './harness/field'
+import { describeRoving } from './harness/roving'
+
+const items = [
   { value: 'a', label: 'Alpha' },
   { value: '', label: 'Empty' },
   { value: 'b', label: 'Beta' },
 ]
-const inputs = () => [
+const radios = (host: HTMLElement) => [
   ...host.querySelectorAll<HTMLInputElement>('input[type="radio"]'),
 ]
-const render = (props: Record<string, unknown> = {}) =>
-  act(async () => root.render(<Radio options={options} {...props} />))
-const key = (node: Element, key: string) =>
-  act(async () => {
-    node.dispatchEvent(
-      new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }),
-    )
-  })
-beforeEach(() => {
-  ;({ host, root } = mount())
+const checkedValue = (host: HTMLElement) =>
+  host.querySelector<HTMLInputElement>('input:checked')?.value ?? null
+
+describeControlled<string | null>({
+  name: 'Radio',
+  prop: 'value',
+  values: ['a', 'b'],
+  render: (props) => <Radio items={items} aria-label="Choice" {...props} />,
+  change: (host, to) =>
+    radios(host)
+      .find((input) => input.value === to)!
+      .click(),
+  read: checkedValue,
+  normalizes: ['missing', null],
+  handler: 'onClick',
+  formReset: true,
 })
-describe('Radio prop contract', () => {
-  it('arrows select and focus an empty string value and can leave it in both directions', async () => {
+
+describe('Radio field', () => {
+  // The harness focuses a radio outside act(); useRovingFocus records that focus in state.
+  beforeEach(() =>
+    allowConsoleError(/An update to ForwardRef\(Radio\) inside a test was not wrapped in act/),
+  )
+  describeField('Radio', (props) => (
+    <Radio items={items} name="field-probe" {...(props as RadioProps)} />
+  ))
+})
+
+describeRoving({
+  name: 'Radio',
+  orientation: 'both',
+  selects: true,
+  activateOnMove: checkedValue,
+  render: (props) => <Radio aria-label="Choice" {...props} />,
+  items: radios,
+})
+
+describe('Radio', () => {
+  let view: View
+  const inputs = () => radios(view.host)
+  const render = (props: Partial<ComponentProps<typeof Radio>> = {}) =>
+    act(async () =>
+      view.root.render(
+        <StrictMode>
+          <Radio items={items} {...(props as RadioProps)} />
+        </StrictMode>,
+      ),
+    )
+  const press = (key: string) =>
+    act(async () => {
+      document.activeElement!.dispatchEvent(
+        new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }),
+      )
+    })
+  beforeEach(() => {
+    view = mount()
+  })
+
+  it('an empty string value takes part in arrows, selection and wrapping', async () => {
     const onValueChange = vi.fn()
     await render({ defaultValue: 'a', onValueChange })
     await act(async () => inputs()[0].focus())
-    await key(inputs()[0], 'ArrowDown')
+    await press('ArrowDown')
     expect(inputs()[1].checked).toBe(true)
     expect(document.activeElement).toBe(inputs()[1])
-    await key(inputs()[1], 'ArrowDown')
-    expect(inputs()[2].checked).toBe(true)
-    expect(document.activeElement).toBe(inputs()[2])
-    await key(inputs()[2], 'ArrowUp')
-    expect(document.activeElement).toBe(inputs()[1])
-    await key(inputs()[1], 'ArrowUp')
+    await press('ArrowRight')
+    await press('ArrowDown')
     expect(document.activeElement).toBe(inputs()[0])
-    expect(onValueChange.mock.calls.map(([details]) => details.value)).toEqual([
-      '',
-      'b',
-      '',
-      'a',
-    ])
+    await press('ArrowUp')
+    await press('End')
+    await press('Home')
+    expect(inputs()[0].checked).toBe(true)
+    expect(
+      onValueChange.mock.calls.map(([details]) => details.value),
+    ).toEqual(['', 'b', 'a', 'b', 'a'])
   })
-  it('native group attributes and external form association reach their semantic owner', async () => {
-    const ref = createRef<HTMLDivElement>(),
-      onFocus = vi.fn(),
-      onKeyDown = vi.fn()
+
+  it('native group attributes reach the radiogroup; the list holds the items', async () => {
+    const ref = createRef<HTMLDivElement>()
+    const onFocus = vi.fn()
+    const onKeyDown = vi.fn()
     await render({
-      id: 'choices',
       ref,
+      id: 'choices',
       form: 'settings',
       name: 'choice',
       'aria-label': 'Choices',
-      'aria-labelledby': 'heading',
       'aria-describedby': 'help',
       title: 'Choose',
       dir: 'rtl',
@@ -67,32 +115,182 @@ describe('Radio prop contract', () => {
       onFocus,
       onKeyDown,
     })
-    expect(ref.current?.id).toBe('choices')
-    expect(ref.current?.getAttribute('aria-label')).toBe('Choices')
-    expect(ref.current?.getAttribute('aria-labelledby')).toBe('heading')
-    expect(ref.current?.getAttribute('aria-describedby')).toBe('help')
-    expect(ref.current?.style.width).toBe('320px')
-    expect(ref.current?.dir).toBe('rtl')
-    for (const input of inputs())
+    const root = ref.current!
+    expect(root.getAttribute('role')).toBe('radiogroup')
+    expect(root.id).toBe('choices')
+    expect(root.getAttribute('aria-label')).toBe('Choices')
+    expect(root.getAttribute('aria-describedby')).toBe('help')
+    expect(root.title).toBe('Choose')
+    expect(root.dir).toBe('rtl')
+    expect(root.style.width).toBe('320px')
+    expect(root.className).toBe('uf-field uf-radio')
+    const list = root.querySelector('[data-scope="radio"][data-part="list"]')!
+    expect(list.parentElement).toBe(root)
+    expect(list.querySelectorAll('[data-part="item"]')).toHaveLength(3)
+    for (const input of inputs()) {
       expect(input.getAttribute('form')).toBe('settings')
+      expect(input.getAttribute('data-part')).toBe('input')
+      expect(input.getAttribute('aria-describedby')).toBe('help')
+      // Native radios carry their own role and checked state.
+      expect(input.hasAttribute('role')).toBe(false)
+      expect(input.hasAttribute('aria-checked')).toBe(false)
+    }
     await act(async () => inputs()[0].focus())
-    await key(inputs()[0], 'Tab')
+    await press('Tab')
     expect(onFocus).toHaveBeenCalledTimes(1)
     expect(onKeyDown).toHaveBeenCalledTimes(1)
   })
-  it('unchanged refs stay attached across value and options renders', async () => {
+
+  it('an item id and naming attributes reach its input, before the field description', async () => {
+    await render({
+      id: 'plan',
+      description: 'Billed monthly',
+      items: [
+        {
+          value: 'a',
+          label: <strong>Alpha</strong>,
+          id: 'alpha',
+          'aria-label': 'Alpha plan',
+          'aria-labelledby': 'alpha-heading',
+          'aria-describedby': 'alpha-help',
+        },
+      ],
+    })
+    const [input] = inputs()
+    expect(input.id).toBe('alpha')
+    expect(input.getAttribute('aria-label')).toBe('Alpha plan')
+    expect(input.getAttribute('aria-labelledby')).toBe('alpha-heading')
+    expect(input.getAttribute('aria-describedby')).toBe(
+      'alpha-help plan-description',
+    )
+  })
+
+  it('a repeated value keeps the first item and reports', async () => {
+    const onValueChange = vi.fn()
+    await expectDevError(
+      () =>
+        render({
+          onValueChange,
+          items: [
+            { value: 'a', label: 'First' },
+            { value: 'a', label: 'Second' },
+            { value: 'b', label: 'Beta' },
+          ],
+        }),
+      /^Face UI Radio: invalid items\[1\] key "a"; dropping the duplicate\.$/,
+    )
+    expect(inputs().map((input) => input.labels![0].textContent)).toEqual([
+      'First',
+      'Beta',
+    ])
+    await act(async () => inputs()[0].click())
+    expect(onValueChange).toHaveBeenCalledExactlyOnceWith({ value: 'a' })
+  })
+
+  it('malformed items render an empty or shorter group and report', async () => {
+    await expectDevError(
+      () => render({ items: 'a' as never }),
+      /^Face UI Radio: invalid items "a"; using \[\]\.$/,
+    )
+    expect(inputs()).toHaveLength(0)
+    await expectDevError(
+      () => render({ items: [null, { value: 1, label: 'One' }, items[0]] as never }),
+      /^Face UI Radio: invalid items\[(0\] null|1\] key 1); dropping the item\.$/,
+    )
+    expect(inputs().map((input) => input.value)).toEqual(['a'])
+  })
+
+  it('a non-string aria-label is ignored with a report', async () => {
+    await expectDevError(
+      () => render({ 'aria-label': 5 as never, label: 'Plan' }),
+      /^Face UI Radio: invalid aria-label 5; ignoring it\.$/,
+    )
+    const root = view.host.querySelector('[role="radiogroup"]')!
+    expect(root.hasAttribute('aria-label')).toBe(false)
+    expect(root.getAttribute('aria-labelledby')).toBe(
+      view.host.querySelector('[data-scope="field"][data-part="label"]')!.id,
+    )
+  })
+
+  it('a disabled item keeps an existing selection but is never chosen', async () => {
+    const onValueChange = vi.fn()
+    await render({
+      defaultValue: 'b',
+      onValueChange,
+      items: [
+        { value: 'a', label: 'Alpha' },
+        { value: 'b', label: 'Beta', disabled: true },
+        { value: 'c', label: 'Gamma' },
+      ],
+    })
+    expect(inputs()[1].checked).toBe(true)
+    expect(inputs()[1].disabled).toBe(true)
+    // The selection is disabled, so the first enabled item holds the tab stop.
+    expect(inputs().map((input) => input.tabIndex)).toEqual([0, -1, -1])
+    await act(async () => inputs()[1].click())
+    await act(async () => inputs()[0].focus())
+    await press('ArrowDown')
+    expect(document.activeElement).toBe(inputs()[2])
+    expect(onValueChange.mock.calls).toEqual([[{ value: 'c' }]])
+  })
+
+  it('disabled disables every input and arrows move nothing', async () => {
+    await render({ disabled: true, defaultValue: 'a', name: 'choice' })
+    const root = view.host.querySelector('[role="radiogroup"]')!
+    expect(root.getAttribute('aria-disabled')).toBe('true')
+    expect(root.hasAttribute('data-disabled')).toBe(true)
+    expect(inputs().every((input) => input.disabled)).toBe(true)
+    expect(
+      [...view.host.querySelectorAll('[data-part="item"]')].every((item) =>
+        item.hasAttribute('data-disabled'),
+      ),
+    ).toBe(true)
+  })
+
+  it('root capture and bubble listeners cancel keyboard and pointer selection', async () => {
+    const onValueChange = vi.fn()
+    await render({
+      defaultValue: 'a',
+      onValueChange,
+      onKeyDownCapture: (event: React.KeyboardEvent) => event.preventDefault(),
+    })
+    await act(async () => inputs()[0].focus())
+    await press('ArrowDown')
+    expect(document.activeElement).toBe(inputs()[0])
+    await render({
+      defaultValue: 'a',
+      onValueChange,
+      onKeyDown: (event: React.KeyboardEvent) => event.preventDefault(),
+      onClick: (event: React.MouseEvent) => event.preventDefault(),
+    })
+    await press('ArrowDown')
+    await act(async () => inputs()[2].click())
+    expect(inputs()[0].checked).toBe(true)
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  it('autoFocus focuses the selected enabled input and marks it for layers', async () => {
+    await render({ defaultValue: '', autoFocus: true })
+    expect(document.activeElement).toBe(inputs()[1])
+    expect(
+      inputs().map((input) => input.hasAttribute('data-autofocus')),
+    ).toEqual([false, true, false])
+  })
+
+  it('unchanged refs stay attached across value and items renders', async () => {
     const ref = vi.fn()
-    await render({ ref })
+    await render({ ref, value: 'a' })
     ref.mockClear()
-    await render({ ref, value: 'b', options: [...options] })
+    await render({ ref, value: 'b', items: [...items] })
     expect(ref).not.toHaveBeenCalled()
   })
+
   it.skipIf(!React.version.startsWith('19.'))(
     'callback ref cleanup is honored on replacement and unmount in StrictMode',
     async () => {
-      const active = new Set<Element>(),
-        cleanup = vi.fn()
-      const ref = (node: Element | null) => {
+      const active = new Set<Element>()
+      const cleanup = vi.fn()
+      const ref = (node: HTMLDivElement | null) => {
         expect(node).not.toBeNull()
         if (!node) return
         active.add(node)
@@ -101,247 +299,49 @@ describe('Radio prop contract', () => {
           cleanup()
         }
       }
-      await act(async () =>
-        root.render(
-          <StrictMode>
-            <Radio options={options} ref={ref} />
-          </StrictMode>,
-        ),
-      )
+      await render({ ref: ref as never })
       expect(active.size).toBe(1)
-      await act(async () =>
-        root.render(
-          <StrictMode>
-            <Radio options={options} ref={createRef<HTMLDivElement>()} />
-          </StrictMode>,
-        ),
-      )
+      await render({ ref: createRef<HTMLDivElement>() })
       expect(active.size).toBe(0)
       expect(cleanup).toHaveBeenCalled()
     },
   )
-  it('root capture can cancel navigation before a value is changed', async () => {
-    const onValueChange = vi.fn()
+
+  it('name, form, required and disabled items reach FormData as a native group', async () => {
+    const form = document.body.appendChild(document.createElement('form'))
+    form.id = 'external'
+    onTestFinished(() => form.remove())
+    const withGamma = [...items, { value: 'c', label: 'Gamma', disabled: true }]
     await render({
-      defaultValue: 'a',
-      onValueChange,
-      onKeyDownCapture: (event: React.KeyboardEvent) => event.preventDefault(),
+      form: 'external',
+      name: 'choice',
+      required: true,
+      defaultValue: '',
+      items: withGamma,
     })
-    await act(async () => inputs()[0].focus())
-    await key(inputs()[0], 'ArrowDown')
-    expect(inputs()[0].checked).toBe(true)
-    expect(onValueChange).not.toHaveBeenCalled()
-  })
-  it('root bubble listeners can cancel native keyboard and pointer defaults', async () => {
-    const onValueChange = vi.fn()
-    await render({
-      defaultValue: 'a',
-      onValueChange,
-      onKeyDown: (event: React.KeyboardEvent) => event.preventDefault(),
-      onClick: (event: React.MouseEvent) => event.preventDefault(),
-    })
-    await act(async () => inputs()[0].focus())
-    await key(inputs()[0], 'ArrowDown')
-    expect(inputs()[0].checked).toBe(true)
+    const root = view.host.querySelector('[role="radiogroup"]')!
+    expect(root.getAttribute('aria-required')).toBe('true')
+    for (const input of inputs()) {
+      expect(input.required).toBe(true)
+      expect(input.form).toBe(form)
+    }
+    expect(formEntries(form)).toEqual([['choice', '']])
     await act(async () => inputs()[2].click())
-    expect(inputs()[0].checked).toBe(true)
-    expect(onValueChange).not.toHaveBeenCalled()
-  })
-  it('visual items and native controls have distinct anatomy', async () => {
-    await render()
-    expect(host.querySelectorAll('[data-part="item"]')).toHaveLength(
-      options.length,
+    expect(formEntries(form)).toEqual([['choice', 'b']])
+    // A disabled selection stays checked but is not submitted.
+    await act(async () =>
+      view.root.render(
+        <Radio key="remount" form="external" name="choice" value="c" items={withGamma} />,
+      ),
     )
-    for (const input of inputs())
-      expect(input.getAttribute('data-part')).toBe('input')
+    expect(inputs()[3].checked).toBe(true)
+    expect(formEntries(form)).toEqual([])
   })
-  it('autoFocus focuses the selected enabled input instead of the wrapper', async () => {
-    await render({ defaultValue: '', autoFocus: true })
-    expect(document.activeElement).toBe(inputs()[1])
-  })
-  it('option id and ARIA support rich or externally described labels', async () => {
-    await render({
-      options: [
-        {
-          value: 'a',
-          label: <strong>Alpha</strong>,
-          id: 'alpha',
-          'aria-label': 'Alpha plan',
-          'aria-describedby': 'alpha-help',
-        },
-      ],
-    })
-    expect(inputs()[0].id).toBe('alpha')
-    expect(inputs()[0].getAttribute('aria-label')).toBe('Alpha plan')
-    expect(inputs()[0].getAttribute('aria-describedby')).toBe('alpha-help')
-  })
-  it('defaultValue is initial only; controlled parent updates and replaced callbacks stay silent', async () => {
-    const old = vi.fn(),
-      next = vi.fn()
-    await render({ defaultValue: '', onValueChange: old })
-    expect(inputs()[1].checked).toBe(true)
-    await act(async () => inputs()[2].click())
-    expect(old).toHaveBeenCalledExactlyOnceWith({ value: 'b' })
-    await render({ defaultValue: 'a', onValueChange: next })
-    expect(inputs()[2].checked).toBe(true)
-    await render({ value: null, onValueChange: next })
-    expect(inputs().some((input) => input.checked)).toBe(false)
-    await render({ value: '', disabled: true, onValueChange: next })
-    expect(inputs()[1].checked).toBe(true)
-    expect(next).not.toHaveBeenCalled()
-  })
-  it('JSON does not invent runtime options or a selected default', async () => {
-    await act(async () => root.render(<Radio />))
+
+  it('JSON does not invent runtime items or a selected default', async () => {
+    await act(async () => view.root.render(<Radio />))
     expect(inputs()).toHaveLength(0)
-    expect(contract.props.options).not.toHaveProperty('default')
+    expect(contract.props.items).not.toHaveProperty('default')
     expect(contract.props.defaultValue).not.toHaveProperty('default')
-  })
-})
-
-describe('component smoke', () => {
-  let container: HTMLDivElement
-  let root: Root
-
-  beforeEach(() => {
-    ;({ host: container, root } = mount())
-  })
-
-  it('Radio changes selection in uncontrolled mode', async () => {
-    await act(async () => {
-      root.render(
-        <Radio
-          name="smoke-radio"
-          defaultValue="1"
-          options={[
-            { value: '1', label: 'Option 1' },
-            { value: '2', label: 'Option 2' },
-          ]}
-        />,
-      )
-    })
-
-    const optionOne = container.querySelector(
-      '[role="radio"][data-value="1"]',
-    ) as HTMLElement | null
-    const optionTwo = container.querySelector(
-      '[role="radio"][data-value="2"]',
-    ) as HTMLElement | null
-
-    expect(optionOne?.getAttribute('aria-checked')).toBe('true')
-    expect(optionTwo?.getAttribute('aria-checked')).toBe('false')
-
-    await act(async () => {
-      optionTwo?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    })
-
-    expect(optionOne?.getAttribute('aria-checked')).toBe('false')
-    expect(optionTwo?.getAttribute('aria-checked')).toBe('true')
-  })
-})
-
-describe('responsive overlay surfaces', () => {
-  let container: HTMLDivElement
-  let root: Root
-  let restoreMatchMedia: MatchMediaRestore | null
-
-  beforeEach(() => {
-    ;({ host: container, root } = mount())
-    restoreMatchMedia = installMatchMedia(true)
-  })
-
-  afterEach(() => {
-    restoreMatchMedia?.()
-    restoreMatchMedia = null
-    document.body.style.overflow = ''
-    document.body.style.paddingRight = ''
-    document.body.style.touchAction = ''
-  })
-
-  it('Radio binds visible option labels to native controls and mirrors checked disabled required state', async () => {
-    await act(async () => {
-      root.render(
-        <Radio
-          name="notification-frequency"
-          defaultValue="daily"
-          required
-          options={[
-            { value: 'daily', label: 'Daily updates' },
-            { value: 'never', label: 'Never notify', disabled: true },
-          ]}
-        />,
-      )
-    })
-
-    const group = container.querySelector(
-      '[role="radiogroup"]',
-    ) as HTMLElement | null
-    const daily = container.querySelector(
-      'label[data-value="daily"]',
-    ) as HTMLLabelElement | null
-    const never = container.querySelector(
-      'label[data-value="never"]',
-    ) as HTMLLabelElement | null
-    const dailyInput = daily?.querySelector(
-      'input[type="radio"]',
-    ) as HTMLInputElement | null
-    const neverInput = never?.querySelector(
-      'input[type="radio"]',
-    ) as HTMLInputElement | null
-
-    expect(group?.getAttribute('aria-orientation')).toBe('vertical')
-    expect(daily?.textContent).toContain('Daily updates')
-    expect(never?.textContent).toContain('Never notify')
-    expect(dailyInput?.labels?.[0]).toBe(daily)
-    expect(neverInput?.labels?.[0]).toBe(never)
-    expect(dailyInput?.getAttribute('aria-checked')).toBe('true')
-    expect(dailyInput?.checked).toBe(true)
-    expect(dailyInput?.required).toBe(true)
-    expect(neverInput?.getAttribute('aria-disabled')).toBe('true')
-    expect(neverInput?.disabled).toBe(true)
-    expect(neverInput?.required).toBe(true)
-  })
-})
-
-describe('keyboard machine fidelity', () => {
-  it('radio roves focus and selection together', () => {
-    const svc = interpret(radioMachine, {
-      value: 'a',
-      itemOrder: ['a', 'b', 'c'],
-      disabledValues: ['b'],
-    }).start()
-
-    svc.send({ type: 'FOCUS', value: 'a' })
-    svc.send({ type: 'FOCUS_NEXT' })
-    expect(svc.getSnapshot().context.focusedValue).toBe('c')
-    expect(svc.getSnapshot().context.value).toBe('c')
-
-    svc.send({ type: 'FOCUS_PREV' })
-    expect(svc.getSnapshot().context.focusedValue).toBe('a')
-    expect(svc.getSnapshot().context.value).toBe('a')
-    svc.stop()
-  })
-
-  it('radio keeps empty values in navigation and rejects disabled or unknown user choices', () => {
-    const chosen: string[] = []
-    const svc = interpret(radioMachine, {
-      value: 'a',
-      itemOrder: ['a', '', 'b'],
-      disabledValues: ['b'],
-      onValueChange: ({ value }) => chosen.push(value),
-    }).start()
-    svc.send({ type: 'SELECT', value: 'b' })
-    svc.send({ type: 'SELECT', value: 'missing' })
-    expect(svc.getSnapshot().context.value).toBe('a')
-    svc.send({ type: 'FOCUS', value: 'a' })
-    svc.send({ type: 'FOCUS_NEXT' })
-    expect(svc.getSnapshot().context.value).toBe('')
-    svc.send({ type: 'FOCUS_NEXT' })
-    expect(svc.getSnapshot().context.value).toBe('a')
-    svc.syncContext({ disabled: true })
-    svc.send({ type: 'FOCUS_NEXT' })
-    svc.send({ type: 'SELECT', value: '' })
-    expect(svc.getSnapshot().context.value).toBe('a')
-    expect(chosen).toEqual(['', 'a'])
-    svc.stop()
   })
 })

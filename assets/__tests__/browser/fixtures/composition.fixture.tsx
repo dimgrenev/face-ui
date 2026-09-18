@@ -56,7 +56,7 @@ function Fixture() {
             <Checkbox label="Checkbox" membrane={membrane} />
             <Radio
               aria-label="Options"
-              options={options}
+              items={options}
               orientation="horizontal"
               membrane={membrane}
             />
@@ -101,7 +101,7 @@ function Fixture() {
           aria-label="Frequency"
           name="frequency"
           defaultValue="a"
-          options={options}
+          items={options}
         />
         <Select
           label="Form choice"

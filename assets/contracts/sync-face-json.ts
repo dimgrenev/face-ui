@@ -161,7 +161,6 @@ const PENDING_UNION_DOC_CONFLICTS: Record<string, string[]> = {
   Date: ['selection', 'valueFormat', 'onValueChange'],
   Input: ['multiline', 'type'],
   Overlay: ['trigger'],
-  Radio: ['name', 'required'],
   Rating: ['name', 'required'],
   SegmentedControl: ['multiple', 'value', 'defaultValue', 'onValueChange'],
   Select: ['multiple', 'value', 'defaultValue'],
@@ -624,8 +623,8 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Default',
         props: {
-          'aria-label': 'Example choice',
-          options: [
+          label: 'Example choice',
+          items: [
             { value: 'one', label: 'Option one' },
             { value: 'two', label: 'Option two' },
             { value: 'three', label: 'Option three', disabled: true },
@@ -636,8 +635,8 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Horizontal',
         props: {
-          'aria-label': 'Example choice',
-          options: [
+          label: 'Example choice',
+          items: [
             { value: 'one', label: 'Option one' },
             { value: 'two', label: 'Option two' },
             { value: 'three', label: 'Option three', disabled: true },
@@ -649,14 +648,28 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Disabled',
         props: {
-          'aria-label': 'Example choice',
-          options: [
+          label: 'Example choice',
+          items: [
             { value: 'one', label: 'Option one' },
             { value: 'two', label: 'Option two' },
             { value: 'three', label: 'Option three', disabled: true },
           ],
           defaultValue: 'one',
           disabled: true,
+        },
+      },
+      {
+        name: 'Invalid',
+        props: {
+          label: 'Example choice',
+          description: 'Pick the option that applies.',
+          error: 'Choose an option.',
+          name: 'example-choice',
+          required: true,
+          items: [
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two' },
+          ],
         },
       },
     ],

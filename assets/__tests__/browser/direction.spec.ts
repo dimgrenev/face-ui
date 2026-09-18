@@ -171,7 +171,7 @@ test('shared control padding follows direction in Checkbox, Radio, and Steps', {
         : component === 'Radio'
           ? mount(page, component, {
               'aria-label': 'Options',
-              options: [{ value: 'a', label: 'Label' }],
+              items: [{ value: 'a', label: 'Label' }],
             })
           : mount(page, component, { items: [{ label: 'Label' }] }))
       const control = page.locator(

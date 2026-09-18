@@ -172,17 +172,17 @@ const PENDING = {
   ],
   'D3 machines': [
     'Accordion', 'Avatar', 'Carousel', 'Checkbox', 'Command', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Pagination',
-    'Panel', 'Popover', 'Radio', 'Select', 'Steps', 'Switcher', 'Table', 'Toast', 'Toc', 'Tooltip', 'Tree', 'Upload',
+    'Panel', 'Popover', 'Select', 'Steps', 'Switcher', 'Table', 'Toast', 'Toc', 'Tooltip', 'Tree', 'Upload',
   ],
   'D3 isomorphic layout effect': [
     'Accordion', 'Avatar', 'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
     'Overlay', 'Pagination', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps',
     'Switcher', 'Table', 'Tabs', 'Toc', 'Tooltip', 'Tree', 'Upload',
   ],
-  'D3 direction': ['Calendar', 'Date', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Tabs'],
+  'D3 direction': ['Calendar', 'Date', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Tabs'],
   'D3 isConnected': ['Breadcrumb', 'Rating', 'SegmentedControl', 'Slider', 'Steps', 'Tabs'],
   'D3 machine-era hooks': [
-    'Accordion', 'Calendar', 'Carousel', 'Command', 'Date', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Radio', 'Select',
+    'Accordion', 'Calendar', 'Carousel', 'Command', 'Date', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Select',
     'Steps', 'Toc', 'Tree',
   ],
   'D5 one implementation': [
