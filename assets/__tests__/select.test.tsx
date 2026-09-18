@@ -298,15 +298,26 @@ describe('Select prop contract', () => {
     expect(host.querySelector('select')!.disabled).toBe(false)
     expect(host.querySelector('select')!.value).toBe('pending')
     await render({ options: [], value: null, required: true })
-    await act(async () =>
-      host
-        .querySelector('select')!
-        .dispatchEvent(new Event('invalid', { cancelable: true })),
-    )
+    // Interactive validation focuses the proxy; the trigger takes that focus.
+    await act(async () => host.querySelector('select')!.focus())
     expect(document.activeElement).toBe(trigger())
     await render({ options: [], value: null, required: true, disabled: true })
     expect(trigger().disabled).toBe(true)
     expect(host.querySelector('select')!.disabled).toBe(true)
+  })
+
+  it('§5 #4: the proxy a validation report focuses hands focus to its own trigger', async () => {
+    await act(async () =>
+      root.render(
+        <form>
+          <Select name="plan" required aria-label="Plan" options={options} />
+          <Select name="region" required aria-label="Region" options={options} />
+        </form>,
+      ),
+    )
+    const [plan] = host.querySelectorAll('select')
+    await act(async () => plan.focus())
+    expect(document.activeElement?.getAttribute('aria-label')).toBe('Plan')
   })
 
   it('renders a duplicate key once and never activates a disabled option', async () => {

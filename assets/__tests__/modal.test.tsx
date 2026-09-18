@@ -530,3 +530,24 @@ describe('responsive overlay surfaces', () => {
     expect(positioner?.getAttribute('data-variant')).toBe('center')
   })
 })
+
+it('§5 #5: a portaled Modal mounts its surface once, in the portal', async () => {
+  const { host, root } = mount()
+  const surfaces = new Set<HTMLElement>()
+  await act(async () =>
+    root.render(
+      <Modal
+        open
+        title="Once"
+        ref={(node) => {
+          if (node) surfaces.add(node)
+        }}
+      />,
+    ),
+  )
+  expect(surfaces.size).toBe(1)
+  const [surface] = surfaces
+  expect(surface.isConnected).toBe(true)
+  expect(host.contains(surface)).toBe(false)
+  expect(host.querySelector('.uf-modal-inlineHost')).toBeNull()
+})

@@ -3,10 +3,11 @@ import type { Root } from 'react-dom/client'
 import { act } from 'react'
 import { Button } from '../../Button/Button'
 import { Menu } from '../../Menu/Menu'
+import { Popover } from '../../Popover/Popover'
 import { libraryCss, mount } from './harness'
 import { installMatchMedia, type MatchMediaRestore } from './harness/match-media'
 import { interpret } from '../create-machine'
-import { menuMachine } from '../machines/menu.machine'
+import { connectMenu, menuMachine } from '../machines/menu.machine'
 
 describe('responsive overlay surfaces', () => {
   let container: HTMLDivElement
@@ -572,5 +573,61 @@ describe('keyboard machine fidelity', () => {
     svc.send({ type: 'TYPEAHEAD', key: 'c', now: 1000 })
     expect(svc.getSnapshot().context.highlightedValue).toBe('custom-action')
     svc.stop()
+  })
+})
+
+describe('§5 #11: Escape belongs to the layer stack', () => {
+  it('the menu content leaves Escape unhandled', () => {
+    const svc = interpret(menuMachine, { itemOrder: ['copy'] }).start()
+    svc.send({ type: 'OPEN_FIRST' })
+    const send = vi.fn()
+    const preventDefault = vi.fn()
+    connectMenu(svc.getSnapshot(), send)
+      .getContentProps()
+      .onKeyDown({ key: 'Escape', preventDefault } as never)
+    expect(send).not.toHaveBeenCalled()
+    expect(preventDefault).not.toHaveBeenCalled()
+    svc.stop()
+  })
+
+  it('Escape closes a menu inside a popover one layer at a time and returns focus', async () => {
+    const { root } = mount()
+    const onOpenChange = vi.fn()
+    await act(async () =>
+      root.render(
+        <Popover
+          defaultOpen
+          onOpenChange={onOpenChange}
+          content={
+            <Menu surface="popover" items={[{ value: 'copy', label: 'Copy' }]}>
+              More
+            </Menu>
+          }
+        >
+          <button>Share</button>
+        </Popover>,
+      ),
+    )
+    const trigger = document.querySelector<HTMLElement>('.uf-menu-trigger')!
+    await act(async () => trigger.focus())
+    await act(async () => {
+      trigger.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }),
+      )
+    })
+    const escape = () =>
+      act(async () => {
+        document.activeElement!.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+        )
+      })
+    const menu = document.querySelector<HTMLElement>('[role="menu"]')!
+    expect(menu.contains(document.activeElement)).toBe(true)
+    await escape()
+    expect(menu.hidden).toBe(true)
+    expect(document.activeElement).toBe(trigger)
+    expect(onOpenChange).not.toHaveBeenCalled()
+    await escape()
+    expect(onOpenChange).toHaveBeenCalledWith({ open: false })
   })
 })

@@ -377,13 +377,9 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
       </div>
     )
 
-    const renderedContent = useMemo(() => {
-      if (resolvedSurface === 'sheet' || !portalTarget) return contentElement
-      return createPortal(contentElement, portalTarget)
-    }, [contentElement, resolvedSurface, portalTarget])
-
     return (
-      <div
+      // Phrasing root: a menu can sit in running text such as a <p>.
+      <span
         className="uf-menu"
         data-surface={resolvedSurface}
         data-trigger={trigger}
@@ -403,8 +399,11 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
           />
         ) : null}
 
-        {renderedContent}
-      </div>
+        {/* Before mount (server, hydration) a popover has nowhere to portal. */}
+        {resolvedSurface === 'sheet'
+          ? contentElement
+          : portalTarget && createPortal(contentElement, portalTarget)}
+      </span>
     )
   },
 )

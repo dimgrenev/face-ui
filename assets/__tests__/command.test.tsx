@@ -245,3 +245,42 @@ describe('responsive overlay surfaces', () => {
     ).toBeNull()
   })
 })
+
+describe('§5 #11: Escape belongs to the layer stack', () => {
+  const items = [
+    { id: 'copy', label: 'Copy' },
+    { id: 'cut', label: 'Cut' },
+  ]
+  const input = () =>
+    document.querySelector<HTMLInputElement>('[role="combobox"]')!
+  const key = (name: string) =>
+    act(async () => {
+      input().dispatchEvent(
+        new KeyboardEvent('keydown', { key: name, bubbles: true, cancelable: true }),
+      )
+    })
+
+  it('Escape in the dialog field closes the dialog', async () => {
+    const { root } = mount()
+    const onOpenChange = vi.fn()
+    await act(async () =>
+      root.render(
+        <Command surface="dialog" defaultOpen items={items} onOpenChange={onOpenChange} />,
+      ),
+    )
+    expect(document.activeElement).toBe(input())
+    await key('Escape')
+    expect(onOpenChange.mock.calls).toEqual([[{ open: false }]])
+    expect(document.querySelector('[role="combobox"]')).toBeNull()
+  })
+
+  it('an inline field keeps focus and its keyboard after Escape', async () => {
+    const { root } = mount()
+    await act(async () => root.render(<Command surface="inline" items={items} />))
+    await act(async () => input().focus())
+    await key('Escape')
+    await key('ArrowDown')
+    expect(document.activeElement).toBe(input())
+    expect(input().getAttribute('aria-activedescendant')).toMatch(/:item:cut$/)
+  })
+})

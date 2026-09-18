@@ -12,7 +12,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Tooltip } from '../../Tooltip/Tooltip'
 import { Popover } from '../../Popover/Popover'
 import { Overlay } from '../../Overlay/Overlay'
-import { mount } from './harness'
+import { Menu } from '../../Menu/Menu'
+import { Select } from '../../Select/Select'
+import { Modal } from '../../Modal/Modal'
+import { hydrate, mount } from './harness'
 
 let root: Root, host: HTMLDivElement
 const render = async (node: ReactNode) => act(async () => root.render(node))
@@ -619,4 +622,84 @@ it('Tooltip on non-action text makes it focusable without inventing a button rol
   expect(document.activeElement).toBe(text)
   expect(visible()).toBe(true)
   expect(text.hasAttribute('role')).toBe(false)
+})
+
+describe('§5 #2: a focus-opened tooltip is a dismissable layer', () => {
+  /** A mouse press whose default focus move is prevented, as by a toolbar button. */
+  const pressKeepingFocus = (node: Element) =>
+    act(async () => {
+      const event = new MouseEvent('pointerdown', { bubbles: true, cancelable: true })
+      Object.defineProperty(event, 'pointerType', { value: 'mouse' })
+      node.dispatchEvent(event)
+    })
+  const shown = (role: string) =>
+    [...document.querySelectorAll<HTMLElement>(`[role="${role}"]`)].some(
+      (node) => !node.hidden,
+    )
+
+  it('closes on an outside press that keeps focus on its trigger', async () => {
+    await render(
+      <>
+        <Tooltip content="Help" openDelay={0}>
+          <button>Trigger</button>
+        </Tooltip>
+        <span id="outside">Outside</span>
+      </>,
+    )
+    await focus()
+    expect(visible()).toBe(true)
+    await pressKeepingFocus(host.querySelector('#outside')!)
+    expect(visible()).toBe(false)
+    expect(document.activeElement).toBe(trigger())
+  })
+
+  it('closes with the popover below it on one outside press', async () => {
+    await render(
+      <>
+        <Popover
+          content={
+            <Tooltip content="Copy link" openDelay={0}>
+              <button id="inner">Copy</button>
+            </Tooltip>
+          }
+        >
+          <button>Share</button>
+        </Popover>
+        <span id="outside">Outside</span>
+      </>,
+    )
+    await click()
+    await act(async () => document.getElementById('inner')!.focus())
+    expect([shown('dialog'), shown('tooltip')]).toEqual([true, true])
+    await pressKeepingFocus(host.querySelector('#outside')!)
+    expect([shown('dialog'), shown('tooltip')]).toEqual([false, false])
+  })
+})
+
+it('§5 #5: Tooltip, Popover, Menu, Select and Modal inside <p> hydrate without recovery', async () => {
+  const items = [{ value: 'a', label: 'Alpha' }]
+  const ui = (
+    <p>
+      Billed per{' '}
+      <Tooltip content="1000 tokens">
+        <abbr tabIndex={0}>kT</abbr>
+      </Tooltip>
+      , see{' '}
+      <Popover content="Source 3">
+        <button>[3]</button>
+      </Popover>
+      , <Menu items={items}>More</Menu>{' '}
+      <Select label="Plan" options={items} defaultValue="a" />{' '}
+      <Modal title="Details" trigger="Open">
+        Body
+      </Modal>
+    </p>
+  )
+  const server = document.body.appendChild(document.createElement('div'))
+  const { recoverableErrors } = await hydrate(ui, server)
+  expect(recoverableErrors).toEqual([])
+  // Surfaces mount after hydration, in the portal only.
+  expect(server.querySelector('[role="tooltip"], [role="dialog"], [role="menu"]')).toBeNull()
+  expect(document.querySelectorAll('.uf-overlay-content')).toHaveLength(2)
+  expect(document.querySelectorAll('[role="menu"], .uf-modal')).toHaveLength(2)
 })

@@ -9,7 +9,7 @@
   --uf-date-sheet-gap: calc(var(--uf-date-sheet-inset) * 2);
   --uf-date-panel-pad: var(--uf-membrane);
   --uf-date-sheet-enter-y: 1.125rem;
-  position: relative;
+  position: relative; /* the form proxy covers the root */
   display: flex;
   flex-direction: column;
   width: 100%;

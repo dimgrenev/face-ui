@@ -217,7 +217,8 @@ export const FloatingOverlay = forwardRef<HTMLDivElement, FloatingOverlayProps>(
       },
       restoreFocus: !tooltip,
       onEscape: () => send('CLOSE'),
-      onOutside: tooltip ? undefined : () => send('CLOSE'),
+      // Tooltips too: one opened by focus must not outlive a press that keeps focus.
+      onOutside: () => send('CLOSE'),
     })
     const contentAttributes = api.getContentProps()
     const contentNode =
@@ -287,7 +288,8 @@ export const FloatingOverlay = forwardRef<HTMLDivElement, FloatingOverlayProps>(
             {children}
           </Trigger>
         )}
-        {portalTarget ? createPortal(surface, portalTarget) : surface}
+        {/* Server and hydrating renders have no surface: a <div> is invalid in phrasing content. */}
+        {portalTarget && createPortal(surface, portalTarget)}
       </>
     )
   },
