@@ -3,7 +3,13 @@ import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import { getAdvancedPropParser, type ParsedProp } from './lib/advancedPropParser'
-import { extractReactTsPropsFromSource, getPropOptions, type ExtractedProp } from './lib/tsPropExtractor'
+import {
+  extractComponentDescription,
+  extractReactTsPropsFromSource,
+  getPropOptions,
+  type ExtractedProp,
+  type SourceBundle,
+} from './lib/tsPropExtractor'
 import { getTypeEnricher, type EnrichedProp } from './lib/typeEnricher'
 
 type VFSFile = { content: string }
@@ -75,11 +81,13 @@ interface PropAnalysis {
 
 interface ContractOverride {
   omitProps?: string[]
-  patchProps?: Record<string, Partial<FaceJsonProp>>
+  /** Editor metadata only: a prop's description comes from its JSDoc. */
+  patchProps?: Record<string, Partial<FaceJsonProp> & { description?: never }>
   patchStates?: (states: NonNullable<FaceJsonContract['states']>) => NonNullable<FaceJsonContract['states']>
 }
 
-interface ComponentContractEntry {
+/** A component directory with its `<Name>.tsx` source and `<Name>.json` contract. */
+export interface ComponentContractEntry {
   componentName: string
   componentDir: string
   sourcePath: string
@@ -144,6 +152,20 @@ function isPlaygroundImplementationProp(propName: string, prop: FaceJsonProp): b
   if (prop.type === 'function') return true
   if (/^on[A-Z]/.test(propName)) return true
   return /(?:ClassName|Ref)$/.test(propName)
+}
+
+/** Props whose union branches still document them differently. Any other
+ * disagreement fails the generator; an entry leaves once its JSDoc is unified. */
+const PENDING_UNION_DOC_CONFLICTS: Record<string, string[]> = {
+  Calendar: ['value', 'defaultValue', 'onValueChange'],
+  Date: ['selection', 'valueFormat', 'onValueChange'],
+  Input: ['multiline', 'type'],
+  Overlay: ['trigger'],
+  Radio: ['name', 'required'],
+  Rating: ['name', 'required'],
+  SegmentedControl: ['multiple', 'value', 'defaultValue', 'onValueChange'],
+  Select: ['multiple', 'value', 'defaultValue'],
+  Tabs: ['renderPanels', 'items'],
 }
 
 // Defaults for the shared range presentation live in its internal component,
@@ -226,13 +248,11 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         type: 'enum',
         default: 'outline',
         options: ['fill', 'outline'],
-        description: 'Fill or outline appearance',
       },
       tone: {
         type: 'enum',
         default: 'neutral',
         options: ['neutral', 'accent', 'positive', 'warning', 'destructive'],
-        description: 'Semantic status tone. Combines with fill or outline appearance.',
       },
     },
     patchStates: () => [
@@ -250,18 +270,15 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       'aria-expanded': {
         type: 'boolean',
         required: false,
-        description: 'Standard expanded state; reverses the disclosure chevron when true.',
       },
       variant: {
         type: 'enum',
         default: 'default',
         options: ['default', 'primary', 'secondary', 'accent', 'outline', 'ghost', 'destructive'],
-        description: 'Visual style variant',
       },
       fullWidth: {
         type: 'boolean',
         default: false,
-        description: 'Full width button.',
       },
     },
     patchStates: (states) => states.map((state) => {
@@ -302,42 +319,31 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       title: {
         type: 'ReactNode',
         required: false,
-        description: 'Convenience title slot rendered through Card.Title and Face UI Text.',
       },
       description: {
         type: 'ReactNode',
         required: false,
-        description: 'Convenience description slot rendered through Card.Description and Face UI Text.',
       },
       content: {
         type: 'ReactNode',
         required: false,
-        description: 'Convenience body slot rendered through Card.Content; primitive values use Face UI Text.',
       },
       footer: {
         type: 'ReactNode',
         required: false,
         controlType: 'object',
-        description: 'Convenience footer slot: text, React content, component descriptors or arrays. The JSON editor accepts every serializable form.',
       },
       variant: {
         options: ['default', 'plain', 'code'],
-        description: 'Meaningful surface role: standard contained surface, unframed composition, or code canvas.',
       },
       padding: {
         options: ['default', 'control', 'membrane', 'none'],
-        description: 'Internal surface inset, from the standard 7px rhythm down to a flush composition.',
       },
       radius: {
         options: ['md', 'lg', 'none'],
-        description: 'Corner geometry for contained, compact, dialog, or flush surfaces.',
-      },
-      border: {
-        description: 'Draw the surface border independently of padding, radius and variant.',
       },
       footerAlign: {
         options: ['start', 'end', 'between'],
-        description: 'Alignment used by the convenience footer slot. Compound usage configures Card.Footer directly.',
       },
     },
     patchStates: () => [
@@ -436,29 +442,24 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         required: false,
         default: 'center',
         options: ['center', 'left', 'right', 'top', 'bottom'],
-        description: 'Viewport placement of the modal surface.',
       },
       edge: {
         type: 'enum',
         required: false,
         default: 'inset',
         options: ['inset', 'flush'],
-        description: 'Inset adds the system viewport gap, radius, and border; flush attaches the surface to its placement edge.',
       },
       width: {
         type: 'number',
         required: false,
-        description: 'Preferred surface width in pixels, constrained by the viewport.',
       },
       height: {
         type: 'number',
         required: false,
-        description: 'Preferred surface height in pixels, constrained by the viewport.',
       },
       actions: {
         type: 'array',
         required: false,
-        description: 'Optional footer actions.',
       },
     },
     patchStates: () => [
@@ -565,11 +566,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
     ],
   },
   Input: {
-    patchProps: {
-      required: {
-        description: 'Require a value for native form validation and show the required indicator.',
-      },
-    },
     patchStates: (states) => states.map((state) => ({
       ...state,
       props: state.props?.type === 'default'
@@ -694,47 +690,39 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
     patchProps: {
       'aria-expanded': {
         type: 'boolean', required: false,
-        description: 'Native disclosure state; also orients chevron.',
       },
       'aria-busy': {
         type: 'boolean', required: false,
-        description: 'Native row-region busy state; changes cursor without disabling.',
       },
       density: {
         type: 'enum',
         required: false,
         default: 'default',
         options: ['default', 'spacious'],
-        description: 'Internal spacing density. Default follows the shared control rhythm; spacious gives inspection rows more breathing room.',
       },
       tone: {
         type: 'enum',
         required: false,
         default: 'neutral',
         options: ['neutral', 'muted', 'accent', 'positive', 'warning', 'destructive'],
-        description: 'Semantic visual tone for row foreground and hover treatment.',
       },
       actionVisibility: {
         type: 'enum',
         required: false,
         default: 'reveal',
         options: ['reveal', 'hover', 'always', 'hidden'],
-        description: 'Reveal on hover/focus/active; hover on hover/focus; always; hidden. Hoverless devices expose reveal/hover actions.',
       },
       leading: {
         type: 'ReactNode',
         required: false,
-        description: 'Isolated leading slot for nested controls. Use icon for decorative icons and leading for actionable controls.',
       },
       meta: {
         type: 'ReactNode',
         required: false,
-        description: 'Trailing non-interactive metadata rendered before actions.',
       },
       interactive: {
         type: 'boolean',
         required: false,
-        description: 'Override interactive semantics. Set false for section/header rows that should not expose button behavior.',
       },
     },
     patchStates: () => [
@@ -759,6 +747,8 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           text: 'Project',
           icon: 'folder',
           chevron: 'down',
+          // A disclosure is a control: without it the row is an inert <div aria-expanded>.
+          interactive: true,
           'aria-expanded': true,
           actionVisibility: 'hover',
           actions: '[Button icon=plus]',
@@ -797,7 +787,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       variant: {
         options: ['body', 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label', 'kbd', 'code', 'markdown', 'muted', 'blockquote'],
         default: 'body',
-        description: 'Semantic typography role. Body is the canonical default.',
       },
     },
     patchStates: (states) => states.map((state) => state.name === 'Default (Body)'
@@ -849,12 +838,10 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       items: {
         type: 'array',
         required: false,
-        description: 'Recursive tree nodes. Nodes may use kind "button", "tile", or "custom", plus icon, rightText, actions, content, or render.',
       },
       renderNode: {
         type: 'function',
         required: false,
-        description: 'Global render override for custom node bodies. Tree still owns nesting, expansion, focus, and selection.',
       },
     },
     patchStates: () => [
@@ -968,16 +955,6 @@ function listComponentContracts(componentName?: string): ComponentContractEntry[
     })
 }
 
-function extractSummary(code: string): string | undefined {
-  const match = /\/\*\*([\s\S]*?)\*\//.exec(code)
-  if (!match) return undefined
-  const lines = match[1]
-    .split('\n')
-    .map((line) => line.replace(/^\s*\*\s?/, '').trim())
-    .filter(Boolean)
-  return lines[0]
-}
-
 function extractsFaceUiProps(interfaceName: string, code: string): boolean {
   const interfacePattern = new RegExp(`(?:export\\s+)?interface\\s+${interfaceName}\\b([^\\{]*)\\{`, 'm')
   const interfaceMatch = interfacePattern.exec(code)
@@ -1012,21 +989,35 @@ function toPropAnalysis(prop: ParsedProp | EnrichedProp | ExtractedProp): PropAn
   }
 }
 
-function buildCanonicalAnalyses(componentName: string, relSourcePath: string, code: string): PropAnalysis[] {
-  const interfaceName = `${componentName}Props`
-  function authoredSource(fileName: string, code: string): Parameters<typeof extractReactTsPropsFromSource>[0] {
-    return {
-      fileName, code,
-      resolveImport(specifier: string): Parameters<typeof extractReactTsPropsFromSource>[0] | undefined {
-        if (!specifier.startsWith('.')) return undefined
-        const base = path.resolve(FACE_UI_ROOT, path.dirname(fileName), specifier)
-        const resolved = [base, `${base}.tsx`, `${base}.ts`, path.join(base, 'index.ts')]
-          .find(candidate => candidate.startsWith(`${FACE_UI_ROOT}${path.sep}`) && fs.existsSync(candidate) && fs.statSync(candidate).isFile())
-        return resolved ? authoredSource(path.relative(FACE_UI_ROOT, resolved), fs.readFileSync(resolved, 'utf8')) : undefined
-      },
-    }
+function authoredSource(fileName: string, code: string): SourceBundle {
+  return {
+    fileName, code,
+    resolveImport(specifier: string): SourceBundle | undefined {
+      if (!specifier.startsWith('.')) return undefined
+      const base = path.resolve(FACE_UI_ROOT, path.dirname(fileName), specifier)
+      const resolved = [base, `${base}.tsx`, `${base}.ts`, path.join(base, 'index.ts')]
+        .find(candidate => candidate.startsWith(`${FACE_UI_ROOT}${path.sep}`) && fs.existsSync(candidate) && fs.statSync(candidate).isFile())
+      return resolved ? authoredSource(path.relative(FACE_UI_ROOT, resolved), fs.readFileSync(resolved, 'utf8')) : undefined
+    },
   }
-  const canonicalProps = extractReactTsPropsFromSource(authoredSource(relSourcePath, code), interfaceName)
+}
+
+function assertUnionDocs(componentName: string, docConflicts: ExtractedProp[]) {
+  const pending = new Set(PENDING_UNION_DOC_CONFLICTS[componentName])
+  const conflicts = docConflicts.filter((prop) => !pending.has(prop.name))
+  if (conflicts.length === 0) return
+  throw new Error(
+    `${componentName}: union branches must share one JSDoc per prop:\n${conflicts
+      .map((prop) => `  ${prop.name}: ${prop.docConflict!.map((doc) => JSON.stringify(doc)).join(' vs ')}`)
+      .join('\n')}`,
+  )
+}
+
+function buildCanonicalAnalyses(
+  interfaceName: string,
+  { fileName: relSourcePath, code }: SourceBundle,
+  canonicalProps: ExtractedProp[],
+): PropAnalysis[] {
   const canonicalNames = new Set(canonicalProps.map((prop) => prop.name).filter(Boolean))
   const parser = getAdvancedPropParser()
   const vfs: Record<string, VFSFile> = { [relSourcePath]: { content: code } }
@@ -1193,12 +1184,7 @@ function applyOverrides(componentName: string, props: Record<string, FaceJsonPro
 
   for (const [propName, propDef] of Object.entries(props)) {
     if (isPlaygroundImplementationProp(propName, propDef) || omitProps.has(propName)) continue
-    next[propName] = { ...propDef, ...(override.patchProps?.[propName] ?? {}) }
-  }
-
-  for (const [propName, patch] of Object.entries(override.patchProps ?? {})) {
-    if (!next[propName]) continue
-    next[propName] = { ...next[propName], ...patch }
+    next[propName] = { ...propDef, ...override.patchProps?.[propName] }
   }
 
   return next
@@ -1393,11 +1379,27 @@ function validateProductScenarioCatalog(entries: ComponentContractEntry[]) {
   }
 }
 
+/** Read a component's authored props, its declaration JSDoc and the props
+ * whose union branches disagree on JSDoc. */
+function analyzeComponent(entry: ComponentContractEntry) {
+  const interfaceName = `${entry.componentName}Props`
+  const source = authoredSource(
+    path.relative(process.cwd(), entry.sourcePath).replace(/\\/g, '/'),
+    fs.readFileSync(entry.sourcePath, 'utf8'),
+  )
+  const canonicalProps = extractReactTsPropsFromSource(source, interfaceName)
+  return {
+    analyses: buildCanonicalAnalyses(interfaceName, source, canonicalProps),
+    description: extractComponentDescription(source),
+    docConflicts: canonicalProps.filter((prop) => prop.docConflict),
+  }
+}
+
+/** Build a component contract; JSDoc owns the component and prop descriptions. */
 export function buildFaceJsonContract(entry: ComponentContractEntry): FaceJsonContract {
-  const code = fs.readFileSync(entry.sourcePath, 'utf8')
   const current = readJson<FaceJsonContract>(entry.contractPath)
-  const relSourcePath = path.relative(process.cwd(), entry.sourcePath).replace(/\\/g, '/')
-  const analyses = buildCanonicalAnalyses(entry.componentName, relSourcePath, code)
+  const { analyses, description, docConflicts } = analyzeComponent(entry)
+  assertUnionDocs(entry.componentName, docConflicts)
   const nextProps: Record<string, FaceJsonProp> = {}
 
   for (const prop of analyses) {
@@ -1415,7 +1417,7 @@ export function buildFaceJsonContract(entry: ComponentContractEntry): FaceJsonCo
   return {
     ...current,
     name: current.name || entry.componentName,
-    description: current.description || extractSummary(code) || `${entry.componentName} component`,
+    description: description ?? (current.description || `${entry.componentName} component`),
     props,
     states: normalizeContractStates(
       entry.componentName,
@@ -1458,6 +1460,23 @@ export function collectProductScenarioContracts(componentName?: string): Product
         changed: JSON.stringify(currentContract) !== JSON.stringify(nextContract),
       }
     })
+  })
+}
+
+/** Components and public props still missing JSDoc, and props whose union
+ * branches disagree: `Name (component)`, `Name.prop` or
+ * `Name.prop (union branches differ)`, one per line. */
+export function collectJsdocReport(entries = listComponentContracts()): string[] {
+  return entries.flatMap((entry) => {
+    const { analyses, description, docConflicts } = analyzeComponent(entry)
+    const omitted = new Set(CONTRACT_OVERRIDES[entry.componentName]?.omitProps)
+    return [
+      ...(description ? [] : [`${entry.componentName} (component)`]),
+      ...analyses
+        .filter((prop) => !prop.description && !omitted.has(prop.name))
+        .map((prop) => `${entry.componentName}.${prop.name}`),
+      ...docConflicts.map((prop) => `${entry.componentName}.${prop.name} (union branches differ)`),
+    ]
   })
 }
 
@@ -1520,6 +1539,12 @@ function main() {
   const args = new Set(process.argv.slice(2))
   const componentArgIndex = process.argv.findIndex((arg) => arg === '--component')
   const componentName = componentArgIndex >= 0 ? process.argv[componentArgIndex + 1] : undefined
+  if (args.has('--report-jsdoc')) {
+    // Report only: W4-03 turns missing JSDoc into a generator error.
+    const report = collectJsdocReport(listComponentContracts(componentName))
+    console.log(`JSDoc report: ${report.length} missing or inconsistent${report.map((line) => `\n  ${line}`).join('')}`)
+    return
+  }
   const exitCode = runContractSync({
     write: args.has('--write'),
     componentName,

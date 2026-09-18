@@ -763,10 +763,7 @@ function resolveBuiltinIconName(requestedName: string | undefined): IconName | u
     : BUILTIN_ICON_FALLBACK;
 }
 
-/**
- * Icon component for Components design system
- * Renders inline SVG icons for better performance and styling
- */
+/** Face UI icon renderer. Built-in icons always render at 20x20; unsupported sources render notdef. */
 export const Icon: React.FC<IconProps> = ({
   name,
   className = '',

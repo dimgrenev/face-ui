@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  extractComponentDescription,
   extractReactTsPropsFromSource as extract,
   getPropOptions,
 } from '../../contracts/lib/tsPropExtractor'
@@ -342,5 +343,93 @@ export interface BaseProps extends HTMLAttributes<HTMLDivElement> {
     expect(
       extract(bundle(files, 'Wrapper'), 'WrapperProps').map((p) => p.name),
     ).toEqual(['correct'])
+  })
+})
+
+describe('JSDoc as the single description source', () => {
+  it('records union branches that document the same prop differently, including a missing JSDoc', () => {
+    const props = extract({
+      fileName: 'Choice.tsx',
+      code: `
+      interface Shared {
+        /** Same everywhere. */
+        size?: string
+      }
+      interface Single {
+        /** Select one option. */
+        multiple?: false
+        /** Picked value. */
+        value?: string
+        hint?: string
+      }
+      interface Multiple {
+        /** Select any number of options. */
+        multiple: true
+        /** Picked value. */
+        value?: string[]
+        /** Hint. */
+        hint?: string
+      }
+      type ChoiceProps = Shared & (Single | Multiple)
+    `,
+    })
+    const byName = new Map(props.map((prop) => [prop.name, prop]))
+    expect(byName.get('multiple')?.docConflict).toEqual([
+      'Select one option.',
+      'Select any number of options.',
+    ])
+    expect(byName.get('hint')?.docConflict).toEqual(['', 'Hint.'])
+    expect(byName.get('value')).not.toHaveProperty('docConflict')
+    expect(byName.get('size')).not.toHaveProperty('docConflict')
+  })
+  it('reads prop JSDoc as one line without tags', () => {
+    const [prop] = extract({
+      fileName: 'Example.tsx',
+      code: `interface ExampleProps {
+        /**
+         * Pre-tokenized lines.
+         * One entry per line.
+         * @example [[]]
+         */
+        lines?: string[]
+      }`,
+    })
+    expect(prop.description).toBe('Pre-tokenized lines. One entry per line.')
+  })
+  it('describes a component by the JSDoc of its own declaration, not the file header', () => {
+    expect(
+      extractComponentDescription({
+        fileName: 'Tile/Tile.tsx',
+        code: `
+      /** Tile — file header. */
+      import { forwardRef } from 'react'
+      /** Helper, not the component. */
+      const TileRoot = () => null
+      /**
+       * Composed row with an optional primary action.
+       * @deprecated only the text above is a description
+       */
+      export const Tile = forwardRef(function Tile() { return null })
+    `,
+      }),
+    ).toBe('Composed row with an optional primary action.')
+    expect(
+      extractComponentDescription({
+        fileName: 'Tile.tsx',
+        code: `// Header\nexport function Tile() { return null }`,
+      }),
+    ).toBeUndefined()
+  })
+  it('follows a re-exported component to its declaring file', () => {
+    const files: Record<string, string> = {
+      'Icon.tsx': `/** Wrapper header. */\nexport { Renderer as Icon, ICON_NAMES } from './impl'`,
+      './impl': `/** Renders built-in icons. */\nexport const Renderer = () => null`,
+    }
+    const bundle = (name: string): Parameters<typeof extract>[0] => ({
+      fileName: name,
+      code: files[name],
+      resolveImport: (specifier) => (files[specifier] ? bundle(specifier) : undefined),
+    })
+    expect(extractComponentDescription(bundle('Icon.tsx'))).toBe('Renders built-in icons.')
   })
 })

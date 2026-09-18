@@ -23,6 +23,7 @@ export default [
       tone: 'neutral',
       icon: 'folder',
       chevron: 'down',
+      interactive: true,
       'aria-expanded': false,
       active: true,
       fullWidth: true,
