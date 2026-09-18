@@ -1,14 +1,22 @@
 import { act, createRef, version } from 'react'
 import type { Root } from 'react-dom/client'
-import { renderToString } from 'react-dom/server'
-import { beforeEach, it, expect, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { SegmentedControl } from '../../SegmentedControl/SegmentedControl'
-import { formEntries, mount } from './harness'
+import { expectDevError, formEntries, mount } from './harness'
+import { describeControlled } from './harness/controlled'
+import { describeField } from './harness/field'
+import { describeRoving } from './harness/roving'
+
 let host: HTMLDivElement, root: Root
 const items = [
   { value: '', label: 'None' },
   { value: 'a', label: 'Alpha' },
   { value: 'b', label: 'Beta' },
+]
+const abc = [
+  { value: 'a', label: 'Alpha' },
+  { value: 'b', label: 'Beta' },
+  { value: 'c', label: 'Gamma' },
 ]
 beforeEach(() => {
   ;({ host, root } = mount())
@@ -32,6 +40,194 @@ const key = (i: number, key: string) =>
       new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }),
     )
   })
+
+const itemOf = (host: HTMLElement, key: string) =>
+  host.querySelector<HTMLButtonElement>(
+    `.uf-toggle-item[data-value="${key}"]`,
+  )!
+const pressed = (host: HTMLElement) =>
+  Array.from(
+    host.querySelectorAll<HTMLElement>(
+      '.uf-toggle-item[aria-checked="true"], .uf-toggle-item[aria-pressed="true"]',
+    ),
+    (node) => node.dataset.value!,
+  )
+
+describeControlled<string | null>({
+  name: 'SegmentedControl',
+  prop: 'value',
+  values: ['a', 'b'],
+  render: (props) => <SegmentedControl items={abc} aria-label="View" {...props} />,
+  change: (host, to) => itemOf(host, to!).click(),
+  read: (host) => pressed(host)[0] ?? null,
+  normalizes: ['missing', null],
+  handler: 'onClick',
+  formReset: true,
+})
+describeControlled<string[]>({
+  name: 'SegmentedControl',
+  prop: 'value',
+  values: [['a'], ['a', 'b']],
+  render: (props) => (
+    <SegmentedControl multiple items={abc} aria-label="Filters" {...props} />
+  ),
+  // Pressing Beta switches between the two values.
+  change: (host) => itemOf(host, 'b').click(),
+  read: pressed,
+  normalizes: [['b', 'missing', 'a'], ['a', 'b']],
+  handler: 'onClick',
+  formReset: true,
+})
+describeField('SegmentedControl', (props) => (
+  <SegmentedControl items={abc} {...props} />
+))
+describeField('SegmentedControl multiple', (props) => (
+  <SegmentedControl multiple items={abc} {...props} />
+))
+const rovingItems = (host: HTMLElement) =>
+  Array.from(host.querySelectorAll<HTMLElement>('.uf-toggle-item'))
+describeRoving({
+  name: 'SegmentedControl',
+  render: ({ items, defaultValue }) => (
+    <SegmentedControl items={items} defaultValue={defaultValue} aria-label="View" />
+  ),
+  items: rovingItems,
+  orientation: 'both',
+  selects: true,
+  activateOnMove: (host) => pressed(host)[0] ?? null,
+})
+describeRoving({
+  name: 'SegmentedControl multiple',
+  render: ({ items, defaultValue }) => (
+    <SegmentedControl
+      multiple
+      items={items}
+      defaultValue={defaultValue === undefined ? undefined : [defaultValue]}
+      aria-label="Filters"
+    />
+  ),
+  items: rovingItems,
+  orientation: 'horizontal',
+  selects: true,
+})
+
+describe('selection-invariant (§5 #8): the value is the intent, the selection its projection', () => {
+  it('a default that arrives with late items is selected: [] → [a] → [a,b,c] shows B', async () => {
+    const cb = vi.fn()
+    await render({ items: [], defaultValue: 'b', onValueChange: cb })
+    expect(selected()).toEqual([])
+    await render({ items: abc.slice(0, 1), defaultValue: 'b', onValueChange: cb })
+    expect(selected()).toEqual([])
+    await render({ items: abc, defaultValue: 'b', onValueChange: cb })
+    expect(selected()).toEqual(['Beta'])
+    expect(cb).not.toHaveBeenCalled()
+  })
+
+  it('a user choice survives briefly empty items and reports once', async () => {
+    const cb = vi.fn()
+    await render({ items: abc, defaultValue: 'a', onValueChange: cb })
+    await click(2)
+    await render({ items: [], onValueChange: cb })
+    expect(buttons()).toEqual([])
+    await render({ items: abc, onValueChange: cb })
+    expect(selected()).toEqual(['Gamma'])
+    expect(cb.mock.calls).toEqual([[{ value: 'c' }]])
+  })
+
+  it('multiple keeps every intended key through async items', async () => {
+    const cb = vi.fn()
+    await render({ multiple: true, items: [], defaultValue: ['c', 'b'], onValueChange: cb })
+    await render({ multiple: true, items: abc.slice(0, 1), onValueChange: cb })
+    expect(selected()).toEqual([])
+    await render({ multiple: true, items: abc, onValueChange: cb })
+    expect(selected()).toEqual(['Beta', 'Gamma'])
+    expect(cb).not.toHaveBeenCalled()
+  })
+
+  it('form reset restores the default even while its key is missing', async () => {
+    await act(async () =>
+      root.render(
+        <form>
+          <SegmentedControl name="view" items={abc} defaultValue="a" />
+        </form>,
+      ),
+    )
+    await click(1)
+    await act(async () =>
+      root.render(
+        <form>
+          <SegmentedControl name="view" items={abc.slice(1)} defaultValue="a" />
+        </form>,
+      ),
+    )
+    await act(async () => {
+      host.querySelector('form')!.reset()
+      await new Promise((resolve) => setTimeout(resolve, 5))
+    })
+    expect(selected()).toEqual([])
+    await act(async () =>
+      root.render(
+        <form>
+          <SegmentedControl name="view" items={abc} defaultValue="a" />
+        </form>,
+      ),
+    )
+    expect(selected()).toEqual(['Alpha'])
+  })
+})
+
+describe('multiple changes the value shape', () => {
+  it('single reports a string or null, multiple a fresh string[]', async () => {
+    const single = vi.fn()
+    await render({ items: abc, onValueChange: single })
+    await click(1)
+    expect(single.mock.calls).toEqual([[{ value: 'b' }]])
+    await act(async () => root.render(null))
+    const multiple = vi.fn()
+    const value = ['a']
+    await render({ multiple: true, items: abc, value, onValueChange: multiple })
+    await click(1)
+    expect(multiple.mock.calls).toEqual([[{ value: ['a', 'b'] }]])
+    expect(multiple.mock.calls[0][0].value).not.toBe(value)
+    expect(Array.isArray(multiple.mock.calls[0][0].value)).toBe(true)
+  })
+
+  it('single mode is a radiogroup of radios, multiple a group of pressed buttons', async () => {
+    await render({ items: abc, defaultValue: 'a' })
+    expect(host.firstElementChild!.getAttribute('role')).toBe('radiogroup')
+    expect(buttons()[0].getAttribute('role')).toBe('radio')
+    expect(buttons()[0].getAttribute('aria-checked')).toBe('true')
+    expect(buttons()[0].hasAttribute('aria-pressed')).toBe(false)
+    await render({ multiple: true, items: abc, defaultValue: ['a'] })
+    expect(host.firstElementChild!.getAttribute('role')).toBe('group')
+    expect(buttons()[0].hasAttribute('role')).toBe(false)
+    expect(buttons()[0].getAttribute('aria-pressed')).toBe('true')
+    expect(buttons()[0].hasAttribute('aria-checked')).toBe(false)
+  })
+
+  it('switching mode projects the stored value without rewriting it', async () => {
+    const cb = vi.fn()
+    await render({ multiple: true, items: abc, defaultValue: ['c', 'b'], onValueChange: cb })
+    expect(selected()).toEqual(['Beta', 'Gamma'])
+    // Single mode shows the first stored key in item order.
+    await render({ items: abc, onValueChange: cb })
+    expect(selected()).toEqual(['Beta'])
+    await render({ multiple: true, items: abc, onValueChange: cb })
+    expect(selected()).toEqual(['Beta', 'Gamma'])
+    expect(cb).not.toHaveBeenCalled()
+    await render({ items: abc, onValueChange: cb })
+    await click(0)
+    expect(cb.mock.calls).toEqual([[{ value: 'a' }]])
+  })
+
+  it('a value of the other shape is projected silently', async () => {
+    await render({ items: abc, value: ['c', 'a'] })
+    expect(selected()).toEqual(['Alpha'])
+    await render({ multiple: true, items: abc, value: 'b' })
+    expect(selected()).toEqual(['Beta'])
+  })
+})
+
 it('radio reselect retains its selected value without a callback', async () => {
   const cb = vi.fn()
   await render({ defaultValue: 'a', onValueChange: cb })
@@ -50,17 +246,27 @@ it('forwards native root identity, description and direction', async () => {
   expect(node.id).toBe('mode')
   expect(node.getAttribute('dir')).toBe('rtl')
   expect(node.getAttribute('aria-label')).toBe('Mode')
+  expect(node.getAttribute('aria-describedby')).toBe('hint')
+})
+it('the strip is a list inside the field root, between label and help', async () => {
+  await render({ label: 'View', description: 'Help', defaultValue: 'a' })
+  const rootNode = host.firstElementChild!
+  expect(rootNode.className).toBe('uf-field uf-toggle')
+  expect(Array.from(rootNode.children, (child) => child.getAttribute('data-part'))).toEqual([
+    'label',
+    'list',
+    'description',
+    null,
+  ])
+  const list = rootNode.children[1]
+  expect(list.className).toBe('uf-toggle-list')
+  expect(list.querySelectorAll('.uf-toggle-item')).toHaveLength(3)
 })
 it('allows empty-string key as a keyboard target', async () => {
   await render({ defaultValue: 'a' })
   await key(1, 'Home')
   expect(document.activeElement).toBe(buttons()[0])
   expect(selected()).toEqual(['None'])
-})
-it('both radio arrow pairs select the next choice', async () => {
-  await render({ defaultValue: 'a' })
-  await key(1, 'ArrowDown')
-  expect(selected()).toEqual(['Beta'])
 })
 it('honors capture cancellation', async () => {
   await act(async () =>
@@ -84,16 +290,32 @@ it('honors cancelled clicks', async () => {
   await click(2)
   expect(selected()).toEqual(['Alpha'])
 })
+it('a click on an element inside a choice selects it', async () => {
+  await render({
+    items: [
+      { value: 'a', label: <span>Alpha</span> },
+      { value: 'b', label: <span>Beta</span> },
+    ],
+    defaultValue: 'a',
+  })
+  await act(async () => buttons()[1].querySelector('span')!.click())
+  expect(selected()).toEqual(['Beta'])
+})
 it('uses a real disabled button', async () => {
   await render({ disabled: true })
   expect(buttons()[0].disabled).toBe(true)
 })
-it('accepts native item names for icons', async () => {
+it('accepts native item names for icons, and item descriptions come first', async () => {
   await render({
-    items: [{ value: 'a', label: <svg />, id: 'grid', 'aria-label': 'Grid' }],
+    id: 'mode',
+    description: 'Help',
+    items: [
+      { value: 'a', label: <svg />, id: 'grid', 'aria-label': 'Grid', 'aria-describedby': 'tip' },
+    ],
   })
   expect(buttons()[0].id).toBe('grid')
   expect(buttons()[0].getAttribute('aria-label')).toBe('Grid')
+  expect(buttons()[0].getAttribute('aria-describedby')).toBe('tip mode-description')
 })
 it('copies callback arrays before exposing them', async () => {
   await render({
@@ -103,10 +325,12 @@ it('copies callback arrays before exposing them', async () => {
   await click(1)
   expect(selected()).toEqual(['Alpha'])
 })
-it('does not silently stringify malformed selection values', () => {
-  expect(() =>
-    renderToString(<SegmentedControl items={items} value={[4] as any} />),
-  ).toThrow()
+it('reports malformed selection keys and ignores them', async () => {
+  await expectDevError(
+    () => render({ multiple: true, value: [4, 'a'] }),
+    /^Face UI SegmentedControl: invalid value\[0\] 4; dropping it\.$/,
+  )
+  expect(selected()).toEqual(['Alpha'])
 })
 it('does not expose removed choices in the next user proposal', async () => {
   const cb = vi.fn()
@@ -114,37 +338,13 @@ it('does not expose removed choices in the next user proposal', async () => {
   await click(1)
   expect(cb).toHaveBeenLastCalledWith({ value: ['a'] })
 })
-it('multiple mode exposes pressed button semantics', async () => {
-  await render({ multiple: true, defaultValue: ['a'] })
-  expect(buttons()[1].getAttribute('role')).toBeNull()
-  expect(buttons()[1].getAttribute('aria-pressed')).toBe('true')
-})
-it('a refused controlled proposal never leaks into DOM or the next proposal', async () => {
-  const cb = vi.fn()
-  await render({ value: 'a', onValueChange: cb })
-  await click(2)
-  expect(selected()).toEqual(['Alpha'])
-  await click(2)
-  expect(cb.mock.calls).toEqual([[{ value: 'b' }], [{ value: 'b' }]])
-})
-it('owner updates are silent and releasing control retains the last accepted value', async () => {
-  const cb = vi.fn()
-  await render({ value: 'a', onValueChange: cb })
-  await render({ value: 'b', onValueChange: cb })
-  await render({ onValueChange: cb })
-  expect(selected()).toEqual(['Beta'])
-  expect(cb).not.toHaveBeenCalled()
-})
-it('defaultValue is mount-only, including after user changes', async () => {
-  await render({ defaultValue: 'a' })
-  await click(2)
-  await render({ defaultValue: '' })
-  expect(selected()).toEqual(['Beta'])
-})
 it('multiple values are copied and canonicalized in item order', async () => {
   const initial = ['b', 'a', 'a']
   const cb = vi.fn()
-  await render({ multiple: true, defaultValue: initial, onValueChange: cb })
+  await expectDevError(
+    () => render({ multiple: true, defaultValue: initial, onValueChange: cb }),
+    /^Face UI SegmentedControl: invalid value\[2\] "a"; dropping the duplicate\.$/,
+  )
   initial.length = 0
   await render({ multiple: true, defaultValue: initial, onValueChange: cb })
   expect(selected()).toEqual(['Alpha', 'Beta'])
@@ -166,23 +366,10 @@ it('selected unavailable choices remain selected, but cannot be changed', async 
   expect(cb).not.toHaveBeenCalled()
   expect(buttons()[1].tabIndex).toBe(0)
 })
-it('removed uncontrolled choices do not reappear when items return', async () => {
-  await render({ defaultValue: 'a' })
-  await render({ items: [items[0], items[2]] })
-  await render()
-  expect(selected()).toEqual([])
-})
 it('controlled unknown keys render no phantom selection and return when represented', async () => {
   await render({ value: 'a', items: [items[0], items[2]] })
   expect(selected()).toEqual([])
   await render({ value: 'a' })
-  expect(selected()).toEqual(['Alpha'])
-})
-it('switching multiple to single keeps the first choice in item order', async () => {
-  await render({ multiple: true, defaultValue: ['b', 'a'] })
-  await render()
-  expect(selected()).toEqual(['Alpha'])
-  await render({ multiple: true })
   expect(selected()).toEqual(['Alpha'])
 })
 it('a controlled multiple proposal can toggle off without mutating input', async () => {
@@ -202,27 +389,11 @@ it('multiple arrows move focus without changing selection', async () => {
   expect(selected()).toEqual(['Alpha'])
   expect(cb).not.toHaveBeenCalled()
 })
-it('multiple only handles arrows on its visual axis', async () => {
+it('multiple vertical answers to the vertical arrows only', async () => {
   await render({ multiple: true, orientation: 'vertical' })
   await key(0, 'ArrowRight')
   expect(document.activeElement).toBe(buttons()[0])
   await key(0, 'ArrowDown')
-  expect(document.activeElement).toBe(buttons()[1])
-})
-it('modified shortcuts are not intercepted', async () => {
-  await render({ defaultValue: 'a' })
-  await act(async () => {
-    buttons()[1].focus()
-    buttons()[1].dispatchEvent(
-      new KeyboardEvent('keydown', {
-        key: 'ArrowRight',
-        ctrlKey: true,
-        bubbles: true,
-        cancelable: true,
-      }),
-    )
-  })
-  expect(selected()).toEqual(['Alpha'])
   expect(document.activeElement).toBe(buttons()[1])
 })
 it('native bubble key handler can cancel navigation', async () => {
@@ -237,25 +408,6 @@ it('native bubble click handler can cancel both pointer and keyboard proposals',
   expect(selected()).toEqual(['Alpha'])
   expect(document.activeElement).toBe(buttons()[2])
 })
-it('skips disabled choices and wraps including empty keys', async () => {
-  await render({ items: [items[0], { ...items[1], disabled: true }, items[2]] })
-  await key(0, 'ArrowRight')
-  expect(document.activeElement).toBe(buttons()[2])
-  await key(2, 'ArrowRight')
-  expect(document.activeElement).toBe(buttons()[0])
-})
-it('recovers focus when its current choice is removed', async () => {
-  await render({ defaultValue: 'a' })
-  await act(async () => buttons()[1].focus())
-  await render({ items: [items[0], items[2]] })
-  expect(document.activeElement).toBe(buttons()[0])
-})
-it('recovers focus when its current choice becomes disabled', async () => {
-  await render({ defaultValue: 'a' })
-  await act(async () => buttons()[1].focus())
-  await render({ items: [items[0], { ...items[1], disabled: true }, items[2]] })
-  expect(document.activeElement).toBe(buttons()[0])
-})
 it('does not steal external focus on item changes', async () => {
   const external = document.createElement('button')
   document.body.append(external)
@@ -268,9 +420,14 @@ it('does not steal external focus on item changes', async () => {
   expect(document.activeElement).toBe(external)
   external.remove()
 })
-it('autoFocus runs only on mount and picks an enabled selected item', async () => {
+it('autoFocus runs only on mount, picks an enabled selected item and marks it', async () => {
   await render({ autoFocus: true, defaultValue: 'a' })
   expect(document.activeElement).toBe(buttons()[1])
+  expect(buttons().map((button) => button.hasAttribute('data-autofocus'))).toEqual([
+    false,
+    true,
+    false,
+  ])
   await act(async () => buttons()[2].focus())
   await render({ autoFocus: true })
   expect(document.activeElement).toBe(buttons()[2])
@@ -289,6 +446,7 @@ it('root ref and native attrs stay on the same node across membrane/orientation 
     style: { width: 240 },
   })
   const node = ref.current
+  expect(node?.className).toBe('uf-field uf-toggle custom')
   await act(async () => buttons()[1].focus())
   const button = buttons()[1]
   await render({ ref, membrane: false, orientation: 'vertical' })
@@ -306,12 +464,13 @@ it.skipIf(!version.startsWith('19.'))(
     expect(cleanup).toHaveBeenCalledTimes(1)
   },
 )
-it('multiple group does not claim an unsupported aria-orientation', async () => {
-  await render({ multiple: true, orientation: 'vertical' })
-  expect(host.firstElementChild!.hasAttribute('aria-orientation')).toBe(false)
-  expect(host.firstElementChild!.getAttribute('data-orientation')).toBe(
-    'vertical',
-  )
+it('multiple group does not claim an unsupported aria-orientation or aria-invalid', async () => {
+  await render({ multiple: true, orientation: 'vertical', error: 'Pick one' })
+  const rootNode = host.firstElementChild!
+  expect(rootNode.hasAttribute('aria-orientation')).toBe(false)
+  expect(rootNode.hasAttribute('aria-invalid')).toBe(false)
+  expect(rootNode.hasAttribute('data-invalid')).toBe(true)
+  expect(rootNode.getAttribute('data-orientation')).toBe('vertical')
 })
 const form = () => host.querySelector('form')!
 const data = () => formEntries(form())
@@ -432,39 +591,62 @@ it('native proxy change proposes once and reverts a refused value', async () => 
   expect(selected()).toEqual(['Alpha'])
   expect(data()).toEqual([['view', 'a']])
 })
-it('invalid item shapes and duplicate keys fail explicitly', () => {
-  for (const items of [
-    [{ value: 1, label: 'x' }],
-    [
-      { value: 'x', label: 'x' },
-      { value: 'x', label: 'y' },
-    ],
-    null,
-  ])
-    expect(() =>
-      renderToString(<SegmentedControl items={items as any} />),
-    ).toThrow()
+it('required blocks submission until a choice is made and marks the label', async () => {
+  await renderForm({ name: 'view', required: true, label: 'View', items: abc })
+  expect(form().checkValidity()).toBe(false)
+  expect(host.querySelector('[data-part="required"]')).not.toBeNull()
+  await click(0)
+  expect(form().checkValidity()).toBe(true)
+  await act(async () => root.render(null))
+  await renderForm({ multiple: true, name: 'view', required: true, items: abc })
+  expect(form().checkValidity()).toBe(false)
+  await click(1)
+  expect(form().checkValidity()).toBe(true)
+})
+it('interactive validation shows the browser message as the error and focuses the tab stop', async () => {
+  await renderForm({
+    id: 'view',
+    name: 'view',
+    required: true,
+    label: 'View',
+    items: abc,
+  })
+  const proxy = host.querySelector('select')!
+  await act(async () => proxy.focus())
+  const error = host.querySelector('[data-part="error"]')!
+  expect(error.textContent).toBe(proxy.validationMessage)
+  expect(host.querySelector('.uf-toggle')!.getAttribute('aria-invalid')).toBe('true')
+  expect(buttons()[0].getAttribute('aria-describedby')).toBe('view-error')
+  expect(document.activeElement).toBe(buttons()[0])
+  await click(1)
+  await act(async () => proxy.focus())
+  expect(host.querySelector('[data-part="error"]')).toBeNull()
+})
+it('invalid items and duplicate keys are skipped with a report', async () => {
+  await expectDevError(
+    () => render({ items: [{ value: 1, label: 'x' }, { value: 'y', label: 'Y' }] }),
+    /^Face UI SegmentedControl: invalid items\[0\] key 1; dropping the item\.$/,
+  )
+  expect(buttons().map((button) => button.textContent)).toEqual(['Y'])
+  await expectDevError(
+    () =>
+      render({
+        items: [
+          { value: 'x', label: 'x' },
+          { value: 'x', label: 'y' },
+        ],
+      }),
+    /^Face UI SegmentedControl: invalid items\[1\] key "x"; dropping the duplicate\.$/,
+  )
+  expect(buttons().map((button) => button.textContent)).toEqual(['x'])
+  await expectDevError(
+    () => render({ items: null }),
+    /^Face UI SegmentedControl: invalid items null; using \[\]\.$/,
+  )
+  expect(buttons()).toEqual([])
 })
 it('empty items do not create phantom choices or keyboard targets', async () => {
   await render({ items: [], value: 'a' })
   expect(buttons()).toEqual([])
   expect(host.firstElementChild!.getAttribute('role')).toBe('radiogroup')
-})
-
-it('Toggle adapts legacy single arrays with native names and no radio deselection',async()=>{
-  const {Toggle}=await import('../../Toggle/Toggle')
-  const cb=vi.fn()
-  await act(async()=>root.render(<Toggle type="single" defaultValue={['a']} items={items} aria-label="Legacy view" onValueChange={cb}/>))
-  await click(1)
-  expect(cb).not.toHaveBeenCalled()
-  await click(2)
-  expect(cb).toHaveBeenLastCalledWith({value:['b']})
-  expect(host.firstElementChild!.getAttribute('aria-label')).toBe('Legacy view')
-})
-it('Toggle multiple defaults to independent pressed buttons',async()=>{
-  const {Toggle}=await import('../../Toggle/Toggle')
-  await act(async()=>root.render(<Toggle defaultValue={['a']} items={items}/>))
-  await click(2)
-  expect(selected()).toEqual(['Alpha','Beta'])
-  expect(buttons()[2].getAttribute('aria-pressed')).toBe('true')
 })

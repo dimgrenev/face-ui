@@ -1,19 +1,26 @@
 /* =================================================================
- * TOGGLE
+ * SEGMENTED CONTROL (compat name: Toggle)
  * ================================================================= */
-/* Spacing and forwarding belong to Membrane; this root only lays out choices.
-   It is positioned: the form proxy covers it to anchor validation bubbles. */
+/* The root is a field (field.css) around the strip. It is positioned:
+   the form proxy covers it to anchor validation bubbles. */
 .uf-toggle[data-scope] {
   position: relative;
-  display: inline-flex;
+  max-inline-size: 100%;
+}
+/* The strip keeps its natural width inside the field and draws the border;
+   spacing and forwarding belong to Membrane. */
+.uf-toggle[data-scope] > .uf-toggle-list {
+  display: flex;
+  align-self: flex-start;
+  justify-self: start;
   max-inline-size: 100%;
   min-inline-size: 0;
   align-items: stretch;
   border-radius: var(--uf-radius);
   border: var(--uf-toggle-border-width) solid var(--uf-overlay-surface-border);
 }
-.uf-toggle[data-scope][data-orientation="vertical"] { flex-direction: column; }
-.uf-toggle[data-scope] > .uf-membrane {
+.uf-toggle[data-scope][data-orientation="vertical"] > .uf-toggle-list { flex-direction: column; }
+.uf-toggle[data-scope] > .uf-toggle-list > .uf-membrane {
   flex: 1 1 auto;
   min-inline-size: min-content;
 }

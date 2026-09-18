@@ -53,6 +53,10 @@ for (const orientation of ['horizontal', 'vertical'] as const)
             }),
           )
           const frame = (await page.locator('#frame').boundingBox())!
+          // The bordered strip keeps its natural width inside the field root.
+          const list = (await page.locator('.uf-toggle-list').boundingBox())!
+          expect(list.x).toBeGreaterThanOrEqual(frame.x - 1)
+          expect(list.x + list.width).toBeLessThanOrEqual(frame.x + frame.width + 1)
           for (const r of rects) {
             expect(r.width).toBeGreaterThanOrEqual(24)
             expect(r.height).toBeGreaterThanOrEqual(24)
@@ -234,7 +238,7 @@ test('root disabled does not multiply opacity or submit', { tag: ['@css'] }, asy
     })
   expect(op[0]).toBeCloseTo(op[1], 4)
 })
-test('focus recovers from removed or disabled choices without restoring stale values', { tag: ['@focus'] }, async ({
+test('focus recovers from a removed choice, whose selection returns with it', { tag: ['@focus'] }, async ({
   page,
 }) => {
   await render(page, { defaultValue: 'grid' })
@@ -245,11 +249,34 @@ test('focus recovers from removed or disabled choices without restoring stale va
       { value: 'list', label: 'List' },
     ],
   })
-  await expect(buttons(page).nth(0)).toBeFocused()
+  // The choice now at the removed one's place takes focus.
+  await expect(buttons(page).nth(1)).toBeFocused()
   await expect(selected(page)).toHaveCount(0)
   await render(page)
-  await expect(selected(page)).toHaveCount(0)
+  await expect(selected(page)).toHaveText('Grid')
+  expect(await events(page)).toEqual([])
 })
+for (const multiple of [false, true])
+  test(`required ${multiple ? 'multiple' : 'single'}: interactive validation shows the browser message and focuses the group`, { tag: ['@native', '@focus'] }, async ({
+    page,
+  }) => {
+    await render(page, { multiple, required: true, label: 'View' })
+    const field = page.locator('.uf-toggle')
+    const error = field.locator('[data-part="error"]')
+    await expect(field).toHaveAccessibleName('View')
+    await expect(error).toHaveCount(0)
+    await page.locator('#edit').evaluate((form: HTMLFormElement) => form.requestSubmit())
+    await expect(error).not.toBeEmpty()
+    await expect(buttons(page).nth(0)).toBeFocused()
+    await expect(buttons(page).nth(0)).toHaveAccessibleDescription(
+      (await error.textContent())!,
+    )
+    if (!multiple) await expect(field).toHaveAttribute('aria-invalid', 'true')
+    await buttons(page).nth(1).click()
+    expect(await data(page)).toEqual([['view', 'grid']])
+    await page.locator('#edit').evaluate((form: HTMLFormElement) => form.requestSubmit())
+    await expect(error).toHaveCount(0)
+  })
 test('forced colors preserves selected border and keyboard focus', { tag: ['@forced-colors', '@css', '@focus'] }, async ({
   page,
 }) => {

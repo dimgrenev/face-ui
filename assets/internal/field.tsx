@@ -86,7 +86,11 @@ export function useField(options: FieldOptions): Field {
   const label = filled(options.label)
   const description = filled(options.description)
   const error = filled(options.error) ?? filled(options.nativeError)
-  const ariaLabel = options['aria-label']?.trim() || undefined
+  // Only a string names; anything else (JSON data) is ignored rather than crashing the render.
+  const ariaLabel =
+    typeof options['aria-label'] === 'string'
+      ? options['aria-label'].trim() || undefined
+      : undefined
   // Native precedence: explicit references, then aria-label, then the visible label.
   const labelledBy =
     idList(options['aria-labelledby']) ??

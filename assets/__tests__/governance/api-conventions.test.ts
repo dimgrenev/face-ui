@@ -304,7 +304,8 @@ function fieldViolations(component: string): string[] {
     .filter((name) => !props.has(name))
     .map((name) => `${component}: field lacks ${name} (A4)`)
   const position = props.get('labelPosition')
-  if (position && literals(position.types).sort().join('|') !== 'start|top')
+  // Union-typed props (single | multiple) list the prop once per branch.
+  if (position && [...new Set(literals(position.types))].sort().join('|') !== 'start|top')
     found.push(`${component} labelPosition: expected 'top' | 'start' (K25)`)
   return found
 }
@@ -370,14 +371,14 @@ const PENDING = {
   'R-triple': ['Accordion', 'Code', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Slider', 'Table', 'Toc', 'Tree'],
   'R-names': [
     'Accordion', 'Avatar', 'Code', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Pagination',
-    'Panel', 'Radio', 'Select', 'Table', 'Tabs', 'Toast', 'Toc', 'Toggle', 'Tree',
+    'Panel', 'Radio', 'Select', 'Table', 'Tabs', 'Toast', 'Toc', 'Tree',
   ],
   'R-dup': ['Carousel', 'Code', 'Date', 'Markdown', 'Progress', 'Select', 'Toc'],
   'R-label': ['Breadcrumb', 'Input', 'Modal', 'Select', 'Toast'],
   'R-aria': ['Carousel', 'Media', 'Scroll', 'Table'],
   'R-logical': ['Modal', 'Table', 'Toast', 'Toc'],
   'R-bool': [],
-  'R-field': ['Date', 'Input', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider'],
+  'R-field': ['Date', 'Input', 'Radio', 'Rating', 'Select', 'Slider'],
   'R-strings': [
     'Breadcrumb', 'Carousel', 'Code', 'Command', 'Date', 'Input', 'Menu', 'Navigation', 'Panel', 'Scroll', 'Select', 'Toast',
   ],

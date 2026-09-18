@@ -282,7 +282,8 @@ export function describeField(
       const element = await named()
       const before = described(element)
       const focus = before.find((target) => target !== root()) ?? element
-      ;(focus as HTMLElement).focus()
+      // Inside act: roving groups record the focused item in state.
+      await act(async () => (focus as HTMLElement).focus())
       for (const props of [
         { label: 'Other', description: 'Help', error: 'Wrong' },
         { description: 'Help' },

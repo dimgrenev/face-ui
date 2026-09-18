@@ -2,22 +2,46 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Toggle",
-  "description": "Deprecated type/array adapter for SegmentedControl; one shared runtime",
+  "description": "Compact choice strip: one radio choice, or independently pressed options with `multiple`.",
   "props": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
+    },
     "items": {
       "type": "array",
       "required": false,
-      "description": "Choices in visual, keyboard and form order; missing items render an empty group."
+      "description": "Choices in visual, keyboard and form order; an item with a missing or repeated `value` is skipped."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable every control and exclude the group from FormData."
+      "description": "Disables every choice and leaves the value out of FormData."
     },
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Visual axis; single radio mode supports both arrow pairs.",
+      "description": "Lays the choices out in a row or a column; a single choice answers to all four arrows.",
       "options": [
         "horizontal",
         "vertical"
@@ -26,65 +50,65 @@
     "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Accessible group name when there is no visible heading."
+      "description": "Names the group when there is no visible label."
     },
     "aria-labelledby": {
       "type": "string",
       "required": false,
-      "description": "Visible heading IDs that name this group."
+      "description": "Ids of visible elements that name the group; they take precedence over `label`."
     },
     "name": {
       "type": "string",
       "required": false,
-      "description": "Native FormData key; multiple selections produce repeated entries."
+      "description": "FormData key; a multiple value submits one entry per choice."
     },
     "form": {
       "type": "string",
       "required": false,
-      "description": "ID of an external form that owns the selection."
+      "description": "Id of the form that submits and resets the value, when it is not an ancestor."
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Blocks form submission until a choice is selected and marks the label."
     },
     "autoFocus": {
       "type": "boolean",
       "required": false,
-      "description": "Focus the selected enabled choice, or the first enabled choice, on mount."
+      "description": "Focuses the selected enabled choice, or the first enabled one, on mount."
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Shared outer spacing around each item; toggling preserves DOM and focus."
+      "description": "Shared outer spacing around each choice; toggling it keeps DOM and focus."
     },
-    "type": {
-      "type": "enum",
+    "multiple": {
+      "type": "boolean",
       "required": false,
-      "description": "Legacy selection mode; new code uses SegmentedControl multiple.",
-      "options": [
-        "single",
-        "multiple"
-      ],
-      "default": "multiple"
+      "description": "Lets the user press any number of choices, and makes the value a `string[]` instead of `string | null`."
     },
     "value": {
-      "type": "array",
+      "type": "any",
       "required": false,
-      "description": "Selected choices; single mode accepts at most one."
+      "description": "Selected key, or keys with `multiple`; keys missing from `items` select nothing until they appear."
     },
     "defaultValue": {
-      "type": "array",
+      "type": "any",
       "required": false,
-      "description": "Initial choices, restored on form reset."
+      "description": "Selection on mount, restored by form reset; same shape as `value`."
     }
   },
   "states": [
     {
-      "name": "Default (Multiple)",
+      "name": "Default (Single)",
       "props": {
-        "type": "multiple"
+        "orientation": "horizontal"
       }
     },
     {
-      "name": "Single",
+      "name": "Multiple",
       "props": {
-        "type": "single"
+        "multiple": true
       }
     },
     {
@@ -110,15 +134,27 @@
     "ArrowLeft": {
       "action": "focusPrevious"
     },
+    "ArrowDown": {
+      "action": "focusNext"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious"
+    },
+    "Home": {
+      "action": "focusFirst"
+    },
+    "End": {
+      "action": "focusLast"
+    },
     "Enter": {
-      "action": "toggle"
+      "action": "selectOrToggle"
     },
     "Space": {
-      "action": "toggle"
+      "action": "selectOrToggle"
     }
   },
   "aria": {
-    "role": "group",
+    "role": "radiogroup",
     "required": [
       "aria-label"
     ]
@@ -126,15 +162,20 @@
   "composition": {
     "required": [
       "root",
+      "list",
       "item"
     ],
     "parts": {
       "root": {
         "slot": "root"
       },
+      "list": {
+        "slot": "list",
+        "parent": "root"
+      },
       "item": {
         "slot": "item",
-        "parent": "root",
+        "parent": "list",
         "multiple": true
       }
     }
@@ -156,7 +197,7 @@
       "--uf-border-width-thin"
     ],
     "notes": [
-      "Compatibility Toggle delegates to SegmentedControl, including native names/forms and shared Membrane."
+      "Toggle is SegmentedControl under its former name: one component, one contract."
     ]
   },
   "platform": {},
