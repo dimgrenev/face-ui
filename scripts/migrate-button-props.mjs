@@ -1,6 +1,6 @@
-import { execFileSync } from 'node:child_process'
 import path from 'node:path'
 import { Project, SyntaxKind } from 'ts-morph'
+import { listTsxSources } from './lib/source-files.mjs'
 
 const write = process.argv.includes('--write')
 const roots = process.argv.slice(2).filter((arg) => arg !== '--write')
@@ -17,27 +17,7 @@ function expression(attribute) {
     : initial.getText()
 }
 for (const root of roots) {
-  const files = execFileSync(
-    'rg',
-    [
-      '--files',
-      root,
-      '-g',
-      '*.tsx',
-      '-g',
-      '!**/node_modules/**',
-      '-g',
-      '!**/packages/face-ui-react/**',
-      '-g',
-      '!**/dist/**',
-      '-g',
-      '!**/.artifacts/**',
-    ],
-    { encoding: 'utf8' },
-  )
-    .trim()
-    .split('\n')
-    .filter(Boolean)
+  const files = listTsxSources(root)
   for (const file of files) {
     const source = project.addSourceFileAtPath(file)
     const names = new Set()

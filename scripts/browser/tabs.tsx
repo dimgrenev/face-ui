@@ -1,4 +1,4 @@
-import React, { StrictMode, version } from 'react'
+import { StrictMode, version } from 'react'
 import { createRoot } from 'react-dom/client'
 import { flushSync } from 'react-dom'
 import { Tabs } from '../../Tabs/Tabs'
