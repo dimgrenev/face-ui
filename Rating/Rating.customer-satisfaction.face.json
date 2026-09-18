@@ -19,14 +19,35 @@
       "disabled": {
         "$ref": "props.disabled"
       },
+      "readOnly": {
+        "$ref": "props.readOnly"
+      },
       "allowHalf": {
         "$ref": "props.allowHalf"
       },
       "label": {
         "$ref": "props.label"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "form": {
+        "$ref": "props.form"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "required": {
+        "$ref": "props.required"
       }
     },
     "children": []
@@ -37,7 +58,8 @@
       "max": 5,
       "allowHalf": false,
       "label": "How helpful was this answer?",
-      "ariaLabel": "Answer helpfulness rating"
+      "name": "helpfulness",
+      "required": true
     }
   },
   "controls": [
@@ -45,48 +67,102 @@
       "name": "value",
       "type": "number",
       "required": false,
-      "description": "Current rating value."
+      "description": "Controlled finite score, bounded to 0..max. Zero means unrated.",
+      "min": 0,
+      "max": 10,
+      "step": 0.1
     },
     {
       "name": "defaultValue",
       "type": "number",
       "required": false,
-      "description": "Uncontrolled initial rating value.",
-      "defaultValue": 0
+      "description": "Initial uncontrolled score, restored by form reset. Defaults to 0.",
+      "defaultValue": 0,
+      "min": 0,
+      "max": 10,
+      "step": 0.5
     },
     {
       "name": "max",
       "type": "number",
       "required": false,
-      "description": "Maximum number of stars.",
-      "defaultValue": 5
+      "description": "Number of stars: an integer from 1 to 10. Defaults to 5.",
+      "defaultValue": 5,
+      "min": 1,
+      "max": 10,
+      "step": 1
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Disable editing and native form submission, retaining the displayed score.",
+      "defaultValue": false
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "description": "Display a precise average as a measurement, without editing or required validation.",
       "defaultValue": false
     },
     {
       "name": "allowHalf",
       "type": "boolean",
       "required": false,
-      "description": "Allow half-star increments.",
+      "description": "Allow half-star input steps. Readonly averages always retain exact fractions.",
       "defaultValue": false
     },
     {
       "name": "label",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Label content."
+      "description": "Noninteractive visible name; empty content falls back to native naming attributes."
     },
     {
-      "name": "ariaLabel",
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Accessible name used when no visible label is provided.",
-      "defaultValue": "Rating"
+      "description": "Name override, or a name when no visible label is provided."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "External naming elements; takes precedence over label and aria-label."
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "Id of an external native form that owns this score."
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the selected or first editable choice on mount. Defaults to false.",
+      "defaultValue": false
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Shared membrane spacing around each choice and the label. Defaults to true.",
+      "defaultValue": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Nonempty native form key; use a distinct name for each independent rating."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Require a score before submitting an editable rating. Defaults to false.",
+      "defaultValue": false
     }
   ],
   "meta": {

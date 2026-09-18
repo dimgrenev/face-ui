@@ -27,6 +27,9 @@
       },
       "disabled": {
         "$ref": "props.disabled"
+      },
+      "headingLevel": {
+        "$ref": "props.headingLevel"
       }
     },
     "children": []
@@ -65,46 +68,61 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Accordion item definitions. Each item can include icon, matching Button icon input semantics."
+      "description": "Ordered section definitions with unique string values."
     },
     {
       "name": "icon",
       "type": "string",
       "required": false,
-      "description": "Default left icon for item triggers. Individual items can override it with item.icon."
+      "description": "Default decorative icon at the start of each trigger; item.icon overrides it."
     },
     {
       "name": "expandedIds",
       "type": "array",
       "required": false,
-      "description": "Currently expanded item IDs (controlled)."
+      "description": "Controlled section values; absent items are retained for asynchronous lists."
     },
     {
       "name": "defaultExpandedIds",
       "type": "array",
       "required": false,
-      "description": "Uncontrolled initial expanded item IDs."
+      "description": "Initial uncontrolled section values; later changes are ignored."
     },
     {
       "name": "multiple",
       "type": "boolean",
       "required": false,
-      "description": "Allow multiple items to be expanded simultaneously.",
+      "description": "Allow multiple open sections; false displays the first available expanded value.",
       "defaultValue": true
     },
     {
       "name": "collapsible",
       "type": "boolean",
       "required": false,
-      "description": "Allow collapsing the last open item.",
+      "description": "Allow users to collapse the last visible open section; does not auto-open a section.",
       "defaultValue": true
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire accordion.",
+      "description": "Disable all disclosure triggers; panel contents keep their own interactivity.",
       "defaultValue": false
+    },
+    {
+      "name": "headingLevel",
+      "type": "select",
+      "required": false,
+      "description": "Heading level for section triggers in the containing document.",
+      "options": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "defaultValue": 3
     }
   ],
   "meta": {

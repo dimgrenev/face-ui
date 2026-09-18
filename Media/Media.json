@@ -83,12 +83,12 @@
       "description": "Start muted."
     },
     "width": {
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Explicit width."
     },
     "height": {
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Explicit height."
     },
@@ -104,7 +104,7 @@
       ]
     },
     "fallback": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Fallback content shown on error."
     },

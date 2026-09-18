@@ -12,7 +12,8 @@
     "groups": {
       "type": "array",
       "required": false,
-      "description": "Group definitions for organizing items."
+      "description": "Group definitions for organizing items.",
+      "default": []
     },
     "placeholder": {
       "type": "string",
@@ -59,7 +60,7 @@
       "default": false
     },
     "emptyContent": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Content to display when no results match.",
       "default": "No results found."

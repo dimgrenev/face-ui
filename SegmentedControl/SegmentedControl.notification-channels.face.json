@@ -10,39 +10,51 @@
       "items": {
         "$ref": "props.items"
       },
-      "value": {
-        "$ref": "props.value"
-      },
-      "defaultValue": {
-        "$ref": "props.defaultValue"
-      },
-      "selectionMode": {
-        "$ref": "props.selectionMode"
-      },
       "disabled": {
         "$ref": "props.disabled"
       },
       "orientation": {
         "$ref": "props.orientation"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "form": {
+        "$ref": "props.form"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
       },
       "membrane": {
         "$ref": "props.membrane"
+      },
+      "multiple": {
+        "$ref": "props.multiple"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "selectionMode": "multiple",
+      "multiple": true,
       "orientation": "horizontal",
       "defaultValue": [
         "email",
         "slack"
       ],
-      "ariaLabel": "Notification channels",
+      "aria-label": "Notification channels",
       "membrane": true,
       "items": [
         {
@@ -65,43 +77,21 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Segment options."
-    },
-    {
-      "name": "value",
-      "type": "array",
-      "required": false,
-      "description": "Currently selected segment values."
-    },
-    {
-      "name": "defaultValue",
-      "type": "array",
-      "required": false,
-      "description": "Uncontrolled initial selected segment values."
-    },
-    {
-      "name": "selectionMode",
-      "type": "select",
-      "required": false,
-      "description": "Selection mode: single or multiple.",
-      "options": [
-        "single",
-        "multiple"
-      ],
-      "defaultValue": "single"
+      "description": "Choices in visual, keyboard and form order; missing items render an empty group.",
+      "defaultValue": []
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state for the entire group.",
+      "description": "Disable every control and exclude the group from FormData.",
       "defaultValue": false
     },
     {
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Layout orientation.",
+      "description": "Visual axis; single radio mode supports both arrow pairs.",
       "options": [
         "horizontal",
         "vertical"
@@ -109,17 +99,61 @@
       "defaultValue": "horizontal"
     },
     {
-      "name": "ariaLabel",
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Accessible name for the segmented group."
+      "description": "Accessible group name when there is no visible heading."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Visible heading IDs that name this group."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native FormData key; multiple selections produce repeated entries."
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "ID of an external form that owns the selection."
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the selected enabled choice, or the first enabled choice, on mount.",
+      "defaultValue": false
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each segment item.",
+      "description": "Shared outer spacing around each item; toggling preserves DOM and focus.",
       "defaultValue": true
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "required": false,
+      "description": "False selects one item without clearing on reselect; true toggles independent options.",
+      "defaultValue": false
+    },
+    {
+      "name": "value",
+      "type": "any",
+      "required": false,
+      "description": "Controlled selection: string/null for single, readonly string[] for multiple. Unknown keys are omitted."
+    },
+    {
+      "name": "defaultValue",
+      "type": "any",
+      "required": false,
+      "description": "Initial selection, restored on form reset: string/null for single, readonly string[] for multiple."
     }
   ],
   "meta": {

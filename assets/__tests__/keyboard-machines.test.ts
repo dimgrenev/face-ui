@@ -5,29 +5,9 @@ import { menuMachine } from '../machines/menu.machine'
 import { navigationMachine } from '../machines/navigation.machine'
 import { radioMachine } from '../machines/radio.machine'
 import { selectMachine } from '../machines/select.machine'
-import { tabsMachine } from '../machines/tabs.machine'
 import { treeMachine } from '../machines/tree.machine'
 
 describe('keyboard machine fidelity', () => {
-  it('tabs rove focus across enabled items and auto-select on focus', () => {
-    const svc = interpret(tabsMachine, {
-      value: 'overview',
-      itemOrder: ['overview', 'details', 'billing'],
-      disabledValues: ['details'],
-      activationMode: 'automatic',
-    }).start()
-
-    svc.send({ type: 'FOCUS', value: 'overview' })
-    svc.send({ type: 'FOCUS_NEXT' })
-    expect(svc.getSnapshot().context.focusedValue).toBe('billing')
-    expect(svc.getSnapshot().context.value).toBe('billing')
-
-    svc.send({ type: 'FOCUS_PREV' })
-    expect(svc.getSnapshot().context.focusedValue).toBe('overview')
-    expect(svc.getSnapshot().context.value).toBe('overview')
-    svc.stop()
-  })
-
   it('radio roves focus and selection together', () => {
     const svc = interpret(radioMachine, {
       value: 'a',
@@ -43,6 +23,30 @@ describe('keyboard machine fidelity', () => {
     svc.send({ type: 'FOCUS_PREV' })
     expect(svc.getSnapshot().context.focusedValue).toBe('a')
     expect(svc.getSnapshot().context.value).toBe('a')
+    svc.stop()
+  })
+
+  it('radio keeps empty values in navigation and rejects disabled or unknown user choices', () => {
+    const chosen: string[] = []
+    const svc = interpret(radioMachine, {
+      value: 'a',
+      itemOrder: ['a', '', 'b'],
+      disabledValues: ['b'],
+      onValueChange: ({ value }) => chosen.push(value),
+    }).start()
+    svc.send({ type: 'SELECT', value: 'b' })
+    svc.send({ type: 'SELECT', value: 'missing' })
+    expect(svc.getSnapshot().context.value).toBe('a')
+    svc.send({ type: 'FOCUS', value: 'a' })
+    svc.send({ type: 'FOCUS_NEXT' })
+    expect(svc.getSnapshot().context.value).toBe('')
+    svc.send({ type: 'FOCUS_NEXT' })
+    expect(svc.getSnapshot().context.value).toBe('a')
+    svc.syncContext({ disabled: true })
+    svc.send({ type: 'FOCUS_NEXT' })
+    svc.send({ type: 'SELECT', value: '' })
+    expect(svc.getSnapshot().context.value).toBe('a')
+    expect(chosen).toEqual(['', 'a'])
     svc.stop()
   })
 
@@ -204,6 +208,7 @@ describe('keyboard machine fidelity', () => {
     single.stop()
 
     const multi = interpret(selectMachine, {
+      multiple: true,
       value: [],
       optionOrder: ['alpha', 'beta', 'gamma'],
       disabledValues: ['beta'],

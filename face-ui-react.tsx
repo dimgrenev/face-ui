@@ -144,6 +144,11 @@ function resolveRenderableComponent(candidate: any, fallbackExportName?: string)
 // Компоненты не должны содержать sandbox-специфичные костыли (типа распаковки module namespace объектов).
 // Совместимость sandbox обеспечивается на стороне iframe-хоста (`public/runtime/sandbox/react-host.js`).
 
+// Navigation belongs to the demo boundary, not to the shared link components.
+function preventGalleryNavigation(event: React.MouseEvent<HTMLElement>) {
+  if (event.target instanceof Element && event.target.closest('a[href]')) event.preventDefault();
+}
+
 export default function faceUiReact(props: FeldGalleryProps) {
   const galleryRef = useRef<HTMLDivElement | null>(null);
   const face = (props && props.face && typeof props.face === 'object' && Array.isArray((props.face as any).cards))
@@ -203,10 +208,10 @@ export default function faceUiReact(props: FeldGalleryProps) {
   return (
     <div ref={galleryRef} className="uf-gallery" data-theme={theme}>
       <Bar className="uf-gallery-header">
-        <Bar.LeftEllipsis>
+        <Bar.Section grow>
           <Text as="span" className="uf-gallery-title" fullWidth truncate>face-ui-react</Text>
-        </Bar.LeftEllipsis>
-        <Bar.Right>
+        </Bar.Section>
+        <Bar.Section align="end">
           <Button
             type="button"
             className="uf-gallery-icon-button"
@@ -227,10 +232,10 @@ export default function faceUiReact(props: FeldGalleryProps) {
             aria-label="Clear"
             onClick={() => { setLocalFaceOverride(null); setThemeOverride(null); }}
           />
-        </Bar.Right>
+        </Bar.Section>
       </Bar>
 
-      <div className="uf-gallery-grid">
+      <div className="uf-gallery-grid" onClick={preventGalleryNavigation} onAuxClick={preventGalleryNavigation}>
         {visibleCards.map((card) => {
           const rawName = String(card?.component || 'Component');
           const normalizedName = resolveCardComponentKey(rawName);

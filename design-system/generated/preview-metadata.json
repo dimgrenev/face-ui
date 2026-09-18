@@ -23,6 +23,25 @@
       ]
     },
     {
+      "sheet": "compatibility",
+      "profile": "design-system",
+      "title": "Compatibility",
+      "generatedPath": "design-system/tokens/colors.css",
+      "previewKind": "compatibility",
+      "tokenCount": 10,
+      "selectors": [
+        ":root,\n[data-theme='light'],\n[data-theme='dark']"
+      ],
+      "sampleTokens": [
+        "background",
+        "foreground",
+        "border",
+        "panel-bg",
+        "header-bg",
+        "input-bg"
+      ]
+    },
+    {
       "sheet": "effects",
       "profile": "design-system",
       "title": "Effects",
@@ -31,10 +50,10 @@
       "tokenCount": 24,
       "selectors": [
         ":root",
-        ":root,\n[data-theme='dark']",
-        ":root[data-theme='dark'],\n:root:not([data-theme])",
-        ":root[data-theme='light']",
-        ":root[data-theme='light'],\n[data-theme='light']"
+        ":root,\n[data-theme='light'],\n[data-theme='dark']",
+        ":root[data-theme='light'],\n[data-theme='light']",
+        ":root[data-theme='dark'],\n:root:not([data-theme]),\n[data-theme='dark']",
+        ":root,\n[data-theme='dark']"
       ],
       "sampleTokens": [
         "uf-shadow-none",
@@ -46,6 +65,45 @@
       ]
     },
     {
+      "sheet": "geometry",
+      "profile": "design-system",
+      "title": "Geometry",
+      "generatedPath": "design-system/tokens/geometry.css",
+      "previewKind": "geometry",
+      "tokenCount": 40,
+      "selectors": [
+        ":root",
+        ":root,\n[data-theme='light'],\n[data-theme='dark']"
+      ],
+      "sampleTokens": [
+        "uf-control-height",
+        "uf-control-font-size",
+        "uf-control-line-height",
+        "uf-control-letter-spacing",
+        "uf-control-pad-y",
+        "uf-control-pad-text"
+      ]
+    },
+    {
+      "sheet": "motion",
+      "profile": "design-system",
+      "title": "Motion",
+      "generatedPath": "design-system/tokens/motion.css",
+      "previewKind": "motion",
+      "tokenCount": 7,
+      "selectors": [
+        ":root"
+      ],
+      "sampleTokens": [
+        "uf-motion-instant",
+        "uf-motion-fast",
+        "uf-motion-snappy",
+        "uf-motion-normal",
+        "uf-motion-slow",
+        "uf-ease-out"
+      ]
+    },
+    {
       "sheet": "semantic-action",
       "profile": "design-system",
       "title": "Semantic / Action",
@@ -53,9 +111,9 @@
       "previewKind": "semantic",
       "tokenCount": 13,
       "selectors": [
-        ":root",
         ":root,\n[data-theme='dark']",
-        ":root[data-theme='light'],\n[data-theme='light']"
+        ":root[data-theme='light'],\n[data-theme='light']",
+        ":root"
       ],
       "sampleTokens": [
         "uf-color-active",
@@ -134,7 +192,8 @@
       "previewKind": "shape",
       "tokenCount": 19,
       "selectors": [
-        ":root"
+        ":root",
+        ":root,\n[data-theme='light'],\n[data-theme='dark']"
       ],
       "sampleTokens": [
         "uf-border-width-none",
@@ -172,7 +231,8 @@
       "previewKind": "theme-state",
       "tokenCount": 29,
       "selectors": [
-        ":root"
+        ":root",
+        ":root,\n[data-theme='light'],\n[data-theme='dark']"
       ],
       "sampleTokens": [
         "uf-control-font-size",
@@ -191,7 +251,8 @@
       "previewKind": "typography",
       "tokenCount": 64,
       "selectors": [
-        ":root"
+        ":root",
+        ":root,\n[data-theme='light'],\n[data-theme='dark']"
       ],
       "sampleTokens": [
         "uf-font-family-base",

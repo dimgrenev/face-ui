@@ -90,6 +90,28 @@ const toggleGroup = (ctx: SidebarContext, event: SidebarEvent): void => {
 // Machine
 // ---------------------------------------------------------------------------
 
+const sidebarEvents = {
+  TOGGLE_COLLAPSE: [
+    {
+      guard: (ctx: SidebarContext) => !ctx.collapsed,
+      target: 'collapsed' as const,
+      actions: [syncCollapsedTrue],
+    },
+    { target: 'expanded' as const, actions: [syncCollapsedFalse] },
+  ],
+  SET_COLLAPSED: [
+    {
+      guard: (_ctx: SidebarContext, event: SidebarEvent) =>
+        event.type === 'SET_COLLAPSED' && event.collapsed,
+      target: 'collapsed' as const,
+      actions: [syncCollapsedTrue],
+    },
+    { target: 'expanded' as const, actions: [syncCollapsedFalse] },
+  ],
+  SELECT: { actions: [selectItem] },
+  TOGGLE_GROUP: { actions: [toggleGroup] },
+}
+
 export const sidebarMachine = createMachine<SidebarSchema>({
   id: 'sidebar',
   initial: 'expanded',
@@ -115,53 +137,8 @@ export const sidebarMachine = createMachine<SidebarSchema>({
   },
 
   states: {
-    expanded: {
-      entry: [syncCollapsedFalse],
-      on: {
-        TOGGLE_COLLAPSE: {
-          target: 'collapsed',
-        },
-        SET_COLLAPSED: [
-          {
-            guard: (_ctx, event) => {
-              const e = event as { type: 'SET_COLLAPSED'; collapsed: boolean }
-              return e.collapsed === true
-            },
-            target: 'collapsed',
-          },
-        ],
-        SELECT: {
-          actions: [selectItem],
-        },
-        TOGGLE_GROUP: {
-          actions: [toggleGroup],
-        },
-      },
-    },
-
-    collapsed: {
-      entry: [syncCollapsedTrue],
-      on: {
-        TOGGLE_COLLAPSE: {
-          target: 'expanded',
-        },
-        SET_COLLAPSED: [
-          {
-            guard: (_ctx, event) => {
-              const e = event as { type: 'SET_COLLAPSED'; collapsed: boolean }
-              return e.collapsed === false
-            },
-            target: 'expanded',
-          },
-        ],
-        SELECT: {
-          actions: [selectItem],
-        },
-        TOGGLE_GROUP: {
-          actions: [toggleGroup],
-        },
-      },
-    },
+    expanded: { on: sidebarEvents },
+    collapsed: { on: sidebarEvents },
   },
 })
 
@@ -178,9 +155,12 @@ interface SidebarGroupConnectProps {
   id: string
 }
 
-export function connectSidebar(state: MachineSnapshot<SidebarSchema>, send: SendFn<SidebarSchema>) {
+export function connectSidebar(
+  state: MachineSnapshot<SidebarSchema>,
+  send: SendFn<SidebarSchema>,
+) {
   const ctx = state.context
-  const isCollapsed = state.matches('collapsed')
+  const isCollapsed = ctx.collapsed
   const attrs = sidebarAnatomy.getPartAttrs
 
   return {
@@ -195,7 +175,10 @@ export function connectSidebar(state: MachineSnapshot<SidebarSchema>, send: Send
         ...attrs('root'),
         'data-state': isCollapsed ? 'collapsed' : 'expanded',
         style: {
-          width: typeof currentWidth === 'number' ? `${currentWidth}px` : currentWidth,
+          width:
+            typeof currentWidth === 'number'
+              ? `${currentWidth}px`
+              : currentWidth,
         },
         onKeyDown(event: { key: string; preventDefault: () => void }) {
           if (event.key === '[') {
@@ -226,8 +209,9 @@ export function connectSidebar(state: MachineSnapshot<SidebarSchema>, send: Send
 
       return {
         ...attrs('item'),
-        role: 'menuitem' as const,
-        'aria-selected': isSelected,
+        role: 'button' as const,
+        type: 'button' as const,
+        'aria-pressed': isSelected,
         'data-selected': isSelected ? '' : undefined,
         'data-disabled': isDisabled ? '' : undefined,
         'data-state': isCollapsed ? 'collapsed' : 'expanded',
@@ -235,13 +219,6 @@ export function connectSidebar(state: MachineSnapshot<SidebarSchema>, send: Send
         tabIndex: isDisabled ? -1 : 0,
         onClick() {
           if (!isDisabled) {
-            send({ type: 'SELECT', id: props.id })
-          }
-        },
-        onKeyDown(event: { key: string; preventDefault: () => void }) {
-          if (isDisabled) return
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
             send({ type: 'SELECT', id: props.id })
           }
         },
@@ -265,18 +242,13 @@ export function connectSidebar(state: MachineSnapshot<SidebarSchema>, send: Send
       return {
         ...attrs('groupLabel'),
         role: 'button' as const,
+        type: 'button' as const,
         'aria-expanded': isExpanded,
         'data-state': isExpanded ? 'open' : 'closed',
         'data-value': props.id,
         tabIndex: 0,
         onClick() {
           send({ type: 'TOGGLE_GROUP', id: props.id })
-        },
-        onKeyDown(event: { key: string; preventDefault: () => void }) {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            send({ type: 'TOGGLE_GROUP', id: props.id })
-          }
         },
       }
     },
@@ -291,12 +263,6 @@ export function connectSidebar(state: MachineSnapshot<SidebarSchema>, send: Send
         tabIndex: 0,
         onClick() {
           send({ type: 'TOGGLE_COLLAPSE' })
-        },
-        onKeyDown(event: { key: string; preventDefault: () => void }) {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            send({ type: 'TOGGLE_COLLAPSE' })
-          }
         },
       }
     },

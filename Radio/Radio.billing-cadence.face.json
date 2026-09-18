@@ -19,20 +19,29 @@
       "orientation": {
         "$ref": "props.orientation"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
       },
       "disabled": {
         "$ref": "props.disabled"
       },
-      "required": {
-        "$ref": "props.required"
+      "form": {
+        "$ref": "props.form"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
       },
       "name": {
         "$ref": "props.name"
       },
-      "membrane": {
-        "$ref": "props.membrane"
+      "required": {
+        "$ref": "props.required"
       }
     },
     "children": []
@@ -43,7 +52,7 @@
       "defaultValue": "annual",
       "name": "billing-cadence",
       "membrane": true,
-      "ariaLabel": "Billing cadence",
+      "aria-label": "Billing cadence",
       "options": [
         {
           "value": "monthly",
@@ -61,41 +70,25 @@
       "name": "options",
       "type": "array",
       "required": false,
-      "description": "Radio options to render.",
-      "defaultValue": [
-        {
-          "value": "one",
-          "label": "Option one"
-        },
-        {
-          "value": "two",
-          "label": "Option two"
-        },
-        {
-          "value": "three",
-          "label": "Option three",
-          "disabled": true
-        }
-      ]
+      "description": "Visible options in navigation order. Empty or missing options render an empty group."
     },
     {
       "name": "value",
       "type": "string",
       "required": false,
-      "description": "Currently selected value."
+      "description": "Controlled selection; null means no selection. Parent updates do not emit a change."
     },
     {
       "name": "defaultValue",
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial selected value.",
-      "defaultValue": "one"
+      "description": "Uncontrolled initial selection, restored by form reset."
     },
     {
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Layout orientation.",
+      "description": "Visual arrangement and ARIA orientation. Both arrow pairs remain available.",
       "options": [
         "horizontal",
         "vertical"
@@ -103,37 +96,56 @@
       "defaultValue": "vertical"
     },
     {
-      "name": "ariaLabel",
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the selected enabled option, or the first enabled option, on mount.",
+      "defaultValue": false
+    },
+    {
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Accessible label for the radio group (role=\"radiogroup\" requires a name)."
+      "description": "Accessible group name when there is no external visible heading."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Ids of visible headings that name this group."
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state for the entire group.",
+      "description": "Disable every option; native inputs leave focus navigation and form submission.",
       "defaultValue": false
     },
     {
-      "name": "required",
-      "type": "boolean",
-      "required": false,
-      "description": "Mark as required.",
-      "defaultValue": false
-    },
-    {
-      "name": "name",
+      "name": "form",
       "type": "string",
       "required": false,
-      "description": "Form field name."
+      "description": "Id of an external native form that owns all options."
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around control geometry.",
+      "description": "Shared outer spacing around each option; preserves native controls when toggled.",
       "defaultValue": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Nonempty native group and FormData key; use a distinct name for each independent group in a form."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Require a selection before submission. Native group validation requires a nonempty name.",
+      "defaultValue": false
     }
   ],
   "meta": {

@@ -7,31 +7,30 @@
     "items": {
       "type": "array",
       "required": false,
-      "description": "Breadcrumb entries, from root to current page."
+      "description": "Ordered locations from root to current; the last item is current."
     },
     "separator": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Custom separator between items. Defaults to \"/\".",
+      "description": "Decorative separator. '/' uses the slash icon; empty content removes the separator.",
       "default": "/"
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Wrap breadcrumb options (link/current) with membrane spacing.",
+      "description": "Membrane spacing around inline items and the overflow trigger.",
       "default": true
     },
-    "allowNavigation": {
-      "type": "boolean",
-      "required": false,
-      "description": "Allow real browser navigation on link click. Defaults to false for sandbox/demo safety.",
-      "default": false
-    },
-    "collapseAfter": {
+    "maxItems": {
       "type": "number",
       "required": false,
-      "description": "Collapse middle crumbs after this many visible entries.",
+      "description": "Maximum visible positions, including overflow: integer >=3; null shows all. Defaults to 4.",
       "default": 4
+    },
+    "overflowLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name of the overflow button and its list dialog. Empty text uses the default."
     }
   },
   "states": [
@@ -40,8 +39,6 @@
       "props": {
         "separator": "/",
         "membrane": true,
-        "allowNavigation": false,
-        "collapseAfter": 4,
         "items": [
           {
             "label": "Home",
@@ -66,7 +63,8 @@
           {
             "label": "Breadcrumb"
           }
-        ]
+        ],
+        "maxItems": 4
       }
     },
     {
@@ -127,40 +125,67 @@
       }
     },
     {
-      "name": "Navigation Enabled",
+      "name": "Uncollapsed",
       "props": {
+        "maxItems": null,
         "items": [
           {
             "label": "Home",
             "href": "#"
           },
           {
-            "label": "Library",
+            "label": "Design",
+            "href": "#"
+          },
+          {
+            "label": "System",
+            "href": "#"
+          },
+          {
+            "label": "Components",
+            "href": "#"
+          },
+          {
+            "label": "Navigation",
             "href": "#"
           },
           {
             "label": "Breadcrumb"
           }
-        ],
-        "allowNavigation": true
+        ]
       }
     }
   ],
-  "behavior": {},
-  "keyboard": {},
+  "behavior": {
+    "navigation": "href remains a native link; callbacks receive the event and may preventDefault. Without href, callbacks are native buttons and inactive locations are text.",
+    "overflow": "maxItems includes the overflow position; null shows all. Root and current are preserved. Hidden ancestors use the same renderer inside a named Popover.",
+    "empty": "An empty trail renders no navigation landmark."
+  },
+  "keyboard": {
+    "Tab": {
+      "action": "focusNextInteractiveLocation"
+    },
+    "Enter": {
+      "action": "activateFocusedLinkOrButton"
+    },
+    "Space": {
+      "action": "activateFocusedButton"
+    },
+    "Escape": {
+      "action": "closeOverflow"
+    }
+  },
   "aria": {
     "role": "navigation",
-    "required": [
-      "aria-label"
-    ]
+    "label": "Native aria-label/aria-labelledby name the nav; default Breadcrumb. overflowLabel names the overflow button and dialog.",
+    "current": "The last location has aria-current=page; a destination is optional.",
+    "separator": "Separators are decorative and hidden from assistive technology."
   },
   "composition": {
     "required": [
       "root",
       "list",
-      "item",
-      "link",
-      "separator"
+      "item"
     ],
     "parts": {
       "root": {
@@ -182,15 +207,23 @@
       "separator": {
         "slot": "separator",
         "parent": "item"
+      },
+      "current": {
+        "slot": "current",
+        "parent": "item"
+      },
+      "action": {
+        "slot": "action",
+        "parent": "item"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "item"
       }
     }
   },
   "tokenMapping": {
-    "component": [
-      "--uf-breadcrumb-separator-w",
-      "--uf-breadcrumb-separator-h",
-      "--uf-icon-only-size"
-    ],
+    "component": [],
     "semanticFallbacks": [
       "--uf-membrane",
       "--uf-control-height",
@@ -204,8 +237,8 @@
       "--uf-color-hover-bg"
     ],
     "notes": [
-      "Breadcrumb items and overflow controls render through Button/Text-compatible primitives.",
-      "Separator sizing is local to breadcrumb but derived from shared spacing and membrane tokens."
+      "Inline locations share control geometry and Membrane. Overflow uses the shared ghost Button and Popover.",
+      "Separator and wrapping belong to Breadcrumb; there is no duplicated Button skin."
     ]
   },
   "platform": {},

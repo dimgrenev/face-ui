@@ -5,12 +5,12 @@
   "description": "Loading placeholder with animation",
   "props": {
     "width": {
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Explicit width"
     },
     "height": {
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Explicit height"
     },

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 
 import { getAdvancedPropParser, type ParsedProp } from './lib/advancedPropParser'
 import { PRODUCT_SCENARIOS, type ProductScenario } from './product-scenarios'
-import { extractReactTsPropsFromSource, type ExtractedProp } from './lib/tsPropExtractor'
+import { extractReactTsPropsFromSource, getPropOptions, type ExtractedProp } from './lib/tsPropExtractor'
 import { getTypeEnricher, type EnrichedProp } from './lib/typeEnricher'
 
 type VFSFile = { content: string }
@@ -58,7 +58,7 @@ interface PropAnalysis {
   required: boolean
   defaultValue?: unknown
   description?: string
-  options?: string[]
+  options?: Array<string | number | boolean>
   enumValues?: Record<string, string | number>
   isArray?: boolean
   arrayItemType?: string
@@ -126,16 +126,17 @@ function isPlaygroundImplementationProp(propName: string, prop: FaceJsonProp): b
   return /(?:ClassName|Ref)$/.test(propName)
 }
 
+// Defaults for the shared range presentation live in its internal component,
+// outside either public wrapper's source (the contract parser reads the wrapper).
+const RANGE_PRESENTATION_DEFAULTS = {
+  tone: { default: 'neutral' }, shape: { default: 'linear' },
+  showValue: { default: false }, membrane: { default: true },
+}
 const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   Accordion: {
     patchProps: {
-      items: {
-        description: 'Accordion item definitions. Each item can include icon, matching Button icon input semantics.',
-      },
       icon: {
         type: 'string',
-        required: false,
-        description: 'Default left icon for item triggers. Individual items can override it with item.icon.',
       },
     },
     patchStates: (states) => {
@@ -226,6 +227,11 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   },
   Button: {
     patchProps: {
+      'aria-expanded': {
+        type: 'boolean',
+        required: false,
+        description: 'Standard expanded state; reverses the disclosure chevron when true.',
+      },
       variant: {
         type: 'enum',
         default: 'default',
@@ -289,10 +295,10 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         description: 'Convenience body slot rendered through Card.Content; primitive values use Face UI Text.',
       },
       footer: {
-        type: 'object',
+        type: 'ReactNode',
         required: false,
         controlType: 'object',
-        description: 'Convenience footer slot. Use React content or a structured component descriptor.',
+        description: 'Convenience footer slot: text, React content, component descriptors or arrays. The JSON editor accepts every serializable form.',
       },
       variant: {
         options: ['default', 'plain', 'code'],
@@ -306,7 +312,10 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         options: ['md', 'lg', 'none'],
         description: 'Corner geometry for contained, compact, dialog, or flush surfaces.',
       },
-      footerLayout: {
+      border: {
+        description: 'Draw the surface border independently of padding, radius and variant.',
+      },
+      footerAlign: {
         options: ['start', 'end', 'between'],
         description: 'Alignment used by the convenience footer slot. Compound usage configures Card.Footer directly.',
       },
@@ -321,7 +330,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
             __componentName__: 'Button',
             text: 'Open',
             icon: 'arrow-right',
-            iconPosition: 'right',
+            iconPosition: 'end',
             membrane: true,
             fullWidth: false,
           },
@@ -348,11 +357,11 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         },
       },
       {
-        name: 'Interactive',
+        name: 'Hover highlight',
         props: {
-          interactive: true,
+          hoverable: true,
           title: 'Deploy preview',
-          content: 'Interactive surfaces can react to hover while click behavior stays with their children.',
+          content: 'The surface highlights on hover or focus within; its children own their actions.',
         },
       },
     ],
@@ -382,6 +391,14 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         }
       : state),
   },
+  Date: {
+    patchStates: (states) => states.map((state) => {
+      if (state.props.mode !== 'week') return state
+      const props = { ...state.props }
+      delete props.selection
+      return { ...state, props }
+    }),
+  },
   Icon: {
     patchStates: () => [
       { name: 'Default', props: { name: 'settings' } },
@@ -390,46 +407,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       { name: 'Unknown Fallback', props: { name: 'unknown-icon' } },
       { name: 'Accessible', props: { name: 'account', label: 'Account' } },
     ],
-  },
-  Checkbox: {
-    patchProps: {
-      checked: {
-        type: 'union',
-        required: false,
-        description: 'Controlled checked state. Accepts boolean or "indeterminate".',
-        options: [true, false, 'indeterminate'],
-        default: null,
-      },
-      defaultChecked: {
-        type: 'union',
-        required: false,
-        description: 'Uncontrolled initial checked state. Accepts boolean or "indeterminate".',
-        options: [true, false, 'indeterminate'],
-        default: false,
-      },
-      disabled: {
-        description: 'Disable pointer and keyboard interaction.',
-      },
-      required: {
-        description: 'Mark the hidden native input as required.',
-      },
-      name: {
-        description: 'Native form field name for the hidden input.',
-      },
-      label: {
-        type: 'ReactNode',
-        description: 'Visible label content rendered through Face UI Text.',
-      },
-      onCheckedChange: {
-        description: 'Callback fired with { checked } when the machine state changes.',
-      },
-      className: {
-        description: 'Additional className on the root label.',
-      },
-      membrane: {
-        description: 'Wrap the control in the standard one-token membrane.',
-      },
-    },
   },
   Modal: {
     omitProps: ['disabled', 'label'],
@@ -570,7 +547,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   Input: {
     patchProps: {
       required: {
-        description: 'Show the required indicator (*).',
+        description: 'Require a value for native form validation and show the required indicator.',
       },
     },
     patchStates: (states) => states.map((state) => ({
@@ -581,6 +558,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
     })),
   },
   Progress: {
+    patchProps: RANGE_PRESENTATION_DEFAULTS,
     patchStates: () => [
       {
         name: 'Default',
@@ -590,7 +568,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           tone: 'neutral',
           shape: 'linear',
           showValue: true,
-          label: 'Typography',
+          label: 'Uploading assets',
         },
       },
       {
@@ -603,15 +581,15 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
       {
         name: 'Warning',
-        props: { value: 82, tone: 'warning', showValue: true, label: 'Storage used' },
+        props: { value: 82, tone: 'warning', showValue: true, label: 'Upload paused' },
       },
       {
         name: 'Destructive',
-        props: { value: 96, tone: 'destructive', showValue: true, label: 'Quota used' },
+        props: { value: 96, tone: 'destructive', showValue: true, label: 'Upload failed' },
       },
       {
         name: 'Circle',
-        props: { value: 28, shape: 'circle', showValue: true, ariaLabel: 'Context progress' },
+        props: { value: 28, shape: 'circle', showValue: true, 'aria-label': 'Import progress' },
       },
       {
         name: 'Indeterminate',
@@ -619,39 +597,23 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     ],
   },
+  Meter: {
+    patchProps: RANGE_PRESENTATION_DEFAULTS,
+    patchStates: () => [
+      { name: 'Default', props: { value: 28, label: 'Storage used', showValue: true } },
+      { name: 'Empty', props: { value: 0, label: 'Daily quota', showValue: true } },
+      { name: 'Full', props: { value: 100, tone: 'destructive', label: 'Storage full', showValue: true } },
+      { name: 'Warning', props: { value: 82, tone: 'warning', label: 'Daily quota', showValue: true } },
+      { name: 'Positive', props: { value: 35, tone: 'positive', label: 'Storage used', showValue: true } },
+      { name: 'Circle', props: { value: 74, shape: 'circle', 'aria-label': 'Context used', showValue: true } },
+    ],
+  },
   Radio: {
-    patchProps: {
-      options: {
-        type: 'array',
-        required: false,
-        description: 'Radio options to render.',
-        default: [
-          { value: 'one', label: 'Option one' },
-          { value: 'two', label: 'Option two' },
-          { value: 'three', label: 'Option three', disabled: true },
-        ],
-      },
-      defaultValue: {
-        type: 'string',
-        required: false,
-        description: 'Uncontrolled initial selected value.',
-        default: 'one',
-      },
-      orientation: {
-        type: 'enum',
-        required: false,
-        description: 'Layout orientation.',
-        options: ['horizontal', 'vertical'],
-        default: 'vertical',
-      },
-      disabled: {
-        description: 'Disabled state for the entire group.',
-      },
-    },
     patchStates: () => [
       {
         name: 'Default',
         props: {
+          'aria-label': 'Example choice',
           options: [
             { value: 'one', label: 'Option one' },
             { value: 'two', label: 'Option two' },
@@ -663,6 +625,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Horizontal',
         props: {
+          'aria-label': 'Example choice',
           options: [
             { value: 'one', label: 'Option one' },
             { value: 'two', label: 'Option two' },
@@ -675,6 +638,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Disabled',
         props: {
+          'aria-label': 'Example choice',
           options: [
             { value: 'one', label: 'Option one' },
             { value: 'two', label: 'Option two' },
@@ -686,106 +650,35 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     ],
   },
+  Rating: {
+    patchProps: {
+      max: { min: 1, max: 10, step: 1 },
+    },
+  },
   Slider: {
     patchProps: {
-      variant: {
-        type: 'enum',
-        required: false,
-        default: 'simple',
-        options: ['simple', 'advanced'],
-        description: 'Standard track/thumb presentation or enhanced value-thumb presentation.',
-      },
-      leadingIcon: {
-        type: 'string',
-        required: false,
-        description: 'Leading icon name for the advanced slider.',
-      },
-      leadingText: {
-        type: 'string',
-        required: false,
-        description: 'Leading text for the advanced slider.',
-      },
-      crop: {
-        type: 'boolean',
-        required: false,
-        default: false,
-        description: 'Enable crop handles in the advanced slider.',
-      },
-      defaultCropRange: {
-        type: 'object',
-        required: false,
-        description: 'Uncontrolled initial crop range for the advanced slider.',
-      },
-      cropRange: {
-        type: 'object',
-        required: false,
-        description: 'Controlled crop range for the advanced slider.',
-      },
-      cropLocksValue: {
-        type: 'boolean',
-        required: false,
-        default: true,
-        description: 'Clamp the value to the crop range.',
-      },
-      onCropChange: {
-        type: 'function',
-        required: false,
-        description: 'Called when the crop range changes.',
-      },
+      min: { default: 0 }, max: { default: 100 }, step: { default: 1 },
+      disabled: { default: false }, orientation: { default: 'horizontal' },
+      showValue: { default: false }, crop: { default: false },
+      clampToCrop: { default: true }, membrane: { default: true }, autoFocus: { default: false },
     },
     patchStates: () => [
-      {
-        name: 'Default',
-        props: {
-          label: 'Value',
-          defaultValue: [50],
-        },
-      },
-      {
-        name: 'Range',
-        props: {
-          defaultValue: [20, 80],
-          label: 'Price range',
-        },
-      },
-      {
-        name: 'Advanced',
-        props: {
-          variant: 'advanced',
-          label: 'Zoom',
-          defaultValue: [42],
-          leadingText: 'Zoom',
-        },
-      },
-      {
-        name: 'Crop',
-        props: {
-          variant: 'advanced',
-          label: 'Crop',
-          defaultValue: [40],
-          crop: true,
-          defaultCropRange: { min: 20, max: 80 },
-          cropLocksValue: true,
-          leadingText: 'Crop',
-        },
-      },
-      {
-        name: 'Disabled',
-        props: {
-          defaultValue: [30],
-          disabled: true,
-        },
-      },
+      { name: 'Default', props: { label: 'Value', defaultValue: [50] } },
+      { name: 'Range', props: { defaultValue: [20, 80], label: 'Price range', labels: { thumbs: ['Minimum price', 'Maximum price'] } } },
+      { name: 'Value', props: { showValue: true, label: 'Zoom', defaultValue: 42 } },
+      { name: 'Crop', props: { showValue: true, label: 'Crop', defaultValue: 40, crop: true, defaultCropRange: { min: 20, max: 80 } } },
+      { name: 'Disabled', props: { label: 'Unavailable value', defaultValue: 30, disabled: true } },
     ],
   },
   Tile: {
     patchProps: {
-      intent: {
-        type: 'enum',
-        required: false,
-        default: 'default',
-        options: ['default', 'disclosure', 'tree', 'tab', 'section'],
-        description: 'Semantic row intent. Use default for generic and navigation rows, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.',
+      'aria-expanded': {
+        type: 'boolean', required: false,
+        description: 'Native disclosure state; also orients chevron.',
+      },
+      'aria-busy': {
+        type: 'boolean', required: false,
+        description: 'Native row-region busy state; changes cursor without disabling.',
       },
       density: {
         type: 'enum',
@@ -806,7 +699,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         required: false,
         default: 'reveal',
         options: ['reveal', 'hover', 'always', 'hidden'],
-        description: 'How the actions slot is exposed: reveal on hover/focus/active, hover only, always visible, or hidden.',
+        description: 'Reveal on hover/focus/active; hover on hover/focus; always; hidden. Hoverless devices expose reveal/hover actions.',
       },
       leading: {
         type: 'ReactNode',
@@ -817,18 +710,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         type: 'ReactNode',
         required: false,
         description: 'Trailing non-interactive metadata rendered before actions.',
-      },
-      busy: {
-        type: 'boolean',
-        required: false,
-        default: false,
-        description: 'Marks the row busy with data-busy and aria-busy without disabling it by itself.',
-      },
-      selectedDescendant: {
-        type: 'boolean',
-        required: false,
-        default: false,
-        description: 'Marks parent rows that contain the selected descendant, commonly while collapsed.',
       },
       interactive: {
         type: 'boolean',
@@ -847,7 +728,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Navigation Active',
         props: {
-          intent: 'default',
           text: 'Current page',
           icon: 'file',
           active: true,
@@ -856,11 +736,10 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Disclosure Parent',
         props: {
-          intent: 'disclosure',
           text: 'Project',
           icon: 'folder',
-          selector: true,
-          selectorOpen: true,
+          chevron: 'down',
+          'aria-expanded': true,
           actionVisibility: 'hover',
           actions: '[Button icon=plus]',
         },
@@ -868,28 +747,15 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Tree Row',
         props: {
-          intent: 'tree',
           text: 'src/components/Button.tsx',
           icon: 'file',
           level: 2,
         },
       },
       {
-        name: 'Tab',
-        props: {
-          intent: 'tab',
-          text: 'Preview',
-          icon: 'browser',
-          active: true,
-          fullWidth: false,
-          actionVisibility: 'hover',
-          actions: '[Button icon=close]',
-        },
-      },
-      {
         name: 'Section',
         props: {
-          intent: 'section',
+          tone: 'muted',
           text: 'Collections',
           interactive: false,
         },
@@ -899,7 +765,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         props: {
           text: 'Delete chat?',
           tone: 'destructive',
-          busy: true,
+          'aria-busy': true,
           actionVisibility: 'always',
           actions: '[Button icon=close]',
         },
@@ -1092,36 +958,6 @@ function extractSummary(code: string): string | undefined {
   return lines[0]
 }
 
-function extractBalancedBraces(code: string, start: number): string | null {
-  if (code[start] !== '{') return null
-  let depth = 0
-  for (let index = start; index < code.length; index += 1) {
-    if (code[index] === '{') depth += 1
-    else if (code[index] === '}') {
-      depth -= 1
-      if (depth === 0) return code.slice(start + 1, index)
-    }
-  }
-  return null
-}
-
-function extractNamedPropsBody(code: string, interfaceName: string): string | null {
-  const patterns = [
-    new RegExp(`(?:export\\s+)?interface\\s+${interfaceName}\\b[^\\{]*\\{`, 'm'),
-    new RegExp(`(?:export\\s+)?type\\s+${interfaceName}\\s*=\\s*\\{`, 'm'),
-  ]
-
-  for (const pattern of patterns) {
-    const match = pattern.exec(code)
-    if (!match) continue
-    const braceStart = match.index + match[0].length - 1
-    const body = extractBalancedBraces(code, braceStart)
-    if (body != null) return body
-  }
-
-  return null
-}
-
 function extractsFaceUiProps(interfaceName: string, code: string): boolean {
   const interfacePattern = new RegExp(`(?:export\\s+)?interface\\s+${interfaceName}\\b([^\\{]*)\\{`, 'm')
   const interfaceMatch = interfacePattern.exec(code)
@@ -1158,11 +994,19 @@ function toPropAnalysis(prop: ParsedProp | EnrichedProp | ExtractedProp): PropAn
 
 function buildCanonicalAnalyses(componentName: string, relSourcePath: string, code: string): PropAnalysis[] {
   const interfaceName = `${componentName}Props`
-  const targetBody = extractNamedPropsBody(code, interfaceName)
-  const canonicalCode = targetBody
-    ? `${code}\n\ntype __FaceUiCanonicalProps = {\n${targetBody}\n}\n`
-    : code
-  const canonicalProps = extractReactTsPropsFromSource({ fileName: relSourcePath, code: canonicalCode }) || []
+  function authoredSource(fileName: string, code: string): Parameters<typeof extractReactTsPropsFromSource>[0] {
+    return {
+      fileName, code,
+      resolveImport(specifier: string): Parameters<typeof extractReactTsPropsFromSource>[0] | undefined {
+        if (!specifier.startsWith('.')) return undefined
+        const base = path.resolve(FACE_UI_ROOT, path.dirname(fileName), specifier)
+        const resolved = [base, `${base}.tsx`, `${base}.ts`, path.join(base, 'index.ts')]
+          .find(candidate => candidate.startsWith(`${FACE_UI_ROOT}${path.sep}`) && fs.existsSync(candidate) && fs.statSync(candidate).isFile())
+        return resolved ? authoredSource(path.relative(FACE_UI_ROOT, resolved), fs.readFileSync(resolved, 'utf8')) : undefined
+      },
+    }
+  }
+  const canonicalProps = extractReactTsPropsFromSource(authoredSource(relSourcePath, code), interfaceName)
   const canonicalNames = new Set(canonicalProps.map((prop) => prop.name).filter(Boolean))
   const parser = getAdvancedPropParser()
   const vfs: Record<string, VFSFile> = { [relSourcePath]: { content: code } }
@@ -1175,7 +1019,7 @@ function buildCanonicalAnalyses(componentName: string, relSourcePath: string, co
   }
 
   if (canonicalNames.size > 0) {
-    if (extractsFaceUiProps(interfaceName, code)) {
+    if (extractsFaceUiProps(interfaceName, code) && !new RegExp(`type\\s+${interfaceName}\\s*=`).test(code)) {
       const analyses: PropAnalysis[] = []
       const seen = new Set<string>()
       for (const prop of enrichedProps) {
@@ -1201,6 +1045,7 @@ function buildCanonicalAnalyses(componentName: string, relSourcePath: string, co
         type: canonical.type,
         required: canonical.required,
         defaultValue: canonical.defaultValue,
+        description: canonical.description,
         options: canonical.options,
       })
     }
@@ -1227,42 +1072,28 @@ function buildCanonicalAnalyses(componentName: string, relSourcePath: string, co
 }
 
 function mergeCanonicalProp(canonical: ExtractedProp, enriched: EnrichedProp): PropAnalysis {
-  const next: PropAnalysis = {
+  return {
     name: enriched.name,
-    type: enriched.type,
-    required: enriched.required,
-    defaultValue: enriched.defaultValue,
-    description: enriched.description,
-    options: enriched.options,
+    type: canonical.type === 'any' ? enriched.type : canonical.type,
+    required: canonical.required,
+    defaultValue: canonical.defaultValue !== undefined ? canonical.defaultValue : enriched.defaultValue,
+    description: canonical.description ?? enriched.description,
+    options: getPropOptions(canonical.options, enriched.options),
     enumValues: enriched.enumValues,
-    isArray: enriched.isArray,
-    arrayItemType: enriched.arrayItemType,
-    isObject: enriched.isObject,
+    isArray: canonical.type === 'any' ? enriched.isArray : canonical.type === 'array',
+    arrayItemType: canonical.type === 'any' || canonical.type === 'array' ? enriched.arrayItemType : undefined,
+    isObject: canonical.type === 'any' ? enriched.isObject : canonical.type === 'object',
     objectShape: enriched.objectShape,
     isInherited: enriched.isInherited,
   }
 
-  if (canonical.defaultValue !== undefined && next.defaultValue === undefined) {
-    next.defaultValue = canonical.defaultValue
-  }
-
-  if (canonical.options && canonical.options.length > 0 && (!next.options || next.options.length === 0)) {
-    next.options = canonical.options
-  }
-
-  if (!next.type || next.type === 'any') {
-    next.type = canonical.type
-  }
-
-  return next
 }
 
-function normalizeOptions(input?: string[]): string[] | undefined {
+function normalizeOptions(input?: Array<string | number | boolean>): Array<string | number | boolean> | undefined {
   if (!Array.isArray(input)) return undefined
-  const seen = new Set<string>()
+  const seen = new Set<string | number | boolean>()
   const next = input
-    .map((item) => String(item))
-    .map((item) => item.trim())
+    .map((item) => typeof item === 'string' ? item.trim() : item)
     .filter((item) => item !== '' && item !== 'undefined' && item !== 'null')
     .filter((item) => {
       if (seen.has(item)) return false
@@ -1276,9 +1107,11 @@ function normalizeType(prop: PropAnalysis, existing?: FaceJsonProp): Pick<FaceJs
   const typeText = String(prop.type || '').toLowerCase()
   const options = normalizeOptions(prop.options ?? (prop.enumValues ? Object.values(prop.enumValues).map(String) : undefined))
 
+  if (typeText.includes('reactnode') || typeText.includes('reactelement')) return { type: 'ReactNode' }
   if (options && options.length > 0) {
-    return { type: 'enum', options }
+    return { type: new Set(options.map(option => typeof option)).size > 1 ? 'union' : 'enum', options }
   }
+  if (typeText.includes('|')) return { type: 'any' }
   if (prop.isArray || typeText === 'array' || typeText.endsWith('[]')) {
     return { type: 'array' }
   }
@@ -1291,10 +1124,13 @@ function normalizeType(prop: PropAnalysis, existing?: FaceJsonProp): Pick<FaceJs
   if (typeText.includes('boolean')) {
     return { type: 'boolean' }
   }
+  if (typeText.includes('number') && typeText.includes('string')) {
+    return { type: 'any' }
+  }
   if (typeText.includes('number')) {
     return { type: 'number' }
   }
-  if (typeText.includes('string') || typeText.includes('reactnode') || typeText.includes('reactelement') || typeText.includes('key')) {
+  if (typeText.includes('string') || typeText.includes('key')) {
     return { type: 'string' }
   }
 

@@ -84,7 +84,7 @@
     },
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Trigger element (the anchor)."
     },
@@ -119,9 +119,9 @@
       "required": false,
       "description": "Popover alignment relative to the trigger.",
       "options": [
-        "start",
         "center",
-        "end"
+        "end",
+        "start"
       ],
       "defaultValue": "end"
     },
@@ -134,7 +134,7 @@
     },
     {
       "name": "surfaceTitle",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Optional title used for the mobile sheet header."
     }

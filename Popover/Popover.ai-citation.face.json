@@ -7,9 +7,6 @@
   "root": {
     "type": "Popover",
     "props": {
-      "interactive": {
-        "$ref": "props.interactive"
-      },
       "content": {
         "$ref": "props.content"
       },
@@ -19,11 +16,8 @@
       "open": {
         "$ref": "props.open"
       },
-      "openDelay": {
-        "$ref": "props.openDelay"
-      },
-      "closeDelay": {
-        "$ref": "props.closeDelay"
+      "defaultOpen": {
+        "$ref": "props.defaultOpen"
       },
       "side": {
         "$ref": "props.side"
@@ -33,6 +27,9 @@
       },
       "sideOffset": {
         "$ref": "props.sideOffset"
+      },
+      "dir": {
+        "$ref": "props.dir"
       }
     },
     "children": []
@@ -41,7 +38,6 @@
     "props": {
       "children": "Source 3",
       "content": "Authentication guide, section 4.2: Session renewal.",
-      "interactive": true,
       "side": "right",
       "align": "center",
       "sideOffset": 6,
@@ -50,47 +46,34 @@
   },
   "controls": [
     {
-      "name": "interactive",
-      "type": "boolean",
-      "required": false,
-      "description": "Whether the popover content is interactive (focusable).",
-      "defaultValue": true
-    },
-    {
       "name": "content",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Content rendered inside the floating surface."
+      "description": "Floating content. Empty content leaves the trigger without a layer. Tooltip content must be noninteractive."
     },
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Trigger element (the anchor)."
+      "description": "One trigger element forwarding props/ref, or text rendered as a Button."
     },
     {
       "name": "open",
       "type": "boolean",
       "required": false,
-      "description": "Controlled open state."
+      "description": "Controlled visibility. Changes from the parent do not emit onOpenChange."
     },
     {
-      "name": "openDelay",
-      "type": "number",
+      "name": "defaultOpen",
+      "type": "boolean",
       "required": false,
-      "description": "Delay before opening (ms)."
-    },
-    {
-      "name": "closeDelay",
-      "type": "number",
-      "required": false,
-      "description": "Delay before closing (ms)."
+      "description": "Initial uncontrolled visibility; later changes do not reset the layer."
     },
     {
       "name": "side",
       "type": "select",
       "required": false,
-      "description": "Preferred side placement.",
+      "description": "Preferred side; may flip when the opposite side has more room.",
       "options": [
         "top",
         "right",
@@ -102,7 +85,7 @@
       "name": "align",
       "type": "select",
       "required": false,
-      "description": "Alignment along the side.",
+      "description": "Logical alignment on the cross axis, following dir or the trigger's direction.",
       "options": [
         "start",
         "center",
@@ -113,7 +96,13 @@
       "name": "sideOffset",
       "type": "number",
       "required": false,
-      "description": "Offset from the trigger along the side axis (px)."
+      "description": "Additional nonnegative gap in pixels before the content membrane."
+    },
+    {
+      "name": "dir",
+      "type": "string",
+      "required": false,
+      "description": "Content direction. Omitted inherits the trigger; auto follows the content."
     }
   ],
   "meta": {

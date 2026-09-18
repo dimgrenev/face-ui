@@ -2,8 +2,7 @@
  * Input Machine
  *
  * States: idle, focused
- * Base text input machine. Type variants (textarea, number, otp, tags)
- * are handled by the React adapter, not this machine.
+ * Text editing and focus state. The React adapter owns native input/textarea semantics.
  */
 
 import { createMachine } from '../create-machine'
@@ -206,7 +205,7 @@ export function connectInput(
       return {
         ...inputAnatomy.getPartAttrs('clear'),
         role: 'button' as const,
-        tabIndex: -1,
+        tabIndex: 0,
         'aria-label': 'Clear input',
         'data-disabled': disabled || undefined,
         hidden: isEmpty || disabled || readOnly,

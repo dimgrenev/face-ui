@@ -83,7 +83,7 @@
       }
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Trigger element (the anchor)."
     },
@@ -114,9 +114,9 @@
       "required": false,
       "description": "Popover alignment relative to the trigger.",
       "options": [
-        "start",
         "center",
-        "end"
+        "end",
+        "start"
       ],
       "default": "end"
     },
@@ -127,7 +127,7 @@
       "default": 4
     },
     "surfaceTitle": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Optional title used for the mobile sheet header."
     }

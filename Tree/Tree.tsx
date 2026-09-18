@@ -7,7 +7,14 @@
  * `<Tree items={[{ id: 'a', label: 'Folder', children: [{ id: 'b', label: 'File' }] }]} />`
  */
 
-import { forwardRef, useEffect, useMemo, useRef, type CSSProperties, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useMemo,
+  useRef,
+  type CSSProperties,
+  type ReactNode,
+} from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { treeMachine, connectTree } from '../assets/machines/tree.machine'
@@ -71,19 +78,29 @@ function normalizeIdArray(value: string[] | undefined): string[] | undefined {
   return Array.isArray(value) ? value.map((id) => String(id)) : undefined
 }
 
-function idArraysEqual(left: string[] | undefined, right: string[] | undefined): boolean {
+function idArraysEqual(
+  left: string[] | undefined,
+  right: string[] | undefined,
+): boolean {
   if (left === right) return true
   if (!Array.isArray(left) || !Array.isArray(right)) return false
   if (left.length !== right.length) return false
   return left.every((item, index) => item === right[index])
 }
 
-function computeVisibleIds(nodes: TreeNode[], expandedSet: Set<string>): string[] {
+function computeVisibleIds(
+  nodes: TreeNode[],
+  expandedSet: Set<string>,
+): string[] {
   const ids: string[] = []
   const visit = (itemsToVisit: TreeNode[]) => {
     for (const item of itemsToVisit) {
       ids.push(item.id)
-      if (expandedSet.has(item.id) && Array.isArray(item.children) && item.children.length > 0) {
+      if (
+        expandedSet.has(item.id) &&
+        Array.isArray(item.children) &&
+        item.children.length > 0
+      ) {
         visit(item.children)
       }
     }
@@ -107,7 +124,8 @@ interface TreeNodeRendererProps {
 function TreeNodeRenderer(props: TreeNodeRendererProps) {
   const { node, api, depth, activePathIds, renderNode } = props
   const nodeRender = typeof node.render === 'function' ? node.render : undefined
-  const treeRenderNode = typeof renderNode === 'function' ? renderNode : undefined
+  const treeRenderNode =
+    typeof renderNode === 'function' ? renderNode : undefined
   const hasChildren = Array.isArray(node.children) && node.children.length > 0
   const isInActivePath = activePathIds.has(node.id)
   const isExpanded = api.expandedIds.includes(node.id)
@@ -124,12 +142,19 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
   }
 
   const renderLabel = () => {
-    if (typeof node.label === 'string' || typeof node.label === 'number') return undefined
+    if (typeof node.label === 'string' || typeof node.label === 'number')
+      return undefined
     return node.label
   }
 
-  const renderDefaultRow = (rowProps: Record<string, any>, className: string) => {
-    const customContent = nodeRender?.(renderDetails) ?? treeRenderNode?.(renderDetails) ?? node.content
+  const renderDefaultRow = (
+    rowProps: Record<string, any>,
+    className: string,
+  ) => {
+    const customContent =
+      nodeRender?.(renderDetails) ??
+      treeRenderNode?.(renderDetails) ??
+      node.content
     if (customContent != null || node.kind === 'custom') {
       return (
         <div
@@ -138,16 +163,21 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
           data-active-path={isInActivePath ? '' : undefined}
           data-kind="custom"
           className={cn('uf-tree-custom-node', className)}
-          style={{ '--face-runtime-option-level': Math.max(0, depth) } as CSSProperties}
+          style={
+            {
+              '--face-runtime-option-level': Math.max(0, depth),
+            } as CSSProperties
+          }
         >
           {customContent ?? node.label}
         </div>
       )
     }
 
-    const text = typeof node.label === 'string' || typeof node.label === 'number'
-      ? String(node.label)
-      : undefined
+    const text =
+      typeof node.label === 'string' || typeof node.label === 'number'
+        ? String(node.label)
+        : undefined
     const commonProps = {
       ...rowProps,
       'data-tree-node-id': node.id,
@@ -168,8 +198,8 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
           {...commonProps}
           text={text}
           active={isSelected || isInActivePath}
-          selector={hasChildren}
-          selectorOpen={isExpanded}
+          chevron={hasChildren ? 'down' : undefined}
+          aria-expanded={hasChildren ? isExpanded : undefined}
           actions={node.actions}
         >
           {renderLabel()}
@@ -182,8 +212,8 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
         {...commonProps}
         text={text}
         variant="default"
-        selector={hasChildren}
-        selectorOpen={isExpanded}
+        chevron={hasChildren ? 'down' : undefined}
+        aria-expanded={hasChildren ? isExpanded : undefined}
       >
         {renderLabel()}
       </Button>
@@ -191,25 +221,53 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
   }
 
   if (!hasChildren) {
-    const itemProps = { ...(api.getItemProps({ id: node.id, disabled: node.disabled, depth }) as any) }
+    const itemProps = {
+      ...(api.getItemProps({
+        id: node.id,
+        disabled: node.disabled,
+        depth,
+      }) as any),
+    }
     itemProps['aria-level'] = depth + 1
     delete itemProps['data-scope']
     delete itemProps['data-part']
     return renderDefaultRow(itemProps, 'uf-tree-item-button')
   }
 
-  const branchProps = { ...(api.getBranchProps({ id: node.id, disabled: node.disabled, depth }) as any) }
+  const branchProps = {
+    ...(api.getBranchProps({
+      id: node.id,
+      disabled: node.disabled,
+      depth,
+    }) as any),
+  }
   branchProps.className = cn('uf-tree-branch', branchProps.className)
-  const branchTriggerProps = { ...(api.getBranchTriggerProps({ id: node.id, disabled: node.disabled, depth }) as any) }
+  const branchTriggerProps = {
+    ...(api.getBranchTriggerProps({
+      id: node.id,
+      disabled: node.disabled,
+      depth,
+    }) as any),
+  }
   delete branchTriggerProps['data-scope']
   delete branchTriggerProps['data-part']
 
   return (
     <div {...branchProps}>
-      {renderDefaultRow({
-        ...branchTriggerProps,
-      }, 'uf-tree-branch-button')}
-      <div {...api.getBranchContentProps({ id: node.id, disabled: node.disabled, depth })} className="uf-tree-branch-content">
+      {renderDefaultRow(
+        {
+          ...branchTriggerProps,
+        },
+        'uf-tree-branch-button',
+      )}
+      <div
+        {...api.getBranchContentProps({
+          id: node.id,
+          disabled: node.disabled,
+          depth,
+        })}
+        className="uf-tree-branch-content"
+      >
         {node.children!.map((child) => (
           <TreeNodeRenderer
             key={child.id}
@@ -244,40 +302,58 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
     } = props
 
     const items = Array.isArray(rawItems) ? rawItems : []
-    const expandedChangeHandler = typeof onExpandedChange === 'function' ? onExpandedChange : undefined
-    const selectedChangeHandler = typeof onSelectedChange === 'function' ? onSelectedChange : undefined
+    const expandedChangeHandler =
+      typeof onExpandedChange === 'function' ? onExpandedChange : undefined
+    const selectedChangeHandler =
+      typeof onSelectedChange === 'function' ? onSelectedChange : undefined
 
     const controlledExpandedIds = normalizeIdArray(expandedIds)
     const isExpandedControlled = controlledExpandedIds !== undefined
-    const initialExpandedIds = controlledExpandedIds ?? normalizeIdArray(defaultExpandedIds) ?? []
+    const initialExpandedIds =
+      controlledExpandedIds ?? normalizeIdArray(defaultExpandedIds) ?? []
     const machineExpandedIds = useControllableMachineProp(
       isExpandedControlled ? controlledExpandedIds : undefined,
       initialExpandedIds,
     )
 
-    const controlledSelectedId = selectedId !== undefined ? String(selectedId) : undefined
+    const controlledSelectedId =
+      selectedId !== undefined ? String(selectedId) : undefined
     const isSelectedControlled = controlledSelectedId !== undefined
-    const initialSelectedId = controlledSelectedId ?? (defaultSelectedId ? String(defaultSelectedId) : null)
+    const initialSelectedId =
+      controlledSelectedId ??
+      (defaultSelectedId ? String(defaultSelectedId) : null)
     const machineSelectedId = useControllableMachineProp<string | null>(
       isSelectedControlled ? controlledSelectedId : undefined,
       initialSelectedId,
     )
 
-    const initialVisibleIds = computeVisibleIds(items, new Set(initialExpandedIds))
-    const machineVisibleIds = useControllableMachineProp<string[] | undefined>(undefined, initialVisibleIds)
+    const initialVisibleIds = computeVisibleIds(
+      items,
+      new Set(initialExpandedIds),
+    )
+    const machineVisibleIds = useControllableMachineProp<string[] | undefined>(
+      undefined,
+      initialVisibleIds,
+    )
 
     const { state, send } = useMachine(treeMachine, {
       expandedIds: machineExpandedIds,
       visibleIds: machineVisibleIds,
       selectedId: machineSelectedId,
       onExpandedChange: ((details: { expandedIds: string[] }) => {
-        if (isExpandedControlled && idArraysEqual(details.expandedIds, controlledExpandedIds)) {
+        if (
+          isExpandedControlled &&
+          idArraysEqual(details.expandedIds, controlledExpandedIds)
+        ) {
           return
         }
         expandedChangeHandler?.(details)
       }) as any,
       onSelectedChange: ((details: { selectedId: string }) => {
-        if (isSelectedControlled && details.selectedId === controlledSelectedId) {
+        if (
+          isSelectedControlled &&
+          details.selectedId === controlledSelectedId
+        ) {
           return
         }
         selectedChangeHandler?.(details)
@@ -286,7 +362,11 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
 
     const api = connectTree(state, send)
     const rootRef = useRef<HTMLDivElement | null>(null)
-    const expandedSig = useMemo(() => (Array.isArray(api.expandedIds) ? api.expandedIds.join('\u0001') : ''), [api.expandedIds])
+    const expandedSig = useMemo(
+      () =>
+        Array.isArray(api.expandedIds) ? api.expandedIds.join('\u0001') : '',
+      [api.expandedIds],
+    )
     const activePathIds = useMemo(() => {
       const selected = String(api.selectedId ?? '').trim()
       const set = new Set<string>()
@@ -311,7 +391,10 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
     }, [api.selectedId, items])
 
     useEffect(() => {
-      const nextVisibleIds = computeVisibleIds(items, new Set(state.context.expandedIds))
+      const nextVisibleIds = computeVisibleIds(
+        items,
+        new Set(state.context.expandedIds),
+      )
       send({ type: 'SET_VISIBLE', visibleIds: nextVisibleIds })
     }, [items, send, state.context.expandedIds])
 
@@ -332,12 +415,20 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(
       }
       if (!target) return
       if (target !== document.activeElement) {
-        try { target.focus({ preventScroll: true }) } catch {
-          try { target.focus() } catch {}
+        try {
+          target.focus({ preventScroll: true })
+        } catch {
+          try {
+            target.focus()
+          } catch {}
         }
       }
       try {
-        target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' })
+        target.scrollIntoView({
+          block: 'nearest',
+          inline: 'nearest',
+          behavior: 'auto',
+        })
       } catch {}
     }, [expandedSig, state.context.focusedId])
 

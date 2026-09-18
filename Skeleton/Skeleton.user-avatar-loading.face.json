@@ -29,13 +29,13 @@
   "controls": [
     {
       "name": "width",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Explicit width"
     },
     {
       "name": "height",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Explicit height"
     },

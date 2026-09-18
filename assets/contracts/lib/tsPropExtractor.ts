@@ -1,355 +1,497 @@
-// Lightweight TypeScript-like prop extractor focused on practical cases
-// Goals:
-// - Detect interface/alias used for React props with string-literal unions
-// - Detect boolean/number/string types
-// - Extract defaults from parameter destructuring in component signature
-// - Keep dependencies zero; tolerate syntax noise
+import ts from 'typescript'
 
 export type ExtractedProp = {
-  name: string;
-  type: string; // 'string' | 'number' | 'boolean' | 'function' | 'object' | 'array' | 'select' | 'any'
-  required: boolean;
-  options?: string[]; // for select
-  defaultValue?: any;
-};
+  name: string
+  type: string
+  required: boolean
+  options?: Array<string | number | boolean>
+  defaultValue?: unknown
+  description?: string
+}
 
 type SourceBundle = {
-  fileName: string;
-  code: string;
-};
+  fileName: string
+  code: string
+  /** Resolve authored local types; platform declarations stay outside the editor. */
+  resolveImport?: (specifier: string) => SourceBundle | undefined
+}
 
-// Very tolerant tokenizer for string literal union like 'a' | 'b' | "c"
-function parseStringUnion(typeText: string): string[] | null {
-  const t = typeText.trim();
-  if (!t.includes("'") && !t.includes('"')) return null;
-  const parts = t
-    .split('|')
-    .map((p) => p.trim())
-    .filter(Boolean);
-  const values: string[] = [];
-  for (const p of parts) {
-    const m = /^['"](.*)['"]$/m.exec(p);
-    if (!m) return null;
-    values.push(m[1]);
+/** Preserve authored order; checker union order depends on which library types
+ * TypeScript interns first and must not affect generated controls. */
+export function getPropOptions(
+  authored: ExtractedProp['options'],
+  enriched: ExtractedProp['options'],
+): ExtractedProp['options'] {
+  return (
+    authored ??
+    enriched?.slice().sort((left, right) => {
+      const a = `${typeof left}:${left}`,
+        b = `${typeof right}:${right}`
+      return a < b ? -1 : a > b ? 1 : 0
+    })
+  )
+}
+
+/** Read the authored TypeScript contract without interpreting comments as code. */
+export function extractReactTsPropsFromSource(
+  { fileName, code, resolveImport }: SourceBundle,
+  interfaceName?: string,
+  visited = new Set<string>(),
+): ExtractedProp[] {
+  const identity = `${fileName}#${interfaceName ?? ''}`
+  if (visited.has(identity)) return []
+  const nextVisited = new Set([...visited, identity])
+  const source = ts.createSourceFile(
+    fileName,
+    code,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX,
+  )
+  const declarations = source.statements.filter(
+    (node): node is ts.InterfaceDeclaration | ts.TypeAliasDeclaration =>
+      ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node),
+  )
+  const declaration = interfaceName
+    ? declarations.find((node) => node.name.text === interfaceName)
+    : ([...declarations]
+        .reverse()
+        .find((node) => /Props$/i.test(node.name.text)) ??
+      [...declarations].reverse().find((node) => /Props/i.test(node.name.text)))
+  if (!declaration) return []
+
+  const aliases = new Map(
+    declarations
+      .filter(ts.isTypeAliasDeclaration)
+      .map((node) => [node.name.text, node.type]),
+  )
+  const enums = new Map(
+    source.statements
+      .filter(ts.isEnumDeclaration)
+      .map((node) => [node.name.text, node]),
+  )
+  const named = new Map(declarations.map((node) => [node.name.text, node]))
+  const imports = new Map<string, { specifier: string; name: string }>()
+  for (const statement of source.statements) {
+    if (
+      !ts.isImportDeclaration(statement) ||
+      !ts.isStringLiteral(statement.moduleSpecifier)
+    )
+      continue
+    const bindings = statement.importClause?.namedBindings
+    if (!bindings || !ts.isNamedImports(bindings)) continue
+    for (const binding of bindings.elements)
+      imports.set(binding.name.text, {
+        specifier: statement.moduleSpecifier.text,
+        name: (binding.propertyName ?? binding.name).text,
+      })
   }
-  return values.length > 0 ? values : null;
-}
-
-// Extract map of prop name -> default value from function parameter destructuring
-// Example: function Button({ label = 'Button', variant = 'primary' }: ButtonProps) { ... }
-function extractDefaultsFromParam(code: string): Record<string, any> {
-  const out: Record<string, any> = {};
-  try {
-    // Find the first function component declaration or const with arrow
-    // Case A: function/arrow with typed destructuring: ({ a = 1 }: Props) { ... } or => ( ... )
-    // Case B: forwardRef style: ({ a = 1, ...rest }, ref) => { ... }
-    const mA = code.match(/\(\{([\s\S]*?)\}\s*:\s*[^)]+\)\s*(?:\{|\(|=>)/);
-    const mB = code.match(/\(\{([\s\S]*?)\}\s*(?::\s*[^),]+)?\s*,\s*[_$A-Za-z][\w$]*\s*\)\s*=>\s*(?:\{|\()/);
-    const inside = (mA && mA[1]) ? mA[1] : ((mB && mB[1]) ? mB[1] : '');
-    if (!inside) return out;
-    // Brace-aware top-level comma splitting (handles nested objects/arrays in defaults)
-    const parts: string[] = [];
-    let depth = 0;
-    let current = '';
-    for (let i = 0; i < inside.length; i++) {
-      const ch = inside[i];
-      if (ch === '{' || ch === '[' || ch === '(') depth++;
-      else if (ch === '}' || ch === ']' || ch === ')') depth--;
-      if (ch === ',' && depth === 0) {
-        const trimmed = current.trim();
-        if (trimmed) parts.push(trimmed);
-        current = '';
-      } else {
-        current += ch;
-      }
-    }
-    const last = current.trim();
-    if (last) parts.push(last);
-    for (const p of parts) {
-      const m = /(\w+)\s*=\s*([^,]+)/.exec(p);
-      if (!m) continue;
-      const key = m[1];
-      const valRaw = m[2].trim();
-      if (/^'(.*)'$/.test(valRaw)) out[key] = valRaw.slice(1, -1);
-      else if (/^\d+(?:\.\d+)?$/.test(valRaw)) out[key] = Number(valRaw);
-      else if (/^(true|false)$/.test(valRaw)) out[key] = valRaw === 'true';
-      else if (/^\[.*\]$/.test(valRaw)) out[key] = [];
-      else if (/^\{.*\}$/.test(valRaw)) out[key] = {};
-      else out[key] = undefined;
-    }
-  } catch {}
-  return out;
-}
-
-// Extract defaults from Component.defaultProps = { ... }
-function extractDefaultPropsObject(code: string): Record<string, any> {
-  const out: Record<string, any> = {};
-  try {
-    const m = /\.defaultProps\s*=\s*\{([\s\S]*?)\}/m.exec(code);
-    if (!m) return out;
-    const body = m[1];
-    const pairs = body.split(',').map((s) => s.trim()).filter(Boolean);
-    for (const p of pairs) {
-      const mm = /(\w+)\s*:\s*([^,]+)/.exec(p);
-      if (!mm) continue;
-      const key = mm[1];
-      const valRaw = mm[2].trim();
-      if (/^'(.*)'$/.test(valRaw)) out[key] = valRaw.slice(1, -1);
-      else if(/^"(.*)"$/.test(valRaw)) out[key] = valRaw.slice(1, -1);
-      else if (/^\d+(?:\.\d+)?$/.test(valRaw)) out[key] = Number(valRaw);
-      else if (/^(true|false)$/.test(valRaw)) out[key] = valRaw === 'true';
-      else if (/^\[.*\]$/.test(valRaw)) out[key] = [];
-      else if (/^\{.*\}$/.test(valRaw)) out[key] = {};
-      else out[key] = undefined;
-    }
-  } catch {}
-  return out;
-}
-
-// Extract props interface text.
-// Prefers `*Props` declarations. Supports both exported and non-exported interfaces/types.
-// Uses balanced brace matching to handle nested object types like `style?: { color: string }`.
-function extractPropsInterface(code: string): string | null {
-  try {
-    type Match = { name: string; body: string; kind: 'interface' | 'type' };
-    const matches: Match[] = [];
-
-    // interface XProps { ... }  (optionally exported, supports `extends ...`)
-    const ifaceRe = /(?:export\s+)?interface\s+([A-Za-z0-9_]+)[^{]*\{/g;
-    let m: RegExpExecArray | null;
-    while ((m = ifaceRe.exec(code))) {
-      const braceStart = m.index + m[0].length - 1;
-      const body = extractBalancedBraces(code, braceStart);
-      if (body !== null) matches.push({ name: m[1], body, kind: 'interface' });
-    }
-
-    // type XProps = { ... }  (optionally exported)
-    const typeRe = /(?:export\s+)?type\s+([A-Za-z0-9_]+)\s*=\s*\{/g;
-    while ((m = typeRe.exec(code))) {
-      const braceStart = m.index + m[0].length - 1;
-      const body = extractBalancedBraces(code, braceStart);
-      if (body !== null) matches.push({ name: m[1], body, kind: 'type' });
-    }
-
-    if (matches.length === 0) return null;
-
-    const isPropsName = (n: string) => n.toLowerCase().includes('props');
-    const endsWithProps = (n: string) => /props$/i.test(n);
-
-    // Prefer LAST matching *Props interface — more specific than base interfaces
-    // that tend to appear earlier in the file (e.g. ButtonBaseProps before ButtonProps).
-    const propsEnding = [...matches].reverse().find((x) => endsWithProps(x.name));
-    const propsContaining = [...matches].reverse().find((x) => isPropsName(x.name));
-    const best = propsEnding || propsContaining || matches[matches.length - 1] || matches[0];
-
-    return best?.body ?? null;
-  } catch {
-    return null;
+  function imported(name: string): ExtractedProp[] {
+    const entry = imports.get(name)
+    const bundle = entry && resolveImport?.(entry.specifier)
+    return bundle
+      ? extractReactTsPropsFromSource(bundle, entry!.name, nextVisited).map(
+          ({ defaultValue, ...prop }) => prop,
+        )
+      : []
   }
-}
 
-// Extract simple type/enum aliases within the same file for resolving interface property types
-function extractLocalAliases(code: string): Record<string, { type: 'union'|'enum'; options: string[] }>{
-  const map: Record<string, { type: 'union'|'enum'; options: string[] }> = {};
-  try {
-    // type Alias = 'a' | 'b' (optionally exported)
-    const typeRegex = /(?:export\s+)?type\s+([A-Za-z0-9_]+)\s*=\s*([^;\n]+);?/g;
-    let m: RegExpExecArray | null;
-    while ((m = typeRegex.exec(code))) {
-      const name = m[1];
-      const rhs = m[2];
-      const union = parseStringUnion(rhs);
-      if (union && union.length) map[name] = { type: 'union', options: union };
+  function literal(node: ts.Expression | undefined): unknown {
+    if (!node) return undefined
+    if (ts.isStringLiteralLike(node)) return node.text
+    if (ts.isNumericLiteral(node)) return Number(node.text)
+    if (node.kind === ts.SyntaxKind.TrueKeyword) return true
+    if (node.kind === ts.SyntaxKind.FalseKeyword) return false
+    if (node.kind === ts.SyntaxKind.NullKeyword) return null
+    if (
+      ts.isPrefixUnaryExpression(node) &&
+      node.operator === ts.SyntaxKind.MinusToken &&
+      ts.isNumericLiteral(node.operand)
+    )
+      return -Number(node.operand.text)
+    if (ts.isArrayLiteralExpression(node)) {
+      const values = node.elements.map((element) => literal(element))
+      return values.some((value) => value === undefined) ? undefined : values
     }
-    // enum Alias { A='a', B='b' } (optionally exported)
-    const enumRegex = /(?:export\s+)?enum\s+([A-Za-z0-9_]+)\s*\{([\s\S]*?)\}/g;
-    while ((m = enumRegex.exec(code))) {
-      const name = m[1];
-      const body = m[2];
-      const opts: string[] = [];
-      const lineRe = /(\w+)\s*=\s*'(.*?)'/g;
-      let mm: RegExpExecArray | null;
-      while ((mm = lineRe.exec(body))) {
-        opts.push(mm[2]);
+    if (ts.isObjectLiteralExpression(node)) {
+      const result: Record<string, unknown> = {}
+      for (const property of node.properties) {
+        if (
+          !ts.isPropertyAssignment(property) ||
+          !property.name ||
+          ts.isComputedPropertyName(property.name)
+        )
+          return undefined
+        const value = literal(property.initializer)
+        if (value === undefined) return undefined
+        result[property.name.getText(source).replace(/^['"]|['"]$/g, '')] =
+          value
       }
-      if (opts.length) map[name] = { type: 'enum', options: opts };
+      return result
     }
-  } catch {}
-  return map;
-}
+    return undefined
+  }
 
-// Extract JSDoc typedefs with string-literal unions
-// Example: /** @typedef {'primary'|'secondary'|'danger'} Variant */
-function extractJsDocAliases(code: string): Record<string, { type: 'union'; options: string[] }>{
-  const map: Record<string, { type: 'union'; options: string[] }> = {};
-  try {
-    const re = /@typedef\s*\{([^}]+)\}\s*([A-Za-z0-9_]+)/g;
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(code))) {
-      const typeBody = m[1];
-      const name = m[2];
-      const union = parseStringUnion(typeBody);
-      if (union && union.length) map[name] = { type: 'union', options: union };
+  function classify(
+    node: ts.TypeNode | undefined,
+    seen = new Set<string>(),
+  ): Pick<ExtractedProp, 'type' | 'options'> {
+    if (!node) return { type: 'any' }
+    if (
+      ts.isParenthesizedTypeNode(node) ||
+      (ts.isTypeOperatorNode(node) &&
+        node.operator === ts.SyntaxKind.ReadonlyKeyword)
+    )
+      return classify(node.type, seen)
+    if (ts.isLiteralTypeNode(node)) {
+      if (ts.isStringLiteral(node.literal))
+        return { type: 'select', options: [node.literal.text] }
+      if (
+        node.literal.kind === ts.SyntaxKind.TrueKeyword ||
+        node.literal.kind === ts.SyntaxKind.FalseKeyword
+      )
+        return { type: 'boolean' }
+      if (ts.isNumericLiteral(node.literal)) return { type: 'number' }
     }
-  } catch {}
-  return map;
-}
+    if (ts.isUnionTypeNode(node)) {
+      const types = node.types.filter(
+        (type) =>
+          type.kind !== ts.SyntaxKind.UndefinedKeyword &&
+          !(
+            ts.isLiteralTypeNode(type) &&
+            type.literal.kind === ts.SyntaxKind.NullKeyword
+          ),
+      )
+      if (types.length === 1) return classify(types[0], seen)
+      if (
+        types.every(
+          (type) =>
+            ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal),
+        )
+      ) {
+        return {
+          type: 'select',
+          options: types.map(
+            (type) =>
+              ((type as ts.LiteralTypeNode).literal as ts.StringLiteral).text,
+          ),
+        }
+      }
+      if (
+        types.every(
+          (type) =>
+            ts.isLiteralTypeNode(type) &&
+            (type.literal.kind === ts.SyntaxKind.TrueKeyword ||
+              type.literal.kind === ts.SyntaxKind.FalseKeyword),
+        )
+      )
+        return { type: 'boolean' }
+      const finiteValues = types.map((type) => {
+        if (type.kind === ts.SyntaxKind.BooleanKeyword) return [true, false]
+        if (!ts.isLiteralTypeNode(type)) return undefined
+        const value = literal(type.literal)
+        return typeof value === 'string' ||
+          typeof value === 'number' ||
+          typeof value === 'boolean'
+          ? [value]
+          : undefined
+      })
+      if (finiteValues.every((values) => values !== undefined))
+        return { type: 'select', options: [...new Set(finiteValues.flat())] }
+      const classified = types.map((type) => classify(type, new Set(seen)))
+      if (classified.every((type) => type.type === 'select'))
+        return {
+          type: 'select',
+          options: [
+            ...new Set(classified.flatMap((type) => type.options ?? [])),
+          ],
+        }
+      if (classified.every((type) => type.type === classified[0]?.type))
+        return classified[0] ?? { type: 'any' }
+      // Preserve mixed primitive contracts instead of silently narrowing them.
+      if (
+        classified.every((type) =>
+          ['string', 'number', 'boolean', 'array', 'object'].includes(
+            type.type,
+          ),
+        )
+      )
+        return { type: classified.map((type) => type.type).join(' | ') }
+      return { type: 'any' }
+    }
+    if (ts.isTypeReferenceNode(node)) {
+      const name = node.typeName.getText(source)
+      if (seen.has(name)) return { type: 'any' }
+      const next = new Set([...seen, name])
+      const alias = aliases.get(name)
+      if (alias) return classify(alias, next)
+      const enumeration = enums.get(name)
+      if (enumeration) {
+        const values = enumeration.members.map((member) =>
+          literal(member.initializer),
+        )
+        if (values.every((value) => typeof value === 'string'))
+          return { type: 'select', options: values as string[] }
+        return { type: 'number' }
+      }
+      if (['Array', 'ReadonlyArray'].includes(name)) return { type: 'array' }
+      if (
+        [
+          'ReactNode',
+          'React.ReactNode',
+          'ReactElement',
+          'React.ReactElement',
+        ].includes(name)
+      )
+        return { type: 'ReactNode' }
+      return { type: 'any' }
+    }
+    if (ts.isArrayTypeNode(node) || ts.isTupleTypeNode(node))
+      return { type: 'array' }
+    if (ts.isFunctionTypeNode(node)) return { type: 'function' }
+    if (ts.isTypeLiteralNode(node)) return { type: 'object' }
+    if (node.kind === ts.SyntaxKind.StringKeyword) return { type: 'string' }
+    if (node.kind === ts.SyntaxKind.NumberKeyword) return { type: 'number' }
+    if (node.kind === ts.SyntaxKind.BooleanKeyword) return { type: 'boolean' }
+    if (node.kind === ts.SyntaxKind.ObjectKeyword) return { type: 'object' }
+    return { type: 'any' }
+  }
 
-// Extract the body between matched braces, handling nesting.
-// Returns the content between the opening `{` at `start` and its matching `}`.
-function extractBalancedBraces(code: string, start: number): string | null {
-  if (code[start] !== '{') return null;
-  let depth = 0;
-  for (let i = start; i < code.length; i++) {
-    if (code[i] === '{') depth++;
-    else if (code[i] === '}') {
-      depth--;
-      if (depth === 0) return code.slice(start + 1, i);
+  const defaults = new Map<string, unknown>()
+  const componentName = fileName
+    .replaceAll('\\', '/')
+    .split('/')
+    .pop()
+    ?.replace(/\.[^.]+$/, '')
+  type ComponentFunction =
+    | ts.FunctionDeclaration
+    | ts.FunctionExpression
+    | ts.ArrowFunction
+  const bindings = new Map<string, ts.Node>()
+  for (const statement of source.statements) {
+    if (ts.isFunctionDeclaration(statement) && statement.name)
+      bindings.set(statement.name.text, statement)
+    if (ts.isVariableStatement(statement)) {
+      for (const variable of statement.declarationList.declarations) {
+        if (ts.isIdentifier(variable.name))
+          bindings.set(variable.name.text, variable)
+      }
     }
   }
-  return null;
-}
-
-function normalizeType(tsType: string, unionOptions: string[] | null): { type: string; options?: string[] } {
-  const t = tsType.trim().toLowerCase();
-  if (unionOptions && unionOptions.length > 0) return { type: 'select', options: unionOptions };
-  if (t.startsWith('string')) return { type: 'string' };
-  if (t.startsWith('number')) return { type: 'number' };
-  if (t.startsWith('boolean')) return { type: 'boolean' };
-  if (t.startsWith('array') || /\[\]$/.test(t)) return { type: 'array' };
-  if (t.startsWith('function') || t.includes('=>')) return { type: 'function' };
-  if (t.startsWith('object') || t.startsWith('{')) return { type: 'object' };
-  return { type: 'any' };
-}
-
-// Parse rudimentary PropTypes: oneOf([...]), string, number, bool, array, object, func, and .isRequired
-function extractPropTypes(code: string): Record<string, { type: string; options?: string[]; required?: boolean }>{
-  const out: Record<string, { type: string; options?: string[]; required?: boolean }> = {};
-  try {
-    const m = /\.propTypes\s*=\s*\{([\s\S]*?)\}/m.exec(code);
-    if (!m) return out;
-    const body = m[1];
-    const entries = body.split(',').map((s)=>s.trim()).filter(Boolean);
-    for (const e of entries) {
-      const mm = /(\w+)\s*:\s*([^,]+)/.exec(e);
-      if (!mm) continue;
-      const key = mm[1];
-      const rhs = mm[2];
-      const isReq = /\.isRequired\b/.test(rhs);
-      if (/PropTypes\.oneOf\s*\(\s*\[(.*?)\]\s*\)/.test(rhs)) {
-        const list = /PropTypes\.oneOf\s*\(\s*\[(.*?)\]\s*\)/.exec(rhs)![1];
-        const opts = list.split(',').map(s=>s.trim()).map(s=>s.replace(/^'(.*)'$/,'$1').replace(/^"(.*)"$/,'$1')).filter(Boolean);
-        out[key] = { type: 'select', options: opts, required: isReq };
-      } else if (/PropTypes\.bool/.test(rhs)) out[key] = { type: 'boolean', required: isReq };
-      else if (/PropTypes\.number/.test(rhs)) out[key] = { type: 'number', required: isReq };
-      else if (/PropTypes\.string/.test(rhs)) out[key] = { type: 'string', required: isReq };
-      else if (/PropTypes\.array/.test(rhs)) out[key] = { type: 'array', required: isReq };
-      else if (/PropTypes\.object/.test(rhs)) out[key] = { type: 'object', required: isReq };
-      else if (/PropTypes\.func/.test(rhs)) out[key] = { type: 'function', required: isReq };
-      else out[key] = { type: 'any', required: isReq };
+  function resolveComponent(
+    node: ts.Node | undefined,
+    seen = new Set<ts.Node>(),
+  ): ComponentFunction | undefined {
+    if (!node || seen.has(node)) return undefined
+    seen.add(node)
+    if (
+      ts.isFunctionDeclaration(node) ||
+      ts.isFunctionExpression(node) ||
+      ts.isArrowFunction(node)
+    )
+      return node
+    if (ts.isVariableDeclaration(node))
+      return resolveComponent(node.initializer, seen)
+    if (ts.isIdentifier(node))
+      return resolveComponent(bindings.get(node.text), seen)
+    if (
+      ts.isAsExpression(node) ||
+      ts.isSatisfiesExpression(node) ||
+      ts.isParenthesizedExpression(node) ||
+      ts.isNonNullExpression(node)
+    )
+      return resolveComponent(node.expression, seen)
+    if (ts.isCallExpression(node)) {
+      const callee = node.expression.getText(source)
+      if (
+        [
+          'forwardRef',
+          'React.forwardRef',
+          'memo',
+          'React.memo',
+          'Object.assign',
+        ].includes(callee)
+      )
+        return resolveComponent(node.arguments[0], seen)
     }
-  } catch {}
-  return out;
-}
-
-export function extractReactTsPropsFromSource(bundle: SourceBundle): ExtractedProp[] {
-  const { code } = bundle;
-  const defaults = { ...extractDefaultsFromParam(code), ...extractDefaultPropsObject(code) };
-  const aliases = { ...extractLocalAliases(code), ...extractJsDocAliases(code) };
-  const propTypes = extractPropTypes(code);
-  const iface = extractPropsInterface(code);
-  const out: ExtractedProp[] = [];
-  if (iface) {
-    // Collapse multiline types into single entries. Split on `;`/newline, but
-    // ONLY at bracket depth 0 — otherwise inline object types inside callback
-    // params (e.g. `onSortChange?: (d: { column: string; direction: 'asc' }) => void`)
-    // leak their inner keys as phantom top-level props. We track `()`/`{}`/`[]`
-    // only (not `<>`, which is ambiguous with the `=>` in arrow types), and we
-    // ignore brackets/separators inside string literals so a stray `(` or `;`
-    // in a string-union option can't desync the depth counter.
-    const rawEntries: string[] = [];
-    {
-      let depth = 0;
-      let buf = '';
-      let quote = '';
-      let prev = '';
-      for (const ch of iface) {
-        if (quote) {
-          buf += ch;
-          if (ch === quote && prev !== '\\') quote = '';
-          prev = ch;
-          continue;
-        }
-        if (ch === "'" || ch === '"' || ch === '`') {
-          quote = ch;
-          buf += ch;
-          prev = ch;
-          continue;
-        }
-        if (ch === '(' || ch === '[' || ch === '{') depth++;
-        else if (ch === ')' || ch === ']' || ch === '}') depth = Math.max(0, depth - 1);
-        if ((ch === ';' || ch === '\n') && depth === 0) {
-          const t = buf.trim();
-          if (t) rawEntries.push(t);
-          buf = '';
-        } else {
-          buf += ch;
-        }
-        prev = ch;
-      }
-      const tail = buf.trim();
-      if (tail) rawEntries.push(tail);
-    }
-    // Rejoin fragments that are continuations (don't start with a property name pattern).
-    const entries: string[] = [];
-    for (const raw of rawEntries) {
-      // Normalize internal newlines so the regex can match the full type.
-      const flat = raw.replace(/\s*\n\s*/g, ' ').trim();
-      if (/^\w+\s*\??:/.test(flat)) {
-        entries.push(flat);
-      } else if (entries.length > 0) {
-        entries[entries.length - 1] += ' ' + flat;
+    return undefined
+  }
+  const component = resolveComponent(bindings.get(componentName ?? ''))
+  function readBindingDefaults(binding: ts.BindingName) {
+    if (!ts.isObjectBindingPattern(binding)) return
+    for (const element of binding.elements) {
+      const name = element.propertyName ?? element.name
+      if (ts.isIdentifier(name) || ts.isStringLiteral(name)) {
+        const value = literal(element.initializer)
+        if (value !== undefined) defaults.set(name.text, value)
       }
     }
-    for (const line of entries) {
-      const m = /^(\w+)\s*(\??)\s*:\s*(.+)$/.exec(line);
-      if (!m) continue;
-      const [, name, opt, rawType] = m;
-      const typeText = rawType.replace(/\|\s*undefined\b/,'').trim();
-      const alias = aliases[typeText];
-      const union = alias ? alias.options : parseStringUnion(typeText);
-      const { type, options } = normalizeType(typeText, union || null);
-      const prop: ExtractedProp = {
+  }
+  const propsParameter = component?.parameters[0]
+  if (propsParameter) {
+    readBindingDefaults(propsParameter.name)
+    // Only a direct destructure of this function's props parameter establishes
+    // prop defaults. Nested callbacks and unrelated objects have their own API.
+    if (
+      ts.isIdentifier(propsParameter.name) &&
+      component?.body &&
+      ts.isBlock(component.body)
+    ) {
+      for (const statement of component.body.statements) {
+        if (!ts.isVariableStatement(statement)) continue
+        for (const variable of statement.declarationList.declarations) {
+          if (
+            variable.initializer &&
+            ts.isIdentifier(variable.initializer) &&
+            variable.initializer.text === propsParameter.name.text
+          )
+            readBindingDefaults(variable.name)
+        }
+      }
+    }
+  }
+
+  function readMember(member: ts.TypeElement): ExtractedProp[] {
+    if (
+      !ts.isPropertySignature(member) ||
+      member.type?.kind === ts.SyntaxKind.NeverKeyword
+    )
+      return []
+    if (!member.name || ts.isComputedPropertyName(member.name)) return []
+    const name = member.name.getText(source).replace(/^['"]|['"]$/g, '')
+    return [
+      {
         name,
-        type,
-        required: opt !== '?',
-      };
-      if (options) prop.options = options;
-      if (propTypes[name]) {
-        const pt = propTypes[name];
-        prop.type = pt.type || prop.type;
-        if (pt.options) prop.options = pt.options;
-        if (typeof pt.required === 'boolean') prop.required = pt.required;
-      }
-      if (Object.prototype.hasOwnProperty.call(defaults, name)) {
-        prop.defaultValue = defaults[name];
-      }
-      out.push(prop);
-    }
+        ...classify(member.type),
+        ...(ts.getJSDocCommentsAndTags(member).length
+          ? {
+              description: ts
+                .getJSDocCommentsAndTags(member)
+                .filter(ts.isJSDoc)
+                .map((doc) =>
+                  typeof doc.comment === 'string' ? doc.comment : '',
+                )
+                .filter(Boolean)
+                .join('\n'),
+            }
+          : {}),
+        required:
+          !member.questionToken &&
+          !(
+            member.type &&
+            ts.isUnionTypeNode(member.type) &&
+            member.type.types.some(
+              (type) => type.kind === ts.SyntaxKind.UndefinedKeyword,
+            )
+          ),
+        ...(defaults.has(name) ? { defaultValue: defaults.get(name) } : {}),
+      },
+    ]
   }
-  // If no TS interface, try to build from propTypes only
-  if (out.length === 0 && Object.keys(propTypes).length > 0) {
-    for (const [name, pt] of Object.entries(propTypes)) {
-      const p: ExtractedProp = {
-        name,
-        type: pt.type,
-        required: !!pt.required,
-      };
-      if (pt.options) p.options = pt.options;
-      if (Object.prototype.hasOwnProperty.call(defaults, name)) p.defaultValue = defaults[name];
-      out.push(p);
-    }
-  }
-  return out;
-}
 
+  function merge(groups: ExtractedProp[][], union: boolean): ExtractedProp[] {
+    const names = [
+      ...new Set(groups.flatMap((group) => group.map((prop) => prop.name))),
+    ]
+    return names.map((name) => {
+      const props = groups.flatMap((group) =>
+        group.filter((prop) => prop.name === name),
+      )
+      const last = props[props.length - 1]
+      const sameType = props.every((prop) => prop.type === last.type)
+      return {
+        ...last,
+        description: props.find((prop) => prop.description)?.description,
+        type: sameType
+          ? last.type
+          : props.every((prop) =>
+                ['string', 'number', 'boolean', 'array', 'object'].includes(
+                  prop.type,
+                ),
+              )
+            ? [...new Set(props.map((prop) => prop.type))].join(' | ')
+            : 'any',
+        // A partly unresolved union needs checker enrichment. Options from its
+        // last resolved branch would silently narrow the entire contract.
+        options:
+          sameType && last.type === 'select'
+            ? [...new Set(props.flatMap((prop) => prop.options ?? []))]
+            : undefined,
+        required: union
+          ? props.length === groups.length &&
+            props.every((prop) => prop.required)
+          : props.some((prop) => prop.required),
+      }
+    })
+  }
+
+  function read(
+    node: ts.Node | undefined,
+    seen = new Set<ts.Node>(),
+  ): ExtractedProp[] {
+    if (!node || seen.has(node)) return []
+    const next = new Set([...seen, node])
+    if (ts.isInterfaceDeclaration(node)) {
+      const inherited =
+        node.heritageClauses?.flatMap((clause) =>
+          clause.types.flatMap((base) =>
+            readReference(
+              base.expression.getText(source),
+              base.typeArguments,
+              next,
+            ),
+          ),
+        ) ?? []
+      // Authored members override inherited declarations. Platform attributes
+      // stay in React's types; only explicitly authored fields enter the editor.
+      const result = new Map(inherited.map((prop) => [prop.name, prop]))
+      for (const member of node.members.flatMap(readMember))
+        result.set(member.name, member)
+      return [...result.values()]
+    }
+    if (ts.isTypeAliasDeclaration(node) || ts.isParenthesizedTypeNode(node))
+      return read(node.type, next)
+    if (ts.isTypeReferenceNode(node))
+      return readReference(
+        node.typeName.getText(source),
+        node.typeArguments,
+        next,
+      )
+    if (ts.isTypeLiteralNode(node)) return node.members.flatMap(readMember)
+    if (ts.isUnionTypeNode(node) || ts.isIntersectionTypeNode(node))
+      return merge(
+        node.types.map((type) => read(type, next)),
+        ts.isUnionTypeNode(node),
+      )
+    return []
+  }
+  function readReference(
+    name: string,
+    args: readonly ts.TypeNode[] | undefined,
+    seen: Set<ts.Node>,
+  ): ExtractedProp[] {
+    if (['Omit', 'Pick'].includes(name) && args?.length === 2) {
+      const keys =
+        args[1].kind === ts.SyntaxKind.NeverKeyword
+          ? []
+          : classify(args[1]).options
+      if (!keys) return []
+      return read(args[0], seen).filter((prop) =>
+        name === 'Pick' ? keys.includes(prop.name) : !keys.includes(prop.name),
+      )
+    }
+    if (
+      ['Partial', 'Required', 'Readonly'].includes(name) &&
+      args?.length === 1
+    )
+      return read(args[0], seen).map((prop) =>
+        name === 'Readonly' ? prop : { ...prop, required: name === 'Required' },
+      )
+    return named.has(name) ? read(named.get(name), seen) : imported(name)
+  }
+  return read(declaration).map((prop) =>
+    defaults.has(prop.name)
+      ? { ...prop, defaultValue: defaults.get(prop.name) }
+      : prop,
+  )
+}

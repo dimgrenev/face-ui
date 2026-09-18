@@ -5,70 +5,86 @@
  * `<Card><Card.Header><Card.Title>Settings</Card.Title></Card.Header></Card>`
  */
 
-import React, { forwardRef, isValidElement, type ReactNode, type HTMLAttributes } from 'react'
+import { forwardRef, type ReactNode, type HTMLAttributes } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
+import { getCardSurfaceProps } from '../assets/internal/card-surface'
 import { Button } from '../Button/Button'
 import { Icon } from '../Icon/Icon'
 import { Text, type TextProps } from '../Text/Text'
+import {
+  hasSlotContent,
+  renderSlotContent,
+  type SlotContent,
+  type SlotDescriptor,
+} from '../assets/slot-content'
 
 export const cardAnatomy = createAnatomy('card').parts(
-  'root', 'header', 'title', 'description', 'content', 'footer', 'actions',
+  'root',
+  'header',
+  'title',
+  'description',
+  'content',
+  'footer',
+  'actions',
 )
 
-export type CardVariant =
-  | 'default'
-  | 'code'
-  | 'plain'
+export type CardVariant = 'default' | 'code' | 'plain'
 export type CardPadding = 'none' | 'membrane' | 'control' | 'default'
 export type CardRadius = 'none' | 'md' | 'lg'
-export type CardHeaderLayout = 'stack' | 'bar'
-export type CardFooterLayout = 'start' | 'end' | 'between'
-export type CardActionAlign = 'start' | 'end' | 'between'
+export type CardHeaderOrientation = 'vertical' | 'horizontal'
+export type CardAlign = 'start' | 'end' | 'between'
 
-export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'content' | 'title'> {
+export interface CardProps
+  extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    | 'children'
+    | 'content'
+    | 'title'
+    | 'dangerouslySetInnerHTML'
+    | 'defaultChecked'
+    | 'defaultValue'
+  > {
   title?: ReactNode
   description?: ReactNode
-  content?: ReactNode
-  footer?: ReactNode
+  content?: SlotContent
+  footer?: SlotContent
   variant?: CardVariant
   padding?: CardPadding
   radius?: CardRadius
   border?: boolean
-  interactive?: boolean
+  /** Highlight the surface on hover or focus within; does not create an action. */
+  hoverable?: boolean
   fullWidth?: boolean
-  footerLayout?: CardFooterLayout
-  children?: ReactNode
+  footerAlign?: CardAlign
+  children?: SlotContent
 }
 
-export interface CardSlotProps extends HTMLAttributes<HTMLDivElement> {
-  children?: ReactNode
+export interface CardSlotProps
+  extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    'children' | 'dangerouslySetInnerHTML' | 'defaultChecked' | 'defaultValue'
+  > {
+  children?: SlotContent
 }
 
 export interface CardHeaderProps extends CardSlotProps {
-  layout?: CardHeaderLayout
+  orientation?: CardHeaderOrientation
 }
 
 export interface CardFooterProps extends CardSlotProps {
-  layout?: CardFooterLayout
+  align?: CardAlign
 }
 
 export interface CardActionsProps extends CardSlotProps {
-  align?: CardActionAlign
+  align?: CardAlign
 }
 
-export interface CardTitleProps extends Omit<TextProps, 'children'> {
-  children?: ReactNode
-}
+export type CardTitleProps = TextProps
 
-export interface CardDescriptionProps extends Omit<TextProps, 'children'> {
-  children?: ReactNode
-}
+export type CardDescriptionProps = TextProps
 
-export type CardChildDescriptor = {
-  __componentName__: string
-  [key: string]: any
-}
+export type CardChildDescriptor = SlotDescriptor
 
 type CardPart = (typeof cardAnatomy.parts)[number]
 
@@ -77,89 +93,21 @@ function getCardSlotPartAttrs(part: CardPart): { 'data-part': string } {
   return { 'data-part': attrs['data-part'] }
 }
 
-function withDefaultMembrane<T extends Record<string, any>>(props: T): T {
-  if (Object.prototype.hasOwnProperty.call(props, 'membrane')) return props
-  return { ...props, membrane: true }
-}
-
-function renderCardSlotDescriptor(
-  Component: React.ComponentType<any>,
-  slotProps: Record<string, any>,
-): ReactNode {
-  const { children, ...rest } = slotProps
-  return (
-    <Component {...rest}>
-      {renderCardNode(children)}
-    </Component>
-  )
-}
-
-function renderCardDescriptor(node: CardChildDescriptor): ReactNode {
-  const { __componentName__, ...slotProps } = node
-  switch (__componentName__) {
-    case 'Text': return <Text fullWidth {...withDefaultMembrane(slotProps)} />
-    case 'Button': return <Button {...withDefaultMembrane(slotProps)} />
-    case 'Icon': {
-      const { name: iconName, ...iconProps } = slotProps
-      return typeof iconName === 'string' && iconName.length > 0
-        ? <Icon name={iconName} {...iconProps} />
-        : null
-    }
-    case 'Card.Header': return renderCardSlotDescriptor(CardHeader, slotProps)
-    case 'Card.Title': return renderCardSlotDescriptor(CardTitle, slotProps)
-    case 'Card.Description': return renderCardSlotDescriptor(CardDescription, slotProps)
-    case 'Card.Content': return renderCardSlotDescriptor(CardContent, slotProps)
-    case 'Card.Footer': return renderCardSlotDescriptor(CardFooter, slotProps)
-    case 'Card.Actions': return renderCardSlotDescriptor(CardActions, slotProps)
-    default: return null
-  }
-}
-
-function isCardChildDescriptor(node: unknown): node is CardChildDescriptor {
-  return Boolean(
-    node &&
-    typeof node === 'object' &&
-    !isValidElement(node) &&
-    typeof (node as { __componentName__?: unknown }).__componentName__ === 'string',
-  )
-}
-
-function renderCardNode(node: ReactNode, variant: 'body' | 'muted' = 'body'): ReactNode {
-  if (node == null) return null
-  if (Array.isArray(node)) {
-    return node.map((item, index) => (
-      <React.Fragment key={index}>
-        {renderCardNode(item, variant)}
-      </React.Fragment>
-    ))
-  }
-  if (typeof node === 'string' || typeof node === 'number') {
-    return (
-      <Text as="div" variant={variant} fullWidth membrane>
-        {String(node)}
-      </Text>
-    )
-  }
-  if (isCardChildDescriptor(node)) {
-    return renderCardDescriptor(node)
-  }
-  return node
+function renderCardNode(node: SlotContent): ReactNode {
+  return renderSlotContent(node, CARD_SLOT_COMPONENTS, (value) => (
+    <Text as="div">{value}</Text>
+  ))
 }
 
 const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   function CardHeader(props, ref) {
-    const {
-      layout = 'stack',
-      children,
-      className,
-      ...rest
-    } = props
+    const { orientation = 'vertical', children, className, ...rest } = props
 
     return (
       <div
         ref={ref}
         {...cardAnatomy.getPartAttrs('header')}
-        data-layout={layout}
+        data-orientation={orientation}
         className={cn('uf-card__header', className)}
         {...rest}
       >
@@ -172,8 +120,8 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
 const CardTitle = forwardRef<HTMLElement, CardTitleProps>(
   function CardTitle(props, ref) {
     const {
-      as = 'div',
       variant = 'body',
+      as = variant === 'body' ? 'div' : undefined,
       fullWidth = true,
       membrane = true,
       children,
@@ -201,8 +149,8 @@ const CardTitle = forwardRef<HTMLElement, CardTitleProps>(
 const CardDescription = forwardRef<HTMLElement, CardDescriptionProps>(
   function CardDescription(props, ref) {
     const {
-      as = 'div',
       variant = 'muted',
+      as = variant === 'muted' ? 'div' : undefined,
       fullWidth = true,
       membrane = true,
       children,
@@ -229,11 +177,7 @@ const CardDescription = forwardRef<HTMLElement, CardDescriptionProps>(
 
 const CardContent = forwardRef<HTMLDivElement, CardSlotProps>(
   function CardContent(props, ref) {
-    const {
-      children,
-      className,
-      ...rest
-    } = props
+    const { children, className, ...rest } = props
 
     return (
       <div
@@ -250,18 +194,13 @@ const CardContent = forwardRef<HTMLDivElement, CardSlotProps>(
 
 const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   function CardFooter(props, ref) {
-    const {
-      layout = 'end',
-      children,
-      className,
-      ...rest
-    } = props
+    const { align = 'end', children, className, ...rest } = props
 
     return (
       <div
         ref={ref}
         {...cardAnatomy.getPartAttrs('footer')}
-        data-layout={layout}
+        data-align={align}
         className={cn('uf-card__footer', className)}
         {...rest}
       >
@@ -273,12 +212,7 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
 
 const CardActions = forwardRef<HTMLDivElement, CardActionsProps>(
   function CardActions(props, ref) {
-    const {
-      align = 'end',
-      children,
-      className,
-      ...rest
-    } = props
+    const { align = 'end', children, className, ...rest } = props
 
     return (
       <div
@@ -305,52 +239,49 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
       padding = 'default',
       radius = 'md',
       border = true,
-      interactive = false,
+      hoverable = false,
       fullWidth = true,
-      footerLayout = 'end',
+      footerAlign = 'end',
       children,
       className,
       ...rest
     } = props
 
-    const hasStructuredProps = title != null || description != null || content != null || footer != null
-    const hasHeader = title != null || description != null
-    const hasContent = content != null || (hasStructuredProps && children != null)
-    const hasFooter = footer != null
+    const hasStructuredProps =
+      title != null || description != null || content != null || footer != null
+    const hasTitle = hasSlotContent(title)
+    const hasDescription = hasSlotContent(description)
+    const hasHeader = hasTitle || hasDescription
+    const hasContent = hasSlotContent(content ?? children)
+    const hasFooter = hasSlotContent(footer)
 
     return (
       <div
         ref={ref}
         {...cardAnatomy.getPartAttrs('root')}
-        data-card-variant={variant}
-        data-padding={padding}
-        data-radius={radius}
-        data-border={border ? 'true' : 'false'}
-        data-interactive={interactive ? '' : undefined}
-        data-full-width={fullWidth ? '' : undefined}
-        className={cn('uf-card', className)}
+        {...getCardSurfaceProps({ variant, padding, radius, border, hoverable, fullWidth, className })}
         {...rest}
       >
         {hasStructuredProps ? (
           <>
             {hasHeader ? (
               <CardHeader>
-                {title != null ? <CardTitle>{title}</CardTitle> : null}
-                {description != null ? <CardDescription>{description}</CardDescription> : null}
+                {hasTitle ? <CardTitle>{title}</CardTitle> : null}
+                {hasDescription ? (
+                  <CardDescription>{description}</CardDescription>
+                ) : null}
               </CardHeader>
             ) : null}
             {hasContent ? (
-              <CardContent>
-                {content ?? children}
-              </CardContent>
+              <CardContent>{content ?? children}</CardContent>
             ) : null}
             {hasFooter ? (
-              <CardFooter layout={footerLayout}>
-                {renderCardNode(footer)}
-              </CardFooter>
+              <CardFooter align={footerAlign}>{footer}</CardFooter>
             ) : null}
           </>
-        ) : renderCardNode(children)}
+        ) : (
+          renderCardNode(children)
+        )}
       </div>
     )
   },
@@ -375,3 +306,15 @@ export const Card = Object.assign(CardRoot, {
   Footer: CardFooter,
   Actions: CardActions,
 }) as CardCompoundComponent
+
+const CARD_SLOT_COMPONENTS = {
+  Text,
+  Button,
+  Icon,
+  'Card.Header': CardHeader,
+  'Card.Title': CardTitle,
+  'Card.Description': CardDescription,
+  'Card.Content': CardContent,
+  'Card.Footer': CardFooter,
+  'Card.Actions': CardActions,
+}

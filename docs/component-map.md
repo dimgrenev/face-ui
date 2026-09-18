@@ -36,6 +36,11 @@
 - `Date`
 - `Calendar`
 
+## Feedback and Measurements
+
+- `Progress` — task completion, including unknown duration
+- `Meter` — a known measurement such as quota or storage usage
+
 ## Patterns
 - `Table`
 - `Carousel`

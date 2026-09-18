@@ -7,29 +7,17 @@
   "root": {
     "type": "Date",
     "props": {
-      "mode": {
-        "$ref": "props.mode"
+      "open": {
+        "$ref": "props.open"
       },
-      "selection": {
-        "$ref": "props.selection"
-      },
-      "views": {
-        "$ref": "props.views"
-      },
-      "openTo": {
-        "$ref": "props.openTo"
-      },
-      "value": {
-        "$ref": "props.value"
-      },
-      "defaultValue": {
-        "$ref": "props.defaultValue"
-      },
-      "valueFormat": {
-        "$ref": "props.valueFormat"
+      "defaultOpen": {
+        "$ref": "props.defaultOpen"
       },
       "locale": {
         "$ref": "props.locale"
+      },
+      "labels": {
+        "$ref": "props.labels"
       },
       "timezone": {
         "$ref": "props.timezone"
@@ -61,12 +49,6 @@
       "showClear": {
         "$ref": "props.showClear"
       },
-      "showPresets": {
-        "$ref": "props.showPresets"
-      },
-      "presets": {
-        "$ref": "props.presets"
-      },
       "surface": {
         "$ref": "props.surface"
       },
@@ -85,6 +67,12 @@
       "error": {
         "$ref": "props.error"
       },
+      "name": {
+        "$ref": "props.name"
+      },
+      "form": {
+        "$ref": "props.form"
+      },
       "required": {
         "$ref": "props.required"
       },
@@ -102,6 +90,30 @@
       },
       "fullWidth": {
         "$ref": "props.fullWidth"
+      },
+      "mode": {
+        "$ref": "props.mode"
+      },
+      "openTo": {
+        "$ref": "props.openTo"
+      },
+      "selection": {
+        "$ref": "props.selection"
+      },
+      "presets": {
+        "$ref": "props.presets"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "valueFormat": {
+        "$ref": "props.valueFormat"
+      },
+      "excludeDisabledDates": {
+        "$ref": "props.excludeDisabledDates"
       }
     },
     "children": []
@@ -125,135 +137,85 @@
   },
   "controls": [
     {
-      "name": "mode",
-      "type": "select",
+      "name": "open",
+      "type": "boolean",
       "required": false,
-      "description": "Picker mode: date, datetime, time, week, month or year",
-      "options": [
-        "date",
-        "datetime",
-        "time",
-        "week",
-        "month",
-        "year"
-      ],
-      "defaultValue": "date"
+      "description": "Controlled visibility; disabled, readOnly and hidden fields cannot open."
     },
     {
-      "name": "selection",
-      "type": "select",
+      "name": "defaultOpen",
+      "type": "boolean",
       "required": false,
-      "description": "Selection model: single or range",
-      "options": [
-        "single",
-        "range"
-      ],
-      "defaultValue": "single"
-    },
-    {
-      "name": "views",
-      "type": "array",
-      "required": false,
-      "description": "Allowed views order"
-    },
-    {
-      "name": "openTo",
-      "type": "select",
-      "required": false,
-      "description": "Initial opened view",
-      "options": [
-        "month",
-        "year",
-        "day",
-        "hours",
-        "minutes"
-      ]
-    },
-    {
-      "name": "value",
-      "type": "any",
-      "required": false,
-      "description": "Controlled value (iso/date/range)"
-    },
-    {
-      "name": "defaultValue",
-      "type": "any",
-      "required": false,
-      "description": "defaultValue prop",
-      "defaultValue": null
-    },
-    {
-      "name": "valueFormat",
-      "type": "select",
-      "required": false,
-      "description": "Value emission format: iso or date",
-      "options": [
-        "date",
-        "iso"
-      ],
-      "defaultValue": "iso"
+      "description": "Initial visibility for an uncontrolled picker.",
+      "defaultValue": false
     },
     {
       "name": "locale",
       "type": "string",
       "required": false,
-      "description": "Formatting locale",
+      "description": "Date formatting language, numbering system and default first weekday; dates stay Gregorian.",
       "defaultValue": "en-US"
+    },
+    {
+      "name": "labels",
+      "type": "object",
+      "required": false,
+      "description": "Internal action and view labels; field label, placeholder and surfaceTitle keep their own content APIs."
     },
     {
       "name": "timezone",
       "type": "string",
       "required": false,
-      "description": "Formatting timezone",
+      "description": "Zone for instants and today's civil date. Defaults to UTC.",
       "defaultValue": "UTC"
     },
     {
       "name": "weekStartsOn",
       "type": "select",
       "required": false,
-      "description": "Week start day index",
+      "description": "Override the locale's first weekday: 0=Sunday through 6=Saturday.",
       "options": [
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6"
-      ],
-      "defaultValue": 1
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
     },
     {
       "name": "format",
       "type": "string",
       "required": false,
-      "description": "format prop"
+      "description": "Display pattern; see the supported tokens and quoted literals in the Date docs."
     },
     {
       "name": "min",
       "type": "any",
       "required": false,
-      "description": "min prop",
+      "description": "Inclusive lower bound in timezone; a date-only bound includes its whole day.",
       "defaultValue": null
     },
     {
       "name": "max",
       "type": "any",
       "required": false,
-      "description": "max prop",
+      "description": "Inclusive upper bound in timezone; a date-only bound includes its whole day.",
       "defaultValue": null
     },
     {
       "name": "disabledDates",
       "type": "array",
       "required": false,
-      "description": "disabledDates prop"
+      "description": "Unavailable whole days; Date instants are converted into timezone before taking the day.",
+      "defaultValue": []
     },
     {
       "name": "disabledTime",
       "type": "object",
       "required": false,
-      "description": "disabledTime prop"
+      "description": "Unavailable hours (0–23) and minutes (0–59) for every day in time/datetime mode."
     },
     {
       "name": "closeOnSelect",
@@ -265,28 +227,15 @@
       "name": "showNow",
       "type": "boolean",
       "required": false,
-      "description": "Show Now action in footer",
+      "description": "Show the shortcut to the current day or time in timezone.",
       "defaultValue": true
     },
     {
       "name": "showClear",
       "type": "boolean",
       "required": false,
-      "description": "Show Clear action in footer",
+      "description": "Show the clear action; it is disabled when the selection is empty.",
       "defaultValue": true
-    },
-    {
-      "name": "showPresets",
-      "type": "boolean",
-      "required": false,
-      "description": "Show preset quick actions",
-      "defaultValue": false
-    },
-    {
-      "name": "presets",
-      "type": "array",
-      "required": false,
-      "description": "presets prop"
     },
     {
       "name": "surface",
@@ -308,33 +257,45 @@
     },
     {
       "name": "surfaceTitle",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "surfaceTitle prop"
     },
     {
       "name": "label",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Control label"
     },
     {
       "name": "description",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Helper text below control"
     },
     {
       "name": "error",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Error message below control"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native form field name. Ranges serialize as an ISO start/end interval."
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "Associate the field with a form by id."
     },
     {
       "name": "required",
       "type": "boolean",
       "required": false,
-      "description": "required prop",
+      "description": "Require a complete selection for native form validation.",
       "defaultValue": false
     },
     {
@@ -369,6 +330,82 @@
       "type": "boolean",
       "required": false,
       "description": "Stretch control to container width",
+      "defaultValue": true
+    },
+    {
+      "name": "mode",
+      "type": "select",
+      "required": false,
+      "description": "Picker mode: date, datetime, time, week, month or year",
+      "options": [
+        "date",
+        "datetime",
+        "time",
+        "month",
+        "year",
+        "week"
+      ],
+      "defaultValue": "date"
+    },
+    {
+      "name": "openTo",
+      "type": "select",
+      "required": false,
+      "description": "Initial opened view",
+      "options": [
+        "day",
+        "hours",
+        "minutes",
+        "month",
+        "year"
+      ]
+    },
+    {
+      "name": "selection",
+      "type": "select",
+      "required": false,
+      "description": "Single value or range endpoints; week owns its range selection.",
+      "options": [
+        "single",
+        "range"
+      ],
+      "defaultValue": "single"
+    },
+    {
+      "name": "presets",
+      "type": "array",
+      "required": false,
+      "description": "Explicit shortcuts with unique id, label and selection-shaped value; an omitted or empty array renders none."
+    },
+    {
+      "name": "value",
+      "type": "any",
+      "required": false,
+      "description": "Controlled civil ISO or Date instant, or a range of these; null clears selection."
+    },
+    {
+      "name": "defaultValue",
+      "type": "any",
+      "required": false,
+      "description": "Initial uncontrolled value; ignored while value is controlled.",
+      "defaultValue": null
+    },
+    {
+      "name": "valueFormat",
+      "type": "select",
+      "required": false,
+      "description": "Callback representation; form submission always uses civil ISO values.",
+      "options": [
+        "iso",
+        "date"
+      ],
+      "defaultValue": "iso"
+    },
+    {
+      "name": "excludeDisabledDates",
+      "type": "boolean",
+      "required": false,
+      "description": "Exclude unavailable days from the whole range; false constrains only its endpoints.",
       "defaultValue": true
     }
   ],

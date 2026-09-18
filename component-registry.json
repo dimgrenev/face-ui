@@ -353,8 +353,8 @@
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
-        "Steps",
-        "Slider"
+        "Meter",
+        "Steps"
       ]
     },
     "Tabs": {
@@ -501,6 +501,16 @@
       "related": [
         "Button",
         "Text"
+      ]
+    },
+    "Meter": {
+      "category": "feedback",
+      "status": "stable",
+      "a11yReviewed": true,
+      "mobileReviewed": true,
+      "related": [
+        "Progress",
+        "Slider"
       ]
     }
   },

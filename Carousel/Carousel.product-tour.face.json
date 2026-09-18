@@ -74,7 +74,8 @@
       "name": "slides",
       "type": "array",
       "required": false,
-      "description": "Data-driven image slides. Composed children take precedence when both are provided."
+      "description": "Data-driven image slides. Composed children take precedence when both are provided.",
+      "defaultValue": []
     },
     {
       "name": "loop",

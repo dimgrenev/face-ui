@@ -7,7 +7,12 @@
 
 import { createMachine } from '../create-machine'
 import { createAnatomy } from '../anatomy'
-import type { MachineSchema, MachineConfig, MachineSnapshot, SendFn } from '../types'
+import type {
+  MachineSchema,
+  MachineConfig,
+  MachineSnapshot,
+  SendFn,
+} from '../types'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -55,18 +60,45 @@ export interface PaginationSchema extends MachineSchema {
 // ---------------------------------------------------------------------------
 
 function computeTotalPages(ctx: PaginationContext): number {
-  return Math.max(1, Math.ceil(ctx.total / ctx.pageSize))
+  return Math.max(
+    1,
+    Math.ceil(
+      (Number.isFinite(ctx.total) ? Math.max(0, ctx.total) : 0) /
+        (Number.isFinite(ctx.pageSize) ? Math.max(1, ctx.pageSize) : 10),
+    ),
+  )
 }
 
 function clampPage(page: number, totalPages: number): number {
-  return Math.max(1, Math.min(page, totalPages))
+  return Math.max(
+    1,
+    Math.min(Number.isFinite(page) ? Math.trunc(page) : 1, totalPages),
+  )
+}
+
+function getPage(ctx: PaginationContext): number {
+  return clampPage(ctx.page, computeTotalPages(ctx))
+}
+
+function assignPage(ctx: PaginationContext, page: number): void {
+  const next = clampPage(page, computeTotalPages(ctx))
+  if (next !== getPage(ctx)) ctx.page = next
 }
 
 /**
  * Build the visible page range with ellipsis markers.
  * Returns an array of page numbers and -1 for ellipsis positions.
  */
-function computeRange(page: number, totalPages: number, siblingCount: number): number[] {
+function computeRange(
+  page: number,
+  totalPages: number,
+  siblingCount: number,
+): number[] {
+  siblingCount = Math.max(
+    0,
+    Math.min(20, Number.isFinite(siblingCount) ? Math.trunc(siblingCount) : 1),
+  )
+  page = clampPage(page, totalPages)
   // Total slots: first + last + current + 2*siblings + 2 ellipsis positions
   const totalSlots = 2 * siblingCount + 5
 
@@ -118,90 +150,93 @@ const isNotDisabled = (ctx: PaginationContext): boolean => !ctx.disabled
 
 const setPage = (ctx: PaginationContext, event: PaginationEvent): void => {
   const e = event as { type: 'SET_PAGE'; page: number }
-  const totalPages = computeTotalPages(ctx)
-  ctx.page = clampPage(e.page, totalPages)
+  assignPage(ctx, e.page)
 }
 
 const goNext = (ctx: PaginationContext): void => {
-  const totalPages = computeTotalPages(ctx)
-  ctx.page = clampPage(ctx.page + 1, totalPages)
+  assignPage(ctx, getPage(ctx) + 1)
 }
 
 const goPrev = (ctx: PaginationContext): void => {
-  ctx.page = clampPage(ctx.page - 1, computeTotalPages(ctx))
+  assignPage(ctx, getPage(ctx) - 1)
 }
 
 const goFirst = (ctx: PaginationContext): void => {
-  ctx.page = 1
+  assignPage(ctx, 1)
 }
 
 const goLast = (ctx: PaginationContext): void => {
-  ctx.page = computeTotalPages(ctx)
+  assignPage(ctx, computeTotalPages(ctx))
 }
 
 // ---------------------------------------------------------------------------
 // Machine
 // ---------------------------------------------------------------------------
 
-export const paginationMachine: MachineConfig<PaginationSchema> = createMachine<PaginationSchema>({
-  id: 'pagination',
-  initial: 'idle',
-  context: {
-    page: 1,
-    total: 0,
-    pageSize: 10,
-    siblingCount: 1,
-    disabled: false,
-    onPageChange: null,
-  },
-
-  computed: {
-    totalPages: (ctx: PaginationContext) => computeTotalPages(ctx),
-    range: (ctx: PaginationContext) =>
-      computeRange(ctx.page, computeTotalPages(ctx), ctx.siblingCount),
-    hasPrev: (ctx: PaginationContext) => ctx.page > 1,
-    hasNext: (ctx: PaginationContext) => ctx.page < computeTotalPages(ctx),
-  },
-
-  watch: {
-    page: (ctx: PaginationContext) => {
-      ctx.onPageChange?.({ page: ctx.page })
+export const paginationMachine: MachineConfig<PaginationSchema> =
+  createMachine<PaginationSchema>({
+    id: 'pagination',
+    initial: 'idle',
+    context: {
+      page: 1,
+      total: 0,
+      pageSize: 10,
+      siblingCount: 1,
+      disabled: false,
+      onPageChange: null,
     },
-  },
 
-  states: {
-    idle: {
-      on: {
-        SET_PAGE: {
-          guard: isNotDisabled,
-          actions: [setPage],
-        },
-        NEXT: {
-          guard: isNotDisabled,
-          actions: [goNext],
-        },
-        PREV: {
-          guard: isNotDisabled,
-          actions: [goPrev],
-        },
-        FIRST: {
-          guard: isNotDisabled,
-          actions: [goFirst],
-        },
-        LAST: {
-          guard: isNotDisabled,
-          actions: [goLast],
+    computed: {
+      totalPages: (ctx: PaginationContext) => computeTotalPages(ctx),
+      range: (ctx: PaginationContext) =>
+        computeRange(ctx.page, computeTotalPages(ctx), ctx.siblingCount),
+      hasPrev: (ctx: PaginationContext) => getPage(ctx) > 1,
+      hasNext: (ctx: PaginationContext) =>
+        getPage(ctx) < computeTotalPages(ctx),
+    },
+
+    watch: {
+      page: (ctx: PaginationContext) => {
+        ctx.onPageChange?.({ page: ctx.page })
+      },
+    },
+
+    states: {
+      idle: {
+        on: {
+          SET_PAGE: {
+            guard: isNotDisabled,
+            actions: [setPage],
+          },
+          NEXT: {
+            guard: isNotDisabled,
+            actions: [goNext],
+          },
+          PREV: {
+            guard: isNotDisabled,
+            actions: [goPrev],
+          },
+          FIRST: {
+            guard: isNotDisabled,
+            actions: [goFirst],
+          },
+          LAST: {
+            guard: isNotDisabled,
+            actions: [goLast],
+          },
         },
       },
     },
-  },
-})
+  })
 
 // ---------------------------------------------------------------------------
 // Connect — maps machine state to DOM props
 // ---------------------------------------------------------------------------
 
-export function connectPagination(state: MachineSnapshot<PaginationSchema>, send: SendFn<PaginationSchema>) {
+export function connectPagination(
+  state: MachineSnapshot<PaginationSchema>,
+  send: SendFn<PaginationSchema>,
+) {
   const ctx = state.context
   const computed = state.computed
   const attrs = paginationAnatomy.getPartAttrs
@@ -213,7 +248,7 @@ export function connectPagination(state: MachineSnapshot<PaginationSchema>, send
 
   return {
     /** Current page number (1-indexed) */
-    page: ctx.page,
+    page: clampPage(ctx.page, totalPages),
     /** Total number of pages */
     totalPages,
     /** Visible page numbers (-1 = ellipsis) */
@@ -228,7 +263,6 @@ export function connectPagination(state: MachineSnapshot<PaginationSchema>, send
         ...attrs('root'),
         role: 'navigation' as const,
         'aria-label': 'Pagination',
-        'data-disabled': ctx.disabled ? '' : undefined,
       }
     },
 
@@ -240,8 +274,9 @@ export function connectPagination(state: MachineSnapshot<PaginationSchema>, send
         'aria-label': 'Previous page',
         'data-disabled': isDisabled ? '' : undefined,
         disabled: isDisabled,
-        onClick() {
-          if (!isDisabled) {
+        tabIndex: isDisabled ? -1 : 0,
+        onClick(event?: { defaultPrevented?: boolean }) {
+          if (!isDisabled && !event?.defaultPrevented) {
             send({ type: 'PREV' })
           }
         },
@@ -256,8 +291,9 @@ export function connectPagination(state: MachineSnapshot<PaginationSchema>, send
         'aria-label': 'Next page',
         'data-disabled': isDisabled ? '' : undefined,
         disabled: isDisabled,
-        onClick() {
-          if (!isDisabled) {
+        tabIndex: isDisabled ? -1 : 0,
+        onClick(event?: { defaultPrevented?: boolean }) {
+          if (!isDisabled && !event?.defaultPrevented) {
             send({ type: 'NEXT' })
           }
         },
@@ -265,7 +301,7 @@ export function connectPagination(state: MachineSnapshot<PaginationSchema>, send
     },
 
     getPageProps(page: number) {
-      const isCurrent = ctx.page === page
+      const isCurrent = clampPage(ctx.page, totalPages) === page
       const isDisabled = ctx.disabled
       return {
         ...attrs('item'),
@@ -276,8 +312,9 @@ export function connectPagination(state: MachineSnapshot<PaginationSchema>, send
         'data-disabled': isDisabled ? '' : undefined,
         'data-value': page,
         disabled: isDisabled,
-        onClick() {
-          if (!isDisabled) {
+        tabIndex: isDisabled ? -1 : 0,
+        onClick(event?: { defaultPrevented?: boolean }) {
+          if (!isDisabled && !event?.defaultPrevented) {
             send({ type: 'SET_PAGE', page })
           }
         },

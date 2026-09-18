@@ -36,7 +36,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Resolve package version
         id: version
@@ -62,6 +62,12 @@ jobs:
 
       - name: Build and verify
         run: pnpm check
+
+      - name: Install browsers
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: Check browser behavior and accessibility
+        run: pnpm test:browser
 
       - name: Publish
         run: npm publish --access public --provenance

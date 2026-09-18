@@ -25,7 +25,7 @@ export interface LabelProps {
 /** Icon props */
 export interface IconProps {
   icon?: unknown
-  iconPosition?: 'left' | 'right'
+  iconPosition?: 'start' | 'end'
   iconOnly?: boolean
 }
 

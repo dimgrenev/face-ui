@@ -7,7 +7,12 @@
 
 import { createMachine } from '../create-machine'
 import { createAnatomy } from '../anatomy'
-import type { MachineSchema, MachineSnapshot, SendFn } from '../types'
+import type {
+  MachineSchema,
+  MachineSnapshot,
+  SendFn,
+  StateNode,
+} from '../types'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -15,10 +20,10 @@ import type { MachineSchema, MachineSnapshot, SendFn } from '../types'
 
 export const switcherAnatomy = createAnatomy('switcher').parts(
   'root',
-  'control',
+  'track',
   'thumb',
   'label',
-  'hiddenInput',
+  'input',
 )
 
 // ---------------------------------------------------------------------------
@@ -35,14 +40,59 @@ export interface SwitcherSchema extends MachineSchema {
     onCheckedChange?: (details: { checked: boolean }) => void
   }
   state: 'unchecked' | 'checked'
-  event:
-    | { type: 'TOGGLE' }
-    | { type: 'SET'; checked: boolean }
+  event: { type: 'TOGGLE' } | { type: 'SET'; checked: boolean }
 }
 
 // ---------------------------------------------------------------------------
 // Machine
 // ---------------------------------------------------------------------------
+
+// Every state accepts the same events. Decisions use context so external
+// controlled updates cannot leave the next toggle tied to an obsolete state.
+const checkedState: StateNode<SwitcherSchema> = {
+  on: {
+    TOGGLE: [
+      {
+        guard: (ctx) => !ctx.disabled && ctx.checked === true,
+        target: 'unchecked',
+        actions: [
+          (ctx) => {
+            ctx.checked = false
+          },
+        ],
+      },
+      {
+        guard: (ctx) => !ctx.disabled,
+        target: 'checked',
+        actions: [
+          (ctx) => {
+            ctx.checked = true
+          },
+        ],
+      },
+    ],
+    SET: [
+      {
+        guard: (_ctx, event) => event.type === 'SET' && event.checked === true,
+        target: 'checked',
+        actions: [
+          (ctx) => {
+            ctx.checked = true
+          },
+        ],
+      },
+      {
+        guard: (_ctx, event) => event.type === 'SET' && event.checked === false,
+        target: 'unchecked',
+        actions: [
+          (ctx) => {
+            ctx.checked = false
+          },
+        ],
+      },
+    ],
+  },
+}
 
 export const switcherMachine = createMachine<SwitcherSchema>({
   id: 'switcher',
@@ -62,49 +112,8 @@ export const switcherMachine = createMachine<SwitcherSchema>({
   },
 
   states: {
-    unchecked: {
-      on: {
-        TOGGLE: [
-          {
-            guard: (ctx) => !ctx.disabled,
-            target: 'checked',
-            actions: [(ctx) => { ctx.checked = true }],
-          },
-        ],
-        SET: [
-          {
-            guard: (ctx, e) => {
-              const v = (e as { type: 'SET'; checked: boolean }).checked
-              return !ctx.disabled && v === true
-            },
-            target: 'checked',
-            actions: [(ctx) => { ctx.checked = true }],
-          },
-        ],
-      },
-    },
-
-    checked: {
-      on: {
-        TOGGLE: [
-          {
-            guard: (ctx) => !ctx.disabled,
-            target: 'unchecked',
-            actions: [(ctx) => { ctx.checked = false }],
-          },
-        ],
-        SET: [
-          {
-            guard: (ctx, e) => {
-              const v = (e as { type: 'SET'; checked: boolean }).checked
-              return !ctx.disabled && v === false
-            },
-            target: 'unchecked',
-            actions: [(ctx) => { ctx.checked = false }],
-          },
-        ],
-      },
-    },
+    unchecked: checkedState,
+    checked: checkedState,
   },
 })
 
@@ -128,25 +137,11 @@ export function connectSwitcher(
       }
     },
 
-    getControlProps() {
+    getTrackProps() {
       return {
-        ...switcherAnatomy.getPartAttrs('control'),
+        ...switcherAnatomy.getPartAttrs('track'),
         'data-state': dataState,
         'data-disabled': disabled || undefined,
-        role: 'switch' as const,
-        'aria-checked': checked,
-        'aria-disabled': disabled || undefined,
-        'aria-required': required || undefined,
-        tabIndex: disabled ? -1 : 0,
-        onClick() {
-          send({ type: 'TOGGLE' })
-        },
-        onKeyDown(event: { key: string; preventDefault: () => void }) {
-          if (event.key === ' ' || event.key === 'Enter') {
-            event.preventDefault()
-            send({ type: 'TOGGLE' })
-          }
-        },
       }
     },
 
@@ -163,15 +158,14 @@ export function connectSwitcher(
         ...switcherAnatomy.getPartAttrs('label'),
         'data-state': dataState,
         'data-disabled': disabled || undefined,
-        onClick() {
-          send({ type: 'TOGGLE' })
-        },
       }
     },
 
-    getHiddenInputProps() {
+    getInputProps() {
       return {
-        ...switcherAnatomy.getPartAttrs('hiddenInput'),
+        ...switcherAnatomy.getPartAttrs('input'),
+        'data-state': dataState,
+        'data-disabled': disabled || undefined,
         type: 'checkbox' as const,
         role: 'switch' as const,
         name,
@@ -179,20 +173,22 @@ export function connectSwitcher(
         checked,
         disabled,
         required,
-        'aria-hidden': true as const,
-        tabIndex: -1,
-        style: {
-          position: 'absolute' as const,
-          width: 'var(--uf-membrane)',
-          height: 'var(--uf-membrane)',
-          margin: 'calc(-1 * var(--uf-membrane))',
-          padding: '0',
-          overflow: 'hidden' as const,
-          clip: 'rect(0,0,0,0)',
-          border: '0',
-        },
-        onChange() {
-          send({ type: 'TOGGLE' })
+        'aria-checked': checked,
+        'aria-disabled': disabled || undefined,
+        'aria-required': required || undefined,
+        tabIndex: disabled ? -1 : 0,
+        onChange(event: {
+          target: { checked: boolean }
+          defaultPrevented?: boolean
+          nativeEvent?: { defaultPrevented: boolean }
+        }) {
+          if (
+            disabled ||
+            event.defaultPrevented ||
+            event.nativeEvent?.defaultPrevented
+          )
+            return
+          send({ type: 'SET', checked: event.target.checked })
         },
       }
     },

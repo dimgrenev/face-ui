@@ -6,9 +6,19 @@
  * `<Table columns={[...]} rows={[...]} showRowNumbers stickyHeader />`
  */
 
-import { forwardRef, useEffect, useMemo, useRef, useState, isValidElement, type ReactNode, type CSSProperties } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  isValidElement,
+  type ReactNode,
+  type CSSProperties,
+} from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { tableMachine, connectTable } from '../assets/machines/table.machine'
+import { Membrane } from '../assets/adapters/react/Membrane'
 import { cn } from '../assets/utils'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
@@ -39,7 +49,11 @@ export interface TableColumn<T = any> {
   /** Truncate cell text with ellipsis. */
   truncate?: boolean
   /** Custom render function for cell content. */
-  render?: (value: unknown, row: T, ctx: { rowIndex: number; column: TableColumn<T> }) => ReactNode
+  render?: (
+    value: unknown,
+    row: T,
+    ctx: { rowIndex: number; column: TableColumn<T> },
+  ) => ReactNode
 }
 
 export interface TableProps<T = any> {
@@ -54,7 +68,10 @@ export interface TableProps<T = any> {
   /** Controlled sort direction. */
   sortDirection?: 'asc' | 'desc'
   /** Callback when sort changes. */
-  onSortChange?: (details: { column: string; direction: 'asc' | 'desc' }) => void
+  onSortChange?: (details: {
+    column: string
+    direction: 'asc' | 'desc'
+  }) => void
   /** Controlled selected row IDs. */
   selectedRows?: string[]
   /** Callback when selection changes. */
@@ -83,8 +100,10 @@ export interface TableProps<T = any> {
   onRowMouseLeave?: (row: T, index: number) => void
   /** Row ID to highlight as active (applies `data-active` attribute). */
   activeRowId?: string
-  /** Enable membrane (tile-like) row styles: rounded corners, hover bg, padding. */
+  /** Outer spacing boundary, consistent with other Face UI components. */
   membrane?: boolean
+  /** Plain table rows or separated rows with rounded hover surfaces. */
+  rowStyle?: 'plain' | 'tile'
   /** Accessible label for the table when there is no visible caption. */
   ariaLabel?: string
 }
@@ -99,7 +118,11 @@ function normalizeRowId(value: unknown, index: number): string {
   return id.trim() ? id : String(index)
 }
 
-function getRowId<T>(row: T, rowKey: string | ((row: T) => string) | undefined, index: number): string {
+function getRowId<T>(
+  row: T,
+  rowKey: string | ((row: T) => string) | undefined,
+  index: number,
+): string {
   if (typeof rowKey === 'function') {
     return normalizeRowId(rowKey(row), index)
   }
@@ -112,15 +135,22 @@ function getRowId<T>(row: T, rowKey: string | ((row: T) => string) | undefined, 
   return String(index)
 }
 
-function getCellValue<T>(row: T, accessor?: string | ((row: T) => ReactNode)): ReactNode {
+function getCellValue<T>(
+  row: T,
+  accessor?: string | ((row: T) => ReactNode),
+): ReactNode {
   if (accessor == null) return undefined
   if (typeof accessor === 'function') return accessor(row)
   return (row as Record<string, unknown>)[accessor] as ReactNode
 }
 
-function getRawValue<T>(row: T, accessor?: string | ((row: T) => ReactNode)): unknown {
+function getRawValue<T>(
+  row: T,
+  accessor?: string | ((row: T) => ReactNode),
+): unknown {
   if (accessor == null) return undefined
-  if (typeof accessor === 'string') return (row as Record<string, unknown>)[accessor]
+  if (typeof accessor === 'string')
+    return (row as Record<string, unknown>)[accessor]
   return accessor(row)
 }
 
@@ -129,17 +159,36 @@ function compareTableValues(left: unknown, right: unknown): number {
   if (left == null) return -1
   if (right == null) return 1
   if (typeof left === 'number' && typeof right === 'number') return left - right
-  if (typeof left === 'boolean' && typeof right === 'boolean') return Number(left) - Number(right)
-  if (left instanceof Date && right instanceof Date) return left.getTime() - right.getTime()
-  return String(left).localeCompare(String(right), undefined, { numeric: true, sensitivity: 'base' })
+  if (typeof left === 'boolean' && typeof right === 'boolean')
+    return Number(left) - Number(right)
+  if (left instanceof Date && right instanceof Date)
+    return left.getTime() - right.getTime()
+  return String(left).localeCompare(String(right), undefined, {
+    numeric: true,
+    sensitivity: 'base',
+  })
 }
 
-function renderCellContent(content: ReactNode, align: TableAlign = 'left'): ReactNode {
+function renderCellContent(
+  content: ReactNode,
+  align: TableAlign = 'left',
+): ReactNode {
   if (content == null) return null
   if (isValidElement(content) || Array.isArray(content)) return content
-  if (typeof content === 'string' || typeof content === 'number' || typeof content === 'boolean') {
+  if (
+    typeof content === 'string' ||
+    typeof content === 'number' ||
+    typeof content === 'boolean'
+  ) {
     return (
-      <Text as="div" fullWidth align={align} inset="none" membrane={false} className="uf-table__cellText">
+      <Text
+        as="div"
+        fullWidth
+        align={align}
+        inset="none"
+        membrane={false}
+        className="uf-table__cellText"
+      >
         {String(content)}
       </Text>
     )
@@ -147,12 +196,26 @@ function renderCellContent(content: ReactNode, align: TableAlign = 'left'): Reac
   return content
 }
 
-function renderHeaderContent(content: ReactNode, align: TableAlign = 'left'): ReactNode {
+function renderHeaderContent(
+  content: ReactNode,
+  align: TableAlign = 'left',
+): ReactNode {
   if (content == null) return null
   if (isValidElement(content) || Array.isArray(content)) return content
-  if (typeof content === 'string' || typeof content === 'number' || typeof content === 'boolean') {
+  if (
+    typeof content === 'string' ||
+    typeof content === 'number' ||
+    typeof content === 'boolean'
+  ) {
     return (
-      <Text as="div" fullWidth align={align} inset="none" membrane={false} className="uf-table__headerText">
+      <Text
+        as="div"
+        fullWidth
+        align={align}
+        inset="none"
+        membrane={false}
+        className="uf-table__headerText"
+      >
         {String(content)}
       </Text>
     )
@@ -188,15 +251,18 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
       onRowMouseLeave,
       activeRowId,
       membrane = false,
+      rowStyle = 'plain',
       ariaLabel,
     } = props
 
     const columns = (Array.isArray(rawColumns) ? rawColumns : []).map((col) => {
       const c = col as TableColumn<any>
       const normalizedHeader = c.header ?? c.id
-      const fallbackAccessor = (typeof (c as any).accessor === 'string' || typeof (c as any).accessor === 'function')
-        ? (c as any).accessor
-        : c.id
+      const fallbackAccessor =
+        typeof (c as any).accessor === 'string' ||
+        typeof (c as any).accessor === 'function'
+          ? (c as any).accessor
+          : c.id
       return {
         ...c,
         header: normalizedHeader,
@@ -222,7 +288,9 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
     })
 
     const api = connectTable(state, send)
-    const [resizedWidths, setResizedWidths] = useState<Record<string, number>>({})
+    const [resizedWidths, setResizedWidths] = useState<Record<string, number>>(
+      {},
+    )
     const resizeStateRef = useRef<{
       id: string
       nextId: string | null
@@ -236,7 +304,9 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
     } | null>(null)
     const displayRows = useMemo(() => {
       if (!api.sortColumn) return rows
-      const sortColumnDef = columns.find((column) => column.id === api.sortColumn)
+      const sortColumnDef = columns.find(
+        (column) => column.id === api.sortColumn,
+      )
       if (!sortColumnDef || !sortColumnDef.accessor) return rows
       const sorted = [...rows]
       sorted.sort((leftRow, rightRow) => {
@@ -257,10 +327,14 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
         width = Math.max(drag.minWidth, Math.min(drag.maxWidth, width))
 
         if (drag.nextId) {
-          const maxWidthByNext = drag.startWidth + (drag.startNextWidth - drag.nextMinWidth)
+          const maxWidthByNext =
+            drag.startWidth + (drag.startNextWidth - drag.nextMinWidth)
           width = Math.min(width, maxWidthByNext)
           let nextWidth = drag.startNextWidth - (width - drag.startWidth)
-          nextWidth = Math.max(drag.nextMinWidth, Math.min(drag.nextMaxWidth, nextWidth))
+          nextWidth = Math.max(
+            drag.nextMinWidth,
+            Math.min(drag.nextMaxWidth, nextWidth),
+          )
           width = drag.startWidth + (drag.startNextWidth - nextWidth)
 
           setResizedWidths((prev) => ({
@@ -287,13 +361,13 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
       }
     }, [onColumnResize])
 
-    return (
+    const table = (
       <table
         ref={ref}
         {...api.getRootProps()}
         data-sticky-header={stickyHeader || undefined}
         data-show-dividers={showDividers || undefined}
-        data-membrane={membrane || undefined}
+        data-row-style={rowStyle}
         aria-label={ariaLabel}
         className={cn('uf-table', className)}
         style={resizable ? { tableLayout: 'fixed' } : undefined}
@@ -306,20 +380,23 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
               </th>
             )}
             {showRowNumbers && (
-                <th role="columnheader" className="uf-table__row-number-header">
-                  <div className="uf-table__cellSlot" data-align="left">
-                    {renderHeaderContent('#', 'left')}
-                  </div>
-                </th>
-              )}
+              <th role="columnheader" className="uf-table__row-number-header">
+                <div className="uf-table__cellSlot" data-align="left">
+                  {renderHeaderContent('#', 'left')}
+                </div>
+              </th>
+            )}
             {columns.map((col, index) => {
               const style: Record<string, unknown> = {}
-              if (resizedWidths[col.id] != null) style.width = resizedWidths[col.id]
+              if (resizedWidths[col.id] != null)
+                style.width = resizedWidths[col.id]
               else if (col.width != null) style.width = col.width
               if (col.minWidth != null) style.minWidth = col.minWidth
               if (col.maxWidth != null) style.maxWidth = col.maxWidth
               if (col.align) style.textAlign = col.align
-              const headerCellProps = api.getHeaderCellProps(col.id, { sortable: col.sortable }) as any
+              const headerCellProps = api.getHeaderCellProps(col.id, {
+                sortable: col.sortable,
+              }) as any
               const sortButtonProps = col.sortable
                 ? { type: 'button' as const, onClick: headerCellProps.onClick }
                 : null
@@ -333,9 +410,16 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
                 <th
                   key={col.id}
                   {...thProps}
-                  style={Object.keys(style).length > 0 ? style as CSSProperties : undefined}
+                  style={
+                    Object.keys(style).length > 0
+                      ? (style as CSSProperties)
+                      : undefined
+                  }
                 >
-                  <div className="uf-table__cellSlot" data-align={col.align ?? 'left'}>
+                  <div
+                    className="uf-table__cellSlot"
+                    data-align={col.align ?? 'left'}
+                  >
                     {sortButtonProps ? (
                       <button
                         {...sortButtonProps}
@@ -348,7 +432,13 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
                     )}
                     {api.sortColumn === col.id && (
                       <span aria-hidden="true" className="uf-table__sort-icon">
-                        <Icon name={api.sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'} />
+                        <Icon
+                          name={
+                            api.sortDirection === 'asc'
+                              ? 'arrow-up'
+                              : 'arrow-down'
+                          }
+                        />
                       </span>
                     )}
                   </div>
@@ -357,12 +447,19 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
                       className="uf-table__resize-handle"
                       onPointerDown={(event) => {
                         event.preventDefault()
-                        const cell = event.currentTarget.parentElement as HTMLElement | null
-                        const measuredWidth = resizedWidths[col.id] ?? cell?.getBoundingClientRect().width ?? 120
+                        const cell = event.currentTarget
+                          .parentElement as HTMLElement | null
+                        const measuredWidth =
+                          resizedWidths[col.id] ??
+                          cell?.getBoundingClientRect().width ??
+                          120
                         const nextColumn = columns[index + 1]
-                        const nextCell = cell?.nextElementSibling as HTMLElement | null
+                        const nextCell =
+                          cell?.nextElementSibling as HTMLElement | null
                         const nextWidth = nextColumn
-                          ? resizedWidths[nextColumn.id] ?? nextCell?.getBoundingClientRect().width ?? 120
+                          ? (resizedWidths[nextColumn.id] ??
+                            nextCell?.getBoundingClientRect().width ??
+                            120)
                           : 0
                         resizeStateRef.current = {
                           id: col.id,
@@ -371,9 +468,15 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
                           startWidth: measuredWidth,
                           startNextWidth: nextWidth,
                           minWidth: col.minWidth ?? 80,
-                          maxWidth: typeof col.maxWidth === 'number' ? col.maxWidth : Number.MAX_SAFE_INTEGER,
+                          maxWidth:
+                            typeof col.maxWidth === 'number'
+                              ? col.maxWidth
+                              : Number.MAX_SAFE_INTEGER,
                           nextMinWidth: nextColumn?.minWidth ?? 80,
-                          nextMaxWidth: typeof nextColumn?.maxWidth === 'number' ? nextColumn.maxWidth : Number.MAX_SAFE_INTEGER,
+                          nextMaxWidth:
+                            typeof nextColumn?.maxWidth === 'number'
+                              ? nextColumn.maxWidth
+                              : Number.MAX_SAFE_INTEGER,
                         }
                       }}
                     />
@@ -388,15 +491,28 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
           {displayRows.map((row, rowIndex) => {
             const rowId = resolvedGetRowId(row, rowIndex)
             const isLastColumnSticky = stickyLastColumn
-            const lastColumnId = columns.length > 0 ? String(columns[columns.length - 1]?.id || '') : ''
+            const lastColumnId =
+              columns.length > 0
+                ? String(columns[columns.length - 1]?.id || '')
+                : ''
             return (
               <tr
                 key={rowId}
                 {...api.getRowProps(rowId)}
                 data-active={activeRowId === rowId || undefined}
-                onClick={onRowClick ? () => onRowClick(row, rowIndex) : undefined}
-                onMouseEnter={onRowMouseEnter ? () => onRowMouseEnter(row, rowIndex) : undefined}
-                onMouseLeave={onRowMouseLeave ? () => onRowMouseLeave(row, rowIndex) : undefined}
+                onClick={
+                  onRowClick ? () => onRowClick(row, rowIndex) : undefined
+                }
+                onMouseEnter={
+                  onRowMouseEnter
+                    ? () => onRowMouseEnter(row, rowIndex)
+                    : undefined
+                }
+                onMouseLeave={
+                  onRowMouseLeave
+                    ? () => onRowMouseLeave(row, rowIndex)
+                    : undefined
+                }
                 style={onRowClick ? { cursor: 'pointer' } : undefined}
               >
                 {selectable && (
@@ -424,16 +540,33 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
                   } else {
                     content = getCellValue(row, col.accessor)
                   }
-                  const renderedContent = renderCellContent(content, col.align ?? 'left')
+                  const renderedContent = renderCellContent(
+                    content,
+                    col.align ?? 'left',
+                  )
 
                   return (
                     <td
                       key={col.id}
                       {...api.getCellProps(rowId, col.id)}
                       data-truncate={col.truncate || undefined}
-                      data-sticky-right={isLastColumnSticky && lastColumnId && String(col.id) === lastColumnId ? '' : undefined}
-                      style={Object.keys(cellStyle).length > 0 ? cellStyle as CSSProperties : undefined}
-                      title={col.truncate && typeof content === 'string' ? content : undefined}
+                      data-sticky-right={
+                        isLastColumnSticky &&
+                        lastColumnId &&
+                        String(col.id) === lastColumnId
+                          ? ''
+                          : undefined
+                      }
+                      style={
+                        Object.keys(cellStyle).length > 0
+                          ? (cellStyle as CSSProperties)
+                          : undefined
+                      }
+                      title={
+                        col.truncate && typeof content === 'string'
+                          ? content
+                          : undefined
+                      }
                     >
                       <div
                         className="uf-table__cellSlot"
@@ -450,6 +583,11 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
           })}
         </tbody>
       </table>
+    )
+    return (
+      <Membrane enabled={membrane} as="div" fullWidth>
+        {table}
+      </Membrane>
     )
   },
 )

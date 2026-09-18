@@ -7,9 +7,6 @@
   "root": {
     "type": "Slider",
     "props": {
-      "variant": {
-        "$ref": "props.variant"
-      },
       "value": {
         "$ref": "props.value"
       },
@@ -34,98 +31,107 @@
       "label": {
         "$ref": "props.label"
       },
-      "leadingIcon": {
-        "$ref": "props.leadingIcon"
+      "aria-label": {
+        "$ref": "props.aria-label"
       },
-      "leadingText": {
-        "$ref": "props.leadingText"
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "labels": {
+        "$ref": "props.labels"
+      },
+      "showValue": {
+        "$ref": "props.showValue"
       },
       "crop": {
         "$ref": "props.crop"
       },
-      "defaultCropRange": {
-        "$ref": "props.defaultCropRange"
-      },
       "cropRange": {
         "$ref": "props.cropRange"
       },
-      "cropLocksValue": {
-        "$ref": "props.cropLocksValue"
+      "defaultCropRange": {
+        "$ref": "props.defaultCropRange"
+      },
+      "clampToCrop": {
+        "$ref": "props.clampToCrop"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "cropName": {
+        "$ref": "props.cropName"
+      },
+      "form": {
+        "$ref": "props.form"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "variant": "advanced",
+      "showValue": true,
       "label": "Creativity",
+      "name": "creativity",
       "defaultValue": [
         62
       ],
       "min": 0,
       "max": 100,
-      "step": 1,
-      "leadingIcon": "component",
-      "leadingText": "Creative"
+      "step": 1
     }
   },
   "controls": [
     {
-      "name": "variant",
-      "type": "select",
-      "required": false,
-      "description": "Standard track/thumb presentation or enhanced value-thumb presentation.",
-      "options": [
-        "simple",
-        "advanced"
-      ],
-      "defaultValue": "simple"
-    },
-    {
       "name": "value",
-      "type": "array",
+      "type": "any",
       "required": false,
-      "description": "Current value(s). Single thumb = [n], range = [min, max]."
+      "description": "Controlled finite number or nonempty array. Values are snapped and sorted."
     },
     {
       "name": "defaultValue",
-      "type": "array",
+      "type": "any",
       "required": false,
-      "description": "Uncontrolled initial value(s)."
+      "description": "Initial uncontrolled value(s), restored on reset. Defaults to min."
     },
     {
       "name": "min",
       "type": "number",
       "required": false,
-      "description": "Minimum value.",
+      "description": "Finite lower bound and step origin. Defaults to 0.",
       "defaultValue": 0
     },
     {
       "name": "max",
       "type": "number",
       "required": false,
-      "description": "Maximum value.",
+      "description": "Finite upper bound, at least min. Defaults to 100.",
       "defaultValue": 100
     },
     {
       "name": "step",
       "type": "number",
       "required": false,
-      "description": "Step increment.",
+      "description": "Positive finite increment. End selects the last step at or below max. Defaults to 1.",
       "defaultValue": 1
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Disable editing and submission, including crop. Defaults to false.",
       "defaultValue": false
     },
     {
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Orientation.",
+      "description": "Horizontal follows text direction; vertical increases upward. Defaults to horizontal.",
       "options": [
         "horizontal",
         "vertical"
@@ -134,46 +140,91 @@
     },
     {
       "name": "label",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Label content."
+      "description": "Visible noninteractive name, including rich text."
     },
     {
-      "name": "leadingIcon",
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Leading icon name for the advanced slider."
+      "description": "Name when there is no visible label, or override for it."
     },
     {
-      "name": "leadingText",
+      "name": "aria-labelledby",
       "type": "string",
       "required": false,
-      "description": "Leading text for the advanced slider."
+      "description": "External naming elements; takes precedence over label and aria-label."
+    },
+    {
+      "name": "labels",
+      "type": "object",
+      "required": false,
+      "description": "Specific or localized names for individual controls."
+    },
+    {
+      "name": "showValue",
+      "type": "boolean",
+      "required": false,
+      "description": "Display the value inside each primary handle. Defaults to false.",
+      "defaultValue": false
     },
     {
       "name": "crop",
       "type": "boolean",
       "required": false,
-      "description": "Enable crop handles in the advanced slider.",
+      "description": "Enable two editable crop boundaries independently of value presentation. Defaults to false.",
       "defaultValue": false
-    },
-    {
-      "name": "defaultCropRange",
-      "type": "object",
-      "required": false,
-      "description": "Uncontrolled initial crop range for the advanced slider."
     },
     {
       "name": "cropRange",
       "type": "object",
       "required": false,
-      "description": "Controlled crop range for the advanced slider."
+      "description": "Controlled crop boundaries, sorted and snapped to the same step grid."
     },
     {
-      "name": "cropLocksValue",
+      "name": "defaultCropRange",
+      "type": "object",
+      "required": false,
+      "description": "Initial uncontrolled crop, restored on reset. Defaults to the full range."
+    },
+    {
+      "name": "clampToCrop",
       "type": "boolean",
       "required": false,
-      "description": "Clamp the value to the crop range.",
+      "description": "Constrain primary values to the accepted crop. Defaults to true.",
+      "defaultValue": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native form key, repeated for ordered primary values."
+    },
+    {
+      "name": "cropName",
+      "type": "string",
+      "required": false,
+      "description": "Native form key, repeated for crop start/end when crop is enabled."
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "External form id for all controls."
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the first primary thumb on mount. Defaults to false.",
+      "defaultValue": false
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Shared spacing around handles and label. Defaults to true.",
       "defaultValue": true
     }
   ],

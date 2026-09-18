@@ -4,25 +4,20 @@
   "name": "Tabs",
   "description": "Tabbed navigation with content panels",
   "props": {
-    "items": {
-      "type": "array",
-      "required": false,
-      "description": "Tab definitions. Each item supports value, label, content, disabled, panelId, leadingIcon, trailingIcon, and an optional overlay action via actionIcon, actionLabel, actionVisibility, actionPosition, and onAction."
-    },
     "value": {
       "type": "string",
       "required": false,
-      "description": "Currently selected tab value."
+      "description": "Controlled selected key. Unknown keys show no panel until they exist."
     },
     "defaultValue": {
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial tab value."
+      "description": "Mount-only selected key. Otherwise use the first enabled tab."
     },
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Orientation of the tab list.",
+      "description": "Axis of keyboard navigation and the tab list.",
       "options": [
         "horizontal",
         "vertical"
@@ -32,7 +27,7 @@
     "activationMode": {
       "type": "enum",
       "required": false,
-      "description": "Activation mode: automatic selects on focus, manual requires click/Enter.",
+      "description": "Automatic activates on focus; manual requires a click, Space or Enter.",
       "options": [
         "automatic",
         "manual"
@@ -42,32 +37,68 @@
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire tab group.",
+      "description": "Disable tab navigation and header actions, retaining the visible panel.",
       "default": false
     },
-    "withLine": {
-      "type": "boolean",
+    "variant": {
+      "type": "enum",
       "required": false,
-      "description": "Render the active-tab indicator line.",
-      "default": false
+      "description": "Pill background or an underline that follows the selected tab's geometry.",
+      "options": [
+        "pill",
+        "underline"
+      ],
+      "default": "pill"
     },
     "wrap": {
       "type": "boolean",
       "required": false,
-      "description": "Allow tab triggers to wrap onto multiple rows.",
+      "description": "Wrap the tab list instead of scrolling along its axis.",
       "default": false
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each tab trigger.",
+      "description": "Shared outer spacing around each tab; toggling preserves DOM and focus.",
       "default": true
+    },
+    "actions": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Header controls outside tablist, such as New, Close selected, or More."
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the selected enabled tab, or first enabled tab, once on mount.",
+      "default": false
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name of the tablist, not the generic outer wrapper."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "Visible heading IDs naming the tablist."
+    },
+    "aria-describedby": {
+      "type": "string",
+      "required": false,
+      "description": "Additional description IDs for the tablist."
     },
     "renderPanels": {
       "type": "boolean",
       "required": false,
-      "description": "Render internal content panels. Set false when panels are rendered outside Tabs.",
+      "description": "Render persistent internal panels.",
       "default": true
+    },
+    "items": {
+      "type": "array",
+      "required": false,
+      "description": "Tab definitions. Each item supports value, label, content, disabled, panelId, leadingIcon, trailingIcon, and an optional overlay action via actionIcon, actionLabel, actionVisibility, actionPosition, and onAction.",
+      "default": []
     }
   },
   "states": [
@@ -77,7 +108,6 @@
         "orientation": "horizontal",
         "activationMode": "automatic",
         "disabled": false,
-        "withLine": false,
         "wrap": false,
         "membrane": true,
         "items": [
@@ -92,7 +122,9 @@
             "content": "Content B"
           }
         ],
-        "defaultValue": "a"
+        "defaultValue": "a",
+        "variant": "pill",
+        "aria-label": "Sections"
       }
     },
     {
@@ -116,7 +148,8 @@
           }
         ],
         "defaultValue": "overview",
-        "orientation": "vertical"
+        "orientation": "vertical",
+        "aria-label": "Sections"
       }
     },
     {
@@ -140,7 +173,8 @@
           }
         ],
         "defaultValue": "overview",
-        "activationMode": "manual"
+        "activationMode": "manual",
+        "aria-label": "Sections"
       }
     },
     {
@@ -164,7 +198,8 @@
           }
         ],
         "defaultValue": "overview",
-        "disabled": true
+        "disabled": true,
+        "aria-label": "Sections"
       }
     }
   ],

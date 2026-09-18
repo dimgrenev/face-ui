@@ -8,14 +8,6 @@ export type { SwitcherSchema } from './switcher.machine'
 export { radioMachine, radioAnatomy, connectRadio } from './radio.machine'
 export type { RadioSchema } from './radio.machine'
 
-export { toggleMachine, toggleAnatomy, connectToggle } from './toggle.machine'
-export type { ToggleSchema } from './toggle.machine'
-
-export { sliderMachine, sliderAnatomy, connectSlider } from './slider.machine'
-export type { SliderSchema } from './slider.machine'
-
-export { ratingMachine, ratingAnatomy, connectRating } from './rating.machine'
-export type { RatingSchema } from './rating.machine'
 
 export { inputMachine, inputAnatomy, connectInput } from './input.machine'
 export type { InputSchema } from './input.machine'
@@ -35,14 +27,9 @@ export type { MenuSchema } from './menu.machine'
 export { toastMachine, toastAnatomy, connectToast, createToaster } from './toast.machine'
 export type { ToastAction, ToastItem, ToastOptions, ToastSchema, ToastTone, Toaster } from './toast.machine'
 
-export { tabsMachine, tabsAnatomy, connectTabs } from './tabs.machine'
-export type { TabsSchema } from './tabs.machine'
 
 export { accordionMachine, accordionAnatomy, connectAccordion } from './accordion.machine'
 export type { AccordionSchema } from './accordion.machine'
-
-export { progressMachine, progressAnatomy, connectProgress } from './progress.machine'
-export type { ProgressSchema } from './progress.machine'
 
 export { avatarMachine, avatarAnatomy, connectAvatar } from './avatar.machine'
 export type { AvatarSchema } from './avatar.machine'

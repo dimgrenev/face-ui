@@ -13,14 +13,25 @@ import { Text } from '../Text/Text'
 export const badgeAnatomy = createAnatomy('badge').parts('root')
 
 export type BadgeAppearance = 'fill' | 'outline'
-export type BadgeTone = 'neutral' | 'accent' | 'positive' | 'warning' | 'destructive'
+export type BadgeTone =
+  | 'neutral'
+  | 'accent'
+  | 'positive'
+  | 'warning'
+  | 'destructive'
 
-export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+export interface BadgeProps
+  extends Omit<
+    HTMLAttributes<HTMLSpanElement>,
+    'dangerouslySetInnerHTML' | 'defaultChecked' | 'defaultValue'
+  > {
+  /** Plain status text. Rich children take precedence when provided. */
   text?: string
   /** Fill or outline treatment. */
   appearance?: BadgeAppearance
   /** Semantic status tone, independent from appearance. */
   tone?: BadgeTone
+  /** Custom inline content, including a status icon or formatted count. */
   children?: ReactNode
 }
 

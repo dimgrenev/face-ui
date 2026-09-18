@@ -8,31 +8,39 @@
  * `<Avatar name="JD" fallback={<Icon />} />`
  */
 
-import { forwardRef, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { avatarMachine, connectAvatar } from '../assets/machines/avatar.machine'
 import { cn } from '../assets/utils'
-import { Icon, type IconName } from '../Icon/Icon'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface AvatarProps {
+export interface AvatarProps
+  extends Omit<
+    HTMLAttributes<HTMLSpanElement>,
+    'children' | 'dangerouslySetInnerHTML' | 'defaultChecked' | 'defaultValue'
+  > {
   /** Image source URL. */
   src?: string
-  /** User name (used for initials fallback and alt text). */
+  /** Person's full name, used for initials and the accessible name. */
   name?: string
-  /** Icon content shown when no image is available. */
-  icon?: IconName | ReactNode
-  /** Custom fallback content when image is unavailable. */
+  /** Text or rich content shown instead of initials while the image is unavailable. */
   fallback?: ReactNode
-  /** Custom media content. Rendered inside the clipped avatar circle when no image is available. */
-  children?: ReactNode
-  /** Delay in ms before showing fallback (gives image time to load). */
+  /** Delay for a pending image. Missing/failed images show fallback immediately. */
   fallbackDelayMs?: number
-  className?: string
 }
+
+const useIsomorphicLayoutEffect =
+  typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 // ---------------------------------------------------------------------------
 // Component
@@ -40,27 +48,55 @@ export interface AvatarProps {
 
 export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
   function Avatar(props, ref) {
-    const { src = '', name = '', icon, fallback, children, fallbackDelayMs = 0, className } = props
-    const hasImageSource = src.trim().length > 0
+    const {
+      src = '',
+      name = '',
+      fallback,
+      fallbackDelayMs = 0,
+      className,
+      ...rest
+    } = props
+    const imageSource = src.trim()
+    const accessibleName = name.trim().replace(/\s+/g, ' ')
+    const delay = Number.isFinite(fallbackDelayMs)
+      ? Math.max(0, fallbackDelayMs)
+      : 0
+    const previous = useRef({ src: imageSource, delay })
 
     const { state, send } = useMachine(avatarMachine, {
-      src,
-      name,
-      fallbackDelayMs,
+      src: imageSource,
+      name: accessibleName,
+      fallbackDelayMs: delay,
     })
     const api = connectAvatar(state, send)
-    const iconNode = typeof icon === 'string'
-      ? <Icon name={icon} />
-      : icon
-    const fallbackContent = children ?? iconNode ?? fallback ?? api.initials
+    useIsomorphicLayoutEffect(() => {
+      if (
+        previous.current.src !== imageSource ||
+        (api.isLoading && previous.current.delay !== delay)
+      ) {
+        send({ type: 'SRC_CHANGE', src: imageSource })
+      }
+      previous.current = { src: imageSource, delay }
+    }, [imageSource, delay, api.isLoading, send])
 
     return (
-      <span ref={ref} {...api.getRootProps()} className={cn('uf-avatar', className)}>
-        {hasImageSource ? <img key="image" {...api.getImageProps()} /> : null}
+      <span
+        ref={ref}
+        {...api.getRootProps()}
+        role={
+          accessibleName || rest['aria-label'] || rest['aria-labelledby']
+            ? 'img'
+            : undefined
+        }
+        aria-label={accessibleName || undefined}
+        className={cn('uf-avatar', className)}
+        {...rest}
+      >
+        {imageSource ? (
+          <img key={imageSource} {...api.getImageProps(imageSource)} alt="" />
+        ) : null}
         <span key="fallback" {...api.getFallbackProps()}>
-          <span className="uf-avatar__content">
-            {fallbackContent}
-          </span>
+          <span className="uf-avatar__content">{fallback ?? api.initials}</span>
         </span>
       </span>
     )

@@ -6,9 +6,10 @@
  * If fallbackDelayMs > 0, the fallback waits before showing (gives image time to load).
  */
 
+import { splitGraphemes } from 'unicode-segmenter/grapheme'
 import { createMachine } from '../create-machine'
 import { createAnatomy } from '../anatomy'
-import type { MachineSchema } from '../types'
+import type { MachineSchema, TransitionConfig } from '../types'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -34,10 +35,10 @@ export interface AvatarSchema extends MachineSchema {
   }
   state: 'loading' | 'loaded' | 'error'
   event:
-    | { type: 'IMG_LOAD' }
-    | { type: 'IMG_ERROR' }
+    | { type: 'IMG_LOAD'; src: string }
+    | { type: 'IMG_ERROR'; src: string }
     | { type: 'SHOW_FALLBACK' }
-    | { type: 'SRC_CHANGE' }
+    | { type: 'SRC_CHANGE'; src: string }
 }
 
 // ---------------------------------------------------------------------------
@@ -45,15 +46,31 @@ export interface AvatarSchema extends MachineSchema {
 // ---------------------------------------------------------------------------
 
 function getInitials(name: string): string {
-  if (!name) return ''
   const parts = name.trim().split(/\s+/)
-  if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
-  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
+  const initials =
+    parts.length === 1 ? parts : [parts[0], parts[parts.length - 1]]
+  // Use the same Unicode rules on the server and client, independent of ICU.
+  return initials
+    .map((part) => splitGraphemes(part).next().value ?? '')
+    .join('')
+    .toUpperCase()
 }
 
 // ---------------------------------------------------------------------------
 // Machine
 // ---------------------------------------------------------------------------
+
+const reload: TransitionConfig<AvatarSchema> = {
+  target: 'loading',
+  reenter: true,
+  actions: [
+    (ctx, event) => {
+      if (event.type !== 'SRC_CHANGE') return
+      ctx.src = event.src
+      ctx.fallbackTimerElapsed = false
+    },
+  ],
+}
 
 export const avatarMachine = createMachine<AvatarSchema>({
   id: 'avatar',
@@ -69,13 +86,18 @@ export const avatarMachine = createMachine<AvatarSchema>({
 
   states: {
     loading: {
-      effects: ['preloadImage', 'fallbackTimer'],
+      effects: ['fallbackTimer'],
       on: {
+        SRC_CHANGE: reload,
         IMG_LOAD: {
           target: 'loaded',
+          guard: (ctx, event) =>
+            event.type === 'IMG_LOAD' && event.src === ctx.src,
         },
         IMG_ERROR: {
           target: 'error',
+          guard: (ctx, event) =>
+            event.type === 'IMG_ERROR' && event.src === ctx.src,
         },
         SHOW_FALLBACK: {
           actions: [
@@ -94,14 +116,7 @@ export const avatarMachine = createMachine<AvatarSchema>({
         },
       ],
       on: {
-        SRC_CHANGE: {
-          target: 'loading',
-          actions: [
-            (ctx) => {
-              ctx.fallbackTimerElapsed = false
-            },
-          ],
-        },
+        SRC_CHANGE: reload,
       },
     },
 
@@ -113,14 +128,7 @@ export const avatarMachine = createMachine<AvatarSchema>({
         },
       ],
       on: {
-        SRC_CHANGE: {
-          target: 'loading',
-          actions: [
-            (ctx) => {
-              ctx.fallbackTimerElapsed = false
-            },
-          ],
-        },
+        SRC_CHANGE: reload,
       },
     },
   },
@@ -136,33 +144,13 @@ export const avatarMachine = createMachine<AvatarSchema>({
     initials: (ctx) => getInitials(ctx.name),
   },
 
-  watch: {
-    src: (ctx) => {
-      // Handled externally — the adapter re-sends SRC_CHANGE
-      void ctx
-    },
-  },
-
   implementations: {
     effects: {
-      preloadImage: (ctx, send) => {
+      fallbackTimer: (ctx, send) => {
         if (!ctx.src) {
-          send({ type: 'IMG_ERROR' })
+          send({ type: 'IMG_ERROR', src: '' })
           return
         }
-        const img = new Image()
-        const onLoad = () => send({ type: 'IMG_LOAD' })
-        const onError = () => send({ type: 'IMG_ERROR' })
-        img.addEventListener('load', onLoad)
-        img.addEventListener('error', onError)
-        img.src = ctx.src
-        return () => {
-          img.removeEventListener('load', onLoad)
-          img.removeEventListener('error', onError)
-        }
-      },
-
-      fallbackTimer: (ctx, send) => {
         if (ctx.fallbackDelayMs <= 0) return
         const timer = setTimeout(() => {
           send({ type: 'SHOW_FALLBACK' })
@@ -185,6 +173,8 @@ interface AvatarPartProps {
   alt?: string
   hidden?: boolean
   style?: Record<string, string>
+  onLoad?: () => void
+  onError?: () => void
 }
 
 export function connectAvatar(
@@ -208,13 +198,15 @@ export function connectAvatar(
       }
     },
 
-    getImageProps(): AvatarPartProps {
+    getImageProps(src = ctx.src): AvatarPartProps {
       return {
         ...avatarAnatomy.getPartAttrs('image'),
-        src: ctx.src,
+        src,
         alt: ctx.name,
         hidden: !showImage,
         'data-state': stateValue,
+        onLoad: () => send({ type: 'IMG_LOAD', src }),
+        onError: () => send({ type: 'IMG_ERROR', src }),
       }
     },
 
@@ -229,9 +221,7 @@ export function connectAvatar(
 
     /** Imperative helpers */
     setSrc(src: string) {
-      // Context will be patched by the adapter; trigger reload
-      void src
-      send({ type: 'SRC_CHANGE' })
+      send({ type: 'SRC_CHANGE', src })
     },
 
     /** Computed accessors */

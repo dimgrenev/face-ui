@@ -5,34 +5,29 @@
   "description": "Non-interactive floating text hint anchored to a trigger element",
   "props": {
     "content": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Content rendered inside the floating surface."
+      "description": "Floating content. Empty content leaves the trigger without a layer. Tooltip content must be noninteractive."
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Trigger element (the anchor)."
+      "description": "One trigger element forwarding props/ref, or text rendered as a Button."
     },
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled open state."
+      "description": "Controlled visibility. Changes from the parent do not emit onOpenChange."
     },
-    "openDelay": {
-      "type": "number",
+    "defaultOpen": {
+      "type": "boolean",
       "required": false,
-      "description": "Delay before opening (ms)."
-    },
-    "closeDelay": {
-      "type": "number",
-      "required": false,
-      "description": "Delay before closing (ms)."
+      "description": "Initial uncontrolled visibility; later changes do not reset the layer."
     },
     "side": {
       "type": "enum",
       "required": false,
-      "description": "Preferred side placement.",
+      "description": "Preferred side; may flip when the opposite side has more room.",
       "options": [
         "top",
         "right",
@@ -43,7 +38,7 @@
     "align": {
       "type": "enum",
       "required": false,
-      "description": "Alignment along the side.",
+      "description": "Logical alignment on the cross axis, following dir or the trigger's direction.",
       "options": [
         "start",
         "center",
@@ -53,7 +48,22 @@
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Offset from the trigger along the side axis (px)."
+      "description": "Additional nonnegative gap in pixels before the content membrane."
+    },
+    "dir": {
+      "type": "string",
+      "required": false,
+      "description": "Content direction. Omitted inherits the trigger; auto follows the content."
+    },
+    "openDelay": {
+      "type": "number",
+      "required": false,
+      "description": "Hover/focus opening delay in milliseconds (0–2147483647); default 200."
+    },
+    "closeDelay": {
+      "type": "number",
+      "required": false,
+      "description": "Closing delay after hover and focus leave (0–2147483647); default 0."
     }
   },
   "states": [
@@ -83,39 +93,29 @@
     }
   },
   "aria": {
-    "role": "tooltip"
+    "role": "tooltip",
+    "notes": [
+      "The trigger retains its existing aria-describedby IDs and adds the tooltip ID. Pointer hover over trigger or content and trigger focus keep it open.",
+      "A native disabled button supports pointer hover but cannot receive keyboard focus; essential help also needs a visible or focusable location."
+    ]
   },
   "composition": {
     "required": [
-      "root",
       "trigger",
       "content"
     ],
-    "recommended": [
-      "arrow"
-    ],
     "parts": {
-      "root": {
-        "slot": "root"
-      },
       "trigger": {
-        "slot": "trigger",
-        "parent": "root"
+        "slot": "trigger"
       },
       "content": {
-        "slot": "content",
-        "parent": "root"
-      },
-      "arrow": {
-        "slot": "arrow",
-        "parent": "content"
+        "slot": "content"
       }
     }
   },
   "tokenMapping": {
     "component": [
-      "--uf-overlay-content-max-w",
-      "--uf-overlay-content-border-width"
+      "--uf-overlay-content-max-w"
     ],
     "semanticFallbacks": [
       "--uf-control-height",
@@ -149,14 +149,14 @@
     "notes": [
       "Tooltip is the non-interactive hover variant of Overlay.",
       "Tooltip uses Button-compatible control padding and a 240px max width, then wraps copy instead of truncating.",
-      "Tooltip appears with a 2px side offset from the trigger surface; membrane on both sides contributes its own visual spacing.",
+      "sideOffset is the gap from the trigger border box to the content membrane. The visible surface adds the membrane inset.",
       "Tooltip background and border are aliases of the shared overlay/dropdown surface tokens.",
       "Tooltip copy must stay brief; use Popover for interactive or rich content."
     ]
   },
   "platform": {
-    "popover": true,
-    "anchorPositioning": true
+    "popover": false,
+    "anchorPositioning": false
   },
   "usage": {
     "whenToUse": [

@@ -137,7 +137,7 @@
       "name": "--uf-border-default",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border)"
         }
       ]
@@ -147,7 +147,7 @@
       "name": "--uf-border-subtle",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border-subtle)"
         }
       ]
@@ -157,7 +157,7 @@
       "name": "--uf-border-focus",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-border-width-base) var(--uf-border-style-solid) var(--uf-color-ring)"
         }
       ]

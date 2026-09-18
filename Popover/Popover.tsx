@@ -1,11 +1,13 @@
 import { forwardRef } from 'react'
-import { Overlay, type OverlayProps } from '../Overlay/Overlay'
+import {
+  FloatingOverlay,
+  type FloatingSurfaceProps,
+} from '../assets/adapters/react/FloatingOverlay'
 
-export interface PopoverProps extends Omit<OverlayProps, 'trigger' | 'interactive'> {
-  interactive?: boolean
-}
+export interface PopoverProps extends FloatingSurfaceProps {}
 
-export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover(props, ref) {
-  const { interactive = true, ...rest } = props
-  return <Overlay ref={ref} trigger="click" interactive={interactive} {...rest} />
-})
+export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
+  function Popover(props, ref) {
+    return <FloatingOverlay {...props} ref={ref} trigger="click" />
+  },
+)

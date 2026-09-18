@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useState, type CSSProperties, type RefObject } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from 'react'
 
 export type FloatingSide = 'top' | 'right' | 'bottom' | 'left'
 export type FloatingAlign = 'start' | 'center' | 'end'
@@ -10,6 +16,10 @@ export interface UseFloatingPositionOptions {
   side?: FloatingSide
   align?: FloatingAlign
   sideOffset?: number
+  /** Explicit content direction; otherwise alignment follows the trigger. */
+  dir?: string
+  /** Semantic surface when contentRef measures an outer positioning boundary. */
+  directionRef?: RefObject<HTMLElement | null>
   viewportInset?: number
   matchTriggerWidth?: boolean
 }
@@ -33,7 +43,8 @@ function getAvailableSpace(
   viewportHeight: number,
 ) {
   if (side === 'top') return triggerRect.top - sideOffset - viewportInset
-  if (side === 'bottom') return viewportHeight - triggerRect.bottom - sideOffset - viewportInset
+  if (side === 'bottom')
+    return viewportHeight - triggerRect.bottom - sideOffset - viewportInset
   if (side === 'left') return triggerRect.left - sideOffset - viewportInset
   return viewportWidth - triggerRect.right - sideOffset - viewportInset
 }
@@ -56,9 +67,12 @@ function resolveSide(
     viewportHeight,
   )
   const oppositeSide: FloatingSide =
-    preferredSide === 'top' ? 'bottom'
-      : preferredSide === 'bottom' ? 'top'
-        : preferredSide === 'left' ? 'right'
+    preferredSide === 'top'
+      ? 'bottom'
+      : preferredSide === 'bottom'
+        ? 'top'
+        : preferredSide === 'left'
+          ? 'right'
           : 'left'
   const oppositeSpace = getAvailableSpace(
     triggerRect,
@@ -68,9 +82,10 @@ function resolveSide(
     viewportWidth,
     viewportHeight,
   )
-  const requiredSpace = preferredSide === 'top' || preferredSide === 'bottom'
-    ? contentRect.height
-    : contentRect.width
+  const requiredSpace =
+    preferredSide === 'top' || preferredSide === 'bottom'
+      ? contentRect.height
+      : contentRect.width
 
   return currentSpace < requiredSpace && oppositeSpace > currentSpace
     ? oppositeSide
@@ -85,22 +100,49 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
     side = 'bottom',
     align = 'start',
     sideOffset = 6,
+    dir,
+    directionRef = contentRef,
     viewportInset = 8,
     matchTriggerWidth = false,
   } = options
-  const [style, setStyle] = useState<CSSProperties>(initialStyle)
+  if (!['top', 'right', 'bottom', 'left'].includes(side))
+    throw new TypeError('Floating side must be top, right, bottom or left')
+  if (!['start', 'center', 'end'].includes(align))
+    throw new TypeError('Floating align must be start, center or end')
+  if (dir !== undefined && !['ltr', 'rtl', 'auto'].includes(dir))
+    throw new TypeError('Floating dir must be ltr, rtl or auto')
+  for (const [name, value] of Object.entries({ sideOffset, viewportInset }))
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0)
+      throw new RangeError(
+        `Floating ${name} must be a finite nonnegative number`,
+      )
+  const [position, setPosition] = useState({ style: initialStyle, side })
 
   const update = useCallback(() => {
-    if (typeof window === 'undefined') return
-
     const triggerEl = triggerRef.current
     const contentEl = contentRef.current
     if (!triggerEl || !contentEl) return
 
     const triggerRect = triggerEl.getBoundingClientRect()
     const contentRect = contentEl.getBoundingClientRect()
-    const viewportWidth = window.innerWidth
-    const viewportHeight = window.innerHeight
+    const view = triggerEl.ownerDocument.defaultView
+    if (!view) return
+    const viewportWidth = view.innerWidth
+    const viewportHeight = view.innerHeight
+    const direction =
+      dir === 'ltr' || dir === 'rtl'
+        ? dir
+        : view.getComputedStyle(
+            dir === 'auto' ? (directionRef.current ?? contentEl) : triggerEl,
+          ).direction
+    const horizontalAlign =
+      direction === 'rtl'
+        ? align === 'start'
+          ? 'end'
+          : align === 'end'
+            ? 'start'
+            : align
+        : align
     const resolvedSide = resolveSide(
       side,
       triggerRect,
@@ -125,15 +167,18 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
     }
 
     if (resolvedSide === 'top' || resolvedSide === 'bottom') {
-      if (align === 'center') left = triggerRect.left + (triggerRect.width - contentRect.width) / 2
-      if (align === 'end') left = triggerRect.right - contentRect.width
+      if (horizontalAlign === 'center')
+        left = triggerRect.left + (triggerRect.width - contentRect.width) / 2
+      if (horizontalAlign === 'end')
+        left = triggerRect.right - contentRect.width
     } else {
       if (align === 'start') top = triggerRect.top
       if (align === 'end') top = triggerRect.bottom - contentRect.height
     }
 
-    const maxHeight = Math.max(
-      80,
+    const vertical = resolvedSide === 'top' || resolvedSide === 'bottom'
+    const available = Math.max(
+      0,
       getAvailableSpace(
         triggerRect,
         resolvedSide,
@@ -143,51 +188,107 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
         viewportHeight,
       ),
     )
+    const maxHeight = Math.max(
+      0,
+      vertical
+        ? Math.min(available, viewportHeight - viewportInset * 2)
+        : viewportHeight - viewportInset * 2,
+    )
+    const maxWidth = Math.max(
+      0,
+      vertical
+        ? viewportWidth - viewportInset * 2
+        : Math.min(available, viewportWidth - viewportInset * 2),
+    )
 
-    setStyle({
+    const nextStyle: CSSProperties = {
       position: 'fixed',
-      top: Math.round(clamp(top, viewportInset, viewportHeight - contentRect.height - viewportInset)),
-      left: Math.round(clamp(left, viewportInset, viewportWidth - contentRect.width - viewportInset)),
+      direction: direction === 'rtl' ? 'rtl' : 'ltr',
+      top: Math.round(
+        clamp(
+          top,
+          viewportInset,
+          viewportHeight - contentRect.height - viewportInset,
+        ),
+      ),
+      left: Math.round(
+        clamp(
+          left,
+          viewportInset,
+          viewportWidth - contentRect.width - viewportInset,
+        ),
+      ),
       right: 'auto',
       bottom: 'auto',
-      maxWidth: `calc(100vw - ${viewportInset * 2}px)`,
+      maxWidth: Math.round(maxWidth),
       maxHeight: Math.round(maxHeight),
       overflowY: 'auto',
       ...(matchTriggerWidth
         ? {
-            width: Math.round(triggerRect.width),
-            minWidth: Math.round(triggerRect.width),
+            width: Math.round(Math.min(triggerRect.width, maxWidth)),
+            minWidth: Math.round(Math.min(triggerRect.width, maxWidth)),
           }
         : null),
-    })
-  }, [align, contentRef, matchTriggerWidth, side, sideOffset, triggerRef, viewportInset])
+    }
+    setPosition((previous) =>
+      previous.side === resolvedSide &&
+      Object.keys(previous.style).length === Object.keys(nextStyle).length &&
+      Object.entries(nextStyle).every(
+        ([key, value]) => previous.style[key as keyof CSSProperties] === value,
+      )
+        ? previous
+        : { style: nextStyle, side: resolvedSide },
+    )
+  }, [
+    align,
+    contentRef,
+    dir,
+    directionRef,
+    matchTriggerWidth,
+    side,
+    sideOffset,
+    triggerRef,
+    viewportInset,
+  ])
 
   useEffect(() => {
     if (!open) {
-      setStyle(initialStyle)
+      setPosition((previous) =>
+        previous.style === initialStyle && previous.side === side
+          ? previous
+          : { style: initialStyle, side },
+      )
       return
     }
 
+    const view = triggerRef.current?.ownerDocument.defaultView
+    if (!view) return
     update()
-    const rafId = window.requestAnimationFrame(update)
+    const rafId = view.requestAnimationFrame(update)
     const handleWindowChange = () => update()
     const resizeObserver =
-      typeof ResizeObserver !== 'undefined'
-        ? new ResizeObserver(handleWindowChange)
+      typeof view.ResizeObserver !== 'undefined'
+        ? new view.ResizeObserver(handleWindowChange)
         : null
 
     if (triggerRef.current) resizeObserver?.observe(triggerRef.current)
     if (contentRef.current) resizeObserver?.observe(contentRef.current)
-    window.addEventListener('resize', handleWindowChange)
-    window.addEventListener('scroll', handleWindowChange, true)
+    view.addEventListener('resize', handleWindowChange)
+    view.addEventListener('scroll', handleWindowChange, true)
 
     return () => {
-      window.cancelAnimationFrame(rafId)
+      view.cancelAnimationFrame(rafId)
       resizeObserver?.disconnect()
-      window.removeEventListener('resize', handleWindowChange)
-      window.removeEventListener('scroll', handleWindowChange, true)
+      view.removeEventListener('resize', handleWindowChange)
+      view.removeEventListener('scroll', handleWindowChange, true)
     }
-  }, [contentRef, open, triggerRef, update])
+  }, [contentRef, open, side, triggerRef, update])
 
-  return { style, update }
+  // Native direction and class changes need not resize the anchor. Read them
+  // after each commit; equality above avoids producing another render.
+  useEffect(() => {
+    if (open) update()
+  })
+
+  return { ...position, update }
 }

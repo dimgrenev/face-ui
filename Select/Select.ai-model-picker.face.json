@@ -7,26 +7,23 @@
   "root": {
     "type": "Select",
     "props": {
-      "variant": {
-        "$ref": "props.variant"
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "form": {
+        "$ref": "props.form"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
       },
       "options": {
         "$ref": "props.options"
       },
-      "value": {
-        "$ref": "props.value"
-      },
-      "defaultValue": {
-        "$ref": "props.defaultValue"
-      },
       "placeholder": {
         "$ref": "props.placeholder"
-      },
-      "disabled": {
-        "$ref": "props.disabled"
-      },
-      "type": {
-        "$ref": "props.type"
       },
       "label": {
         "$ref": "props.label"
@@ -34,14 +31,26 @@
       "labelOrientation": {
         "$ref": "props.labelOrientation"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
-      },
       "displayValue": {
         "$ref": "props.displayValue"
       },
+      "iconOnly": {
+        "$ref": "props.iconOnly"
+      },
+      "fullWidth": {
+        "$ref": "props.fullWidth"
+      },
       "stretchText": {
         "$ref": "props.stretchText"
+      },
+      "required": {
+        "$ref": "props.required"
+      },
+      "open": {
+        "$ref": "props.open"
+      },
+      "defaultOpen": {
+        "$ref": "props.defaultOpen"
       },
       "surface": {
         "$ref": "props.surface"
@@ -52,24 +61,34 @@
       "surfaceTitle": {
         "$ref": "props.surfaceTitle"
       },
+      "closeLabel": {
+        "$ref": "props.closeLabel"
+      },
       "contentMinWidth": {
         "$ref": "props.contentMinWidth"
       },
       "membrane": {
         "$ref": "props.membrane"
+      },
+      "multiple": {
+        "$ref": "props.multiple"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "variant": "side",
-      "type": "select",
       "label": "Model",
       "placeholder": "Choose model",
       "defaultValue": "balanced",
-      "ariaLabel": "AI model",
-      "surface": "popover",
+      "aria-label": "AI model",
+      "surface": "side",
       "surfaceTitle": "Choose model",
       "stretchText": true,
       "membrane": true,
@@ -91,71 +110,54 @@
   },
   "controls": [
     {
-      "name": "variant",
-      "type": "select",
+      "name": "disabled",
+      "type": "boolean",
       "required": false,
-      "description": "Visual/behavioral variant.",
-      "options": [
-        "default",
-        "side",
-        "iconOnly"
-      ],
-      "defaultValue": "default"
+      "description": "Disable focus, interaction and native form submission.",
+      "defaultValue": false
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native form key; multiple values produce repeated entries."
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "Associate this field with a form by id."
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible field name when a visible label is not appropriate."
     },
     {
       "name": "options",
       "type": "array",
       "required": false,
-      "description": "Available options."
-    },
-    {
-      "name": "value",
-      "type": "array",
-      "required": false,
-      "description": "Current selected value. String for single, string[] for multiselect."
-    },
-    {
-      "name": "defaultValue",
-      "type": "array",
-      "required": false,
-      "description": "Uncontrolled initial selected value."
+      "description": "Available choices, with unique values."
     },
     {
       "name": "placeholder",
       "type": "string",
       "required": false,
-      "description": "Placeholder text when no value is selected.",
+      "description": "Hint shown when no value or display override is present.",
       "defaultValue": "Select option"
     },
     {
-      "name": "disabled",
-      "type": "boolean",
-      "required": false,
-      "description": "Disable the select.",
-      "defaultValue": false
-    },
-    {
-      "name": "type",
-      "type": "select",
-      "required": false,
-      "description": "Selection mode.",
-      "options": [
-        "select",
-        "multiselect"
-      ],
-      "defaultValue": "select"
-    },
-    {
       "name": "label",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Label rendered above/beside the select."
+      "description": "Visible field label; native aria-label/aria-labelledby override its accessible name."
     },
     {
       "name": "labelOrientation",
       "type": "select",
       "required": false,
-      "description": "Label placement relative to the control.",
+      "description": "Label placement. Has no effect without a label.",
       "options": [
         "vertical",
         "horizontal"
@@ -163,33 +165,62 @@
       "defaultValue": "vertical"
     },
     {
-      "name": "ariaLabel",
-      "type": "string",
+      "name": "displayValue",
+      "type": "any",
       "required": false,
-      "description": "Accessible label (aria-label)."
+      "description": "Replace selected labels in the trigger, for example with a count or icon."
     },
     {
-      "name": "displayValue",
-      "type": "string",
+      "name": "iconOnly",
+      "type": "boolean",
       "required": false,
-      "description": "Optional override for the content shown in the trigger."
+      "description": "A square trigger without a chevron. Supply an accessible field name.",
+      "defaultValue": false
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Fill the available inline width. Defaults to true.",
+      "defaultValue": true
     },
     {
       "name": "stretchText",
       "type": "boolean",
       "required": false,
-      "description": "Stretch the value area so the arrow pins to the right edge.",
+      "description": "Expand the value area and align the chevron to the inline end.",
+      "defaultValue": false
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Require at least one selection for native form validation.",
+      "defaultValue": false
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled popup visibility. Disabled/empty lists cannot be opened."
+    },
+    {
+      "name": "defaultOpen",
+      "type": "boolean",
+      "required": false,
+      "description": "Uncontrolled initial popup visibility.",
       "defaultValue": false
     },
     {
       "name": "surface",
       "type": "select",
       "required": false,
-      "description": "Preferred content surface. Auto switches to bottom sheet on compact viewports.",
+      "description": "Auto uses a sheet on compact viewports; side is a hover/click inspector picker.",
       "options": [
         "auto",
         "popover",
-        "sheet"
+        "sheet",
+        "side"
       ],
       "defaultValue": "auto"
     },
@@ -197,26 +228,52 @@
       "name": "surfaceBreakpoint",
       "type": "number",
       "required": false,
-      "description": "Breakpoint where auto surfaces switch from popover to sheet."
+      "description": "Viewport breakpoint used only by surface=\"auto\"."
     },
     {
       "name": "surfaceTitle",
+      "type": "any",
+      "required": false,
+      "description": "Mobile sheet heading. Falls back to the field label or accessible name."
+    },
+    {
+      "name": "closeLabel",
       "type": "string",
       "required": false,
-      "description": "Optional title used for the mobile sheet header."
+      "description": "Accessible name for the sheet close button.",
+      "defaultValue": "Close"
     },
     {
       "name": "contentMinWidth",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Minimum width for popover content. Useful when the trigger is compact."
+      "description": "Minimum popover width, capped by the viewport. Does not resize side/sheet surfaces."
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around trigger/option geometry.",
+      "description": "Shared membrane around the trigger and option geometry.",
       "defaultValue": true
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "required": false,
+      "description": "Select one option.",
+      "defaultValue": false
+    },
+    {
+      "name": "value",
+      "type": "any",
+      "required": false,
+      "description": "Selected option, or null for no selection."
+    },
+    {
+      "name": "defaultValue",
+      "type": "any",
+      "required": false,
+      "description": "Initial selection, restored on form reset."
     }
   ],
   "meta": {

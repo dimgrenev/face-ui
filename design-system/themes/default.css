@@ -19,15 +19,20 @@
   --uf-topbar-pad-bottom: 2px;
   --uf-topbar-pad-left: 12px;
   --uf-topbar-slot-pad-y: 0px;
-  --uf-control-pad-left: var(--uf-control-pad-text);
-  --uf-control-pad-right: var(--uf-control-pad-text);
+  --uf-control-pad-start: var(--uf-control-pad-text);
+  --uf-control-pad-end: var(--uf-control-pad-text);
   --uf-option-indent: calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1));
   --uf-content-inset: 12px;
   --uf-icon-size: 20px;
   --uf-icon-only-size: 32px;
   --uf-hidden-input-size: 1px;
   --uf-hidden-input-offset: -1px;
+  --uf-interactive-weight: 500;
+}
+
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
   --uf-workspace-resize-line-color: var(--uf-color-border);
   --uf-workspace-resize-line-active-color: var(--uf-color-border-hover);
-  --uf-interactive-weight: 500;
 }

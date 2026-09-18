@@ -94,7 +94,7 @@ describe('Upload smoke', () => {
     expect(remove?.disabled).toBe(true)
     expect(remove?.textContent).toBe('Remove')
     expect(remove?.querySelector('[data-scope="button"][data-part="text"]')?.textContent).toBe('Remove')
-    expect(remove?.closest('.uf-membrane')).toBeNull()
+    expect(remove?.closest('.uf-membrane:not([data-membrane-disabled])')).toBeNull()
   })
 
   it('renders upload actions through Button text while preserving remove semantics', async () => {
@@ -131,7 +131,7 @@ describe('Upload smoke', () => {
     expect(remove?.getAttribute('aria-label')).toBe('Remove brief.pdf')
     expect(remove?.textContent).toBe('Remove')
     expect(remove?.querySelector('[data-scope="button"][data-part="text"]')?.textContent).toBe('Remove')
-    expect(remove?.closest('.uf-membrane')).toBeNull()
+    expect(remove?.closest('.uf-membrane:not([data-membrane-disabled])')).toBeNull()
 
     await act(async () => {
       remove?.dispatchEvent(new MouseEvent('click', { bubbles: true }))

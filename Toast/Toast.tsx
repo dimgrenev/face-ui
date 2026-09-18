@@ -9,8 +9,18 @@
  * subscribe/getSnapshot compatible with `useSyncExternalStore`.
  */
 
-import { forwardRef, useSyncExternalStore, useCallback, type HTMLAttributes, type ReactNode } from 'react'
-import { connectToast, createToaster, toastAnatomy } from '../assets/machines/toast.machine'
+import {
+  forwardRef,
+  useSyncExternalStore,
+  useCallback,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
+import {
+  connectToast,
+  createToaster,
+  toastAnatomy,
+} from '../assets/machines/toast.machine'
 import type {
   ToastAction,
   ToastItem,
@@ -49,7 +59,10 @@ export type ToastPlacement =
   | 'top-center'
   | 'top-right'
 
-export interface ToastProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface ToastProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'title'
+> {
   /** Primary notification text. */
   title?: ReactNode
   /** Supporting notification text. */
@@ -78,7 +91,9 @@ export interface UseToastReturn {
 export interface ToastContextValue {
   toaster: ToasterType
   useToast: () => UseToastReturn
-  Toaster: React.ForwardRefExoticComponent<ToasterProps & React.RefAttributes<HTMLDivElement>>
+  Toaster: React.ForwardRefExoticComponent<
+    ToasterProps & React.RefAttributes<HTMLDivElement>
+  >
 }
 
 // ---------------------------------------------------------------------------
@@ -114,20 +129,21 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(
       >
         <div className="uf-toast-body">
           <Bar className="uf-toast-bar">
-            <Bar.LeftEllipsis>
+            <Bar.Section grow>
               {title != null ? (
                 <Text
                   {...(toastAnatomy.getPartAttrs('title') as any)}
                   as="div"
-
                   className="uf-toast-title"
                 >
                   {title}
                 </Text>
-              ) : <span />}
-            </Bar.LeftEllipsis>
+              ) : (
+                <span />
+              )}
+            </Bar.Section>
             {dismissible ? (
-              <Bar.Right>
+              <Bar.Section align="end">
                 <Button
                   {...toastAnatomy.getPartAttrs('close')}
                   aria-label={closeLabel}
@@ -138,7 +154,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(
                   className="uf-toast-close"
                   onClick={onDismiss}
                 />
-              </Bar.Right>
+              </Bar.Section>
             ) : null}
           </Bar>
           {description != null ? (
@@ -203,14 +219,13 @@ export function createToastContext(options?: {
       } = props
 
       // Subscribe to the toaster service snapshot
-      const subscribe = useCallback(
-        (cb: () => void) => {
-          // toaster.subscribe gives us the snapshot, but useSyncExternalStore
-          // wants a plain callback. Wrap it.
-          return toaster.subscribe(cb as unknown as (snap: MachineSnapshot<ToastSchema>) => void)
-        },
-        [],
-      )
+      const subscribe = useCallback((cb: () => void) => {
+        // toaster.subscribe gives us the snapshot, but useSyncExternalStore
+        // wants a plain callback. Wrap it.
+        return toaster.subscribe(
+          cb as unknown as (snap: MachineSnapshot<ToastSchema>) => void,
+        )
+      }, [])
 
       const getSnapshot = useCallback(() => toaster.getSnapshot(), [])
 
@@ -230,7 +245,6 @@ export function createToastContext(options?: {
           ref={ref}
           {...api.getGroupProps()}
           data-placement={placement}
-          data-membrane=""
           className={cn('uf-toaster', className)}
           {...rest}
         >

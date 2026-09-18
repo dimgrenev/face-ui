@@ -43,10 +43,16 @@ function installMatchMedia(matches: boolean): MatchMediaRestore {
     matches: stub.matches,
     media: query,
     onchange: null,
-    addEventListener: (_event: string, listener: (event: MediaQueryListEvent) => void) => {
+    addEventListener: (
+      _event: string,
+      listener: (event: MediaQueryListEvent) => void,
+    ) => {
       stub.listeners.add(listener)
     },
-    removeEventListener: (_event: string, listener: (event: MediaQueryListEvent) => void) => {
+    removeEventListener: (
+      _event: string,
+      listener: (event: MediaQueryListEvent) => void,
+    ) => {
       stub.listeners.delete(listener)
     },
     addListener: (listener: (event: MediaQueryListEvent) => void) => {
@@ -80,7 +86,9 @@ function readComponentStyles() {
     `${cwd}/../face-ui/assets/styles/components.css`,
     `${cwd}/face-ui/assets/styles/components.css`,
   ]
-  const componentStylesPath = candidates.find((candidate) => existsSync(candidate))
+  const componentStylesPath = candidates.find((candidate) =>
+    existsSync(candidate),
+  )
   if (!componentStylesPath) {
     throw new Error(`Unable to locate Face UI component styles from ${cwd}`)
   }
@@ -93,7 +101,9 @@ describe('responsive overlay surfaces', () => {
   let restoreMatchMedia: MatchMediaRestore | null
 
   beforeEach(() => {
-    ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+    ;(
+      globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).IS_REACT_ACT_ENVIRONMENT = true
     ;(globalThis as typeof globalThis & { React?: typeof React }).React = React
     container = document.createElement('div')
     document.body.appendChild(container)
@@ -128,7 +138,11 @@ describe('responsive overlay surfaces', () => {
 
     expect(renderSequence[0]).toBe('popover')
     expect(renderSequence).toContain('sheet')
-    expect(container.querySelector('[data-testid="surface-probe"]')?.getAttribute('data-surface')).toBe('sheet')
+    expect(
+      container
+        .querySelector('[data-testid="surface-probe"]')
+        ?.getAttribute('data-surface'),
+    ).toBe('sheet')
   })
 
   it('Select switches auto surfaces to a bottom sheet on compact viewports', async () => {
@@ -144,15 +158,21 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '[data-part="trigger"]',
+    ) as HTMLButtonElement | null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const content = container.querySelector('[data-part="content"]') as HTMLElement | null
-    const backdrop = container.querySelector('.uf-responsive-overlay-backdrop') as HTMLElement | null
+    const content = container.querySelector(
+      '[data-part="content"]',
+    ) as HTMLElement | null
+    const backdrop = container.querySelector(
+      '.uf-responsive-overlay-backdrop',
+    ) as HTMLElement | null
     expect(content?.getAttribute('data-surface')).toBe('sheet')
     expect(content?.hidden).toBe(false)
     expect(backdrop?.getAttribute('data-state')).toBe('open')
@@ -163,7 +183,9 @@ describe('responsive overlay surfaces', () => {
       backdrop?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const closedContent = container.querySelector('[data-part="content"]') as HTMLElement | null
+    const closedContent = container.querySelector(
+      '[data-part="content"]',
+    ) as HTMLElement | null
     expect(closedContent?.hidden ?? true).toBe(true)
   })
 
@@ -176,12 +198,19 @@ describe('responsive overlay surfaces', () => {
     await act(async () => {
       root.render(
         <form onSubmit={handleSubmit}>
-          <Button text="Run action" onClick={handleClick} fullWidth={false} membrane={false} />
+          <Button
+            text="Run action"
+            onClick={handleClick}
+            fullWidth={false}
+            membrane={false}
+          />
         </form>,
       )
     })
 
-    const button = container.querySelector('.uf-button') as HTMLButtonElement | null
+    const button = container.querySelector(
+      '.uf-button',
+    ) as HTMLButtonElement | null
     expect(button).not.toBeNull()
     expect(button?.tagName).toBe('BUTTON')
     expect(button?.type).toBe('button')
@@ -209,9 +238,19 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const rootNode = container.querySelector('[data-scope="steps"][data-part="root"]') as HTMLElement | null
-    const triggers = Array.from(container.querySelectorAll<HTMLButtonElement>('[data-scope="steps"][data-part="trigger"]'))
-    const contents = Array.from(container.querySelectorAll<HTMLElement>('[data-scope="steps"][data-part="content"]'))
+    const rootNode = container.querySelector(
+      '[data-scope="steps"][data-part="root"]',
+    ) as HTMLElement | null
+    const triggers = Array.from(
+      container.querySelectorAll<HTMLButtonElement>(
+        '[data-scope="steps"][data-part="trigger"]',
+      ),
+    )
+    const contents = Array.from(
+      container.querySelectorAll<HTMLElement>(
+        '[data-scope="steps"][data-part="content"]',
+      ),
+    )
 
     expect(rootNode?.getAttribute('aria-label')).toBe('Steps')
     expect(triggers).toHaveLength(3)
@@ -247,15 +286,23 @@ describe('responsive overlay surfaces', () => {
           description="Shown to workspace admins."
           error="Profile notes are required."
           disabled
-          textLayout="wrap"
+          multiline
         />,
       )
     })
 
-    const label = container.querySelector('.uf-input label') as HTMLLabelElement | null
-    const textarea = container.querySelector('.uf-input textarea') as HTMLTextAreaElement | null
-    const description = container.querySelector('.uf-input__description') as HTMLElement | null
-    const error = container.querySelector('.uf-input__error') as HTMLElement | null
+    const label = container.querySelector(
+      '.uf-input label',
+    ) as HTMLLabelElement | null
+    const textarea = container.querySelector(
+      '.uf-input textarea',
+    ) as HTMLTextAreaElement | null
+    const description = container.querySelector(
+      '.uf-input__description',
+    ) as HTMLElement | null
+    const error = container.querySelector(
+      '.uf-input__error',
+    ) as HTMLElement | null
 
     expect(label).not.toBeNull()
     expect(textarea).not.toBeNull()
@@ -265,12 +312,14 @@ describe('responsive overlay surfaces', () => {
     expect(textarea?.disabled).toBe(true)
     expect(textarea?.getAttribute('aria-disabled')).toBe('true')
     expect(textarea?.getAttribute('aria-invalid')).toBe('true')
-    expect(textarea?.getAttribute('aria-describedby')).toBe('profile-notes-description profile-notes-error')
+    expect(textarea?.getAttribute('aria-describedby')).toBe(
+      'profile-notes-description profile-notes-error',
+    )
     expect(description?.id).toBe('profile-notes-description')
     expect(description?.textContent).toContain('Shown to workspace admins.')
     expect(error?.id).toBe('profile-notes-error')
     expect(error?.getAttribute('role')).toBe('alert')
-    expect(error?.getAttribute('aria-live')).toBe('polite')
+    expect(error?.hasAttribute('aria-live')).toBe(false)
     expect(error?.textContent).toContain('Profile notes are required.')
   })
 
@@ -287,13 +336,21 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const label = container.querySelector('.uf-checkbox') as HTMLLabelElement | null
-    const control = label?.querySelector('[data-part="control"]') as HTMLElement | null
-    const input = label?.querySelector('input[type="checkbox"]') as HTMLInputElement | null
-    const visibleText = label?.querySelector('[data-part="label"]') as HTMLElement | null
+    const label = container.querySelector(
+      '.uf-checkbox',
+    ) as HTMLLabelElement | null
+    const indicator = label?.querySelector(
+      '[data-part="indicator"]',
+    ) as HTMLElement | null
+    const input = label?.querySelector(
+      'input[type="checkbox"]',
+    ) as HTMLInputElement | null
+    const visibleText = label?.querySelector(
+      '[data-part="label"]',
+    ) as HTMLElement | null
 
     expect(label).not.toBeNull()
-    expect(control).not.toBeNull()
+    expect(indicator).not.toBeNull()
     expect(input).not.toBeNull()
     expect(visibleText?.textContent).toContain('Accept terms')
     expect(input?.labels?.[0]).toBe(label)
@@ -301,9 +358,9 @@ describe('responsive overlay surfaces', () => {
     expect(input?.checked).toBe(true)
     expect(input?.disabled).toBe(true)
     expect(input?.required).toBe(true)
-    expect(control?.getAttribute('aria-checked')).toBe('true')
-    expect(control?.getAttribute('aria-disabled')).toBe('true')
-    expect(control?.getAttribute('aria-required')).toBe('true')
+    expect(input?.getAttribute('aria-checked')).toBe('true')
+    expect(input?.getAttribute('aria-disabled')).toBe('true')
+    expect(input?.getAttribute('aria-required')).toBe('true')
   })
 
   it('Radio binds visible option labels to native controls and mirrors checked disabled required state', async () => {
@@ -321,21 +378,31 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const group = container.querySelector('[role="radiogroup"]') as HTMLElement | null
-    const daily = container.querySelector('[role="radio"][data-value="daily"]') as HTMLLabelElement | null
-    const never = container.querySelector('[role="radio"][data-value="never"]') as HTMLLabelElement | null
-    const dailyInput = daily?.querySelector('input[type="radio"]') as HTMLInputElement | null
-    const neverInput = never?.querySelector('input[type="radio"]') as HTMLInputElement | null
+    const group = container.querySelector(
+      '[role="radiogroup"]',
+    ) as HTMLElement | null
+    const daily = container.querySelector(
+      'label[data-value="daily"]',
+    ) as HTMLLabelElement | null
+    const never = container.querySelector(
+      'label[data-value="never"]',
+    ) as HTMLLabelElement | null
+    const dailyInput = daily?.querySelector(
+      'input[type="radio"]',
+    ) as HTMLInputElement | null
+    const neverInput = never?.querySelector(
+      'input[type="radio"]',
+    ) as HTMLInputElement | null
 
     expect(group?.getAttribute('aria-orientation')).toBe('vertical')
     expect(daily?.textContent).toContain('Daily updates')
     expect(never?.textContent).toContain('Never notify')
     expect(dailyInput?.labels?.[0]).toBe(daily)
     expect(neverInput?.labels?.[0]).toBe(never)
-    expect(daily?.getAttribute('aria-checked')).toBe('true')
+    expect(dailyInput?.getAttribute('aria-checked')).toBe('true')
     expect(dailyInput?.checked).toBe(true)
     expect(dailyInput?.required).toBe(true)
-    expect(never?.getAttribute('aria-disabled')).toBe('true')
+    expect(neverInput?.getAttribute('aria-disabled')).toBe('true')
     expect(neverInput?.disabled).toBe(true)
     expect(neverInput?.required).toBe(true)
   })
@@ -363,21 +430,36 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const switchers = Array.from(container.querySelectorAll<HTMLElement>('.uf-switcher'))
-    const autoPublish = switchers.find((node) => node.textContent?.includes('Auto publish')) ?? null
-    const lockedSync = switchers.find((node) => node.textContent?.includes('Locked sync')) ?? null
-    const autoLabel = autoPublish?.querySelector('label') as HTMLLabelElement | null
-    const autoControl = autoPublish?.querySelector('div[role="switch"]') as HTMLElement | null
-    const autoInput = autoPublish?.querySelector('input[role="switch"]') as HTMLInputElement | null
-    const lockedControl = lockedSync?.querySelector('div[role="switch"]') as HTMLElement | null
-    const lockedInput = lockedSync?.querySelector('input[role="switch"]') as HTMLInputElement | null
-    const autoLabelText = autoLabel?.querySelector('.uf-text[data-scope="text"]') as HTMLElement | null
+    const switchers = Array.from(
+      container.querySelectorAll<HTMLElement>('.uf-switcher'),
+    )
+    const autoPublish =
+      switchers.find((node) => node.textContent?.includes('Auto publish')) ??
+      null
+    const lockedSync =
+      switchers.find((node) => node.textContent?.includes('Locked sync')) ??
+      null
+    const autoLabel = autoPublish as HTMLLabelElement | null
+    const autoControl = autoPublish?.querySelector(
+      'input[role="switch"]',
+    ) as HTMLElement | null
+    const autoInput = autoPublish?.querySelector(
+      'input[role="switch"]',
+    ) as HTMLInputElement | null
+    const lockedControl = lockedSync?.querySelector(
+      'input[role="switch"]',
+    ) as HTMLElement | null
+    const lockedInput = lockedSync?.querySelector(
+      'input[role="switch"]',
+    ) as HTMLInputElement | null
+    const autoLabelText = autoLabel?.querySelector(
+      '.uf-text[data-part="label"]',
+    ) as HTMLElement | null
 
     expect(autoLabel?.textContent).toContain('Auto publish')
     expect(autoLabelText?.textContent).toContain('Auto publish')
     expect(autoLabelText?.getAttribute('data-inset')).toBe('none')
-    expect(autoLabel?.id).toBeTruthy()
-    expect(autoControl?.getAttribute('aria-labelledby')).toBe(autoLabel?.id)
+    expect(autoInput?.labels?.[0]).toBe(autoLabel)
     expect(autoControl?.getAttribute('aria-checked')).toBe('false')
     expect(autoControl?.getAttribute('aria-required')).toBe('true')
     expect(autoInput?.checked).toBe(false)
@@ -411,23 +493,36 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const label = container.querySelector('[data-part="label"]') as HTMLLabelElement | null
-    const trigger = container.querySelector('[role="combobox"]') as HTMLButtonElement | null
+    const label = container.querySelector(
+      '[data-part="label"]',
+    ) as HTMLLabelElement | null
+    const trigger = container.querySelector(
+      '[role="combobox"]',
+    ) as HTMLButtonElement | null
     expect(label).not.toBeNull()
     expect(trigger).not.toBeNull()
     expect(label?.id).toBeTruthy()
     expect(trigger?.id).toBeTruthy()
     expect(label?.htmlFor).toBe(trigger?.id)
     expect(trigger?.getAttribute('aria-labelledby')).toBe(label?.id)
-    expect(trigger?.getAttribute('aria-controls')).toBeTruthy()
+    expect(trigger?.hasAttribute('aria-controls')).toBe(false)
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const listbox = container.querySelector('[role="listbox"]') as HTMLElement | null
-    const options = Array.from(container.querySelectorAll<HTMLElement>('[role="option"]'))
-    expect(listbox?.id).toBe(trigger?.getAttribute('aria-controls'))
+    const listbox = container.querySelector(
+      '[role="listbox"]',
+    ) as HTMLElement | null
+    const options = Array.from(
+      container.querySelectorAll<HTMLElement>('[role="option"]'),
+    )
+    expect(
+      document
+        .getElementById(trigger?.getAttribute('aria-controls') ?? '')
+        ?.contains(listbox),
+    ).toBe(true)
+    expect(listbox?.contains(document.activeElement)).toBe(true)
     expect(listbox?.getAttribute('aria-labelledby')).toBe(label?.id)
     expect(options).toHaveLength(2)
     expect(options.every((option) => Boolean(option.id))).toBe(true)
@@ -449,38 +544,68 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = container.querySelector('[role="combobox"]') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '[role="combobox"]',
+    ) as HTMLButtonElement | null
     expect(trigger).not.toBeNull()
     expect(trigger?.hasAttribute('aria-activedescendant')).toBe(false)
 
     await act(async () => {
-      trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+      trigger?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+      )
     })
 
-    let highlighted = container.querySelector<HTMLElement>('[role="option"][data-highlighted]')
+    let highlighted = container.querySelector<HTMLElement>(
+      '[role="option"][data-highlighted]',
+    )
     expect(highlighted?.textContent).toContain('Regular')
-    expect(trigger?.getAttribute('aria-activedescendant')).toBe(highlighted?.id)
+    expect(
+      container
+        .querySelector('[role="listbox"]')
+        ?.getAttribute('aria-activedescendant'),
+    ).toBe(highlighted?.id)
 
     await act(async () => {
-      trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+      trigger?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+      )
     })
 
-    highlighted = container.querySelector<HTMLElement>('[role="option"][data-highlighted]')
+    highlighted = container.querySelector<HTMLElement>(
+      '[role="option"][data-highlighted]',
+    )
     expect(highlighted?.textContent).toContain('Bold')
-    expect(trigger?.getAttribute('aria-activedescendant')).toBe(highlighted?.id)
+    expect(
+      container
+        .querySelector('[role="listbox"]')
+        ?.getAttribute('aria-activedescendant'),
+    ).toBe(highlighted?.id)
 
     await act(async () => {
-      trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }))
+      trigger?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Home', bubbles: true }),
+      )
     })
-    expect(container.querySelector<HTMLElement>('[role="option"][data-highlighted]')?.textContent).toContain('Regular')
+    expect(
+      container.querySelector<HTMLElement>('[role="option"][data-highlighted]')
+        ?.textContent,
+    ).toContain('Regular')
 
     await act(async () => {
-      trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }))
+      trigger?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'End', bubbles: true }),
+      )
     })
-    expect(container.querySelector<HTMLElement>('[role="option"][data-highlighted]')?.textContent).toContain('Bold')
+    expect(
+      container.querySelector<HTMLElement>('[role="option"][data-highlighted]')
+        ?.textContent,
+    ).toContain('Bold')
 
     await act(async () => {
-      trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      trigger?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+      )
     })
 
     expect(container.querySelector('[role="listbox"]')).toBeNull()
@@ -494,7 +619,7 @@ describe('responsive overlay surfaces', () => {
     await act(async () => {
       root.render(
         <Select
-          type="multiselect"
+          multiple
           defaultValue={[]}
           options={[
             { value: 'regular', label: 'Regular' },
@@ -507,15 +632,19 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = container.querySelector('[role="combobox"]') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '[role="combobox"]',
+    ) as HTMLButtonElement | null
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
     expect(handleOpenChange).toHaveBeenLastCalledWith({ open: true })
 
-    const regularOption = Array.from(container.querySelectorAll<HTMLElement>('[role="option"]'))
-      .find((node) => node.textContent?.includes('Regular')) ?? null
+    const regularOption =
+      Array.from(
+        container.querySelectorAll<HTMLElement>('[role="option"]'),
+      ).find((node) => node.textContent?.includes('Regular')) ?? null
     expect(regularOption).not.toBeNull()
 
     await act(async () => {
@@ -532,26 +661,34 @@ describe('responsive overlay surfaces', () => {
       root.render(<Date />)
     })
 
-    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '[data-part="trigger"]',
+    ) as HTMLButtonElement | null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const content = container.querySelector('[data-part="content"]') as HTMLElement | null
-    const calendar = content?.querySelector('.uf-calendar[data-scope="calendar"]') as HTMLElement | null
+    const content = document.getElementById(
+      trigger?.getAttribute('aria-controls') ?? '',
+    ) as HTMLElement | null
+    const calendar = content?.querySelector(
+      '.uf-calendar[data-scope="calendar"]',
+    ) as HTMLElement | null
     expect(content?.getAttribute('data-surface')).toBe('sheet')
     expect(content?.hidden).toBe(false)
     expect(calendar).not.toBeNull()
     expect(document.body.style.overflow).toBe('hidden')
-    expect(container.textContent).toContain('Choose date')
+    expect(content?.textContent).toContain('Choose date')
 
     const componentStyles = readComponentStyles()
     expect(componentStyles).toMatch(
       /\.uf-date__content\[data-surface="sheet"\] \.uf-date__grid,\s*\.uf-date__content\[data-surface="sheet"\] \.uf-calendar\[data-scope="calendar"\] \{\s*width: 100%;\s*inline-size: 100%;\s*min-inline-size: 0;\s*\}/,
     )
-    expect(componentStyles).toContain('.uf-date__content[data-surface="sheet"] .uf-date__grid > .uf-membrane')
+    expect(componentStyles).toContain(
+      '.uf-date__content[data-surface="sheet"] .uf-date__grid > .uf-membrane',
+    )
   })
 
   it('Date keeps auto surfaces as a popover on wide viewports', async () => {
@@ -561,17 +698,21 @@ describe('responsive overlay surfaces', () => {
       root.render(<Date />)
     })
 
-    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '[data-part="trigger"]',
+    ) as HTMLButtonElement | null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const content = container.querySelector('[data-part="content"]') as HTMLElement | null
+    const content = document.getElementById(
+      trigger?.getAttribute('aria-controls') ?? '',
+    ) as HTMLElement | null
     expect(content?.getAttribute('data-surface')).toBe('popover')
     expect(content?.hidden).toBe(false)
-    expect(container.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
+    expect(document.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
     expect(document.body.style.overflow).toBe('')
     expect(container.textContent).not.toContain('Choose date')
   })
@@ -581,12 +722,16 @@ describe('responsive overlay surfaces', () => {
       root.render(<Date />)
     })
 
-    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '[data-part="trigger"]',
+    ) as HTMLButtonElement | null
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const content = container.querySelector('[data-part="content"]') as HTMLElement | null
+    const content = document.getElementById(
+      trigger?.getAttribute('aria-controls') ?? '',
+    ) as HTMLElement | null
     expect(content?.getAttribute('data-surface')).toBe('sheet')
     expect(document.body.style.overflow).toBe('hidden')
 
@@ -597,7 +742,7 @@ describe('responsive overlay surfaces', () => {
     })
 
     expect(content?.getAttribute('data-surface')).toBe('popover')
-    expect(container.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
+    expect(document.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
     expect(document.body.style.overflow).toBe('')
 
     restoreMatchMedia?.setMatches(true)
@@ -607,7 +752,9 @@ describe('responsive overlay surfaces', () => {
     })
 
     expect(content?.getAttribute('data-surface')).toBe('sheet')
-    expect(container.querySelector('.uf-responsive-overlay-backdrop')).not.toBeNull()
+    expect(
+      document.querySelector('.uf-responsive-overlay-backdrop'),
+    ).not.toBeNull()
     expect(document.body.style.overflow).toBe('hidden')
   })
 
@@ -626,11 +773,15 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const rootNode = container.querySelector('[data-scope="date"][data-part="root"]') as HTMLElement | null
-    const label = container.querySelector('.uf-date__label') as HTMLLabelElement | null
-    const trigger = container.querySelector('[data-scope="date"][data-part="trigger"]') as HTMLButtonElement | null
-    const content = container.querySelector('[data-scope="date"][data-part="content"]') as HTMLElement | null
-
+    const rootNode = container.querySelector(
+      '[data-scope="date"][data-part="root"]',
+    ) as HTMLElement | null
+    const label = container.querySelector(
+      '.uf-date__label',
+    ) as HTMLLabelElement | null
+    const trigger = container.querySelector(
+      '[data-scope="date"][data-part="trigger"]',
+    ) as HTMLButtonElement | null
     expect(rootNode?.getAttribute('data-mode')).toBe('date')
     expect(rootNode?.getAttribute('data-state')).toBe('closed')
     expect(label?.tagName).toBe('LABEL')
@@ -641,9 +792,10 @@ describe('responsive overlay surfaces', () => {
     expect(trigger?.getAttribute('aria-haspopup')).toBe('dialog')
     expect(trigger?.getAttribute('aria-expanded')).toBe('false')
     expect(trigger?.textContent).toContain('Pick start')
-    expect(content?.getAttribute('role')).toBe('dialog')
-    expect(content?.getAttribute('aria-label')).toBe('Date picker')
-    expect(content?.hidden).toBe(true)
+    expect(trigger?.hasAttribute('aria-controls')).toBe(false)
+    expect(
+      document.querySelector('[data-scope="date"][role="dialog"]'),
+    ).toBeNull()
 
     const openEvent = new KeyboardEvent('keydown', {
       key: 'ArrowDown',
@@ -658,6 +810,14 @@ describe('responsive overlay surfaces', () => {
     expect(handleOpenChange).toHaveBeenLastCalledWith({ open: true })
     expect(rootNode?.getAttribute('data-state')).toBe('open')
     expect(trigger?.getAttribute('aria-expanded')).toBe('true')
+    const content = document.getElementById(
+      trigger?.getAttribute('aria-controls') ?? '',
+    ) as HTMLElement | null
+    expect(content?.getAttribute('role')).toBe('dialog')
+    expect(
+      document.getElementById(content?.getAttribute('aria-labelledby') ?? '')
+        ?.textContent,
+    ).toBe('Start date')
     expect(content?.hidden).toBe(false)
 
     const closeEvent = new KeyboardEvent('keydown', {
@@ -673,7 +833,8 @@ describe('responsive overlay surfaces', () => {
     expect(handleOpenChange).toHaveBeenLastCalledWith({ open: false })
     expect(rootNode?.getAttribute('data-state')).toBe('closed')
     expect(trigger?.getAttribute('aria-expanded')).toBe('false')
-    expect(content?.hidden).toBe(true)
+    expect(content?.isConnected).toBe(false)
+    expect(trigger?.hasAttribute('aria-controls')).toBe(false)
   })
 
   it('Tooltip exposes non-interactive tooltip semantics from the focusable trigger', async () => {
@@ -689,51 +850,61 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = container.querySelector('[data-scope="overlay"][data-part="trigger"]') as HTMLElement | null
-    const button = trigger?.querySelector('button') as HTMLButtonElement | null
-    let content = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'))
-      .find((node) => node.textContent?.includes('Exports the current report.')) ?? null
-    let arrow = content?.querySelector('[data-scope="overlay"][data-part="arrow"]') as HTMLElement | null
+    const trigger = container.querySelector(
+      '[data-scope="overlay"][data-part="trigger"]',
+    ) as HTMLElement | null
+    const button = trigger as HTMLButtonElement | null
+    let content =
+      Array.from(
+        document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'),
+      ).find((node) =>
+        node.textContent?.includes('Exports the current report.'),
+      ) ?? null
 
     expect(trigger).not.toBeNull()
     expect(button).not.toBeNull()
     expect(button?.textContent).toContain('Export')
-    expect(trigger?.getAttribute('aria-expanded')).toBe('false')
+    expect(trigger?.getAttribute('aria-expanded')).toBeNull()
     expect(content?.getAttribute('role')).toBe('tooltip')
     expect(content?.getAttribute('data-trigger')).toBe('hover')
     expect(content?.getAttribute('data-state')).toBe('closed')
     expect(content?.hidden).toBe(true)
-    expect(arrow?.hidden).toBe(true)
 
     await act(async () => {
       button?.focus()
     })
 
-    content = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'))
-      .find((node) => node.textContent?.includes('Exports the current report.')) ?? null
-    arrow = content?.querySelector('[data-scope="overlay"][data-part="arrow"]') as HTMLElement | null
+    content =
+      Array.from(
+        document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'),
+      ).find((node) =>
+        node.textContent?.includes('Exports the current report.'),
+      ) ?? null
 
     expect(document.activeElement).toBe(button)
-    expect(trigger?.getAttribute('aria-expanded')).toBe('true')
+    expect(trigger?.getAttribute('aria-describedby')).toBe(
+      content?.id,
+    )
     expect(content?.getAttribute('data-state')).toBe('open')
     expect(content?.hidden).toBe(false)
-    expect(arrow?.hidden).toBe(false)
 
     await act(async () => {
       button?.blur()
     })
 
-    content = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'))
-      .find((node) => node.textContent?.includes('Exports the current report.')) ?? null
-    arrow = content?.querySelector('[data-scope="overlay"][data-part="arrow"]') as HTMLElement | null
+    content =
+      Array.from(
+        document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'),
+      ).find((node) =>
+        node.textContent?.includes('Exports the current report.'),
+      ) ?? null
 
-    expect(trigger?.getAttribute('aria-expanded')).toBe('false')
+    expect(trigger?.getAttribute('aria-expanded')).toBeNull()
     expect(content?.getAttribute('data-state')).toBe('closed')
     expect(content?.hidden).toBe(true)
-    expect(arrow?.hidden).toBe(true)
   })
 
-  it('Popover toggles click-trigger ARIA state without stealing trigger focus', async () => {
+  it('Popover opens from its semantic trigger and focuses interactive content', async () => {
     const handleOpenChange = vi.fn()
 
     await act(async () => {
@@ -747,10 +918,14 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = container.querySelector('[data-scope="overlay"][data-part="trigger"]') as HTMLElement | null
-    const button = trigger?.querySelector('button') as HTMLButtonElement | null
-    let content = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'))
-      .find((node) => node.textContent?.includes('Popover action')) ?? null
+    const trigger = container.querySelector(
+      '[data-scope="overlay"][data-part="trigger"]',
+    ) as HTMLElement | null
+    const button = trigger as HTMLButtonElement | null
+    let content =
+      Array.from(
+        document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'),
+      ).find((node) => node.textContent?.includes('Popover action')) ?? null
     const action = content?.querySelector('button') as HTMLButtonElement | null
 
     expect(trigger).not.toBeNull()
@@ -773,22 +948,28 @@ describe('responsive overlay surfaces', () => {
       button?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    content = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'))
-      .find((node) => node.textContent?.includes('Popover action')) ?? null
+    content =
+      Array.from(
+        document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'),
+      ).find((node) => node.textContent?.includes('Popover action')) ?? null
 
     expect(handleOpenChange).toHaveBeenLastCalledWith({ open: true })
     expect(trigger?.getAttribute('aria-expanded')).toBe('true')
     expect(trigger?.getAttribute('data-state')).toBe('open')
     expect(content?.getAttribute('data-state')).toBe('open')
     expect(content?.hidden).toBe(false)
-    expect(document.activeElement).toBe(button)
+    expect(document.activeElement).toBe(action)
 
     await act(async () => {
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+      )
     })
 
-    content = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'))
-      .find((node) => node.textContent?.includes('Popover action')) ?? null
+    content =
+      Array.from(
+        document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'),
+      ).find((node) => node.textContent?.includes('Popover action')) ?? null
 
     expect(handleOpenChange).toHaveBeenLastCalledWith({ open: false })
     expect(trigger?.getAttribute('aria-expanded')).toBe('false')
@@ -812,14 +993,19 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = Array.from(container.querySelectorAll('button')).find((button) => button.textContent?.includes('Open menu')) ?? null
+    const trigger =
+      Array.from(container.querySelectorAll('button')).find((button) =>
+        button.textContent?.includes('Open menu'),
+      ) ?? null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const content = container.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement | null
+    const content = container.querySelector(
+      '[data-scope="menu"][data-part="content"]',
+    ) as HTMLElement | null
     expect(content?.getAttribute('data-surface')).toBe('sheet')
     expect(content?.hidden).toBe(false)
     expect(document.body.style.overflow).toBe('hidden')
@@ -840,20 +1026,29 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const wrapper = container.querySelector('.uf-menu-trigger') as HTMLElement | null
-    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open menu')) ?? null
+    const wrapper = container.querySelector(
+      '.uf-menu-trigger',
+    ) as HTMLElement | null
+    const trigger =
+      Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
+        (button) => button.textContent?.includes('Open menu'),
+      ) ?? null
     expect(wrapper).not.toBeNull()
     expect(trigger).not.toBeNull()
-    expect(wrapper?.getAttribute('aria-haspopup')).toBeNull()
+    expect(wrapper).toBe(trigger)
     expect(trigger?.getAttribute('aria-haspopup')).toBe('menu')
     expect(trigger?.getAttribute('aria-expanded')).toBe('false')
     expect(trigger?.getAttribute('aria-controls')).toBeTruthy()
 
     await act(async () => {
-      trigger?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+      trigger?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }),
+      )
     })
 
-    const controlledContent = document.getElementById(trigger?.getAttribute('aria-controls') ?? '')
+    const controlledContent = document.getElementById(
+      trigger?.getAttribute('aria-controls') ?? '',
+    )
     expect(controlledContent?.getAttribute('data-scope')).toBe('menu')
     expect(controlledContent?.hidden).toBe(false)
     expect(trigger?.getAttribute('aria-expanded')).toBe('true')
@@ -873,18 +1068,23 @@ describe('responsive overlay surfaces', () => {
           surface="popover"
           align="start"
           sideOffset={4}
-          items={[
-            { value: 'copy', label: 'Copy' },
-          ]}
+          items={[{ value: 'copy', label: 'Copy' }]}
         >
           <Button text="Open menu" fullWidth={false} membrane={false} />
         </Menu>,
       )
     })
 
-    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open menu')) ?? null
-    const triggerAnchor = container.querySelector('.uf-menu-trigger') as HTMLElement | null
-    const content = document.body.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement | null
+    const trigger =
+      Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
+        (button) => button.textContent?.includes('Open menu'),
+      ) ?? null
+    const triggerAnchor = container.querySelector(
+      '.uf-menu-trigger',
+    ) as HTMLElement | null
+    const content = document.body.querySelector(
+      '[data-scope="menu"][data-part="content"]',
+    ) as HTMLElement | null
     expect(trigger).not.toBeNull()
     expect(triggerAnchor).not.toBeNull()
     expect(content).not.toBeNull()
@@ -926,8 +1126,12 @@ describe('responsive overlay surfaces', () => {
     expect(content?.style.left).toBe('100px')
     expect(content?.style.top).toBe('76px')
 
-    const membrane = content?.querySelector('.uf-menu-contentMembrane') as HTMLElement | null
-    const panel = content?.querySelector('.uf-menu-contentPanel') as HTMLElement | null
+    const membrane = content?.querySelector(
+      '.uf-menu-contentMembrane',
+    ) as HTMLElement | null
+    const panel = content?.querySelector(
+      '.uf-menu-contentPanel',
+    ) as HTMLElement | null
     expect(membrane).not.toBeNull()
     expect(membrane?.classList.contains('uf-membrane')).toBe(true)
     expect(membrane?.classList.contains('uf-membrane--full')).toBe(true)
@@ -937,7 +1141,8 @@ describe('responsive overlay surfaces', () => {
     expect(panel?.hasAttribute('data-full-width')).toBe(true)
 
     const componentStyles = readComponentStyles()
-    const menuPanelBlock = componentStyles.match(/\.uf-menu-contentPanel\s*\{[^}]*\}/)?.[0] ?? ''
+    const menuPanelBlock =
+      componentStyles.match(/\.uf-menu-contentPanel\s*\{[^}]*\}/)?.[0] ?? ''
     expect(menuPanelBlock).not.toContain('max-height')
   })
 
@@ -945,12 +1150,7 @@ describe('responsive overlay surfaces', () => {
     await act(async () => {
       root.render(
         <>
-          <Menu
-            surface="popover"
-            items={[
-              { value: 'copy', label: 'Copy' },
-            ]}
-          >
+          <Menu surface="popover" items={[{ value: 'copy', label: 'Copy' }]}>
             <Button text="Open menu" fullWidth={false} membrane={false} />
           </Menu>
           <button
@@ -964,8 +1164,13 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open menu')) ?? null
-    const outside = container.querySelector('[data-testid="outside-stop"]') as HTMLButtonElement | null
+    const trigger =
+      Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
+        (button) => button.textContent?.includes('Open menu'),
+      ) ?? null
+    const outside = container.querySelector(
+      '[data-testid="outside-stop"]',
+    ) as HTMLButtonElement | null
     expect(trigger).not.toBeNull()
     expect(outside).not.toBeNull()
 
@@ -974,7 +1179,9 @@ describe('responsive overlay surfaces', () => {
       await Promise.resolve()
     })
 
-    const content = document.body.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement | null
+    const content = document.body.querySelector(
+      '[data-scope="menu"][data-part="content"]',
+    ) as HTMLElement | null
     expect(content?.hidden).toBe(false)
 
     await act(async () => {
@@ -989,12 +1196,7 @@ describe('responsive overlay surfaces', () => {
     await act(async () => {
       root.render(
         <>
-          <Menu
-            surface="popover"
-            items={[
-              { value: 'copy', label: 'Copy' },
-            ]}
-          >
+          <Menu surface="popover" items={[{ value: 'copy', label: 'Copy' }]}>
             <Button text="Open menu" fullWidth={false} membrane={false} />
           </Menu>
           <button type="button" data-testid="outside-click">
@@ -1004,8 +1206,13 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open menu')) ?? null
-    const outside = container.querySelector('[data-testid="outside-click"]') as HTMLButtonElement | null
+    const trigger =
+      Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
+        (button) => button.textContent?.includes('Open menu'),
+      ) ?? null
+    const outside = container.querySelector(
+      '[data-testid="outside-click"]',
+    ) as HTMLButtonElement | null
     expect(trigger).not.toBeNull()
     expect(outside).not.toBeNull()
 
@@ -1014,7 +1221,9 @@ describe('responsive overlay surfaces', () => {
       await Promise.resolve()
     })
 
-    const content = document.body.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement | null
+    const content = document.body.querySelector(
+      '[data-scope="menu"][data-part="content"]',
+    ) as HTMLElement | null
     expect(content?.hidden).toBe(false)
 
     await act(async () => {
@@ -1031,24 +1240,29 @@ describe('responsive overlay surfaces', () => {
         <Menu
           trigger="context"
           surface="popover"
-          items={[
-            { value: 'inspect', label: 'Inspect' },
-          ]}
+          items={[{ value: 'inspect', label: 'Inspect' }]}
         >
           <Button text="Context target" fullWidth={false} membrane={false} />
         </Menu>,
       )
     })
 
-    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Context target')) ?? null
+    const trigger =
+      Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
+        (button) => button.textContent?.includes('Context target'),
+      ) ?? null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
-      trigger?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }))
+      trigger?.dispatchEvent(
+        new MouseEvent('contextmenu', { bubbles: true, cancelable: true }),
+      )
       await Promise.resolve()
     })
 
-    const content = document.body.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement | null
+    const content = document.body.querySelector(
+      '[data-scope="menu"][data-part="content"]',
+    ) as HTMLElement | null
     expect(content?.hidden).toBe(false)
     expect(content?.textContent).toContain('Inspect')
   })
@@ -1071,64 +1285,105 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open menu')) ?? null
+    const trigger =
+      Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
+        (button) => button.textContent?.includes('Open menu'),
+      ) ?? null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
-      trigger?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+      trigger?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }),
+      )
     })
 
-    let highlighted = container.querySelector<HTMLElement>('[role="menuitem"][data-highlighted]')
-    const disabledItem = Array.from(container.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'))
-      .find((button) => button.textContent?.includes('Paste')) ?? null
+    let highlighted = container.querySelector<HTMLElement>(
+      '[role="menuitem"][data-highlighted]',
+    )
+    const disabledItem =
+      Array.from(
+        container.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'),
+      ).find((button) => button.textContent?.includes('Paste')) ?? null
     expect(highlighted?.textContent).toContain('Copy')
     expect(document.activeElement).toBe(highlighted)
     expect(disabledItem?.disabled).toBe(true)
 
     await act(async () => {
-      highlighted?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+      highlighted?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }),
+      )
     })
 
-    highlighted = container.querySelector<HTMLElement>('[role="menuitem"][data-highlighted]')
+    highlighted = container.querySelector<HTMLElement>(
+      '[role="menuitem"][data-highlighted]',
+    )
     expect(highlighted?.textContent).toContain('Delete')
     expect(document.activeElement).toBe(highlighted)
 
     await act(async () => {
-      highlighted?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Home' }))
+      highlighted?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: 'Home' }),
+      )
     })
-    highlighted = container.querySelector<HTMLElement>('[role="menuitem"][data-highlighted]')
+    highlighted = container.querySelector<HTMLElement>(
+      '[role="menuitem"][data-highlighted]',
+    )
     expect(highlighted?.textContent).toContain('Copy')
 
     await act(async () => {
-      highlighted?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'End' }))
+      highlighted?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: 'End' }),
+      )
     })
-    highlighted = container.querySelector<HTMLElement>('[role="menuitem"][data-highlighted]')
+    highlighted = container.querySelector<HTMLElement>(
+      '[role="menuitem"][data-highlighted]',
+    )
     expect(highlighted?.textContent).toContain('Delete')
 
     await act(async () => {
-      highlighted?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+      highlighted?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }),
+      )
     })
-    expect(container.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"]')?.hidden).toBe(true)
+    expect(
+      container.querySelector<HTMLElement>(
+        '[data-scope="menu"][data-part="content"]',
+      )?.hidden,
+    ).toBe(true)
     expect(handleSelect).not.toHaveBeenCalled()
 
     await act(async () => {
-      trigger?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+      trigger?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }),
+      )
     })
 
-    highlighted = container.querySelector<HTMLElement>('[role="menuitem"][data-highlighted]')
+    highlighted = container.querySelector<HTMLElement>(
+      '[role="menuitem"][data-highlighted]',
+    )
     await act(async () => {
-      highlighted?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'd' }))
+      highlighted?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: 'd' }),
+      )
     })
-    highlighted = container.querySelector<HTMLElement>('[role="menuitem"][data-highlighted]')
+    highlighted = container.querySelector<HTMLElement>(
+      '[role="menuitem"][data-highlighted]',
+    )
     expect(highlighted?.textContent).toContain('Delete')
 
     await act(async () => {
-      highlighted?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: ' ' }))
+      highlighted?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: ' ' }),
+      )
     })
 
     expect(handleSelect).toHaveBeenCalledTimes(1)
     expect(handleSelect).toHaveBeenLastCalledWith({ value: 'delete' })
-    expect(container.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"]')?.hidden).toBe(true)
+    expect(
+      container.querySelector<HTMLElement>(
+        '[data-scope="menu"][data-part="content"]',
+      )?.hidden,
+    ).toBe(true)
   })
 
   it('Menu typeahead uses textValue for custom group item labels', async () => {
@@ -1159,21 +1414,30 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((button) => button.textContent?.includes('Open menu')) ?? null
+    const trigger =
+      Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
+        (button) => button.textContent?.includes('Open menu'),
+      ) ?? null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const content = container.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"]')
+    const content = container.querySelector<HTMLElement>(
+      '[data-scope="menu"][data-part="content"]',
+    )
     expect(content?.hidden).toBe(false)
 
     await act(async () => {
-      content?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'p' }))
+      content?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, key: 'p' }),
+      )
     })
 
-    const highlighted = container.querySelector<HTMLElement>('[role="menuitem"][data-highlighted]')
+    const highlighted = container.querySelector<HTMLElement>(
+      '[role="menuitem"][data-highlighted]',
+    )
     expect(highlighted?.dataset.value).toBe('preferences')
   })
 
@@ -1190,15 +1454,22 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '[data-part="trigger"]',
+    ) as HTMLButtonElement | null
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
     const contentId = trigger?.getAttribute('aria-controls') ?? ''
-    const content = document.getElementById(contentId) as HTMLElement | null
+    const content =
+      document
+        .getElementById(contentId)
+        ?.closest<HTMLElement>('[data-part="content"]') ?? null
     expect(content?.getAttribute('data-surface')).toBe('popover')
-    expect(container.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
+    expect(
+      container.querySelector('.uf-responsive-overlay-backdrop'),
+    ).toBeNull()
     expect(document.body.style.overflow).toBe('')
   })
 
@@ -1220,8 +1491,12 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = container.querySelector('[data-part="trigger"]') as HTMLButtonElement | null
-    const outside = container.querySelector('[data-testid="select-outside-click"]') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '[data-part="trigger"]',
+    ) as HTMLButtonElement | null
+    const outside = container.querySelector(
+      '[data-testid="select-outside-click"]',
+    ) as HTMLButtonElement | null
     expect(trigger).not.toBeNull()
     expect(outside).not.toBeNull()
 
@@ -1260,14 +1535,28 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const rootNode = container.querySelector('[data-scope="command"][data-part="root"]') as HTMLElement | null
-    const input = container.querySelector('[data-scope="command"][data-part="input"]') as HTMLInputElement | null
-    const listbox = container.querySelector('[data-scope="command"][data-part="list"]') as HTMLElement | null
-    const group = container.querySelector('[data-scope="command"][data-part="group"]') as HTMLElement | null
-    const groupLabel = container.querySelector('[data-scope="command"][data-part="groupLabel"]') as HTMLElement | null
-    const options = Array.from(container.querySelectorAll<HTMLButtonElement>('[role="option"]'))
-    const copy = options.find((option) => option.dataset.value === 'copy') ?? null
-    const paste = options.find((option) => option.dataset.value === 'paste') ?? null
+    const rootNode = container.querySelector(
+      '[data-scope="command"][data-part="root"]',
+    ) as HTMLElement | null
+    const input = container.querySelector(
+      '[data-scope="command"][data-part="input"]',
+    ) as HTMLInputElement | null
+    const listbox = container.querySelector(
+      '[data-scope="command"][data-part="list"]',
+    ) as HTMLElement | null
+    const group = container.querySelector(
+      '[data-scope="command"][data-part="group"]',
+    ) as HTMLElement | null
+    const groupLabel = container.querySelector(
+      '[data-scope="command"][data-part="groupLabel"]',
+    ) as HTMLElement | null
+    const options = Array.from(
+      container.querySelectorAll<HTMLButtonElement>('[role="option"]'),
+    )
+    const copy =
+      options.find((option) => option.dataset.value === 'copy') ?? null
+    const paste =
+      options.find((option) => option.dataset.value === 'paste') ?? null
     const cut = options.find((option) => option.dataset.value === 'cut') ?? null
 
     expect(rootNode?.getAttribute('data-state')).toBe('idle')
@@ -1292,7 +1581,9 @@ describe('responsive overlay surfaces', () => {
     expect(rootNode?.getAttribute('data-state')).toBe('focused')
 
     await act(async () => {
-      input?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+      input?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+      )
     })
 
     expect(input?.getAttribute('aria-activedescendant')).toBe(cut?.id)
@@ -1300,11 +1591,15 @@ describe('responsive overlay surfaces', () => {
     expect(paste?.getAttribute('aria-selected')).toBe('false')
 
     await act(async () => {
-      input?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+      input?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+      )
     })
 
     expect(handleSelect).toHaveBeenCalledTimes(1)
-    expect(handleSelect.mock.calls.at(-1)?.[0]).toMatchObject({ item: { id: 'cut' } })
+    expect(handleSelect.mock.calls.at(-1)?.[0]).toMatchObject({
+      item: { id: 'cut' },
+    })
   })
 
   it('Command switches auto surfaces to a dialog on compact viewports', async () => {
@@ -1325,19 +1620,28 @@ describe('responsive overlay surfaces', () => {
 
     expect(container.querySelector('[role="combobox"]')).toBeNull()
 
-    const trigger = container.querySelector('.uf-command__trigger') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '.uf-command__trigger',
+    ) as HTMLButtonElement | null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const input = container.querySelector('[role="combobox"]') as HTMLInputElement | null
+    const input = container.querySelector(
+      '[role="combobox"]',
+    ) as HTMLInputElement | null
     expect(input).not.toBeNull()
     expect(document.body.style.overflow).toBe('hidden')
-    expect(container.querySelector('.uf-command .uf-responsive-sheetHeader')).toBeNull()
+    expect(
+      container.querySelector('.uf-command .uf-responsive-sheetHeader'),
+    ).toBeNull()
 
-    const pasteButton = Array.from(container.querySelectorAll<HTMLButtonElement>('.uf-command-item')).find((button) => button.textContent?.includes('Paste')) ?? null
+    const pasteButton =
+      Array.from(
+        container.querySelectorAll<HTMLButtonElement>('.uf-command-item'),
+      ).find((button) => button.textContent?.includes('Paste')) ?? null
     expect(pasteButton).not.toBeNull()
 
     await act(async () => {
@@ -1345,7 +1649,9 @@ describe('responsive overlay surfaces', () => {
     })
 
     expect(handleSelect).toHaveBeenCalledTimes(1)
-    expect(container.querySelector('.uf-command__dialog[data-state=\"open\"]')).toBeNull()
+    expect(
+      container.querySelector('.uf-command__dialog[data-state=\"open\"]'),
+    ).toBeNull()
   })
 
   it('Panel switches auto surfaces to a left drawer on compact viewports', async () => {
@@ -1353,14 +1659,18 @@ describe('responsive overlay surfaces', () => {
       root.render(<Panel items={[]} />)
     })
 
-    const trigger = container.querySelector('.uf-sidebar-sheetTrigger button') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '.uf-sidebar-sheetTrigger',
+    ) as HTMLButtonElement | null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const panel = container.querySelector('.uf-sidebar-sheet') as HTMLElement | null
+    const panel = document.body.querySelector(
+      '.uf-sidebar-sheet',
+    ) as HTMLElement | null
     expect(panel?.getAttribute('data-placement')).toBe('left')
     expect(panel?.getAttribute('data-state')).toBe('open')
     expect(document.body.style.overflow).toBe('hidden')
@@ -1372,23 +1682,31 @@ describe('responsive overlay surfaces', () => {
         <Navigation
           items={[
             { id: 'home', label: 'Home' },
-            { id: 'library', label: 'Library', items: [{ id: 'typefaces', label: 'Typefaces' }] },
+            {
+              id: 'library',
+              label: 'Library',
+              items: [{ id: 'typefaces', label: 'Typefaces' }],
+            },
           ]}
         />,
       )
     })
 
-    const trigger = container.querySelector('.uf-navigation-sheetTrigger button') as HTMLButtonElement | null
+    const trigger = container.querySelector(
+      '.uf-navigation-sheetTrigger',
+    ) as HTMLButtonElement | null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const panel = container.querySelector('.uf-navigation-sheet') as HTMLElement | null
+    const panel = document.body.querySelector(
+      '.uf-navigation-sheet',
+    ) as HTMLElement | null
     expect(panel?.getAttribute('data-state')).toBe('open')
-    expect(container.textContent).toContain('Navigation')
-    expect(container.textContent).toContain('Typefaces')
+    expect(panel?.textContent).toContain('Navigation')
+    expect(panel?.textContent).toContain('Typefaces')
   })
 
   it('Modal edge placement contains focus and restores trigger focus', async () => {
@@ -1409,8 +1727,10 @@ describe('responsive overlay surfaces', () => {
       )
     })
 
-    const trigger = Array.from(container.querySelectorAll<HTMLButtonElement>('button'))
-      .find((button) => button.textContent?.includes('Open inspector')) ?? null
+    const trigger =
+      Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
+        (button) => button.textContent?.includes('Open inspector'),
+      ) ?? null
     expect(trigger).not.toBeNull()
 
     trigger?.focus()
@@ -1420,12 +1740,19 @@ describe('responsive overlay surfaces', () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const dialog = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="content"]')
-    const positioner = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="positioner"]')
-    const buttons = Array.from(dialog?.querySelectorAll<HTMLButtonElement>('button') || [])
+    const dialog = document.body.querySelector<HTMLElement>(
+      '[data-scope="modal"][data-part="content"]',
+    )
+    const positioner = document.body.querySelector<HTMLElement>(
+      '[data-scope="modal"][data-part="positioner"]',
+    )
+    const buttons = Array.from(
+      dialog?.querySelectorAll<HTMLButtonElement>('button') || [],
+    )
     const first = buttons[0]
     const last = buttons[buttons.length - 1]
-    const close = dialog?.querySelector<HTMLButtonElement>('[data-part="close"]') ?? null
+    const close =
+      dialog?.querySelector<HTMLButtonElement>('[data-part="close"]') ?? null
 
     expect(dialog?.hidden).toBe(false)
     expect(dialog?.getAttribute('data-edge')).toBe('flush')
@@ -1463,30 +1790,36 @@ describe('responsive overlay surfaces', () => {
       close?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    expect(document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="content"]')?.hidden).toBe(true)
+    expect(
+      document.body.querySelector<HTMLElement>(
+        '[data-scope="modal"][data-part="content"]',
+      )?.hidden,
+    ).toBe(true)
     expect(document.activeElement).toBe(trigger)
   })
 
   it('keeps center placement centered on compact viewports', async () => {
     await act(async () => {
       root.render(
-        <Modal
-          trigger="Open modal"
-          title="Responsive modal"
-        >
+        <Modal trigger="Open modal" title="Responsive modal">
           Body
         </Modal>,
       )
     })
 
-    const trigger = Array.from(container.querySelectorAll('button')).find((button) => button.textContent?.includes('Open modal')) ?? null
+    const trigger =
+      Array.from(container.querySelectorAll('button')).find((button) =>
+        button.textContent?.includes('Open modal'),
+      ) ?? null
     expect(trigger).not.toBeNull()
 
     await act(async () => {
       trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const positioner = document.body.querySelector('[data-scope="modal"][data-part="positioner"]') as HTMLElement | null
+    const positioner = document.body.querySelector(
+      '[data-scope="modal"][data-part="positioner"]',
+    ) as HTMLElement | null
     expect(positioner?.getAttribute('data-variant')).toBe('center')
   })
 })

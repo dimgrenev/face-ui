@@ -28,13 +28,19 @@ function readCssNumberToken(source: string, tokenName: string): number {
   return Number(match[1])
 }
 
-const componentsCss = readFixture('../styles/components.css')
+const componentsCss = readFixture('../styles/components.css') + readFixture('../styles/text.css')
 const baseCss = readFixture('../styles/base.css')
 const animationsCss = readFixture('../styles/animations.css')
 const tokensCss = readFixture('../styles/tokens.css')
-const designSystemColorCss = readFixture('../../design-system/tokens/colors.css')
-const colorSystemSource = readFixture('../../design-system/source/color-system.jsonc')
-const semanticFeedbackSource = readFixture('../../design-system/source/semantic-feedback.jsonc')
+const designSystemColorCss = readFixture(
+  '../../design-system/tokens/colors.css',
+)
+const colorSystemSource = readFixture(
+  '../../design-system/source/color-system.jsonc',
+)
+const semanticFeedbackSource = readFixture(
+  '../../design-system/source/semantic-feedback.jsonc',
+)
 const textMeta = JSON.parse(readFixture('../../Text/Text.json')) as {
   props?: { size?: { options?: string[] }; variant?: { options?: string[] } }
   tokenMapping?: { component?: string[]; semanticFallbacks?: string[] }
@@ -46,7 +52,9 @@ const textSizeTokenMap = {
   lg: '--uf-font-size-lg',
   xl: '--uf-font-size-xl',
 } as const
-const textSizeOptions = Object.keys(textSizeTokenMap) as Array<keyof typeof textSizeTokenMap>
+const textSizeOptions = Object.keys(textSizeTokenMap) as Array<
+  keyof typeof textSizeTokenMap
+>
 
 function queryModal(container: HTMLElement): HTMLElement | null {
   return container.querySelector('.uf-modal[data-scope]') as HTMLElement | null
@@ -57,17 +65,31 @@ function escapeRegExp(input: string): string {
 }
 
 function readCssBlock(source: string, selector: string): string {
-  const match = source.match(new RegExp(`${escapeRegExp(selector)}\\s*\\{([\\s\\S]*?)\\n\\}`))
+  const match = source.match(
+    new RegExp(
+      `(?:^|\\n)[\\t ]*${escapeRegExp(selector)}\\s*\\{([\\s\\S]*?)\\n\\}`,
+    ),
+  )
   if (!match) throw new Error(`Missing CSS selector: ${selector}`)
   return match[1] || ''
 }
 
 function readCssBlocks(source: string, selector: string): string[] {
-  return Array.from(source.matchAll(new RegExp(`${escapeRegExp(selector)}\\s*\\{([\\s\\S]*?)\\n\\}`, 'g')))
-    .map((match) => match[1] || '')
+  return Array.from(
+    source.matchAll(
+      new RegExp(
+        `(?:^|\\n)[\\t ]*${escapeRegExp(selector)}\\s*\\{([\\s\\S]*?)\\n\\}`,
+        'g',
+      ),
+    ),
+  ).map((match) => match[1] || '')
 }
 
-function expectCssBlockContains(source: string, selector: string, declaration: string) {
+function expectCssBlockContains(
+  source: string,
+  selector: string,
+  declaration: string,
+) {
   const blocks = readCssBlocks(source, selector)
   expect(blocks.length, `${selector} should exist`).toBeGreaterThan(0)
   expect(
@@ -78,11 +100,18 @@ function expectCssBlockContains(source: string, selector: string, declaration: s
 
 function isAllowedMonochromeColorLiteral(literal: string): boolean {
   const normalized = literal.toLowerCase().replace(/\s+/g, '')
-  if (normalized === '#000' || normalized === '#000000' || normalized === '#fff' || normalized === '#ffffff') {
+  if (
+    normalized === '#000' ||
+    normalized === '#000000' ||
+    normalized === '#fff' ||
+    normalized === '#ffffff'
+  ) {
     return true
   }
 
-  const rgba = normalized.match(/^rgba?\((0|255),(0|255),(0|255)(?:,([0-9.]+))?\)$/)
+  const rgba = normalized.match(
+    /^rgba?\((0|255),(0|255),(0|255)(?:,([0-9.]+))?\)$/,
+  )
   if (!rgba) return false
   if (!(rgba[1] === rgba[2] && rgba[2] === rgba[3])) return false
 
@@ -90,24 +119,38 @@ function isAllowedMonochromeColorLiteral(literal: string): boolean {
   if (!Number.isFinite(alpha) || alpha < 0 || alpha > 1) return false
 
   const percent = alpha * 100
-  return Math.abs(Math.round(percent) - percent) < 0.0001 && Math.round(percent) % 2 === 0
+  return (
+    Math.abs(Math.round(percent) - percent) < 0.0001 &&
+    Math.round(percent) % 2 === 0
+  )
 }
 
 function findNonMonochromeColorLiterals(source: string): string[] {
-  const colorLiteralPattern = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]+\)|hsla?\([^)]+\)|hsl\([^)]+\)|oklch\([^)]+\)|color\([^)]+\)/g
+  const colorLiteralPattern =
+    /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]+\)|hsla?\([^)]+\)|hsl\([^)]+\)|oklch\([^)]+\)|color\([^)]+\)/g
   return source.split('\n').flatMap((line) => {
     const literals = line.match(colorLiteralPattern) || []
-    return literals.filter((literal) => !isAllowedMonochromeColorLiteral(literal))
+    return literals.filter(
+      (literal) => !isAllowedMonochromeColorLiteral(literal),
+    )
   })
 }
 
 function findFeedbackSourceOffenders(jsoncSource: string): string[] {
-  let parsed: { tokens?: Array<{ name?: string; variants?: Array<{ value?: string }> }> }
-  try { parsed = JSON.parse(jsoncSource) } catch { return ['semantic-feedback.jsonc: unparseable'] }
+  let parsed: {
+    tokens?: Array<{ name?: string; variants?: Array<{ value?: string }> }>
+  }
+  try {
+    parsed = JSON.parse(jsoncSource)
+  } catch {
+    return ['semantic-feedback.jsonc: unparseable']
+  }
   const out: string[] = []
   for (const tok of parsed.tokens ?? []) {
     for (const variant of tok.variants ?? []) {
-      const chromatic = findNonMonochromeColorLiterals(String(variant.value ?? ''))
+      const chromatic = findNonMonochromeColorLiterals(
+        String(variant.value ?? ''),
+      )
       if (chromatic.length) {
         out.push(`semantic-feedback.jsonc: ${tok.name}=${variant.value}`)
       }
@@ -121,7 +164,9 @@ describe('taxonomy and governance', () => {
   let root: Root
 
   beforeEach(() => {
-    ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+    ;(
+      globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).IS_REACT_ACT_ENVIRONMENT = true
     ;(globalThis as typeof globalThis & { React?: typeof React }).React = React
     container = document.createElement('div')
     document.body.appendChild(container)
@@ -141,7 +186,10 @@ describe('taxonomy and governance', () => {
     expect(isDeprecatedFaceUiComponent('Date')).toBe(false)
     expect(getFaceUiComponentMeta('Sidebar')?.status).toBe('stable')
     expect(getFaceUiComponentMeta('Sidebar')?.aliases).toContain('Sidebar')
-    expect(getFaceUiComponentMeta('Overlay')?.replacedBy).toEqual(['Tooltip', 'Popover'])
+    expect(getFaceUiComponentMeta('Overlay')?.replacedBy).toEqual([
+      'Tooltip',
+      'Popover',
+    ])
     expect(getFaceUiComponentMeta('Drawer')).toBeNull()
     expect(getFaceUiComponentMeta('Sheet')).toBeNull()
   })
@@ -168,33 +216,53 @@ describe('taxonomy and governance', () => {
     expect(tokensCss).toContain('--uf-motion-iteration-indefinite: 1;')
     expect(componentsCss).toContain('var(--uf-motion-iteration-indefinite)')
     expect(componentsCss).not.toMatch(/animation:\s*[^;]*\binfinite\b/)
-    expect(animationsCss).toContain('animation-duration: var(--uf-motion-duration-reduced);')
-    expect(animationsCss).toContain('transition-duration: var(--uf-motion-duration-reduced);')
+    expect(animationsCss).toContain(
+      'animation-duration: var(--uf-motion-duration-reduced) !important;',
+    )
+    expect(animationsCss).toContain(
+      'transition-duration: var(--uf-motion-duration-reduced) !important;',
+    )
   })
 
   it('keeps component geometry runtime aliases available', () => {
     expect(tokensCss).toContain('--uf-membrane: 1px;')
     expect(tokensCss).toContain('--uf-radius: 6px;')
     expect(tokensCss).toContain('--uf-radius-base: var(--uf-radius);')
-    expect(tokensCss).toContain('--uf-control-pad-left: var(--uf-control-pad-text);')
-    expect(tokensCss).toContain('--uf-control-pad-right: var(--uf-control-pad-text);')
-    expect(tokensCss).toContain('--uf-option-indent: calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1));')
-    expect(tokensCss).toContain('--uf-selector-indicator-gap: var(--uf-spacing-1);')
-    expect(tokensCss).toContain('--uf-selector-indicator-offset-inline-start: calc(var(--uf-membrane) * -2);')
-    expect(tokensCss).toContain('--uf-selector-indicator-edge-gap: var(--uf-spacing-1);')
-    expect(tokensCss).toContain('--uf-select-indicator-edge-gap: var(--uf-selector-indicator-edge-gap);')
+    expect(tokensCss).toContain(
+      '--uf-control-pad-start: var(--uf-control-pad-text);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-control-pad-end: var(--uf-control-pad-text);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-option-indent: calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1));',
+    )
+    expect(tokensCss).toContain(
+      '--uf-selector-indicator-gap: var(--uf-spacing-1);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-selector-indicator-offset-inline-start: calc(var(--uf-membrane) * -2);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-selector-indicator-edge-gap: var(--uf-spacing-1);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-select-indicator-edge-gap: var(--uf-selector-indicator-edge-gap);',
+    )
     expect(tokensCss).toContain('--uf-content-inset: 12px;')
-    expect(tokensCss).toContain('--uf-button-ring-color: var(--uf-color-border);')
+    expect(tokensCss).toContain(
+      '--uf-button-ring-color: var(--uf-color-border);',
+    )
     expect(componentsCss).toContain('padding: var(--uf-membrane);')
     expect(componentsCss).toContain('border-radius: var(--uf-radius);')
   })
 
   it('does not double-inset controls that own an explicit membrane wrapper', () => {
-    const rootMembraneOverrides = readCssBlock(baseCss, '[data-scope="card"][data-part="root"],\n[data-scope="button"][data-part="root"],\n[data-scope="text"][data-part="root"],\n[data-scope="bar"][data-part="root"],\n[data-scope="sidebar"][data-part="root"],\n[data-scope="input"][data-part="root"],\n[data-scope="select"][data-part="root"],\n[data-scope="resizable"][data-part="root"]')
-
-    expect(rootMembraneOverrides).toContain('padding: 0;')
-    expect(baseCss).toContain('[data-scope="input"][data-part="root"]')
-    expect(baseCss).toContain('[data-scope="select"][data-part="root"]')
+    // No component allowlist: anatomy roots never create outer spacing.
+    expect(baseCss).not.toMatch(/padding:\s*var\(--uf-membrane/)
+    expect(readCssBlock(componentsCss, '.uf-membrane')).toContain(
+      'padding: var(--uf-membrane);',
+    )
   })
 
   it('keeps every runtime and design-system color on the monochrome 2% atom scale', () => {
@@ -205,7 +273,9 @@ describe('taxonomy and governance', () => {
     }
     const offenders = [
       ...Object.entries(sources).flatMap(([sourceName, source]) =>
-        findNonMonochromeColorLiterals(source).map((literal) => `${sourceName}: ${literal}`),
+        findNonMonochromeColorLiterals(source).map(
+          (literal) => `${sourceName}: ${literal}`,
+        ),
       ),
       ...findFeedbackSourceOffenders(semanticFeedbackSource),
     ]
@@ -218,122 +288,215 @@ describe('taxonomy and governance', () => {
     }
 
     expect(tokensCss).toContain('--uf-color-new: var(--uf-color-foreground);')
-    expect(designSystemColorCss).toContain('--uf-color-new: var(--uf-color-foreground);')
+    expect(designSystemColorCss).toContain(
+      '--uf-color-new: var(--uf-color-foreground);',
+    )
     expect(offenders).toEqual([])
   })
 
   it('keeps core controls on the 32px geometry contract with compact and large as explicit density variants', () => {
     expect(tokensCss).toContain('--uf-control-height: 32px;')
-    expect(readCssBlock(tokensCss, '.uf-compact')).toContain('--uf-control-height: 28px;')
-    expect(readCssBlock(tokensCss, '.uf-large')).toContain('--uf-control-height: 40px;')
+    expect(readCssBlock(tokensCss, '.uf-compact')).toContain(
+      '--uf-control-height: 28px;',
+    )
+    expect(readCssBlock(tokensCss, '.uf-large')).toContain(
+      '--uf-control-height: 40px;',
+    )
+
+    expectCssBlockContains(
+      componentsCss,
+      '.uf-toggle[data-scope] .uf-toggle-item',
+      'min-block-size: max(24px, var(--uf-control-height));',
+    )
 
     const controlSelectors = [
-      '.uf-button[data-scope="button"]',
+      '.uf-button[data-scope]',
       '.uf-tile[data-scope="tile"]',
       '.uf-badge[data-scope]',
       '.uf-checkbox[data-scope="checkbox"]',
-      '.uf-switcher[data-scope]',
+      '.uf-switcher[data-scope="switcher"]',
       '[data-scope="radio"] [data-part="item"]',
       '[data-scope="input"] [data-part="input"],\n[data-scope="input"] [data-part="textarea"]',
       '.uf-select[data-scope="select"] [data-part="trigger"]',
       ':is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"]',
       '.uf-date__trigger',
       '.uf-slider[data-scope="slider"]',
-      '.uf-rating-star',
-      '[data-scope="toggle-group"] [data-part="item"],\n.uf-toggle[data-scope] [data-part="item"]',
+
       '[data-scope="tabs"] [data-part="trigger"]',
-      '[data-scope="accordion"] [data-part="trigger"],\n[data-scope="accordion"] [data-part="item-trigger"]',
-      '[data-scope="steps"] [data-part="trigger"]',
+      '[data-scope="accordion"][data-part="trigger"]',
+      '[data-scope="steps"][data-part="trigger"]',
       '.uf-command__trigger',
-      '.uf-breadcrumb[data-scope] a',
+      '.uf-breadcrumb-label[data-scope]',
       '.uf-sidebar-item',
       '[data-scope="navigation"] [data-part="trigger"],\n[data-scope="navigation"] [data-part="link"]',
       '.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]),\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]),\n.uf-tree[data-scope] .uf-tree-custom-node',
     ]
 
     for (const selector of controlSelectors) {
-      expectCssBlockContains(componentsCss, selector, 'min-height: var(--uf-control-height);')
+      expectCssBlockContains(
+        componentsCss,
+        selector,
+        'min-height: var(--uf-control-height);',
+      )
     }
 
-    expect(readCssBlock(componentsCss, '.uf-button[data-scope="button"][data-selector]'))
-      .toContain('--uf-control-pad-right: var(--uf-selector-indicator-edge-gap);')
-    expect(readCssBlock(componentsCss, '[data-scope="button"] [data-part="label"],\n.uf-button__label'))
-      .toContain('text-overflow: ellipsis;')
-    expect(readCssBlock(componentsCss, '[data-scope="button"] [data-part="indicator"],\n[data-scope="tile"] [data-part="indicator"],\n.uf-select[data-scope="select"] [data-part="indicator"]'))
-      .toContain('margin-inline-start: var(--uf-selector-indicator-offset-inline-start, 0px);')
-    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector] [data-part="indicator"]'))
-      .toContain('opacity: var(--uf-tile-selector-indicator-opacity, 0);')
-    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector] [data-part="text"]'))
-      .toContain('gap: var(--uf-selector-indicator-gap);')
-    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector] [data-part="text"]'))
-      .toContain('width: auto;')
-    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-selector]:hover [data-part="indicator"],\n.uf-tile[data-scope="tile"][data-selector]:focus-visible [data-part="indicator"]'))
-      .toContain('opacity: var(--uf-tile-selector-indicator-hover-opacity, 0.7);')
-    expect(componentsCss).not.toContain('.uf-tile[data-scope="tile"][data-selector]:focus-within [data-part="indicator"]')
+    expect(
+      readCssBlock(componentsCss, '.uf-button[data-scope][data-selector]'),
+    ).toContain('--uf-control-pad-end: var(--uf-selector-indicator-edge-gap);')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '.uf-button [data-part="label"],\n.uf-button__label',
+      ),
+    ).toContain('text-overflow: ellipsis;')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '.uf-button [data-part="indicator"],\n[data-scope="tile"][data-part="indicator"],\n.uf-select[data-scope="select"] [data-part="indicator"]',
+      ),
+    ).toContain(
+      'margin-inline-start: var(--uf-selector-indicator-offset-inline-start, 0px);',
+    )
+    expect(
+      readCssBlock(componentsCss, '.uf-tile__indicator[data-scope]'),
+    ).toContain('opacity: var(--uf-tile-indicator-opacity);')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '.uf-tile[data-scope="tile"][data-selector] > [data-part="text"]',
+      ),
+    ).toContain('gap: var(--uf-selector-indicator-gap);')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '.uf-tile[data-scope="tile"][data-selector] > [data-part="text"]',
+      ),
+    ).toContain('width: auto;')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '.uf-tile[data-scope="tile"][data-selector]:is(:hover, :focus-within)',
+      ),
+    ).toContain(
+      '--uf-tile-indicator-opacity: var(--uf-tile-selector-indicator-hover-opacity);',
+    )
     const tileBlock = readCssBlock(componentsCss, '.uf-tile[data-scope="tile"]')
     expect(tileBlock).toContain('--uf-tile-pad: calc(var(--uf-membrane) * 3);')
     expect(tileBlock).toContain('--uf-tile-pad-y: var(--uf-tile-pad);')
     expect(tileBlock).toContain('--uf-tile-pad-x: var(--uf-tile-pad);')
-    expect(tileBlock).toContain('--uf-tile-action-size: calc(var(--uf-control-height) - (var(--uf-tile-pad) * 2) - (var(--uf-membrane) * 2));')
+    expect(tileBlock).toContain(
+      '--uf-tile-action-size: calc(var(--uf-control-height) - (var(--uf-tile-pad) * 2) - (var(--uf-membrane) * 2));',
+    )
     expect(tileBlock).toContain('padding-top: var(--uf-tile-pad-y);')
-    expect(tileBlock).toContain('padding-left: var(--uf-tile-pad-left);')
-    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-icon-left]'))
-      .toContain('--uf-tile-pad-left: var(--uf-control-pad-icon);')
-    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-icon-right]'))
-      .toContain('--uf-tile-pad-right: var(--uf-control-pad-icon);')
-    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-action-visibility="always"] [data-part="actions"]'))
-      .toContain('pointer-events: auto;')
-    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-action-visibility="hidden"] [data-part="actions"]'))
-      .toContain('pointer-events: none;')
-    expect(readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-intent="section"]'))
-      .toContain('cursor: default;')
-    expect(readCssBlock(componentsCss, '[data-scope="select"] [data-part="trigger"]'))
-      .toContain('padding-right: var(--uf-select-indicator-edge-gap);')
-    expect(readCssBlock(componentsCss, '.uf-badge[data-scope]'))
-      .toContain('padding: var(--uf-control-pad-y) var(--uf-control-pad-text);')
-    expect(readCssBlock(componentsCss, '.uf-badge[data-scope]'))
-      .toContain('font-size: var(--uf-control-font-size);')
-    expect(readCssBlock(componentsCss, '.uf-bar[data-scope="bar"]'))
-      .toContain('gap: var(--uf-control-gap);')
-    expect(readCssBlock(componentsCss, '.uf-bar__left,\n.uf-bar__right'))
-      .toContain('gap: var(--uf-control-gap);')
-    expect(readCssBlock(componentsCss, '.uf-breadcrumb[data-scope] a'))
-      .toContain('line-height: var(--uf-control-line-height);')
-    expect(readCssBlock(componentsCss, '[data-scope="accordion"] [data-part="content"],\n[data-scope="accordion"] [data-part="item-content"]'))
-      .toContain('padding: 0;')
-    expect(readCssBlock(componentsCss, '[data-scope="accordion"] .uf-accordion-slot'))
-      .toContain('display: flex;')
-    expect(readCssBlock(componentsCss, '[data-scope="accordion"] .uf-accordion-slot > .uf-membrane,\n[data-scope="accordion"] .uf-accordion-slot > .uf-button[data-scope="button"],\n[data-scope="accordion"] .uf-accordion-slot > .uf-tile[data-scope="tile"],\n[data-scope="accordion"] .uf-accordion-slot > .uf-text[data-scope="text"]'))
-      .toContain('width: 100%;')
-    expect(readCssBlocks(componentsCss, '[data-scope="accordion"] .uf-accordion-slot > .uf-text[data-scope="text"],\n[data-scope="accordion"] .uf-accordion-slot > .uf-membrane > .uf-text[data-scope="text"]'))
-      .toHaveLength(0)
-    expect(readCssBlock(componentsCss, '.uf-steps[data-scope]'))
-      .not.toContain('--uf-steps-label-inset')
-    expect(readCssBlock(componentsCss, '[data-scope="steps"] [data-part="trigger"]'))
-      .toContain('--uf-control-pad-left: var(--uf-control-pad-icon);')
-    expect(readCssBlock(componentsCss, '[data-scope="steps"] [data-part="trigger"]'))
-      .toContain('padding-left: var(--uf-control-pad-left);')
+    expect(tileBlock).toContain(
+      'padding-inline-start: var(--uf-tile-pad-start);',
+    )
+    expect(
+      readCssBlock(
+        componentsCss,
+        '.uf-tile[data-scope="tile"][data-icon-start]',
+      ),
+    ).toContain('--uf-tile-pad-start: var(--uf-control-pad-icon);')
+    expect(
+      readCssBlock(componentsCss, '.uf-tile[data-scope="tile"][data-icon-end]'),
+    ).toContain('--uf-tile-pad-end: var(--uf-control-pad-icon);')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '.uf-tile[data-scope="tile"][data-action-visibility="always"] > [data-part="actions"]',
+      ),
+    ).toContain('pointer-events: auto;')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '.uf-tile[data-scope="tile"][data-action-visibility="hidden"] > [data-part="actions"]',
+      ),
+    ).toContain('pointer-events: none;')
+    expect(
+      readCssBlock(componentsCss, '.uf-tile[data-scope="tile"]'),
+    ).toContain('cursor: default;')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '.uf-select[data-scope="select"] [data-part="trigger"]',
+      ),
+    ).toContain('padding-inline-end: var(--uf-select-indicator-edge-gap);')
+    expect(readCssBlock(componentsCss, '.uf-badge[data-scope]')).toContain(
+      'padding: var(--uf-control-pad-y) var(--uf-control-pad-text);',
+    )
+    expect(readCssBlock(componentsCss, '.uf-badge[data-scope]')).toContain(
+      'font-size: var(--uf-control-font-size);',
+    )
+    expect(readCssBlock(componentsCss, '.uf-bar[data-scope="bar"]')).toContain(
+      'gap: var(--uf-control-gap);',
+    )
+    expect(readCssBlock(componentsCss, '.uf-bar-section')).toContain(
+      'gap: var(--uf-control-gap);',
+    )
+    expect(
+      readCssBlock(componentsCss, '.uf-breadcrumb-label[data-scope]'),
+    ).toContain('line-height: var(--uf-control-line-height);')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '[data-scope="accordion"][data-part="content"]',
+      ),
+    ).toContain('padding: 0;')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '[data-scope="accordion"] .uf-accordion-slot',
+      ),
+    ).toContain('display: flex;')
+    expect(
+      readCssBlock(
+        componentsCss,
+        '[data-scope="accordion"] .uf-accordion-slot > .uf-membrane,\n[data-scope="accordion"] .uf-accordion-slot > .uf-button[data-scope],\n[data-scope="accordion"] .uf-accordion-slot > .uf-tile[data-scope="tile"],\n[data-scope="accordion"] .uf-accordion-slot > .uf-text[data-scope="text"]',
+      ),
+    ).toContain('width: 100%;')
+    expect(
+      readCssBlocks(
+        componentsCss,
+        '[data-scope="accordion"] .uf-accordion-slot > .uf-text[data-scope="text"],\n[data-scope="accordion"] .uf-accordion-slot > .uf-membrane > .uf-text[data-scope="text"]',
+      ),
+    ).toHaveLength(0)
+    expect(readCssBlock(componentsCss, '.uf-steps[data-scope]')).not.toContain(
+      '--uf-steps-label-inset',
+    )
+    expect(
+      readCssBlock(componentsCss, '[data-scope="steps"][data-part="trigger"]'),
+    ).toContain('--uf-control-pad-start: var(--uf-control-pad-icon);')
+    expect(
+      readCssBlock(componentsCss, '[data-scope="steps"][data-part="trigger"]'),
+    ).toContain('padding-inline-start: var(--uf-control-pad-start);')
     expect(componentsCss).not.toContain('.uf-steps-contentText')
-    expect(readCssBlock(componentsCss, '[data-scope="steps"] [data-part="content"]'))
-      .toContain('padding: 0;')
-    expect(readCssBlock(componentsCss, '.uf-code[data-scope]'))
-      .toContain('max-inline-size: 100%;')
-    expect(readCssBlock(componentsCss, '.uf-code[data-scope] pre'))
-      .toContain('min-inline-size: 0;')
-    expect(readCssBlock(componentsCss, '.uf-code[data-scope] pre'))
-      .toContain('overflow-x: auto;')
-    expect(readCssBlock(componentsCss, '.uf-code[data-scope] code'))
-      .toContain('min-inline-size: 100%;')
-    expect(readCssBlock(componentsCss, '.uf-code[data-scope] code'))
-      .toContain('width: max-content;')
-    expect(readCssBlock(componentsCss, '[data-scope="code"] [data-part="line"]'))
-      .toContain('min-inline-size: max-content;')
+    expect(
+      readCssBlock(componentsCss, '[data-scope="steps"][data-part="content"]'),
+    ).toContain('padding: 0;')
+    expect(readCssBlock(componentsCss, '.uf-code[data-scope]')).toContain(
+      'max-inline-size: 100%;',
+    )
+    expect(readCssBlock(componentsCss, '.uf-code[data-scope] pre')).toContain(
+      'min-inline-size: 0;',
+    )
+    expect(readCssBlock(componentsCss, '.uf-code[data-scope] pre')).toContain(
+      'overflow-x: auto;',
+    )
+    expect(readCssBlock(componentsCss, '.uf-code[data-scope] code')).toContain(
+      'min-inline-size: 100%;',
+    )
+    expect(readCssBlock(componentsCss, '.uf-code[data-scope] code')).toContain(
+      'width: max-content;',
+    )
+    expect(
+      readCssBlock(componentsCss, '[data-scope="code"] [data-part="line"]'),
+    ).toContain('min-inline-size: max-content;')
   })
 
   it('keeps standard interactive hover surfaces on the shared hover background token', () => {
     const hoverSelectors = [
-      '.uf-button[data-scope="button"]:hover',
-      '.uf-tile[data-scope="tile"]:hover',
+      '.uf-button[data-scope]:hover:not(:disabled):not([data-disabled])',
+      '.uf-tile[data-scope="tile"][data-interactive]:not([data-primary-disabled]):hover',
       '.uf-checkbox[data-scope="checkbox"]:hover',
       '.uf-switcher[data-scope]:hover:not([data-disabled])',
       '.uf-radio-option:hover,\n[data-scope="radio"] [data-part="item"]:hover',
@@ -341,21 +504,21 @@ describe('taxonomy and governance', () => {
       '.uf-select[data-scope="select"] [data-part="trigger"]:hover',
       ':is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"]:hover,\n:is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"][data-highlighted]',
       '.uf-date__trigger:hover',
-      '.uf-rating-star:hover',
-      '[data-scope="toggle-group"] [data-part="item"]:hover,\n.uf-toggle[data-scope] [data-part="item"]:hover',
+      '.uf-rating__option[data-scope="rating"]:hover:not(:has(input:disabled)),\n.uf-membrane[data-membrane-hover] > .uf-rating__option[data-scope="rating"]',
+      '.uf-toggle[data-scope] .uf-toggle-item:hover:not(:disabled)',
       '.uf-menu-item:hover,\n.uf-menu-item[data-highlighted]',
       '[data-scope="tabs"] [data-part="trigger"]:hover',
-      '[data-scope="accordion"] [data-part="trigger"]:hover,\n[data-scope="accordion"] [data-part="item-trigger"]:hover',
-      '.uf-pagination[data-scope] button:hover',
-      '[data-scope="steps"] [data-part="trigger"]:hover',
+      '[data-scope="accordion"][data-part="trigger"]:hover:not([aria-disabled="true"])',
+      '[data-scope="steps"][data-part="trigger"]:hover:not(:disabled)',
       '[data-scope="calendar"] [data-part="prevButton"]:hover,\n[data-scope="calendar"] [data-part="nextButton"]:hover',
       '.uf-command__trigger:hover',
-      '.uf-breadcrumb[data-scope] a:hover',
+      '.uf-breadcrumb-label.uf-control:hover',
       '.uf-sidebar-item:hover',
       '[data-scope="navigation"] [data-part="trigger"]:hover,\n[data-scope="navigation"] [data-part="link"]:hover',
       '[data-scope="tree-view"] [data-part="item"]:hover,\n[data-scope="tree-view"] [data-part="branchTrigger"]:hover,\n.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]):hover,\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]):hover,\n.uf-tree[data-scope] .uf-tree-custom-node:hover',
     ]
-    const hoverBackgroundPattern = /background:\s*var\(--uf-(?:color-hover-bg|button-hover-bg|tile-hover-bg)\);/
+    const hoverBackgroundPattern =
+      /background:\s*var\(--uf-(?:color-hover-bg|button-hover-bg|tile-hover-bg)\);/
 
     for (const selector of hoverSelectors) {
       const blocks = readCssBlocks(componentsCss, selector)
@@ -397,40 +560,60 @@ describe('taxonomy and governance', () => {
     expect(textMeta.props?.variant?.options).toContain('label')
     expect(textMeta.props?.variant?.options).not.toContain('default')
     expect(textMeta.props?.variant?.options).not.toContain('caption')
-    expect(textMeta.tokenMapping?.component).toContain('--uf-text-size-font-size')
-    expect(textMeta.tokenMapping?.component).toContain('--uf-text-label-font-size')
-    expect(textMeta.tokenMapping?.component).toContain('--uf-text-label-line-height')
-    expect(textMeta.tokenMapping?.component).toContain('--uf-text-label-min-height')
+    expect(textMeta.tokenMapping?.component).toContain(
+      '--uf-text-size-font-size',
+    )
+    expect(textMeta.tokenMapping?.component).toContain(
+      '--uf-text-label-font-size',
+    )
+    expect(textMeta.tokenMapping?.component).toContain(
+      '--uf-text-label-line-height',
+    )
+    expect(textMeta.tokenMapping?.component).toContain(
+      '--uf-text-label-min-height',
+    )
     expect(textMeta.tokenMapping?.component).toContain('--uf-text-label-pad-y')
-    expect(componentsCss).toContain('font-size: var(--uf-text-font-size, var(--uf-text-size-font-size,')
-    expect(componentsCss).toContain('.uf-text[data-scope][data-variant="markdown"]')
+    expect(componentsCss).toContain(
+      'font-size: var(--uf-text-font-size, var(--uf-text-size-font-size,',
+    )
+    expect(componentsCss).toContain(
+      '.uf-text[data-scope][data-variant="markdown"]',
+    )
     expect(componentsCss).toContain('--uf-text-markdown-line-height: 24px;')
-    expect(componentsCss).toContain('.uf-text[data-scope][data-variant="markdown"] .uf-text__content')
+    expect(componentsCss).toContain(
+      '.uf-text[data-scope][data-variant="markdown"] .uf-text__content',
+    )
     expect(componentsCss).toContain('line-height: inherit;')
-    expect(componentsCss).toContain('calc(var(--uf-text-pad-y, var(--uf-control-pad-y)) - 2px)')
-    expect(tokensCss).toContain('--uf-text-label-font-size: var(--uf-font-size-base);')
+    expect(componentsCss).toContain(
+      'calc(var(--uf-text-pad-y, var(--uf-control-pad-y)) - 2px)',
+    )
+    expect(tokensCss).toContain(
+      '--uf-text-label-font-size: var(--uf-font-size-base);',
+    )
     expect(tokensCss).toContain('--uf-text-label-line-height: 16px;')
-    expect(tokensCss).toContain('--uf-text-label-min-height: var(--uf-spacing-6);')
+    expect(tokensCss).toContain(
+      '--uf-text-label-min-height: var(--uf-spacing-6);',
+    )
     expect(tokensCss).toContain('--uf-text-label-pad-y: var(--uf-spacing-1);')
     expectCssBlockContains(
       componentsCss,
       '.uf-text[data-scope][data-variant="label"]',
-      '--uf-text-font-size: var(--uf-text-label-font-size, 12px);',
+      'font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-text-label-font-size, 12px)));',
     )
     expectCssBlockContains(
       componentsCss,
       '.uf-text[data-scope][data-variant="label"]',
-      '--uf-text-line-height: var(--uf-text-label-line-height, 16px);',
+      'line-height: var(--uf-text-line-height, max(var(--uf-text-label-line-height, 16px), 1.25em));',
     )
     expectCssBlockContains(
       componentsCss,
       '.uf-text[data-scope][data-variant="label"]',
-      'font-size: var(--uf-text-font-size);',
+      '--uf-text-size-font-size',
     )
     expectCssBlockContains(
       componentsCss,
       '.uf-text[data-scope][data-variant="label"]',
-      'line-height: var(--uf-text-line-height);',
+      '--uf-text-label-line-height',
     )
     expectCssBlockContains(
       componentsCss,
@@ -453,14 +636,20 @@ describe('taxonomy and governance', () => {
       'padding-bottom: var(--uf-text-label-pad-y, var(--uf-spacing-1));',
     )
 
-    const markdownNode = container.querySelector<HTMLElement>('.uf-text[data-scope="text"][data-variant="markdown"]')
+    const markdownNode = container.querySelector<HTMLElement>(
+      '.uf-text[data-scope="text"][data-variant="markdown"]',
+    )
     expect(markdownNode).not.toBeNull()
-    const labelNode = container.querySelector<HTMLElement>('.uf-text[data-scope="text"][data-variant="label"]')
+    const labelNode = container.querySelector<HTMLElement>(
+      '.uf-text[data-scope="text"][data-variant="label"]',
+    )
     expect(labelNode).not.toBeNull()
     expect(labelNode?.tagName).toBe('LABEL')
     for (const size of textSizeOptions) {
       const token = textSizeTokenMap[size]
-      const node = container.querySelector<HTMLElement>(`.uf-text[data-scope="text"][data-size="${size}"]`)
+      const node = container.querySelector<HTMLElement>(
+        `.uf-text[data-scope="text"][data-size="${size}"]`,
+      )
 
       expect(node).not.toBeNull()
       expect(node?.style.fontSize).toBe('')
@@ -478,44 +667,94 @@ describe('taxonomy and governance', () => {
     await act(async () => {
       root.render(
         <div>
-          <Tooltip open content="Tooltip content">Hover me</Tooltip>
-          <Popover open content="Popover content">Open me</Popover>
+          <Tooltip open content="Tooltip content">
+            Hover me
+          </Tooltip>
+          <Popover open content="Popover content">
+            Open me
+          </Popover>
         </div>,
       )
     })
 
     // Overlay portals content to document.body, so query there instead of the render container
-    const contents = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'))
+    const contents = Array.from(
+      document.body.querySelectorAll<HTMLElement>('.uf-overlay-content'),
+    )
     expect(contents).toHaveLength(2)
     expect(contents[0]?.getAttribute('data-trigger')).toBe('hover')
     expect(contents[1]?.getAttribute('data-trigger')).toBe('click')
   })
 
   it('keeps dropdown and overlay surfaces theme-aware while Tooltip colors stay invariant', () => {
-    expect(tokensCss).toContain('--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
-    expect(tokensCss).toContain('--uf-overlay-surface-bg: var(--uf-color-white-100);')
-    expect(designSystemColorCss).toContain('--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
-    expect(designSystemColorCss).toContain('--uf-overlay-surface-bg: var(--uf-color-white-100);')
-    expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-black-96);')
-    expect(tokensCss).toContain('--uf-overlay-surface-underlay-bg: var(--uf-color-white-100);')
-    expect(tokensCss).toContain('--uf-overlay-surface-background: linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg);')
-    expect(tokensCss).toContain('--uf-dropdown-surface-bg: var(--uf-overlay-surface-bg);')
-    expect(tokensCss).toContain('--uf-dropdown-surface-bg: var(--uf-color-white-100);')
-    expect(tokensCss).toContain('--uf-dropdown-surface-underlay-bg: var(--uf-overlay-surface-underlay-bg);')
-    expect(tokensCss).toContain('--uf-dropdown-surface-underlay-bg: var(--uf-color-white-100);')
-    expect(tokensCss).toContain('--uf-dropdown-surface-background: linear-gradient(var(--uf-dropdown-surface-bg), var(--uf-dropdown-surface-bg)), var(--uf-dropdown-surface-underlay-bg);')
-    expect(designSystemColorCss).toContain('--uf-dropdown-surface-bg: var(--uf-overlay-surface-bg);')
-    expect(designSystemColorCss).toContain('--uf-dropdown-surface-bg: var(--uf-color-white-100);')
-    expect(tokensCss).toContain('--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
-    expect(tokensCss).toContain('--uf-tooltip-background: linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-96);')
+    expect(tokensCss).toContain(
+      '--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));',
+    )
+    expect(tokensCss).toContain(
+      '--uf-overlay-surface-bg: var(--uf-color-white-100);',
+    )
+    expect(designSystemColorCss).toContain(
+      '--uf-overlay-surface-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));',
+    )
+    expect(designSystemColorCss).toContain(
+      '--uf-overlay-surface-bg: var(--uf-color-white-100);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-overlay-surface-underlay-bg: var(--uf-color-black-96);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-overlay-surface-underlay-bg: var(--uf-color-white-100);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-overlay-surface-background: linear-gradient(var(--uf-overlay-surface-bg), var(--uf-overlay-surface-bg)), var(--uf-overlay-surface-underlay-bg);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-dropdown-surface-bg: var(--uf-overlay-surface-bg);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-dropdown-surface-bg: var(--uf-color-white-100);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-dropdown-surface-underlay-bg: var(--uf-overlay-surface-underlay-bg);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-dropdown-surface-underlay-bg: var(--uf-color-white-100);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-dropdown-surface-background: linear-gradient(var(--uf-dropdown-surface-bg), var(--uf-dropdown-surface-bg)), var(--uf-dropdown-surface-underlay-bg);',
+    )
+    expect(designSystemColorCss).toContain(
+      '--uf-dropdown-surface-bg: var(--uf-overlay-surface-bg);',
+    )
+    expect(designSystemColorCss).toContain(
+      '--uf-dropdown-surface-bg: var(--uf-color-white-100);',
+    )
+    expect(tokensCss).toContain(
+      '--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));',
+    )
+    expect(tokensCss).toContain(
+      '--uf-tooltip-background: linear-gradient(var(--uf-tooltip-bg), var(--uf-tooltip-bg)), var(--uf-color-black-96);',
+    )
     expect(tokensCss).toContain('--uf-tooltip-fg: var(--uf-color-white-92);')
-    expect(tokensCss).toContain('--uf-tooltip-border: var(--uf-color-white-20);')
-    expect(designSystemColorCss).toContain('--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));')
-    expect(designSystemColorCss).toContain('--uf-tooltip-fg: var(--uf-color-white-92);')
-    expect(componentsCss).toContain('.uf-card[data-scope][data-card-variant="code"]')
+    expect(tokensCss).toContain(
+      '--uf-tooltip-border: var(--uf-color-white-20);',
+    )
+    expect(designSystemColorCss).toContain(
+      '--uf-tooltip-bg: var(--uf-color-surface-sidebar, var(--uf-color-white-14));',
+    )
+    expect(designSystemColorCss).toContain(
+      '--uf-tooltip-fg: var(--uf-color-white-92);',
+    )
+    expect(componentsCss).toContain(
+      '.uf-card[data-scope][data-card-variant="code"]',
+    )
     expect(componentsCss).toContain('--uf-card-bg: var(--uf-tooltip-bg);')
-    expect(componentsCss).toContain('--uf-card-background: var(--uf-tooltip-background);')
-    expect(componentsCss).toContain('--uf-card-border: var(--uf-tooltip-border);')
+    expect(componentsCss).toContain(
+      '--uf-card-background: var(--uf-tooltip-background);',
+    )
+    expect(componentsCss).toContain(
+      '--uf-card-border: var(--uf-tooltip-border);',
+    )
     expect(componentsCss).toContain('--uf-text-color: var(--uf-tooltip-fg);')
     expect(componentsCss).toContain('color: var(--uf-tooltip-fg);')
   })
@@ -524,25 +763,43 @@ describe('taxonomy and governance', () => {
     await act(async () => {
       root.render(
         <div>
-          <Modal open portal={false} title="Bottom" placement="bottom">Content</Modal>
-          <Modal open portal={false} title="Left" placement="left" edge="flush">Content</Modal>
-          <Modal open portal={false} title="Top" placement="top">Content</Modal>
-          <Modal open portal={false} title="Right" placement="right">Content</Modal>
+          <Modal open portal={false} title="Bottom" placement="bottom">
+            Content
+          </Modal>
+          <Modal open portal={false} title="Left" placement="left" edge="flush">
+            Content
+          </Modal>
+          <Modal open portal={false} title="Top" placement="top">
+            Content
+          </Modal>
+          <Modal open portal={false} title="Right" placement="right">
+            Content
+          </Modal>
         </div>,
       )
     })
 
-    const modals = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-modal[data-scope]'))
-    const positioners = Array.from(document.body.querySelectorAll<HTMLElement>('.uf-modal-positioner[data-scope]'))
+    const modals = Array.from(
+      document.body.querySelectorAll<HTMLElement>('.uf-modal[data-scope]'),
+    )
+    const positioners = Array.from(
+      document.body.querySelectorAll<HTMLElement>(
+        '.uf-modal-positioner[data-scope]',
+      ),
+    )
     expect(modals).toHaveLength(4)
     expect(modals[0]?.getAttribute('data-variant')).toBe('bottom')
     expect(modals[0]?.getAttribute('data-edge')).toBe('inset')
     expect(modals[0]?.classList.contains('uf-modal--edge-inset')).toBe(true)
-    expect(positioners[0]?.classList.contains('uf-modal-positioner--edge-inset')).toBe(true)
+    expect(
+      positioners[0]?.classList.contains('uf-modal-positioner--edge-inset'),
+    ).toBe(true)
     expect(modals[1]?.getAttribute('data-variant')).toBe('left')
     expect(modals[1]?.getAttribute('data-edge')).toBe('flush')
     expect(modals[1]?.classList.contains('uf-modal--edge-flush')).toBe(true)
-    expect(positioners[1]?.classList.contains('uf-modal-positioner--edge-flush')).toBe(true)
+    expect(
+      positioners[1]?.classList.contains('uf-modal-positioner--edge-flush'),
+    ).toBe(true)
     expect(modals[2]?.getAttribute('data-variant')).toBe('top')
     expect(modals[2]?.classList.contains('uf-modal--edge-inset')).toBe(true)
     expect(modals[3]?.getAttribute('data-variant')).toBe('right')
@@ -555,9 +812,15 @@ describe('taxonomy and governance', () => {
     expect(modals[1]?.getAttribute('data-radius')).toBe('none')
     expect(modals[2]?.getAttribute('data-radius')).toBe('lg')
     expect(modals[3]?.getAttribute('data-radius')).toBe('lg')
-    expect(componentsCss).toContain('.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="top"]')
-    expect(componentsCss).toContain('.uf-modal[data-scope].uf-modal--edge-flush:is([data-variant="top"], [data-variant="bottom"])')
-    expect(componentsCss).toContain('.uf-modal[data-scope].uf-modal--edge-inset:is([data-variant="top"], [data-variant="bottom"])')
+    expect(componentsCss).toContain(
+      '.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="top"]',
+    )
+    expect(componentsCss).toContain(
+      '.uf-modal[data-scope].uf-modal--edge-flush:is([data-variant="top"], [data-variant="bottom"])',
+    )
+    expect(componentsCss).toContain(
+      '.uf-modal[data-scope].uf-modal--edge-inset:is([data-variant="top"], [data-variant="bottom"])',
+    )
   })
 
   it('SegmentedControl defaults to single selection and Date renders date field behavior', async () => {
@@ -569,14 +832,16 @@ describe('taxonomy and governance', () => {
               { value: 'grid', label: 'Grid' },
               { value: 'list', label: 'List' },
             ]}
-            defaultValue={['grid']}
+            defaultValue="grid"
           />
           <DateField label="Date" />
         </div>,
       )
     })
 
-    const buttons = Array.from(container.querySelectorAll<HTMLButtonElement>('.uf-toggle-item'))
+    const buttons = Array.from(
+      container.querySelectorAll<HTMLButtonElement>('.uf-toggle-item'),
+    )
     expect(buttons).toHaveLength(2)
     expect(buttons[0]?.getAttribute('data-state')).toBe('on')
 
@@ -591,7 +856,9 @@ describe('taxonomy and governance', () => {
 
     await act(async () => {
       buttons[1]?.focus()
-      buttons[1]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+      buttons[1]?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }),
+      )
     })
 
     expect(document.activeElement).toBe(buttons[0])
@@ -604,7 +871,9 @@ describe('taxonomy and governance', () => {
 
   it('honors an explicit flush inset for label text', async () => {
     await act(async () => {
-      root.render(<Text as="span" variant="label" inset="none" text="Flush label" />)
+      root.render(
+        <Text as="span" variant="label" inset="none" text="Flush label" />,
+      )
     })
 
     const label = container.querySelector<HTMLElement>('[data-scope="text"]')

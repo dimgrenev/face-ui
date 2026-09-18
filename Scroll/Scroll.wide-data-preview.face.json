@@ -33,7 +33,7 @@
   "controls": [
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Content to make scrollable."
     },
@@ -51,7 +51,7 @@
     },
     {
       "name": "height",
-      "type": "number",
+      "type": "any",
       "required": false,
       "description": "Viewport height.",
       "defaultValue": 240

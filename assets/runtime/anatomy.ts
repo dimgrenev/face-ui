@@ -11,7 +11,7 @@ export interface Anatomy<TParts extends string = string> {
   getPartAttrs: (part: TParts) => { 'data-scope': string; 'data-part': string }
 }
 
-interface AnatomyBuilder<TParts extends string = never> {
+interface AnatomyBuilder {
   parts: <P extends string>(...parts: P[]) => Anatomy<P>
 }
 

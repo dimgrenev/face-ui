@@ -6,61 +6,78 @@
     "items": {
       "type": "array",
       "required": false,
-      "description": "Segment options."
-    },
-    "value": {
-      "type": "array",
-      "required": false,
-      "description": "Currently selected segment values."
-    },
-    "defaultValue": {
-      "type": "array",
-      "required": false,
-      "description": "Uncontrolled initial selected segment values."
-    },
-    "selectionMode": {
-      "type": "enum",
-      "required": false,
-      "description": "Selection mode: single or multiple.",
-      "options": [
-        "single",
-        "multiple"
-      ],
-      "default": "single"
+      "description": "Choices in visual, keyboard and form order; missing items render an empty group.",
+      "default": []
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state for the entire group.",
+      "description": "Disable every control and exclude the group from FormData.",
       "default": false
     },
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Layout orientation.",
+      "description": "Visual axis; single radio mode supports both arrow pairs.",
       "options": [
         "horizontal",
         "vertical"
       ],
       "default": "horizontal"
     },
-    "ariaLabel": {
+    "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Accessible name for the segmented group."
+      "description": "Accessible group name when there is no visible heading."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "Visible heading IDs that name this group."
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Native FormData key; multiple selections produce repeated entries."
+    },
+    "form": {
+      "type": "string",
+      "required": false,
+      "description": "ID of an external form that owns the selection."
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the selected enabled choice, or the first enabled choice, on mount.",
+      "default": false
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each segment item.",
+      "description": "Shared outer spacing around each item; toggling preserves DOM and focus.",
       "default": true
+    },
+    "multiple": {
+      "type": "boolean",
+      "required": false,
+      "description": "False selects one item without clearing on reselect; true toggles independent options.",
+      "default": false
+    },
+    "value": {
+      "type": "any",
+      "required": false,
+      "description": "Controlled selection: string/null for single, readonly string[] for multiple. Unknown keys are omitted."
+    },
+    "defaultValue": {
+      "type": "any",
+      "required": false,
+      "description": "Initial selection, restored on form reset: string/null for single, readonly string[] for multiple."
     }
   },
   "states": [
     {
-      "name": "Default",
+      "name": "Single view",
       "props": {
-        "selectionMode": "single",
         "items": [
           {
             "value": "grid",
@@ -75,27 +92,81 @@
             "label": "Board"
           }
         ],
-        "defaultValue": [
-          "grid"
+        "defaultValue": "grid",
+        "aria-label": "View"
+      }
+    },
+    {
+      "name": "Multiple filters",
+      "props": {
+        "multiple": true,
+        "items": [
+          {
+            "value": "email",
+            "label": "Email"
+          },
+          {
+            "value": "push",
+            "label": "Push"
+          }
         ],
-        "membrane": true
+        "defaultValue": [
+          "email"
+        ],
+        "aria-label": "Channels"
+      }
+    },
+    {
+      "name": "Vertical",
+      "props": {
+        "orientation": "vertical",
+        "items": [
+          {
+            "value": "compact",
+            "label": "Compact"
+          },
+          {
+            "value": "comfortable",
+            "label": "Comfortable"
+          }
+        ],
+        "defaultValue": "compact",
+        "aria-label": "Density"
       }
     }
   ],
-  "description": "Horizontal toggle group for switching between 2–4 mutually exclusive views or filters",
+  "description": "Compact single-choice radio strip or a group of independently pressed options",
   "behavior": {
-    "rovingFocus": false
+    "rovingFocus": true
   },
   "keyboard": {
+    "ArrowRight": {
+      "action": "focusNext"
+    },
+    "ArrowLeft": {
+      "action": "focusPrevious"
+    },
+    "ArrowDown": {
+      "action": "focusNext"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious"
+    },
+    "Home": {
+      "action": "focusFirst"
+    },
+    "End": {
+      "action": "focusLast"
+    },
     "Enter": {
-      "action": "select"
+      "action": "selectOrToggle"
     },
     "Space": {
-      "action": "select"
+      "action": "selectOrToggle"
     }
   },
   "aria": {
-    "role": "group",
+    "role": "radiogroup",
     "required": [
       "aria-label"
     ]
@@ -129,11 +200,13 @@
       "--uf-control-pad-text",
       "--uf-color-fg",
       "--uf-color-hover-bg",
-      "--uf-font-weight-bold"
+      "--uf-color-active-bg",
+      "--uf-border-width-thin"
     ],
     "notes": [
-      "SegmentedControl is a thin wrapper over Toggle; token mapping intentionally mirrors Toggle until dedicated segmented-control slots exist.",
-      "SelectionMode maps to Toggle type and preserves Toggle keyboard/focus behavior."
+      "One implementation owns SegmentedControl and compatibility Toggle.",
+      "Shared Membrane owns item spacing; orientation changes layout and multiple changes selection semantics.",
+      "Selection uses fill and a stable border, without changing text metrics."
     ]
   },
   "platform": {},
@@ -144,8 +217,9 @@
       "Filter presets"
     ],
     "whenNotToUse": [
-      "Many options (use Tabs or Select)",
-      "Form value selection (use Radio)",
+      "Many or dynamically searched options (use Select)",
+      "Navigating content panels (use Tabs)",
+      "Validated required form choices (use Radio or Select)",
       "Binary on/off (use Switcher)"
     ],
     "alternatives": [

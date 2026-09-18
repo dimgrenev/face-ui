@@ -1,0 +1,45 @@
+import {
+  Avatar,
+  Input,
+  Radio,
+  Button,
+  Checkbox,
+  Switcher,
+  Select,
+  Tooltip,
+  Popover,
+  Modal,
+} from '../../index'
+export function HydrationFixture() {
+  return (
+    <main>
+      <h1>Server rendered controls</h1>
+      <Avatar name="𠮷田 太郎" />
+      <Avatar name="áda Lovelace" />
+      <Avatar name="👩🏽‍💻 Ada" />
+      <Avatar name="🇷🇺 Иван" />
+      <Avatar name="क्षमा शर्मा" />
+      <Input label="Server name" defaultValue="Анна" description="Public name" required />
+      <Input label="Server notes" multiline rows={3} defaultValue={"First line\nSecond line"} />
+      <Radio aria-label="Server choice" name="server-choice" required defaultValue="" options={[{value:'',label:'Standard'},{value:'pro',label:'Professional'}]} />
+      <Button text="Save" />
+      <Checkbox label="Terms" defaultChecked />
+      <Checkbox label="Partial selection" checked="indeterminate" />
+      <Switcher label="Notifications" defaultChecked />
+      <Select
+        label="Plan"
+        options={[{ value: 'a', label: 'Standard' }]}
+        defaultValue="a"
+      />
+      <Tooltip content="Help">
+        <Button text="Help trigger" />
+      </Tooltip>
+      <Popover content="Details" aria-label="Details">
+        <Button text="Details trigger" />
+      </Popover>
+      <Modal title="Dialog" trigger="Open dialog">
+        Dialog content
+      </Modal>
+    </main>
+  )
+}

@@ -85,7 +85,8 @@
       "name": "groups",
       "type": "array",
       "required": false,
-      "description": "Group definitions for organizing items."
+      "description": "Group definitions for organizing items.",
+      "defaultValue": []
     },
     {
       "name": "placeholder",
@@ -140,7 +141,7 @@
     },
     {
       "name": "emptyContent",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Content to display when no results match.",
       "defaultValue": "No results found."

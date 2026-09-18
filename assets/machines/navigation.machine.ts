@@ -43,11 +43,10 @@ interface NavigationContext {
   disabledIds: string[]
   orientation: 'horizontal' | 'vertical'
   closeDelay: number
-  closeTimerId: ReturnType<typeof setTimeout> | null
   onActiveChange: ((details: { id: string }) => void) | null
 }
 
-type NavigationState = 'idle' | 'open'
+type NavigationState = 'idle' | 'open' | 'closing'
 
 type NavigationEvent =
   | { type: 'OPEN_ITEM'; id: string }
@@ -75,19 +74,10 @@ export interface NavigationSchema extends MachineSchema {
 const openItem = (ctx: NavigationContext, event: NavigationEvent): void => {
   const e = event as { type: 'OPEN_ITEM'; id: string }
   ctx.openItemId = e.id
-  // Clear any pending close timer
-  if (ctx.closeTimerId != null) {
-    clearTimeout(ctx.closeTimerId)
-    ctx.closeTimerId = null
-  }
 }
 
 const closeItem = (ctx: NavigationContext): void => {
   ctx.openItemId = null
-  if (ctx.closeTimerId != null) {
-    clearTimeout(ctx.closeTimerId)
-    ctx.closeTimerId = null
-  }
 }
 
 const setActive = (ctx: NavigationContext, event: NavigationEvent): void => {
@@ -96,18 +86,18 @@ const setActive = (ctx: NavigationContext, event: NavigationEvent): void => {
   ctx.focusedId = e.id
 }
 
-const handleMouseEnter = (ctx: NavigationContext, event: NavigationEvent): void => {
+const handleMouseEnter = (
+  ctx: NavigationContext,
+  event: NavigationEvent,
+): void => {
   const e = event as { type: 'MOUSE_ENTER'; id: string }
   ctx.openItemId = e.id
-  ctx.focusedId = e.id
-  // Clear any pending close timer
-  if (ctx.closeTimerId != null) {
-    clearTimeout(ctx.closeTimerId)
-    ctx.closeTimerId = null
-  }
 }
 
-const setFocusedItem = (ctx: NavigationContext, event: NavigationEvent): void => {
+const setFocusedItem = (
+  ctx: NavigationContext,
+  event: NavigationEvent,
+): void => {
   const e = event as { type: 'FOCUS_ITEM'; id: string }
   ctx.focusedId = e.id
 }
@@ -120,9 +110,12 @@ const focusByOffset = (ctx: NavigationContext, delta: 1 | -1): void => {
   if (enabledIds.length === 0) return
   const currentId = ctx.focusedId ?? ctx.activeId
   const currentIndex = currentId ? enabledIds.indexOf(currentId) : -1
-  const nextIndex = currentIndex < 0
-    ? (delta > 0 ? 0 : enabledIds.length - 1)
-    : (currentIndex + delta + enabledIds.length) % enabledIds.length
+  const nextIndex =
+    currentIndex < 0
+      ? delta > 0
+        ? 0
+        : enabledIds.length - 1
+      : (currentIndex + delta + enabledIds.length) % enabledIds.length
   ctx.focusedId = enabledIds[nextIndex]
 }
 
@@ -136,16 +129,44 @@ const focusLastItem = (ctx: NavigationContext): void => {
   if (enabledIds.length > 0) ctx.focusedId = enabledIds[enabledIds.length - 1]
 }
 
-const cancelClose = (ctx: NavigationContext): void => {
-  if (ctx.closeTimerId != null) {
-    clearTimeout(ctx.closeTimerId)
-    ctx.closeTimerId = null
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Machine
 // ---------------------------------------------------------------------------
+
+const openedEvents = {
+  OPEN_ITEM: {
+    target: 'open' as const,
+    actions: [openItem],
+  },
+  MOUSE_ENTER: {
+    target: 'open' as const,
+    actions: [handleMouseEnter],
+  },
+  CLOSE: {
+    target: 'idle' as const,
+    actions: [closeItem],
+  },
+  MOUSE_LEAVE: { target: 'closing' as const },
+  CANCEL_CLOSE: { target: 'open' as const },
+  SET_ACTIVE: {
+    actions: [setActive],
+  },
+  FOCUS_ITEM: {
+    actions: [setFocusedItem],
+  },
+  NAVIGATE_NEXT: {
+    actions: [(ctx: NavigationContext) => focusByOffset(ctx, 1)],
+  },
+  NAVIGATE_PREV: {
+    actions: [(ctx: NavigationContext) => focusByOffset(ctx, -1)],
+  },
+  NAVIGATE_FIRST: {
+    actions: [focusFirstItem],
+  },
+  NAVIGATE_LAST: {
+    actions: [focusLastItem],
+  },
+}
 
 export const navigationMachine = createMachine<NavigationSchema>({
   id: 'navigation',
@@ -158,7 +179,6 @@ export const navigationMachine = createMachine<NavigationSchema>({
     disabledIds: [],
     orientation: 'horizontal',
     closeDelay: 200,
-    closeTimerId: null,
     onActiveChange: null,
   },
 
@@ -202,45 +222,14 @@ export const navigationMachine = createMachine<NavigationSchema>({
       },
     },
 
-    open: {
-      on: {
-        OPEN_ITEM: {
-          actions: [openItem],
-        },
-        MOUSE_ENTER: {
-          actions: [handleMouseEnter],
-        },
-        CLOSE: {
-          target: 'idle',
-          actions: [closeItem],
-        },
-        MOUSE_LEAVE: {
-          // Delayed close is handled in the connect layer via setTimeout
-          // because effects need DOM-level integration. The machine just tracks state.
-          target: 'idle',
-          actions: [closeItem],
-        },
-        CANCEL_CLOSE: {
-          actions: [cancelClose],
-        },
-        SET_ACTIVE: {
-          actions: [setActive],
-        },
-        FOCUS_ITEM: {
-          actions: [setFocusedItem],
-        },
-        NAVIGATE_NEXT: {
-          actions: [(ctx) => focusByOffset(ctx, 1)],
-        },
-        NAVIGATE_PREV: {
-          actions: [(ctx) => focusByOffset(ctx, -1)],
-        },
-        NAVIGATE_FIRST: {
-          actions: [focusFirstItem],
-        },
-        NAVIGATE_LAST: {
-          actions: [focusLastItem],
-        },
+    open: { on: openedEvents },
+    closing: { on: openedEvents, effects: ['closeAfterDelay'] },
+  },
+  implementations: {
+    effects: {
+      closeAfterDelay: (ctx, send) => {
+        const timer = setTimeout(() => send({ type: 'CLOSE' }), ctx.closeDelay)
+        return () => clearTimeout(timer)
       },
     },
   },
@@ -256,31 +245,24 @@ interface NavItemConnectProps {
   disabled?: boolean
 }
 
-export function connectNavigation(state: MachineSnapshot<NavigationSchema>, send: SendFn<NavigationSchema>) {
+export function connectNavigation(
+  state: MachineSnapshot<NavigationSchema>,
+  send: SendFn<NavigationSchema>,
+) {
   const ctx = state.context
-  const isOpen = state.matches('open')
+  const isOpen = ctx.openItemId !== null
   const attrs = navigationAnatomy.getPartAttrs
   const isHorizontal = ctx.orientation === 'horizontal'
-  const firstEnabledId = ctx.itemOrder.find((id) => !ctx.disabledIds.includes(id))
-  const tabStopId = ctx.focusedId ?? ctx.activeId ?? firstEnabledId
+  const firstEnabledId = ctx.itemOrder.find(
+    (id) => !ctx.disabledIds.includes(id),
+  )
+  const tabStopId = [ctx.focusedId, ctx.activeId, firstEnabledId].find(
+    (id) => id && ctx.itemOrder.includes(id) && !ctx.disabledIds.includes(id),
+  )
 
   // Delay close helper — used by mouse leave handlers
-  let closeTimer: ReturnType<typeof setTimeout> | null = null
-
-  const scheduleClose = () => {
-    if (closeTimer != null) clearTimeout(closeTimer)
-    closeTimer = setTimeout(() => {
-      send({ type: 'CLOSE' })
-      closeTimer = null
-    }, ctx.closeDelay)
-  }
-
-  const cancelScheduledClose = () => {
-    if (closeTimer != null) {
-      clearTimeout(closeTimer)
-      closeTimer = null
-    }
-  }
+  const scheduleClose = () => send({ type: 'MOUSE_LEAVE' })
+  const cancelScheduledClose = () => send({ type: 'CANCEL_CLOSE' })
 
   return {
     /** Whether any dropdown is open */
@@ -294,7 +276,6 @@ export function connectNavigation(state: MachineSnapshot<NavigationSchema>, send
       return {
         ...attrs('root'),
         role: 'navigation' as const,
-        'aria-orientation': ctx.orientation,
         'data-orientation': ctx.orientation,
       }
     },
@@ -372,8 +353,10 @@ export function connectNavigation(state: MachineSnapshot<NavigationSchema>, send
         'aria-expanded': props.hasItems ? isItemOpen : undefined,
         'data-state': isItemOpen ? 'open' : 'closed',
         'data-disabled': isDisabled ? '' : undefined,
+        'aria-disabled': isDisabled || undefined,
+        disabled: isDisabled,
         'data-value': props.id,
-        tabIndex: isDisabled ? -1 : (isTabStop ? 0 : -1),
+        tabIndex: isDisabled ? -1 : isTabStop ? 0 : -1,
         onClick() {
           if (isDisabled) return
           if (props.hasItems) {
@@ -396,15 +379,6 @@ export function connectNavigation(state: MachineSnapshot<NavigationSchema>, send
           const openKey = isHorizontal ? 'ArrowDown' : 'ArrowRight'
 
           switch (event.key) {
-            case 'Enter':
-            case ' ':
-              event.preventDefault()
-              if (props.hasItems) {
-                send({ type: 'OPEN_ITEM', id: props.id })
-              } else {
-                send({ type: 'SET_ACTIVE', id: props.id })
-              }
-              break
             case openKey:
               if (props.hasItems) {
                 event.preventDefault()
@@ -454,6 +428,8 @@ export function connectNavigation(state: MachineSnapshot<NavigationSchema>, send
         'aria-current': isActive ? ('page' as const) : undefined,
         'data-active': isActive ? '' : undefined,
         'data-disabled': isDisabled ? '' : undefined,
+        'aria-disabled': isDisabled || undefined,
+        disabled: isDisabled,
         'data-value': props.id,
         tabIndex: isDisabled ? -1 : 0,
         onClick() {

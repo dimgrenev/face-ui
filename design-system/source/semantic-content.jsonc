@@ -50,11 +50,11 @@
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-white-54)"
+          "value": "var(--uf-color-white-68)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-black-48)"
+          "value": "var(--uf-color-black-60)"
         }
       ]
     },

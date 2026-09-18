@@ -284,7 +284,7 @@
     },
     {
       "sheet": "semantic-feedback",
-      "name": "--uf-progress-track-bg",
+      "name": "--uf-range-track-bg",
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
@@ -298,21 +298,21 @@
     },
     {
       "sheet": "semantic-feedback",
-      "name": "--uf-progress-indicator-bg",
+      "name": "--uf-range-indicator-bg",
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
-          "value": "var(--uf-color-fg)"
+          "value": "var(--uf-color-fg-muted)"
         },
         {
           "selector": ":root[data-theme='light'],\n[data-theme='light']",
-          "value": "var(--uf-color-fg)"
+          "value": "var(--uf-color-fg-muted)"
         }
       ]
     },
     {
       "sheet": "semantic-feedback",
-      "name": "--uf-progress-indicator-positive-bg",
+      "name": "--uf-range-indicator-positive-bg",
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
@@ -326,7 +326,7 @@
     },
     {
       "sheet": "semantic-feedback",
-      "name": "--uf-progress-indicator-warning-bg",
+      "name": "--uf-range-indicator-warning-bg",
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",
@@ -340,7 +340,7 @@
     },
     {
       "sheet": "semantic-feedback",
-      "name": "--uf-progress-indicator-destructive-bg",
+      "name": "--uf-range-indicator-destructive-bg",
       "variants": [
         {
           "selector": ":root,\n[data-theme='dark']",

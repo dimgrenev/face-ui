@@ -19,7 +19,6 @@ import type { MachineSchema } from '../types'
 export const overlayAnatomy = createAnatomy('overlay').parts(
   'trigger',
   'content',
-  'arrow',
 )
 
 // ---------------------------------------------------------------------------
@@ -39,8 +38,6 @@ interface OverlayContext {
   open: boolean
   trigger: OverlayTrigger
   interactive: boolean
-  triggerEl: HTMLElement | null
-  contentEl: HTMLElement | null
   openDelay: number
   closeDelay: number
   positioning: OverlayPositioning
@@ -61,8 +58,7 @@ type OverlayEvent =
   | { type: 'OPEN' }
   | { type: 'CLOSE' }
   | { type: 'DISMISS' }
-  | { type: 'SET_TRIGGER'; el: HTMLElement | null }
-  | { type: 'SET_CONTENT'; el: HTMLElement | null }
+  | { type: 'RECONFIGURE' }
 
 export interface OverlaySchema extends MachineSchema {
   context: OverlayContext
@@ -74,17 +70,13 @@ export interface OverlaySchema extends MachineSchema {
 // Guards
 // ---------------------------------------------------------------------------
 
-const isHoverTrigger = (ctx: OverlayContext): boolean =>
-  ctx.trigger === 'hover'
+const isHoverTrigger = (ctx: OverlayContext): boolean => ctx.trigger === 'hover'
 
-const isClickTrigger = (ctx: OverlayContext): boolean =>
-  ctx.trigger === 'click'
+const isClickTrigger = (ctx: OverlayContext): boolean => ctx.trigger === 'click'
 
-const hasOpenDelay = (ctx: OverlayContext): boolean =>
-  ctx.openDelay > 0
+const hasOpenDelay = (ctx: OverlayContext): boolean => ctx.openDelay > 0
 
-const hasCloseDelay = (ctx: OverlayContext): boolean =>
-  ctx.closeDelay > 0
+const hasCloseDelay = (ctx: OverlayContext): boolean => ctx.closeDelay > 0
 
 // ---------------------------------------------------------------------------
 // Actions
@@ -105,14 +97,6 @@ const clearTimer = (ctx: OverlayContext): void => {
   }
 }
 
-const setTriggerEl = (ctx: OverlayContext, event: OverlayEvent): void => {
-  ctx.triggerEl = (event as { type: 'SET_TRIGGER'; el: HTMLElement | null }).el
-}
-
-const setContentEl = (ctx: OverlayContext, event: OverlayEvent): void => {
-  ctx.contentEl = (event as { type: 'SET_CONTENT'; el: HTMLElement | null }).el
-}
-
 // ---------------------------------------------------------------------------
 // Machine
 // ---------------------------------------------------------------------------
@@ -125,8 +109,6 @@ export const overlayMachine = createMachine<OverlaySchema>({
     open: false,
     trigger: 'hover',
     interactive: false,
-    triggerEl: null,
-    contentEl: null,
     openDelay: 200,
     closeDelay: 0,
     positioning: { side: 'top', align: 'center', sideOffset: 8 },
@@ -150,41 +132,39 @@ export const overlayMachine = createMachine<OverlaySchema>({
       on: {
         // Hover trigger: enter → opening (with delay)
         POINTER_ENTER: [
-          { target: 'opening', guard: (ctx) => isHoverTrigger(ctx) && hasOpenDelay(ctx) },
+          {
+            target: 'opening',
+            guard: (ctx) => isHoverTrigger(ctx) && hasOpenDelay(ctx),
+          },
           { target: 'open', guard: isHoverTrigger },
         ],
         FOCUS: [
-          { target: 'opening', guard: (ctx) => isHoverTrigger(ctx) && hasOpenDelay(ctx) },
+          {
+            target: 'opening',
+            guard: (ctx) => isHoverTrigger(ctx) && hasOpenDelay(ctx),
+          },
           { target: 'open', guard: isHoverTrigger },
         ],
         // Click trigger: toggle
-        CLICK: [
-          { target: 'open', guard: isClickTrigger },
-        ],
+        CLICK: [{ target: 'open', guard: isClickTrigger }],
         // Programmatic
-        OPEN: [
-          { target: 'opening', guard: hasOpenDelay },
-          { target: 'open' },
-        ],
-        SET_TRIGGER: { actions: [setTriggerEl] },
-        SET_CONTENT: { actions: [setContentEl] },
+        OPEN: { target: 'open' },
       },
     },
 
     opening: {
       effects: ['trackOpenDelay'],
       on: {
+        RECONFIGURE: [
+          { target: 'closed', guard: isClickTrigger },
+          { target: 'opening', reenter: true },
+        ],
+        OPEN: { target: 'open' },
         OPEN_DELAY_DONE: { target: 'open' },
         // Cancel on leave before delay completes
-        POINTER_LEAVE: [
-          { target: 'closed', guard: isHoverTrigger },
-        ],
-        BLUR: [
-          { target: 'closed', guard: isHoverTrigger },
-        ],
+        POINTER_LEAVE: [{ target: 'closed', guard: isHoverTrigger }],
+        BLUR: [{ target: 'closed', guard: isHoverTrigger }],
         CLOSE: { target: 'closed' },
-        SET_TRIGGER: { actions: [setTriggerEl] },
-        SET_CONTENT: { actions: [setContentEl] },
       },
       exit: [clearTimer],
     },
@@ -192,15 +172,20 @@ export const overlayMachine = createMachine<OverlaySchema>({
     open: {
       tags: ['visible'],
       entry: [syncOpenTrue],
-      effects: ['trackDismiss'],
       on: {
         // Hover trigger: leave → closing or closed
         POINTER_LEAVE: [
-          { target: 'closing', guard: (ctx) => isHoverTrigger(ctx) && hasCloseDelay(ctx) },
+          {
+            target: 'closing',
+            guard: (ctx) => isHoverTrigger(ctx) && hasCloseDelay(ctx),
+          },
           { target: 'closed', guard: isHoverTrigger },
         ],
         BLUR: [
-          { target: 'closing', guard: (ctx) => isHoverTrigger(ctx) && hasCloseDelay(ctx) },
+          {
+            target: 'closing',
+            guard: (ctx) => isHoverTrigger(ctx) && hasCloseDelay(ctx),
+          },
           { target: 'closed', guard: isHoverTrigger },
         ],
         // Hover re-enter content (interactive mode): stay open
@@ -209,33 +194,32 @@ export const overlayMachine = createMachine<OverlaySchema>({
           { guard: (ctx) => isHoverTrigger(ctx) && ctx.interactive },
         ],
         // Click trigger: click toggles off
-        CLICK: [
-          { target: 'closed', guard: isClickTrigger },
-        ],
+        CLICK: [{ target: 'closed', guard: isClickTrigger }],
         // Dismiss (Escape + outside click) for click mode
         DISMISS: { target: 'closed' },
         CLOSE: { target: 'closed' },
-        SET_TRIGGER: { actions: [setTriggerEl] },
-        SET_CONTENT: { actions: [setContentEl] },
       },
     },
 
     closing: {
       effects: ['trackCloseDelay'],
       on: {
+        RECONFIGURE: [
+          { target: 'open', guard: isClickTrigger },
+          { target: 'closing', reenter: true },
+        ],
         CLOSE_DELAY_DONE: { target: 'closed' },
         // Re-enter before delay: go back to open
         POINTER_ENTER: [
-          { target: 'open', guard: (ctx) => isHoverTrigger(ctx) && ctx.interactive },
+          {
+            target: 'open',
+            guard: (ctx) => isHoverTrigger(ctx) && ctx.interactive,
+          },
           { target: 'open', guard: isHoverTrigger },
         ],
-        FOCUS: [
-          { target: 'open', guard: isHoverTrigger },
-        ],
+        FOCUS: [{ target: 'open', guard: isHoverTrigger }],
         OPEN: { target: 'open' },
         CLOSE: { target: 'closed' },
-        SET_TRIGGER: { actions: [setTriggerEl] },
-        SET_CONTENT: { actions: [setContentEl] },
       },
       exit: [clearTimer],
     },
@@ -260,35 +244,6 @@ export const overlayMachine = createMachine<OverlaySchema>({
 
         return () => {
           clearTimer(ctx)
-        }
-      },
-
-      trackDismiss: (ctx, send) => {
-        // Only track dismiss for click-triggered overlays
-        if (ctx.trigger !== 'click') return
-
-        const onKeyDown = (e: KeyboardEvent) => {
-          if (e.key === 'Escape') {
-            send({ type: 'DISMISS' })
-          }
-        }
-
-        const onPointerDown = (e: MouseEvent) => {
-          const target = e.target as Node | null
-          if (!target) return
-          const isInsideTrigger = ctx.triggerEl?.contains(target) ?? false
-          const isInsideContent = ctx.contentEl?.contains(target) ?? false
-          if (!isInsideTrigger && !isInsideContent) {
-            send({ type: 'DISMISS' })
-          }
-        }
-
-        document.addEventListener('keydown', onKeyDown)
-        document.addEventListener('pointerdown', onPointerDown)
-
-        return () => {
-          document.removeEventListener('keydown', onKeyDown)
-          document.removeEventListener('pointerdown', onPointerDown)
         }
       },
     },
@@ -342,8 +297,8 @@ export function connectOverlay(
 
         // Click trigger
         ...(triggerIsClick && {
-          onClick() {
-            send({ type: 'CLICK' })
+          onClick(event?: { defaultPrevented?: boolean }) {
+            if (!event?.defaultPrevented) send({ type: 'CLICK' })
           },
         }),
       }
@@ -359,23 +314,15 @@ export function connectOverlay(
         'data-align': ctx.positioning.align,
 
         // Interactive hover: pointer on content keeps it open
-        ...(triggerIsHover && ctx.interactive && {
-          onPointerEnter() {
-            send({ type: 'POINTER_ENTER' })
-          },
-          onPointerLeave() {
-            send({ type: 'POINTER_LEAVE' })
-          },
-        }),
-      }
-    },
-
-    getArrowProps() {
-      return {
-        ...attrs('arrow'),
-        'data-side': ctx.positioning.side,
-        'data-align': ctx.positioning.align,
-        hidden: !isOpen,
+        ...(triggerIsHover &&
+          ctx.interactive && {
+            onPointerEnter() {
+              send({ type: 'POINTER_ENTER' })
+            },
+            onPointerLeave() {
+              send({ type: 'POINTER_LEAVE' })
+            },
+          }),
       }
     },
   }

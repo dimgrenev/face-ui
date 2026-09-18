@@ -13,6 +13,10 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        react: [18, 19]
 
     steps:
       - name: Checkout
@@ -29,7 +33,17 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
+
+      - name: Install React 19 compatibility matrix
+        if: matrix.react == 19
+        run: pnpm add -D react@19.3.0 react-dom@19.3.0 @types/react@19.3.0 @types/react-dom@19.3.0 --save-exact --ignore-scripts
 
       - name: Check package
         run: pnpm check
+
+      - name: Install browser
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: Check browser behavior and accessibility
+        run: pnpm test:browser

@@ -54,18 +54,23 @@
       "description": "Whether the surface can be closed via Escape / backdrop click.",
       "default": true
     },
-    "title": {
+    "closeLabel": {
       "type": "string",
+      "required": false,
+      "description": "Accessible name and tooltip of the close button. Empty text uses the default."
+    },
+    "title": {
+      "type": "ReactNode",
       "required": false,
       "description": "Title content rendered inside the surface."
     },
     "description": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Description content rendered below the title."
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Body content."
     },
@@ -75,7 +80,7 @@
       "description": "Optional footer actions."
     },
     "trigger": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Trigger element that toggles the modal open."
     },
@@ -88,8 +93,7 @@
     "scrollLock": {
       "type": "boolean",
       "required": false,
-      "description": "Lock body scroll while the modal is open. Opt-in; off by default.",
-      "default": false
+      "description": "Lock body scroll while open. Defaults to true for portaled surfaces."
     },
     "portal": {
       "type": "boolean",

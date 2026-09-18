@@ -13,7 +13,12 @@
 
 import { createMachine } from '../create-machine'
 import { createAnatomy } from '../anatomy'
-import type { MachineSchema, MachineConfig, MachineSnapshot, SendFn } from '../types'
+import type {
+  MachineSchema,
+  MachineConfig,
+  MachineSnapshot,
+  SendFn,
+} from '../types'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -32,7 +37,11 @@ export const accordionAnatomy = createAnatomy('accordion').parts(
 
 interface AccordionContext {
   [key: string]: unknown
-  expandedIds: string[]
+  /** Ordered enabled item values supplied by the adapter. */
+  enabledValues: readonly string[]
+  /** All rendered values, including disabled panels. Null permits standalone machine use. */
+  itemValues: readonly string[] | null
+  expandedIds: readonly string[]
   focusedValue: string | null
   multiple: boolean
   collapsible: boolean
@@ -66,6 +75,15 @@ export interface AccordionSchema extends MachineSchema {
 
 const isNotDisabled = (ctx: AccordionContext): boolean => !ctx.disabled
 
+/** Projection is shared by rendering and actions; missing sections cannot affect collapse limits. */
+function getExpandedIds(ctx: AccordionContext): string[] {
+  const available = ctx.itemValues === null ? null : new Set(ctx.itemValues)
+  const values = [...new Set(ctx.expandedIds)].filter(
+    (value) => !available || available.has(value),
+  )
+  return ctx.multiple ? values : values.slice(0, 1)
+}
+
 // ---------------------------------------------------------------------------
 // Actions
 // ---------------------------------------------------------------------------
@@ -73,17 +91,19 @@ const isNotDisabled = (ctx: AccordionContext): boolean => !ctx.disabled
 const toggleItem = (ctx: AccordionContext, event: AccordionEvent): void => {
   const e = event as { type: 'TOGGLE'; value: string }
   const value = e.value
-  const isExpanded = ctx.expandedIds.includes(value)
+  if (!ctx.enabledValues.includes(value)) return
+  const expanded = getExpandedIds(ctx)
+  const isExpanded = expanded.includes(value)
 
   if (isExpanded) {
     // Collapse: check if collapsible allows it
-    if (ctx.collapsible || ctx.expandedIds.length > 1) {
-      ctx.expandedIds = ctx.expandedIds.filter((id) => id !== value)
+    if (ctx.collapsible || expanded.length > 1) {
+      ctx.expandedIds = expanded.filter((id) => id !== value)
     }
   } else {
     // Expand
     if (ctx.multiple) {
-      ctx.expandedIds = [...ctx.expandedIds, value]
+      ctx.expandedIds = [...expanded, value]
     } else {
       ctx.expandedIds = [value]
     }
@@ -96,11 +116,27 @@ const setExpanded = (ctx: AccordionContext, event: AccordionEvent): void => {
 }
 
 const expandAll = (ctx: AccordionContext): void => {
-  // expandAll is only meaningful when multiple=true; otherwise it's a no-op
-  // The caller is responsible for knowing the full list of item values.
-  // This action is a signal — the connect layer or user code should populate it.
-  if (!ctx.multiple) return
+  if (ctx.multiple) ctx.expandedIds = [...ctx.enabledValues]
 }
+
+const moveFocus =
+  (direction: 'next' | 'prev' | 'first' | 'last') =>
+  (ctx: AccordionContext): void => {
+    const values = ctx.enabledValues
+    if (!values.length) return
+    const current = values.indexOf(ctx.focusedValue ?? '')
+    const index =
+      direction === 'first'
+        ? 0
+        : direction === 'last'
+          ? values.length - 1
+          : direction === 'next'
+            ? (current + 1) % values.length
+            : current < 0
+              ? values.length - 1
+              : (current - 1 + values.length) % values.length
+    ctx.focusedValue = values[index]
+  }
 
 const collapseAll = (ctx: AccordionContext): void => {
   if (ctx.collapsible) {
@@ -108,7 +144,10 @@ const collapseAll = (ctx: AccordionContext): void => {
   }
 }
 
-const setFocusedValue = (ctx: AccordionContext, event: AccordionEvent): void => {
+const setFocusedValue = (
+  ctx: AccordionContext,
+  event: AccordionEvent,
+): void => {
   const e = event as { type: 'FOCUS'; value: string }
   ctx.focusedValue = e.value
 }
@@ -121,94 +160,97 @@ const clearFocusedValue = (ctx: AccordionContext): void => {
 // Machine
 // ---------------------------------------------------------------------------
 
-export const accordionMachine: MachineConfig<AccordionSchema> = createMachine<AccordionSchema>({
-  id: 'accordion',
-  initial: 'idle',
-  context: {
-    expandedIds: [],
-    focusedValue: null,
-    multiple: true,
-    collapsible: true,
-    disabled: false,
-    onExpandedChange: null,
-  },
-
-  watch: {
-    expandedIds: (ctx: AccordionContext) => {
-      ctx.onExpandedChange?.({ expandedIds: ctx.expandedIds })
+export const accordionMachine: MachineConfig<AccordionSchema> =
+  createMachine<AccordionSchema>({
+    id: 'accordion',
+    initial: 'idle',
+    context: {
+      expandedIds: [],
+      enabledValues: [],
+      itemValues: null,
+      focusedValue: null,
+      multiple: true,
+      collapsible: true,
+      disabled: false,
+      onExpandedChange: null,
     },
-  },
 
-  states: {
-    idle: {
-      on: {
-        TOGGLE: {
-          guard: isNotDisabled,
-          actions: [toggleItem],
+    watch: {
+      expandedIds: (ctx: AccordionContext) => {
+        ctx.onExpandedChange?.({ expandedIds: getExpandedIds(ctx) })
+      },
+    },
+
+    states: {
+      idle: {
+        on: {
+          TOGGLE: {
+            guard: isNotDisabled,
+            actions: [toggleItem],
+          },
+          SET_EXPANDED: {
+            actions: [setExpanded],
+          },
+          EXPAND_ALL: {
+            guard: isNotDisabled,
+            actions: [expandAll],
+          },
+          COLLAPSE_ALL: {
+            guard: isNotDisabled,
+            actions: [collapseAll],
+          },
+          FOCUS: {
+            target: 'focused',
+            guard: isNotDisabled,
+            actions: [setFocusedValue],
+          },
         },
-        SET_EXPANDED: {
-          actions: [setExpanded],
-        },
-        EXPAND_ALL: {
-          guard: isNotDisabled,
-          actions: [expandAll],
-        },
-        COLLAPSE_ALL: {
-          guard: isNotDisabled,
-          actions: [collapseAll],
-        },
-        FOCUS: {
-          target: 'focused',
-          guard: isNotDisabled,
-          actions: [setFocusedValue],
+      },
+      focused: {
+        on: {
+          TOGGLE: {
+            guard: isNotDisabled,
+            actions: [toggleItem],
+          },
+          SET_EXPANDED: {
+            actions: [setExpanded],
+          },
+          EXPAND_ALL: {
+            guard: isNotDisabled,
+            actions: [expandAll],
+          },
+          COLLAPSE_ALL: {
+            guard: isNotDisabled,
+            actions: [collapseAll],
+          },
+          FOCUS: {
+            guard: isNotDisabled,
+            actions: [setFocusedValue],
+          },
+          BLUR: {
+            target: 'idle',
+            actions: [clearFocusedValue],
+          },
+          FOCUS_NEXT: {
+            guard: isNotDisabled,
+            actions: [moveFocus('next')],
+          },
+          FOCUS_PREV: {
+            guard: isNotDisabled,
+            actions: [moveFocus('prev')],
+          },
+          FOCUS_FIRST: {
+            guard: isNotDisabled,
+            actions: [moveFocus('first')],
+          },
+          FOCUS_LAST: {
+            guard: isNotDisabled,
+            actions: [moveFocus('last')],
+          },
         },
       },
     },
-    focused: {
-      on: {
-        TOGGLE: {
-          guard: isNotDisabled,
-          actions: [toggleItem],
-        },
-        SET_EXPANDED: {
-          actions: [setExpanded],
-        },
-        EXPAND_ALL: {
-          guard: isNotDisabled,
-          actions: [expandAll],
-        },
-        COLLAPSE_ALL: {
-          guard: isNotDisabled,
-          actions: [collapseAll],
-        },
-        FOCUS: {
-          guard: isNotDisabled,
-          actions: [setFocusedValue],
-        },
-        BLUR: {
-          target: 'idle',
-          actions: [clearFocusedValue],
-        },
-        FOCUS_NEXT: {
-          guard: isNotDisabled,
-          actions: [],
-        },
-        FOCUS_PREV: {
-          guard: isNotDisabled,
-          actions: [],
-        },
-        FOCUS_FIRST: {
-          guard: isNotDisabled,
-          actions: [],
-        },
-        FOCUS_LAST: {
-          guard: isNotDisabled,
-          actions: [],
-        },
-      },
-    },
-  },
-})
+  })
 
 // ---------------------------------------------------------------------------
 // Connect — maps machine state to DOM props
@@ -216,7 +258,6 @@ export const accordionMachine: MachineConfig<AccordionSchema> = createMachine<Ac
 
 interface ItemProps {
   value: string
-  disabled?: boolean
 }
 
 interface TriggerProps {
@@ -226,50 +267,54 @@ interface TriggerProps {
 
 interface ContentProps {
   value: string
+  region?: boolean
 }
 
-export function connectAccordion(state: MachineSnapshot<AccordionSchema>, send: SendFn<AccordionSchema>) {
+export function connectAccordion(
+  state: MachineSnapshot<AccordionSchema>,
+  send: SendFn<AccordionSchema>,
+) {
   const ctx = state.context
   const attrs = accordionAnatomy.getPartAttrs
+  const expandedIds = getExpandedIds(ctx)
 
   return {
     /** Current expanded item IDs */
-    expandedIds: ctx.expandedIds,
+    expandedIds,
 
     getRootProps() {
-      return {
-        ...attrs('root'),
-        'data-disabled': ctx.disabled ? '' : undefined,
-      }
+      return attrs('root')
     },
 
     getItemProps(props: ItemProps) {
-      const isExpanded = ctx.expandedIds.includes(props.value)
-      const isDisabled = ctx.disabled || props.disabled
+      const isExpanded = expandedIds.includes(props.value)
       return {
         ...attrs('item'),
         'data-state': isExpanded ? 'open' : 'closed',
-        'data-disabled': isDisabled ? '' : undefined,
         'data-value': props.value,
       }
     },
 
     getTriggerProps(props: TriggerProps) {
-      const isExpanded = ctx.expandedIds.includes(props.value)
+      const isExpanded = expandedIds.includes(props.value)
       const isDisabled = ctx.disabled || props.disabled
+      const cannotCollapse =
+        isExpanded && !ctx.collapsible && expandedIds.length === 1
       return {
         ...attrs('trigger'),
         role: 'button' as const,
         type: 'button' as const,
         id: `accordion:trigger:${props.value}`,
         'aria-expanded': isExpanded,
+        'aria-disabled': isDisabled || cannotCollapse ? true : undefined,
         'aria-controls': `accordion:content:${props.value}`,
         'data-state': isExpanded ? 'open' : 'closed',
         'data-disabled': isDisabled ? '' : undefined,
         'data-value': props.value,
         disabled: isDisabled,
-        onClick() {
-          if (!isDisabled) {
+        tabIndex: isDisabled ? -1 : 0,
+        onClick(event?: { defaultPrevented?: boolean }) {
+          if (!isDisabled && !event?.defaultPrevented) {
             send({ type: 'TOGGLE', value: props.value })
           }
         },
@@ -281,8 +326,22 @@ export function connectAccordion(state: MachineSnapshot<AccordionSchema>, send: 
         onBlur() {
           send({ type: 'BLUR' })
         },
-        onKeyDown(event: { key: string; preventDefault: () => void }) {
-          if (isDisabled) return
+        onKeyDown(event: {
+          key: string
+          preventDefault: () => void
+          defaultPrevented?: boolean
+          altKey?: boolean
+          ctrlKey?: boolean
+          metaKey?: boolean
+        }) {
+          if (
+            isDisabled ||
+            event.defaultPrevented ||
+            event.altKey ||
+            event.ctrlKey ||
+            event.metaKey
+          )
+            return
 
           switch (event.key) {
             case 'ArrowDown':
@@ -309,12 +368,14 @@ export function connectAccordion(state: MachineSnapshot<AccordionSchema>, send: 
     },
 
     getContentProps(props: ContentProps) {
-      const isExpanded = ctx.expandedIds.includes(props.value)
+      const isExpanded = expandedIds.includes(props.value)
       return {
         ...attrs('content'),
-        role: 'region' as const,
+        role: props.region ? ('region' as const) : undefined,
         id: `accordion:content:${props.value}`,
-        'aria-labelledby': `accordion:trigger:${props.value}`,
+        'aria-labelledby': props.region
+          ? `accordion:trigger:${props.value}`
+          : undefined,
         'data-state': isExpanded ? 'open' : 'closed',
         hidden: !isExpanded,
       }

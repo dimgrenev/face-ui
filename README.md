@@ -13,8 +13,8 @@ npm install @userface/face-ui-react react react-dom
 Peer dependencies:
 
 ```txt
-react >=18
-react-dom >=18
+react ^18.0.0 || ^19.0.0
+react-dom ^18.0.0 || ^19.0.0
 ```
 
 ## Use
@@ -22,39 +22,40 @@ react-dom >=18
 Load Akt from Google Fonts in the document head:
 
 ```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Akt:wght@100..900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Akt:wght@100..900&display=swap"
+  rel="stylesheet"
+/>
 ```
 
 Import the CSS once at the application boundary:
 
 ```tsx
-import '@userface/face-ui-react/assets/styles/index.css';
+import '@userface/face-ui-react/assets/styles/index.css'
 ```
 
 Use the primary barrel for normal application code:
 
 ```tsx
-import { Button, Text } from '@userface/face-ui-react';
+import { Button, Text } from '@userface/face-ui-react'
 
 export function Example() {
-  return (
-    <Button text="Create project" variant="accent" />
-  );
+  return <Button text="Create project" variant="accent" />
 }
 ```
 
-Canonical component subpaths are also exported:
+Component subpaths resolve to the same implementation:
 
 ```tsx
-import { Button } from '@userface/face-ui-react/Button/Button';
+import { Button } from '@userface/face-ui-react/Button/Button'
 ```
 
 Compatibility aliases live outside the primary barrel:
 
 ```tsx
-import { Toggle } from '@userface/face-ui-react/compat';
+import { Toggle } from '@userface/face-ui-react/compat'
 ```
 
 ## Public Surface
@@ -71,30 +72,30 @@ Display and patterns: `Avatar`, `Badge`, `Card`, `Skeleton`, `Progress`, `Carous
 
 Deprecated compatibility names are still shipped for migration, but new code should use the canonical names:
 
-| Compatibility | Use instead |
-| --- | --- |
-| `Overlay` | `Tooltip` or `Popover` |
-| `Toggle` | `SegmentedControl` |
-| `Sidebar` | `Panel` |
+| Compatibility | Use instead            |
+| ------------- | ---------------------- |
+| `Overlay`     | `Tooltip` or `Popover` |
+| `Toggle`      | `SegmentedControl`     |
+| `Sidebar`     | `Panel`                |
 
 ## Contracts
 
 Each component is published with a JSON contract next to the module:
 
 ```ts
-import buttonContract from '@userface/face-ui-react/Button/Button.json';
+import buttonContract from '@userface/face-ui-react/Button/Button.json'
 ```
 
 The package registry is available as:
 
 ```ts
-import registry from '@userface/face-ui-react/component-registry.json';
+import registry from '@userface/face-ui-react/component-registry.json'
 ```
 
 Preview and runtime tooling can read:
 
 ```ts
-import runtime from '@userface/face-ui-react/uf.runtime';
+import runtime from '@userface/face-ui-react/uf.runtime'
 ```
 
 These files describe props, states, behavior, anatomy, token mapping, accessibility notes, usage rules, and governance metadata.
@@ -111,6 +112,8 @@ Face UI ships plain CSS:
 
 No Tailwind, CSS-in-JS runtime, or provider is required. Component styling is scoped with `data-scope` and `data-part` attributes, plus `--uf-*` CSS variables.
 
+Set `data-theme="light"` or `data-theme="dark"` on the document element and apply background/foreground tokens to the host surface. Body portals require document-level theme overrides. The runtime stylesheet already includes tokens.
+
 Typography is token-driven. `Akt` is intentionally loaded by the application shell through Google Fonts; the package keeps only the local `Begriffsschrift` mono face for code UI.
 
 ## Example Media
@@ -118,7 +121,7 @@ Typography is token-driven. `Akt` is intentionally loaded by the application she
 Curated media examples ship with the package under `assets/media/examples`. They are intended for `Media`, `Carousel`, cards, and gallery previews, not as product content.
 
 ```ts
-import officeCoreManifest from '@userface/face-ui-react/assets/media/examples/office-core/manifest.json';
+import officeCoreManifest from '@userface/face-ui-react/assets/media/examples/office-core/manifest.json'
 ```
 
 Image files are exposed through the same package subpath, for example `@userface/face-ui-react/assets/media/examples/office-core/lobby-day.webp`.
@@ -127,11 +130,15 @@ When a host serves package examples as static preview assets, use the manifest `
 ## Development
 
 ```bash
-pnpm install --no-frozen-lockfile
+pnpm install --frozen-lockfile
 pnpm check
+pnpm exec playwright install chromium firefox webkit
+pnpm test:browser
 ```
 
 `pnpm check` runs:
+
+- generated token, component contract and gallery drift checks
 
 - npm build for ESM, CommonJS, and types
 - Vitest contract and interaction tests
@@ -146,6 +153,10 @@ pnpm test
 pnpm smoke
 pnpm pack:dry
 ```
+
+Browser tests cover the component gallery, real keyboard and focus behavior, forms, nested portals, SSR hydration, theme contrast and layout in Chromium, Firefox and WebKit. CI checks React 18 and 19; these regression gates are not accessibility certification.
+
+See [the composition contract and API migration](docs.md) and [token authoring guide](design-system/README.md).
 
 ## Release
 
@@ -162,7 +173,7 @@ Required GitHub secret:
 NPM_TOKEN
 ```
 
-The release workflow installs dependencies, applies the requested version, runs `pnpm check`, and publishes the package publicly to npm.
+The release workflow installs locked dependencies, applies the requested version, runs package and browser checks, and publishes the package publicly to npm.
 
 ## Governance
 

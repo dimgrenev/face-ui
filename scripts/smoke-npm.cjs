@@ -124,6 +124,15 @@ async function main() {
     assert(false, `CJS root export failed: ${error.message}`);
   }
 
+  for (const [subpath, entry] of Object.entries(packageJson.exports)) {
+    if (!/^\.\/[A-Z][A-Za-z]+$/.test(subpath)) continue;
+    try {
+      assert(exists(entry.types), `Missing declaration for ${subpath}`);
+      await import(`${packageJson.name}/${subpath.slice(2)}`);
+      require(`${packageJson.name}/${subpath.slice(2)}`);
+    } catch (error) { assert(false, `Component subpath ${subpath} failed: ${error.message}`); }
+  }
+
   try {
     const cjsButton = require(path.join(root, 'dist/cjs/Button/Button.js'));
     assert(typeof cjsButton.Button === 'object' || typeof cjsButton.Button === 'function', 'CJS component export must expose Button');
@@ -134,6 +143,7 @@ async function main() {
   try {
     const esm = await import(pathToFileURL(path.join(root, 'dist/esm/index.js')).href);
     assert(typeof esm.Button === 'object' || typeof esm.Button === 'function', 'ESM root export must expose Button');
+    assert(typeof esm.Icon === 'function' || typeof esm.Icon === 'object', 'ESM root export must expose Icon');
   } catch (error) {
     assert(false, `ESM root export failed: ${error.message}`);
   }

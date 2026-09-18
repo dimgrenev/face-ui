@@ -7,9 +7,6 @@
   "root": {
     "type": "Tabs",
     "props": {
-      "items": {
-        "$ref": "props.items"
-      },
       "value": {
         "$ref": "props.value"
       },
@@ -25,8 +22,8 @@
       "disabled": {
         "$ref": "props.disabled"
       },
-      "withLine": {
-        "$ref": "props.withLine"
+      "variant": {
+        "$ref": "props.variant"
       },
       "wrap": {
         "$ref": "props.wrap"
@@ -34,18 +31,37 @@
       "membrane": {
         "$ref": "props.membrane"
       },
+      "actions": {
+        "$ref": "props.actions"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "aria-describedby": {
+        "$ref": "props.aria-describedby"
+      },
       "renderPanels": {
         "$ref": "props.renderPanels"
+      },
+      "items": {
+        "$ref": "props.items"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
+      "aria-label": "Settings sections",
       "orientation": "vertical",
       "activationMode": "manual",
       "defaultValue": "general",
-      "withLine": false,
+      "variant": "pill",
       "wrap": true,
       "membrane": true,
       "renderPanels": true,
@@ -70,28 +86,22 @@
   },
   "controls": [
     {
-      "name": "items",
-      "type": "array",
-      "required": false,
-      "description": "Tab definitions. Each item supports value, label, content, disabled, panelId, leadingIcon, trailingIcon, and an optional overlay action via actionIcon, actionLabel, actionVisibility, actionPosition, and onAction."
-    },
-    {
       "name": "value",
       "type": "string",
       "required": false,
-      "description": "Currently selected tab value."
+      "description": "Controlled selected key. Unknown keys show no panel until they exist."
     },
     {
       "name": "defaultValue",
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial tab value."
+      "description": "Mount-only selected key. Otherwise use the first enabled tab."
     },
     {
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Orientation of the tab list.",
+      "description": "Axis of keyboard navigation and the tab list.",
       "options": [
         "horizontal",
         "vertical"
@@ -102,7 +112,7 @@
       "name": "activationMode",
       "type": "select",
       "required": false,
-      "description": "Activation mode: automatic selects on focus, manual requires click/Enter.",
+      "description": "Automatic activates on focus; manual requires a click, Space or Enter.",
       "options": [
         "automatic",
         "manual"
@@ -113,36 +123,78 @@
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire tab group.",
+      "description": "Disable tab navigation and header actions, retaining the visible panel.",
       "defaultValue": false
     },
     {
-      "name": "withLine",
-      "type": "boolean",
+      "name": "variant",
+      "type": "select",
       "required": false,
-      "description": "Render the active-tab indicator line.",
-      "defaultValue": false
+      "description": "Pill background or an underline that follows the selected tab's geometry.",
+      "options": [
+        "pill",
+        "underline"
+      ],
+      "defaultValue": "pill"
     },
     {
       "name": "wrap",
       "type": "boolean",
       "required": false,
-      "description": "Allow tab triggers to wrap onto multiple rows.",
+      "description": "Wrap the tab list instead of scrolling along its axis.",
       "defaultValue": false
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each tab trigger.",
+      "description": "Shared outer spacing around each tab; toggling preserves DOM and focus.",
       "defaultValue": true
+    },
+    {
+      "name": "actions",
+      "type": "any",
+      "required": false,
+      "description": "Header controls outside tablist, such as New, Close selected, or More."
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the selected enabled tab, or first enabled tab, once on mount.",
+      "defaultValue": false
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name of the tablist, not the generic outer wrapper."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Visible heading IDs naming the tablist."
+    },
+    {
+      "name": "aria-describedby",
+      "type": "string",
+      "required": false,
+      "description": "Additional description IDs for the tablist."
     },
     {
       "name": "renderPanels",
       "type": "boolean",
       "required": false,
-      "description": "Render internal content panels. Set false when panels are rendered outside Tabs.",
+      "description": "Render persistent internal panels.",
       "defaultValue": true
+    },
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Tab definitions. Each item supports value, label, content, disabled, panelId, leadingIcon, trailingIcon, and an optional overlay action via actionIcon, actionLabel, actionVisibility, actionPosition, and onAction.",
+      "defaultValue": []
     }
   ],
   "meta": {

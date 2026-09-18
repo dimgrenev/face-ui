@@ -20,10 +20,10 @@
       "description": "Convenience body slot rendered through Card.Content; primitive values use Face UI Text."
     },
     "footer": {
-      "type": "object",
+      "type": "ReactNode",
       "controlType": "object",
       "required": false,
-      "description": "Convenience footer slot. Use React content or a structured component descriptor."
+      "description": "Convenience footer slot: text, React content, component descriptors or arrays. The JSON editor accepts every serializable form."
     },
     "variant": {
       "type": "enum",
@@ -34,7 +34,8 @@
         "plain",
         "code"
       ],
-      "description": "Meaningful surface role: standard contained surface, unframed composition, or code canvas."
+      "description": "Meaningful surface role: standard contained surface, unframed composition, or code canvas.",
+      "default": "default"
     },
     "padding": {
       "type": "enum",
@@ -46,7 +47,8 @@
         "membrane",
         "none"
       ],
-      "description": "Internal surface inset, from the standard 7px rhythm down to a flush composition."
+      "description": "Internal surface inset, from the standard 7px rhythm down to a flush composition.",
+      "default": "default"
     },
     "radius": {
       "type": "enum",
@@ -57,36 +59,40 @@
         "lg",
         "none"
       ],
-      "description": "Corner geometry for contained, compact, dialog, or flush surfaces."
+      "description": "Corner geometry for contained, compact, dialog, or flush surfaces.",
+      "default": "md"
     },
     "border": {
       "type": "boolean",
       "required": false,
-      "description": "Whether the surface draws the membrane/border stroke."
+      "description": "Draw the surface border independently of padding, radius and variant.",
+      "default": true
     },
-    "interactive": {
+    "hoverable": {
       "type": "boolean",
       "required": false,
-      "description": "Applies interactive hover surface behavior without making the card itself a button."
+      "description": "Highlight the surface on hover or focus within; does not create an action.",
+      "default": false
     },
     "fullWidth": {
       "type": "boolean",
       "required": false,
-      "description": "Whether the card stretches to the available inline size. When disabled, the card keeps intrinsic width and centers in the available inline space."
+      "description": "Stretch to the available inline size. False uses intrinsic width and preserves parent alignment.",
+      "default": true
     },
-    "footerLayout": {
+    "footerAlign": {
       "type": "enum",
-      "controlType": "select",
       "required": false,
+      "description": "Alignment used by the convenience footer slot. Compound usage configures Card.Footer directly.",
       "options": [
         "start",
         "end",
         "between"
       ],
-      "description": "Alignment used by the convenience footer slot. Compound usage configures Card.Footer directly."
+      "default": "end"
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Compound children or custom content escape hatch."
     }
@@ -101,7 +107,7 @@
           "__componentName__": "Button",
           "text": "Open",
           "icon": "arrow-right",
-          "iconPosition": "right",
+          "iconPosition": "end",
           "membrane": true,
           "fullWidth": false
         }
@@ -128,11 +134,11 @@
       }
     },
     {
-      "name": "Interactive",
+      "name": "Hover highlight",
       "props": {
-        "interactive": true,
+        "hoverable": true,
         "title": "Deploy preview",
-        "content": "Interactive surfaces can react to hover while click behavior stays with their children."
+        "content": "The surface highlights on hover or focus within; its children own their actions."
       }
     }
   ],
@@ -196,7 +202,6 @@
       "Card is the shared contained-surface shell for other composed components.",
       "Card separates visual surface presets from behavior; Modal still owns dialog behavior and can render its body through Card.",
       "Title, description, string content and footer strings render through Text; Button descriptors receive membranes by default.",
-      "Flush square surfaces with padding none and radius none suppress the border automatically because they are already bounded by their parent edge.",
       "The surface background is layered over an underlay token so transparency stays stable across parent backgrounds."
     ]
   },

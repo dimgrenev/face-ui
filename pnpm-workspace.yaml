@@ -1,12 +1,5 @@
 packages:
   - .
 
-allowBuilds:
-  esbuild: set this to true or false
-  keytar: set this to true or false
-
 onlyBuiltDependencies:
   - esbuild
-  - esbuild@0.27.7
-  - keytar
-  - keytar@7.9.0

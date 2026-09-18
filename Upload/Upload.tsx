@@ -7,7 +7,10 @@
 import { forwardRef, useCallback, useRef, useState } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { uploadMachine, connectUpload } from '../assets/machines/upload.machine'
-import type { UploadFile, UploadRejectedFile } from '../assets/machines/upload.machine'
+import type {
+  UploadFile,
+  UploadRejectedFile,
+} from '../assets/machines/upload.machine'
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
 import { Button } from '../Button/Button'
@@ -89,14 +92,19 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
 
     const inputRef = useRef<HTMLInputElement>(null)
     const isControlled = files !== undefined
-    const [uncontrolledFiles, setUncontrolledFiles] = useState<UploadFile[]>(() => [...defaultFiles])
+    const [uncontrolledFiles, setUncontrolledFiles] = useState<UploadFile[]>(
+      () => [...defaultFiles],
+    )
     const resolvedFiles = isControlled ? files : uncontrolledFiles
     const resolvedLabels = { ...DEFAULT_LABELS, ...labels }
 
-    const handleFilesChange = useCallback((details: { files: UploadFile[] }) => {
-      if (!isControlled) setUncontrolledFiles(details.files)
-      onFilesChange?.(details)
-    }, [isControlled, onFilesChange])
+    const handleFilesChange = useCallback(
+      (details: { files: UploadFile[] }) => {
+        if (!isControlled) setUncontrolledFiles(details.files)
+        onFilesChange?.(details)
+      },
+      [isControlled, onFilesChange],
+    )
 
     const { state, send } = useMachine(uploadMachine, {
       files: resolvedFiles,
@@ -122,9 +130,17 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
     }
 
     return (
-      <div ref={ref} {...api.getRootProps()} className={cn('uf-upload', className)}>
+      <div
+        ref={ref}
+        {...api.getRootProps()}
+        className={cn('uf-upload', className)}
+      >
         <div {...api.getDropzoneProps()}>
-          <input ref={inputRef} {...api.getHiddenInputProps()} />
+          <input
+            ref={inputRef}
+            {...api.getHiddenInputProps()}
+            aria-label={resolvedLabels.trigger}
+          />
           <Text as="div" className="uf-upload-dropHint" variant="muted">
             {api.isDragging ? resolvedLabels.dragging : resolvedLabels.idle}
           </Text>
@@ -145,7 +161,11 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
                 <Text as="span" {...api.getFileNameProps(file.id)}>
                   {file.name}
                 </Text>
-                <Text as="span" {...api.getFileSizeProps(file.id)} variant="muted">
+                <Text
+                  as="span"
+                  {...api.getFileSizeProps(file.id)}
+                  variant="muted"
+                >
                   {formatFileSize(file.size)}
                 </Text>
                 <Button

@@ -7,11 +7,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Modal } from '../../Modal/Modal'
 
 function keyDown(node: HTMLElement, key: string, init: KeyboardEventInit = {}) {
-  node.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init }))
+  node.dispatchEvent(
+    new KeyboardEvent('keydown', {
+      key,
+      bubbles: true,
+      cancelable: true,
+      ...init,
+    }),
+  )
 }
 
 function click(node: HTMLElement | null | undefined) {
-  node?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+  node?.dispatchEvent(
+    new MouseEvent('click', { bubbles: true, cancelable: true }),
+  )
 }
 
 describe('Modal controlled a11y baseline', () => {
@@ -19,12 +28,16 @@ describe('Modal controlled a11y baseline', () => {
   let root: Root
 
   beforeEach(() => {
-    ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+    ;(
+      globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).IS_REACT_ACT_ENVIRONMENT = true
     ;(globalThis as typeof globalThis & { React?: typeof React }).React = React
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) =>
-      window.setTimeout(() => callback(performance.now()), 0)
+      window.setTimeout(() => callback(performance.now()), 0),
     )
-    vi.stubGlobal('cancelAnimationFrame', (id: number) => window.clearTimeout(id))
+    vi.stubGlobal('cancelAnimationFrame', (id: number) =>
+      window.clearTimeout(id),
+    )
     container = document.createElement('div')
     document.body.appendChild(container)
     root = createRoot(container)
@@ -36,23 +49,31 @@ describe('Modal controlled a11y baseline', () => {
     })
     container.remove()
     vi.unstubAllGlobals()
-    delete (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT
+    delete (
+      globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).IS_REACT_ACT_ENVIRONMENT
   })
 
   function getContent(): HTMLElement {
-    const content = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="content"]')
+    const content = document.body.querySelector<HTMLElement>(
+      '[data-scope="modal"][data-part="content"]',
+    )
     expect(content).not.toBeNull()
     return content as HTMLElement
   }
 
   function getTrigger(): HTMLButtonElement {
-    const trigger = container.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="trigger"]')
+    const trigger = container.querySelector<HTMLButtonElement>(
+      '[data-scope="modal"][data-part="trigger"]',
+    )
     expect(trigger).not.toBeNull()
     return trigger as HTMLButtonElement
   }
 
   function getBackdrop(): HTMLElement {
-    const backdrop = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="backdrop"]')
+    const backdrop = document.body.querySelector<HTMLElement>(
+      '[data-scope="modal"][data-part="backdrop"]',
+    )
     expect(backdrop).not.toBeNull()
     return backdrop as HTMLElement
   }
@@ -71,9 +92,15 @@ describe('Modal controlled a11y baseline', () => {
     })
 
     const content = getContent()
-    const title = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="title"]')
-    const description = document.body.querySelector<HTMLElement>('[data-scope="modal"][data-part="description"]')
-    const close = document.body.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
+    const title = document.body.querySelector<HTMLElement>(
+      '[data-scope="modal"][data-part="title"]',
+    )
+    const description = document.body.querySelector<HTMLElement>(
+      '[data-scope="modal"][data-part="description"]',
+    )
+    const close = document.body.querySelector<HTMLButtonElement>(
+      '[data-scope="modal"][data-part="close"]',
+    )
 
     expect(content.hidden).toBe(false)
     expect(content.getAttribute('role')).toBe('dialog')
@@ -115,7 +142,9 @@ describe('Modal controlled a11y baseline', () => {
     })
 
     const content = getContent()
-    const close = document.body.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
+    const close = document.body.querySelector<HTMLButtonElement>(
+      '[data-scope="modal"][data-part="close"]',
+    )
 
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
     expect(content.hidden).toBe(false)
@@ -151,8 +180,12 @@ describe('Modal controlled a11y baseline', () => {
     })
 
     const content = getContent()
-    const close = document.body.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
-    const buttons = Array.from(content.querySelectorAll<HTMLButtonElement>('button:not([disabled])'))
+    const close = document.body.querySelector<HTMLButtonElement>(
+      '[data-scope="modal"][data-part="close"]',
+    )
+    const buttons = Array.from(
+      content.querySelectorAll<HTMLButtonElement>('button:not([disabled])'),
+    )
     const lastButton = buttons[buttons.length - 1]
 
     expect(close).not.toBeNull()
@@ -193,14 +226,20 @@ describe('Modal controlled a11y baseline', () => {
     const bodyText = body?.querySelector<HTMLElement>('[data-scope="text"]')
     const footer = content.querySelector<HTMLElement>('.uf-modal-actionsBar')
     const actions = footer?.querySelector<HTMLElement>('[data-part="actions"]')
-    const buttons = Array.from(actions?.querySelectorAll<HTMLButtonElement>('button[data-scope="button"][data-part="root"]') ?? [])
+    const buttons = Array.from(
+      actions?.querySelectorAll<HTMLButtonElement>(
+        'button[data-scope="button"][data-part="root"]',
+      ) ?? [],
+    )
 
     expect(bodyText?.textContent).toContain('Review the workspace details')
     expect(bodyText?.getAttribute('data-membrane')).not.toBeNull()
     expect(bodyText?.getAttribute('data-inset')).toBe('control')
-    expect(footer?.getAttribute('data-layout')).toBe('end')
+    expect(footer?.getAttribute('data-align')).toBe('end')
     expect(actions?.getAttribute('data-align')).toBe('end')
-    expect(buttons.map((button) => button.getAttribute('data-variant'))).toEqual(['outline', 'accent'])
+    expect(
+      buttons.map((button) => button.getAttribute('data-variant')),
+    ).toEqual(['outline', 'accent'])
   })
 
   it('keeps non-closable alertdialog open on Escape and backdrop click', async () => {
@@ -210,6 +249,7 @@ describe('Modal controlled a11y baseline', () => {
       root.render(
         <Modal
           trigger="Open alert"
+          role="alertdialog"
           title="Delete locked project"
           description="Owner approval is required."
           closable={false}
@@ -228,7 +268,9 @@ describe('Modal controlled a11y baseline', () => {
 
     const content = getContent()
     const backdrop = getBackdrop()
-    const close = document.body.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')
+    const close = document.body.querySelector<HTMLButtonElement>(
+      '[data-scope="modal"][data-part="close"]',
+    )
 
     expect(content.hidden).toBe(false)
     expect(content.getAttribute('role')).toBe('alertdialog')

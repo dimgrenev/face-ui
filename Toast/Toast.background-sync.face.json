@@ -42,13 +42,13 @@
   "controls": [
     {
       "name": "title",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Primary notification text."
     },
     {
       "name": "description",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Supporting notification text."
     },
@@ -64,10 +64,10 @@
       "required": false,
       "description": "Semantic notification tone.",
       "options": [
+        "destructive",
         "neutral",
         "positive",
-        "warning",
-        "destructive"
+        "warning"
       ],
       "defaultValue": "neutral"
     },

@@ -7,7 +7,12 @@
 
 import { createMachine } from '../create-machine'
 import { createAnatomy } from '../anatomy'
-import type { MachineSchema, MachineSnapshot, SendFn } from '../types'
+import type {
+  MachineSchema,
+  MachineSnapshot,
+  SendFn,
+  EventHandler,
+} from '../types'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -61,6 +66,7 @@ export interface UploadSchema extends MachineSchema {
     maxSize: number
     maxFiles: number
     disabled: boolean
+    dragDepth: number
     onFilesChange: ((details: { files: UploadFile[] }) => void) | null
     onReject: ((details: { files: UploadRejectedFile[] }) => void) | null
   }
@@ -72,14 +78,23 @@ export interface UploadSchema extends MachineSchema {
     | { type: 'ADD_FILES'; items: UploadSourceFile[] }
     | { type: 'REMOVE_FILE'; id: string }
     | { type: 'SET_PROGRESS'; id: string; progress: number }
-    | { type: 'SET_STATUS'; id: string; status: 'pending' | 'uploading' | 'complete' | 'error'; error?: string }
+    | {
+        type: 'SET_STATUS'
+        id: string
+        status: 'pending' | 'uploading' | 'complete' | 'error'
+        error?: string
+      }
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function matchesAccept(fileName: string, fileType: string, accept: string): boolean {
+function matchesAccept(
+  fileName: string,
+  fileType: string,
+  accept: string,
+): boolean {
   if (!accept) return true
   const normalizedName = fileName.toLowerCase()
   const normalizedType = fileType.toLowerCase()
@@ -131,9 +146,13 @@ function validateFiles(
     })
   }
 
-  if (ctx.multiple && ctx.maxFiles > 0 && ctx.files.length + accepted.length > ctx.maxFiles) {
-    const overCount = ctx.files.length + accepted.length - ctx.maxFiles
-    const removed = accepted.splice(accepted.length - overCount, overCount)
+  if (
+    ctx.multiple &&
+    ctx.maxFiles > 0 &&
+    ctx.files.length + accepted.length > ctx.maxFiles
+  ) {
+    const remaining = Math.max(0, ctx.maxFiles - ctx.files.length)
+    const removed = accepted.splice(remaining)
     for (const r of removed) {
       rejected.push({ ...r, reason: 'count' })
     }
@@ -165,6 +184,77 @@ function addFilesToContext(
 // Machine
 // ---------------------------------------------------------------------------
 
+const fileEvents: Partial<
+  Record<UploadSchema['event']['type'], EventHandler<UploadSchema>>
+> = {
+  ADD_FILES: [
+    {
+      guard: (ctx) => !ctx.disabled,
+      actions: [
+        (ctx, event) => {
+          const e = event as { type: 'ADD_FILES'; items: UploadSourceFile[] }
+          addFilesToContext(ctx, e.items)
+        },
+      ],
+    },
+  ],
+  REMOVE_FILE: {
+    guard: (ctx) => !ctx.disabled,
+    actions: [
+      (ctx, event) => {
+        const e = event as { type: 'REMOVE_FILE'; id: string }
+        ctx.files = ctx.files.filter((f) => f.id !== e.id)
+      },
+    ],
+  },
+  SET_PROGRESS: {
+    actions: [
+      (ctx, event) => {
+        const e = event as {
+          type: 'SET_PROGRESS'
+          id: string
+          progress: number
+        }
+        ctx.files = ctx.files.map((f) =>
+          f.id === e.id
+            ? {
+                ...f,
+                progress: Number.isFinite(e.progress)
+                  ? Math.max(0, Math.min(100, e.progress))
+                  : f.progress,
+              }
+            : f,
+        )
+      },
+    ],
+  },
+  SET_STATUS: {
+    actions: [
+      (ctx, event) => {
+        const e = event as {
+          type: 'SET_STATUS'
+          id: string
+          status: 'pending' | 'uploading' | 'complete' | 'error'
+          error?: string
+        }
+        ctx.files = ctx.files.map((f) =>
+          f.id === e.id ? { ...f, status: e.status, error: e.error } : f,
+        )
+      },
+    ],
+  },
+  DROP: {
+    target: 'idle',
+    actions: [
+      (ctx, event) => {
+        ctx.dragDepth = 0
+        if (!ctx.disabled && event.type === 'DROP')
+          addFilesToContext(ctx, event.items)
+      },
+    ],
+  },
+}
+
 export const uploadMachine = createMachine<UploadSchema>({
   id: 'upload',
   initial: 'idle',
@@ -176,6 +266,7 @@ export const uploadMachine = createMachine<UploadSchema>({
     maxSize: 0,
     maxFiles: 0,
     disabled: false,
+    dragDepth: 0,
     onFilesChange: null,
     onReject: null,
   },
@@ -199,67 +290,44 @@ export const uploadMachine = createMachine<UploadSchema>({
           {
             guard: (ctx) => !ctx.disabled,
             target: 'dragging',
-          },
-        ],
-        ADD_FILES: [
-          {
-            guard: (ctx) => !ctx.disabled,
             actions: [
-              (ctx, event) => {
-                const e = event as { type: 'ADD_FILES'; items: UploadSourceFile[] }
-                addFilesToContext(ctx, e.items)
+              (ctx) => {
+                ctx.dragDepth = 1
               },
             ],
           },
         ],
-        REMOVE_FILE: {
-          guard: (ctx) => !ctx.disabled,
-          actions: [
-            (ctx, event) => {
-              const e = event as { type: 'REMOVE_FILE'; id: string }
-              ctx.files = ctx.files.filter((f) => f.id !== e.id)
-            },
-          ],
-        },
-        SET_PROGRESS: {
-          actions: [
-            (ctx, event) => {
-              const e = event as { type: 'SET_PROGRESS'; id: string; progress: number }
-              ctx.files = ctx.files.map((f) =>
-                f.id === e.id ? { ...f, progress: e.progress } : f,
-              )
-            },
-          ],
-        },
-        SET_STATUS: {
-          actions: [
-            (ctx, event) => {
-              const e = event as { type: 'SET_STATUS'; id: string; status: 'pending' | 'uploading' | 'complete' | 'error'; error?: string }
-              ctx.files = ctx.files.map((f) =>
-                f.id === e.id ? { ...f, status: e.status, error: e.error } : f,
-              )
-            },
-          ],
-        },
+        ...fileEvents,
       },
     },
 
     dragging: {
       on: {
-        DRAG_LEAVE: {
-          target: 'idle',
-        },
-        DROP: {
-          target: 'idle',
+        ...fileEvents,
+        DRAG_LEAVE: [
+          {
+            guard: (ctx) => ctx.dragDepth <= 1,
+            target: 'idle',
+            actions: [
+              (ctx) => {
+                ctx.dragDepth = 0
+              },
+            ],
+          },
+          {
+            actions: [
+              (ctx) => {
+                ctx.dragDepth = Math.max(0, ctx.dragDepth - 1)
+              },
+            ],
+          },
+        ],
+        DRAG_ENTER: {
           actions: [
-            (ctx, event) => {
-              const e = event as { type: 'DROP'; items: UploadSourceFile[] }
-              addFilesToContext(ctx, e.items)
+            (ctx) => {
+              ctx.dragDepth += 1
             },
           ],
-        },
-        DRAG_ENTER: {
-          // Stay in dragging — absorb nested drag-enter events
         },
       },
     },
@@ -300,21 +368,34 @@ export function connectUpload(
         ...uploadAnatomy.getPartAttrs('dropzone'),
         'data-disabled': disabled || undefined,
         'data-dragging': isDragging || undefined,
-        onDragEnter(event: { preventDefault: () => void; stopPropagation: () => void }) {
+        onDragEnter(event: {
+          preventDefault: () => void
+          stopPropagation: () => void
+        }) {
           event.preventDefault()
           event.stopPropagation()
           if (!disabled) send({ type: 'DRAG_ENTER' })
         },
-        onDragOver(event: { preventDefault: () => void; stopPropagation: () => void }) {
+        onDragOver(event: {
+          preventDefault: () => void
+          stopPropagation: () => void
+        }) {
           event.preventDefault()
           event.stopPropagation()
         },
-        onDragLeave(event: { preventDefault: () => void; stopPropagation: () => void }) {
+        onDragLeave(event: {
+          preventDefault: () => void
+          stopPropagation: () => void
+        }) {
           event.preventDefault()
           event.stopPropagation()
-          if (!disabled) send({ type: 'DRAG_LEAVE' })
+          send({ type: 'DRAG_LEAVE' })
         },
-        onDrop(event: { preventDefault: () => void; stopPropagation: () => void; dataTransfer: { files: ArrayLike<File> } }) {
+        onDrop(event: {
+          preventDefault: () => void
+          stopPropagation: () => void
+          dataTransfer: { files: ArrayLike<File> }
+        }) {
           event.preventDefault()
           event.stopPropagation()
           if (disabled) return

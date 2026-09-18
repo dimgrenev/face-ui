@@ -31,13 +31,13 @@
       "description": "Uncontrolled initial selected item ID."
     },
     "width": {
-      "type": "number",
+      "type": "any",
       "required": false,
       "description": "Width when expanded.",
       "default": 260
     },
     "collapsedWidth": {
-      "type": "number",
+      "type": "any",
       "required": false,
       "description": "Width when collapsed.",
       "default": 60
@@ -70,12 +70,12 @@
       "default": false
     },
     "trigger": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Optional trigger for sheet mode."
     },
     "surfaceTitle": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Optional title used in compact sheet header."
     }

@@ -2,22 +2,29 @@
  * Navigation — horizontal/vertical navigation with hover dropdowns.
  *
  * Flat API: all items rendered from `items` prop.
- * Items with sub-items render as hover-triggered dropdown menus.
+ * Top-level groups open dropdowns; nested groups preserve their hierarchy inside the menu.
  *
  * `<Navigation items={[{ id: 'home', label: 'Home' }, { id: 'products', label: 'Products', items: [...] }]} />`
  */
 
-import { forwardRef, useEffect, useRef, type ReactNode } from 'react'
+import { forwardRef, useEffect, useRef, useId, type ReactNode } from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import {
   DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
   useIsCompactViewport,
 } from '../assets/adapters/react/use-responsive-overlay-surface'
+import { Trigger } from '../assets/adapters/react/Trigger'
+import { useLayer } from '../assets/adapters/react/use-layer'
+import { usePortalTarget } from '../assets/adapters/react/use-portal-target'
+import { createPortal } from 'react-dom'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { useControllableOpenState } from '../assets/adapters/react/use-controllable-open-state'
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
-import { navigationMachine, connectNavigation } from '../assets/machines/navigation.machine'
+import {
+  navigationMachine,
+  connectNavigation,
+} from '../assets/machines/navigation.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
 import { Card } from '../Card/Card'
@@ -38,7 +45,7 @@ export interface NavigationProps {
   /** Navigation item definitions (supports nested dropdowns). */
   items?: NavigationItem[]
   /** Currently active item ID. */
-  activeId?: string
+  activeId?: string | null
   /** Uncontrolled initial active item ID. */
   defaultActiveId?: string | null
   /** Callback when active item changes. */
@@ -74,14 +81,37 @@ interface DropdownItemRendererProps {
 
 function DropdownItemRenderer(props: DropdownItemRendererProps) {
   const { item, api } = props
+  if (item.items?.length)
+    return (
+      <div
+        role="group"
+        aria-label={typeof item.label === 'string' ? item.label : undefined}
+        className="uf-navigation-nestedGroup"
+      >
+        <Text as="div" variant="muted" membrane={false}>
+          {item.label}
+        </Text>
+        {item.items.map((child) => (
+          <DropdownItemRenderer
+            key={child.id}
+            item={item.disabled ? { ...child, disabled: true } : child}
+            api={api}
+          />
+        ))}
+      </div>
+    )
   const linkProps = api.getLinkProps({ id: item.id, disabled: item.disabled })
 
   if (item.href) {
     return (
       <a
         {...linkProps}
-        href={item.href}
+        href={item.disabled ? undefined : item.href}
         onClick={(e) => {
+          if (item.disabled) {
+            e.preventDefault()
+            return
+          }
           linkProps.onClick()
           if (item.onClick) {
             e.preventDefault()
@@ -136,11 +166,18 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
 
     const items = Array.isArray(rawItems) ? rawItems : []
     const isCompactViewport = useIsCompactViewport(surfaceBreakpoint)
-    const isSheetSurface = surface === 'sheet' || (surface === 'auto' && isCompactViewport)
+    const isSheetSurface =
+      surface === 'sheet' || (surface === 'auto' && isCompactViewport)
     const itemOrder = items.map((item) => item.id)
-    const disabledIds = items.filter((item) => item.disabled).map((item) => item.id)
+    const disabledIds = items
+      .filter((item) => item.disabled)
+      .map((item) => item.id)
     const machineActiveId = useControllableMachineProp(
-      typeof activeId === 'string' ? activeId : (activeId === null ? null : undefined),
+      typeof activeId === 'string'
+        ? activeId
+        : activeId === null
+          ? null
+          : undefined,
       defaultActiveId,
     )
 
@@ -152,10 +189,56 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
       onActiveChange: onActiveChange ?? null,
     })
 
+    const navigationId = useId()
     const api = connectNavigation(state, send)
     const rootRef = useRef<HTMLDivElement | null>(null)
-    const [sheetOpen, setSheetOpen] = useControllableOpenState(open, defaultOpen, onOpenChange)
+    const [sheetOpen, setSheetOpen] = useControllableOpenState(
+      open,
+      defaultOpen,
+      onOpenChange,
+    )
+    const sheetRef = useRef<HTMLDivElement | null>(null)
+    const sheetTriggerRef = useRef<HTMLElement | null>(null)
+    const sheetId = useId()
+    const sheetTitleId = useId()
+    const portalTarget = usePortalTarget()
+    useLayer({
+      enabled: isSheetSurface && sheetOpen && portalTarget !== null,
+      contentRef: sheetRef,
+      triggerRef: sheetTriggerRef,
+      modal: true,
+      autoFocus: true,
+      restoreFocus: true,
+      onEscape: () => setSheetOpen(false),
+      onOutside: () => setSheetOpen(false),
+    })
     useBodyScrollLock(isSheetSurface && sheetOpen)
+
+    const pendingMenuFocus = useRef<'first' | 'last' | null>(null)
+    useLayer({
+      enabled: !isSheetSurface && api.isOpen,
+      contentRef: rootRef,
+      onOutside: () => send({ type: 'CLOSE' }),
+      onEscape: () => {
+        const button = rootRef.current?.querySelector<HTMLElement>(
+          '[aria-expanded="true"]',
+        )
+        send({ type: 'CLOSE' })
+        button?.focus()
+      },
+    })
+    useEffect(() => {
+      if (!api.openItemId || !pendingMenuFocus.current) return
+      const stops = rootRef.current?.querySelectorAll<HTMLElement>(
+        '[role="menu"]:not([hidden]) [role="menuitem"]:not([aria-disabled="true"])',
+      )
+      const target =
+        pendingMenuFocus.current === 'last'
+          ? stops?.[stops.length - 1]
+          : stops?.[0]
+      pendingMenuFocus.current = null
+      target?.focus()
+    }, [api.openItemId])
 
     useEffect(() => {
       if (isSheetSurface) return
@@ -163,11 +246,15 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
       if (!targetId) return
       const root = rootRef.current
       if (!root) return
-      const triggers = root.querySelectorAll<HTMLElement>('[role="menuitem"][data-value]')
+      const triggers = root.querySelectorAll<HTMLElement>(
+        '[role="menuitem"][data-value]',
+      )
       for (const trigger of triggers) {
         if (trigger.getAttribute('data-value') !== targetId) continue
         if (trigger !== document.activeElement) {
-          try { trigger.focus() } catch {}
+          try {
+            trigger.focus()
+          } catch {}
         }
         break
       }
@@ -204,55 +291,92 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
         return (
           <Button
             key={item.id}
-            text={typeof item.label === 'string' || typeof item.label === 'number' ? String(item.label) : undefined}
+            disabled={item.disabled}
+            text={
+              typeof item.label === 'string' || typeof item.label === 'number'
+                ? String(item.label)
+                : undefined
+            }
             fullWidth
             align="left"
             stretchText
             membrane
             variant={isActive ? 'default' : 'ghost'}
-            className={cn('uf-navigation-sheetItem', nested && 'uf-navigation-sheetItem--nested')}
+            className={cn(
+              'uf-navigation-sheetItem',
+              nested && 'uf-navigation-sheetItem--nested',
+            )}
             onClick={() => {
               send({ type: 'SET_ACTIVE', id: item.id })
               item.onClick?.()
               if (item.href && typeof window !== 'undefined' && !item.onClick) {
-                try { window.location.assign(item.href) } catch {}
+                try {
+                  window.location.assign(item.href)
+                } catch {}
               }
               setSheetOpen(false)
             }}
           >
-            {typeof item.label === 'string' || typeof item.label === 'number' ? undefined : item.label}
+            {typeof item.label === 'string' || typeof item.label === 'number'
+              ? undefined
+              : item.label}
           </Button>
         )
       }
 
       return (
         <div className={cn('uf-navigation-sheetHost', className)}>
-          <span
+          <Trigger
+            ref={sheetTriggerRef}
+            aria-haspopup="dialog"
+            aria-expanded={sheetOpen}
+            aria-controls={sheetId}
             className="uf-navigation-sheetTrigger"
-            style={{ display: 'inline-flex' }}
             onClick={() => setSheetOpen(true)}
           >
             {triggerNode}
-          </span>
-          <div
-            className="uf-responsive-overlay-backdrop"
-            data-state={sheetOpen ? 'open' : 'closed'}
-            onClick={() => setSheetOpen(false)}
-          />
-          <Card
-            padding="default"
-            radius="md"
-            className="uf-responsive-panel uf-navigation-sheet"
-            data-state={sheetOpen ? 'open' : 'closed'}
-          >
-            <ResponsiveSheetHeader
-              title={surfaceTitle ?? 'Navigation'}
-              onClose={() => setSheetOpen(false)}
-            />
-            <div className="uf-navigation-sheetList">
-              {items.map((item) => renderSheetItem(item))}
-            </div>
-          </Card>
+          </Trigger>
+          {portalTarget
+            ? createPortal(
+                <>
+                  <div
+                    className="uf-responsive-overlay-backdrop"
+                    data-state={sheetOpen ? 'open' : 'closed'}
+                    hidden={!sheetOpen}
+                  />
+                  <Card
+                    ref={(node) => {
+                      sheetRef.current = node
+                      if (typeof ref === 'function') ref(node)
+                      else if (ref) ref.current = node
+                    }}
+                    id={sheetId}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby={sheetTitleId}
+                    tabIndex={-1}
+                    hidden={!sheetOpen}
+                    padding="default"
+                    radius="md"
+                    className="uf-responsive-panel uf-navigation-sheet"
+                    data-state={sheetOpen ? 'open' : 'closed'}
+                  >
+                    <ResponsiveSheetHeader
+                      title={
+                        <span id={sheetTitleId}>
+                          {surfaceTitle ?? 'Navigation'}
+                        </span>
+                      }
+                      onClose={() => setSheetOpen(false)}
+                    />
+                    <div className="uf-navigation-sheetList">
+                      {items.map((item) => renderSheetItem(item))}
+                    </div>
+                  </Card>
+                </>,
+                portalTarget,
+              )
+            : null}
         </div>
       )
     }
@@ -265,6 +389,56 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
           else if (ref) (ref as any).current = node
         }}
         {...api.getRootProps()}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node))
+            send({ type: 'CLOSE' })
+        }}
+        onKeyDownCapture={(event) => {
+          const target = event.target as HTMLElement
+          const menu = target.closest('[role="menu"]')
+          if (!menu) {
+            if (
+              target.closest('[aria-haspopup="menu"]') &&
+              ['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)
+            ) {
+              pendingMenuFocus.current =
+                event.key === 'ArrowUp' ? 'last' : 'first'
+              if (event.key === 'ArrowUp') {
+                event.preventDefault()
+                event.stopPropagation()
+                send({ type: 'OPEN_ITEM', id: target.dataset.value! })
+              }
+            }
+            return
+          }
+          const stops = Array.from(
+            menu.querySelectorAll<HTMLElement>(
+              '[role="menuitem"]:not([aria-disabled="true"])',
+            ),
+          )
+          const current = stops.indexOf(target)
+          const direction =
+            event.key === 'ArrowDown' ? 1 : event.key === 'ArrowUp' ? -1 : 0
+          if (direction || event.key === 'Home' || event.key === 'End') {
+            event.preventDefault()
+            event.stopPropagation()
+            const next =
+              event.key === 'Home'
+                ? 0
+                : event.key === 'End'
+                  ? stops.length - 1
+                  : (current + direction + stops.length) % stops.length
+            stops[next]?.focus()
+          } else if (event.key === 'Escape') {
+            event.preventDefault()
+            event.stopPropagation()
+            const trigger = rootRef.current?.querySelector<HTMLElement>(
+              '[aria-expanded="true"]',
+            )
+            send({ type: 'CLOSE' })
+            trigger?.focus()
+          }
+        }}
         className={cn('uf-navigation', className)}
       >
         <div {...api.getListProps()}>
@@ -274,12 +448,24 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
             return (
               <div
                 key={item.id}
-                {...api.getItemProps({ id: item.id, hasItems, disabled: item.disabled })}
+                {...api.getItemProps({
+                  id: item.id,
+                  hasItems,
+                  disabled: item.disabled,
+                })}
               >
                 {hasItems ? (
                   <>
                     <Button
-                      {...api.getTriggerProps({ id: item.id, hasItems, disabled: item.disabled })}
+                      {...{
+                        ...api.getTriggerProps({
+                          id: item.id,
+                          hasItems,
+                          disabled: item.disabled,
+                        }),
+                        id: `${navigationId}-trigger-${item.id}`,
+                        'aria-controls': `${navigationId}-content-${item.id}`,
+                      }}
                       fullWidth={false}
                       variant={api.openItemId === item.id ? 'default' : 'ghost'}
                       className="uf-navigation-trigger"
@@ -287,21 +473,39 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
                       {item.label}
                     </Button>
                     <Card
-                      {...api.getContentProps({ id: item.id, hasItems, disabled: item.disabled })}
+                      {...api.getContentProps({
+                        id: item.id,
+                        hasItems,
+                        disabled: item.disabled,
+                      })}
+                      id={`${navigationId}-content-${item.id}`}
+                      aria-labelledby={`${navigationId}-trigger-${item.id}`}
                       padding="membrane"
                       radius="md"
                       fullWidth={false}
                     >
                       {item.items!.map((child) => (
-                        <DropdownItemRenderer key={child.id} item={child} api={api} />
+                        <DropdownItemRenderer
+                          key={child.id}
+                          item={child}
+                          api={api}
+                        />
                       ))}
                     </Card>
                   </>
                 ) : item.href ? (
                   <a
-                    {...api.getTriggerProps({ id: item.id, hasItems: false, disabled: item.disabled })}
-                    href={item.href}
+                    {...api.getTriggerProps({
+                      id: item.id,
+                      hasItems: false,
+                      disabled: item.disabled,
+                    })}
+                    href={item.disabled ? undefined : item.href}
                     onClick={(e) => {
+                      if (item.disabled) {
+                        e.preventDefault()
+                        return
+                      }
                       if (item.onClick) {
                         e.preventDefault()
                         item.onClick()
@@ -313,11 +517,16 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
                   </a>
                 ) : (
                   <Button
-                    {...api.getTriggerProps({ id: item.id, hasItems: false, disabled: item.disabled })}
+                    {...api.getTriggerProps({
+                      id: item.id,
+                      hasItems: false,
+                      disabled: item.disabled,
+                    })}
                     fullWidth={false}
                     variant={api.activeId === item.id ? 'default' : 'ghost'}
                     className="uf-navigation-trigger"
                     onClick={() => {
+                      if (item.disabled) return
                       send({ type: 'SET_ACTIVE', id: item.id })
                       item.onClick?.()
                     }}

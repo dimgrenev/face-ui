@@ -2,51 +2,76 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Toggle",
-  "description": "Unified toggle and toggle group with single or multiple selection",
+  "description": "Deprecated type/array adapter for SegmentedControl; one shared runtime",
   "props": {
     "items": {
       "type": "array",
       "required": false,
-      "description": "Toggle items to render."
+      "description": "Choices in visual, keyboard and form order; missing items render an empty group."
     },
-    "value": {
-      "type": "array",
+    "disabled": {
+      "type": "boolean",
       "required": false,
-      "description": "Currently selected values."
+      "description": "Disable every control and exclude the group from FormData."
     },
-    "defaultValue": {
-      "type": "array",
+    "orientation": {
+      "type": "enum",
       "required": false,
-      "description": "Uncontrolled initial selected values."
+      "description": "Visual axis; single radio mode supports both arrow pairs.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ]
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible group name when there is no visible heading."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "Visible heading IDs that name this group."
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Native FormData key; multiple selections produce repeated entries."
+    },
+    "form": {
+      "type": "string",
+      "required": false,
+      "description": "ID of an external form that owns the selection."
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the selected enabled choice, or the first enabled choice, on mount."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Shared outer spacing around each item; toggling preserves DOM and focus."
     },
     "type": {
       "type": "enum",
       "required": false,
-      "description": "Selection mode: single or multiple.",
+      "description": "Legacy selection mode; new code uses SegmentedControl multiple.",
       "options": [
         "single",
         "multiple"
       ],
       "default": "multiple"
     },
-    "disabled": {
-      "type": "boolean",
+    "value": {
+      "type": "array",
       "required": false,
-      "description": "Disabled state for the entire group."
+      "description": "Selected choices; single mode accepts at most one."
     },
-    "orientation": {
-      "type": "enum",
+    "defaultValue": {
+      "type": "array",
       "required": false,
-      "description": "Layout orientation.",
-      "options": [
-        "horizontal",
-        "vertical"
-      ]
-    },
-    "membrane": {
-      "type": "boolean",
-      "required": false,
-      "description": "Outer membrane wrapper around each toggle item."
+      "description": "Initial choices, restored on form reset."
     }
   },
   "states": [
@@ -127,13 +152,11 @@
       "--uf-control-pad-text",
       "--uf-color-fg",
       "--uf-color-hover-bg",
-      "--uf-font-weight-bold",
-      "--uf-motion-duration-emphasis",
-      "--uf-motion-ease-emphasized"
+      "--uf-color-active-bg",
+      "--uf-border-width-thin"
     ],
     "notes": [
-      "Toggle is deprecated in the registry and should stay aligned with SegmentedControl while compatibility remains.",
-      "Item emphasis animation uses shared Face UI motion tokens while compatibility remains."
+      "Compatibility Toggle delegates to SegmentedControl, including native names/forms and shared Membrane."
     ]
   },
   "platform": {},

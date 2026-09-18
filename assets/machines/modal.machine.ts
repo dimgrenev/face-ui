@@ -5,9 +5,10 @@
  *
  * - variant='center'                     -> classic dialog
  * - variant='left'|'right'|'top'|'bottom' -> edge-aligned surface
- * - closable=false                       -> alertdialog (no Escape, no backdrop dismiss)
+ * - closable=false                       -> explicit dismissal only
  */
 
+import { getFocusableElements, registerLayer } from '../runtime/layers'
 import { createMachine } from '../create-machine'
 import { createAnatomy } from '../anatomy'
 import type { MachineSchema } from '../types'
@@ -84,39 +85,30 @@ const setContentEl = (ctx: ModalContext, event: ModalEvent): void => {
   if (ctx.open) focusInitialElement(ctx)
 }
 
-const FOCUSABLE_SELECTOR = [
-  'a[href]',
-  'button:not([disabled])',
-  'textarea:not([disabled])',
-  'input:not([disabled])',
-  'select:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
-].join(',')
-
-function getFocusableElements(root: HTMLElement | null): HTMLElement[] {
-  if (!root) return []
-  return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
-    .filter((element) => !element.hidden && element.getAttribute('aria-hidden') !== 'true')
-}
-
 function focusInitialElement(ctx: ModalContext): void {
   if (!ctx.autoFocusOnOpen) return
   const el = ctx.contentEl
   if (!el) return
   const focusable = getFocusableElements(el)
-  try { (focusable[0] || el).focus() } catch {}
+  try {
+    ;(focusable[0] || el).focus()
+  } catch {}
 }
 
-function focusInitialElementWhenVisible(ctx: ModalContext): (() => void) | undefined {
+function focusInitialElementWhenVisible(
+  ctx: ModalContext,
+): (() => void) | undefined {
   focusInitialElement(ctx)
 
   let cancelled = false
-  const schedule = typeof requestAnimationFrame === 'function'
-    ? requestAnimationFrame
-    : (callback: FrameRequestCallback) => window.setTimeout(callback, 0)
-  const cancel = typeof cancelAnimationFrame === 'function'
-    ? cancelAnimationFrame
-    : window.clearTimeout
+  const schedule =
+    typeof requestAnimationFrame === 'function'
+      ? requestAnimationFrame
+      : (callback: FrameRequestCallback) => window.setTimeout(callback, 0)
+  const cancel =
+    typeof cancelAnimationFrame === 'function'
+      ? cancelAnimationFrame
+      : window.clearTimeout
 
   const frame = schedule(() => {
     if (cancelled || !ctx.open || !ctx.contentEl) return
@@ -140,36 +132,9 @@ function restorePreviousFocus(ctx: ModalContext): void {
   const previous = ctx.previousFocusEl
   ctx.previousFocusEl = null
   if (!previous || !document.contains(previous)) return
-  try { previous.focus() } catch {}
-}
-
-function containTabFocus(ctx: ModalContext, event: { shiftKey?: boolean; preventDefault: () => void }): void {
-  const el = ctx.contentEl
-  if (!el) return
-  const focusable = getFocusableElements(el)
-  if (focusable.length === 0) {
-    event.preventDefault()
-    try { el.focus() } catch {}
-    return
-  }
-
-  const first = focusable[0]
-  const last = focusable[focusable.length - 1]
-  const active = document.activeElement
-  const activeInside = active instanceof HTMLElement && el.contains(active)
-
-  if (event.shiftKey) {
-    if (!activeInside || active === first) {
-      event.preventDefault()
-      try { last.focus() } catch {}
-    }
-    return
-  }
-
-  if (!activeInside || active === last) {
-    event.preventDefault()
-    try { first.focus() } catch {}
-  }
+  try {
+    previous.focus()
+  } catch {}
 }
 
 // ---------------------------------------------------------------------------
@@ -194,7 +159,7 @@ export const modalMachine = createMachine<ModalSchema>({
 
   computed: {
     isOpen: (ctx) => ctx.open,
-    role: (ctx) => (ctx.closable ? 'dialog' : 'alertdialog'),
+    role: () => 'dialog',
   },
 
   watch: {
@@ -221,12 +186,8 @@ export const modalMachine = createMachine<ModalSchema>({
       on: {
         CLOSE: { target: 'closed' },
         TOGGLE: { target: 'closed' },
-        ESCAPE: [
-          { target: 'closed', guard: isClosable },
-        ],
-        BACKDROP_CLICK: [
-          { target: 'closed', guard: isClosable },
-        ],
+        ESCAPE: [{ target: 'closed', guard: isClosable }],
+        BACKDROP_CLICK: [{ target: 'closed', guard: isClosable }],
         SET_CONTENT: { actions: [setContentEl] },
       },
     },
@@ -235,23 +196,21 @@ export const modalMachine = createMachine<ModalSchema>({
   implementations: {
     effects: {
       trackDocumentEscape: (ctx, send) => {
+        if (typeof document === 'undefined') return
         capturePreviousFocus(ctx)
-        const onKeyDown = (event: KeyboardEvent) => {
-          if (event.key === 'Escape') {
-            send({ type: 'ESCAPE' })
-          }
-        }
-        document.addEventListener('keydown', onKeyDown)
-
-        return () => {
-          document.removeEventListener('keydown', onKeyDown)
-        }
+        return registerLayer(ctx.contentEl?.ownerDocument ?? document, {
+          elements: () => [ctx.contentEl],
+          modal: () => ctx.contentEl,
+          onEscape: () => send({ type: 'ESCAPE' }),
+          onOutside: () => send({ type: 'BACKDROP_CLICK' }),
+        })
       },
       focusInitial: (ctx) => {
+        if (typeof document === 'undefined') return
         return focusInitialElementWhenVisible(ctx)
       },
       restoreFocus: (ctx) => {
-        restorePreviousFocus(ctx)
+        if (typeof document !== 'undefined') restorePreviousFocus(ctx)
       },
     },
   },
@@ -284,8 +243,8 @@ export function connectModal(
         type: 'button' as const,
         'aria-haspopup': role as 'dialog',
         'aria-expanded': isOpen,
-        onClick() {
-          send({ type: 'TOGGLE' })
+        onClick(event?: { defaultPrevented?: boolean }) {
+          if (!event?.defaultPrevented) send({ type: 'TOGGLE' })
         },
       }
     },
@@ -320,14 +279,6 @@ export function connectModal(
         'data-variant': ctx.variant,
         hidden: !isOpen,
         tabIndex: -1,
-        onKeyDown(e: { key: string; shiftKey?: boolean; preventDefault: () => void }) {
-          if (e.key === 'Tab') {
-            containTabFocus(ctx, e)
-          }
-          if (e.key === 'Escape') {
-            send({ type: 'ESCAPE' })
-          }
-        },
       }
     },
 
@@ -351,8 +302,9 @@ export function connectModal(
         type: 'button' as const,
         'aria-label': 'Close',
         hidden: !ctx.closable,
-        onClick() {
-          send({ type: 'CLOSE' })
+        tabIndex: ctx.closable ? 0 : -1,
+        onClick(event?: { defaultPrevented?: boolean }) {
+          if (!event?.defaultPrevented) send({ type: 'CLOSE' })
         },
       }
     },

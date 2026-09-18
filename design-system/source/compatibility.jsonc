@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "generatedPath": "design-system/tokens/colors.css",
+  "tokens": [
+    {
+      "sheet": "compatibility",
+      "name": "--background",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
+          "value": "var(--uf-color-background)"
+        }
+      ]
+    },
+    {
+      "sheet": "compatibility",
+      "name": "--foreground",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
+          "value": "var(--uf-color-foreground)"
+        }
+      ]
+    },
+    {
+      "sheet": "compatibility",
+      "name": "--border",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
+          "value": "var(--uf-color-border)"
+        }
+      ]
+    },
+    {
+      "sheet": "compatibility",
+      "name": "--panel-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
+          "value": "var(--uf-color-panel)"
+        }
+      ]
+    },
+    {
+      "sheet": "compatibility",
+      "name": "--header-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
+          "value": "var(--uf-color-header)"
+        }
+      ]
+    },
+    {
+      "sheet": "compatibility",
+      "name": "--input-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
+          "value": "var(--uf-color-input)"
+        }
+      ]
+    },
+    {
+      "sheet": "compatibility",
+      "name": "--active-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
+          "value": "var(--uf-color-active)"
+        }
+      ]
+    },
+    {
+      "sheet": "compatibility",
+      "name": "--active-text",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
+          "value": "var(--uf-color-active-text)"
+        }
+      ]
+    },
+    {
+      "sheet": "compatibility",
+      "name": "--secondary-text",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
+          "value": "var(--uf-color-text-secondary)"
+        }
+      ]
+    },
+    {
+      "sheet": "compatibility",
+      "name": "--hover-bg",
+      "variants": [
+        {
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
+          "value": "var(--uf-color-hover)"
+        }
+      ]
+    }
+  ]
+}

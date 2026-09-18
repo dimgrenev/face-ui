@@ -1,9 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { registerLayer } from '../../runtime/layers'
 
-type DismissRef = {
-  readonly current: Element | null
-}
-
+type DismissRef = { readonly current: Element | null }
 export interface UseDismissOutsideOptions {
   enabled: boolean
   refs: ReadonlyArray<DismissRef>
@@ -11,51 +9,27 @@ export interface UseDismissOutsideOptions {
   events?: ReadonlyArray<'pointerdown' | 'mousedown' | 'click'>
 }
 
-const DEFAULT_DISMISS_OUTSIDE_EVENTS = ['pointerdown', 'mousedown', 'click'] as const
-
-function getOwnerDocument(refs: ReadonlyArray<DismissRef>): Document | null {
-  for (const ref of refs) {
-    const ownerDocument = ref.current?.ownerDocument
-    if (ownerDocument) return ownerDocument
-  }
-  return typeof document === 'undefined' ? null : document
-}
-
-function isEventInsideRef(event: Event, ref: DismissRef): boolean {
-  const node = ref.current
-  if (!node) return false
-
-  const target = event.target as Node | null
-  if (target && node.contains(target)) return true
-
-  const path = typeof event.composedPath === 'function'
-    ? event.composedPath()
-    : []
-  return path.includes(node)
-}
-
+/** @deprecated Use useLayer to compose focus containment and dismissal in one layer. */
 export function useDismissOutside(options: UseDismissOutsideOptions): void {
-  const { enabled, refs, onDismiss, events = DEFAULT_DISMISS_OUTSIDE_EVENTS } = options
-
+  const latest = useRef(options)
   useEffect(() => {
-    if (!enabled) return undefined
-
-    const ownerDocument = getOwnerDocument(refs)
-    if (!ownerDocument) return undefined
-
-    const handleDismissEvent = (event: Event) => {
-      if (refs.some((ref) => isEventInsideRef(event, ref))) return
-      onDismiss(event)
-    }
-
-    for (const eventName of events) {
-      ownerDocument.addEventListener(eventName, handleDismissEvent, true)
-    }
-
-    return () => {
-      for (const eventName of events) {
-        ownerDocument.removeEventListener(eventName, handleDismissEvent, true)
-      }
-    }
-  }, [enabled, events, onDismiss, refs])
+    latest.current = options
+  })
+  useEffect(() => {
+    if (!options.enabled) return
+    const doc = options.refs.find((ref) => ref.current)?.current?.ownerDocument
+    if (!doc) return
+    return registerLayer(doc, {
+      elements: () => latest.current.refs.map((ref) => ref.current),
+      onOutside: (event) => {
+        const events = latest.current.events
+        if (
+          !events ||
+          events.includes(event.type as 'click') ||
+          (event.type === 'pointerdown' && events.includes('mousedown'))
+        )
+          latest.current.onDismiss(event)
+      },
+    })
+  }, [options.enabled])
 }

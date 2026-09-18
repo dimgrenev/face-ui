@@ -34,14 +34,11 @@
       "stretchText": {
         "$ref": "props.stretchText"
       },
-      "selector": {
-        "$ref": "props.selector"
+      "chevron": {
+        "$ref": "props.chevron"
       },
-      "selectorOpen": {
-        "$ref": "props.selectorOpen"
-      },
-      "selectorDirection": {
-        "$ref": "props.selectorDirection"
+      "aria-expanded": {
+        "$ref": "props.aria-expanded"
       },
       "fullWidth": {
         "$ref": "props.fullWidth"
@@ -83,7 +80,7 @@
     },
     {
       "name": "rightText",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Optional secondary text, rendered at the far right inside the text area."
     },
@@ -105,7 +102,7 @@
     },
     {
       "name": "icon",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Icon (string from registry, ReactNode, or SVG element)."
     },
@@ -113,29 +110,33 @@
       "name": "iconPosition",
       "type": "select",
       "required": false,
-      "description": "Icon position relative to text.",
+      "description": "Icon at the start or end of the label, following text direction. Default: start.",
       "options": [
-        "left",
-        "right"
-      ]
+        "start",
+        "end"
+      ],
+      "defaultValue": "start"
     },
     {
       "name": "iconOnly",
       "type": "boolean",
       "required": false,
-      "description": "Icon-only mode (no text, square button)."
+      "description": "Hide the visual label while preserving its accessible text. Compact buttons are square.",
+      "defaultValue": false
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state."
+      "description": "Disabled state.",
+      "defaultValue": false
     },
     {
       "name": "loading",
       "type": "boolean",
       "required": false,
-      "description": "Loading state (shows spinner, dims text)."
+      "description": "Loading state (shows spinner, dims text).",
+      "defaultValue": false
     },
     {
       "name": "stretchText",
@@ -144,25 +145,23 @@
       "description": "Stretch text area (flex:1)."
     },
     {
-      "name": "selector",
-      "type": "boolean",
-      "required": false,
-      "description": "Render a compact selector indicator after the label."
-    },
-    {
-      "name": "selectorOpen",
-      "type": "boolean",
-      "required": false,
-      "description": "Open state for the selector indicator."
-    },
-    {
-      "name": "selectorDirection",
+      "name": "chevron",
       "type": "select",
       "required": false,
-      "description": "Direction of the selector indicator. Use side for side-panel selectors.",
+      "description": "Trailing disclosure chevron. aria-expanded reverses its direction when open.",
       "options": [
-        "vertical",
-        "side"
+        "down",
+        "right"
+      ]
+    },
+    {
+      "name": "aria-expanded",
+      "type": "boolean",
+      "required": false,
+      "description": "Standard expanded state; reverses the disclosure chevron when true.",
+      "options": [
+        "false",
+        "true"
       ]
     },
     {
@@ -179,8 +178,8 @@
       "description": "Text alignment.",
       "options": [
         "left",
-        "right",
-        "center"
+        "center",
+        "right"
       ]
     },
     {
@@ -193,7 +192,8 @@
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing around the button."
+      "description": "Membrane spacing around the button.",
+      "defaultValue": true
     },
     {
       "name": "copyText",
@@ -203,9 +203,9 @@
     },
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Custom children (overrides text/icon rendering)."
+      "description": "Label content, overriding text. Icon and secondary text remain separate slots."
     }
   ],
   "meta": {

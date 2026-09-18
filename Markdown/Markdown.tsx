@@ -10,10 +10,17 @@ import sanitizeHtml from 'sanitize-html'
 import { marked } from 'marked'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
+import { Membrane } from '../assets/adapters/react/Membrane'
 
-export const markdownAnatomy = createAnatomy('markdown').parts('root', 'content')
+export const markdownAnatomy = createAnatomy('markdown').parts(
+  'root',
+  'content',
+)
 
-export interface MarkdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'content'> {
+export interface MarkdownProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'content'
+> {
   /** Markdown source text. */
   content?: string
   /** Enable GitHub Flavored Markdown extensions. */
@@ -32,16 +39,6 @@ export interface MarkdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'con
   fullWidth?: boolean
 }
 
-function hasGfmSyntax(source: string): boolean {
-  const value = String(source || '')
-  // Heuristic: GFM-only patterns (task lists / pipe tables / strikethrough).
-  return (
-    /(^|\n)\s*[-*]\s+\[[ xX]\]\s+/.test(value) ||
-    /(^|\n)\s*\|.+\|\s*\n\s*\|(?:\s*:?-+:?\s*\|)+/m.test(value) ||
-    /~~[^~]+~~/.test(value)
-  )
-}
-
 function stripHtmlTokens(value: any): any {
   if (Array.isArray(value)) {
     return value
@@ -57,17 +54,39 @@ function stripHtmlTokens(value: any): any {
   return out
 }
 
-function getStrictSanitizeOptions(linkTarget: '_self' | '_blank', linkRel: string) {
+function getStrictSanitizeOptions(
+  linkTarget: '_self' | '_blank',
+  linkRel: string,
+) {
   return {
+    // No style attributes are accepted; do not invoke the Node-oriented CSS parser.
+    parseStyleAttributes: false,
     allowedTags: [
-      'p', 'br', 'hr',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'p',
+      'br',
+      'hr',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
       'blockquote',
-      'ul', 'ol', 'li',
+      'ul',
+      'ol',
+      'li',
       'a',
-      'strong', 'em', 'del',
-      'code', 'pre',
-      'table', 'thead', 'tbody', 'tr', 'th', 'td',
+      'strong',
+      'em',
+      'del',
+      'code',
+      'pre',
+      'table',
+      'thead',
+      'tbody',
+      'tr',
+      'th',
+      'td',
       'img',
       'input',
     ],
@@ -77,7 +96,7 @@ function getStrictSanitizeOptions(linkTarget: '_self' | '_blank', linkRel: strin
       th: ['align'],
       td: ['align'],
       ol: ['start'],
-      input: ['type', 'checked', 'disabled'],
+      input: ['type', 'checked', 'disabled', 'aria-label'],
       code: ['class'],
     } as Record<string, string[]>,
     allowedClasses: {
@@ -92,7 +111,7 @@ function getStrictSanitizeOptions(linkTarget: '_self' | '_blank', linkRel: strin
         const href = String(attribs.href || '')
         const isInternal = href.startsWith('/') || href.startsWith('#')
         const target = isInternal ? '_self' : linkTarget
-        const rel = target === '_blank' ? linkRel : (attribs.rel || '')
+        const rel = target === '_blank' ? linkRel : attribs.rel || ''
         return {
           tagName: 'a',
           attribs: {
@@ -109,6 +128,8 @@ function getStrictSanitizeOptions(linkTarget: '_self' | '_blank', linkRel: strin
           // Markdown task-list items are the only inputs we render; force them to
           // rendered-but-inert checkboxes regardless of the source type.
           type: 'checkbox',
+          'aria-label':
+            'checked' in attribs ? 'Completed task' : 'Incomplete task',
           disabled: 'disabled',
         },
       }),
@@ -116,60 +137,21 @@ function getStrictSanitizeOptions(linkTarget: '_self' | '_blank', linkRel: strin
   }
 }
 
-function getRelaxedSanitizeOptions(linkTarget: '_self' | '_blank', linkRel: string) {
-  const allowedTags = Array.from(new Set([
-    ...(sanitizeHtml.defaults.allowedTags || []),
-    'img',
-    'table',
-    'thead',
-    'tbody',
-    'tr',
-    'th',
-    'td',
-    'input',
-    'hr',
-    'h1',
-    'h2',
-    'h3',
-    'h4',
-    'h5',
-    'h6',
-  ]))
+function getRelaxedSanitizeOptions(
+  linkTarget: '_self' | '_blank',
+  linkRel: string,
+) {
+  const strict = getStrictSanitizeOptions(linkTarget, linkRel)
   return {
-    allowedTags,
+    ...strict,
+    allowedTags: [
+      ...new Set([...sanitizeHtml.defaults.allowedTags, ...strict.allowedTags]),
+    ],
     allowedAttributes: {
       ...sanitizeHtml.defaults.allowedAttributes,
-      a: ['href', 'name', 'target', 'title', 'rel'],
-      img: ['src', 'alt', 'title'],
-      th: ['align'],
-      td: ['align'],
-      ol: ['start'],
-      input: ['type', 'checked', 'disabled'],
-      code: ['class'],
-    } as Record<string, string[]>,
-    allowedClasses: {
-      code: [/^language-/],
-    } as Record<string, Array<string | RegExp>>,
-    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
-    allowedSchemesByTag: {
-      img: ['http', 'https', 'data'],
-    } as Record<string, string[]>,
-    transformTags: {
-      a: (_tagName: string, attribs: Record<string, string>) => {
-        const href = String(attribs.href || '')
-        const isInternal = href.startsWith('/') || href.startsWith('#')
-        const target = isInternal ? '_self' : linkTarget
-        const rel = target === '_blank' ? linkRel : (attribs.rel || '')
-        return {
-          tagName: 'a',
-          attribs: {
-            ...attribs,
-            target,
-            rel,
-          },
-        }
-      },
-    } as Record<string, any>,
+      ...strict.allowedAttributes,
+      a: [...strict.allowedAttributes.a, 'name'],
+    },
   }
 }
 
@@ -191,10 +173,16 @@ export const Markdown = forwardRef<HTMLDivElement, MarkdownProps>(
     const html = useMemo(() => {
       try {
         const source = String(content || '')
-        const effectiveGfm = Boolean(gfm || hasGfmSyntax(source))
-        const lexed = marked.lexer(source, { gfm: effectiveGfm, breaks: true }) as any[]
+        const effectiveGfm = gfm
+        const lexed = marked.lexer(source, {
+          gfm: effectiveGfm,
+          breaks: true,
+        }) as any[]
         const tokens = allowRawHtml ? lexed : (stripHtmlTokens(lexed) as any[])
-        const parsed = marked.parser(tokens, { gfm: effectiveGfm, breaks: true }) as string
+        const parsed = marked.parser(tokens, {
+          gfm: effectiveGfm,
+          breaks: true,
+        }) as string
         const sanitizeOptions = safeMode
           ? getStrictSanitizeOptions(linkTarget, linkRel)
           : getRelaxedSanitizeOptions(linkTarget, linkRel)
@@ -219,12 +207,10 @@ export const Markdown = forwardRef<HTMLDivElement, MarkdownProps>(
       </div>
     )
 
-    if (!membrane) return rootNode
-
     return (
-      <span className={cn('uf-membrane', fullWidth && 'uf-membrane--full')}>
+      <Membrane enabled={membrane} as="div" fullWidth={fullWidth}>
         {rootNode}
-      </span>
+      </Membrane>
     )
   },
 )

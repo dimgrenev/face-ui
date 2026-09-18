@@ -16,9 +16,6 @@
       "variant": {
         "$ref": "props.variant"
       },
-      "intent": {
-        "$ref": "props.intent"
-      },
       "density": {
         "$ref": "props.density"
       },
@@ -43,14 +40,8 @@
       "disabled": {
         "$ref": "props.disabled"
       },
-      "busy": {
-        "$ref": "props.busy"
-      },
       "active": {
         "$ref": "props.active"
-      },
-      "selectedDescendant": {
-        "$ref": "props.selectedDescendant"
       },
       "interactive": {
         "$ref": "props.interactive"
@@ -58,11 +49,14 @@
       "stretchText": {
         "$ref": "props.stretchText"
       },
-      "selector": {
-        "$ref": "props.selector"
+      "chevron": {
+        "$ref": "props.chevron"
       },
-      "selectorOpen": {
-        "$ref": "props.selectorOpen"
+      "aria-expanded": {
+        "$ref": "props.aria-expanded"
+      },
+      "aria-busy": {
+        "$ref": "props.aria-busy"
       },
       "fullWidth": {
         "$ref": "props.fullWidth"
@@ -92,12 +86,11 @@
     "props": {
       "text": "Customer success",
       "rightText": "12",
-      "intent": "disclosure",
       "tone": "neutral",
       "icon": "folder",
-      "selector": true,
-      "selectorOpen": false,
-      "selectedDescendant": true,
+      "chevron": "down",
+      "aria-expanded": false,
+      "active": true,
       "fullWidth": true,
       "align": "left",
       "actionVisibility": "reveal",
@@ -113,7 +106,7 @@
     },
     {
       "name": "rightText",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Optional secondary text at the far right of the label area."
     },
@@ -125,20 +118,6 @@
       "options": [
         "default",
         "ghost"
-      ],
-      "defaultValue": "default"
-    },
-    {
-      "name": "intent",
-      "type": "select",
-      "required": false,
-      "description": "Semantic row intent. Use default for generic and navigation rows, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.",
-      "options": [
-        "default",
-        "disclosure",
-        "tree",
-        "tab",
-        "section"
       ],
       "defaultValue": "default"
     },
@@ -172,7 +151,7 @@
       "name": "actionVisibility",
       "type": "select",
       "required": false,
-      "description": "How the actions slot is exposed: reveal on hover/focus/active, hover only, always visible, or hidden.",
+      "description": "Reveal on hover/focus/active; hover on hover/focus; always; hidden. Hoverless devices expose reveal/hover actions.",
       "options": [
         "reveal",
         "hover",
@@ -183,7 +162,7 @@
     },
     {
       "name": "icon",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Icon (string from registry or ReactNode)."
     },
@@ -191,12 +170,12 @@
       "name": "iconPosition",
       "type": "select",
       "required": false,
-      "description": "Icon position relative to text.",
+      "description": "Icon at the start or end of the label, following text direction. Default: start.",
       "options": [
-        "left",
-        "right"
+        "start",
+        "end"
       ],
-      "defaultValue": "left"
+      "defaultValue": "start"
     },
     {
       "name": "leading",
@@ -214,14 +193,7 @@
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
-      "defaultValue": false
-    },
-    {
-      "name": "busy",
-      "type": "boolean",
-      "required": false,
-      "description": "Marks the row busy with data-busy and aria-busy without disabling it by itself.",
+      "description": "Disable the primary action. Nested controls own their disabled state.",
       "defaultValue": false
     },
     {
@@ -229,13 +201,6 @@
       "type": "boolean",
       "required": false,
       "description": "Active / selected state.",
-      "defaultValue": false
-    },
-    {
-      "name": "selectedDescendant",
-      "type": "boolean",
-      "required": false,
-      "description": "Marks parent rows that contain the selected descendant, commonly while collapsed.",
       "defaultValue": false
     },
     {
@@ -251,18 +216,34 @@
       "description": "Stretch text area (flex:1)."
     },
     {
-      "name": "selector",
-      "type": "boolean",
+      "name": "chevron",
+      "type": "select",
       "required": false,
-      "description": "Render a compact selector indicator after the label.",
-      "defaultValue": false
+      "description": "Trailing disclosure chevron, matching Button. Down follows aria-expanded.",
+      "options": [
+        "down",
+        "right"
+      ]
     },
     {
-      "name": "selectorOpen",
+      "name": "aria-expanded",
       "type": "boolean",
       "required": false,
-      "description": "Open state for the selector indicator.",
-      "defaultValue": false
+      "description": "Native disclosure state; also orients chevron.",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    {
+      "name": "aria-busy",
+      "type": "boolean",
+      "required": false,
+      "description": "Native row-region busy state; changes cursor without disabling.",
+      "options": [
+        "false",
+        "true"
+      ]
     },
     {
       "name": "fullWidth",
@@ -278,8 +259,8 @@
       "description": "Text alignment.",
       "options": [
         "left",
-        "right",
-        "center"
+        "center",
+        "right"
       ],
       "defaultValue": "left"
     },
@@ -305,15 +286,15 @@
     },
     {
       "name": "actions",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile."
     },
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Custom children (overrides text/icon rendering)."
+      "description": "Custom label content. Overrides text; icon/rightText/other slots remain independent."
     }
   ],
   "meta": {

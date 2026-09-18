@@ -1,8 +1,21 @@
 import { forwardRef } from 'react'
-import { Overlay, type OverlayProps } from '../Overlay/Overlay'
+import {
+  FloatingOverlay,
+  type FloatingSurfaceProps,
+  type HoverTimingProps,
+} from '../assets/adapters/react/FloatingOverlay'
 
-export interface TooltipProps extends Omit<OverlayProps, 'trigger' | 'interactive'> {}
+export interface TooltipProps extends FloatingSurfaceProps, HoverTimingProps {}
 
-export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(function Tooltip(props, ref) {
-  return <Overlay ref={ref} trigger="hover" interactive={false} {...props} />
-})
+export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
+  function Tooltip(props, ref) {
+    return (
+      <FloatingOverlay
+        {...props}
+        ref={ref}
+        trigger="hover"
+        interactive={false}
+      />
+    )
+  },
+)

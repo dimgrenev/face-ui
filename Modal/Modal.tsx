@@ -6,14 +6,28 @@
  * `<Modal open title="Settings" />`
  */
 
-import { forwardRef, useId, useCallback, useEffect, useState, type MutableRefObject, type ReactNode, type HTMLAttributes, type CSSProperties, type MouseEventHandler } from 'react'
+import {
+  forwardRef,
+  useId,
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+  type MutableRefObject,
+  type ReactNode,
+  type HTMLAttributes,
+  type CSSProperties,
+  type MouseEventHandler,
+} from 'react'
 import { createPortal } from 'react-dom'
-import { useMachine } from '../assets/adapters/react/use-machine'
+import { useControllableOpenState } from '../assets/adapters/react/use-controllable-open-state'
+import { Trigger } from '../assets/adapters/react/Trigger'
+import { useLayer } from '../assets/adapters/react/use-layer'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
-import { modalMachine, connectModal } from '../assets/machines/modal.machine'
-import type { ModalSchema } from '../assets/machines/modal.machine'
+import { connectModal } from '../assets/machines/modal.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
+import { resolveLabel } from '../assets/runtime/labels'
 import type { ButtonVariant } from '../Button/Button'
 import { Card } from '../Card/Card'
 import { Text } from '../Text/Text'
@@ -32,13 +46,18 @@ export interface ModalAction {
   onClick?: MouseEventHandler<HTMLButtonElement>
 }
 
-interface ModalSharedProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'content'> {
+interface ModalSharedProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'title' | 'content'
+> {
   /** Controlled open state. */
   open?: boolean
   /** Close the surface when its backdrop is clicked. */
   closeOnOverlayClick?: boolean
   /** Whether the surface can be closed via Escape / backdrop click. */
   closable?: boolean
+  /** Accessible name and tooltip of the close button. Empty text uses the default. */
+  closeLabel?: string
   /** Title content rendered inside the surface. */
   title?: ReactNode
   /** Description content rendered below the title. */
@@ -53,7 +72,7 @@ interface ModalSharedProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' 
   onOpenChange?: (details: { open: boolean }) => void
   /** Move focus into the surface when it opens. Disable for bounded previews that render it inline. */
   autoFocusOnOpen?: boolean
-  /** Lock body scroll while the modal is open. Opt-in; off by default. */
+  /** Lock body scroll while open. Defaults to true for portaled surfaces. */
   scrollLock?: boolean
   /** Render overlay into document.body. Disable for bounded component previews. */
   portal?: boolean
@@ -77,7 +96,8 @@ export interface ModalProps extends ModalSharedProps {
 }
 
 function renderModalBody(children: ReactNode): ReactNode {
-  if (typeof children !== 'string' && typeof children !== 'number') return children
+  if (typeof children !== 'string' && typeof children !== 'number')
+    return children
   return (
     <Text as="div" variant="body" fullWidth membrane>
       {String(children)}
@@ -97,6 +117,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       edge = 'inset',
       closeOnOverlayClick = true,
       closable = true,
+      closeLabel,
       title,
       description,
       children,
@@ -106,14 +127,21 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       height,
       onOpenChange,
       autoFocusOnOpen = true,
-      scrollLock = false,
+      scrollLock,
       portal = true,
       className,
       backdropClassName,
       positionerClassName,
       style,
+      role = 'dialog',
       ...rest
     } = props
+
+    const resolvedCloseLabel = resolveLabel(
+      closeLabel,
+      'Close modal',
+      'Modal closeLabel',
+    )
 
     const titleId = useId()
     const descriptionId = useId()
@@ -124,64 +152,103 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       setPortalTarget(document.body)
     }, [])
 
-    const { state, send } = useMachine<ModalSchema>(modalMachine, {
+    const [isOpen, setOpen] = useControllableOpenState(
       open,
-      variant: placement,
-      closable,
-      autoFocusOnOpen,
-      titleId,
-      descriptionId,
-      onOpenChange: ((details: { open: boolean }) => {
-        if (typeof onOpenChange === 'function') onOpenChange(details)
-      }) as any,
-    })
-    const controlledOpen = typeof open === 'boolean' ? open : null
-    const isMachineOpen = state.matches('open')
-
-    useBodyScrollLock(isMachineOpen && scrollLock)
-
-    useEffect(() => {
-      if (controlledOpen === null || controlledOpen === isMachineOpen) return
-      send(controlledOpen ? 'OPEN' : 'CLOSE')
-    }, [controlledOpen, isMachineOpen, send])
-
-    const api = connectModal(state, send)
-    const triggerProps = api.getTriggerProps()
-    const isPrimitiveTrigger = typeof trigger === 'string' || typeof trigger === 'number'
-    const backdropProps = api.getBackdropProps() as any
-    if (!closeOnOverlayClick) {
-      delete backdropProps.onClick
+      false,
+      onOpenChange,
+    )
+    const contentRef = useRef<HTMLDivElement | null>(null)
+    const triggerRef = useRef<HTMLElement | null>(null)
+    const send: Parameters<typeof connectModal>[1] = (event) => {
+      const type = typeof event === 'string' ? event : event.type
+      if (type === 'OPEN') setOpen(true)
+      else if (type === 'CLOSE') setOpen(false)
+      else if (type === 'TOGGLE') setOpen(!isOpen)
+      else if ((type === 'ESCAPE' || type === 'BACKDROP_CLICK') && closable)
+        setOpen(false)
     }
+    useBodyScrollLock(isOpen && (scrollLock ?? portal))
+    useLayer({
+      enabled: isOpen && (!portal || portalTarget !== null),
+      contentRef,
+      triggerRef,
+      modal: true,
+      autoFocus: autoFocusOnOpen,
+      restoreFocus: autoFocusOnOpen,
+      onEscape: () => {
+        if (closable) setOpen(false)
+      },
+      onOutside: () => {
+        if (closable && closeOnOverlayClick) setOpen(false)
+      },
+    })
+    const api = connectModal(
+      {
+        value: isOpen ? 'open' : 'closed',
+        context: {
+          open: isOpen,
+          variant: placement,
+          closable,
+          autoFocusOnOpen,
+          contentEl: contentRef.current,
+          previousFocusEl: null,
+          titleId: title != null ? titleId : '',
+          descriptionId: description != null ? descriptionId : '',
+          onOpenChange: onOpenChange ?? null,
+        },
+        computed: { role },
+        matches: (...states) => states.includes(isOpen ? 'open' : 'closed'),
+      },
+      send,
+    )
+    const triggerProps = api.getTriggerProps()
+    const backdropProps = api.getBackdropProps() as any
+    // The shared layer owns dismissal for the entire outside gesture.
+    delete backdropProps.onClick
 
     const handleRef = useCallback(
       (el: HTMLDivElement | null) => {
-        send({ type: 'SET_CONTENT', el })
+        contentRef.current = el
         if (typeof ref === 'function') ref(el)
-        else if (ref) (ref as MutableRefObject<HTMLDivElement | null>).current = el
+        else if (ref)
+          (ref as MutableRefObject<HTMLDivElement | null>).current = el
       },
-      [ref, send],
+      [ref],
     )
 
     const contentStyle: CSSProperties = {
       ...style,
-      ...(width != null ? { '--face-runtime-modal-w': `${width}px` } as CSSProperties : {}),
-      ...(height != null ? { '--face-runtime-modal-h': `${height}px` } as CSSProperties : {}),
+      ...(width != null
+        ? ({ '--face-runtime-modal-w': `${width}px` } as CSSProperties)
+        : {}),
+      ...(height != null
+        ? ({ '--face-runtime-modal-h': `${height}px` } as CSSProperties)
+        : {}),
     }
 
     const overlay = (
       <>
-        <div {...backdropProps} data-portal={portal ? 'true' : 'false'} className={cn('uf-modal-backdrop', backdropClassName)} />
+        <div
+          {...backdropProps}
+          data-portal={portal ? 'true' : 'false'}
+          className={cn('uf-modal-backdrop', backdropClassName)}
+        />
 
         <div
           {...api.getPositionerProps()}
           data-edge={edge}
           data-portal={portal ? 'true' : 'false'}
-          className={cn('uf-modal-positioner', `uf-modal-positioner--edge-${edge}`, positionerClassName)}
+          className={cn(
+            'uf-modal-positioner',
+            `uf-modal-positioner--edge-${edge}`,
+            positionerClassName,
+          )}
         >
           <Card
             ref={handleRef}
-            {...rest}
             {...api.getContentProps()}
+            {...rest}
+            onKeyDown={rest.onKeyDown}
             data-edge={edge}
             padding="default"
             radius={edge === 'flush' ? 'none' : 'lg'}
@@ -190,7 +257,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
             style={contentStyle}
           >
             {(title != null || closable) && (
-              <Card.Header layout="bar" className="uf-modal-bar">
+              <Card.Header orientation="horizontal" className="uf-modal-bar">
                 {title != null ? (
                   <Card.Title
                     {...(api.getTitleProps() as any)}
@@ -211,8 +278,8 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                       fullWidth={false}
                       variant="default"
                       className="uf-modal-closeButton"
-                      aria-label="Close modal"
-                      title="Close"
+                      aria-label={resolvedCloseLabel}
+                      title={resolvedCloseLabel}
                     />
                   </Card.Actions>
                 ) : null}
@@ -239,18 +306,29 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
             ) : null}
 
             {actions.length > 0 ? (
-              <Card.Footer className="uf-modal-actionsBar" layout="end">
+              <Card.Footer className="uf-modal-actionsBar" align="end">
                 <Card.Actions align="end">
                   {actions.map((action, index) => (
                     <Button
                       key={`modal-action:${index}`}
-                      text={typeof action.label === 'string' || typeof action.label === 'number' ? String(action.label) : undefined}
-                      variant={action.variant ?? (index === actions.length - 1 ? 'accent' : 'outline')}
+                      text={
+                        typeof action.label === 'string' ||
+                        typeof action.label === 'number'
+                          ? String(action.label)
+                          : undefined
+                      }
+                      variant={
+                        action.variant ??
+                        (index === actions.length - 1 ? 'accent' : 'outline')
+                      }
                       disabled={action.disabled}
                       onClick={action.onClick}
                       fullWidth={false}
                     >
-                      {typeof action.label === 'string' || typeof action.label === 'number' ? undefined : action.label}
+                      {typeof action.label === 'string' ||
+                      typeof action.label === 'number'
+                        ? undefined
+                        : action.label}
                     </Button>
                   ))}
                 </Card.Actions>
@@ -264,26 +342,16 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
     return (
       <>
         {trigger != null && (
-          isPrimitiveTrigger ? (
-            <Button
-              {...(triggerProps as any)}
-              text={String(trigger)}
-              fullWidth={false}
-              membrane={false}
-            />
-          ) : (
-            <span
-              {...triggerProps}
-              style={{ display: 'inline-flex' }}
-            >
-              {trigger}
-            </span>
-          )
+          <Trigger {...triggerProps} ref={triggerRef}>
+            {trigger}
+          </Trigger>
         )}
 
-        {portal && portalTarget
-          ? createPortal(overlay, portalTarget)
-          : <span className="uf-modal-inlineHost">{overlay}</span>}
+        {portal && portalTarget ? (
+          createPortal(overlay, portalTarget)
+        ) : (
+          <span className="uf-modal-inlineHost">{overlay}</span>
+        )}
       </>
     )
   },

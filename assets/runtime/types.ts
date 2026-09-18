@@ -51,7 +51,11 @@ export type ComputedFn<S extends MachineSchema> = (
 
 export interface TransitionConfig<S extends MachineSchema> {
   target?: S['state']
-  actions?: (keyof NonNullable<MachineConfig<S>['implementations']>['actions'])[] | ActionFn<S>[]
+  /** Restart entry/exit/effects even when targeting the current state. */
+  reenter?: boolean
+  actions?:
+    | (keyof NonNullable<MachineConfig<S>['implementations']>['actions'])[]
+    | ActionFn<S>[]
   guard?: GuardFn<S>
 }
 

@@ -17,6 +17,7 @@ import type { MachineSchema, MachineSnapshot, SendFn } from '../types'
 export const radioAnatomy = createAnatomy('radio').parts(
   'root',
   'item',
+  'input',
   'label',
   'indicator',
 )
@@ -43,6 +44,30 @@ export interface RadioSchema extends MachineSchema {
     | { type: 'FOCUS_NEXT' }
     | { type: 'FOCUS_PREV' }
     | { type: 'SET_VALUE'; value: string }
+}
+
+/** Shared navigation order; empty strings are valid values, undefined means no target. */
+export function getRadioNavigationValue(
+  context: Pick<
+    RadioSchema['context'],
+    'itemOrder' | 'disabledValues' | 'disabled'
+  >,
+  current: string | null,
+  direction: 1 | -1,
+): string | undefined {
+  if (context.disabled) return undefined
+  const enabled = context.itemOrder.filter(
+    (value) => !context.disabledValues.includes(value),
+  )
+  if (!enabled.length) return undefined
+  const index = current === null ? -1 : enabled.indexOf(current)
+  return enabled[
+    index < 0
+      ? direction === 1
+        ? 0
+        : enabled.length - 1
+      : (index + direction + enabled.length) % enabled.length
+  ]
 }
 
 // ---------------------------------------------------------------------------
@@ -74,7 +99,12 @@ export const radioMachine = createMachine<RadioSchema>({
       on: {
         SELECT: [
           {
-            guard: (ctx) => !ctx.disabled,
+            guard: (ctx, event) =>
+              !ctx.disabled &&
+              !ctx.disabledValues.includes(
+                (event as { value: string }).value,
+              ) &&
+              ctx.itemOrder.includes((event as { value: string }).value),
             actions: [
               (ctx, e) => {
                 ctx.value = (e as { type: 'SELECT'; value: string }).value
@@ -104,7 +134,12 @@ export const radioMachine = createMachine<RadioSchema>({
       on: {
         SELECT: [
           {
-            guard: (ctx) => !ctx.disabled,
+            guard: (ctx, event) =>
+              !ctx.disabled &&
+              !ctx.disabledValues.includes(
+                (event as { value: string }).value,
+              ) &&
+              ctx.itemOrder.includes((event as { value: string }).value),
             actions: [
               (ctx, e) => {
                 ctx.value = (e as { type: 'SELECT'; value: string }).value
@@ -123,28 +158,30 @@ export const radioMachine = createMachine<RadioSchema>({
         FOCUS_NEXT: {
           actions: [
             (ctx) => {
-              const enabled = ctx.itemOrder.filter((value) => !ctx.disabledValues.includes(value))
-              if (enabled.length === 0) return
-              const current = ctx.focusedValue ?? ctx.value
-              const currentIndex = current ? enabled.indexOf(current) : -1
-              const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % enabled.length
-              const nextValue = enabled[nextIndex]
-              ctx.focusedValue = nextValue
-              ctx.value = nextValue
+              const next = getRadioNavigationValue(
+                ctx,
+                ctx.focusedValue ?? ctx.value,
+                1,
+              )
+              if (next !== undefined) {
+                ctx.focusedValue = next
+                ctx.value = next
+              }
             },
           ],
         },
         FOCUS_PREV: {
           actions: [
             (ctx) => {
-              const enabled = ctx.itemOrder.filter((value) => !ctx.disabledValues.includes(value))
-              if (enabled.length === 0) return
-              const current = ctx.focusedValue ?? ctx.value
-              const currentIndex = current ? enabled.indexOf(current) : -1
-              const nextIndex = currentIndex < 0 ? enabled.length - 1 : (currentIndex - 1 + enabled.length) % enabled.length
-              const nextValue = enabled[nextIndex]
-              ctx.focusedValue = nextValue
-              ctx.value = nextValue
+              const next = getRadioNavigationValue(
+                ctx,
+                ctx.focusedValue ?? ctx.value,
+                -1,
+              )
+              if (next !== undefined) {
+                ctx.focusedValue = next
+                ctx.value = next
+              }
             },
           ],
         },
@@ -168,10 +205,23 @@ export function connectRadio(
   state: MachineSnapshot<RadioSchema>,
   send: SendFn<RadioSchema>,
 ) {
-  const { value, focusedValue, itemOrder, disabledValues, disabled, orientation } = state.context
+  const {
+    value,
+    focusedValue,
+    itemOrder,
+    disabledValues,
+    disabled,
+    orientation,
+  } = state.context
   const isFocused = state.matches('focused')
-  const firstEnabled = itemOrder.find((itemValue) => !disabledValues.includes(itemValue))
-  const tabStopValue = focusedValue ?? value ?? firstEnabled
+  const firstEnabled = itemOrder.find(
+    (itemValue) => !disabledValues.includes(itemValue),
+  )
+  const enabled = itemOrder.filter((item) => !disabledValues.includes(item))
+  const tabStopValue =
+    [focusedValue, value].find(
+      (item) => item != null && enabled.includes(item),
+    ) ?? firstEnabled
 
   return {
     getRootProps() {
@@ -186,12 +236,22 @@ export function connectRadio(
     },
 
     getItemProps(props: { value: string; disabled?: boolean }) {
+      return {
+        ...radioAnatomy.getPartAttrs('item'),
+        'data-state': value === props.value ? 'checked' : 'unchecked',
+        'data-disabled': disabled || props.disabled || undefined,
+        'data-orientation': orientation,
+        'data-value': props.value,
+      }
+    },
+
+    getInputProps(props: { value: string; disabled?: boolean }) {
       const itemDisabled = disabled || props.disabled
       const isSelected = value === props.value
       const isTabStop = tabStopValue === props.value
 
       return {
-        ...radioAnatomy.getPartAttrs('item'),
+        ...radioAnatomy.getPartAttrs('input'),
         role: 'radio' as const,
         'aria-checked': isSelected,
         'aria-disabled': itemDisabled || undefined,
@@ -199,9 +259,18 @@ export function connectRadio(
         'data-disabled': itemDisabled || undefined,
         'data-orientation': orientation,
         'data-value': props.value,
-        tabIndex: isTabStop ? 0 : -1,
-        onClick() {
-          if (!itemDisabled) {
+        tabIndex: !itemDisabled && isTabStop ? 0 : -1,
+        onChange(event: {
+          target: { checked: boolean }
+          defaultPrevented?: boolean
+          nativeEvent?: { defaultPrevented: boolean }
+        }) {
+          if (
+            !itemDisabled &&
+            event.target.checked &&
+            !event.defaultPrevented &&
+            !event.nativeEvent?.defaultPrevented
+          ) {
             send({ type: 'SELECT', value: props.value })
           }
         },
@@ -211,17 +280,17 @@ export function connectRadio(
         onBlur() {
           send({ type: 'BLUR' })
         },
-        onKeyDown(event: { key: string; preventDefault: () => void }) {
-          if (itemDisabled) return
+        onKeyDown(event: {
+          key: string
+          defaultPrevented?: boolean
+          preventDefault: () => void
+        }) {
+          if (itemDisabled || event.defaultPrevented) return
 
-          const isVertical = orientation === 'vertical'
-          const nextKey = isVertical ? 'ArrowDown' : 'ArrowRight'
-          const prevKey = isVertical ? 'ArrowUp' : 'ArrowLeft'
-
-          if (event.key === nextKey) {
+          if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
             event.preventDefault()
             send({ type: 'FOCUS_NEXT' })
-          } else if (event.key === prevKey) {
+          } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
             event.preventDefault()
             send({ type: 'FOCUS_PREV' })
           } else if (event.key === ' ') {
@@ -232,10 +301,10 @@ export function connectRadio(
       }
     },
 
-    getLabelProps() {
+    getLabelProps(props: { disabled?: boolean } = {}) {
       return {
         ...radioAnatomy.getPartAttrs('label'),
-        'data-disabled': disabled || undefined,
+        'data-disabled': disabled || props.disabled || undefined,
         'data-orientation': orientation,
       }
     },

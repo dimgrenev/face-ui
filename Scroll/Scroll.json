@@ -5,7 +5,7 @@
   "description": "Native scroll area",
   "props": {
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Content to make scrollable."
     },
@@ -21,7 +21,7 @@
       "default": "vertical"
     },
     "height": {
-      "type": "number",
+      "type": "any",
       "required": false,
       "description": "Viewport height.",
       "default": 240

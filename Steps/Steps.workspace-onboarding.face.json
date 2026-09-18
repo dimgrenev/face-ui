@@ -21,6 +21,9 @@
       },
       "disabled": {
         "$ref": "props.disabled"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
       }
     },
     "children": []
@@ -54,34 +57,41 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Step definitions."
+      "description": "Ordered step definitions. An omitted or empty list renders no navigation."
     },
     {
       "name": "step",
       "type": "number",
       "required": false,
-      "description": "Current step index (0-based)."
+      "description": "Controlled nonnegative integer index; displayed within the current item bounds."
     },
     {
       "name": "defaultStep",
       "type": "number",
       "required": false,
-      "description": "Uncontrolled initial step index.",
+      "description": "Initial uncontrolled index; later changes are ignored. Defaults to 0.",
       "defaultValue": 0
     },
     {
       "name": "linear",
       "type": "boolean",
       "required": false,
-      "description": "Linear mode: prevents skipping steps.",
+      "description": "Allow only the current, earlier or immediately next step. Does not validate forms.",
       "defaultValue": true
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire steps navigation.",
+      "description": "Disable step navigation; the visible panel remains usable.",
       "defaultValue": false
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around each step control. Defaults to true.",
+      "defaultValue": true
     }
   ],
   "meta": {

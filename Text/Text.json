@@ -34,7 +34,7 @@
     "size": {
       "type": "enum",
       "required": false,
-      "description": "Text size.",
+      "description": "Explicit font size, overriding the variant's default.",
       "options": [
         "xs",
         "sm",
@@ -48,6 +48,9 @@
       "required": false,
       "description": "HTML element to render. Auto-detected from variant if not specified.",
       "options": [
+        "p",
+        "span",
+        "div",
         "h1",
         "h2",
         "h3",
@@ -57,28 +60,26 @@
         "label",
         "kbd",
         "code",
-        "p",
-        "span",
-        "div",
         "strong",
         "em",
-        "small"
+        "small",
+        "blockquote"
       ]
     },
     "icon": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Icon element (ReactNode)."
+      "description": "Built-in icon name or custom node. Empty content creates no icon slot."
     },
     "iconPosition": {
       "type": "enum",
       "required": false,
-      "description": "Icon position relative to text.",
+      "description": "Icon at the start or end of the label, following text direction. Default: start.",
       "options": [
-        "left",
-        "right"
+        "start",
+        "end"
       ],
-      "default": "left"
+      "default": "start"
     },
     "inset": {
       "type": "enum",
@@ -87,6 +88,16 @@
       "options": [
         "control",
         "none"
+      ],
+      "default": "control"
+    },
+    "heightMode": {
+      "type": "enum",
+      "required": false,
+      "description": "Block sizing. `control` keeps the variant's control height; `content` fits its line boxes without vertical padding. Horizontal inset is preserved.",
+      "options": [
+        "control",
+        "content"
       ],
       "default": "control"
     },
@@ -108,8 +119,8 @@
       "description": "Text alignment.",
       "options": [
         "left",
-        "right",
-        "center"
+        "center",
+        "right"
       ],
       "default": "left"
     },
@@ -126,14 +137,14 @@
       "default": false
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Custom children (overrides text)."
     },
     "htmlFor": {
       "type": "string",
       "required": false,
-      "description": "For label variant: htmlFor attribute."
+      "description": "Associated control ID when the resolved element is a label."
     }
   },
   "states": [
@@ -141,7 +152,7 @@
       "name": "Default (Body)",
       "props": {
         "variant": "body",
-        "iconPosition": "left",
+        "iconPosition": "start",
         "inset": "control",
         "stretchText": false,
         "fullWidth": false,
@@ -192,7 +203,7 @@
       "props": {
         "text": "With left icon",
         "icon": "search",
-        "iconPosition": "left"
+        "iconPosition": "start"
       }
     },
     {
@@ -200,7 +211,7 @@
       "props": {
         "text": "Pinned right icon",
         "icon": "arrow-right",
-        "iconPosition": "right",
+        "iconPosition": "end",
         "stretchText": true,
         "fullWidth": true
       }

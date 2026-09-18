@@ -34,7 +34,7 @@
       "name": "text",
       "type": "string",
       "required": false,
-      "description": "Badge text content"
+      "description": "Plain status text. Rich children take precedence when provided."
     },
     {
       "name": "appearance",
@@ -63,9 +63,9 @@
     },
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Custom children content (overrides text)"
+      "description": "Custom inline content, including a status icon or formatted count."
     }
   ],
   "meta": {

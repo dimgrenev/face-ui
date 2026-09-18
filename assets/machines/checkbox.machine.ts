@@ -7,7 +7,12 @@
 
 import { createMachine } from '../create-machine'
 import { createAnatomy } from '../anatomy'
-import type { MachineSchema, MachineSnapshot, SendFn } from '../types'
+import type {
+  MachineSchema,
+  MachineSnapshot,
+  SendFn,
+  StateNode,
+} from '../types'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -15,10 +20,9 @@ import type { MachineSchema, MachineSnapshot, SendFn } from '../types'
 
 export const checkboxAnatomy = createAnatomy('checkbox').parts(
   'root',
-  'control',
+  'input',
   'indicator',
   'label',
-  'hiddenInput',
 )
 
 // ---------------------------------------------------------------------------
@@ -43,7 +47,9 @@ export interface CheckboxSchema extends MachineSchema {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function stateFromChecked(checked: boolean | 'indeterminate'): CheckboxSchema['state'] {
+function stateFromChecked(
+  checked: boolean | 'indeterminate',
+): CheckboxSchema['state'] {
   if (checked === 'indeterminate') return 'indeterminate'
   return checked ? 'checked' : 'unchecked'
 }
@@ -51,6 +57,61 @@ function stateFromChecked(checked: boolean | 'indeterminate'): CheckboxSchema['s
 // ---------------------------------------------------------------------------
 // Machine
 // ---------------------------------------------------------------------------
+
+// Every state accepts the same events. Decisions use context so external
+// controlled updates cannot leave the next toggle tied to an obsolete state.
+const checkedState: StateNode<CheckboxSchema> = {
+  on: {
+    TOGGLE: [
+      {
+        guard: (ctx) => !ctx.disabled && ctx.checked === true,
+        target: 'unchecked',
+        actions: [
+          (ctx) => {
+            ctx.checked = false
+          },
+        ],
+      },
+      {
+        guard: (ctx) => !ctx.disabled,
+        target: 'checked',
+        actions: [
+          (ctx) => {
+            ctx.checked = true
+          },
+        ],
+      },
+    ],
+    SET: [
+      {
+        guard: (_ctx, event) => event.type === 'SET' && event.checked === true,
+        target: 'checked',
+        actions: [
+          (ctx) => {
+            ctx.checked = true
+          },
+        ],
+      },
+      {
+        guard: (_ctx, event) => event.type === 'SET' && event.checked === false,
+        target: 'unchecked',
+        actions: [
+          (ctx) => {
+            ctx.checked = false
+          },
+        ],
+      },
+      {
+        target: 'indeterminate',
+        actions: [
+          (ctx) => {
+            ctx.checked = 'indeterminate'
+          },
+        ],
+      },
+    ],
+  },
+}
 
 export const checkboxMachine = createMachine<CheckboxSchema>({
   id: 'checkbox',
@@ -69,95 +130,9 @@ export const checkboxMachine = createMachine<CheckboxSchema>({
   },
 
   states: {
-    unchecked: {
-      on: {
-        TOGGLE: [
-          {
-            guard: (ctx) => !ctx.disabled,
-            target: 'checked',
-            actions: [(ctx) => { ctx.checked = true }],
-          },
-        ],
-        SET: [
-          {
-            guard: (ctx, e) => {
-              const v = (e as { type: 'SET'; checked: boolean | 'indeterminate' }).checked
-              return !ctx.disabled && v === true
-            },
-            target: 'checked',
-            actions: [(ctx) => { ctx.checked = true }],
-          },
-          {
-            guard: (ctx, e) => {
-              const v = (e as { type: 'SET'; checked: boolean | 'indeterminate' }).checked
-              return !ctx.disabled && v === 'indeterminate'
-            },
-            target: 'indeterminate',
-            actions: [(ctx) => { ctx.checked = 'indeterminate' }],
-          },
-        ],
-      },
-    },
-
-    checked: {
-      on: {
-        TOGGLE: [
-          {
-            guard: (ctx) => !ctx.disabled,
-            target: 'unchecked',
-            actions: [(ctx) => { ctx.checked = false }],
-          },
-        ],
-        SET: [
-          {
-            guard: (ctx, e) => {
-              const v = (e as { type: 'SET'; checked: boolean | 'indeterminate' }).checked
-              return !ctx.disabled && v === false
-            },
-            target: 'unchecked',
-            actions: [(ctx) => { ctx.checked = false }],
-          },
-          {
-            guard: (ctx, e) => {
-              const v = (e as { type: 'SET'; checked: boolean | 'indeterminate' }).checked
-              return !ctx.disabled && v === 'indeterminate'
-            },
-            target: 'indeterminate',
-            actions: [(ctx) => { ctx.checked = 'indeterminate' }],
-          },
-        ],
-      },
-    },
-
-    indeterminate: {
-      on: {
-        TOGGLE: [
-          {
-            guard: (ctx) => !ctx.disabled,
-            target: 'checked',
-            actions: [(ctx) => { ctx.checked = true }],
-          },
-        ],
-        SET: [
-          {
-            guard: (ctx, e) => {
-              const v = (e as { type: 'SET'; checked: boolean | 'indeterminate' }).checked
-              return !ctx.disabled && v === true
-            },
-            target: 'checked',
-            actions: [(ctx) => { ctx.checked = true }],
-          },
-          {
-            guard: (ctx, e) => {
-              const v = (e as { type: 'SET'; checked: boolean | 'indeterminate' }).checked
-              return !ctx.disabled && v === false
-            },
-            target: 'unchecked',
-            actions: [(ctx) => { ctx.checked = false }],
-          },
-        ],
-      },
-    },
+    unchecked: checkedState,
+    checked: checkedState,
+    indeterminate: checkedState,
   },
 })
 
@@ -183,24 +158,33 @@ export function connectCheckbox(
       }
     },
 
-    getControlProps() {
+    getInputProps() {
       return {
-        ...checkboxAnatomy.getPartAttrs('control'),
+        ...checkboxAnatomy.getPartAttrs('input'),
         'data-state': dataState,
         'data-disabled': disabled || undefined,
+        type: 'checkbox' as const,
         role: 'checkbox' as const,
+        name,
+        checked: isChecked,
+        disabled,
+        required,
         'aria-checked': isIndeterminate ? ('mixed' as const) : isChecked,
         'aria-disabled': disabled || undefined,
         'aria-required': required || undefined,
         tabIndex: disabled ? -1 : 0,
-        onClick() {
-          send({ type: 'TOGGLE' })
-        },
-        onKeyDown(event: { key: string; preventDefault: () => void }) {
-          if (event.key === ' ' || event.key === 'Enter') {
-            event.preventDefault()
-            send({ type: 'TOGGLE' })
-          }
+        onChange(event: {
+          target: { checked: boolean }
+          defaultPrevented?: boolean
+          nativeEvent?: { defaultPrevented: boolean }
+        }) {
+          if (
+            disabled ||
+            event.defaultPrevented ||
+            event.nativeEvent?.defaultPrevented
+          )
+            return
+          send({ type: 'SET', checked: event.target.checked })
         },
       }
     },
@@ -210,32 +194,6 @@ export function connectCheckbox(
         ...checkboxAnatomy.getPartAttrs('indicator'),
         'data-state': dataState,
         'data-disabled': disabled || undefined,
-        hidden: !isChecked && !isIndeterminate,
-      }
-    },
-
-    getHiddenInputProps() {
-      return {
-        ...checkboxAnatomy.getPartAttrs('hiddenInput'),
-        type: 'checkbox' as const,
-        name,
-        checked: isChecked,
-        disabled,
-        required,
-        tabIndex: -1,
-        style: {
-          position: 'absolute' as const,
-          width: 'var(--uf-membrane)',
-          height: 'var(--uf-membrane)',
-          margin: 'calc(-1 * var(--uf-membrane))',
-          padding: '0',
-          overflow: 'hidden' as const,
-          clip: 'rect(0,0,0,0)',
-          border: '0',
-        },
-        onChange() {
-          send({ type: 'TOGGLE' })
-        },
       }
     },
 
@@ -244,9 +202,6 @@ export function connectCheckbox(
         ...checkboxAnatomy.getPartAttrs('label'),
         'data-state': dataState,
         'data-disabled': disabled || undefined,
-        onClick() {
-          send({ type: 'TOGGLE' })
-        },
       }
     },
   }

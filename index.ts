@@ -1,11 +1,13 @@
 // @userface/face-ui-react - main barrel export
 
 // Primitives
+export { Icon, ICON_NAMES } from './Icon/Icon'
+export type { IconProps, IconName } from './Icon/Icon'
 export { Button, ButtonGroup, buttonAnatomy } from './Button/Button'
-export type { ButtonProps, ButtonVariant, ButtonGroupProps } from './Button/Button'
+export type { ButtonProps, ButtonVariant, ButtonChevron, ButtonGroupProps } from './Button/Button'
 
 export { Tile, tileAnatomy } from './Tile/Tile'
-export type { TileActionVisibility, TileDensity, TileIntent, TileProps, TileTone, TileVariant } from './Tile/Tile'
+export type { TileActionVisibility, TileDensity, TileProps, TileTone, TileVariant } from './Tile/Tile'
 
 export { Text, textAnatomy } from './Text/Text'
 export type { TextProps, TextVariant } from './Text/Text'
@@ -19,13 +21,12 @@ export type { BadgeProps, BadgeAppearance, BadgeTone } from './Badge/Badge'
 
 export { Card, cardAnatomy } from './Card/Card'
 export type {
-  CardActionAlign,
+  CardAlign,
   CardActionsProps,
   CardCompoundComponent,
   CardDescriptionProps,
-  CardFooterLayout,
   CardFooterProps,
-  CardHeaderLayout,
+  CardHeaderOrientation,
   CardHeaderProps,
   CardPadding,
   CardProps,
@@ -48,22 +49,22 @@ export { Switcher } from './Switcher/Switcher'
 export type { SwitcherProps } from './Switcher/Switcher'
 
 export { Radio } from './Radio/Radio'
-export type { RadioProps } from './Radio/Radio'
+export type { RadioProps, RadioOption } from './Radio/Radio'
 
 export { SegmentedControl } from './SegmentedControl/SegmentedControl'
 export type { SegmentedControlProps, SegmentedControlItem } from './SegmentedControl/SegmentedControl'
 
 export { Slider } from './Slider/Slider'
-export type { SliderProps } from './Slider/Slider'
+export type { SliderProps, SliderCropRange, SliderLabels, SliderValueDetails, SliderFormatDetails } from './Slider/Slider'
 
 export { Rating } from './Rating/Rating'
-export type { RatingProps } from './Rating/Rating'
+export type { RatingProps, RatingValueDetails } from './Rating/Rating'
 
 export { Input } from './Input/Input'
 export type { InputProps } from './Input/Input'
 
 export { Select } from './Select/Select'
-export type { SelectProps } from './Select/Select'
+export type { SelectProps, SelectOption, SelectSurface } from './Select/Select'
 
 // Overlays
 export { Modal } from './Modal/Modal'
@@ -90,20 +91,23 @@ export type {
 
 // Navigation
 export { Tabs } from './Tabs/Tabs'
-export type { TabsProps } from './Tabs/Tabs'
+export type { TabsProps, TabItem, ExternalTabItem } from './Tabs/Tabs'
 
 export { Accordion } from './Accordion/Accordion'
 export type { AccordionProps } from './Accordion/Accordion'
 
 export { Pagination } from './Pagination/Pagination'
-export type { PaginationProps } from './Pagination/Pagination'
+export type { PaginationProps, PaginationLabels } from './Pagination/Pagination'
 
 export { Steps } from './Steps/Steps'
-export type { StepsProps } from './Steps/Steps'
+export type { StepsProps, StepItem } from './Steps/Steps'
 
-// Data Display (with machine)
+// Data display
 export { Progress } from './Progress/Progress'
 export type { ProgressProps, ProgressShape, ProgressTone } from './Progress/Progress'
+export { Meter } from './Meter/Meter'
+export type { MeterProps, MeterShape, MeterTone } from './Meter/Meter'
+export type { RangeValueDetails } from './assets/internal/range-indicator'
 
 export { Avatar } from './Avatar/Avatar'
 export type { AvatarProps } from './Avatar/Avatar'
@@ -141,10 +145,10 @@ export { Table } from './Table/Table'
 export type { TableProps, TableColumn } from './Table/Table'
 
 export { Calendar } from './Calendar/Calendar'
-export type { CalendarProps } from './Calendar/Calendar'
+export type { CalendarProps, CalendarRangeValue, CalendarLabels } from './Calendar/Calendar'
 
 export { Date } from './Date/Date'
-export type { DateProps, DatePreset } from './Date/Date'
+export type { DateProps, DatePreset, DateRangeValue, DateLabels } from './Date/Date'
 
 // Toc / Bar / Breadcrumb / Code / Media / Scroll
 export { Toc } from './Toc/Toc'
@@ -170,6 +174,7 @@ export type { MarkdownProps } from './Markdown/Markdown'
 
 // Utils
 export { cn } from './assets/utils'
+export { hasSlotContent } from './assets/slot-content'
 export {
   FACE_UI_COMPONENT_REGISTRY,
   FACE_UI_COMPONENT_META,

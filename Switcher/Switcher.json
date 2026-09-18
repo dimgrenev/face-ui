@@ -7,67 +7,83 @@
     "checked": {
       "type": "boolean",
       "required": false,
-      "description": "Checked state (controlled)."
+      "description": "Controlled on/off setting. Parent updates do not emit change notifications."
     },
     "defaultChecked": {
       "type": "boolean",
       "required": false,
-      "description": "Initial checked state (uncontrolled)."
+      "description": "Uncontrolled initial setting, also restored by form reset.",
+      "default": false
+    },
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible label. Empty content adds no label slot; zero remains visible."
+    },
+    "truncate": {
+      "type": "boolean",
+      "required": false,
+      "description": "Truncate overflowing label text with an ellipsis. By default the full label wraps.",
+      "default": false
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name, including when there is no visible label."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "External label element IDs; takes native precedence over aria-label."
+    },
+    "aria-describedby": {
+      "type": "string",
+      "required": false,
+      "description": "External description element IDs."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Exclude the switch from activation, focus navigation and form submission.",
       "default": false
     },
     "required": {
       "type": "boolean",
       "required": false,
-      "description": "Mark as required.",
+      "description": "Require the on state for native form validation.",
       "default": false
     },
     "name": {
       "type": "string",
       "required": false,
-      "description": "Form field name.",
-      "default": ""
+      "description": "FormData key. An unnamed switch does not contribute a form field."
     },
     "value": {
       "type": "string",
       "required": false,
-      "description": "Hidden input value when checked.",
+      "description": "Value submitted only when on; it does not control the setting.",
       "default": "on"
     },
-    "label": {
+    "form": {
       "type": "string",
       "required": false,
-      "description": "Label content (ReactNode)."
+      "description": "ID of an external native form that owns the input."
     },
-    "text": {
-      "type": "string",
-      "required": false,
-      "description": "Text content (string shorthand, used when `withText` is true)."
-    },
-    "withText": {
+    "autoFocus": {
       "type": "boolean",
       "required": false,
-      "description": "Show text label alongside the switch.",
-      "default": true
+      "description": "Focus the native input on mount."
     },
-    "textWrap": {
-      "type": "enum",
+    "fullWidth": {
+      "type": "boolean",
       "required": false,
-      "description": "Label text overflow: 'truncate' clips with ellipsis, 'wrap' wraps full text.",
-      "options": [
-        "truncate",
-        "wrap"
-      ],
-      "default": "truncate"
+      "description": "Expand the membrane and clickable label to the container width.",
+      "default": false
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around control geometry.",
+      "description": "Shared outer spacing; toggling it preserves input identity and state.",
       "default": true
     }
   },
@@ -77,28 +93,27 @@
       "props": {
         "disabled": false,
         "required": false,
-        "name": "",
         "value": "on",
-        "withText": true,
-        "textWrap": "truncate",
         "membrane": true,
         "label": "Dark mode",
-        "text": "I accept the End User License Agreement",
-        "defaultChecked": false
+        "defaultChecked": false,
+        "fullWidth": true
       }
     },
     {
       "name": "Checked",
       "props": {
         "defaultChecked": true,
-        "label": "Enabled"
+        "label": "Enabled",
+        "fullWidth": true
       }
     },
     {
       "name": "Disabled",
       "props": {
         "disabled": true,
-        "label": "Unavailable"
+        "label": "Unavailable",
+        "fullWidth": true
       }
     },
     {
@@ -106,22 +121,27 @@
       "props": {
         "checked": true,
         "disabled": true,
-        "label": "Locked on"
+        "label": "Locked on",
+        "fullWidth": true
       }
     }
   ],
-  "behavior": {},
+  "behavior": {
+    "controlledValue": "checked controls the binary setting. Parent updates and form reset do not emit user change notifications.",
+    "uncontrolledValue": "defaultChecked initializes selection and is restored by form reset.",
+    "nativeEvents": "Space and pointer activation use the native input. onChange and onCheckedChange each notify once; prevented activation changes nothing."
+  },
   "keyboard": {
     "Space": {
       "action": "toggle"
     },
     "Enter": {
-      "action": "toggle"
+      "action": "nativeFormBehavior"
     }
   },
   "aria": {
     "role": "switch",
-    "nativeElement": "A visually hidden native input[type=\"checkbox\"] preserves form participation and is marked aria-hidden.",
+    "nativeElement": "A visually hidden native input[type=\"checkbox\"] with role=\"switch\" remains focusable, accessible and participates in forms.",
     "states": [
       "aria-checked=true",
       "aria-checked=false",
@@ -132,15 +152,15 @@
       "visible label or external accessible name"
     ],
     "notes": [
-      "role=\"switch\" and aria-checked are set on the control part; when a visible label is present it is associated to the control via aria-labelledby."
+      "The wrapping native label names the input. Explicit native aria-label/aria-labelledby override the visible label using browser naming precedence."
     ]
   },
   "composition": {
     "required": [
       "root",
-      "control",
-      "thumb",
-      "hiddenInput"
+      "input",
+      "track",
+      "thumb"
     ],
     "recommended": [
       "label"
@@ -149,37 +169,29 @@
       "root": {
         "slot": "root"
       },
-      "control": {
-        "slot": "control",
+      "input": {
+        "slot": "input",
+        "parent": "root"
+      },
+      "track": {
+        "slot": "track",
         "parent": "root"
       },
       "thumb": {
         "slot": "thumb",
-        "parent": "control"
+        "parent": "track"
       },
       "label": {
         "slot": "label",
-        "parent": "root"
-      },
-      "hiddenInput": {
-        "slot": "hiddenInput",
         "parent": "root"
       }
     }
   },
   "tokenMapping": {
     "component": [
-      "--uf-switcher-control-size",
-      "--uf-switcher-track-inset-block",
-      "--uf-switcher-track-inset-inline",
-      "--uf-switcher-track-radius",
-      "--uf-switcher-thumb-size",
-      "--uf-switcher-thumb-top",
-      "--uf-switcher-thumb-left",
-      "--uf-switcher-thumb-translate-x"
+      "--uf-switcher-control-size"
     ],
     "semanticFallbacks": [
-      "--uf-control-line-height",
       "--uf-control-height",
       "--uf-control-gap",
       "--uf-control-pad-y",
@@ -192,7 +204,9 @@
       "--uf-color-bg",
       "--uf-color-hover-bg",
       "--uf-motion-duration-control",
-      "--uf-motion-ease-standard"
+      "--uf-motion-ease-standard",
+      "--uf-icon-size",
+      "--uf-color-fg-muted"
     ],
     "notes": [
       "Switcher geometry is expressed through component-local aliases over shared control, space and membrane tokens.",

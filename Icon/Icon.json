@@ -17,7 +17,7 @@
     "title": {
       "type": "string",
       "required": false,
-      "description": "Optional title element for inline SVG."
+      "description": "SVG title: native pointer hint and accessible name when label is absent."
     }
   },
   "states": [

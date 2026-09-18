@@ -1,264 +1,212 @@
-/**
- * Calendar — standalone date picker grid.
- *
- * `<Calendar value={date} onValueChange={({ value }) => setDate(value)} />`
- *
- * Public API uses Date objects. Internal machine uses ISO strings.
- */
+/** A civil-day selector. ISO dates are independent of the browser's timezone. */
+import { forwardRef, useState } from 'react'
+import { parseCivilDate as parseDate } from '../assets/runtime/civil-date'
+import {
+  CalendarGrid,
+  type CalendarRootAttributes,
+} from '../assets/internal/CalendarGrid'
+import { normalizeRange } from '../assets/date-utils'
+import {
+  getNextDateRange,
+  isDateRangeDisabled,
+} from '../assets/runtime/date-range'
+import { areContextValuesEqual } from '../assets/create-machine'
+import { resolveLabels } from '../assets/runtime/labels'
+import {
+  defaultCalendarLabels,
+  type CalendarLabels,
+} from '../assets/runtime/date-labels'
+export type { CalendarLabels } from '../assets/runtime/date-labels'
 
-import { forwardRef, useMemo, useState } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
-import { calendarMachine, connectCalendar } from '../assets/machines/calendar.machine'
-import { cn } from '../assets/utils'
-import { Icon } from '../Icon/Icon'
-import { Button } from '../Button/Button'
-import { Text } from '../Text/Text'
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-export interface CalendarProps {
-  /** Selected date. */
-  value?: Date | CalendarRangeValue | null
-  /** Default selected date (uncontrolled). */
-  defaultValue?: Date | CalendarRangeValue
-  /** Selection model. */
-  selection?: 'single' | 'range'
-  /** Minimum selectable date. */
-  min?: Date
-  /** Maximum selectable date. */
-  max?: Date
-  /** Array of dates that cannot be selected. */
-  disabledDates?: Date[]
-  /** Locale for month and weekday names. */
+interface CalendarSharedProps extends CalendarRootAttributes {
+  /** Displayed month as YYYY-MM-DD, independently of selection. */
+  viewDate?: string
+  /** Initial displayed month as YYYY-MM-DD; read only on initialization. */
+  defaultViewDate?: string
+  /** User navigation only; receives the first day of the month as YYYY-MM-DD. */
+  onViewDateChange?: (details: { viewDate: string }) => void
+  /** Earliest selectable civil date, inclusive, as YYYY-MM-DD. */
+  min?: string
+  /** Latest selectable civil date, inclusive, as YYYY-MM-DD. */
+  max?: string
+  /** Unavailable civil dates as YYYY-MM-DD strings. */
+  disabledDates?: readonly string[]
+  /** Disable date selection and month navigation; remove internal controls from Tab. */
+  disabled?: boolean
+  /** Prevent user selection while keeping focus and month navigation available. */
+  readOnly?: boolean
+  /** Date formatting language, numbering system and default first weekday; dates stay Gregorian. */
   locale?: string
-  /** First day of the week: 0=Sunday, 1=Monday, etc. */
+  /** Internal navigation labels; use aria-label/aria-labelledby to name the calendar group. */
+  labels?: Partial<CalendarLabels>
+  /** Override the locale's first weekday: 0=Sunday through 6=Saturday. */
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6
-  /** Callback when the selected date changes. */
-  onValueChange?: (details: { value: Date | CalendarRangeValue }) => void
-  /** Additional CSS class. */
+  /** CSS class on the calendar group root, also addressed by id, style and ref. */
   className?: string
+  /** Accessible name of the calendar group; the inner grid is named by its displayed month. */
+  'aria-label'?: string
+  /** External label IDs for the calendar group; takes precedence over aria-label. */
+  'aria-labelledby'?: string
+  /** External description IDs for the calendar group. */
+  'aria-describedby'?: string
 }
 
 export interface CalendarRangeValue {
-  start?: Date | null
-  end?: Date | null
+  /** First civil date as YYYY-MM-DD, or null for an empty endpoint. */
+  start: string | null
+  /** Last civil date as YYYY-MM-DD, or null while selecting the range. */
+  end: string | null
 }
 
-// ---------------------------------------------------------------------------
-// Date <-> ISO helpers
-// ---------------------------------------------------------------------------
+export type CalendarProps = CalendarSharedProps &
+  (
+    | {
+        selection?: 'single'
+        excludeDisabledDates?: never
+        /** Selected civil day or range; dates use YYYY-MM-DD and null clears the controlled value. */
+        value?: string | null
+        /** Initial uncontrolled civil day or range; dates use YYYY-MM-DD. */
+        defaultValue?: string | null
+        /** Called once for a user selection, with its civil ISO date. */
+        onValueChange?: (details: { value: string }) => void
+      }
+    | {
+        selection: 'range'
+        /** Exclude unavailable days from the whole range; false constrains only its endpoints. */
+        excludeDisabledDates?: boolean
+        /** Selected civil range; null clears the controlled value. */
+        value?: CalendarRangeValue | null
+        /** Initial uncontrolled civil range. */
+        defaultValue?: CalendarRangeValue | null
+        /** Called once for a user selection, including an incomplete range. */
+        onValueChange?: (details: { value: CalendarRangeValue }) => void
+      }
+  )
 
-function dateToISO(d: Date | string | unknown): string | null {
-  // Runtime contracts can hydrate ISO strings even though the typed API uses Date.
-  if (typeof d === 'string') {
-    const parsed = new Date(d)
-    if (!Number.isNaN(parsed.getTime())) {
-      const y = String(parsed.getFullYear()).padStart(4, '0')
-      const m = String(parsed.getMonth() + 1).padStart(2, '0')
-      const day = String(parsed.getDate()).padStart(2, '0')
-      return `${y}-${m}-${day}`
+function readDate(value: unknown, prop: string): string {
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    try {
+      return parseDate(value).toString()
+    } catch {
+      /* Report the owning prop below. */
     }
-    return null
   }
-  if (!(d instanceof Date) || Number.isNaN(d.getTime())) return null
-  const y = String(d.getFullYear()).padStart(4, '0')
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
+  throw new RangeError(
+    `Calendar ${prop} must be a valid Gregorian YYYY-MM-DD string (years 0001–9999)`,
+  )
 }
 
-function isoToDate(iso: string): Date {
-  const [y, m, d] = iso.split('-').map(Number)
-  return new Date(y, m - 1, d)
+function readSelection(
+  value: unknown,
+  selection: 'single' | 'range',
+  prop: string,
+): CalendarRangeValue {
+  if (value == null) return { start: null, end: null }
+  if (selection === 'single') return { start: readDate(value, prop), end: null }
+  if (typeof value !== 'object' || !('start' in value) || !('end' in value))
+    throw new RangeError(
+      `Calendar ${prop} must have start and end civil dates, each YYYY-MM-DD or null`,
+    )
+  return normalizeRange(
+    value.start === null ? null : readDate(value.start, `${prop}.start`),
+    value.end === null ? null : readDate(value.end, `${prop}.end`),
+  )
 }
-
-function isCalendarRangeValue(value: unknown): value is CalendarRangeValue {
-  return Boolean(value && typeof value === 'object' && ('start' in value || 'end' in value))
-}
-
-function normalizeCalendarRange(value: Date | CalendarRangeValue | null | undefined): { start: string | null; end: string | null } {
-  if (!isCalendarRangeValue(value)) {
-    const iso = value ? dateToISO(value) : null
-    return { start: iso, end: null }
-  }
-  return {
-    start: value.start ? dateToISO(value.start) : null,
-    end: value.end ? dateToISO(value.end) : null,
-  }
-}
-
-function normalizeRangeOrder(range: { start: string | null; end: string | null }): { start: string | null; end: string | null } {
-  if (!range.start || !range.end || range.start <= range.end) return range
-  return { start: range.end, end: range.start }
-}
-
-function rangeToDates(range: { start: string | null; end: string | null }): CalendarRangeValue {
-  return {
-    start: range.start ? isoToDate(range.start) : null,
-    end: range.end ? isoToDate(range.end) : null,
-  }
-}
-
-function getViewDate(value?: Date | CalendarRangeValue | null, defaultValue?: Date | CalendarRangeValue): string {
-  const valueRange = normalizeCalendarRange(value)
-  const defaultRange = normalizeCalendarRange(defaultValue)
-  if (valueRange.start) return valueRange.start.slice(0, 7) + '-01'
-  if (valueRange.end) return valueRange.end.slice(0, 7) + '-01'
-  if (defaultRange.start) return defaultRange.start.slice(0, 7) + '-01'
-  if (defaultRange.end) return defaultRange.end.slice(0, 7) + '-01'
-  const now = dateToISO(new Date())
-  return `${now?.slice(0, 7) ?? '1970-01'}-01`
-}
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
 
 export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
   function Calendar(props, ref) {
     const {
       value,
       defaultValue,
+      viewDate,
+      defaultViewDate,
+      onViewDateChange,
       selection = 'single',
+      onValueChange: _onValueChange,
       min,
       max,
       disabledDates = [],
+      excludeDisabledDates = true,
+      disabled = false,
+      readOnly = false,
       locale = 'en-US',
-      weekStartsOn = 0,
-      onValueChange,
-      className,
-    } = props
-
-    const controlledRange = useMemo(() => normalizeCalendarRange(value), [value])
-    const defaultRange = useMemo(() => normalizeCalendarRange(defaultValue), [defaultValue])
-    const [uncontrolledRange, setUncontrolledRange] = useState(defaultRange)
-    const rangeValue = value !== undefined ? controlledRange : uncontrolledRange
-    const selectedISO = useControllableMachineProp(
-      selection === 'single'
-        ? (value !== undefined ? (value && !isCalendarRangeValue(value) ? dateToISO(value) : null) : undefined)
-        : (value !== undefined ? rangeValue.start : undefined),
-      selection === 'single'
-        ? (defaultValue && !isCalendarRangeValue(defaultValue) ? dateToISO(defaultValue) : null)
-        : defaultRange.start,
-    )
-    const viewDate = useControllableMachineProp<string | null>(undefined, getViewDate(value, defaultValue))
-    const focusedDate = useControllableMachineProp<string | null>(undefined, selectedISO ?? viewDate)
-
-    const handleValueChange = selection === 'single' && onValueChange
-      ? (details: { value: string }) => {
-          onValueChange({ value: isoToDate(details.value) })
-        }
-      : null
-
-    const { state, send } = useMachine(calendarMachine, {
-      value: selectedISO ?? undefined,
-      viewDate: viewDate ?? undefined,
-      focusedDate: focusedDate ?? undefined,
-      min: min ? dateToISO(min) ?? undefined : undefined,
-      max: max ? dateToISO(max) ?? undefined : undefined,
-      disabledDates: disabledDates.map(dateToISO).filter((date): date is string => date != null),
-      locale,
+      labels,
       weekStartsOn,
-      onValueChange: handleValueChange,
-    })
-
-    const api = connectCalendar(state, send)
-    const handleRangeDateSelect = (date: string) => {
-      const isRestart = !rangeValue.start || (rangeValue.start && rangeValue.end)
-      const nextRange = normalizeRangeOrder(isRestart
-        ? { start: date, end: null }
-        : { start: rangeValue.start, end: date })
-      if (value === undefined) setUncontrolledRange(nextRange)
-      onValueChange?.({ value: rangeToDates(nextRange) })
+      className,
+      ...nativeProps
+    } = props
+    const controlled =
+      value !== undefined ? readSelection(value, selection, 'value') : undefined
+    const [stored, setStored] = useState(
+      () =>
+        controlled ?? readSelection(defaultValue, selection, 'defaultValue'),
+    )
+    // Preserve the last controlled value when the caller releases ownership.
+    if (controlled && !areContextValuesEqual(controlled, stored))
+      setStored(controlled)
+    else if (selection === 'single' && stored.end !== null)
+      setStored({ start: stored.start ?? stored.end, end: null })
+    const current = controlled ?? stored
+    const selected =
+      selection === 'single'
+        ? { start: current.start ?? current.end, end: null }
+        : current
+    const [initialView] = useState(() =>
+      viewDate !== undefined || defaultViewDate === undefined
+        ? undefined
+        : readDate(defaultViewDate, 'defaultViewDate'),
+    )
+    if (!Array.isArray(disabledDates))
+      throw new RangeError(
+        'Calendar disabledDates must be an array of YYYY-MM-DD strings',
+      )
+    const constraints = {
+      min: min === undefined ? null : readDate(min, 'min'),
+      max: max === undefined ? null : readDate(max, 'max'),
+      disabledDates: Array.from(disabledDates, (date, index) =>
+        readDate(date, `disabledDates[${index}]`),
+      ),
+      excludeDisabledDates,
     }
-
     return (
-      <div ref={ref} {...api.getRootProps()} className={cn('uf-calendar', className)}>
-        <div {...api.getHeaderProps()}>
-          <Button
-            {...api.getPrevMonthProps()}
-            icon={<Icon name="arrow-left" />}
-            iconOnly
-            fullWidth={false}
-            className="uf-calendar-navButton"
-          />
-          <Text
-            {...api.getTitleProps()}
-            as="div"
-            text={api.monthLabel}
-
-            align="center"
-            fullWidth
-            className="uf-calendar-titleText"
-          />
-          <Button
-            {...api.getNextMonthProps()}
-            icon={<Icon name="arrow-right" />}
-            iconOnly
-            fullWidth={false}
-            className="uf-calendar-navButton"
-          />
-        </div>
-
-        <table {...api.getGridProps()}>
-          <thead>
-            <tr>
-              {api.weekdayLabels.map((label, i) => {
-                const firstLetter = Array.from(String(label || '').trim())[0] ?? ''
-                return (
-                  <th key={i} {...api.getWeekdayProps(i)}>
-                    <Text
-                      as="span"
-                      text={firstLetter}
-
-                      inset="none"
-                      className="uf-calendar-weekdayText"
-                    />
-                  </th>
+      <CalendarGrid
+        {...nativeProps}
+        ref={ref}
+        value={selection === 'range' ? selected : selected.start}
+        viewDate={
+          viewDate === undefined
+            ? undefined
+            : readDate(viewDate, 'viewDate').slice(0, 7) + '-01'
+        }
+        defaultViewDate={
+          initialView === undefined
+            ? undefined
+            : initialView.slice(0, 7) + '-01'
+        }
+        min={constraints.min}
+        max={constraints.max}
+        disabledDates={constraints.disabledDates}
+        disabled={disabled}
+        readOnly={readOnly}
+        locale={locale}
+        labels={resolveLabels(defaultCalendarLabels, labels, 'Calendar')}
+        weekStartsOn={weekStartsOn}
+        onViewDateChange={onViewDateChange}
+        className={className}
+        onDateSelect={(date) => {
+          const next =
+            selection === 'range'
+              ? getNextDateRange(selected, date, (range) =>
+                  isDateRangeDisabled(range, constraints),
                 )
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: 6 }, (_, weekIndex) => (
-              <tr key={weekIndex}>
-                {api.days.slice(weekIndex * 7, weekIndex * 7 + 7).map((day) => {
-                  const dayProps = api.getDayProps(day) as any
-                  const normalizedRange = normalizeRangeOrder(rangeValue)
-                  const isRangeStart = selection === 'range' && normalizedRange.start === day.date
-                  const isRangeEnd = selection === 'range' && normalizedRange.end === day.date
-                  const isRangeBetween = selection === 'range' && Boolean(
-                    normalizedRange.start &&
-                    normalizedRange.end &&
-                    day.date > normalizedRange.start &&
-                    day.date < normalizedRange.end,
-                  )
-                  return (
-                    <td key={day.date}>
-                      <Button
-                        {...dayProps}
-                        text={String(day.dayOfMonth)}
-                        fullWidth
-                        className="uf-calendar-dayButton"
-                        data-range-start={isRangeStart || undefined}
-                        data-range-end={isRangeEnd || undefined}
-                        data-range-between={isRangeBetween || undefined}
-                        onClick={(event) => {
-                          dayProps.onClick?.(event)
-                          if (selection === 'range' && !day.isDisabled) handleRangeDateSelect(day.date)
-                        }}
-                      />
-                    </td>
-                  )
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              : { start: date, end: null }
+          if (areContextValuesEqual(selected, next)) return
+          if (value === undefined) setStored(next)
+          if (props.selection === 'range')
+            props.onValueChange?.({ value: next })
+          else props.onValueChange?.({ value: date })
+        }}
+      />
     )
   },
 )

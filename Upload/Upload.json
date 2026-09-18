@@ -42,7 +42,8 @@
     "defaultFiles": {
       "type": "array",
       "required": false,
-      "description": "Initial file list for uncontrolled usage."
+      "description": "Initial file list for uncontrolled usage.",
+      "default": []
     },
     "labels": {
       "type": "object",

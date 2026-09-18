@@ -8,7 +8,27 @@
 
 import { createMachine } from '../create-machine'
 import { createAnatomy } from '../anatomy'
-import type { MachineSchema, MachineSnapshot, SendFn } from '../types'
+import { getTodayISO } from '../date-utils'
+import {
+  defaultCalendarLabels,
+  type CalendarLabels,
+} from '../runtime/date-labels'
+import {
+  CalendarDate,
+  getDayOfWeek as civilWeekday,
+} from '@internationalized/date'
+import { parseCivilDate as parseDate } from '../runtime/civil-date'
+import {
+  createDateFormatter,
+  createDateNumberFormatter,
+  resolveWeekStartsOn,
+} from '../runtime/date-locale'
+import type {
+  MachineSchema,
+  MachineSnapshot,
+  SendFn,
+  EventHandler,
+} from '../types'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -57,12 +77,21 @@ export interface CalendarSchema extends MachineSchema {
     max: string | null
     /** Disabled dates as ISO strings */
     disabledDates: string[]
+    /** Suspend selection and navigation. */
+    disabled: boolean
+    /** Permit browsing while keeping the selected value immutable. */
+    readOnly: boolean
     /** 0=Sunday, 1=Monday, ... 6=Saturday */
-    weekStartsOn: number
+    weekStartsOn: number | null
     /** Locale for month/day names */
     locale: string
+    labels: CalendarLabels
+    /** Zone used for the current-day marker; null uses the browser's zone. */
+    timezone: string | null
     /** Callback when value changes */
     onValueChange: ((details: { value: string }) => void) | null
+    /** User navigation only; external synchronization remains quiet. */
+    onViewDateChange: ((details: { viewDate: string }) => void) | null
   }
   state: 'idle' | 'focused'
   event:
@@ -74,49 +103,37 @@ export interface CalendarSchema extends MachineSchema {
     | { type: 'NEXT_MONTH' }
     | { type: 'PREV_YEAR' }
     | { type: 'NEXT_YEAR' }
-    | { type: 'KEY_DOWN'; key: string }
+    | { type: 'KEY_DOWN'; key: string; shiftKey?: boolean }
 }
 
 // ---------------------------------------------------------------------------
 // Date helpers (ISO string based)
 // ---------------------------------------------------------------------------
 
-function toISODate(year: number, month: number, day: number): string {
-  const y = String(year).padStart(4, '0')
-  const m = String(month + 1).padStart(2, '0')
-  const d = String(day).padStart(2, '0')
-  return `${y}-${m}-${d}`
-}
+const firstSupportedDate = parseDate('0001-01-01')
 
-function parseISO(iso: string): { year: number; month: number; day: number } {
-  const [y, m, d] = iso.split('-').map(Number)
-  return { year: y, month: m - 1, day: d }
-}
-
-function todayISO(): string {
-  const d = new Date()
-  return toISODate(d.getFullYear(), d.getMonth(), d.getDate())
-}
-
-function addMonths(iso: string, count: number): string {
-  const { year, month } = parseISO(iso)
-  const d = new Date(year, month + count, 1)
-  return toISODate(d.getFullYear(), d.getMonth(), 1)
+function addMonths(iso: string, count: number): string | null {
+  const base = parseDate(iso).set({ day: 1 })
+  const next = base.add({ months: count }).set({ day: 1 })
+  // CalendarDate clamps at year 9999; a clamped month is not a navigation step.
+  return next.era === 'AD' &&
+    (next.year - base.year) * 12 + next.month - base.month === count
+    ? next.toString()
+    : null
 }
 
 function addDays(iso: string, count: number): string {
-  const { year, month, day } = parseISO(iso)
-  const d = new Date(year, month, day + count)
-  return toISODate(d.getFullYear(), d.getMonth(), d.getDate())
-}
-
-function getDaysInMonth(year: number, month: number): number {
-  return new Date(year, month + 1, 0).getDate()
+  return parseDate(iso).add({ days: count }).toString()
 }
 
 function getDayOfWeek(iso: string): number {
-  const { year, month, day } = parseISO(iso)
-  return new Date(year, month, day).getDay()
+  return civilWeekday(parseDate(iso), 'en-US', 'sun')
+}
+
+function gridStart(viewDate: string, weekStartsOn: number): CalendarDate {
+  const month = parseDate(viewDate).set({ day: 1 })
+  const leading = (civilWeekday(month, 'en-US', 'sun') - weekStartsOn + 7) % 7
+  return month.subtract({ days: leading })
 }
 
 function isDateDisabled(
@@ -125,6 +142,7 @@ function isDateDisabled(
   max: string | null,
   disabledDates: string[],
 ): boolean {
+  if (iso < '0001-01-01' || iso > '9999-12-31' || iso.length !== 10) return true
   if (min && iso < min) return true
   if (max && iso > max) return true
   return disabledDates.includes(iso)
@@ -138,110 +156,202 @@ function buildDaysGrid(
   max: string | null,
   disabledDates: string[],
   weekStartsOn: number,
+  today: string,
 ): CalendarDay[] {
-  const { year, month } = parseISO(viewDate)
-  const today = todayISO()
-  const daysInMonth = getDaysInMonth(year, month)
-
-  // Day of week of the 1st of the month
-  const firstDayISO = toISODate(year, month, 1)
-  const firstDow = getDayOfWeek(firstDayISO)
-
-  // How many days from previous month to show
-  const leadingDays = (firstDow - weekStartsOn + 7) % 7
-
+  const month = viewDate.slice(0, 7)
+  const first = gridStart(viewDate, weekStartsOn)
   const days: CalendarDay[] = []
-
-  // Previous month days
-  const prevMonth = month === 0 ? 11 : month - 1
-  const prevYear = month === 0 ? year - 1 : year
-  const daysInPrevMonth = getDaysInMonth(prevYear, prevMonth)
-  for (let i = leadingDays - 1; i >= 0; i--) {
-    const d = daysInPrevMonth - i
-    const iso = toISODate(prevYear, prevMonth, d)
+  for (let index = 0; index < 42; index++) {
+    const day = first.add({ days: index })
+    if (day.compare(first) !== index) break
+    if (day.compare(firstSupportedDate) < 0) continue
+    const iso = day.toString()
     days.push({
       date: iso,
-      dayOfMonth: d,
-      isCurrentMonth: false,
+      dayOfMonth: day.day,
+      isCurrentMonth: iso.slice(0, 7) === month,
       isToday: iso === today,
       isSelected: iso === value,
       isDisabled: isDateDisabled(iso, min, max, disabledDates),
       isFocused: iso === focusedDate,
     })
   }
-
-  // Current month days
-  for (let d = 1; d <= daysInMonth; d++) {
-    const iso = toISODate(year, month, d)
-    days.push({
-      date: iso,
-      dayOfMonth: d,
-      isCurrentMonth: true,
-      isToday: iso === today,
-      isSelected: iso === value,
-      isDisabled: isDateDisabled(iso, min, max, disabledDates),
-      isFocused: iso === focusedDate,
-    })
-  }
-
-  // Next month days — fill to 42 total (6 rows x 7 columns)
-  const remaining = 42 - days.length
-  const nextMonth = month === 11 ? 0 : month + 1
-  const nextYear = month === 11 ? year + 1 : year
-  for (let d = 1; d <= remaining; d++) {
-    const iso = toISODate(nextYear, nextMonth, d)
-    days.push({
-      date: iso,
-      dayOfMonth: d,
-      isCurrentMonth: false,
-      isToday: iso === today,
-      isSelected: iso === value,
-      isDisabled: isDateDisabled(iso, min, max, disabledDates),
-      isFocused: iso === focusedDate,
-    })
-  }
-
   return days
 }
 
 function getMonthLabel(viewDate: string, locale: string): string {
-  const { year, month } = parseISO(viewDate)
-  const d = new Date(year, month, 1)
-  try {
-    const monthName = d.toLocaleDateString(locale, { month: 'long' }).trim()
-    return `${monthName} ${year}`
-  } catch {
-    const monthName = d.toLocaleDateString('en-US', { month: 'long' }).trim()
-    return `${monthName} ${year}`
-  }
+  return createDateFormatter(locale, {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(parseDate(viewDate).toDate('UTC'))
 }
 
-function getWeekdayLabels(weekStartsOn: number, locale: string): string[] {
-  const labels: string[] = []
-  // Start from a known Sunday (Jan 4, 1970 is a Sunday)
-  const base = new Date(1970, 0, 4)
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(base)
-    d.setDate(base.getDate() + ((weekStartsOn + i) % 7))
-    try {
-      labels.push(d.toLocaleDateString(locale, { weekday: 'short' }))
-    } catch {
-      labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }))
-    }
-  }
-  return labels
+function formatDayLabel(iso: string, locale: string): string {
+  return createDateFormatter(locale, {
+    dateStyle: 'full',
+    timeZone: 'UTC',
+  }).format(parseDate(iso).toDate('UTC'))
+}
+
+function getWeekdayLabels(
+  weekStartsOn: number,
+  locale: string,
+  weekday: 'narrow' | 'long',
+): string[] {
+  const formatter = createDateFormatter(locale, { weekday, timeZone: 'UTC' })
+  const sunday = new CalendarDate(1970, 1, 4)
+  return Array.from({ length: 7 }, (_, index) =>
+    formatter.format(
+      sunday.add({ days: (weekStartsOn + index) % 7 }).toDate('UTC'),
+    ),
+  )
 }
 
 // ---------------------------------------------------------------------------
 // Machine
 // ---------------------------------------------------------------------------
 
-const initialToday = todayISO()
+function focusedDate(ctx: CalendarSchema['context']): string {
+  if (ctx.focusedDate.slice(0, 7) === ctx.viewDate.slice(0, 7))
+    return ctx.focusedDate
+  const first = gridStart(
+    ctx.viewDate,
+    resolveWeekStartsOn(ctx.locale, ctx.weekStartsOn),
+  )
+  const focused = parseDate(ctx.focusedDate)
+  if (
+    focused.compare(first) >= 0 &&
+    focused.compare(first.add({ days: 41 })) <= 0
+  )
+    return ctx.focusedDate
+  if (ctx.value?.slice(0, 7) === ctx.viewDate.slice(0, 7)) return ctx.value
+  return parseDate(ctx.viewDate).set({ day: focused.day }).toString()
+}
 
+function canNavigate(ctx: CalendarSchema['context'], months: number): boolean {
+  const next = addMonths(ctx.viewDate, months)
+  return (
+    !ctx.disabled &&
+    next !== null &&
+    (months > 0 || !ctx.min || next.slice(0, 7) >= ctx.min.slice(0, 7)) &&
+    (months < 0 || !ctx.max || next.slice(0, 7) <= ctx.max.slice(0, 7))
+  )
+}
+
+function isDateSelectable(
+  ctx: CalendarSchema['context'],
+  date: string,
+): boolean {
+  return (
+    !ctx.disabled &&
+    !ctx.readOnly &&
+    !isDateDisabled(date, ctx.min, ctx.max, ctx.disabledDates)
+  )
+}
+
+function moveMonth(ctx: CalendarSchema['context'], months: number) {
+  if (!canNavigate(ctx, months)) return
+  const day = parseDate(focusedDate(ctx)).day
+  ctx.viewDate = addMonths(ctx.viewDate, months)!
+  ctx.focusedDate = parseDate(ctx.viewDate).set({ day }).toString()
+}
+
+// Mouse navigation and keyboard navigation share the same viewed-month owner.
+const navigation: Partial<
+  Record<CalendarSchema['event']['type'], EventHandler<CalendarSchema>>
+> = {
+  SELECT_DATE: {
+    actions: [
+      (ctx, event) => {
+        if (event.type !== 'SELECT_DATE' || !isDateSelectable(ctx, event.date))
+          return
+        ctx.value = event.date
+        ctx.focusedDate = event.date
+        ctx.viewDate = event.date.slice(0, 7) + '-01'
+      },
+    ],
+  },
+  FOCUS_DATE: {
+    actions: [
+      (ctx, event) => {
+        if (ctx.disabled || event.type !== 'FOCUS_DATE') return
+        // A visible adjacent-month button must stay under the pointer between
+        // pointerdown/focus and click. Selection or arrow navigation changes month.
+        ctx.focusedDate = event.date
+      },
+    ],
+  },
+  PREV_MONTH: { actions: [(ctx) => moveMonth(ctx, -1)] },
+  NEXT_MONTH: { actions: [(ctx) => moveMonth(ctx, 1)] },
+  PREV_YEAR: { actions: [(ctx) => moveMonth(ctx, -12)] },
+  NEXT_YEAR: { actions: [(ctx) => moveMonth(ctx, 12)] },
+  KEY_DOWN: {
+    actions: [
+      (ctx, event) => {
+        if (ctx.disabled || event.type !== 'KEY_DOWN') return
+        const current = focusedDate(ctx)
+        let next = current
+        switch (event.key) {
+          case 'ArrowRight':
+            next = addDays(current, 1)
+            break
+          case 'ArrowLeft':
+            next = addDays(current, -1)
+            break
+          case 'ArrowDown':
+            next = addDays(current, 7)
+            break
+          case 'ArrowUp':
+            next = addDays(current, -7)
+            break
+          case 'Home':
+            next = addDays(
+              current,
+              -(
+                (getDayOfWeek(current) -
+                  resolveWeekStartsOn(ctx.locale, ctx.weekStartsOn) +
+                  7) %
+                7
+              ),
+            )
+            break
+          case 'End':
+            next = addDays(
+              current,
+              6 -
+                ((getDayOfWeek(current) -
+                  resolveWeekStartsOn(ctx.locale, ctx.weekStartsOn) +
+                  7) %
+                  7),
+            )
+            break
+          case 'PageUp':
+            moveMonth(ctx, event.shiftKey ? -12 : -1)
+            return
+          case 'PageDown':
+            moveMonth(ctx, event.shiftKey ? 12 : 1)
+            return
+          case 'Enter':
+          case ' ':
+            if (isDateSelectable(ctx, current)) ctx.value = current
+            return
+          default:
+            return
+        }
+        if (next.length !== 10 || next < '0001-01-01' || next > '9999-12-31')
+          return
+        ctx.focusedDate = next
+        ctx.viewDate = next.slice(0, 7) + '-01'
+      },
+    ],
+  },
+}
+
+const initialToday = getTodayISO()
 export const calendarMachine = createMachine<CalendarSchema>({
   id: 'calendar',
   initial: 'idle',
-
   context: {
     value: null,
     focusedDate: initialToday,
@@ -249,207 +359,67 @@ export const calendarMachine = createMachine<CalendarSchema>({
     min: null,
     max: null,
     disabledDates: [],
-    weekStartsOn: 0,
+    disabled: false,
+    readOnly: false,
+    weekStartsOn: null,
     locale: 'en-US',
+    labels: defaultCalendarLabels,
+    timezone: null,
     onValueChange: null,
+    onViewDateChange: null,
   },
-
   watch: {
     value(ctx) {
-      if (ctx.value) {
-        ctx.onValueChange?.({ value: ctx.value })
-      }
+      if (ctx.value) ctx.onValueChange?.({ value: ctx.value })
+    },
+    viewDate(ctx) {
+      ctx.onViewDateChange?.({ viewDate: ctx.viewDate })
     },
   },
-
   computed: {
     days: (ctx) =>
       buildDaysGrid(
         ctx.viewDate,
         ctx.value,
-        ctx.focusedDate,
+        focusedDate(ctx),
         ctx.min,
         ctx.max,
         ctx.disabledDates,
-        ctx.weekStartsOn,
+        resolveWeekStartsOn(ctx.locale, ctx.weekStartsOn),
+        getTodayISO(ctx.timezone ?? undefined),
       ),
+    leadingEmptyDays: (ctx) =>
+      Math.max(
+        0,
+        firstSupportedDate.compare(
+          gridStart(
+            ctx.viewDate,
+            resolveWeekStartsOn(ctx.locale, ctx.weekStartsOn),
+          ),
+        ),
+      ),
+    focusedDate,
     monthLabel: (ctx) => getMonthLabel(ctx.viewDate, ctx.locale),
-    yearLabel: (ctx) => parseISO(ctx.viewDate).year.toString(),
-    weekdayLabels: (ctx) => getWeekdayLabels(ctx.weekStartsOn, ctx.locale),
+    yearLabel: (ctx) =>
+      createDateNumberFormatter(ctx.locale).format(
+        parseDate(ctx.viewDate).year,
+      ),
+    weekdayLabels: (ctx) =>
+      getWeekdayLabels(
+        resolveWeekStartsOn(ctx.locale, ctx.weekStartsOn),
+        ctx.locale,
+        'narrow',
+      ),
+    weekdayNames: (ctx) =>
+      getWeekdayLabels(
+        resolveWeekStartsOn(ctx.locale, ctx.weekStartsOn),
+        ctx.locale,
+        'long',
+      ),
   },
-
   states: {
-    idle: {
-      on: {
-        FOCUS: {
-          target: 'focused',
-        },
-        SELECT_DATE: {
-          actions: [
-            (ctx, event) => {
-              const e = event as { type: 'SELECT_DATE'; date: string }
-              if (isDateDisabled(e.date, ctx.min, ctx.max, ctx.disabledDates)) return
-              ctx.value = e.date
-              ctx.focusedDate = e.date
-              // Ensure viewDate shows the selected month
-              ctx.viewDate = e.date.slice(0, 7) + '-01'
-            },
-          ],
-        },
-        PREV_MONTH: {
-          actions: [
-            (ctx) => {
-              ctx.viewDate = addMonths(ctx.viewDate, -1)
-            },
-          ],
-        },
-        NEXT_MONTH: {
-          actions: [
-            (ctx) => {
-              ctx.viewDate = addMonths(ctx.viewDate, 1)
-            },
-          ],
-        },
-        PREV_YEAR: {
-          actions: [
-            (ctx) => {
-              ctx.viewDate = addMonths(ctx.viewDate, -12)
-            },
-          ],
-        },
-        NEXT_YEAR: {
-          actions: [
-            (ctx) => {
-              ctx.viewDate = addMonths(ctx.viewDate, 12)
-            },
-          ],
-        },
-      },
-    },
-
-    focused: {
-      on: {
-        BLUR: {
-          target: 'idle',
-        },
-        SELECT_DATE: {
-          actions: [
-            (ctx, event) => {
-              const e = event as { type: 'SELECT_DATE'; date: string }
-              if (isDateDisabled(e.date, ctx.min, ctx.max, ctx.disabledDates)) return
-              ctx.value = e.date
-              ctx.focusedDate = e.date
-              ctx.viewDate = e.date.slice(0, 7) + '-01'
-            },
-          ],
-        },
-        FOCUS_DATE: {
-          actions: [
-            (ctx, event) => {
-              const e = event as { type: 'FOCUS_DATE'; date: string }
-              ctx.focusedDate = e.date
-              // If focused date moves outside current view, update viewDate
-              const focusedMonth = e.date.slice(0, 7) + '-01'
-              if (focusedMonth !== ctx.viewDate) {
-                ctx.viewDate = focusedMonth
-              }
-            },
-          ],
-        },
-        KEY_DOWN: {
-          actions: [
-            (ctx, event) => {
-              const e = event as { type: 'KEY_DOWN'; key: string }
-              let nextDate = ctx.focusedDate
-
-              switch (e.key) {
-                case 'ArrowRight':
-                  nextDate = addDays(ctx.focusedDate, 1)
-                  break
-                case 'ArrowLeft':
-                  nextDate = addDays(ctx.focusedDate, -1)
-                  break
-                case 'ArrowDown':
-                  nextDate = addDays(ctx.focusedDate, 7)
-                  break
-                case 'ArrowUp':
-                  nextDate = addDays(ctx.focusedDate, -7)
-                  break
-                case 'Home': {
-                  // Go to start of week
-                  const dow = getDayOfWeek(ctx.focusedDate)
-                  const diff = (dow - ctx.weekStartsOn + 7) % 7
-                  nextDate = addDays(ctx.focusedDate, -diff)
-                  break
-                }
-                case 'End': {
-                  // Go to end of week
-                  const dow = getDayOfWeek(ctx.focusedDate)
-                  const diff = (6 - ((dow - ctx.weekStartsOn + 7) % 7))
-                  nextDate = addDays(ctx.focusedDate, diff)
-                  break
-                }
-                case 'Enter':
-                case ' ':
-                  if (!isDateDisabled(ctx.focusedDate, ctx.min, ctx.max, ctx.disabledDates)) {
-                    ctx.value = ctx.focusedDate
-                    ctx.viewDate = ctx.focusedDate.slice(0, 7) + '-01'
-                  }
-                  return
-                default:
-                  return
-              }
-
-              ctx.focusedDate = nextDate
-              // Update viewDate if needed
-              const focusedMonth = nextDate.slice(0, 7) + '-01'
-              if (focusedMonth !== ctx.viewDate) {
-                ctx.viewDate = focusedMonth
-              }
-            },
-          ],
-        },
-        PREV_MONTH: {
-          actions: [
-            (ctx) => {
-              ctx.viewDate = addMonths(ctx.viewDate, -1)
-              ctx.focusedDate = addDays(ctx.focusedDate, -getDaysInMonth(
-                parseISO(ctx.viewDate).year,
-                parseISO(ctx.viewDate).month,
-              ))
-            },
-          ],
-        },
-        NEXT_MONTH: {
-          actions: [
-            (ctx) => {
-              const prev = ctx.viewDate
-              ctx.viewDate = addMonths(prev, 1)
-              ctx.focusedDate = addDays(ctx.focusedDate, getDaysInMonth(
-                parseISO(prev).year,
-                parseISO(prev).month,
-              ))
-            },
-          ],
-        },
-        PREV_YEAR: {
-          actions: [
-            (ctx) => {
-              ctx.viewDate = addMonths(ctx.viewDate, -12)
-              ctx.focusedDate = addMonths(ctx.focusedDate.slice(0, 7) + '-' + ctx.focusedDate.slice(8), -12)
-            },
-          ],
-        },
-        NEXT_YEAR: {
-          actions: [
-            (ctx) => {
-              ctx.viewDate = addMonths(ctx.viewDate, 12)
-              ctx.focusedDate = addMonths(ctx.focusedDate.slice(0, 7) + '-' + ctx.focusedDate.slice(8), 12)
-            },
-          ],
-        },
-      },
-    },
+    idle: { on: { ...navigation, FOCUS: { target: 'focused' } } },
+    focused: { on: { ...navigation, BLUR: { target: 'idle' } } },
   },
 })
 
@@ -470,22 +440,31 @@ export function connectCalendar(
   return {
     /** Computed accessors */
     days,
+    leadingEmptyDays: state.computed['leadingEmptyDays'] as number,
     monthLabel,
     weekdayLabels,
     value: ctx.value,
-    focusedDate: ctx.focusedDate,
+    focusedDate: focusedDate(ctx),
     isFocused,
+    isDateSelectable: (date: string) => isDateSelectable(ctx, date),
 
     getRootProps() {
       return {
         ...calendarAnatomy.getPartAttrs('root'),
         role: 'group' as const,
         'aria-label': 'Calendar',
+        'aria-disabled': ctx.disabled || undefined,
+        'data-disabled': ctx.disabled || undefined,
+        'data-readonly': ctx.readOnly || undefined,
         onFocus() {
-          if (!isFocused) send({ type: 'FOCUS' })
+          send({ type: 'FOCUS' })
         },
-        onBlur() {
-          send({ type: 'BLUR' })
+        onBlur(event: {
+          currentTarget: HTMLElement
+          relatedTarget: EventTarget | null
+        }) {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null))
+            send({ type: 'BLUR' })
         },
       }
     },
@@ -500,8 +479,10 @@ export function connectCalendar(
       return {
         ...calendarAnatomy.getPartAttrs('prevButton'),
         type: 'button' as const,
-        'aria-label': 'Previous month',
-        onClick() {
+        'aria-label': ctx.labels.previousMonth,
+        disabled: !canNavigate(ctx, -1),
+        onClick(event?: { defaultPrevented?: boolean }) {
+          if (event?.defaultPrevented) return
           send({ type: 'PREV_MONTH' })
         },
       }
@@ -511,8 +492,10 @@ export function connectCalendar(
       return {
         ...calendarAnatomy.getPartAttrs('nextButton'),
         type: 'button' as const,
-        'aria-label': 'Next month',
-        onClick() {
+        'aria-label': ctx.labels.nextMonth,
+        disabled: !canNavigate(ctx, 1),
+        onClick(event?: { defaultPrevented?: boolean }) {
+          if (event?.defaultPrevented) return
           send({ type: 'NEXT_MONTH' })
         },
       }
@@ -530,14 +513,51 @@ export function connectCalendar(
         ...calendarAnatomy.getPartAttrs('grid'),
         role: 'grid' as const,
         'aria-label': monthLabel,
-        onKeyDown(event: { key: string; preventDefault: () => void }) {
+        'aria-readonly': ctx.readOnly || undefined,
+        onKeyDown(event: {
+          key: string
+          shiftKey?: boolean
+          altKey?: boolean
+          ctrlKey?: boolean
+          metaKey?: boolean
+          defaultPrevented?: boolean
+          nativeEvent?: { isComposing?: boolean }
+          currentTarget?: HTMLElement
+          preventDefault: () => void
+        }) {
+          if (
+            ctx.disabled ||
+            event.defaultPrevented ||
+            event.altKey ||
+            event.ctrlKey ||
+            event.metaKey ||
+            event.nativeEvent?.isComposing
+          )
+            return
           const handledKeys = [
-            'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
-            'Home', 'End', 'Enter', ' ',
+            'ArrowLeft',
+            'ArrowRight',
+            'ArrowUp',
+            'ArrowDown',
+            'Home',
+            'End',
+            'Enter',
+            ' ',
+            'PageUp',
+            'PageDown',
           ]
           if (handledKeys.includes(event.key)) {
             event.preventDefault()
-            send({ type: 'KEY_DOWN', key: event.key })
+            const rtl =
+              event.currentTarget &&
+              getComputedStyle(event.currentTarget).direction === 'rtl'
+            const key =
+              rtl && event.key === 'ArrowLeft'
+                ? 'ArrowRight'
+                : rtl && event.key === 'ArrowRight'
+                  ? 'ArrowLeft'
+                  : event.key
+            send({ type: 'KEY_DOWN', key, shiftKey: event.shiftKey })
           }
         },
       }
@@ -546,7 +566,7 @@ export function connectCalendar(
     getWeekdayProps(index: number) {
       return {
         ...calendarAnatomy.getPartAttrs('weekday'),
-        'aria-label': weekdayLabels[index],
+        'aria-label': (state.computed['weekdayNames'] as string[])[index],
         role: 'columnheader' as const,
       }
     },
@@ -554,18 +574,27 @@ export function connectCalendar(
     getDayProps(day: CalendarDay) {
       return {
         ...calendarAnatomy.getPartAttrs('day'),
-        role: 'gridcell' as const,
-        tabIndex: day.isFocused ? 0 : -1,
-        'aria-selected': day.isSelected || undefined,
-        'aria-disabled': day.isDisabled || undefined,
+        type: 'button' as const,
+        'aria-label': formatDayLabel(day.date, ctx.locale),
+
+        tabIndex: !ctx.disabled && day.isFocused ? 0 : -1,
+        disabled: ctx.disabled,
+
+        'aria-disabled':
+          ctx.disabled || ctx.readOnly || day.isDisabled || undefined,
+        'aria-current': day.isToday ? ('date' as const) : undefined,
         'data-selected': day.isSelected || undefined,
         'data-today': day.isToday || undefined,
         'data-disabled': day.isDisabled || undefined,
         'data-outside': !day.isCurrentMonth || undefined,
         'data-focused': day.isFocused || undefined,
         'data-date': day.date,
-        onClick() {
-          if (!day.isDisabled) {
+        onClick(event?: { defaultPrevented?: boolean }) {
+          if (
+            !event?.defaultPrevented &&
+            !day.isDisabled &&
+            isDateSelectable(ctx, day.date)
+          ) {
             send({ type: 'SELECT_DATE', date: day.date })
           }
         },

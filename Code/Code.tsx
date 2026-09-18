@@ -7,7 +7,13 @@
  * `<Code code={snippet} title="example.ts" defaultCollapsed />`
  */
 
-import { forwardRef, useState, useCallback, useMemo, type CSSProperties } from 'react'
+import {
+  forwardRef,
+  useState,
+  useCallback,
+  useMemo,
+  type CSSProperties,
+} from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
@@ -89,13 +95,18 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
     } = props
 
     const tokenizedText = useMemo(
-      () => tokenLines?.map((line) => line.map((token) => token.content).join('')).join('\n'),
+      () =>
+        tokenLines
+          ?.map((line) => line.map((token) => token.content).join(''))
+          .join('\n'),
       [tokenLines],
     )
     const sourceText = code != null ? code : (tokenizedText ?? '')
     const lines = useMemo(() => sourceText.split('\n'), [sourceText])
     const canToggle = lines.length > 8 || sourceText.length > 240
-    const [collapsed, setCollapsed] = useState(Boolean(defaultCollapsed) && canToggle)
+    const [collapsed, setCollapsed] = useState(
+      Boolean(defaultCollapsed) && canToggle,
+    )
 
     const highlightSet = useMemo(
       () => new Set(Array.isArray(highlight) ? highlight : []),
@@ -104,42 +115,6 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
 
     const hasTitle = title != null
     const hasHeader = hasTitle || canToggle
-
-    const onCopy = useCallback(async () => {
-      const text = sourceText
-      const canUseNavigatorClipboard =
-        typeof window !== 'undefined' &&
-        typeof navigator !== 'undefined' &&
-        typeof navigator.clipboard?.writeText === 'function' &&
-        window.isSecureContext &&
-        window.top === window.self
-
-      if (canUseNavigatorClipboard) {
-        try {
-          await navigator.clipboard.writeText(text)
-          return
-        } catch {
-          // fall through to legacy copy path
-        }
-      }
-
-      if (typeof document === 'undefined') return
-
-      try {
-        const el = document.createElement('textarea')
-        el.value = text
-        el.setAttribute('readonly', 'true')
-        el.style.position = 'fixed'
-        el.style.left = '-9999em'
-        el.style.opacity = '0'
-        document.body.appendChild(el)
-        el.select()
-        document.execCommand('copy')
-        document.body.removeChild(el)
-      } catch {
-        // ignore
-      }
-    }, [sourceText])
 
     const onToggle = useCallback(() => setCollapsed((v) => !v), [])
 
@@ -174,7 +149,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(
                 className="uf-code-action"
                 aria-label="Copy code"
                 title="Copy"
-                onClick={onCopy}
+                copyText={sourceText}
               />
               {canToggle && (
                 <Button

@@ -16,11 +16,11 @@
       "membrane": {
         "$ref": "props.membrane"
       },
-      "allowNavigation": {
-        "$ref": "props.allowNavigation"
+      "maxItems": {
+        "$ref": "props.maxItems"
       },
-      "collapseAfter": {
-        "$ref": "props.collapseAfter"
+      "overflowLabel": {
+        "$ref": "props.overflowLabel"
       }
     },
     "children": []
@@ -29,8 +29,7 @@
     "props": {
       "separator": "/",
       "membrane": true,
-      "collapseAfter": 5,
-      "allowNavigation": true,
+      "maxItems": 5,
       "items": [
         {
           "label": "Cart",
@@ -55,35 +54,34 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Breadcrumb entries, from root to current page."
+      "description": "Ordered locations from root to current; the last item is current."
     },
     {
       "name": "separator",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Custom separator between items. Defaults to \"/\".",
+      "description": "Decorative separator. '/' uses the slash icon; empty content removes the separator.",
       "defaultValue": "/"
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Wrap breadcrumb options (link/current) with membrane spacing.",
+      "description": "Membrane spacing around inline items and the overflow trigger.",
       "defaultValue": true
     },
     {
-      "name": "allowNavigation",
-      "type": "boolean",
-      "required": false,
-      "description": "Allow real browser navigation on link click. Defaults to false for sandbox/demo safety.",
-      "defaultValue": false
-    },
-    {
-      "name": "collapseAfter",
+      "name": "maxItems",
       "type": "number",
       "required": false,
-      "description": "Collapse middle crumbs after this many visible entries.",
+      "description": "Maximum visible positions, including overflow: integer >=3; null shows all. Defaults to 4.",
       "defaultValue": 4
+    },
+    {
+      "name": "overflowLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name of the overflow button and its list dialog. Empty text uses the default."
     }
   ],
   "meta": {

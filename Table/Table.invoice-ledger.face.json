@@ -49,6 +49,9 @@
       "membrane": {
         "$ref": "props.membrane"
       },
+      "rowStyle": {
+        "$ref": "props.rowStyle"
+      },
       "ariaLabel": {
         "$ref": "props.ariaLabel"
       }
@@ -144,7 +147,8 @@
       "name": "selectedRows",
       "type": "array",
       "required": false,
-      "description": "Controlled selected row IDs."
+      "description": "Controlled selected row IDs.",
+      "defaultValue": []
     },
     {
       "name": "selectable",
@@ -198,8 +202,19 @@
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Enable membrane (tile-like) row styles: rounded corners, hover bg, padding.",
+      "description": "Outer spacing boundary, consistent with other Face UI components.",
       "defaultValue": false
+    },
+    {
+      "name": "rowStyle",
+      "type": "select",
+      "required": false,
+      "description": "Plain table rows or separated rows with rounded hover surfaces.",
+      "options": [
+        "plain",
+        "tile"
+      ],
+      "defaultValue": "plain"
     },
     {
       "name": "ariaLabel",

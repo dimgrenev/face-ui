@@ -1,5 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createMachine, interpret, and, or, not, areContextValuesEqual } from '../create-machine'
+import {
+  createMachine,
+  interpret,
+  and,
+  or,
+  not,
+  areContextValuesEqual,
+} from '../create-machine'
 import type { MachineSchema } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -49,8 +56,12 @@ const testMachine = createMachine<TestSchema>({
   },
   implementations: {
     actions: {
-      increment: (ctx) => { ctx.count++ },
-      setValue: (ctx, e) => { ctx.count = (e as { type: 'SET'; value: number }).value },
+      increment: (ctx) => {
+        ctx.count++
+      },
+      setValue: (ctx, e) => {
+        ctx.count = (e as { type: 'SET'; value: number }).value
+      },
       onEnterActive: () => {},
       onExitActive: () => {},
     },
@@ -69,6 +80,17 @@ describe('createMachine', () => {
 })
 
 describe('interpret', () => {
+  it('keeps previously published snapshots stable after a transition', () => {
+    const svc = interpret(testMachine).start()
+    const previous = svc.getSnapshot()
+    svc.send('INCREMENT')
+    svc.send('ACTIVATE')
+    expect(previous.context.count).toBe(0)
+    expect(previous.matches('idle')).toBe(true)
+    expect(previous.hasTag('active')).toBe(false)
+    svc.stop()
+  })
+
   it('starts in initial state', () => {
     const svc = interpret(testMachine).start()
     const snap = svc.getSnapshot()
@@ -190,7 +212,10 @@ describe('interpret', () => {
 
   it('does not notify when syncContext receives structurally equal values', () => {
     interface EqualSchema extends MachineSchema {
-      context: { items: string[]; range: { start: string | null; end: string | null } }
+      context: {
+        items: string[]
+        range: { start: string | null; end: string | null }
+      }
       state: 'idle'
       event: { type: 'NOOP' }
     }
@@ -218,7 +243,10 @@ describe('interpret', () => {
 
     expect(listener).not.toHaveBeenCalled()
     expect(svc.getSnapshot().context.items).toEqual(['a', 'b'])
-    expect(svc.getSnapshot().context.range).toEqual({ start: '2026-03-06', end: null })
+    expect(svc.getSnapshot().context.range).toEqual({
+      start: '2026-03-06',
+      end: null,
+    })
     svc.stop()
   })
 
@@ -256,8 +284,15 @@ describe('interpret', () => {
 
 describe('areContextValuesEqual', () => {
   it('matches arrays and plain objects structurally', () => {
-    expect(areContextValuesEqual(['a', { value: 1 }], ['a', { value: 1 }])).toBe(true)
-    expect(areContextValuesEqual({ start: null, end: 'x' }, { start: null, end: 'x' })).toBe(true)
+    expect(
+      areContextValuesEqual(['a', { value: 1 }], ['a', { value: 1 }]),
+    ).toBe(true)
+    expect(
+      areContextValuesEqual(
+        { start: null, end: 'x' },
+        { start: null, end: 'x' },
+      ),
+    ).toBe(true)
     expect(areContextValuesEqual(['a'], ['b'])).toBe(false)
     expect(areContextValuesEqual({ start: null }, { start: 'x' })).toBe(false)
   })
@@ -285,7 +320,9 @@ describe('effects', () => {
       },
       implementations: {
         actions: {
-          tick: (ctx) => { ctx.value++ },
+          tick: (ctx) => {
+            ctx.value++
+          },
         },
         effects: {
           timer: (_ctx, send) => {
@@ -313,31 +350,75 @@ describe('guard combinators', () => {
 
   it('and() combines guards', () => {
     type Ctx = { disabled: boolean; count: number }
-    const combined = and<{ context: Ctx; state: string; event: { type: string } }>(
-      isEnabled as (ctx: Ctx) => boolean,
-      hasValue as (ctx: Ctx) => boolean,
+    const combined = and<{
+      context: Ctx
+      state: string
+      event: { type: string }
+    }>(isEnabled as (ctx: Ctx) => boolean, hasValue as (ctx: Ctx) => boolean)
+    expect(combined({ disabled: false, count: 5 } as Ctx, { type: 'X' })).toBe(
+      true,
     )
-    expect(combined({ disabled: false, count: 5 } as Ctx, { type: 'X' })).toBe(true)
-    expect(combined({ disabled: true, count: 5 } as Ctx, { type: 'X' })).toBe(false)
-    expect(combined({ disabled: false, count: 0 } as Ctx, { type: 'X' })).toBe(false)
+    expect(combined({ disabled: true, count: 5 } as Ctx, { type: 'X' })).toBe(
+      false,
+    )
+    expect(combined({ disabled: false, count: 0 } as Ctx, { type: 'X' })).toBe(
+      false,
+    )
   })
 
   it('or() combines guards', () => {
     type Ctx = { disabled: boolean; count: number }
-    const combined = or<{ context: Ctx; state: string; event: { type: string } }>(
-      isEnabled as (ctx: Ctx) => boolean,
-      hasValue as (ctx: Ctx) => boolean,
+    const combined = or<{
+      context: Ctx
+      state: string
+      event: { type: string }
+    }>(isEnabled as (ctx: Ctx) => boolean, hasValue as (ctx: Ctx) => boolean)
+    expect(combined({ disabled: true, count: 5 } as Ctx, { type: 'X' })).toBe(
+      true,
     )
-    expect(combined({ disabled: true, count: 5 } as Ctx, { type: 'X' })).toBe(true)
-    expect(combined({ disabled: true, count: 0 } as Ctx, { type: 'X' })).toBe(false)
+    expect(combined({ disabled: true, count: 0 } as Ctx, { type: 'X' })).toBe(
+      false,
+    )
   })
 
   it('not() inverts guard', () => {
     type Ctx = { disabled: boolean }
-    const notDisabled = not<{ context: Ctx; state: string; event: { type: string } }>(
-      (ctx: Ctx) => ctx.disabled,
-    )
+    const notDisabled = not<{
+      context: Ctx
+      state: string
+      event: { type: string }
+    }>((ctx: Ctx) => ctx.disabled)
     expect(notDisabled({ disabled: false } as Ctx, { type: 'X' })).toBe(true)
     expect(notDisabled({ disabled: true } as Ctx, { type: 'X' })).toBe(false)
   })
+})
+
+it('serializes events sent by effects and owns every cleanup exactly once', () => {
+  const cleanupStart = vi.fn()
+  const cleanupActive = vi.fn()
+  const machine = createMachine<TestSchema>({
+    id: 'synchronous-effects',
+    initial: 'idle',
+    context: { count: 0, disabled: false },
+    states: {
+      idle: { effects: ['start'], on: { ACTIVATE: { target: 'active' } } },
+      active: { effects: ['active'] },
+    },
+    implementations: {
+      effects: {
+        start: (_ctx, send) => {
+          send('ACTIVATE')
+          return cleanupStart
+        },
+        active: () => cleanupActive,
+      },
+    },
+  })
+  const service = interpret(machine).start()
+  expect(service.getSnapshot().value).toBe('active')
+  expect(cleanupStart).toHaveBeenCalledTimes(1)
+  expect(cleanupActive).not.toHaveBeenCalled()
+  service.stop()
+  expect(cleanupStart).toHaveBeenCalledTimes(1)
+  expect(cleanupActive).toHaveBeenCalledTimes(1)
 })

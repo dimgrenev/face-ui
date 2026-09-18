@@ -2,30 +2,45 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Progress",
-  "description": "Loading progress indicator bar or circular ring",
+  "description": "Task completion with known or unknown duration, as a linear bar or circular ring",
   "props": {
     "value": {
       "type": "number",
       "required": false,
-      "description": "Current value. Values outside 0..max are clamped for rendering and accessibility.",
+      "description": "Finite amount completed; values outside 0..max are bounded. Defaults to 0.",
       "default": 0
     },
     "max": {
       "type": "number",
       "required": false,
-      "description": "Maximum value (default 100).",
+      "description": "Finite positive total amount of work. Defaults to 100.",
       "default": 100
     },
     "indeterminate": {
       "type": "boolean",
       "required": false,
-      "description": "Renders an unknown-duration progress state without exposing aria-valuenow.",
+      "description": "Unknown duration: omit aria-valuenow and numeric text. Defaults to false.",
       "default": false
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name when no visible label is present, or an explicit name override."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "IDs of external naming elements; takes precedence over label and aria-label."
+    },
+    "aria-valuetext": {
+      "type": "string",
+      "required": false,
+      "description": "Speech-only value description; formatValue controls visible text as well."
     },
     "tone": {
       "type": "enum",
       "required": false,
-      "description": "Semantic feedback tone.",
+      "description": "Semantic feedback color, independent of the numeric value. Defaults to neutral.",
       "options": [
         "neutral",
         "positive",
@@ -37,7 +52,7 @@
     "shape": {
       "type": "enum",
       "required": false,
-      "description": "Visual progress shape.",
+      "description": "Linear bar or circular ring; both display the same exact fraction. Defaults to linear.",
       "options": [
         "linear",
         "circle"
@@ -47,18 +62,19 @@
     "showValue": {
       "type": "boolean",
       "required": false,
-      "description": "Show the computed percentage in the header or beside a circular ring.",
+      "description": "Show formatted value text. Unknown task progress never displays a numeric value.",
       "default": false
     },
     "label": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Optional label rendered in the header for linear progress or beside the ring for circular progress."
+      "description": "Noninteractive visible label. Name an unlabelled indicator with native aria-label or aria-labelledby."
     },
-    "ariaLabel": {
-      "type": "string",
+    "membrane": {
+      "type": "boolean",
       "required": false,
-      "description": "Accessible label for the progressbar when no visible label is rendered."
+      "description": "Membrane spacing around the complete indicator. Defaults to true.",
+      "default": true
     }
   },
   "states": [
@@ -70,7 +86,7 @@
         "tone": "neutral",
         "shape": "linear",
         "showValue": true,
-        "label": "Typography"
+        "label": "Uploading assets"
       }
     },
     {
@@ -96,7 +112,7 @@
         "value": 82,
         "tone": "warning",
         "showValue": true,
-        "label": "Storage used"
+        "label": "Upload paused"
       }
     },
     {
@@ -105,7 +121,7 @@
         "value": 96,
         "tone": "destructive",
         "showValue": true,
-        "label": "Quota used"
+        "label": "Upload failed"
       }
     },
     {
@@ -114,7 +130,7 @@
         "value": 28,
         "shape": "circle",
         "showValue": true,
-        "ariaLabel": "Context progress"
+        "aria-label": "Import progress"
       }
     },
     {
@@ -130,10 +146,10 @@
   "aria": {
     "role": "progressbar",
     "required": [
-      "aria-valuenow",
-      "aria-valuemin",
-      "aria-valuemax",
       "aria-label or aria-labelledby"
+    ],
+    "notes": [
+      "Known progress exposes aria-valuenow/min/max. Unknown progress omits aria-valuenow."
     ]
   },
   "composition": {
@@ -165,15 +181,13 @@
   },
   "tokenMapping": {
     "component": [
-      "--uf-progress-track-height",
-      "--uf-progress-track-inset-inline",
-      "--uf-progress-label-min-width",
-      "--uf-progress-circle-size",
-      "--uf-progress-track-bg",
-      "--uf-progress-indicator-bg",
-      "--uf-progress-indicator-positive-bg",
-      "--uf-progress-indicator-warning-bg",
-      "--uf-progress-indicator-destructive-bg"
+      "--uf-range-track-height",
+      "--uf-range-circle-size",
+      "--uf-range-track-bg",
+      "--uf-range-indicator-bg",
+      "--uf-range-indicator-positive-bg",
+      "--uf-range-indicator-warning-bg",
+      "--uf-range-indicator-destructive-bg"
     ],
     "semanticFallbacks": [
       "--uf-membrane",
@@ -195,10 +209,9 @@
       "--uf-motion-ease-in-out"
     ],
     "notes": [
-      "Progress labels render through Text.",
-      "Linear progress uses a label/value header plus a one-membrane track inset to the same horizontal rhythm as Input and Select labels.",
-      "Circular progress maps the same percent into --uf-progress-percent for a conic-gradient ring.",
-      "Determinate width/ring fill and indeterminate animation remain behavior/data outputs, with motion driven by shared Face UI motion tokens."
+      "Progress and Meter share one presentation and the canonical Membrane.",
+      "Both shapes use the exact bounded fraction through --uf-range-percent.",
+      "Use formatValue for localized units and native aria-valuetext for a speech-only override."
     ]
   },
   "platform": {},
@@ -210,11 +223,13 @@
     ],
     "whenNotToUse": [
       "Content-shaped loading placeholders (use Skeleton)",
-      "Step-by-step wizard (use Steps)"
+      "Step-by-step wizard (use Steps)",
+      "Known measurements such as quota, storage or context usage (use Meter)"
     ],
     "alternatives": [
       "Skeleton",
-      "Steps"
+      "Steps",
+      "Meter"
     ],
     "context": "both"
   }

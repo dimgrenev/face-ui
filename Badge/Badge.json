@@ -7,7 +7,7 @@
     "text": {
       "type": "string",
       "required": false,
-      "description": "Badge text content"
+      "description": "Plain status text. Rich children take precedence when provided."
     },
     "appearance": {
       "type": "enum",
@@ -33,9 +33,9 @@
       "default": "neutral"
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Custom children content (overrides text)"
+      "description": "Custom inline content, including a status icon or formatted count."
     }
   },
   "states": [

@@ -7,14 +7,11 @@
   "root": {
     "type": "Calendar",
     "props": {
-      "value": {
-        "$ref": "props.value"
+      "viewDate": {
+        "$ref": "props.viewDate"
       },
-      "defaultValue": {
-        "$ref": "props.defaultValue"
-      },
-      "selection": {
-        "$ref": "props.selection"
+      "defaultViewDate": {
+        "$ref": "props.defaultViewDate"
       },
       "min": {
         "$ref": "props.min"
@@ -25,11 +22,41 @@
       "disabledDates": {
         "$ref": "props.disabledDates"
       },
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "readOnly": {
+        "$ref": "props.readOnly"
+      },
       "locale": {
         "$ref": "props.locale"
       },
+      "labels": {
+        "$ref": "props.labels"
+      },
       "weekStartsOn": {
         "$ref": "props.weekStartsOn"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "aria-describedby": {
+        "$ref": "props.aria-describedby"
+      },
+      "selection": {
+        "$ref": "props.selection"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "excludeDisabledDates": {
+        "$ref": "props.excludeDisabledDates"
       }
     },
     "children": []
@@ -48,16 +75,95 @@
   },
   "controls": [
     {
-      "name": "value",
-      "type": "object",
+      "name": "viewDate",
+      "type": "string",
       "required": false,
-      "description": "Selected date."
+      "description": "Displayed month as YYYY-MM-DD, independently of selection."
     },
     {
-      "name": "defaultValue",
+      "name": "defaultViewDate",
+      "type": "string",
+      "required": false,
+      "description": "Initial displayed month as YYYY-MM-DD; read only on initialization."
+    },
+    {
+      "name": "min",
+      "type": "string",
+      "required": false,
+      "description": "Earliest selectable civil date, inclusive, as YYYY-MM-DD."
+    },
+    {
+      "name": "max",
+      "type": "string",
+      "required": false,
+      "description": "Latest selectable civil date, inclusive, as YYYY-MM-DD."
+    },
+    {
+      "name": "disabledDates",
+      "type": "array",
+      "required": false,
+      "description": "Unavailable civil dates as YYYY-MM-DD strings.",
+      "defaultValue": []
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "Disable date selection and month navigation; remove internal controls from Tab.",
+      "defaultValue": false
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "description": "Prevent user selection while keeping focus and month navigation available.",
+      "defaultValue": false
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "required": false,
+      "description": "Date formatting language, numbering system and default first weekday; dates stay Gregorian.",
+      "defaultValue": "en-US"
+    },
+    {
+      "name": "labels",
       "type": "object",
       "required": false,
-      "description": "Default selected date (uncontrolled)."
+      "description": "Internal navigation labels; use aria-label/aria-labelledby to name the calendar group."
+    },
+    {
+      "name": "weekStartsOn",
+      "type": "select",
+      "required": false,
+      "description": "Override the locale's first weekday: 0=Sunday through 6=Saturday.",
+      "options": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name of the calendar group; the inner grid is named by its displayed month."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "External label IDs for the calendar group; takes precedence over aria-label."
+    },
+    {
+      "name": "aria-describedby",
+      "type": "string",
+      "required": false,
+      "description": "External description IDs for the calendar group."
     },
     {
       "name": "selection",
@@ -71,45 +177,23 @@
       "defaultValue": "single"
     },
     {
-      "name": "min",
+      "name": "value",
       "type": "object",
       "required": false,
-      "description": "Minimum selectable date."
+      "description": "Selected civil day or range; dates use YYYY-MM-DD and null clears the controlled value."
     },
     {
-      "name": "max",
+      "name": "defaultValue",
       "type": "object",
       "required": false,
-      "description": "Maximum selectable date."
+      "description": "Initial uncontrolled civil day or range; dates use YYYY-MM-DD."
     },
     {
-      "name": "disabledDates",
-      "type": "array",
+      "name": "excludeDisabledDates",
+      "type": "boolean",
       "required": false,
-      "description": "Array of dates that cannot be selected."
-    },
-    {
-      "name": "locale",
-      "type": "string",
-      "required": false,
-      "description": "Locale for month and weekday names.",
-      "defaultValue": "en-US"
-    },
-    {
-      "name": "weekStartsOn",
-      "type": "select",
-      "required": false,
-      "description": "First day of the week: 0=Sunday, 1=Monday, etc.",
-      "options": [
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6"
-      ],
-      "defaultValue": 0
+      "description": "Exclude unavailable days from the whole range; false constrains only its endpoints.",
+      "defaultValue": true
     }
   ],
   "meta": {

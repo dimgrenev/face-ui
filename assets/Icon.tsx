@@ -4,10 +4,11 @@ export interface IconProps {
   /** Built-in Face UI icon name. Unknown names render the notdef glyph. */
   name: IconName | string;
   className?: string;
-  style?: React.CSSProperties;
+  /** Paint/transform styles. The design-system box is fixed at 20px; width/height are not configurable. */
+  style?: Omit<React.CSSProperties, 'width' | 'height'>;
   /** Accessible label. If omitted, icon is decorative. */
   label?: string;
-  /** Optional title element for inline SVG. */
+  /** SVG title: native pointer hint and accessible name when label is absent. */
   title?: string;
 }
 
@@ -757,7 +758,7 @@ const BUILTIN_ICON_FALLBACK: IconName = 'notdef';
 
 function resolveBuiltinIconName(requestedName: string | undefined): IconName | undefined {
   if (!requestedName) return undefined;
-  return (icons as Record<string, React.ReactNode>)[requestedName]
+  return Object.prototype.hasOwnProperty.call(icons, requestedName)
     ? requestedName as IconName
     : BUILTIN_ICON_FALLBACK;
 }
@@ -776,53 +777,35 @@ export const Icon: React.FC<IconProps> = ({
   const requestedName = typeof name === 'string' && name.trim().length > 0 ? name.trim() : undefined;
   const builtinName = resolveBuiltinIconName(requestedName);
 
-  const builtinEntry = builtinName
-    ? {
-        content: (icons as Record<string, React.ReactNode>)[builtinName],
-        viewBox: (ICON_VIEWBOX as Record<string, string>)[builtinName] || '0 0 20 20',
-        nativeSize: FACE_UI_ICON_SIZE,
-        nativeWidth: FACE_UI_ICON_SIZE,
-        nativeHeight: FACE_UI_ICON_SIZE,
-      }
-    : null;
-
-  const iconEntry = builtinEntry;
-  const resolvedWidth = FACE_UI_ICON_SIZE;
-  const resolvedHeight = FACE_UI_ICON_SIZE;
+  if (!builtinName) return null;
 
   const mergedStyle: React.CSSProperties = {
     ...style,
-    width: resolvedWidth,
-    height: resolvedHeight,
+    width: FACE_UI_ICON_SIZE,
+    height: FACE_UI_ICON_SIZE,
   };
 
   const mergedClassName = ['uf-icon', className].filter(Boolean).join(' ');
-  const ariaProps = label
-    ? { role: 'img' as const, 'aria-label': label }
+  const accessibleLabel = label?.trim() || undefined;
+  const accessibleTitle = title?.trim() || undefined;
+  const ariaProps = accessibleLabel || accessibleTitle
+    ? { role: 'img' as const, 'aria-label': accessibleLabel }
     : { 'aria-hidden': true as const };
-
-  const iconContent = iconEntry?.content ?? null;
-  const viewBox = iconEntry?.viewBox || builtinEntry?.viewBox || '0 0 20 20';
-
-  if (!iconContent) {
-    if (requestedName) console.warn(`Icon "${requestedName}" not found`);
-    return null;
-  }
 
   return (
     <svg
       className={mergedClassName}
-      width={resolvedWidth}
-      height={resolvedHeight}
-      viewBox={viewBox}
+      width={FACE_UI_ICON_SIZE}
+      height={FACE_UI_ICON_SIZE}
+      viewBox={ICON_VIEWBOX[builtinName] || '0 0 20 20'}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       style={mergedStyle}
-      data-icon={requestedName || builtinName || 'notdef'}
+      data-icon={requestedName}
       {...ariaProps}
     >
-      {title ? <title>{title}</title> : null}
-      {iconContent}
+      {accessibleTitle ? <title>{accessibleTitle}</title> : null}
+      {icons[builtinName]}
     </svg>
   );
 };

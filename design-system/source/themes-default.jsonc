@@ -98,7 +98,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "2px"
+          "value": "12px"
         }
       ]
     },
@@ -158,7 +158,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "12px"
+          "value": "2px"
         }
       ]
     },
@@ -184,7 +184,7 @@
     },
     {
       "sheet": "themes",
-      "name": "--uf-control-pad-left",
+      "name": "--uf-control-pad-start",
       "variants": [
         {
           "selector": ":root",
@@ -194,7 +194,7 @@
     },
     {
       "sheet": "themes",
-      "name": "--uf-control-pad-right",
+      "name": "--uf-control-pad-end",
       "variants": [
         {
           "selector": ":root",
@@ -267,7 +267,7 @@
       "name": "--uf-workspace-resize-line-color",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-color-border)"
         }
       ]
@@ -277,7 +277,7 @@
       "name": "--uf-workspace-resize-line-active-color",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-color-border-hover)"
         }
       ]

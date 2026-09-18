@@ -347,7 +347,7 @@
       "name": "--uf-text-color",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-color-foreground)"
         }
       ]
@@ -368,7 +368,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "var(--uf-control-font-size)"
+          "value": "initial"
         }
       ]
     },
@@ -378,7 +378,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "var(--uf-font-weight)"
+          "value": "initial"
         }
       ]
     },
@@ -388,7 +388,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "var(--uf-control-line-height)"
+          "value": "initial"
         }
       ]
     },
@@ -538,7 +538,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "var(--uf-font-size)"
+          "value": "initial"
         }
       ]
     },

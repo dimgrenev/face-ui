@@ -92,7 +92,9 @@ function filterItems(items: CommandItemDef[], query: string): CommandItemDef[] {
   const lowerQuery = query.toLowerCase()
   return items.filter((item) => {
     const labelMatch = item.label.toLowerCase().includes(lowerQuery)
-    const keywordMatch = item.keywords?.some((kw) => kw.toLowerCase().includes(lowerQuery)) ?? false
+    const keywordMatch =
+      item.keywords?.some((kw) => kw.toLowerCase().includes(lowerQuery)) ??
+      false
     return labelMatch || keywordMatch
   })
 }
@@ -125,14 +127,23 @@ const highlightNext = (ctx: CommandContext): void => {
 
   // Find next enabled item
   let nextIndex = ctx.highlightedIndex + 1
-  while (nextIndex < ctx.filteredItems.length && ctx.filteredItems[nextIndex].disabled) {
+  while (
+    nextIndex < ctx.filteredItems.length &&
+    ctx.filteredItems[nextIndex].disabled
+  ) {
     nextIndex++
   }
   ctx.highlightedIndex = clampIndex(nextIndex, ctx.filteredItems.length)
 
   // If we landed on a disabled item, skip forward
-  while (ctx.highlightedIndex >= 0 && ctx.filteredItems[ctx.highlightedIndex]?.disabled) {
-    ctx.highlightedIndex = clampIndex(ctx.highlightedIndex + 1, ctx.filteredItems.length)
+  while (
+    ctx.highlightedIndex >= 0 &&
+    ctx.filteredItems[ctx.highlightedIndex]?.disabled
+  ) {
+    ctx.highlightedIndex = clampIndex(
+      ctx.highlightedIndex + 1,
+      ctx.filteredItems.length,
+    )
   }
 }
 
@@ -150,8 +161,14 @@ const highlightPrev = (ctx: CommandContext): void => {
   ctx.highlightedIndex = clampIndex(prevIndex, ctx.filteredItems.length)
 
   // If we landed on a disabled item, skip backward
-  while (ctx.highlightedIndex >= 0 && ctx.filteredItems[ctx.highlightedIndex]?.disabled) {
-    ctx.highlightedIndex = clampIndex(ctx.highlightedIndex - 1, ctx.filteredItems.length)
+  while (
+    ctx.highlightedIndex >= 0 &&
+    ctx.filteredItems[ctx.highlightedIndex]?.disabled
+  ) {
+    ctx.highlightedIndex = clampIndex(
+      ctx.highlightedIndex - 1,
+      ctx.filteredItems.length,
+    )
   }
 }
 
@@ -271,7 +288,11 @@ interface GroupConnectProps {
   id: string
 }
 
-export function connectCommand(state: MachineSnapshot<CommandSchema>, send: SendFn<CommandSchema>) {
+export function connectCommand(
+  state: MachineSnapshot<CommandSchema>,
+  send: SendFn<CommandSchema>,
+  instanceId = 'command',
+) {
   const ctx = state.context
   const isFocused = state.matches('focused')
   const attrs = commandAnatomy.getPartAttrs
@@ -293,7 +314,10 @@ export function connectCommand(state: MachineSnapshot<CommandSchema>, send: Send
      * Returns an array of { group, items } objects, with ungrouped items first.
      */
     getGroupedItems() {
-      const grouped: { group: CommandGroupDef | null; items: CommandItemDef[] }[] = []
+      const grouped: {
+        group: CommandGroupDef | null
+        items: CommandItemDef[]
+      }[] = []
       const groupMap = new Map<string | undefined, CommandItemDef[]>()
 
       for (const item of ctx.filteredItems) {
@@ -333,9 +357,11 @@ export function connectCommand(state: MachineSnapshot<CommandSchema>, send: Send
         ...attrs('input'),
         role: 'combobox' as const,
         'aria-expanded': true,
-        'aria-controls': 'command:list',
+        'aria-controls': `${instanceId}:list`,
         'aria-activedescendant':
-          ctx.highlightedIndex >= 0 ? `command:item:${ctx.filteredItems[ctx.highlightedIndex]?.id}` : undefined,
+          ctx.highlightedIndex >= 0
+            ? `${instanceId}:item:${ctx.filteredItems[ctx.highlightedIndex]?.id}`
+            : undefined,
         autoComplete: 'off' as const,
         autoCorrect: 'off' as const,
         spellCheck: false,
@@ -375,7 +401,7 @@ export function connectCommand(state: MachineSnapshot<CommandSchema>, send: Send
     getListProps() {
       return {
         ...attrs('list'),
-        id: 'command:list',
+        id: `${instanceId}:list`,
         role: 'listbox' as const,
         'aria-label': 'Command items',
       }
@@ -385,7 +411,7 @@ export function connectCommand(state: MachineSnapshot<CommandSchema>, send: Send
       return {
         ...attrs('group'),
         role: 'group' as const,
-        'aria-labelledby': `command:group-label:${props.id}`,
+        'aria-labelledby': `${instanceId}:group-label:${props.id}`,
         'data-value': props.id,
       }
     },
@@ -393,7 +419,7 @@ export function connectCommand(state: MachineSnapshot<CommandSchema>, send: Send
     getGroupLabelProps(props: GroupConnectProps) {
       return {
         ...attrs('groupLabel'),
-        id: `command:group-label:${props.id}`,
+        id: `${instanceId}:group-label:${props.id}`,
         role: 'presentation' as const,
         'data-value': props.id,
       }
@@ -405,7 +431,7 @@ export function connectCommand(state: MachineSnapshot<CommandSchema>, send: Send
 
       return {
         ...attrs('item'),
-        id: `command:item:${props.id}`,
+        id: `${instanceId}:item:${props.id}`,
         role: 'option' as const,
         'aria-selected': isHighlighted,
         'aria-disabled': isDisabled ? true : undefined,

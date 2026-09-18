@@ -1,10 +1,12 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, relative } from 'node:path'
+import { generateDesignSystem } from './generate-design-system.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const outputPath = join(root, 'assets/styles/tokens.css')
 const write = process.argv.includes('--write')
+generateDesignSystem(root, write)
 
 const inputs = [
   'design-system/tokens/colors.css',

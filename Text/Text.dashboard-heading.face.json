@@ -28,6 +28,9 @@
       "inset": {
         "$ref": "props.inset"
       },
+      "heightMode": {
+        "$ref": "props.heightMode"
+      },
       "stretchText": {
         "$ref": "props.stretchText"
       },
@@ -98,7 +101,7 @@
       "name": "size",
       "type": "select",
       "required": false,
-      "description": "Text size.",
+      "description": "Explicit font size, overriding the variant's default.",
       "options": [
         "xs",
         "sm",
@@ -113,6 +116,9 @@
       "required": false,
       "description": "HTML element to render. Auto-detected from variant if not specified.",
       "options": [
+        "p",
+        "span",
+        "div",
         "h1",
         "h2",
         "h3",
@@ -122,30 +128,28 @@
         "label",
         "kbd",
         "code",
-        "p",
-        "span",
-        "div",
         "strong",
         "em",
-        "small"
+        "small",
+        "blockquote"
       ]
     },
     {
       "name": "icon",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Icon element (ReactNode)."
+      "description": "Built-in icon name or custom node. Empty content creates no icon slot."
     },
     {
       "name": "iconPosition",
       "type": "select",
       "required": false,
-      "description": "Icon position relative to text.",
+      "description": "Icon at the start or end of the label, following text direction. Default: start.",
       "options": [
-        "left",
-        "right"
+        "start",
+        "end"
       ],
-      "defaultValue": "left"
+      "defaultValue": "start"
     },
     {
       "name": "inset",
@@ -155,6 +159,17 @@
       "options": [
         "control",
         "none"
+      ],
+      "defaultValue": "control"
+    },
+    {
+      "name": "heightMode",
+      "type": "select",
+      "required": false,
+      "description": "Block sizing. `control` keeps the variant's control height; `content` fits its line boxes without vertical padding. Horizontal inset is preserved.",
+      "options": [
+        "control",
+        "content"
       ],
       "defaultValue": "control"
     },
@@ -179,8 +194,8 @@
       "description": "Text alignment.",
       "options": [
         "left",
-        "right",
-        "center"
+        "center",
+        "right"
       ],
       "defaultValue": "left"
     },
@@ -200,7 +215,7 @@
     },
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Custom children (overrides text)."
     },
@@ -208,7 +223,7 @@
       "name": "htmlFor",
       "type": "string",
       "required": false,
-      "description": "For label variant: htmlFor attribute."
+      "description": "Associated control ID when the resolved element is a label."
     }
   ],
   "meta": {

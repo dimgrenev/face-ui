@@ -16,6 +16,15 @@
       "label": {
         "$ref": "props.label"
       },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "aria-describedby": {
+        "$ref": "props.aria-describedby"
+      },
       "disabled": {
         "$ref": "props.disabled"
       },
@@ -24,6 +33,18 @@
       },
       "name": {
         "$ref": "props.name"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "form": {
+        "$ref": "props.form"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "fullWidth": {
+        "$ref": "props.fullWidth"
       },
       "membrane": {
         "$ref": "props.membrane"
@@ -44,19 +65,18 @@
       "name": "checked",
       "type": "any",
       "required": false,
-      "description": "Controlled checked state. Accepts boolean or \"indeterminate\".",
+      "description": "Controlled selection. Indeterminate summarizes a partially selected collection; it does not submit a value.",
       "options": [
         true,
         false,
         "indeterminate"
-      ],
-      "defaultValue": null
+      ]
     },
     {
       "name": "defaultChecked",
       "type": "any",
       "required": false,
-      "description": "Uncontrolled initial checked state. Accepts boolean or \"indeterminate\".",
+      "description": "Uncontrolled initial selection, also restored by form reset.",
       "options": [
         true,
         false,
@@ -68,34 +88,77 @@
       "name": "label",
       "type": "any",
       "required": false,
-      "description": "Visible label content rendered through Face UI Text."
+      "description": "Visible label content. Empty content adds no label slot; zero remains visible."
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name, including when there is no visible label."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "External label element IDs; takes native precedence over aria-label."
+    },
+    {
+      "name": "aria-describedby",
+      "type": "string",
+      "required": false,
+      "description": "External description element IDs."
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable pointer and keyboard interaction.",
+      "description": "Exclude the checkbox from activation, focus navigation and form submission.",
       "defaultValue": false
     },
     {
       "name": "required",
       "type": "boolean",
       "required": false,
-      "description": "Mark the hidden native input as required.",
+      "description": "Require an actual checked value for native form validation; mixed is not checked.",
       "defaultValue": false
     },
     {
       "name": "name",
       "type": "string",
       "required": false,
-      "description": "Native form field name for the hidden input.",
-      "defaultValue": ""
+      "description": "FormData key. Without a name the checkbox does not contribute a field."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Value submitted only when checked. It does not control selection.",
+      "defaultValue": "on"
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "ID of an external native form that owns the input."
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the native input on mount."
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Expand the membrane and clickable label to the container width.",
+      "defaultValue": false
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Wrap the control in the standard one-token membrane.",
+      "description": "Shared outer spacing; toggling it preserves input identity and state.",
       "defaultValue": true
     }
   ],

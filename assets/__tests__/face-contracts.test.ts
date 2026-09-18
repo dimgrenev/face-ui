@@ -60,9 +60,12 @@ describe('face-ui-react contracts', () => {
     expect(popover).toBeDefined()
     if (!popover) throw new Error('Popover contract was not found')
 
-    for (const propName of ['children', 'content', 'open', 'openDelay', 'closeDelay', 'side', 'align', 'sideOffset']) {
+    for (const propName of ['children', 'content', 'open', 'defaultOpen', 'side', 'align', 'sideOffset']) {
       expect(popover.props, `Popover should expose ${propName}`).toHaveProperty(propName)
     }
+    expect(popover.props).not.toHaveProperty('openDelay')
+    expect(popover.props).not.toHaveProperty('closeDelay')
+    expect(popover.props).not.toHaveProperty('interactive')
 
     for (const state of popover.states || []) {
       for (const propName of Object.keys(state.props || {})) {
@@ -191,10 +194,21 @@ describe('face-ui-react contracts', () => {
     expect(contracts.get('Card')?.props.variant?.options).toEqual(['default', 'plain', 'code'])
     expect(contracts.get('Card')?.props.padding?.options).toEqual(['default', 'control', 'membrane', 'none'])
     expect(contracts.get('Card')?.props.radius?.options).toEqual(['md', 'lg', 'none'])
-    expect(contracts.get('Card')?.props.footerLayout?.options).toEqual(['start', 'end', 'between'])
+    expect(contracts.get('Card')?.props.footerAlign?.options).toEqual(['start', 'end', 'between'])
+    expect(contracts.get('Card')?.props.border?.default).toBe(true)
+    expect(contracts.get('Button')?.props.iconPosition?.default).toBe('start')
+    expect(contracts.get('Button')?.props.iconOnly?.default).toBe(false)
+    expect(contracts.get('Button')?.props.disabled?.default).toBe(false)
+    expect(contracts.get('Button')?.props.loading?.default).toBe(false)
+    expect(contracts.get('Button')?.props.membrane?.default).toBe(true)
     expect(contracts.get('Button')?.props.variant?.options).not.toContain('suggestion')
     expect(contracts.get('Text')?.props.variant?.options).not.toContain('default')
-    expect(contracts.get('Tile')?.props.intent?.options).toEqual(['default', 'disclosure', 'tree', 'tab', 'section'])
+    for (const removed of ['intent', 'selector', 'selectorOpen', 'busy', 'selectedDescendant']) {
+      expect(contracts.get('Tile')?.props).not.toHaveProperty(removed)
+    }
+    expect(contracts.get('Tile')?.props.chevron?.options).toEqual(['down', 'right'])
+    expect(contracts.get('Tile')?.props['aria-expanded']?.type).toBe('boolean')
+    expect(contracts.get('Tile')?.props['aria-busy']?.type).toBe('boolean')
     expect(contracts.get('Modal')?.props).not.toHaveProperty('variant')
     expect(contracts.get('Modal')?.props.placement?.options).toEqual(['center', 'left', 'right', 'top', 'bottom'])
     expect(contracts.get('Modal')?.props.edge?.options).toEqual(['inset', 'flush'])

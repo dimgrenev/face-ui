@@ -2,12 +2,12 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Bar",
-  "description": "Toolbar layout component with start/end sections",
+  "description": "Layout bar with start/end sections; native control keyboard behavior is preserved",
   "props": {
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Bar content (typically BarSection elements)."
+      "description": "Content and sections, rendered in the authored order."
     },
     "orientation": {
       "type": "enum",
@@ -30,7 +30,7 @@
             "membrane": false
           },
           {
-            "__componentName__": "Bar.Right",
+            "__componentName__": "Bar.Section",
             "children": [
               {
                 "__componentName__": "Button",
@@ -38,7 +38,8 @@
                 "icon": "link",
                 "fullWidth": false
               }
-            ]
+            ],
+            "align": "end"
           }
         ]
       }
@@ -59,7 +60,7 @@
   "behavior": {},
   "keyboard": {},
   "aria": {
-    "role": "toolbar"
+    "notes": "No implicit widget role. A caller opting into role=toolbar supplies its accessible name and focus-management behavior."
   },
   "composition": {
     "required": [

@@ -8,6 +8,7 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
+import { Membrane } from '../assets/adapters/react/Membrane'
 
 export const separatorAnatomy = createAnatomy('separator').parts('root')
 
@@ -40,16 +41,20 @@ export const Separator = forwardRef<HTMLDivElement, SeparatorProps>(
       />
     )
 
-    if (!membrane) return separatorNode
-
-    const membraneClassName = orientation === 'horizontal'
-      ? 'uf-membrane uf-membrane--full uf-separator-membrane'
-      : 'uf-membrane uf-membrane--full'
+    const membraneClassName =
+      orientation === 'horizontal'
+        ? 'uf-separator-membrane'
+        : 'uf-separator-membrane--vertical'
 
     return (
-      <span className={membraneClassName}>
+      <Membrane
+        enabled={membrane}
+        as="div"
+        fullWidth={orientation === 'horizontal'}
+        className={membraneClassName}
+      >
         {separatorNode}
-      </span>
+      </Membrane>
     )
   },
 )

@@ -2,56 +2,46 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Slider",
-  "description": "Range input with single or multiple thumbs",
+  "description": "Numeric input with ordered thumbs and an optional independently editable crop interval.",
   "props": {
-    "variant": {
-      "type": "enum",
-      "required": false,
-      "description": "Standard track/thumb presentation or enhanced value-thumb presentation.",
-      "options": [
-        "simple",
-        "advanced"
-      ],
-      "default": "simple"
-    },
     "value": {
-      "type": "array",
+      "type": "any",
       "required": false,
-      "description": "Current value(s). Single thumb = [n], range = [min, max]."
+      "description": "Controlled finite number or nonempty array. Values are snapped and sorted."
     },
     "defaultValue": {
-      "type": "array",
+      "type": "any",
       "required": false,
-      "description": "Uncontrolled initial value(s)."
+      "description": "Initial uncontrolled value(s), restored on reset. Defaults to min."
     },
     "min": {
       "type": "number",
       "required": false,
-      "description": "Minimum value.",
+      "description": "Finite lower bound and step origin. Defaults to 0.",
       "default": 0
     },
     "max": {
       "type": "number",
       "required": false,
-      "description": "Maximum value.",
+      "description": "Finite upper bound, at least min. Defaults to 100.",
       "default": 100
     },
     "step": {
       "type": "number",
       "required": false,
-      "description": "Step increment.",
+      "description": "Positive finite increment. End selects the last step at or below max. Defaults to 1.",
       "default": 1
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Disable editing and submission, including crop. Defaults to false.",
       "default": false
     },
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Orientation.",
+      "description": "Horizontal follows text direction; vertical increases upward. Defaults to horizontal.",
       "options": [
         "horizontal",
         "vertical"
@@ -59,40 +49,78 @@
       "default": "horizontal"
     },
     "label": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Label content."
+      "description": "Visible noninteractive name, including rich text."
     },
-    "leadingIcon": {
+    "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Leading icon name for the advanced slider."
+      "description": "Name when there is no visible label, or override for it."
     },
-    "leadingText": {
+    "aria-labelledby": {
       "type": "string",
       "required": false,
-      "description": "Leading text for the advanced slider."
+      "description": "External naming elements; takes precedence over label and aria-label."
+    },
+    "labels": {
+      "type": "object",
+      "required": false,
+      "description": "Specific or localized names for individual controls."
+    },
+    "showValue": {
+      "type": "boolean",
+      "required": false,
+      "description": "Display the value inside each primary handle. Defaults to false.",
+      "default": false
     },
     "crop": {
       "type": "boolean",
       "required": false,
-      "description": "Enable crop handles in the advanced slider.",
+      "description": "Enable two editable crop boundaries independently of value presentation. Defaults to false.",
       "default": false
-    },
-    "defaultCropRange": {
-      "type": "object",
-      "required": false,
-      "description": "Uncontrolled initial crop range for the advanced slider."
     },
     "cropRange": {
       "type": "object",
       "required": false,
-      "description": "Controlled crop range for the advanced slider."
+      "description": "Controlled crop boundaries, sorted and snapped to the same step grid."
     },
-    "cropLocksValue": {
+    "defaultCropRange": {
+      "type": "object",
+      "required": false,
+      "description": "Initial uncontrolled crop, restored on reset. Defaults to the full range."
+    },
+    "clampToCrop": {
       "type": "boolean",
       "required": false,
-      "description": "Clamp the value to the crop range.",
+      "description": "Constrain primary values to the accepted crop. Defaults to true.",
+      "default": true
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Native form key, repeated for ordered primary values."
+    },
+    "cropName": {
+      "type": "string",
+      "required": false,
+      "description": "Native form key, repeated for crop start/end when crop is enabled."
+    },
+    "form": {
+      "type": "string",
+      "required": false,
+      "description": "External form id for all controls."
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the first primary thumb on mount. Defaults to false.",
+      "default": false
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Shared spacing around handles and label. Defaults to true.",
       "default": true
     }
   },
@@ -113,43 +141,41 @@
           20,
           80
         ],
-        "label": "Price range"
+        "label": "Price range",
+        "labels": {
+          "thumbs": [
+            "Minimum price",
+            "Maximum price"
+          ]
+        }
       }
     },
     {
-      "name": "Advanced",
+      "name": "Value",
       "props": {
-        "variant": "advanced",
+        "showValue": true,
         "label": "Zoom",
-        "defaultValue": [
-          42
-        ],
-        "leadingText": "Zoom"
+        "defaultValue": 42
       }
     },
     {
       "name": "Crop",
       "props": {
-        "variant": "advanced",
+        "showValue": true,
         "label": "Crop",
-        "defaultValue": [
-          40
-        ],
+        "defaultValue": 40,
         "crop": true,
         "defaultCropRange": {
           "min": 20,
           "max": 80
-        },
-        "cropLocksValue": true,
-        "leadingText": "Crop"
+        }
       }
     },
     {
       "name": "Disabled",
       "props": {
-        "defaultValue": [
-          30
-        ],
+        "label": "Unavailable value",
+        "defaultValue": 30,
         "disabled": true
       }
     }
@@ -160,19 +186,17 @@
   "keyboard": {
     "ArrowRight": {
       "action": "increment",
-      "condition": "horizontal"
+      "condition": "horizontal LTR increments; RTL decrements"
     },
     "ArrowLeft": {
       "action": "decrement",
-      "condition": "horizontal"
+      "condition": "horizontal LTR decrements; RTL increments"
     },
     "ArrowUp": {
-      "action": "increment",
-      "condition": "vertical"
+      "action": "increment"
     },
     "ArrowDown": {
-      "action": "decrement",
-      "condition": "vertical"
+      "action": "decrement"
     },
     "Home": {
       "action": "setMin"
@@ -188,12 +212,11 @@
     }
   },
   "aria": {
-    "role": "slider",
-    "required": [
-      "aria-valuemin",
-      "aria-valuemax",
-      "aria-valuenow",
-      "aria-label"
+    "role": "group",
+    "notes": [
+      "Each thumb is a native range input with its own accessible name, bounds and orientation.",
+      "Use label, aria-label or aria-labelledby for the group; labels provides complete individual names.",
+      "formatValue supplies accessible value text, including units."
     ]
   },
   "composition": {
@@ -201,7 +224,8 @@
       "root",
       "track",
       "range",
-      "thumb"
+      "thumb",
+      "input"
     ],
     "recommended": [
       "label"
@@ -226,48 +250,52 @@
         "slot": "thumb",
         "parent": "track",
         "multiple": true
+      },
+      "crop": {
+        "slot": "crop",
+        "parent": "track",
+        "multiple": true
+      },
+      "input": {
+        "slot": "input",
+        "multiple": true
       }
-    }
+    },
+    "notes": [
+      "One native input lives inside every thumb and enabled crop part. Membrane surrounds each control without adding tab stops."
+    ]
   },
   "tokenMapping": {
     "component": [
-      "--uf-slider-track-hit-size",
-      "--uf-slider-line-size",
-      "--uf-slider-thumb-size",
-      "--uf-slider-row-gap",
-      "--uf-slider-leading-gap",
-      "--uf-slider-body-basis",
-      "--uf-slider-edge-gap",
-      "--uf-slider-thumb-w-fallback",
-      "--uf-slider-crop-thumb-pad-fallback",
-      "--uf-slider-crop-marker-w",
-      "--uf-slider-crop-marker-h",
-      "--uf-slider-crop-allowed-expand",
-      "--face-runtime-slider-t",
-      "--face-runtime-slider-crop-left-x",
-      "--face-runtime-slider-crop-right-x",
-      "--face-runtime-slider-crop-thumb-pad",
-      "--face-runtime-slider-thumb-w"
+      "--uf-slider-target",
+      "--uf-slider-thumb-inline",
+      "--uf-slider-thumb-block",
+      "--uf-slider-crop-size",
+      "--uf-slider-crop-space",
+      "--uf-slider-position",
+      "--uf-slider-start",
+      "--uf-slider-end",
+      "--uf-slider-offset"
     ],
     "semanticFallbacks": [
       "--uf-control-height",
-      "--uf-control-pad-y",
       "--uf-control-pad-text",
-      "--uf-control-gap",
+      "--uf-control-font-size",
       "--uf-control-line-height",
       "--uf-membrane",
+      "--uf-spacing-2",
+      "--uf-spacing-4",
+      "--uf-icon-size",
       "--uf-radius-full",
       "--uf-color-fg",
-      "--uf-color-hover-bg",
+      "--uf-color-bg",
       "--uf-color-border",
-      "--uf-motion-duration-short",
-      "--uf-motion-ease-standard"
+      "--uf-color-disabled-opacity"
     ],
     "notes": [
-      "Simple slider track, range and thumbs are tokenized through shared control, space, membrane, radius and color fallbacks.",
-      "Simple thumb hover feedback consumes shared Face UI motion tokens.",
-      "Advanced slider exposes private runtime geometry via --face-runtime-slider-* CSS custom properties because thumb width and crop marker positions are measured in React.",
-      "Advanced slider still contains small pixel constants for measurement math; migrate them only with interaction regression coverage."
+      "Measured control extents reserve track edges; all handles share logical track coordinates.",
+      "Hit areas remain at least 24px even when control density is smaller.",
+      "Private Slider variables describe geometry, not alternate behavior."
     ]
   },
   "platform": {},

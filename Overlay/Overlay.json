@@ -4,75 +4,80 @@
   "name": "Overlay",
   "description": "Floating content surface unifying tooltip, popover, and hover card",
   "props": {
-    "trigger": {
-      "type": "enum",
-      "required": false,
-      "description": "How the overlay is triggered.",
-      "options": [
-        "hover",
-        "click"
-      ],
-      "default": "hover"
-    },
-    "interactive": {
-      "type": "boolean",
-      "required": false,
-      "description": "Whether content is interactive (keeps open on hover).",
-      "default": false
-    },
     "content": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Content rendered inside the floating surface."
+      "description": "Floating content. Empty content leaves the trigger without a layer. Tooltip content must be noninteractive."
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Trigger element (the anchor)."
+      "description": "One trigger element forwarding props/ref, or text rendered as a Button."
     },
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled open state."
+      "description": "Controlled visibility. Changes from the parent do not emit onOpenChange."
     },
-    "openDelay": {
-      "type": "number",
+    "defaultOpen": {
+      "type": "boolean",
       "required": false,
-      "description": "Delay before opening (ms)."
-    },
-    "closeDelay": {
-      "type": "number",
-      "required": false,
-      "description": "Delay before closing (ms)."
+      "description": "Initial uncontrolled visibility; later changes do not reset the layer."
     },
     "side": {
       "type": "enum",
       "required": false,
-      "description": "Preferred side placement.",
+      "description": "Preferred side; may flip when the opposite side has more room.",
       "options": [
         "top",
         "right",
         "bottom",
         "left"
-      ],
-      "default": "top"
+      ]
     },
     "align": {
       "type": "enum",
       "required": false,
-      "description": "Alignment along the side.",
+      "description": "Logical alignment on the cross axis, following dir or the trigger's direction.",
       "options": [
         "start",
         "center",
         "end"
-      ],
-      "default": "center"
+      ]
     },
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Offset from the trigger along the side axis (px).",
-      "default": 2
+      "description": "Additional nonnegative gap in pixels before the content membrane."
+    },
+    "dir": {
+      "type": "string",
+      "required": false,
+      "description": "Content direction. Omitted inherits the trigger; auto follows the content."
+    },
+    "openDelay": {
+      "type": "number",
+      "required": false,
+      "description": "Hover/focus opening delay in milliseconds (0–2147483647); default 200."
+    },
+    "closeDelay": {
+      "type": "number",
+      "required": false,
+      "description": "Closing delay after hover and focus leave (0–2147483647); default 0."
+    },
+    "trigger": {
+      "type": "enum",
+      "required": false,
+      "description": "Hover/focus activation for tooltips or interactive hover cards.",
+      "options": [
+        "hover",
+        "click"
+      ]
+    },
+    "interactive": {
+      "type": "boolean",
+      "required": false,
+      "description": "Hover content contains controls: dialog semantics and focus restoration."
     }
   },
   "states": [
@@ -88,7 +93,6 @@
       "name": "Popover (Click)",
       "props": {
         "trigger": "click",
-        "interactive": true,
         "content": "Popover content",
         "side": "bottom"
       }
@@ -113,8 +117,9 @@
   ],
   "behavior": {
     "dismissOnEscape": true,
-    "dismissOnClickOutside": true,
-    "autoFocusOnOpen": "none"
+    "notes": [
+      "Only click and interactive hover content dismiss on an outside interaction. Click content receives focus on opening. Informational hover content retains trigger focus."
+    ]
   },
   "keyboard": {
     "Escape": {
@@ -122,40 +127,27 @@
     }
   },
   "aria": {
-    "role": "tooltip"
+    "notes": [
+      "Hover informational content uses role=\"tooltip\". Click content and interactive hover content use role=\"dialog\"."
+    ]
   },
   "composition": {
     "required": [
-      "root",
       "trigger",
       "content"
     ],
-    "recommended": [
-      "arrow"
-    ],
     "parts": {
-      "root": {
-        "slot": "root"
-      },
       "trigger": {
-        "slot": "trigger",
-        "parent": "root"
+        "slot": "trigger"
       },
       "content": {
-        "slot": "content",
-        "parent": "root"
-      },
-      "arrow": {
-        "slot": "arrow",
-        "parent": "content"
+        "slot": "content"
       }
     }
   },
   "tokenMapping": {
     "component": [
-      "--uf-overlay-content-max-w",
-      "--uf-overlay-content-border-width",
-      "--uf-responsive-overlay-zero-blur"
+      "--uf-overlay-content-max-w"
     ],
     "semanticFallbacks": [
       "--uf-membrane",
@@ -180,20 +172,17 @@
       "--uf-z-overlay"
     ],
     "notes": [
-      "Overlay trigger content is rendered through Button; primitive content is wrapped in flush Text so the surface owns padding.",
-      "sideOffset and floating coordinates are positioning data produced by the floating adapter, not visual tokens.",
-      "Hover and click overlays share card/dropdown surface tokens; tooltip-specific aliases only preserve semantic naming.",
-      "Responsive overlay backdrops use --uf-responsive-overlay-zero-blur as the closed-state blur sentinel before open-state backdrop blur applies."
+      "Trigger props and ref belong to the actual trigger element; primitive content uses Text typography.",
+      "sideOffset measures the gap before the shared Membrane; the public content ref, attributes, style and class belong to one surface."
     ]
   },
   "platform": {
-    "popover": true,
-    "anchorPositioning": true
+    "popover": false,
+    "anchorPositioning": false
   },
   "usage": {
     "whenToUse": [
-      "Background dimming for modals",
-      "Click-outside dismiss layer"
+      "Compatibility for existing hover cards; prefer Tooltip or Popover in new code."
     ],
     "whenNotToUse": [
       "Blocking or viewport-edge content (use Modal)",

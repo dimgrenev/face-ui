@@ -14,9 +14,25 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         collapsible: true,
         defaultExpandedIds: ['profile', 'security'],
         items: [
-          { value: 'profile', label: 'Profile and workspace', icon: 'account', content: 'Company details, workspace identity, and member preferences.' },
-          { value: 'security', label: 'Security', icon: 'settings', content: 'Single sign-on, sessions, and recovery policies.' },
-          { value: 'billing', label: 'Billing', icon: 'file', content: 'Plan, invoices, and payment methods.' },
+          {
+            value: 'profile',
+            label: 'Profile and workspace',
+            icon: 'account',
+            content:
+              'Company details, workspace identity, and member preferences.',
+          },
+          {
+            value: 'security',
+            label: 'Security',
+            icon: 'settings',
+            content: 'Single sign-on, sessions, and recovery policies.',
+          },
+          {
+            value: 'billing',
+            label: 'Billing',
+            icon: 'file',
+            content: 'Plan, invoices, and payment methods.',
+          },
         ],
       },
     },
@@ -27,9 +43,27 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         collapsible: true,
         defaultExpandedIds: ['reasoning'],
         items: [
-          { value: 'reasoning', label: 'Reasoning summary', icon: 'component', content: 'The agent compared three implementation paths before selecting the safest migration.' },
-          { value: 'tools', label: 'Tool activity', icon: 'props', content: 'Search, code inspection, and verification calls used for this run.' },
-          { value: 'sources', label: 'Sources', icon: 'link', content: 'Documentation and repository references used in the answer.' },
+          {
+            value: 'reasoning',
+            label: 'Reasoning summary',
+            icon: 'component',
+            content:
+              'The agent compared three implementation paths before selecting the safest migration.',
+          },
+          {
+            value: 'tools',
+            label: 'Tool activity',
+            icon: 'props',
+            content:
+              'Search, code inspection, and verification calls used for this run.',
+          },
+          {
+            value: 'sources',
+            label: 'Sources',
+            icon: 'link',
+            content:
+              'Documentation and repository references used in the answer.',
+          },
         ],
       },
     },
@@ -48,7 +82,6 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       name: 'Product / AI Assistant',
       props: {
         name: 'Research assistant',
-        icon: 'component',
         fallback: 'AI',
         fallbackDelayMs: 0,
       },
@@ -61,7 +94,11 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
     },
     {
       name: 'Product / Usage Warning',
-      props: { text: '82% of quota used', appearance: 'outline', tone: 'warning' },
+      props: {
+        text: '82% of quota used',
+        appearance: 'outline',
+        tone: 'warning',
+      },
     },
   ],
   Bar: [
@@ -71,7 +108,18 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         orientation: 'horizontal',
         children: [
           { __componentName__: 'Text', text: 'Acme Workspace', truncate: true },
-          { __componentName__: 'Bar.Right', children: [{ __componentName__: 'Button', text: 'Invite', icon: 'plus', fullWidth: false }] },
+          {
+            __componentName__: 'Bar.Section',
+            align: 'end',
+            children: [
+              {
+                __componentName__: 'Button',
+                text: 'Invite',
+                icon: 'plus',
+                fullWidth: false,
+              },
+            ],
+          },
         ],
       },
     },
@@ -80,9 +128,31 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       props: {
         orientation: 'horizontal',
         children: [
-          { __componentName__: 'Button', icon: 'plus', iconOnly: true, fullWidth: false, 'aria-label': 'Attach file' },
-          { __componentName__: 'Text', text: 'Agent mode', variant: 'muted', truncate: true },
-          { __componentName__: 'Bar.Right', children: [{ __componentName__: 'Button', text: 'Run', variant: 'accent', fullWidth: false }] },
+          {
+            __componentName__: 'Button',
+            icon: 'plus',
+            iconOnly: true,
+            fullWidth: false,
+            'aria-label': 'Attach file',
+          },
+          {
+            __componentName__: 'Text',
+            text: 'Agent mode',
+            variant: 'muted',
+            truncate: true,
+          },
+          {
+            __componentName__: 'Bar.Section',
+            align: 'end',
+            children: [
+              {
+                __componentName__: 'Button',
+                text: 'Run',
+                variant: 'accent',
+                fullWidth: false,
+              },
+            ],
+          },
         ],
       },
     },
@@ -93,8 +163,7 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       props: {
         separator: '/',
         membrane: true,
-        collapseAfter: 4,
-        allowNavigation: false,
+        maxItems: 4,
         items: [
           { label: 'workspace' },
           { label: 'apps' },
@@ -109,8 +178,7 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       props: {
         separator: '/',
         membrane: true,
-        collapseAfter: 5,
-        allowNavigation: true,
+        maxItems: 5,
         items: [
           { label: 'Cart', href: '#cart' },
           { label: 'Delivery', href: '#delivery' },
@@ -123,11 +191,25 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Button: [
     {
       name: 'Product / Create Workspace',
-      props: { text: 'Create workspace', icon: 'plus', variant: 'accent', fullWidth: false, align: 'left', membrane: true },
+      props: {
+        text: 'Create workspace',
+        icon: 'plus',
+        variant: 'accent',
+        fullWidth: false,
+        align: 'left',
+        membrane: true,
+      },
     },
     {
       name: 'Product / Revoke API Key',
-      props: { text: 'Revoke key', icon: 'close', variant: 'destructive', fullWidth: false, loading: false, membrane: true },
+      props: {
+        text: 'Revoke key',
+        icon: 'close',
+        variant: 'destructive',
+        fullWidth: false,
+        loading: false,
+        membrane: true,
+      },
     },
   ],
   Calendar: [
@@ -162,8 +244,14 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         padding: 'default',
         radius: 'lg',
         border: true,
-        footerLayout: 'between',
-        footer: { __componentName__: 'Button', text: 'View usage', icon: 'arrow-right', iconPosition: 'right', fullWidth: false },
+        footerAlign: 'between',
+        footer: {
+          __componentName__: 'Button',
+          text: 'View usage',
+          icon: 'arrow-right',
+          iconPosition: 'end',
+          fullWidth: false,
+        },
       },
     },
     {
@@ -173,11 +261,21 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         description: 'Production change',
         content: 'The agent will add one index and backfill 24,600 records.',
         radius: 'lg',
-        interactive: true,
-        footerLayout: 'end',
+        hoverable: true,
+        footerAlign: 'end',
         footer: [
-          { __componentName__: 'Button', text: 'Review SQL', variant: 'outline', fullWidth: false },
-          { __componentName__: 'Button', text: 'Approve', variant: 'accent', fullWidth: false },
+          {
+            __componentName__: 'Button',
+            text: 'Review SQL',
+            variant: 'outline',
+            fullWidth: false,
+          },
+          {
+            __componentName__: 'Button',
+            text: 'Approve',
+            variant: 'accent',
+            fullWidth: false,
+          },
         ],
       },
     },
@@ -192,9 +290,18 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         autoPlayInterval: 5000,
         slidesPerView: 1,
         slides: [
-          { src: '/assets/media/examples/office-core/lobby-day.webp', alt: 'Workspace overview' },
-          { src: '/assets/media/examples/office-core/lobby-glass-blocks.webp', alt: 'Team collaboration view' },
-          { src: '/assets/media/examples/office-core/skyline-window-day.webp', alt: 'Analytics overview' },
+          {
+            src: '/assets/media/examples/office-core/lobby-day.webp',
+            alt: 'Workspace overview',
+          },
+          {
+            src: '/assets/media/examples/office-core/lobby-glass-blocks.webp',
+            alt: 'Team collaboration view',
+          },
+          {
+            src: '/assets/media/examples/office-core/skyline-window-day.webp',
+            alt: 'Analytics overview',
+          },
         ],
       },
     },
@@ -207,8 +314,14 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         defaultIndex: 1,
         slidesPerView: 1,
         slides: [
-          { src: '/assets/media/examples/office-core/lobby-glass-blocks.webp', alt: 'Customer team in a bright office' },
-          { src: '/assets/media/examples/office-core/skyline-window-day.webp', alt: 'Enterprise team reviewing results' },
+          {
+            src: '/assets/media/examples/office-core/lobby-glass-blocks.webp',
+            alt: 'Customer team in a bright office',
+          },
+          {
+            src: '/assets/media/examples/office-core/skyline-window-day.webp',
+            alt: 'Enterprise team reviewing results',
+          },
         ],
       },
     },
@@ -216,11 +329,22 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Checkbox: [
     {
       name: 'Product / Terms Accepted',
-      props: { label: 'I agree to the Terms of Service', defaultChecked: true, required: true, name: 'terms', membrane: true },
+      props: {
+        label: 'I agree to the Terms of Service',
+        defaultChecked: true,
+        required: true,
+        name: 'terms',
+        membrane: true,
+      },
     },
     {
       name: 'Product / Partial Selection',
-      props: { label: 'Select all team members', checked: 'indeterminate', name: 'members', membrane: true },
+      props: {
+        label: 'Select all team members',
+        checked: 'indeterminate',
+        name: 'members',
+        membrane: true,
+      },
     },
   ],
   Code: [
@@ -253,11 +377,29 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         surface: 'inline',
         placeholder: 'Ask or run a command...',
         defaultValue: '',
-        groups: [{ id: 'create', label: 'Create' }, { id: 'navigate', label: 'Navigate' }],
+        groups: [
+          { id: 'create', label: 'Create' },
+          { id: 'navigate', label: 'Navigate' },
+        ],
         items: [
-          { id: 'new-agent', label: 'Create a new agent', keywords: ['assistant', 'bot'], group: 'create' },
-          { id: 'new-workflow', label: 'Create workflow', keywords: ['automation'], group: 'create' },
-          { id: 'settings', label: 'Open settings', keywords: ['preferences'], group: 'navigate' },
+          {
+            id: 'new-agent',
+            label: 'Create a new agent',
+            keywords: ['assistant', 'bot'],
+            group: 'create',
+          },
+          {
+            id: 'new-workflow',
+            label: 'Create workflow',
+            keywords: ['automation'],
+            group: 'create',
+          },
+          {
+            id: 'settings',
+            label: 'Open settings',
+            keywords: ['preferences'],
+            group: 'navigate',
+          },
         ],
         emptyContent: 'No matching commands.',
       },
@@ -307,7 +449,19 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         weekStartsOn: 1,
         label: 'Reporting period',
         surface: 'sheet',
-        showPresets: true,
+        presets: [
+          {
+            id: 'july-2026',
+            label: 'July 2026',
+            value: { start: '2026-07-01', end: '2026-07-31' },
+          },
+          {
+            id: 'q3-2026',
+            label: 'Q3 2026',
+            value: { start: '2026-07-01', end: '2026-09-30' },
+          },
+        ],
+        showNow: false,
         showClear: true,
       },
     },
@@ -315,7 +469,11 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Icon: [
     {
       name: 'Product / Accessible Action',
-      props: { name: 'search', label: 'Search workspace', title: 'Search workspace' },
+      props: {
+        name: 'search',
+        label: 'Search workspace',
+        title: 'Search workspace',
+      },
     },
     {
       name: 'Product / Status Symbol',
@@ -342,10 +500,9 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         type: 'text',
         label: 'System instruction',
         placeholder: 'Describe how the assistant should behave...',
-        textLayout: 'wrap',
+        multiline: true,
         autoGrow: true,
         maxLength: 4000,
-        stretchText: true,
         membrane: true,
       },
     },
@@ -354,7 +511,8 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
     {
       name: 'Product / AI Answer',
       props: {
-        content: '## Migration plan\n\n1. Back up production data.\n2. Apply the schema change.\n3. Verify the health check.\n\n```sql\nCREATE INDEX CONCURRENTLY idx_events_created_at ON events(created_at);\n```',
+        content:
+          '## Migration plan\n\n1. Back up production data.\n2. Apply the schema change.\n3. Verify the health check.\n\n```sql\nCREATE INDEX CONCURRENTLY idx_events_created_at ON events(created_at);\n```',
         gfm: true,
         safeMode: true,
         allowRawHtml: false,
@@ -366,7 +524,8 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
     {
       name: 'Product / Release Notes',
       props: {
-        content: '# Version 2.4\n\n- Added workspace templates\n- Improved audit logs\n- Fixed SSO session renewal\n\n[Read the upgrade guide](https://example.com/upgrade).',
+        content:
+          '# Version 2.4\n\n- Added workspace templates\n- Improved audit logs\n- Fixed SSO session renewal\n\n[Read the upgrade guide](https://example.com/upgrade).',
         gfm: true,
         safeMode: true,
         linkTarget: '_blank',
@@ -454,7 +613,10 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         width: 520,
         closable: true,
         closeOnOverlayClick: true,
-        actions: [{ label: 'Cancel', variant: 'outline' }, { label: 'Create project', variant: 'accent' }],
+        actions: [
+          { label: 'Cancel', variant: 'outline' },
+          { label: 'Create project', variant: 'accent' },
+        ],
         children: 'Project name, region, and environment settings.',
       },
     },
@@ -484,7 +646,14 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         defaultActiveId: 'dashboard',
         items: [
           { id: 'dashboard', label: 'Dashboard', href: '#dashboard' },
-          { id: 'projects', label: 'Projects', items: [{ id: 'active', label: 'Active projects' }, { id: 'archived', label: 'Archived projects' }] },
+          {
+            id: 'projects',
+            label: 'Projects',
+            items: [
+              { id: 'active', label: 'Active projects' },
+              { id: 'archived', label: 'Archived projects' },
+            ],
+          },
           { id: 'analytics', label: 'Analytics', href: '#analytics' },
           { id: 'settings', label: 'Settings', href: '#settings' },
         ],
@@ -510,21 +679,51 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Overlay: [
     {
       name: 'Product / Hover Help',
-      props: { trigger: 'hover', children: 'API limits', content: 'Limits reset at the start of each billing cycle.', side: 'top', align: 'center', sideOffset: 4, openDelay: 250 },
+      props: {
+        trigger: 'hover',
+        children: 'API limits',
+        content: 'Limits reset at the start of each billing cycle.',
+        side: 'top',
+        align: 'center',
+        sideOffset: 4,
+        openDelay: 250,
+      },
     },
     {
       name: 'Product / Click Inspector',
-      props: { trigger: 'click', children: 'Inspect run', content: 'Latency: 1.8s. Tokens: 2,460. Cache hit: 72%.', side: 'right', align: 'start', sideOffset: 6, interactive: true, open: true },
+      props: {
+        trigger: 'click',
+        children: 'Inspect run',
+        content: 'Latency: 1.8s. Tokens: 2,460. Cache hit: 72%.',
+        side: 'right',
+        align: 'start',
+        sideOffset: 6,
+        open: true,
+      },
     },
   ],
   Pagination: [
     {
       name: 'Product / Search Results',
-      props: { defaultPage: 4, total: 248, pageSize: 20, siblingCount: 2, membrane: true, surfaceTitle: 'Choose results page' },
+      props: {
+        defaultPage: 4,
+        total: 248,
+        pageSize: 20,
+        siblingCount: 2,
+        membrane: true,
+        surfaceTitle: 'Choose results page',
+      },
     },
     {
       name: 'Product / Audit Log',
-      props: { defaultPage: 18, total: 1260, pageSize: 50, siblingCount: 1, membrane: true, surfaceTitle: 'Choose audit page' },
+      props: {
+        defaultPage: 18,
+        total: 1260,
+        pageSize: 50,
+        siblingCount: 1,
+        membrane: true,
+        surfaceTitle: 'Choose audit page',
+      },
     },
   ],
   Panel: [
@@ -535,7 +734,11 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         width: 280,
         defaultSelectedId: 'members',
         items: [
-          { id: 'overview', label: 'Overview', icon: 'layout-sidebar-left-open' },
+          {
+            id: 'overview',
+            label: 'Overview',
+            icon: 'layout-sidebar-left-open',
+          },
           { id: 'members', label: 'Members', icon: 'account' },
           { id: 'billing', label: 'Billing', icon: 'file' },
           { id: 'security', label: 'Security', icon: 'settings' },
@@ -561,21 +764,53 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Popover: [
     {
       name: 'Product / Filter Builder',
-      props: { children: 'Add filter', content: 'Status is Active and owner is Current user.', interactive: true, side: 'bottom', align: 'start', sideOffset: 4, open: true },
+      props: {
+        children: 'Add filter',
+        content: 'Status is Active and owner is Current user.',
+        side: 'bottom',
+        align: 'start',
+        sideOffset: 4,
+        open: true,
+      },
     },
     {
       name: 'Product / AI Citation',
-      props: { children: 'Source 3', content: 'Authentication guide, section 4.2: Session renewal.', interactive: true, side: 'right', align: 'center', sideOffset: 6, open: true },
+      props: {
+        children: 'Source 3',
+        content: 'Authentication guide, section 4.2: Session renewal.',
+        side: 'right',
+        align: 'center',
+        sideOffset: 6,
+        open: true,
+      },
     },
   ],
   Progress: [
+    { name: 'Product / Background Task', props: { indeterminate: true, label: 'Analyzing documents' } },
     {
       name: 'Product / File Upload',
-      props: { value: 68, max: 100, tone: 'neutral', shape: 'linear', showValue: true, label: 'Uploading dataset' },
+      props: {
+        value: 68,
+        max: 100,
+        tone: 'neutral',
+        shape: 'linear',
+        showValue: true,
+        label: 'Uploading dataset',
+      },
     },
+  ],
+  Meter: [
+    { name: 'Product / Storage Quota', props: { value: 82, tone: 'warning', label: 'Storage used', showValue: true } },
     {
       name: 'Product / Context Window',
-      props: { value: 74, max: 100, tone: 'warning', shape: 'circle', showValue: true, label: 'Context used' },
+      props: {
+        value: 74,
+        max: 100,
+        tone: 'warning',
+        shape: 'circle',
+        showValue: true,
+        label: 'Context used',
+      },
     },
   ],
   Radio: [
@@ -586,8 +821,11 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         defaultValue: 'annual',
         name: 'billing-cadence',
         membrane: true,
-        ariaLabel: 'Billing cadence',
-        options: [{ value: 'monthly', label: 'Monthly' }, { value: 'annual', label: 'Annual - save 20%' }],
+        'aria-label': 'Billing cadence',
+        options: [
+          { value: 'monthly', label: 'Monthly' },
+          { value: 'annual', label: 'Annual - save 20%' },
+        ],
       },
     },
     {
@@ -597,7 +835,7 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         defaultValue: 'balanced',
         name: 'model-quality',
         membrane: true,
-        ariaLabel: 'Model quality',
+        'aria-label': 'Model quality',
         options: [
           { value: 'fast', label: 'Fast' },
           { value: 'balanced', label: 'Balanced' },
@@ -609,11 +847,23 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Rating: [
     {
       name: 'Product / Customer Satisfaction',
-      props: { defaultValue: 4, max: 5, allowHalf: false, label: 'How helpful was this answer?', ariaLabel: 'Answer helpfulness rating' },
+      props: {
+        defaultValue: 4,
+        max: 5,
+        allowHalf: false,
+        label: 'How helpful was this answer?',
+        name: 'helpfulness',
+        required: true,
+      },
     },
     {
       name: 'Product / Marketplace Score',
-      props: { value: 4.5, max: 5, allowHalf: true, disabled: true, label: '4.5 average rating', ariaLabel: 'Marketplace rating: 4.5 out of 5' },
+      props: {
+        value: 4.2,
+        max: 5,
+        readOnly: true,
+        label: '4.2 average rating',
+      },
     },
   ],
   Scroll: [
@@ -623,7 +873,8 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         orientation: 'vertical',
         height: 240,
         ariaLabel: 'Recent workspace activity',
-        children: '09:42 Deployment completed\n09:38 Smoke tests passed\n09:31 Build started\n09:27 Pull request approved\n09:16 Security scan passed\n09:04 Database backup completed\n08:55 Release candidate created',
+        children:
+          '09:42 Deployment completed\n09:38 Smoke tests passed\n09:31 Build started\n09:27 Pull request approved\n09:16 Security scan passed\n09:04 Database backup completed\n08:55 Release candidate created',
       },
     },
     {
@@ -632,7 +883,8 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         orientation: 'both',
         height: 180,
         ariaLabel: 'Dataset preview',
-        children: 'timestamp,workspace,agent,model,input_tokens,output_tokens,latency_ms,status\n2026-07-10T09:41:00Z,production,research,gpt-5,2840,612,1842,completed',
+        children:
+          'timestamp,workspace,agent,model,input_tokens,output_tokens,latency_ms,status\n2026-07-10T09:41:00Z,production,research,gpt-5,2840,612,1842,completed',
       },
     },
   ],
@@ -640,23 +892,31 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
     {
       name: 'Product / Dashboard View',
       props: {
-        selectionMode: 'single',
+        multiple: false,
         orientation: 'horizontal',
-        defaultValue: ['table'],
-        ariaLabel: 'Dashboard view',
+        defaultValue: 'table',
+        'aria-label': 'Dashboard view',
         membrane: true,
-        items: [{ value: 'table', label: 'Table' }, { value: 'board', label: 'Board' }, { value: 'timeline', label: 'Timeline' }],
+        items: [
+          { value: 'table', label: 'Table' },
+          { value: 'board', label: 'Board' },
+          { value: 'timeline', label: 'Timeline' },
+        ],
       },
     },
     {
       name: 'Product / Notification Channels',
       props: {
-        selectionMode: 'multiple',
+        multiple: true,
         orientation: 'horizontal',
         defaultValue: ['email', 'slack'],
-        ariaLabel: 'Notification channels',
+        'aria-label': 'Notification channels',
         membrane: true,
-        items: [{ value: 'email', label: 'Email' }, { value: 'slack', label: 'Slack' }, { value: 'push', label: 'Push' }],
+        items: [
+          { value: 'email', label: 'Email' },
+          { value: 'slack', label: 'Slack' },
+          { value: 'push', label: 'Push' },
+        ],
       },
     },
   ],
@@ -664,33 +924,38 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
     {
       name: 'Product / AI Model Picker',
       props: {
-        variant: 'side',
-        type: 'select',
         label: 'Model',
         placeholder: 'Choose model',
         defaultValue: 'balanced',
-        ariaLabel: 'AI model',
-        surface: 'popover',
+        'aria-label': 'AI model',
+        surface: 'side',
         surfaceTitle: 'Choose model',
         stretchText: true,
         membrane: true,
-        options: [{ value: 'fast', label: 'Fast' }, { value: 'balanced', label: 'Balanced' }, { value: 'reasoning', label: 'Reasoning' }],
+        options: [
+          { value: 'fast', label: 'Fast' },
+          { value: 'balanced', label: 'Balanced' },
+          { value: 'reasoning', label: 'Reasoning' },
+        ],
       },
     },
     {
       name: 'Product / Team Filter',
       props: {
-        variant: 'default',
-        type: 'multiselect',
+        multiple: true,
         label: 'Teams',
         placeholder: 'All teams',
         defaultValue: ['design', 'engineering'],
-        ariaLabel: 'Filter by team',
+        'aria-label': 'Filter by team',
         surface: 'sheet',
         surfaceTitle: 'Filter teams',
         stretchText: true,
         membrane: true,
-        options: [{ value: 'design', label: 'Design' }, { value: 'engineering', label: 'Engineering' }, { value: 'sales', label: 'Sales' }],
+        options: [
+          { value: 'design', label: 'Design' },
+          { value: 'engineering', label: 'Engineering' },
+          { value: 'sales', label: 'Sales' },
+        ],
       },
     },
   ],
@@ -717,11 +982,28 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Slider: [
     {
       name: 'Product / Price Range',
-      props: { variant: 'simple', label: 'Monthly price', defaultValue: [40, 180], min: 0, max: 250, step: 10, orientation: 'horizontal' },
+      props: {
+        label: 'Monthly price',
+        name: 'price',
+        labels: { thumbs: ['Minimum monthly price', 'Maximum monthly price'] },
+        defaultValue: [40, 180],
+        min: 0,
+        max: 250,
+        step: 10,
+        orientation: 'horizontal',
+      },
     },
     {
       name: 'Product / AI Creativity',
-      props: { variant: 'advanced', label: 'Creativity', defaultValue: [62], min: 0, max: 100, step: 1, leadingIcon: 'component', leadingText: 'Creative' },
+      props: {
+        showValue: true,
+        label: 'Creativity',
+        name: 'creativity',
+        defaultValue: [62],
+        min: 0,
+        max: 100,
+        step: 1,
+      },
     },
   ],
   Steps: [
@@ -733,7 +1015,10 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         items: [
           { label: 'Workspace', content: 'Choose a name and region.' },
           { label: 'Team', content: 'Invite owners and collaborators.' },
-          { label: 'Integrations', content: 'Connect source control and notifications.' },
+          {
+            label: 'Integrations',
+            content: 'Connect source control and notifications.',
+          },
           { label: 'Review', content: 'Confirm configuration before launch.' },
         ],
       },
@@ -741,13 +1026,16 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
     {
       name: 'Product / Deployment Pipeline',
       props: {
-        step: 2,
+        defaultStep: 2,
         linear: false,
         items: [
           { label: 'Build', content: 'Application bundle created.' },
           { label: 'Test', content: 'Unit and integration checks passed.' },
           { label: 'Deploy', content: 'Production rollout is in progress.' },
-          { label: 'Verify', content: 'Health checks will confirm the release.' },
+          {
+            label: 'Verify',
+            content: 'Health checks will confirm the release.',
+          },
         ],
       },
     },
@@ -755,11 +1043,26 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Switcher: [
     {
       name: 'Product / Auto Save',
-      props: { label: 'Auto save', text: 'Save changes continuously', withText: true, defaultChecked: true, name: 'auto-save', value: 'enabled', membrane: true },
+      props: {
+        label: 'Auto save',
+        defaultChecked: true,
+        name: 'auto-save',
+        value: 'enabled',
+        membrane: true,
+        fullWidth: true,
+      },
     },
     {
       name: 'Product / Analytics Consent',
-      props: { label: 'Product analytics', text: 'Share anonymous usage data to improve recommendations and reliability.', withText: true, textWrap: 'wrap', defaultChecked: false, name: 'analytics', value: 'allowed', membrane: true },
+      props: {
+        label: 'Product analytics',
+        truncate: false,
+        defaultChecked: false,
+        name: 'analytics',
+        value: 'allowed',
+        membrane: true,
+        fullWidth: true,
+      },
     },
   ],
   Table: [
@@ -775,13 +1078,24 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         ariaLabel: 'Workspace members',
         rowKey: 'id',
         columns: [
-          { id: 'name', header: 'Member', accessor: 'name', sortable: true, truncate: true },
+          {
+            id: 'name',
+            header: 'Member',
+            accessor: 'name',
+            sortable: true,
+            truncate: true,
+          },
           { id: 'role', header: 'Role', accessor: 'role' },
           { id: 'status', header: 'Status', accessor: 'status' },
         ],
         rows: [
           { id: 'u1', name: 'Maya Chen', role: 'Owner', status: 'Active' },
-          { id: 'u2', name: 'Noah Williams', role: 'Developer', status: 'Invited' },
+          {
+            id: 'u2',
+            name: 'Noah Williams',
+            role: 'Developer',
+            status: 'Invited',
+          },
           { id: 'u3', name: 'Ava Patel', role: 'Analyst', status: 'Active' },
         ],
       },
@@ -799,12 +1113,34 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         rowKey: 'id',
         columns: [
           { id: 'invoice', header: 'Invoice', accessor: 'invoice', width: 160 },
-          { id: 'date', header: 'Date', accessor: 'date', sortable: true, width: 140 },
-          { id: 'amount', header: 'Amount', accessor: 'amount', align: 'right', width: 120 },
+          {
+            id: 'date',
+            header: 'Date',
+            accessor: 'date',
+            sortable: true,
+            width: 140,
+          },
+          {
+            id: 'amount',
+            header: 'Amount',
+            accessor: 'amount',
+            align: 'right',
+            width: 120,
+          },
         ],
         rows: [
-          { id: 'i1', invoice: 'INV-2048', date: '2026-07-01', amount: '$420.00' },
-          { id: 'i2', invoice: 'INV-2017', date: '2026-06-01', amount: '$420.00' },
+          {
+            id: 'i1',
+            invoice: 'INV-2048',
+            date: '2026-07-01',
+            amount: '$420.00',
+          },
+          {
+            id: 'i2',
+            invoice: 'INV-2017',
+            date: '2026-06-01',
+            amount: '$420.00',
+          },
         ],
       },
     },
@@ -813,33 +1149,59 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
     {
       name: 'Product / Analytics Views',
       props: {
+        'aria-label': 'Analytics views',
         orientation: 'horizontal',
         activationMode: 'automatic',
         defaultValue: 'overview',
-        withLine: true,
+        variant: 'underline',
         membrane: true,
         renderPanels: true,
         items: [
-          { value: 'overview', label: 'Overview', content: 'Key metrics and recent trends.' },
-          { value: 'funnels', label: 'Funnels', content: 'Conversion performance by journey.' },
-          { value: 'retention', label: 'Retention', content: 'Cohort retention over time.' },
+          {
+            value: 'overview',
+            label: 'Overview',
+            content: 'Key metrics and recent trends.',
+          },
+          {
+            value: 'funnels',
+            label: 'Funnels',
+            content: 'Conversion performance by journey.',
+          },
+          {
+            value: 'retention',
+            label: 'Retention',
+            content: 'Cohort retention over time.',
+          },
         ],
       },
     },
     {
       name: 'Product / Settings Sections',
       props: {
+        'aria-label': 'Settings sections',
         orientation: 'vertical',
         activationMode: 'manual',
         defaultValue: 'general',
-        withLine: false,
+        variant: 'pill',
         wrap: true,
         membrane: true,
         renderPanels: true,
         items: [
-          { value: 'general', label: 'General', content: 'Workspace identity and defaults.' },
-          { value: 'security', label: 'Security', content: 'Authentication and session policies.' },
-          { value: 'billing', label: 'Billing', content: 'Plan and invoice settings.' },
+          {
+            value: 'general',
+            label: 'General',
+            content: 'Workspace identity and defaults.',
+          },
+          {
+            value: 'security',
+            label: 'Security',
+            content: 'Authentication and session policies.',
+          },
+          {
+            value: 'billing',
+            label: 'Billing',
+            content: 'Plan and invoice settings.',
+          },
         ],
       },
     },
@@ -847,21 +1209,61 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Text: [
     {
       name: 'Product / Dashboard Heading',
-      props: { text: 'Revenue overview', variant: 'h2', size: 'xl', as: 'h2', inset: 'control', fullWidth: true, align: 'left', membrane: true },
+      props: {
+        text: 'Revenue overview',
+        variant: 'h2',
+        size: 'xl',
+        as: 'h2',
+        inset: 'control',
+        fullWidth: true,
+        align: 'left',
+        membrane: true,
+      },
     },
     {
       name: 'Product / Keyboard Shortcut',
-      props: { text: 'Cmd K', variant: 'kbd', size: 'sm', as: 'kbd', inset: 'none', fullWidth: false, align: 'center', membrane: true },
+      props: {
+        text: 'Cmd K',
+        variant: 'kbd',
+        size: 'sm',
+        as: 'kbd',
+        inset: 'none',
+        fullWidth: false,
+        align: 'center',
+        membrane: true,
+      },
     },
   ],
   Tile: [
     {
       name: 'Product / Active Project',
-      props: { text: 'Production API', rightText: 'Healthy', intent: 'default', tone: 'positive', icon: 'folder', active: true, fullWidth: true, align: 'left', actionVisibility: 'hover', membrane: true },
+      props: {
+        text: 'Production API',
+        rightText: 'Healthy',
+        tone: 'positive',
+        icon: 'folder',
+        active: true,
+        fullWidth: true,
+        align: 'left',
+        actionVisibility: 'hover',
+        membrane: true,
+      },
     },
     {
       name: 'Product / Collapsible Workspace',
-      props: { text: 'Customer success', rightText: '12', intent: 'disclosure', tone: 'neutral', icon: 'folder', selector: true, selectorOpen: false, selectedDescendant: true, fullWidth: true, align: 'left', actionVisibility: 'reveal', membrane: true },
+      props: {
+        text: 'Customer success',
+        rightText: '12',
+        tone: 'neutral',
+        icon: 'folder',
+        chevron: 'down',
+        'aria-expanded': false,
+        active: true,
+        fullWidth: true,
+        align: 'left',
+        actionVisibility: 'reveal',
+        membrane: true,
+      },
     },
   ],
   Toast: [
@@ -879,7 +1281,8 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
       name: 'Product / Background Sync',
       props: {
         title: 'Sync is taking longer than expected',
-        description: 'You can keep working while the remaining records are processed.',
+        description:
+          'You can keep working while the remaining records are processed.',
         tone: 'warning',
         dismissible: false,
         action: { label: 'Open activity' },
@@ -919,21 +1322,60 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Toggle: [
     {
       name: 'Product / Editor Mode',
-      props: { type: 'single', orientation: 'horizontal', defaultValue: ['visual'], membrane: true, items: [{ value: 'visual', label: 'Visual' }, { value: 'code', label: 'Code' }] },
+      props: {
+        type: 'single',
+        'aria-label': 'Editor mode',
+        orientation: 'horizontal',
+        defaultValue: ['visual'],
+        membrane: true,
+        items: [
+          { value: 'visual', label: 'Visual' },
+          { value: 'code', label: 'Code' },
+        ],
+      },
     },
     {
       name: 'Product / Visible Layers',
-      props: { type: 'multiple', orientation: 'horizontal', defaultValue: ['grid', 'guides'], membrane: true, items: [{ value: 'grid', label: 'Grid' }, { value: 'guides', label: 'Guides' }, { value: 'comments', label: 'Comments' }] },
+      props: {
+        type: 'multiple',
+        'aria-label': 'Visible layers',
+        orientation: 'horizontal',
+        defaultValue: ['grid', 'guides'],
+        membrane: true,
+        items: [
+          { value: 'grid', label: 'Grid' },
+          { value: 'guides', label: 'Guides' },
+          { value: 'comments', label: 'Comments' },
+        ],
+      },
     },
   ],
   Tooltip: [
     {
       name: 'Product / Keyboard Shortcut Hint',
-      props: { children: 'Search', content: 'Search workspace - Cmd K', side: 'bottom', align: 'center', sideOffset: 2, openDelay: 300, closeDelay: 80, open: true },
+      props: {
+        children: 'Search',
+        content: 'Search workspace - Cmd K',
+        side: 'bottom',
+        align: 'center',
+        sideOffset: 2,
+        openDelay: 300,
+        closeDelay: 80,
+        open: true,
+      },
     },
     {
       name: 'Product / Disabled Action Help',
-      props: { children: 'Deploy', content: 'Resolve two failing checks before deploying.', side: 'top', align: 'end', sideOffset: 4, openDelay: 150, closeDelay: 100, open: true },
+      props: {
+        children: 'Deploy',
+        content: 'Resolve two failing checks before deploying.',
+        side: 'top',
+        align: 'end',
+        sideOffset: 4,
+        openDelay: 150,
+        closeDelay: 100,
+        open: true,
+      },
     },
   ],
   Tree: [
@@ -943,13 +1385,24 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         defaultExpandedIds: ['src', 'components'],
         defaultSelectedId: 'agent',
         items: [
-          { id: 'src', label: 'src', icon: 'folder', children: [
-            { id: 'components', label: 'components', icon: 'folder', kind: 'tile', children: [
-              { id: 'agent', label: 'AgentPanel.tsx', icon: 'file' },
-              { id: 'chat', label: 'ChatComposer.tsx', icon: 'file' },
-            ] },
-            { id: 'app', label: 'App.tsx', icon: 'file' },
-          ] },
+          {
+            id: 'src',
+            label: 'src',
+            icon: 'folder',
+            children: [
+              {
+                id: 'components',
+                label: 'components',
+                icon: 'folder',
+                kind: 'tile',
+                children: [
+                  { id: 'agent', label: 'AgentPanel.tsx', icon: 'file' },
+                  { id: 'chat', label: 'ChatComposer.tsx', icon: 'file' },
+                ],
+              },
+              { id: 'app', label: 'App.tsx', icon: 'file' },
+            ],
+          },
           { id: 'readme', label: 'README.md', icon: 'file' },
         ],
       },
@@ -960,13 +1413,40 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
         defaultExpandedIds: ['company', 'engineering'],
         defaultSelectedId: 'runbooks',
         items: [
-          { id: 'company', label: 'Company wiki', icon: 'folder', kind: 'tile', children: [
-            { id: 'policies', label: 'Policies', icon: 'folder', children: [{ id: 'security-policy', label: 'Security policy', icon: 'file' }] },
-            { id: 'engineering', label: 'Engineering', icon: 'folder', children: [
-              { id: 'runbooks', label: 'Runbooks', icon: 'file', rightText: '8' },
-              { id: 'architecture', label: 'Architecture', icon: 'file' },
-            ] },
-          ] },
+          {
+            id: 'company',
+            label: 'Company wiki',
+            icon: 'folder',
+            kind: 'tile',
+            children: [
+              {
+                id: 'policies',
+                label: 'Policies',
+                icon: 'folder',
+                children: [
+                  {
+                    id: 'security-policy',
+                    label: 'Security policy',
+                    icon: 'file',
+                  },
+                ],
+              },
+              {
+                id: 'engineering',
+                label: 'Engineering',
+                icon: 'folder',
+                children: [
+                  {
+                    id: 'runbooks',
+                    label: 'Runbooks',
+                    icon: 'file',
+                    rightText: '8',
+                  },
+                  { id: 'architecture', label: 'Architecture', icon: 'file' },
+                ],
+              },
+            ],
+          },
         ],
       },
     },
@@ -974,7 +1454,13 @@ export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = {
   Upload: [
     {
       name: 'Product / CSV Import',
-      props: { accept: '.csv,text/csv', multiple: false, maxSize: 10485760, maxFiles: 1, disabled: false },
+      props: {
+        accept: '.csv,text/csv',
+        multiple: false,
+        maxSize: 10485760,
+        maxFiles: 1,
+        disabled: false,
+      },
     },
     {
       name: 'Product / Product Media',

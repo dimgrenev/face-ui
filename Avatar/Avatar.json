@@ -13,28 +13,18 @@
     "name": {
       "type": "string",
       "required": false,
-      "description": "User name (used for initials fallback and alt text).",
+      "description": "Person's full name, used for initials and the accessible name.",
       "default": ""
     },
-    "icon": {
-      "type": "string",
-      "required": false,
-      "description": "Icon content shown when no image is available."
-    },
     "fallback": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Custom fallback content when image is unavailable."
-    },
-    "children": {
-      "type": "string",
-      "required": false,
-      "description": "Custom media content. Rendered inside the clipped avatar circle when no image is available."
+      "description": "Text or rich content shown instead of initials while the image is unavailable."
     },
     "fallbackDelayMs": {
       "type": "number",
       "required": false,
-      "description": "Delay in ms before showing fallback (gives image time to load).",
+      "description": "Delay for a pending image. Missing/failed images show fallback immediately.",
       "default": 0
     }
   },
@@ -44,8 +34,7 @@
       "props": {
         "src": "",
         "name": "Userface",
-        "fallbackDelayMs": 0,
-        "icon": "user"
+        "fallbackDelayMs": 0
       }
     },
     {
@@ -71,10 +60,10 @@
   "behavior": {},
   "keyboard": {},
   "aria": {
-    "nativeElement": "Root is a <span> container with no ARIA role. The `image` part is a native <img> whose accessible name comes from the `name` prop applied as `alt`.",
+    "nativeElement": "A span with role=img and the complete person name; the inner native image has empty alt to avoid duplicate announcements.",
     "notes": [
-      "Accessible name is provided by `name` (rendered as the image `alt` and used to derive the initials fallback). The component does not accept or apply an `aria-label`.",
-      "When the image is unavailable, the fallback (initials, `icon`, or custom `fallback`/`children`) is shown as visible text."
+      "The name prop labels both loaded and fallback states. Override with aria-label or aria-labelledby, or use aria-hidden for a decorative avatar beside a visible name.",
+      "fallback accepts text or React content; omitted fallback derives initials from name."
     ]
   },
   "composition": {

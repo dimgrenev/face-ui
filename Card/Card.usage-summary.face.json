@@ -31,14 +31,14 @@
       "border": {
         "$ref": "props.border"
       },
-      "interactive": {
-        "$ref": "props.interactive"
+      "hoverable": {
+        "$ref": "props.hoverable"
       },
       "fullWidth": {
         "$ref": "props.fullWidth"
       },
-      "footerLayout": {
-        "$ref": "props.footerLayout"
+      "footerAlign": {
+        "$ref": "props.footerAlign"
       },
       "children": {
         "$ref": "props.children"
@@ -53,12 +53,12 @@
       "padding": "default",
       "radius": "lg",
       "border": true,
-      "footerLayout": "between",
+      "footerAlign": "between",
       "footer": {
         "__componentName__": "Button",
         "text": "View usage",
         "icon": "arrow-right",
-        "iconPosition": "right",
+        "iconPosition": "end",
         "fullWidth": false
       }
     }
@@ -84,9 +84,9 @@
     },
     {
       "name": "footer",
-      "type": "object",
+      "type": "any",
       "required": false,
-      "description": "Convenience footer slot. Use React content or a structured component descriptor.",
+      "description": "Convenience footer slot: text, React content, component descriptors or arrays. The JSON editor accepts every serializable form.",
       "controlType": "object"
     },
     {
@@ -99,6 +99,7 @@
         "plain",
         "code"
       ],
+      "defaultValue": "default",
       "controlType": "select"
     },
     {
@@ -112,6 +113,7 @@
         "membrane",
         "none"
       ],
+      "defaultValue": "default",
       "controlType": "select"
     },
     {
@@ -124,28 +126,32 @@
         "lg",
         "none"
       ],
+      "defaultValue": "md",
       "controlType": "select"
     },
     {
       "name": "border",
       "type": "boolean",
       "required": false,
-      "description": "Whether the surface draws the membrane/border stroke."
+      "description": "Draw the surface border independently of padding, radius and variant.",
+      "defaultValue": true
     },
     {
-      "name": "interactive",
+      "name": "hoverable",
       "type": "boolean",
       "required": false,
-      "description": "Applies interactive hover surface behavior without making the card itself a button."
+      "description": "Highlight the surface on hover or focus within; does not create an action.",
+      "defaultValue": false
     },
     {
       "name": "fullWidth",
       "type": "boolean",
       "required": false,
-      "description": "Whether the card stretches to the available inline size. When disabled, the card keeps intrinsic width and centers in the available inline space."
+      "description": "Stretch to the available inline size. False uses intrinsic width and preserves parent alignment.",
+      "defaultValue": true
     },
     {
-      "name": "footerLayout",
+      "name": "footerAlign",
       "type": "select",
       "required": false,
       "description": "Alignment used by the convenience footer slot. Compound usage configures Card.Footer directly.",
@@ -154,11 +160,11 @@
         "end",
         "between"
       ],
-      "controlType": "select"
+      "defaultValue": "end"
     },
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Compound children or custom content escape hatch."
     }

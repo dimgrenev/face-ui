@@ -13,14 +13,8 @@
       "name": {
         "$ref": "props.name"
       },
-      "icon": {
-        "$ref": "props.icon"
-      },
       "fallback": {
         "$ref": "props.fallback"
-      },
-      "children": {
-        "$ref": "props.children"
       },
       "fallbackDelayMs": {
         "$ref": "props.fallbackDelayMs"
@@ -48,32 +42,20 @@
       "name": "name",
       "type": "string",
       "required": false,
-      "description": "User name (used for initials fallback and alt text).",
+      "description": "Person's full name, used for initials and the accessible name.",
       "defaultValue": ""
     },
     {
-      "name": "icon",
-      "type": "string",
-      "required": false,
-      "description": "Icon content shown when no image is available."
-    },
-    {
       "name": "fallback",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Custom fallback content when image is unavailable."
-    },
-    {
-      "name": "children",
-      "type": "string",
-      "required": false,
-      "description": "Custom media content. Rendered inside the clipped avatar circle when no image is available."
+      "description": "Text or rich content shown instead of initials while the image is unavailable."
     },
     {
       "name": "fallbackDelayMs",
       "type": "number",
       "required": false,
-      "description": "Delay in ms before showing fallback (gives image time to load).",
+      "description": "Delay for a pending image. Missing/failed images show fallback immediately.",
       "defaultValue": 0
     }
   ],

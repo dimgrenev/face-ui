@@ -131,13 +131,13 @@
     },
     {
       "name": "trigger",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Optional trigger for compact mode."
     },
     {
       "name": "surfaceTitle",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Optional title used in compact sheet header."
     }

@@ -28,6 +28,9 @@
       "closable": {
         "$ref": "props.closable"
       },
+      "closeLabel": {
+        "$ref": "props.closeLabel"
+      },
       "title": {
         "$ref": "props.title"
       },
@@ -134,20 +137,26 @@
       "defaultValue": true
     },
     {
-      "name": "title",
+      "name": "closeLabel",
       "type": "string",
+      "required": false,
+      "description": "Accessible name and tooltip of the close button. Empty text uses the default."
+    },
+    {
+      "name": "title",
+      "type": "any",
       "required": false,
       "description": "Title content rendered inside the surface."
     },
     {
       "name": "description",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Description content rendered below the title."
     },
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Body content."
     },
@@ -159,7 +168,7 @@
     },
     {
       "name": "trigger",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Trigger element that toggles the modal open."
     },
@@ -174,8 +183,7 @@
       "name": "scrollLock",
       "type": "boolean",
       "required": false,
-      "description": "Lock body scroll while the modal is open. Opt-in; off by default.",
-      "defaultValue": false
+      "description": "Lock body scroll while open. Defaults to true for portaled surfaces."
     },
     {
       "name": "portal",

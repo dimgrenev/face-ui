@@ -58,12 +58,12 @@
       "default": false
     },
     "trigger": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Optional trigger for compact mode."
     },
     "surfaceTitle": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Optional title used in compact sheet header."
     }

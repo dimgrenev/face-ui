@@ -7,7 +7,15 @@
  * `<Command items={[{ id: 'copy', label: 'Copy', keywords: ['clipboard'] }]} />`
  */
 
-import { forwardRef, useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useId,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  type ReactNode,
+} from 'react'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
 import { useControllableOpenState } from '../assets/adapters/react/use-controllable-open-state'
@@ -16,14 +24,21 @@ import {
   useResponsiveOverlaySurface,
 } from '../assets/adapters/react/use-responsive-overlay-surface'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
-import { useFocusTrap } from '../assets/adapters/react/use-focus-trap'
-import { commandMachine, connectCommand } from '../assets/machines/command.machine'
-import type { CommandItemDef, CommandGroupDef } from '../assets/machines/command.machine'
+import { useLayer } from '../assets/adapters/react/use-layer'
+import {
+  commandMachine,
+  connectCommand,
+} from '../assets/machines/command.machine'
+import type {
+  CommandItemDef,
+  CommandGroupDef,
+} from '../assets/machines/command.machine'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
 import { Card } from '../Card/Card'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
+import { Membrane } from '../assets/adapters/react/Membrane'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -82,7 +97,8 @@ export interface CommandProps {
 function toMachineItems(items: CommandItem[]): CommandItemDef[] {
   return items.map((item) => ({
     id: item.id,
-    label: typeof item.label === 'string' ? item.label : String(item.label ?? ''),
+    label:
+      typeof item.label === 'string' ? item.label : String(item.label ?? ''),
     keywords: item.keywords,
     group: item.group,
     disabled: item.disabled,
@@ -116,72 +132,72 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
     const items = Array.isArray(rawItems) ? rawItems : []
 
     // Memoize machine items by serialized ids to avoid infinite re-render loop
-    const itemsKey = items.map(i => i.id).join(',')
+    const itemsKey = items.map((i) => i.id).join(',')
     const machineItems = useMemo(() => toMachineItems(items), [itemsKey])
     const machineQuery = useControllableMachineProp(
       typeof value === 'string' ? value : undefined,
       defaultValue,
     )
     const responsiveOverlaySurface = useResponsiveOverlaySurface(
-      surface === 'dialog' ? 'sheet' : surface === 'inline' ? 'popover' : 'auto',
+      surface === 'dialog'
+        ? 'sheet'
+        : surface === 'inline'
+          ? 'popover'
+          : 'auto',
       surfaceBreakpoint,
     )
-    const resolvedSurface = responsiveOverlaySurface === 'sheet' ? 'dialog' : 'inline'
+    const resolvedSurface =
+      responsiveOverlaySurface === 'sheet' ? 'dialog' : 'inline'
     const isDialogSurface = resolvedSurface === 'dialog'
-    const [dialogOpen, setDialogOpen] = useControllableOpenState(open, defaultOpen, onOpenChange)
+    const [dialogOpen, setDialogOpen] = useControllableOpenState(
+      open,
+      defaultOpen,
+      onOpenChange,
+    )
     const inputRef = useRef<HTMLInputElement | null>(null)
     const paletteRef = useRef<HTMLDivElement | null>(null)
-    const setPaletteRef = useCallback((node: HTMLDivElement | null) => {
-      paletteRef.current = node
-      if (typeof ref === 'function') ref(node)
-      else if (ref) (ref as { current: HTMLDivElement | null }).current = node
-    }, [ref])
+    const setPaletteRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        paletteRef.current = node
+        if (typeof ref === 'function') ref(node)
+        else if (ref) (ref as { current: HTMLDivElement | null }).current = node
+      },
+      [ref],
+    )
 
     const { state, send } = useMachine(commandMachine, {
       items: machineItems,
       groups: groups as CommandGroupDef[],
       query: machineQuery,
       onValueChange: onValueChange ?? null,
-      onSelect: ((details: { item: CommandItemDef }) => {
+      onSelect: (details: { item: CommandItemDef }) => {
         onSelect?.(details)
         if (isDialogSurface) {
           setDialogOpen(false)
         }
-      }),
+      },
     })
     useBodyScrollLock(isDialogSurface && dialogOpen)
-    // Modal palette (dialog surface) traps focus; inline surface does not.
-    useFocusTrap(paletteRef, isDialogSurface && dialogOpen)
+    useLayer({
+      enabled: isDialogSurface && dialogOpen,
+      contentRef: paletteRef,
+      modal: true,
+      autoFocus: true,
+      restoreFocus: true,
+      onEscape: () => setDialogOpen(false),
+      onOutside: () => setDialogOpen(false),
+    })
 
     // Sync items when they change (stable dependency via itemsKey)
     useEffect(() => {
-      send({ type: 'SET_ITEMS', items: machineItems } as CommandItemDef & { type: 'SET_ITEMS'; items: CommandItemDef[] })
+      send({ type: 'SET_ITEMS', items: machineItems } as CommandItemDef & {
+        type: 'SET_ITEMS'
+        items: CommandItemDef[]
+      })
     }, [machineItems, send])
 
-    useEffect(() => {
-      if (!isDialogSurface || !dialogOpen) return
-      const timer = window.setTimeout(() => {
-        inputRef.current?.focus()
-      }, 0)
-      return () => {
-        window.clearTimeout(timer)
-      }
-    }, [isDialogSurface, dialogOpen])
-
-    useEffect(() => {
-      if (!isDialogSurface || !dialogOpen) return
-      const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key !== 'Escape') return
-        event.preventDefault()
-        setDialogOpen(false)
-      }
-      document.addEventListener('keydown', handleKeyDown)
-      return () => {
-        document.removeEventListener('keydown', handleKeyDown)
-      }
-    }, [isDialogSurface, dialogOpen, setDialogOpen])
-
-    const api = connectCommand(state, send)
+    const instanceId = useId()
+    const api = connectCommand(state, send, instanceId)
 
     // Build a lookup from machine item id -> original ReactNode label
     const labelMap = new Map<string, ReactNode>()
@@ -198,6 +214,7 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
         {...api.getInputProps()}
         ref={inputRef}
         placeholder={placeholder}
+        aria-label={placeholder || 'Search commands'}
       />
     )
     const showPalette = !isDialogSurface || dialogOpen
@@ -211,50 +228,79 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
         fullWidth
         className={cn('uf-command', className)}
         data-surface={resolvedSurface}
+        role={isDialogSurface ? 'dialog' : undefined}
+        aria-modal={isDialogSurface || undefined}
+        aria-label={isDialogSurface ? placeholder || 'Commands' : undefined}
+        tabIndex={isDialogSurface ? -1 : undefined}
       >
-        <span className="uf-membrane uf-membrane--full uf-command__inputMembrane">
+        <Membrane
+          fullWidth
+          as="div"
+          className="uf-command__inputMembrane"
+          interactive
+          target={'input'}
+        >
           {inputNode}
-        </span>
+        </Membrane>
 
         <div {...api.getListProps()}>
           {api.isEmpty && (
             <div {...api.getEmptyProps()}>
-              {(typeof emptyContent === 'string' || typeof emptyContent === 'number') ? (
+              {typeof emptyContent === 'string' ||
+              typeof emptyContent === 'number' ? (
                 <Text as="span" inset="none" membrane={false}>
                   {emptyContent}
                 </Text>
-              ) : emptyContent}
+              ) : (
+                emptyContent
+              )}
             </div>
           )}
 
           {groupedItems.map((section) => {
             if (section.group) {
               return (
-                <div key={section.group.id} {...api.getGroupProps({ id: section.group.id })}>
+                <div
+                  key={section.group.id}
+                  {...api.getGroupProps({ id: section.group.id })}
+                >
                   <div {...api.getGroupLabelProps({ id: section.group.id })}>
-                    <Text as="span" size="xs" inset="none" membrane={false} text={section.group.label} />
+                    <Text
+                      as="span"
+                      size="xs"
+                      inset="none"
+                      membrane={false}
+                      text={section.group.label}
+                    />
                   </div>
                   {section.items.map((item) => {
                     const currentIndex = globalIndex++
-                    const itemProps = api.getItemProps({ id: item.id, index: currentIndex, disabled: item.disabled })
+                    const itemProps = api.getItemProps({
+                      id: item.id,
+                      index: currentIndex,
+                      disabled: item.disabled,
+                    })
                     return (
-                      <span
+                      <Membrane
+                        fullWidth
                         key={`${item.id}:membrane`}
-                        className="uf-membrane uf-membrane--full uf-command-itemMembrane"
-                        data-membrane-interactive=""
-                        onClick={(event) => {
-                          if (event.target !== event.currentTarget) return
-                          ;(itemProps as { onClick?: () => void }).onClick?.()
-                        }}
+                        className="uf-command-itemMembrane"
                         onPointerEnter={() => {
-                          ;(itemProps as { onPointerEnter?: () => void }).onPointerEnter?.()
+                          ;(
+                            itemProps as { onPointerEnter?: () => void }
+                          ).onPointerEnter?.()
                         }}
                         onMouseEnter={() => {
-                          ;(itemProps as { onMouseEnter?: () => void }).onMouseEnter?.()
+                          ;(
+                            itemProps as { onMouseEnter?: () => void }
+                          ).onMouseEnter?.()
                         }}
                         onMouseOver={() => {
-                          ;(itemProps as { onMouseOver?: () => void }).onMouseOver?.()
+                          ;(
+                            itemProps as { onMouseOver?: () => void }
+                          ).onMouseOver?.()
                         }}
+                        interactive
                       >
                         <Button
                           {...itemProps}
@@ -271,7 +317,7 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
                         >
                           {labelMap.get(item.id) ?? item.label}
                         </Button>
-                      </span>
+                      </Membrane>
                     )
                   })}
                 </div>
@@ -280,25 +326,30 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
 
             return section.items.map((item) => {
               const currentIndex = globalIndex++
-              const itemProps = api.getItemProps({ id: item.id, index: currentIndex, disabled: item.disabled })
+              const itemProps = api.getItemProps({
+                id: item.id,
+                index: currentIndex,
+                disabled: item.disabled,
+              })
               return (
-                <span
+                <Membrane
+                  fullWidth
                   key={`${item.id}:membrane`}
-                  className="uf-membrane uf-membrane--full uf-command-itemMembrane"
-                  data-membrane-interactive=""
-                  onClick={(event) => {
-                    if (event.target !== event.currentTarget) return
-                    ;(itemProps as { onClick?: () => void }).onClick?.()
-                  }}
+                  className="uf-command-itemMembrane"
                   onPointerEnter={() => {
-                    ;(itemProps as { onPointerEnter?: () => void }).onPointerEnter?.()
+                    ;(
+                      itemProps as { onPointerEnter?: () => void }
+                    ).onPointerEnter?.()
                   }}
                   onMouseEnter={() => {
-                    ;(itemProps as { onMouseEnter?: () => void }).onMouseEnter?.()
+                    ;(
+                      itemProps as { onMouseEnter?: () => void }
+                    ).onMouseEnter?.()
                   }}
                   onMouseOver={() => {
                     ;(itemProps as { onMouseOver?: () => void }).onMouseOver?.()
                   }}
+                  interactive
                 >
                   <Button
                     {...itemProps}
@@ -315,7 +366,7 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
                   >
                     {labelMap.get(item.id) ?? item.label}
                   </Button>
-                </span>
+                </Membrane>
               )
             })
           })}
@@ -328,8 +379,12 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
     }
 
     return (
-      <div className="uf-commandSurface" data-surface={resolvedSurface} data-state={dialogOpen ? 'open' : 'closed'}>
-        <span className="uf-membrane uf-membrane--full uf-command__triggerMembrane">
+      <div
+        className="uf-commandSurface"
+        data-surface={resolvedSurface}
+        data-state={dialogOpen ? 'open' : 'closed'}
+      >
+        <Membrane fullWidth className="uf-command__triggerMembrane" interactive>
           <button
             type="button"
             className="uf-command__trigger"
@@ -344,12 +399,15 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
               as="span"
               membrane={false}
               inset="none"
-              className={cn('uf-command__triggerLabel', !api.query && 'uf-command__triggerLabel--placeholder')}
+              className={cn(
+                'uf-command__triggerLabel',
+                !api.query && 'uf-command__triggerLabel--placeholder',
+              )}
             >
               {triggerLabel}
             </Text>
           </button>
-        </span>
+        </Membrane>
 
         <div
           className="uf-responsive-overlay-backdrop"
@@ -357,7 +415,10 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
           onClick={() => setDialogOpen(false)}
         />
 
-        <div className="uf-command__dialog" data-state={dialogOpen ? 'open' : 'closed'}>
+        <div
+          className="uf-command__dialog"
+          data-state={dialogOpen ? 'open' : 'closed'}
+        >
           {showPalette ? commandBody : null}
         </div>
       </div>

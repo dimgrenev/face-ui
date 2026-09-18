@@ -8,8 +8,6 @@
  */
 
 import {
-  Children,
-  cloneElement,
   forwardRef,
   isValidElement,
   useCallback,
@@ -17,12 +15,11 @@ import {
   useId,
   useMemo,
   useRef,
-  type CSSProperties,
   type MutableRefObject,
-  type ReactElement,
   type ReactNode,
-  type SyntheticEvent,
 } from 'react'
+import { Trigger } from '../assets/adapters/react/Trigger'
+import { usePortalTarget } from '../assets/adapters/react/use-portal-target'
 import { createPortal } from 'react-dom'
 import { useMachine } from '../assets/adapters/react/use-machine'
 import {
@@ -31,8 +28,11 @@ import {
   type ResponsiveOverlaySurface,
 } from '../assets/adapters/react/use-responsive-overlay-surface'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
-import { useDismissOutside } from '../assets/adapters/react/use-dismiss-outside'
-import { useFloatingPosition, type FloatingAlign } from '../assets/adapters/react/use-floating-position'
+import { useLayer } from '../assets/adapters/react/use-layer'
+import {
+  useFloatingPosition,
+  type FloatingAlign,
+} from '../assets/adapters/react/use-floating-position'
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
 import { menuMachine, connectMenu } from '../assets/machines/menu.machine'
 import type { MenuSchema } from '../assets/machines/menu.machine'
@@ -41,6 +41,7 @@ import { Button } from '../Button/Button'
 import { Card } from '../Card/Card'
 import { Separator } from '../Separator/Separator'
 import { Text } from '../Text/Text'
+import { Membrane } from '../assets/adapters/react/Membrane'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -109,9 +110,12 @@ const EMPTY_MENU_ITEMS: MenuItemEntry[] = []
 
 function getMenuLabelText(label: ReactNode): string {
   if (label == null || typeof label === 'boolean') return ''
-  if (typeof label === 'string' || typeof label === 'number') return String(label)
-  if (Array.isArray(label)) return label.map(getMenuLabelText).filter(Boolean).join(' ')
-  if (isValidElement<{ children?: ReactNode }>(label)) return getMenuLabelText(label.props.children)
+  if (typeof label === 'string' || typeof label === 'number')
+    return String(label)
+  if (Array.isArray(label))
+    return label.map(getMenuLabelText).filter(Boolean).join(' ')
+  if (isValidElement<{ children?: ReactNode }>(label))
+    return getMenuLabelText(label.props.children)
   return ''
 }
 
@@ -127,9 +131,10 @@ function collectMenuMachineMetadata(entries: MenuItemEntry[]): {
   const addItem = (item: MenuItemDef) => {
     itemOrder.push(item.value)
     if (item.disabled) disabledValues.push(item.value)
-    itemLabels[item.value] = typeof item.textValue === 'string'
-      ? item.textValue
-      : getMenuLabelText(item.label)
+    itemLabels[item.value] =
+      typeof item.textValue === 'string'
+        ? item.textValue
+        : getMenuLabelText(item.label)
   }
 
   for (const entry of entries) {
@@ -144,35 +149,6 @@ function collectMenuMachineMetadata(entries: MenuItemEntry[]): {
   }
 
   return { itemOrder, disabledValues, itemLabels }
-}
-
-type TriggerEvent = SyntheticEvent<HTMLElement> & {
-  key?: string
-  preventDefault: () => void
-}
-
-type TriggerElementProps = {
-  [key: string]: unknown
-  className?: string
-  style?: CSSProperties
-  disabled?: boolean
-  onClick?: (event: TriggerEvent) => void
-  onContextMenu?: (event: TriggerEvent) => void
-  onKeyDown?: (event: TriggerEvent) => void
-}
-
-function composeTriggerHandler(
-  childHandler: ((event: TriggerEvent) => void) | undefined,
-  menuHandler: ((event: TriggerEvent) => void) | undefined,
-) {
-  if (!childHandler) return menuHandler
-  if (!menuHandler) return childHandler
-
-  return (event: TriggerEvent) => {
-    childHandler(event)
-    if (event.isPropagationStopped()) return
-    menuHandler(event)
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -197,7 +173,10 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
     } = props
 
     const items = Array.isArray(rawItems) ? rawItems : EMPTY_MENU_ITEMS
-    const menuMachineMetadata = useMemo(() => collectMenuMachineMetadata(items), [items])
+    const menuMachineMetadata = useMemo(
+      () => collectMenuMachineMetadata(items),
+      [items],
+    )
 
     const { state, send } = useMachine<MenuSchema>(menuMachine, {
       trigger,
@@ -211,13 +190,16 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
 
     const api = connectMenu(state, send)
     const isOpen = state.matches('open')
-    const resolvedSurface = useResponsiveOverlaySurface(surface, surfaceBreakpoint)
+    const portalTarget = usePortalTarget()
+    const resolvedSurface = useResponsiveOverlaySurface(
+      surface,
+      surfaceBreakpoint,
+    )
     const contentId = useId()
     const triggerElRef = useRef<HTMLElement | null>(null)
     const contentElRef = useRef<HTMLDivElement | null>(null)
-    const dismissRefs = useMemo(() => [triggerElRef, contentElRef], [])
     const { style: floatingStyle } = useFloatingPosition({
-      open: isOpen && resolvedSurface === 'popover',
+      open: isOpen && portalTarget !== null && resolvedSurface === 'popover',
       triggerRef: triggerElRef,
       contentRef: contentElRef,
       side: 'bottom',
@@ -228,63 +210,35 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
       send({ type: 'DISMISS' })
     }, [send])
 
-    useDismissOutside({
-      enabled: isOpen && resolvedSurface === 'popover',
-      refs: dismissRefs,
-      onDismiss: dismissMenu,
+    useLayer({
+      enabled: isOpen && (resolvedSurface === 'sheet' || portalTarget !== null),
+      contentRef: contentElRef,
+      triggerRef: triggerElRef,
+      modal: resolvedSurface === 'sheet',
+      autoFocus: resolvedSurface === 'sheet',
+      restoreFocus: true,
+      onOutside: dismissMenu,
+      onEscape: dismissMenu,
     })
 
-    useEffect(() => {
-      if (!isOpen) return undefined
-
-      const ownerDocument = contentElRef.current?.ownerDocument
-        ?? triggerElRef.current?.ownerDocument
-        ?? (typeof document === 'undefined' ? null : document)
-      if (!ownerDocument) return undefined
-
-      const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-          dismissMenu()
-        }
-      }
-
-      ownerDocument.addEventListener('keydown', handleKeyDown, true)
-      return () => {
-        ownerDocument.removeEventListener('keydown', handleKeyDown, true)
-      }
-    }, [dismissMenu, isOpen])
-
     useBodyScrollLock(isOpen && resolvedSurface === 'sheet')
-    const sheetTitle = surfaceTitle ?? (
-      typeof children === 'string' || typeof children === 'number'
+    const sheetTitle =
+      surfaceTitle ??
+      (typeof children === 'string' || typeof children === 'number'
         ? String(children)
-        : 'Options'
-    )
+        : 'Options')
 
-    const rawTriggerProps = api.getTriggerProps() as TriggerElementProps
-    const {
-      ['data-scope']: triggerScope,
-      ['data-part']: triggerPart,
-      ...interactiveTriggerBaseProps
-    } = rawTriggerProps
     const triggerProps = {
-      ...interactiveTriggerBaseProps,
+      ...api.getTriggerProps(),
       'aria-controls': contentId,
-    } as TriggerElementProps
+    }
     const contentProps = api.getContentProps()
-    const triggerNode = (() => {
-      if (children == null) return <Button text="Options" fullWidth={false} />
-      if (typeof children === 'string' || typeof children === 'number') {
-        return <Button text={String(children)} fullWidth={false} />
-      }
-      return children
-    })()
-
     const handleContentRef = useCallback(
       (el: HTMLDivElement | null) => {
         contentElRef.current = el
         if (typeof ref === 'function') ref(el)
-        else if (ref) (ref as MutableRefObject<HTMLDivElement | null>).current = el
+        else if (ref)
+          (ref as MutableRefObject<HTMLDivElement | null>).current = el
         send({ type: 'SET_CONTENT', el } as MenuSchema['event'])
       },
       [ref, send],
@@ -299,44 +253,33 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
     )
 
     useEffect(() => {
-      if (!isOpen || !state.context.highlightedValue || !state.context.highlightedByKeyboard) return
+      if (
+        !isOpen ||
+        !state.context.highlightedValue ||
+        !state.context.highlightedByKeyboard
+      )
+        return
       const contentEl = contentElRef.current
       if (!contentEl || typeof document === 'undefined') return
 
-      const highlightedItem = Array.from(contentEl.querySelectorAll<HTMLElement>('[role="menuitem"]'))
-        .find((node) => node.dataset.value === state.context.highlightedValue)
+      const highlightedItem = Array.from(
+        contentEl.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+      ).find((node) => node.dataset.value === state.context.highlightedValue)
       if (highlightedItem && document.activeElement !== highlightedItem) {
         highlightedItem.focus()
       }
-    }, [isOpen, state.context.highlightedByKeyboard, state.context.highlightedValue])
-
-    const renderTrigger = () => {
-      if (isValidElement<TriggerElementProps>(triggerNode)) {
-        const child = Children.only(triggerNode) as ReactElement<TriggerElementProps>
-        const childProps = child.props
-        return cloneElement(child, {
-          ...triggerProps,
-          disabled: childProps.disabled || triggerProps.disabled ? true : undefined,
-          onClick: composeTriggerHandler(childProps.onClick, triggerProps.onClick),
-          onContextMenu: composeTriggerHandler(childProps.onContextMenu, triggerProps.onContextMenu),
-          onKeyDown: composeTriggerHandler(childProps.onKeyDown, triggerProps.onKeyDown),
-        })
-      }
-
-      return (
-        <Button
-          {...triggerProps}
-          fullWidth={false}
-          disabled={Boolean(triggerProps.disabled)}
-        >
-          {triggerNode}
-        </Button>
-      )
-    }
+    }, [
+      isOpen,
+      state.context.highlightedByKeyboard,
+      state.context.highlightedValue,
+    ])
 
     // Render a flat or grouped item
     const renderItem = (item: MenuItemDef, key: string) => {
-      const itemProps = api.getItemProps({ value: item.value, disabled: item.disabled })
+      const itemProps = api.getItemProps({
+        value: item.value,
+        disabled: item.disabled,
+      })
       return (
         <Button
           key={`${key}:button`}
@@ -344,7 +287,12 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
           fullWidth
           align="left"
           stretchText
-          className={cn('uf-menu-item', 'uf-option', 'uf-control', (itemProps as { className?: string }).className)}
+          className={cn(
+            'uf-menu-item',
+            'uf-option',
+            'uf-control',
+            (itemProps as { className?: string }).className,
+          )}
         >
           {item.label}
         </Button>
@@ -352,7 +300,11 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
     }
 
     const renderSeparator = (key: string) => (
-      <Separator key={`${key}:separator`} {...api.getSeparatorProps()} className={cn('uf-menu-separator')} />
+      <Separator
+        key={`${key}:separator`}
+        {...api.getSeparatorProps()}
+        className={cn('uf-menu-separator')}
+      />
     )
 
     const renderEntries = (entries: MenuItemEntry[]) =>
@@ -363,9 +315,22 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
 
         if (isGroup(entry)) {
           return (
-            <div key={`group-${i}`} {...api.getGroupProps()} className={cn('uf-menu-group')}>
-              <div {...api.getGroupLabelProps()} className={cn('uf-menu-group-label')}>
-                <Text as="span" size="xs" inset="none" membrane={false} text={entry.label} />
+            <div
+              key={`group-${i}`}
+              {...api.getGroupProps()}
+              className={cn('uf-menu-group')}
+            >
+              <div
+                {...api.getGroupLabelProps()}
+                className={cn('uf-menu-group-label')}
+              >
+                <Text
+                  as="span"
+                  size="xs"
+                  inset="none"
+                  membrane={false}
+                  text={entry.label}
+                />
               </div>
               {entry.items.map((subItem, j) =>
                 isSeparator(subItem)
@@ -386,10 +351,14 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
         id={contentId}
         data-surface={resolvedSurface}
         data-trigger={trigger}
-        className={cn('uf-menu-content', (contentProps as { className?: string }).className, className)}
+        className={cn(
+          'uf-menu-content',
+          (contentProps as { className?: string }).className,
+          className,
+        )}
         style={resolvedSurface === 'popover' ? floatingStyle : undefined}
       >
-        <span className="uf-membrane uf-membrane--full uf-menu-contentMembrane">
+        <Membrane fullWidth as="div" className="uf-menu-contentMembrane">
           <Card
             padding="membrane"
             radius="md"
@@ -404,41 +373,33 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
             ) : null}
             {renderEntries(items)}
           </Card>
-        </span>
+        </Membrane>
       </div>
     )
 
     const renderedContent = useMemo(() => {
-      if (resolvedSurface === 'sheet' || typeof document === 'undefined') return contentElement
-      return createPortal(contentElement, document.body)
-    }, [contentElement, resolvedSurface])
+      if (resolvedSurface === 'sheet' || !portalTarget) return contentElement
+      return createPortal(contentElement, portalTarget)
+    }, [contentElement, resolvedSurface, portalTarget])
 
     return (
-      <div className="uf-menu" data-surface={resolvedSurface} data-trigger={trigger}>
-        <span
+      <div
+        className="uf-menu"
+        data-surface={resolvedSurface}
+        data-trigger={trigger}
+      >
+        <Trigger
+          {...triggerProps}
           ref={handleTriggerRef}
-          data-scope={triggerScope as string | undefined}
-          data-part={triggerPart as string | undefined}
-          data-state={triggerProps['data-state'] as string | undefined}
-          className={cn('uf-menu-trigger')}
-          style={{ display: 'inline-flex' }}
-          onClick={(event) => {
-            if (event.target !== event.currentTarget) return
-            triggerProps.onClick?.(event as unknown as TriggerEvent)
-          }}
-          onContextMenu={(event) => {
-            if (event.target !== event.currentTarget) return
-            triggerProps.onContextMenu?.(event as unknown as TriggerEvent)
-          }}
+          className="uf-menu-trigger"
         >
-          {renderTrigger()}
-        </span>
+          {children ?? 'Options'}
+        </Trigger>
 
         {resolvedSurface === 'sheet' ? (
           <div
             className="uf-responsive-overlay-backdrop"
             data-state={isOpen ? 'open' : 'closed'}
-            onClick={() => send({ type: 'DISMISS' })}
           />
         ) : null}
 

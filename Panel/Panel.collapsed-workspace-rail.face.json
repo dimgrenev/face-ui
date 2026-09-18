@@ -113,14 +113,14 @@
     },
     {
       "name": "width",
-      "type": "number",
+      "type": "any",
       "required": false,
       "description": "Width when expanded.",
       "defaultValue": 260
     },
     {
       "name": "collapsedWidth",
-      "type": "number",
+      "type": "any",
       "required": false,
       "description": "Width when collapsed.",
       "defaultValue": 60
@@ -158,13 +158,13 @@
     },
     {
       "name": "trigger",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Optional trigger for sheet mode."
     },
     {
       "name": "surfaceTitle",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Optional title used in compact sheet header."
     }

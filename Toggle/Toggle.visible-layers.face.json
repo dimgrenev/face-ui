@@ -10,23 +10,38 @@
       "items": {
         "$ref": "props.items"
       },
-      "value": {
-        "$ref": "props.value"
-      },
-      "defaultValue": {
-        "$ref": "props.defaultValue"
-      },
-      "type": {
-        "$ref": "props.type"
-      },
       "disabled": {
         "$ref": "props.disabled"
       },
       "orientation": {
         "$ref": "props.orientation"
       },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "form": {
+        "$ref": "props.form"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
       "membrane": {
         "$ref": "props.membrane"
+      },
+      "type": {
+        "$ref": "props.type"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
       }
     },
     "children": []
@@ -34,6 +49,7 @@
   "currentState": {
     "props": {
       "type": "multiple",
+      "aria-label": "Visible layers",
       "orientation": "horizontal",
       "defaultValue": [
         "grid",
@@ -61,25 +77,65 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Toggle items to render."
+      "description": "Choices in visual, keyboard and form order; missing items render an empty group."
     },
     {
-      "name": "value",
-      "type": "array",
+      "name": "disabled",
+      "type": "boolean",
       "required": false,
-      "description": "Currently selected values."
+      "description": "Disable every control and exclude the group from FormData."
     },
     {
-      "name": "defaultValue",
-      "type": "array",
+      "name": "orientation",
+      "type": "select",
       "required": false,
-      "description": "Uncontrolled initial selected values."
+      "description": "Visual axis; single radio mode supports both arrow pairs.",
+      "options": [
+        "horizontal",
+        "vertical"
+      ]
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible group name when there is no visible heading."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Visible heading IDs that name this group."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native FormData key; multiple selections produce repeated entries."
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "ID of an external form that owns the selection."
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the selected enabled choice, or the first enabled choice, on mount."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Shared outer spacing around each item; toggling preserves DOM and focus."
     },
     {
       "name": "type",
       "type": "select",
       "required": false,
-      "description": "Selection mode: single or multiple.",
+      "description": "Legacy selection mode; new code uses SegmentedControl multiple.",
       "options": [
         "single",
         "multiple"
@@ -87,26 +143,16 @@
       "defaultValue": "multiple"
     },
     {
-      "name": "disabled",
-      "type": "boolean",
+      "name": "value",
+      "type": "array",
       "required": false,
-      "description": "Disabled state for the entire group."
+      "description": "Selected choices; single mode accepts at most one."
     },
     {
-      "name": "orientation",
-      "type": "select",
+      "name": "defaultValue",
+      "type": "array",
       "required": false,
-      "description": "Layout orientation.",
-      "options": [
-        "horizontal",
-        "vertical"
-      ]
-    },
-    {
-      "name": "membrane",
-      "type": "boolean",
-      "required": false,
-      "description": "Outer membrane wrapper around each toggle item."
+      "description": "Initial choices, restored on form reset."
     }
   ],
   "meta": {

@@ -9,12 +9,16 @@ export function useControllableOpenState(
   const isControlled = open !== undefined
   const value = isControlled ? open : uncontrolledOpen
 
-  const setValue = useCallback((nextOpen: boolean) => {
-    if (!isControlled) {
-      setUncontrolledOpen(nextOpen)
-    }
-    onOpenChange?.({ open: nextOpen })
-  }, [isControlled, onOpenChange])
+  const setValue = useCallback(
+    (nextOpen: boolean) => {
+      if (nextOpen === value) return
+      if (!isControlled) {
+        setUncontrolledOpen(nextOpen)
+      }
+      onOpenChange?.({ open: nextOpen })
+    },
+    [isControlled, onOpenChange, value],
+  )
 
   return [value, setValue] as const
 }

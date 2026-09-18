@@ -1,0 +1,223 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Meter",
+  "description": "A known measurement within a bounded range, such as storage or quota usage",
+  "props": {
+    "value": {
+      "type": "number",
+      "required": false,
+      "description": "Finite measured value; values outside min..max are bounded. Defaults to 0.",
+      "default": 0
+    },
+    "min": {
+      "type": "number",
+      "required": false,
+      "description": "Finite lower bound, strictly below max. Defaults to 0.",
+      "default": 0
+    },
+    "max": {
+      "type": "number",
+      "required": false,
+      "description": "Finite upper bound, strictly above min. Defaults to 100.",
+      "default": 100
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name when no visible label is present, or an explicit name override."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "IDs of external naming elements; takes precedence over label and aria-label."
+    },
+    "aria-valuetext": {
+      "type": "string",
+      "required": false,
+      "description": "Speech-only value description; formatValue controls visible text as well."
+    },
+    "tone": {
+      "type": "enum",
+      "required": false,
+      "description": "Semantic feedback color, independent of the numeric value. Defaults to neutral.",
+      "options": [
+        "neutral",
+        "positive",
+        "warning",
+        "destructive"
+      ],
+      "default": "neutral"
+    },
+    "shape": {
+      "type": "enum",
+      "required": false,
+      "description": "Linear bar or circular ring; both display the same exact fraction. Defaults to linear.",
+      "options": [
+        "linear",
+        "circle"
+      ],
+      "default": "linear"
+    },
+    "showValue": {
+      "type": "boolean",
+      "required": false,
+      "description": "Show formatted value text. Unknown task progress never displays a numeric value.",
+      "default": false
+    },
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Noninteractive visible label. Name an unlabelled indicator with native aria-label or aria-labelledby."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around the complete indicator. Defaults to true.",
+      "default": true
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {
+        "value": 28,
+        "label": "Storage used",
+        "showValue": true
+      }
+    },
+    {
+      "name": "Empty",
+      "props": {
+        "value": 0,
+        "label": "Daily quota",
+        "showValue": true
+      }
+    },
+    {
+      "name": "Full",
+      "props": {
+        "value": 100,
+        "tone": "destructive",
+        "label": "Storage full",
+        "showValue": true
+      }
+    },
+    {
+      "name": "Warning",
+      "props": {
+        "value": 82,
+        "tone": "warning",
+        "label": "Daily quota",
+        "showValue": true
+      }
+    },
+    {
+      "name": "Positive",
+      "props": {
+        "value": 35,
+        "tone": "positive",
+        "label": "Storage used",
+        "showValue": true
+      }
+    },
+    {
+      "name": "Circle",
+      "props": {
+        "value": 74,
+        "shape": "circle",
+        "aria-label": "Context used",
+        "showValue": true
+      }
+    }
+  ],
+  "behavior": {},
+  "keyboard": {},
+  "aria": {
+    "role": "meter",
+    "required": [
+      "aria-valuenow",
+      "aria-valuemin",
+      "aria-valuemax",
+      "aria-label or aria-labelledby"
+    ]
+  },
+  "composition": {
+    "required": [
+      "root",
+      "track",
+      "indicator"
+    ],
+    "recommended": [
+      "label"
+    ],
+    "parts": {
+      "root": {
+        "slot": "root"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "root"
+      },
+      "track": {
+        "slot": "track",
+        "parent": "root"
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "track"
+      }
+    }
+  },
+  "tokenMapping": {
+    "component": [
+      "--uf-range-track-height",
+      "--uf-range-circle-size",
+      "--uf-range-track-bg",
+      "--uf-range-indicator-bg",
+      "--uf-range-indicator-positive-bg",
+      "--uf-range-indicator-warning-bg",
+      "--uf-range-indicator-destructive-bg"
+    ],
+    "semanticFallbacks": [
+      "--uf-membrane",
+      "--uf-control-height",
+      "--uf-control-gap",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-radius-full",
+      "--uf-font-size-sm",
+      "--uf-color-fg",
+      "--uf-color-hover-bg",
+      "--uf-color-success",
+      "--uf-color-warning",
+      "--uf-color-destructive",
+      "--uf-motion-duration-control",
+      "--uf-motion-duration-loading",
+      "--uf-motion-iteration-indefinite",
+      "--uf-motion-ease-standard",
+      "--uf-motion-ease-in-out"
+    ],
+    "notes": [
+      "Progress and Meter share one presentation and the canonical Membrane.",
+      "Both shapes use the exact bounded fraction through --uf-range-percent.",
+      "Use formatValue for localized units and native aria-valuetext for a speech-only override."
+    ]
+  },
+  "platform": {},
+  "usage": {
+    "whenToUse": [
+      "Storage, quota or context usage",
+      "A scalar measurement within a known range"
+    ],
+    "whenNotToUse": [
+      "Task completion or unknown duration (use Progress)",
+      "Unknown measurement (render loading or unavailable text)"
+    ],
+    "alternatives": [
+      "Progress",
+      "Slider"
+    ],
+    "context": "both"
+  }
+}

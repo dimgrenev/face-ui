@@ -14,10 +14,15 @@
   --uf-border-style-solid: solid;
   --uf-border-style-dashed: dashed;
   --uf-border-style-dotted: dotted;
-  --uf-border-default: var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border);
-  --uf-border-subtle: var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border-subtle);
-  --uf-border-focus: var(--uf-border-width-base) var(--uf-border-style-solid) var(--uf-color-ring);
   --uf-membrane: 1px;
   --uf-radius: 6px;
   --uf-radius-base: var(--uf-radius);
+}
+
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
+  --uf-border-default: var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border);
+  --uf-border-subtle: var(--uf-border-width-thin) var(--uf-border-style-solid) var(--uf-color-border-subtle);
+  --uf-border-focus: var(--uf-border-width-base) var(--uf-border-style-solid) var(--uf-color-ring);
 }

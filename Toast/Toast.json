@@ -5,12 +5,12 @@
   "description": "Composable notification surface shared by the declarative Toast and imperative Toaster APIs",
   "props": {
     "title": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Primary notification text."
     },
     "description": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Supporting notification text."
     },
@@ -24,10 +24,10 @@
       "required": false,
       "description": "Semantic notification tone.",
       "options": [
+        "destructive",
         "neutral",
         "positive",
-        "warning",
-        "destructive"
+        "warning"
       ],
       "default": "neutral"
     },

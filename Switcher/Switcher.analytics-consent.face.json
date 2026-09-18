@@ -13,6 +13,21 @@
       "defaultChecked": {
         "$ref": "props.defaultChecked"
       },
+      "label": {
+        "$ref": "props.label"
+      },
+      "truncate": {
+        "$ref": "props.truncate"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "aria-describedby": {
+        "$ref": "props.aria-describedby"
+      },
       "disabled": {
         "$ref": "props.disabled"
       },
@@ -25,17 +40,14 @@
       "value": {
         "$ref": "props.value"
       },
-      "label": {
-        "$ref": "props.label"
+      "form": {
+        "$ref": "props.form"
       },
-      "text": {
-        "$ref": "props.text"
+      "autoFocus": {
+        "$ref": "props.autoFocus"
       },
-      "withText": {
-        "$ref": "props.withText"
-      },
-      "textWrap": {
-        "$ref": "props.textWrap"
+      "fullWidth": {
+        "$ref": "props.fullWidth"
       },
       "membrane": {
         "$ref": "props.membrane"
@@ -46,13 +58,12 @@
   "currentState": {
     "props": {
       "label": "Product analytics",
-      "text": "Share anonymous usage data to improve recommendations and reliability.",
-      "withText": true,
-      "textWrap": "wrap",
+      "truncate": false,
       "defaultChecked": false,
       "name": "analytics",
       "value": "allowed",
-      "membrane": true
+      "membrane": true,
+      "fullWidth": true
     }
   },
   "controls": [
@@ -60,77 +71,97 @@
       "name": "checked",
       "type": "boolean",
       "required": false,
-      "description": "Checked state (controlled)."
+      "description": "Controlled on/off setting. Parent updates do not emit change notifications."
     },
     {
       "name": "defaultChecked",
       "type": "boolean",
       "required": false,
-      "description": "Initial checked state (uncontrolled)."
+      "description": "Uncontrolled initial setting, also restored by form reset.",
+      "defaultValue": false
+    },
+    {
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible label. Empty content adds no label slot; zero remains visible."
+    },
+    {
+      "name": "truncate",
+      "type": "boolean",
+      "required": false,
+      "description": "Truncate overflowing label text with an ellipsis. By default the full label wraps.",
+      "defaultValue": false
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name, including when there is no visible label."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "External label element IDs; takes native precedence over aria-label."
+    },
+    {
+      "name": "aria-describedby",
+      "type": "string",
+      "required": false,
+      "description": "External description element IDs."
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Exclude the switch from activation, focus navigation and form submission.",
       "defaultValue": false
     },
     {
       "name": "required",
       "type": "boolean",
       "required": false,
-      "description": "Mark as required.",
+      "description": "Require the on state for native form validation.",
       "defaultValue": false
     },
     {
       "name": "name",
       "type": "string",
       "required": false,
-      "description": "Form field name.",
-      "defaultValue": ""
+      "description": "FormData key. An unnamed switch does not contribute a form field."
     },
     {
       "name": "value",
       "type": "string",
       "required": false,
-      "description": "Hidden input value when checked.",
+      "description": "Value submitted only when on; it does not control the setting.",
       "defaultValue": "on"
     },
     {
-      "name": "label",
+      "name": "form",
       "type": "string",
       "required": false,
-      "description": "Label content (ReactNode)."
+      "description": "ID of an external native form that owns the input."
     },
     {
-      "name": "text",
-      "type": "string",
-      "required": false,
-      "description": "Text content (string shorthand, used when `withText` is true)."
-    },
-    {
-      "name": "withText",
+      "name": "autoFocus",
       "type": "boolean",
       "required": false,
-      "description": "Show text label alongside the switch.",
-      "defaultValue": true
+      "description": "Focus the native input on mount."
     },
     {
-      "name": "textWrap",
-      "type": "select",
+      "name": "fullWidth",
+      "type": "boolean",
       "required": false,
-      "description": "Label text overflow: 'truncate' clips with ellipsis, 'wrap' wraps full text.",
-      "options": [
-        "truncate",
-        "wrap"
-      ],
-      "defaultValue": "truncate"
+      "description": "Expand the membrane and clickable label to the container width.",
+      "defaultValue": false
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around control geometry.",
+      "description": "Shared outer spacing; toggling it preserves input identity and state.",
       "defaultValue": true
     }
   ],

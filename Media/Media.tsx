@@ -9,6 +9,7 @@
 import { forwardRef, useEffect, useState, type ReactNode } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
+import { Membrane } from '../assets/adapters/react/Membrane'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -124,7 +125,7 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
     }
 
     const sizeStyle = {
-      ...((objectFit || (type === 'image' && variant === 'circle'))
+      ...(objectFit || (type === 'image' && variant === 'circle')
         ? { objectFit: objectFit ?? 'cover' }
         : {}),
       ...(type === 'image'
@@ -145,11 +146,7 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
 
     const renderElement = () => {
       if (hasError && fallback) {
-        return (
-          <div {...mediaAnatomy.getPartAttrs('fallback')}>
-            {fallback}
-          </div>
-        )
+        return <div {...mediaAnatomy.getPartAttrs('fallback')}>{fallback}</div>
       }
 
       switch (type) {
@@ -223,14 +220,20 @@ export const Media = forwardRef<HTMLDivElement, MediaProps>(
       </div>
     )
 
-    if (!membrane) return mediaNode
-
     const isFullWidth = width === '100%' || wrapperStyle.width === '100%'
 
     return (
-      <span className={cn('uf-membrane', 'uf-mediaMembrane', isFullWidth && 'uf-membrane--full uf-mediaMembrane--full')}>
+      <Membrane
+        enabled={membrane}
+        as="div"
+        fullWidth={isFullWidth}
+        className={cn(
+          'uf-mediaMembrane',
+          isFullWidth && 'uf-mediaMembrane--full',
+        )}
+      >
         {mediaNode}
-      </span>
+      </Membrane>
     )
   },
 )

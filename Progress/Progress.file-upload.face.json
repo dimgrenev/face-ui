@@ -16,6 +16,15 @@
       "indeterminate": {
         "$ref": "props.indeterminate"
       },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "aria-valuetext": {
+        "$ref": "props.aria-valuetext"
+      },
       "tone": {
         "$ref": "props.tone"
       },
@@ -28,8 +37,8 @@
       "label": {
         "$ref": "props.label"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "membrane": {
+        "$ref": "props.membrane"
       }
     },
     "children": []
@@ -49,28 +58,46 @@
       "name": "value",
       "type": "number",
       "required": false,
-      "description": "Current value. Values outside 0..max are clamped for rendering and accessibility.",
+      "description": "Finite amount completed; values outside 0..max are bounded. Defaults to 0.",
       "defaultValue": 0
     },
     {
       "name": "max",
       "type": "number",
       "required": false,
-      "description": "Maximum value (default 100).",
+      "description": "Finite positive total amount of work. Defaults to 100.",
       "defaultValue": 100
     },
     {
       "name": "indeterminate",
       "type": "boolean",
       "required": false,
-      "description": "Renders an unknown-duration progress state without exposing aria-valuenow.",
+      "description": "Unknown duration: omit aria-valuenow and numeric text. Defaults to false.",
       "defaultValue": false
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name when no visible label is present, or an explicit name override."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "IDs of external naming elements; takes precedence over label and aria-label."
+    },
+    {
+      "name": "aria-valuetext",
+      "type": "string",
+      "required": false,
+      "description": "Speech-only value description; formatValue controls visible text as well."
     },
     {
       "name": "tone",
       "type": "select",
       "required": false,
-      "description": "Semantic feedback tone.",
+      "description": "Semantic feedback color, independent of the numeric value. Defaults to neutral.",
       "options": [
         "neutral",
         "positive",
@@ -83,7 +110,7 @@
       "name": "shape",
       "type": "select",
       "required": false,
-      "description": "Visual progress shape.",
+      "description": "Linear bar or circular ring; both display the same exact fraction. Defaults to linear.",
       "options": [
         "linear",
         "circle"
@@ -94,20 +121,21 @@
       "name": "showValue",
       "type": "boolean",
       "required": false,
-      "description": "Show the computed percentage in the header or beside a circular ring.",
+      "description": "Show formatted value text. Unknown task progress never displays a numeric value.",
       "defaultValue": false
     },
     {
       "name": "label",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Optional label rendered in the header for linear progress or beside the ring for circular progress."
+      "description": "Noninteractive visible label. Name an unlabelled indicator with native aria-label or aria-labelledby."
     },
     {
-      "name": "ariaLabel",
-      "type": "string",
+      "name": "membrane",
+      "type": "boolean",
       "required": false,
-      "description": "Accessible label for the progressbar when no visible label is rendered."
+      "description": "Membrane spacing around the complete indicator. Defaults to true.",
+      "defaultValue": true
     }
   ],
   "meta": {

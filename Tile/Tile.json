@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Tile",
-  "description": "Interactive row with nested action buttons. Acts as a single clickable surface while allowing independent nested Button actions (like Notion sidebar tabs). Uses div[role=button] to allow valid HTML nesting of child buttons.",
+  "description": "Composed row with an optional primary action and independent leading/action controls. A composed button-like row uses a real sibling button; structural rows keep their explicit role.",
   "props": {
     "text": {
       "type": "string",
@@ -10,7 +10,7 @@
       "description": "Primary label."
     },
     "rightText": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Optional secondary text at the far right of the label area."
     },
@@ -21,19 +21,6 @@
       "options": [
         "default",
         "ghost"
-      ],
-      "default": "default"
-    },
-    "intent": {
-      "type": "enum",
-      "required": false,
-      "description": "Semantic row intent. Use default for generic and navigation rows, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.",
-      "options": [
-        "default",
-        "disclosure",
-        "tree",
-        "tab",
-        "section"
       ],
       "default": "default"
     },
@@ -64,7 +51,7 @@
     "actionVisibility": {
       "type": "enum",
       "required": false,
-      "description": "How the actions slot is exposed: reveal on hover/focus/active, hover only, always visible, or hidden.",
+      "description": "Reveal on hover/focus/active; hover on hover/focus; always; hidden. Hoverless devices expose reveal/hover actions.",
       "options": [
         "reveal",
         "hover",
@@ -74,19 +61,19 @@
       "default": "reveal"
     },
     "icon": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Icon (string from registry or ReactNode)."
     },
     "iconPosition": {
       "type": "enum",
       "required": false,
-      "description": "Icon position relative to text.",
+      "description": "Icon at the start or end of the label, following text direction. Default: start.",
       "options": [
-        "left",
-        "right"
+        "start",
+        "end"
       ],
-      "default": "left"
+      "default": "start"
     },
     "leading": {
       "type": "ReactNode",
@@ -101,25 +88,13 @@
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
-      "default": false
-    },
-    "busy": {
-      "type": "boolean",
-      "required": false,
-      "description": "Marks the row busy with data-busy and aria-busy without disabling it by itself.",
+      "description": "Disable the primary action. Nested controls own their disabled state.",
       "default": false
     },
     "active": {
       "type": "boolean",
       "required": false,
       "description": "Active / selected state.",
-      "default": false
-    },
-    "selectedDescendant": {
-      "type": "boolean",
-      "required": false,
-      "description": "Marks parent rows that contain the selected descendant, commonly while collapsed.",
       "default": false
     },
     "interactive": {
@@ -132,17 +107,36 @@
       "required": false,
       "description": "Stretch text area (flex:1)."
     },
-    "selector": {
-      "type": "boolean",
+    "chevron": {
+      "type": "enum",
+      "description": "Trailing disclosure chevron, matching Button. Down follows aria-expanded.",
+      "enum": [
+        "down",
+        "right"
+      ],
       "required": false,
-      "description": "Render a compact selector indicator after the label.",
-      "default": false
+      "options": [
+        "down",
+        "right"
+      ]
     },
-    "selectorOpen": {
+    "aria-expanded": {
       "type": "boolean",
       "required": false,
-      "description": "Open state for the selector indicator.",
-      "default": false
+      "description": "Native disclosure state; also orients chevron.",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    "aria-busy": {
+      "type": "boolean",
+      "required": false,
+      "description": "Native row-region busy state; changes cursor without disabling.",
+      "options": [
+        "false",
+        "true"
+      ]
     },
     "fullWidth": {
       "type": "boolean",
@@ -156,8 +150,8 @@
       "description": "Text alignment.",
       "options": [
         "left",
-        "right",
-        "center"
+        "center",
+        "right"
       ],
       "default": "left"
     },
@@ -179,14 +173,14 @@
       "default": true
     },
     "actions": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile."
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Custom children (overrides text/icon rendering)."
+      "description": "Custom label content. Overrides text; icon/rightText/other slots remain independent."
     }
   },
   "states": [
@@ -200,7 +194,6 @@
     {
       "name": "Navigation Active",
       "props": {
-        "intent": "default",
         "text": "Current page",
         "icon": "file",
         "active": true
@@ -209,11 +202,10 @@
     {
       "name": "Disclosure Parent",
       "props": {
-        "intent": "disclosure",
         "text": "Project",
         "icon": "folder",
-        "selector": true,
-        "selectorOpen": true,
+        "chevron": "down",
+        "aria-expanded": true,
         "actionVisibility": "hover",
         "actions": "[Button icon=plus]"
       }
@@ -221,28 +213,15 @@
     {
       "name": "Tree Row",
       "props": {
-        "intent": "tree",
         "text": "src/components/Button.tsx",
         "icon": "file",
         "level": 2
       }
     },
     {
-      "name": "Tab",
-      "props": {
-        "intent": "tab",
-        "text": "Preview",
-        "icon": "browser",
-        "active": true,
-        "fullWidth": false,
-        "actionVisibility": "hover",
-        "actions": "[Button icon=close]"
-      }
-    },
-    {
       "name": "Section",
       "props": {
-        "intent": "section",
+        "tone": "muted",
         "text": "Collections",
         "interactive": false
       }
@@ -252,7 +231,7 @@
       "props": {
         "text": "Delete chat?",
         "tone": "destructive",
-        "busy": true,
+        "aria-busy": true,
         "actionVisibility": "always",
         "actions": "[Button icon=close]"
       }

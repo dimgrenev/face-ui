@@ -10,7 +10,7 @@
       "description": "Button label text."
     },
     "rightText": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Optional secondary text, rendered at the far right inside the text area."
     },
@@ -30,56 +30,59 @@
       "default": "default"
     },
     "icon": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Icon (string from registry, ReactNode, or SVG element)."
     },
     "iconPosition": {
       "type": "enum",
       "required": false,
-      "description": "Icon position relative to text.",
+      "description": "Icon at the start or end of the label, following text direction. Default: start.",
       "options": [
-        "left",
-        "right"
-      ]
+        "start",
+        "end"
+      ],
+      "default": "start"
     },
     "iconOnly": {
       "type": "boolean",
       "required": false,
-      "description": "Icon-only mode (no text, square button)."
+      "description": "Hide the visual label while preserving its accessible text. Compact buttons are square.",
+      "default": false
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state."
+      "description": "Disabled state.",
+      "default": false
     },
     "loading": {
       "type": "boolean",
       "required": false,
-      "description": "Loading state (shows spinner, dims text)."
+      "description": "Loading state (shows spinner, dims text).",
+      "default": false
     },
     "stretchText": {
       "type": "boolean",
       "required": false,
       "description": "Stretch text area (flex:1)."
     },
-    "selector": {
-      "type": "boolean",
-      "required": false,
-      "description": "Render a compact selector indicator after the label."
-    },
-    "selectorOpen": {
-      "type": "boolean",
-      "required": false,
-      "description": "Open state for the selector indicator."
-    },
-    "selectorDirection": {
+    "chevron": {
       "type": "enum",
       "required": false,
-      "description": "Direction of the selector indicator. Use side for side-panel selectors.",
+      "description": "Trailing disclosure chevron. aria-expanded reverses its direction when open.",
       "options": [
-        "vertical",
-        "side"
+        "down",
+        "right"
+      ]
+    },
+    "aria-expanded": {
+      "type": "boolean",
+      "required": false,
+      "description": "Standard expanded state; reverses the disclosure chevron when true.",
+      "options": [
+        "false",
+        "true"
       ]
     },
     "fullWidth": {
@@ -94,8 +97,8 @@
       "description": "Text alignment.",
       "options": [
         "left",
-        "right",
-        "center"
+        "center",
+        "right"
       ]
     },
     "level": {
@@ -106,7 +109,8 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing around the button."
+      "description": "Membrane spacing around the button.",
+      "default": true
     },
     "copyText": {
       "type": "string",
@@ -114,9 +118,9 @@
       "description": "Copy text to clipboard on click (Clipboard integration)."
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Custom children (overrides text/icon rendering)."
+      "description": "Label content, overriding text. Icon and secondary text remain separate slots."
     }
   },
   "states": [
@@ -188,15 +192,14 @@
       "name": "Selector",
       "props": {
         "text": "GPT-5.5",
-        "selector": true
+        "chevron": "down"
       }
     },
     {
       "name": "Side Selector",
       "props": {
         "text": "Nested",
-        "selector": true,
-        "selectorDirection": "side"
+        "chevron": "right"
       }
     }
   ],
@@ -251,8 +254,8 @@
   },
   "tokenMapping": {
     "component": [
-      "--uf-control-pad-left",
-      "--uf-control-pad-right",
+      "--uf-control-pad-start",
+      "--uf-control-pad-end",
       "--uf-button-focus-ring-width",
       "--uf-button-outline-width",
       "--uf-button-bg",

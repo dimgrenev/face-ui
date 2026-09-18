@@ -170,13 +170,13 @@
     },
     {
       "name": "width",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Explicit width."
     },
     {
       "name": "height",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Explicit height."
     },
@@ -194,7 +194,7 @@
     },
     {
       "name": "fallback",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Fallback content shown on error."
     },

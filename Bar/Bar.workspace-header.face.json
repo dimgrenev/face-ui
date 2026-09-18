@@ -26,7 +26,8 @@
           "truncate": true
         },
         {
-          "__componentName__": "Bar.Right",
+          "__componentName__": "Bar.Section",
+          "align": "end",
           "children": [
             {
               "__componentName__": "Button",
@@ -42,9 +43,9 @@
   "controls": [
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Bar content (typically BarSection elements)."
+      "description": "Content and sections, rendered in the authored order."
     },
     {
       "name": "orientation",
