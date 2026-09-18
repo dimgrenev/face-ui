@@ -9,6 +9,7 @@ import { createAnatomy } from '../anatomy'
 import { cn } from '../utils'
 import { hasSlotContent } from '../slot-content'
 import { resolveLabel } from '../runtime/labels'
+import { invalidProp, readNumber } from '../runtime/props'
 import { Membrane } from '../adapters/react/Membrane'
 import { Text } from '../../Text/Text'
 
@@ -54,7 +55,7 @@ export interface RangeIndicatorProps extends Omit<
   showValue?: boolean
   /** Noninteractive visible label. Name an unlabelled indicator with native aria-label or aria-labelledby. */
   label?: ReactNode
-  /** Format the bounded value for visible text and aria-valuetext. Defaults to an integer percentage, rounded down. */
+  /** Format the bounded value for visible text and aria-valuetext. Defaults to an integer percentage rounded down, also used when the result is blank or not text. */
   formatValue?: (details: RangeValueDetails) => string
   /** Membrane spacing around the complete indicator. Defaults to true. */
   membrane?: boolean
@@ -70,16 +71,24 @@ const anatomy = {
   ),
   meter: createAnatomy('meter').parts('root', 'track', 'indicator', 'label'),
 }
-export function resolveRange(
+/** Invalid bounds (not finite, or min >= max) become 0..100 and a non-finite
+ * value becomes min, both reported; a finite value outside clamps silently. */
+function resolveRange(
+  component: string,
   value: number,
   min: number,
   max: number,
 ): RangeValueDetails {
-  if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min)
-    throw new RangeError('Range indicator requires finite min < max')
-  if (!Number.isFinite(value))
-    throw new RangeError('Range indicator value must be finite')
-  const bounded = Math.min(max, Math.max(min, value))
+  if (!(Number.isFinite(min) && Number.isFinite(max) && min < max)) {
+    const prop = Number.isFinite(min) ? 'max' : 'min'
+    invalidProp(component, prop, prop === 'min' ? min : max, 'using 0..100')
+    min = 0
+    max = 100
+  }
+  const bounded = Math.min(
+    max,
+    Math.max(min, readNumber(component, 'value', value, min)),
+  )
   const span = max - min
   // Halving avoids overflow for finite endpoints on opposite sides of zero.
   const ratio = Number.isFinite(span)
@@ -115,40 +124,37 @@ export const RangeIndicator = forwardRef<HTMLDivElement, InternalProps>(
       'aria-valuetext': ariaValueText,
       ...rest
     } = props
-    const details = resolveRange(value, min, max)
-    if (!['neutral', 'positive', 'warning', 'destructive'].includes(tone))
-      throw new RangeError('Invalid range indicator tone')
-    if (!['linear', 'circle'].includes(shape))
-      throw new RangeError('Invalid range indicator shape')
-    if (formatValue !== undefined && typeof formatValue !== 'function')
-      throw new TypeError('formatValue must be a function')
+    const component = kind === 'progress' ? 'Progress' : 'Meter'
+    const details = resolveRange(component, value, min, max)
+    const percentText = `${details.value === details.max ? 100 : Math.min(99, Math.floor(details.percent + Number.EPSILON * 100))}%`
     const formattedValue = indeterminate
       ? undefined
       : formatValue
-        ? formatValue(details)
-        : `${details.value === max ? 100 : Math.min(99, Math.floor(details.percent + Number.EPSILON * 100))}%`
-    if (
-      formattedValue !== undefined &&
-      (typeof formattedValue !== 'string' || !formattedValue.trim())
-    )
-      throw new TypeError('formatValue must return nonempty text')
+        ? resolveLabel(
+            formatValue(details),
+            percentText,
+            component,
+            'formatValue()',
+          )
+        : percentText
     const id = useId()
     const hasLabel = hasSlotContent(label, { trimText: true })
     const labelId = hasLabel ? `${id}-label` : undefined
     const explicitLabel =
-      resolveLabel(ariaLabel, '', `${kind} aria-label`) || undefined
+      resolveLabel(ariaLabel, '', component, 'aria-label') || undefined
     const explicitLabelledby =
-      resolveLabel(ariaLabelledby, '', `${kind} aria-labelledby`) || undefined
+      resolveLabel(ariaLabelledby, '', component, 'aria-labelledby') ||
+      undefined
     const attrs = anatomy[kind].getPartAttrs
     const state = indeterminate
       ? 'indeterminate'
       : kind === 'progress'
-        ? details.value === max
+        ? details.value === details.max
           ? 'complete'
           : 'loading'
-        : details.value === min
+        : details.value === details.min
           ? 'empty'
-          : details.value === max
+          : details.value === details.max
             ? 'full'
             : 'partial'
     const labelNode = hasLabel ? (
@@ -203,8 +209,8 @@ export const RangeIndicator = forwardRef<HTMLDivElement, InternalProps>(
           {...rest}
           ref={ref}
           role={kind === 'progress' ? 'progressbar' : 'meter'}
-          aria-valuemin={min}
-          aria-valuemax={max}
+          aria-valuemin={details.min}
+          aria-valuemax={details.max}
           aria-valuenow={indeterminate ? undefined : details.value}
           aria-valuetext={ariaValueText ?? formattedValue}
           aria-label={explicitLabel}

@@ -174,9 +174,10 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(
     const hasLabel = hasSlotContent(label, { trimText: true })
     const labelId = hasLabel ? `${id}-label` : undefined
     const explicitLabel =
-      resolveLabel(ariaLabel, '', 'Rating aria-label') || undefined
+      resolveLabel(ariaLabel, '', 'Rating', 'aria-label') || undefined
     const explicitLabelledby =
-      resolveLabel(ariaLabelledby, '', 'Rating aria-labelledby') || undefined
+      resolveLabel(ariaLabelledby, '', 'Rating', 'aria-labelledby') ||
+      undefined
     const rootRef = useRef<HTMLDivElement>(null)
     const composedRef = useComposedRefs(rootRef, ref)
     const formRef = useRef<HTMLInputElement>(null)

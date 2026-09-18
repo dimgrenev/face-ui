@@ -1,9 +1,9 @@
-import React, { act } from 'react'
+import { act } from 'react'
 import type { Root } from 'react-dom/client'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { Calendar, type CalendarProps } from '../../Calendar/Calendar'
 import { Date as DateField, type DateProps } from '../../Date/Date'
-import { allowConsoleError, mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 let host: HTMLDivElement, root: Root
 beforeEach(() => {
@@ -143,57 +143,42 @@ it.each([false, true])(
   },
 )
 
-class Boundary extends React.Component<
-  { children: React.ReactNode },
-  { error: Error | null }
-> {
-  state = { error: null as Error | null }
-  static getDerivedStateFromError(error: Error) {
-    return { error }
-  }
-  render() {
-    return this.state.error ? (
-      <output>{this.state.error.message}</output>
-    ) : (
-      this.props.children
-    )
-  }
-}
 it.each([
-  [false, []],
-  [false, null],
-  [false, { clear: 12 }],
-  [false, { calendar: false }],
-  [true, 'wrong'],
-  [true, { nextMonth: false }],
-  [true, { previousMonth: 12 }],
+  [false, [], 'labels array; using defaults', 'Previous month'],
+  [false, null, 'labels null; using defaults', 'Previous month'],
+  [false, { clear: 12 }, 'labels.clear 12; using "Clear"', 'Clear'],
+  [
+    false,
+    { calendar: false },
+    'labels.calendar false; using "Calendar"',
+    'Calendar',
+  ],
+  [true, 'wrong', 'labels "wrong"; using defaults', 'Previous month'],
+  [
+    true,
+    { nextMonth: false },
+    'labels.nextMonth false; using "Next month"',
+    'Next month',
+  ],
+  [
+    true,
+    { previousMonth: 12 },
+    'labels.previousMonth 12; using "Previous month"',
+    'Previous month',
+  ],
 ] as const)(
-  'invalid label dictionaries fail at their owning component boundary: calendar=%s, labels=%j',
-  async (calendar, labels) => {
-    allowConsoleError(/error boundary you provided, Boundary/)
-    const expectedError = (event: ErrorEvent) => {
-      if (event.message.includes(`${calendar ? 'Calendar' : 'Date'} labels`))
-        event.preventDefault()
-    }
-    window.addEventListener('error', expectedError)
-    try {
-      await act(async () =>
-        root.render(
-          <Boundary>
-            {calendar ? (
-              <Calendar {...({ labels } as any)} />
-            ) : (
-              <DateField {...({ labels } as any)} />
-            )}
-          </Boundary>,
-        ),
-      )
-    } finally {
-      window.removeEventListener('error', expectedError)
-    }
-    expect(host.querySelector('output')?.textContent).toMatch(
-      new RegExp(`^${calendar ? 'Calendar' : 'Date'} labels`),
+  'invalid label dictionaries render defaults and are reported: calendar=%s, labels=%j',
+  async (calendar, labels, report, name) => {
+    await expectDevError(
+      () => render({ labels }, calendar),
+      new RegExp(
+        `^Face UI ${calendar ? 'Calendar' : 'Date'}: invalid ${report.replace(/\./g, '\\.')}\\.$`,
+      ),
     )
+    expect(
+      named(name) ??
+        document.querySelector(`[role="group"][aria-label="${name}"]`),
+    ).toBeTruthy()
   },
 )
 

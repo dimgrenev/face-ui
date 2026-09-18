@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import type { Root } from 'react-dom/client'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { Breadcrumb, type BreadcrumbProps } from '../../Breadcrumb/Breadcrumb'
-import { mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 let host: HTMLDivElement, root: Root
 beforeEach(() => {
@@ -268,14 +268,18 @@ it('overflowLabel names the real trigger and dialog', async () => {
   ).toBe('Все разделы')
   expect(host.querySelector('nav')?.getAttribute('aria-label')).toBe('Путь')
 })
-it('blank overflowLabel has a useful fallback and invalid types fail', async () => {
+it('blank overflowLabel falls back silently; a non-string one falls back and is reported', async () => {
   await render({ items: trail, overflowLabel: '  ' })
   expect(host.querySelector('button')?.getAttribute('aria-label')).toBe(
     'Show path',
   )
-  expect(() =>
-    renderToStaticMarkup(<Breadcrumb overflowLabel={5 as any} />),
-  ).toThrow(RangeError)
+  await expectDevError(
+    () => render({ items: trail, overflowLabel: 5 }),
+    /^Face UI Breadcrumb: invalid overflowLabel 5; using "Show path"\.$/,
+  )
+  expect(host.querySelector('button')?.getAttribute('aria-label')).toBe(
+    'Show path',
+  )
 })
 it('a callback without href is a native button and never submits its parent form', async () => {
   const onClick = vi.fn(),

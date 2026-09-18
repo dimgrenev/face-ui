@@ -139,7 +139,8 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
     const resolvedCloseLabel = resolveLabel(
       closeLabel,
       'Close modal',
-      'Modal closeLabel',
+      'Modal',
+      'closeLabel',
     )
 
     const titleId = useId()
