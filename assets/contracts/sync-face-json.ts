@@ -244,7 +244,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   },
   Badge: {
     patchProps: {
-      appearance: {
+      variant: {
         type: 'enum',
         default: 'outline',
         options: ['fill', 'outline'],
@@ -256,13 +256,13 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     },
     patchStates: () => [
-      { name: 'Default', props: { text: 'Badge' } },
-      { name: 'Neutral Fill', props: { text: 'Neutral', appearance: 'fill' } },
-      { name: 'Accent Outline', props: { text: 'Accent', tone: 'accent' } },
-      { name: 'Positive Outline', props: { text: 'Positive', tone: 'positive' } },
-      { name: 'Warning Outline', props: { text: 'Warning', tone: 'warning' } },
-      { name: 'Destructive Outline', props: { text: 'Destructive', tone: 'destructive' } },
-      { name: 'Destructive Fill', props: { text: 'Destructive', appearance: 'fill', tone: 'destructive' } },
+      { name: 'Default', props: { children: 'Badge' } },
+      { name: 'Neutral Fill', props: { children: 'Neutral', variant: 'fill' } },
+      { name: 'Accent Outline', props: { children: 'Accent', tone: 'accent' } },
+      { name: 'Positive Outline', props: { children: 'Positive', tone: 'positive' } },
+      { name: 'Warning Outline', props: { children: 'Warning', tone: 'warning' } },
+      { name: 'Destructive Outline', props: { children: 'Destructive', tone: 'destructive' } },
+      { name: 'Destructive Fill', props: { children: 'Destructive', variant: 'fill', tone: 'destructive' } },
     ],
   },
   Button: {
@@ -286,7 +286,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         return {
           ...state,
           props: {
-            text: 'Create',
+            children: 'Create',
             icon: 'plus',
             fullWidth: false,
           },
@@ -324,10 +324,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         type: 'ReactNode',
         required: false,
       },
-      content: {
-        type: 'ReactNode',
-        required: false,
-      },
       footer: {
         type: 'ReactNode',
         required: false,
@@ -351,10 +347,10 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         name: 'Default',
         props: {
           title: 'Card Title',
-          content: 'Workspace settings and recent activity stay grouped in one place',
+          children: 'Workspace settings and recent activity stay grouped in one place',
           footer: {
             __componentName__: 'Button',
-            text: 'Open',
+            children: 'Open',
             icon: 'arrow-right',
             iconPosition: 'end',
             membrane: true,
@@ -369,7 +365,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           padding: 'none',
           radius: 'md',
           border: false,
-          content: "const surface = 'code'",
+          children: "const surface = 'code'",
         },
       },
       {
@@ -379,7 +375,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           padding: 'none',
           radius: 'none',
           border: false,
-          content: 'Unframed content for composition inside another surface.',
+          children: 'Unframed content for composition inside another surface.',
         },
       },
       {
@@ -387,7 +383,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         props: {
           hoverable: true,
           title: 'Deploy preview',
-          content: 'The surface highlights on hover or focus within; its children own their actions.',
+          children: 'The surface highlights on hover or focus within; its children own their actions.',
         },
       },
     ],
@@ -430,8 +426,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       { name: 'Default', props: { name: 'settings' } },
       { name: 'Direction Left', props: { name: 'left' } },
       { name: 'Direction Right', props: { name: 'right' } },
-      { name: 'Unknown Fallback', props: { name: 'unknown-icon' } },
-      { name: 'Accessible', props: { name: 'account', label: 'Account' } },
+      { name: 'Accessible', props: { name: 'account', 'aria-label': 'Account' } },
     ],
   },
   Modal: {
@@ -729,14 +724,14 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Default',
         props: {
-          text: 'Page title',
+          children: 'Page title',
           icon: 'file',
         },
       },
       {
         name: 'Navigation Active',
         props: {
-          text: 'Current page',
+          children: 'Current page',
           icon: 'file',
           active: true,
         },
@@ -744,11 +739,9 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Disclosure Parent',
         props: {
-          text: 'Project',
+          children: 'Project',
           icon: 'folder',
           chevron: 'down',
-          // A disclosure is a control: without it the row is an inert <div aria-expanded>.
-          interactive: true,
           'aria-expanded': true,
           actionVisibility: 'hover',
           actions: '[Button icon=plus]',
@@ -757,23 +750,23 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Tree Row',
         props: {
-          text: 'src/components/Button.tsx',
+          children: 'src/components/Button.tsx',
           icon: 'file',
-          level: 2,
+          indent: 2,
         },
       },
       {
         name: 'Section',
         props: {
           tone: 'muted',
-          text: 'Collections',
+          children: 'Collections',
           interactive: false,
         },
       },
       {
         name: 'Busy Destructive',
         props: {
-          text: 'Delete chat?',
+          children: 'Delete chat?',
           tone: 'destructive',
           'aria-busy': true,
           actionVisibility: 'always',

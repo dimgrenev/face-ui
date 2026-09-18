@@ -3,11 +3,11 @@ import { Bar } from '../../../index'
 export const bar = (
   <Bar>
     {[
-      { __componentName__: 'Text', text: 'Workspace' },
+      { __componentName__: 'Text', children: 'Workspace' },
       {
         __componentName__: 'Bar.Section',
         align: 'end',
-        children: [{ __componentName__: 'Button', text: 'Run' }],
+        children: [{ __componentName__: 'Button', children: 'Run' }],
       },
     ]}
   </Bar>

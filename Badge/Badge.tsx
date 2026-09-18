@@ -1,8 +1,8 @@
 /**
  * Badge — status indicator.
  *
- * `<Badge text="New" />`
- * `<Badge text="3" appearance="outline" />`
+ * `<Badge>New</Badge>`
+ * `<Badge variant="fill" tone="positive">3</Badge>`
  */
 
 import { forwardRef, type ReactNode, type HTMLAttributes } from 'react'
@@ -12,7 +12,7 @@ import { Text } from '../Text/Text'
 
 export const badgeAnatomy = createAnatomy('badge').parts('root')
 
-export type BadgeAppearance = 'fill' | 'outline'
+export type BadgeVariant = 'fill' | 'outline'
 export type BadgeTone =
   | 'neutral'
   | 'accent'
@@ -25,21 +25,18 @@ export interface BadgeProps
     HTMLAttributes<HTMLSpanElement>,
     'dangerouslySetInnerHTML' | 'defaultChecked' | 'defaultValue'
   > {
-  /** Plain status text. Rich children take precedence when provided. */
-  text?: string
-  /** Fill or outline treatment. */
-  appearance?: BadgeAppearance
-  /** Semantic status tone, independent from appearance. */
-  tone?: BadgeTone
-  /** Custom inline content, including a status icon or formatted count. */
+  /** Content of the badge: status text, a formatted count or a status icon. */
   children?: ReactNode
+  /** Fill or outline treatment. Default: outline. */
+  variant?: BadgeVariant
+  /** Semantic status tone, independent from the variant. */
+  tone?: BadgeTone
 }
 
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   function Badge(props, ref) {
     const {
-      text,
-      appearance = 'outline',
+      variant = 'outline',
       tone = 'neutral',
       children,
       className,
@@ -52,12 +49,12 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
         inset="control"
         membrane
         {...badgeAnatomy.getPartAttrs('root')}
-        data-appearance={appearance}
+        data-variant={variant}
         data-tone={tone}
         className={cn('uf-badge', className)}
         {...rest}
       >
-        {children ?? text}
+        {children}
       </Text>
     )
   },

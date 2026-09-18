@@ -28,31 +28,34 @@ const events: string[] = []
 const cases = {
   FullWidth: (membrane: boolean) => (
     <Membrane enabled={membrane} fullWidth interactive>
-      <Button membrane={false} text="Save" />
+      <Button membrane={false}>Save</Button>
     </Membrane>
   ),
   ComposedButton: (membrane: boolean) => (
     <Membrane enabled={membrane} interactive>
       <Button
         membrane={false}
-        text="Save"
         onClick={() => events.push('save')}
-      />
+      >
+        Save
+      </Button>
     </Membrane>
   ),
   Button: (membrane: boolean) => (
     <Button
       membrane={membrane}
-      text="Save"
       onClick={() => events.push('save')}
-    />
+    >
+      Save
+    </Button>
   ),
   Tile: (membrane: boolean) => (
     <Tile
       membrane={membrane}
-      text="Project"
       onClick={() => events.push('project')}
-    />
+    >
+      Project
+    </Tile>
   ),
   Text: (membrane: boolean) => (
     <Text membrane={membrane} tabIndex={0}>

@@ -6,14 +6,14 @@ export default [
     props: {
       orientation: 'horizontal',
       children: [
-        { __componentName__: 'Text', text: 'Acme Workspace', truncate: true },
+        { __componentName__: 'Text', children: 'Acme Workspace', truncate: true },
         {
           __componentName__: 'Bar.Section',
           align: 'end',
           children: [
             {
               __componentName__: 'Button',
-              text: 'Invite',
+              children: 'Invite',
               icon: 'plus',
               fullWidth: false,
             },
@@ -36,7 +36,7 @@ export default [
         },
         {
           __componentName__: 'Text',
-          text: 'Agent mode',
+          children: 'Agent mode',
           variant: 'muted',
           truncate: true,
         },
@@ -46,7 +46,7 @@ export default [
           children: [
             {
               __componentName__: 'Button',
-              text: 'Run',
+              children: 'Run',
               variant: 'accent',
               fullWidth: false,
             },

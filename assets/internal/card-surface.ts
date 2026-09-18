@@ -2,7 +2,7 @@ import { cn } from '../utils'
 import type { CardProps } from '../../Card/Card'
 
 /** Shared surface presentation; native attributes remain on the owning div.
- * Card's title/content shorthand is not part of a floating surface's DOM API. */
+ * Card's title/description/footer shorthand is not part of a floating surface's DOM API. */
 export function getCardSurfaceProps({
   variant,
   padding,

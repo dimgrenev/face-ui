@@ -5,7 +5,7 @@ import { Tile } from '../../Tile/Tile'
 import { Button } from '../../Button/Button'
 import { Tree } from '../../Tree/Tree'
 import { Text } from '../../Text/Text'
-import { libraryCss, mount } from './harness'
+import { expectDevError, libraryCss, mount } from './harness'
 let host: HTMLDivElement
 let root: Root
 const render = async (props: React.ComponentProps<typeof Tile>) => {
@@ -18,24 +18,21 @@ beforeEach(() => {
   ;({ host, root } = mount())
 })
 
-it('keeps rightText beside both scalar and composed labels and preserves explicit empty children', async () => {
-  await render({ text: 'Title', rightText: '⌘K' })
+it('keeps meta beside both scalar and composed labels and omits an empty label slot', async () => {
+  await render({ children: 'Title', meta: '⌘K' })
   expect(tile().textContent).toBe('Title⌘K')
-  await render({
-    text: 'Fallback',
-    children: <strong>Custom</strong>,
-    rightText: '⌘K',
-  })
+  expect(tile().querySelector('[data-part="meta"]')?.textContent).toBe('⌘K')
+  await render({ children: <strong>Custom</strong>, meta: '⌘K' })
   expect(tile().textContent).toBe('Custom⌘K')
-  await render({ text: 'Fallback', children: 0, rightText: 'items' })
+  await render({ children: 0, meta: 'items' })
   expect(tile().textContent).toBe('0items')
-  await render({ text: 'Fallback', children: false })
+  await render({ children: false })
   expect(tile().textContent).toBe('')
   expect(tile().querySelector('[data-part="text"]')).toBeNull()
 })
 it('empty slots preserve the primary control without adding layout boxes', async () => {
   await render({
-    text: 'Title',
+    children: 'Title',
     onClick: vi.fn(),
     icon: false,
     leading: <>{false}</>,
@@ -49,16 +46,16 @@ it('empty slots preserve the primary control without adding layout boxes', async
   ).toBe('button')
 })
 it('does not turn a structural role into a keyboard button', async () => {
-  await render({ text: 'Item', role: 'listitem' })
+  await render({ children: 'Item', role: 'listitem' })
   expect(tile().getAttribute('role')).toBe('listitem')
   expect(tile().hasAttribute('tabindex')).toBe(false)
   expect(tile().hasAttribute('data-interactive')).toBe(false)
 })
 it('preserves object refs and native attributes for both compositions', async () => {
   const ref = createRef<HTMLDivElement>()
-  for (const actions of [undefined, <Button key="edit" text="Edit" />]) {
+  for (const actions of [undefined, <Button key="edit">Edit</Button>]) {
     await render({
-      text: 'Project',
+      children: 'Project',
       onClick: vi.fn(),
       actions,
       ref,
@@ -87,8 +84,8 @@ it.skipIf(Number.parseInt(React.version, 10) < 19)(
     const ref = vi.fn((node: HTMLDivElement | null) =>
       node ? cleanup : undefined,
     )
-    await render({ text: 'A', ref })
-    await render({ text: 'B', ref: createRef<HTMLDivElement>() })
+    await render({ children: 'A', ref })
+    await render({ children: 'B', ref: createRef<HTMLDivElement>() })
     expect(cleanup).toHaveBeenCalledTimes(1)
     expect(ref).toHaveBeenCalledTimes(1)
   },
@@ -101,7 +98,7 @@ it('chevron follows aria-expanded and remains independent of icon and label cont
         icon: 'folder',
         chevron: 'down',
         'aria-expanded': expanded,
-        actions: <Button text="Edit" />,
+        actions: <Button>Edit</Button>,
         onClick: vi.fn(),
       })
       const control = tile().querySelector('[data-part="primary"]')!
@@ -114,7 +111,7 @@ it('chevron follows aria-expanded and remains independent of icon and label cont
     }
   }
   await render({
-    chevron: 'right',
+    chevron: 'end',
     'aria-label': 'Next',
     'aria-expanded': true,
   })
@@ -123,40 +120,70 @@ it('chevron follows aria-expanded and remains independent of icon and label cont
       .querySelector('[data-part="indicator"] svg')
       ?.getAttribute('data-icon'),
   ).toBe('select-chevron-right')
-  await render({ text: 'Label', 'aria-expanded': false })
+  await render({ children: 'Label', 'aria-expanded': false })
   expect(tile().querySelector('[data-part="indicator"]')).toBeNull()
 })
 it('aria-busy is the single visual state source without disabling activation', async () => {
   const onClick = vi.fn()
   for (const busy of [true, 'true', false, 'false'] as const) {
-    await render({ text: 'Title', onClick, 'aria-busy': busy })
+    await render({ children: 'Title', onClick, 'aria-busy': busy })
     expect(tile().hasAttribute('data-busy')).toBe(String(busy) === 'true')
     await act(async () => tile().click())
   }
   expect(onClick).toHaveBeenCalledTimes(4)
 })
-it('level is a finite whole depth, clamps to 0..9 and preserves other styles', async () => {
+it('indent is a whole step from 0 to 9, reports other values and preserves other styles', async () => {
+  await render({ children: 'Title', indent: 3, style: { color: 'red' } })
+  expect(tile().style.getPropertyValue('--face-runtime-option-level')).toBe('3')
+  expect(tile().hasAttribute('data-indent')).toBe(true)
   for (const [input, expected] of [
     [-4, '0'],
     [2.8, '2'],
     [99, '9'],
-    [NaN, ''],
-    [Infinity, ''],
+    [NaN, '0'],
+    [Infinity, '0'],
   ] as const) {
-    await render({ text: 'Title', level: input, style: { color: 'red' } })
+    await expectDevError(
+      () => render({ children: 'Title', indent: input, style: { color: 'red' } }),
+      new RegExp(`^Face UI Tile: invalid indent ${input}; using ${expected}\\.$`),
+    )
     expect(tile().style.getPropertyValue('--face-runtime-option-level')).toBe(
       expected,
     )
     expect(tile().style.color).toBe('red')
   }
+  await render({ children: 'Title' })
+  expect(tile().hasAttribute('data-indent')).toBe(false)
+})
+it('aria-expanded makes the row a disclosure button without onClick, role or interactive', async () => {
+  await render({ children: 'Project', chevron: 'down', 'aria-expanded': false })
+  const control = tile().querySelector<HTMLButtonElement>('[data-part="primary"]')
+  expect(control?.tagName).toBe('BUTTON')
+  expect(control?.getAttribute('aria-expanded')).toBe('false')
+  expect(control?.tabIndex).toBe(0)
+  expect(tile().hasAttribute('aria-expanded')).toBe(false)
+  expect(tile().hasAttribute('data-interactive')).toBe(true)
+  await render({ children: 'Project', 'aria-expanded': true, interactive: false })
+  expect(tile().querySelector('[data-part="primary"]')).toBeNull()
+  expect(tile().hasAttribute('data-interactive')).toBe(false)
+})
+it('align is logical and the end chevron marks its direction for mirroring', async () => {
+  for (const align of ['start', 'center', 'end'] as const) {
+    await render({ children: 'Row', align })
+    expect(tile().getAttribute('data-align')).toBe(align)
+  }
+  await render({ children: 'Row', chevron: 'end', onClick: vi.fn() })
+  const indicator = tile().querySelector('[data-part="indicator"]')!
+  expect(indicator.getAttribute('data-direction')).toBe('end')
+  expect(indicator.querySelector('svg')?.getAttribute('data-icon')).toBe('select-chevron-right')
 })
 it('interactive=false suppresses inferred activation and custom roles stay explicit', async () => {
   const onClick = vi.fn()
-  await render({ text: 'Heading', onClick, interactive: false })
+  await render({ children: 'Heading', onClick, interactive: false })
   await act(async () => tile().click())
   expect(onClick).not.toHaveBeenCalled()
   expect(tile().hasAttribute('role')).toBe(false)
-  await render({ text: 'Tab', role: 'tab', 'aria-selected': true, onClick })
+  await render({ children: 'Tab', role: 'tab', 'aria-selected': true, onClick })
   expect(
     tile().querySelector('[data-part="primary"]')?.getAttribute('role'),
   ).toBe('tab')
@@ -165,7 +192,7 @@ it('interactive=false suppresses inferred activation and custom roles stay expli
       .querySelector('[data-part="primary"]')
       ?.getAttribute('aria-selected'),
   ).toBe('true')
-  await render({ text: 'Current', active: true, onClick })
+  await render({ children: 'Current', active: true, onClick })
   expect(tile().getAttribute('aria-selected')).toBeNull()
   expect(tile().getAttribute('aria-current')).toBeNull()
 })
@@ -203,7 +230,6 @@ it('Tree exposes expansion only on branches for both Tile and Button rows', asyn
 })
 it('id identifies the actual primary control for keyboard focus and ARIA references', async () => {
   await render({
-    text: 'Tab',
     id: 'tab-control',
     role: 'tab',
     children: <strong>Tab</strong>,
@@ -215,22 +241,22 @@ it('id identifies the actual primary control for keyboard focus and ARIA referen
 })
 
 it('adding and removing actions preserves the focused primary control', async () => {
-  await render({ text: 'Title', onClick: vi.fn() })
+  await render({ children: 'Title', onClick: vi.fn() })
   const control = tile().querySelector<HTMLButtonElement>(
     '[data-part="primary"]',
   )!
   control.focus()
-  for (const actions of [<Button key="edit" text="Edit" />, false]) {
-    await render({ text: 'Title', onClick: vi.fn(), actions })
+  for (const actions of [<Button key="edit">Edit</Button>, false]) {
+    await render({ children: 'Title', onClick: vi.fn(), actions })
     expect(tile().querySelector('[data-part="primary"]')).toBe(control)
     expect(document.activeElement).toBe(control)
   }
 })
 it('region ARIA stays on the container while control naming addresses the primary button', async () => {
   await render({
-    text: 'Title',
+    children: 'Title',
     interactive: true,
-    actions: <Button text="Edit" />,
+    actions: <Button>Edit</Button>,
     'aria-hidden': true,
     'aria-live': 'polite',
     'aria-atomic': true,
@@ -264,13 +290,14 @@ describe('component smoke', () => {
     await act(async () => {
       root.render(
         <Tile
-          text="Project map"
-          rightText="Ready"
+          meta="Ready"
           icon="file"
           active
           onClick={handleTileClick}
-          actions={<Button text="More" onClick={handleActionClick} />}
-        />,
+          actions={<Button onClick={handleActionClick}>More</Button>}
+        >
+          Project map
+        </Tile>,
       )
     })
 
@@ -352,7 +379,7 @@ describe('component smoke', () => {
 
     await act(async () => {
       root.render(
-        <Tile text="Disabled project" disabled onClick={handleTileClick} />,
+        <Tile disabled onClick={handleTileClick}>Disabled project</Tile>,
       )
     })
 
@@ -379,11 +406,12 @@ describe('component smoke', () => {
     await act(async () => {
       root.render(
         <Tile
-          text="A very long navigation item name that must not expand the tile"
-          rightText="Ready"
+          meta="Ready"
           icon="file"
           style={{ width: '5rem' }}
-        />,
+        >
+          A very long navigation item name that must not expand the tile
+        </Tile>,
       )
     })
 
@@ -429,7 +457,7 @@ describe('component smoke', () => {
 
   it('Tile applies Button-like icon inset only for its own icon slot', async () => {
     await act(async () => {
-      root.render(<Tile icon="file" text="Page title" />)
+      root.render(<Tile icon="file">Page title</Tile>)
     })
 
     const iconTile = container.querySelector(
@@ -562,11 +590,12 @@ describe('component smoke', () => {
     await act(async () => {
       root.render(
         <Tile
-          text="Project"
           icon="folder"
           chevron="down"
           aria-expanded={true}
-        />,
+        >
+          Project
+        </Tile>,
       )
     })
 

@@ -30,8 +30,8 @@ for (const theme of ['light', 'dark']) {
     ] as const) {
       await page.mouse.move(700, 500)
       await render(page, {
-        text: 'Action',
-        rightText: '⌘K',
+        children: 'Action',
+        meta: '⌘K',
         icon: 'user',
         variant,
       })
@@ -84,7 +84,7 @@ test('Button fullWidth, iconOnly, loading and membrane retain their effects in c
   page,
 }) => {
   const button = page.getByRole('button', { name: 'Search' })
-  await render(page, { text: 'Search', icon: 'search', iconOnly: true })
+  await render(page, { children: 'Search', icon: 'search', iconOnly: true })
   await expect(button).toBeVisible()
   const square = await button.boundingBox()
   expect(square!.width).toBe(square!.height)
@@ -94,7 +94,7 @@ test('Button fullWidth, iconOnly, loading and membrane retain their effects in c
   )
   await expect(button.locator('.uf-visually-hidden')).toHaveCSS('width', '1px')
   await render(page, {
-    text: 'Search',
+    children: 'Search',
     icon: 'search',
     iconOnly: true,
     fullWidth: true,
@@ -115,7 +115,7 @@ test('Button fullWidth, iconOnly, loading and membrane retain their effects in c
     (await membrane.boundingBox())!.width - (await button.boundingBox())!.width,
   ).toBe(2)
   await render(page, {
-    text: 'Search',
+    children: 'Search',
     icon: 'search',
     iconOnly: true,
     chevron: 'down',
@@ -140,7 +140,7 @@ test('Button fullWidth, iconOnly, loading and membrane retain their effects in c
     disclosure!.height,
   )
   await render(page, {
-    text: 'Search',
+    children: 'Search',
     icon: 'search',
     iconOnly: true,
     fullWidth: true,
@@ -154,15 +154,15 @@ test('Button fullWidth, iconOnly, loading and membrane retain their effects in c
   await expect(page.locator('.uf-membrane:not([data-membrane-disabled])')).toHaveCount(0)
 })
 
-test('Button align, stretchText, rightText, iconPosition and chevron compose without overriding each other', { tag: ['@layout', '@css'] }, async ({
+test('Button align, stretchText, meta, iconPosition and chevron compose without overriding each other', { tag: ['@layout', '@css'] }, async ({
   page,
 }) => {
   const button = page.getByRole('button')
-  for (const chevron of ['down', 'right'] as const) {
-    for (const align of ['left', 'center', 'right'] as const) {
+  for (const chevron of ['down', 'end'] as const) {
+    for (const align of ['start', 'center', 'end'] as const) {
       await render(page, {
-        text: 'Account',
-        rightText: 'Pro',
+        children: 'Account',
+        meta: 'Pro',
         icon: 'user',
         iconPosition: 'end',
         style: { width: 320 },
@@ -179,8 +179,8 @@ test('Button align, stretchText, rightText, iconPosition and chevron compose wit
       expect(indicator!.x).toBeGreaterThan(icon!.x)
       const compact = await button.locator('[data-part="text"]').boundingBox()
       await render(page, {
-        text: 'Account',
-        rightText: 'Pro',
+        children: 'Account',
+        meta: 'Pro',
         icon: 'user',
         iconPosition: 'end',
         style: { width: 320 },
@@ -194,26 +194,75 @@ test('Button align, stretchText, rightText, iconPosition and chevron compose wit
     }
   }
   await render(page, {
-    text: 'Details',
-    chevron: 'right',
+    children: 'Details',
+    chevron: 'end',
     'aria-expanded': false,
   })
   await expect(button.locator('[data-part="indicator"]')).toHaveCSS(
     'transform',
-    'none',
+    'matrix(1, 0, 0, 1, 0, 0)',
   )
   await render(page, {
-    text: 'Details',
-    chevron: 'right',
+    children: 'Details',
+    chevron: 'end',
     'aria-expanded': true,
   })
   await expect(button.locator('[data-part="indicator"]')).toHaveCSS(
     'transform',
-    'matrix(-1, 0, 0, -1, 0, 0)',
+    'matrix(-1, 0, 0, 1, 0, 0)',
   )
 })
 
-test('Button level changes measured indentation and clamps invalid or fractional levels', { tag: ['@css'] }, async ({
+test('Button align start and the end chevron follow the inline direction in RTL', { tag: ['@layout'] }, async ({
+  page,
+}) => {
+  const button = page.getByRole('button')
+  const geometry = () =>
+    button.evaluate((node) => {
+      const box = node.getBoundingClientRect()
+      const label = node.querySelector('[data-part="label"]')!.getBoundingClientRect()
+      const indicator = node.querySelector('[data-part="indicator"]')!
+      const chevron = indicator.getBoundingClientRect()
+      return {
+        labelStart: label.left - box.left,
+        labelEnd: box.right - label.right,
+        // Distance from the label to the chevron, measured left to right.
+        chevronAfterLabel: chevron.left - label.right,
+        chevronBeforeLabel: label.left - chevron.right,
+        transform: getComputedStyle(indicator).transform,
+      }
+    })
+  const measured = []
+  for (const dir of ['ltr', 'rtl'] as const)
+    for (const expanded of [false, true]) {
+      await render(page, {
+        key: `${dir}-${expanded}`,
+        children: 'Details',
+        align: 'start',
+        chevron: 'end',
+        'aria-expanded': expanded,
+        dir,
+        style: { width: 240 },
+      })
+      await expect(button).toHaveAttribute('dir', dir)
+      measured.push({ dir, expanded, ...(await geometry()) })
+    }
+  const [ltr, ltrOpen, rtl, rtlOpen] = measured
+  // The label starts at the inline start and the chevron follows it toward the inline end.
+  expect(ltr.labelStart).toBeLessThan(ltr.labelEnd)
+  expect(rtl.labelEnd).toBeLessThan(rtl.labelStart)
+  expect(rtl.labelEnd).toBeCloseTo(ltr.labelStart, 0)
+  expect(ltr.chevronAfterLabel).toBeGreaterThanOrEqual(0)
+  expect(rtl.chevronBeforeLabel).toBeGreaterThanOrEqual(0)
+  expect(rtl.chevronBeforeLabel).toBeCloseTo(ltr.chevronAfterLabel, 0)
+  // Closed, the chevron points to the inline end; open, it points back.
+  expect(ltr.transform).toBe('matrix(1, 0, 0, 1, 0, 0)')
+  expect(rtl.transform).toBe('matrix(-1, 0, 0, 1, 0, 0)')
+  expect(ltrOpen.transform).toBe('matrix(-1, 0, 0, 1, 0, 0)')
+  expect(rtlOpen.transform).toBe('matrix(1, 0, 0, 1, 0, 0)')
+})
+
+test('Button indent changes measured indentation and clamps invalid or fractional steps', { tag: ['@css'] }, async ({
   page,
 }) => {
   const button = page.getByRole('button')
@@ -221,22 +270,22 @@ test('Button level changes measured indentation and clamps invalid or fractional
     button.evaluate((node) =>
       Number.parseFloat(getComputedStyle(node).paddingLeft),
     )
-  await render(page, { text: 'Node', level: 0 })
+  await render(page, { children: 'Node', indent: 0 })
   const zero = await padding()
-  await render(page, { text: 'Node', level: 2 })
+  await render(page, { children: 'Node', indent: 2 })
   await expect(button).toHaveCSS('--face-runtime-option-level', '2')
   const two = await padding()
   expect(two).toBeGreaterThan(zero)
-  await render(page, { text: 'Node', level: 2.8 })
+  await render(page, { children: 'Node', indent: 2.8 })
   await expect(button).toHaveCSS('--face-runtime-option-level', '2')
   expect(await padding()).toBe(two)
-  await render(page, { text: 'Node', level: -20 })
+  await render(page, { children: 'Node', indent: -20 })
   await expect(button).toHaveCSS('--face-runtime-option-level', '0')
   expect(await padding()).toBe(zero)
-  await render(page, { text: 'Node', level: 100 })
+  await render(page, { children: 'Node', indent: 100 })
   await expect(button).toHaveCSS('--face-runtime-option-level', '9')
-  await render(page, { text: 'Node' })
-  await expect(button).not.toHaveAttribute('data-level')
+  await render(page, { children: 'Node' })
+  await expect(button).not.toHaveAttribute('data-indent')
   expect(await padding()).toBe(zero)
 })
 
@@ -253,11 +302,11 @@ test('ButtonGroup orientation aligns default membrane buttons and shapes the act
         children: [
           React.createElement(propComponents.Button, {
             key: 'a',
-            text: 'Bold',
+            children: 'Bold',
           }),
           React.createElement(propComponents.Button, {
             key: 'b',
-            text: 'Italic',
+            children: 'Italic',
           }),
         ],
       })
@@ -296,7 +345,7 @@ test('Button native activation, disabled, copyText and onCopied work through key
       },
     })
     state.renderProps('Button', {
-      text: 'Copy',
+      children: 'Copy',
       copyText: 'value',
       onClick: () => state.propEvents.push('click'),
       onCopied: () => state.propEvents.push('copied'),
@@ -320,7 +369,7 @@ test('Button native activation, disabled, copyText and onCopied work through key
   await page.evaluate(() => {
     const state = window as unknown as MountWindow
     state.renderProps('Button', {
-      text: 'Copy',
+      children: 'Copy',
       copyText: 'value',
       disabled: true,
       onClick: () => state.propEvents.push('unexpected'),
@@ -347,7 +396,7 @@ test('Button type, form, name and value participate in real native form actions'
     })
     document.body.appendChild(form)
   })
-  const props = { text: 'Save', form: 'editor', name: 'action', value: 'save' }
+  const props = { children: 'Save', form: 'editor', name: 'action', value: 'save' }
   await render(page, props)
   await page.getByRole('button', { name: 'Save' }).click()
   expect(await page.evaluate(() => (window as any).propEvents)).toEqual([])
@@ -359,7 +408,7 @@ test('Button type, form, name and value participate in real native form actions'
   await expect
     .poll(() => page.evaluate(() => (window as any).propEvents))
     .toEqual(['Draft:save'])
-  await render(page, { ...props, text: 'Reset', type: 'reset' })
+  await render(page, { ...props, children: 'Reset', type: 'reset' })
   await page.getByRole('button', { name: 'Reset' }).click()
   await expect(page.getByRole('textbox', { name: 'Title' })).toHaveValue('')
 })

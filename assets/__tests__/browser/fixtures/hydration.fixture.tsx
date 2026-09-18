@@ -23,7 +23,7 @@ export function HydrationFixture() {
       <Input label="Server name" defaultValue="Анна" description="Public name" required />
       <Input label="Server notes" multiline rows={3} defaultValue={"First line\nSecond line"} />
       <Radio aria-label="Server choice" name="server-choice" required defaultValue="" options={[{value:'',label:'Standard'},{value:'pro',label:'Professional'}]} />
-      <Button text="Save" />
+      <Button>Save</Button>
       <Checkbox label="Terms" defaultChecked />
       <Checkbox label="Partial selection" checked="indeterminate" />
       <Switcher label="Notifications" defaultChecked />
@@ -33,10 +33,10 @@ export function HydrationFixture() {
         defaultValue="a"
       />
       <Tooltip content="Help">
-        <Button text="Help trigger" />
+        <Button>Help trigger</Button>
       </Tooltip>
       <Popover content="Details" aria-label="Details">
-        <Button text="Details trigger" />
+        <Button>Details trigger</Button>
       </Popover>
       <Modal title="Dialog" trigger="Open dialog">
         Dialog content

@@ -18,7 +18,7 @@ beforeEach(() => {
 it('empty React fragments and arrays do not create phantom Text or Button slots', async () => {
   for (const Component of [Text, Button]) {
     await render(
-      <Component text="Ignored" icon={<>{false}</>}>
+      <Component icon={<>{false}</>}>
         {[false, <React.Fragment key="empty">{null}</React.Fragment>]}
       </Component>,
     )

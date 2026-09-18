@@ -28,6 +28,8 @@ import { Text } from '../Text/Text'
 // ---------------------------------------------------------------------------
 
 export type TableAlign = 'left' | 'center' | 'right'
+// Text aligns by the inline axis; physical column values map onto it.
+const TEXT_ALIGN = { left: 'start', center: 'center', right: 'end' } as const
 
 export interface TableColumn<T = any> {
   /** Unique column identifier. */
@@ -184,7 +186,7 @@ function renderCellContent(
       <Text
         as="div"
         fullWidth
-        align={align}
+        align={TEXT_ALIGN[align]}
         inset="none"
         membrane={false}
         className="uf-table__cellText"
@@ -211,7 +213,7 @@ function renderHeaderContent(
       <Text
         as="div"
         fullWidth
-        align={align}
+        align={TEXT_ALIGN[align]}
         inset="none"
         membrane={false}
         className="uf-table__headerText"

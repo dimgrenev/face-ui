@@ -197,7 +197,7 @@ it('root disabled retains selection, disables actions and prevents user callback
     defaultValue: 'a',
     disabled: true,
     onValueChange: cb,
-    actions: <Button text="Close" onClick={action} />,
+    actions: <Button onClick={action}>Close</Button>,
   })
   await click(2)
   expect(selected()).toEqual(['a'])
@@ -210,7 +210,7 @@ it('root disabled retains selection, disables actions and prevents user callback
 })
 it('ordinary header actions remain outside tablist and retain their own behavior', async () => {
   const cb = vi.fn()
-  await render({ actions: <Button text="New" onClick={cb} /> })
+  await render({ actions: <Button onClick={cb}>New</Button> })
   const action = host.querySelector<HTMLButtonElement>('fieldset button')!
   expect(host.querySelector('[role="tablist"]')?.contains(action)).toBe(false)
   await act(async () => action.click())

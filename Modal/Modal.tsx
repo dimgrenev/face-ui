@@ -258,7 +258,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                     {...(api.getTitleProps() as any)}
                     as="div"
                     fullWidth
-                    align="left"
+                    align="start"
                     className={cn('uf-modal-title')}
                   >
                     {title}
@@ -287,7 +287,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 as="div"
                 variant="muted"
                 fullWidth
-                align="left"
+                align="start"
                 className={cn('uf-modal-description')}
               >
                 {description}
@@ -306,12 +306,6 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                   {actions.map((action, index) => (
                     <Button
                       key={`modal-action:${index}`}
-                      text={
-                        typeof action.label === 'string' ||
-                        typeof action.label === 'number'
-                          ? String(action.label)
-                          : undefined
-                      }
                       variant={
                         action.variant ??
                         (index === actions.length - 1 ? 'accent' : 'outline')
@@ -320,10 +314,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                       onClick={action.onClick}
                       fullWidth={false}
                     >
-                      {typeof action.label === 'string' ||
-                      typeof action.label === 'number'
-                        ? undefined
-                        : action.label}
+                      {action.label}
                     </Button>
                   ))}
                 </Card.Actions>

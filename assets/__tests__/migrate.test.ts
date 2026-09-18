@@ -10,10 +10,12 @@ import type { Migration } from '../../scripts/migrations/types'
 // Every top-level prop removed or renamed since d30d501, with a value the old API accepted.
 const REMOVED: Record<string, Record<string, unknown>> = {
   Avatar: { icon: 'user', children: 'AL' },
+  Badge: { appearance: 'fill', text: 'New' },
   Breadcrumb: { collapseAfter: 5, allowNavigation: true },
-  Button: { selector: true, selectorDirection: 'side', selectorOpen: false },
-  Card: { footerLayout: 'between', interactive: true },
+  Button: { selector: true, selectorDirection: 'side', selectorOpen: false, text: 'Save', rightText: 'Pro', level: 1 },
+  Card: { footerLayout: 'between', interactive: true, content: 'Body' },
   Date: { showPresets: true, views: ['day'] },
+  Icon: { label: 'Home' },
   Input: { ariaLabel: 'Name', stretchText: true, textLayout: 'wrap' },
   Popover: { interactive: true, openDelay: 100, closeDelay: 100 },
   Progress: { ariaLabel: 'Upload' },
@@ -24,14 +26,24 @@ const REMOVED: Record<string, Record<string, unknown>> = {
   Slider: { variant: 'advanced', leadingIcon: 'crop', leadingText: 'Crop', cropLocksValue: false },
   Switcher: { text: 'Sync', withText: true, textWrap: 'truncate' },
   Tabs: { withLine: true },
-  Tile: { selector: true, selectorOpen: true, busy: true, intent: 'section', selectedDescendant: true },
+  Text: { text: 'Hello' },
+  Tile: {
+    selector: true,
+    selectorOpen: true,
+    busy: true,
+    intent: 'section',
+    selectedDescendant: true,
+    text: 'Row',
+    rightText: '3',
+    level: 1,
+  },
 }
 const pairs = Object.entries(REMOVED).flatMap(([component, props]) => Object.keys(props).map((prop) => `${component}.${prop}`))
 // Props that kept their name but changed type.
 const RETYPED = ['value', 'defaultValue', 'min', 'max', 'disabledDates', 'onValueChange'].map((prop) => `Calendar.${prop}`)
 
 const oldProp = (row: Migration) =>
-  row.kind === 'rename-prop' || row.kind === 'move-to-labels'
+  row.kind === 'rename-prop' || row.kind === 'move-to-labels' || row.kind === 'text-to-children'
     ? row.from
     : row.kind === 'remove-prop' || row.kind === 'rename-value' || row.kind === 'retype-prop'
       ? row.prop
@@ -141,9 +153,9 @@ export const view = <>
     expect(tsx).toContain(`import type { CardAlign } from '@userface/face-ui-react/Card'`)
     expect(tsx).toContain(`export const align: CardAlign = 'end'`)
     expect(tsx).toContain(`import { computeSelectSidePosition } from '@userface/face-ui-react/Select/select-side-position'`)
-    expect(tsx).toContain(`<Action aria-expanded={open} iconPosition="start" chevron="right" />`)
+    expect(tsx).toContain(`<Action aria-expanded={open} iconPosition="start" chevron="end" />`)
     expect(tsx).toContain(
-      `<Wrapped selectorOpen={open} aria-expanded={native} chevron={(enabled) ? ((direction) === 'side' ? 'right' : 'down') : undefined} />`,
+      `<Wrapped selectorOpen={open} aria-expanded={native} chevron={(enabled) ? ((direction) === 'side' ? 'end' : 'down') : undefined} />`,
     )
     expect(tsx).toContain(`<UI.Tile aria-busy chevron={(expanded) ? 'down' : undefined} />`)
     expect(tsx).toContain(`<Tile selectedDescendant />`)

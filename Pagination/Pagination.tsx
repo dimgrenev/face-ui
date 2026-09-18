@@ -188,13 +188,14 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
       >
         <Button
           {...api.getPrevProps()}
-          text={resolvedLabels.previousPage}
           aria-label={resolvedLabels.previousPage}
           fullWidth={false}
           membrane={membrane}
           variant="ghost"
           className="uf-pagination-nav uf-pagination-navPrev"
-        />
+        >
+          {resolvedLabels.previousPage}
+        </Button>
 
         <span className="uf-pagination-pages">
           {api.range.map((rangeItem, index) =>
@@ -213,7 +214,6 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
               <Button
                 key={rangeItem}
                 {...api.getPageProps(rangeItem)}
-                text={String(rangeItem)}
                 fullWidth={false}
                 membrane={membrane}
                 variant={api.page === rangeItem ? 'primary' : 'ghost'}
@@ -222,7 +222,9 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
                   String(rangeItem),
                 )}
                 className="uf-pagination-page"
-              />
+              >
+                {String(rangeItem)}
+              </Button>
             ),
           )}
         </span>
@@ -230,13 +232,14 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
         <span className="uf-pagination-trailing">
           <Button
             {...api.getNextProps()}
-            text={resolvedLabels.nextPage}
             aria-label={resolvedLabels.nextPage}
             fullWidth={false}
             membrane={membrane}
             variant="ghost"
             className="uf-pagination-nav uf-pagination-navNext"
-          />
+          >
+            {resolvedLabels.nextPage}
+          </Button>
           <Modal
             open={pickerOpen && !hidden}
             onOpenChange={({ open }) => {
@@ -291,13 +294,14 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
                 }}
               />
               <Button
-                text={resolvedLabels.goToPage}
                 disabled={!validPage || disabled}
                 tabIndex={!validPage || disabled ? -1 : 0}
                 onClick={(event) => {
                   if (!event.defaultPrevented) jump()
                 }}
-              />
+              >
+                {resolvedLabels.goToPage}
+              </Button>
             </div>
           </Modal>
         </span>

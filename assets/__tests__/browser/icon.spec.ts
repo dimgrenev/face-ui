@@ -13,7 +13,7 @@ test('Icon name, accessible label, SVG title and paint styles survive real brows
   await expect(page.getByRole('img', { name: 'Account' })).toBeVisible()
   await render({
     name: 'crop',
-    label: 'Profile',
+    'aria-label': 'Profile',
     title: 'Account',
     className: 'custom',
     style: { color: 'rgb(120, 10, 20)', opacity: 0.5 },
@@ -26,7 +26,7 @@ test('Icon name, accessible label, SVG title and paint styles survive real brows
   await expect(icon).toHaveCSS('opacity', '0.5')
   const box = await icon.boundingBox()
   expect([box!.width, box!.height]).toEqual([20, 20])
-  await render({ name: 'user', label: ' ', title: ' ' })
+  await render({ name: 'user', 'aria-label': ' ', title: ' ' })
   await expect(page.getByRole('img')).toHaveCount(0)
   await expect(page.locator('svg')).toHaveAttribute('aria-hidden', 'true')
   await render({ name: '' })

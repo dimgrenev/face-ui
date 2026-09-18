@@ -57,8 +57,19 @@
 .uf-button[data-scope][data-selector][data-selector-direction="side"] {
   height: var(--uf-control-height);
 }
+/* The end chevron points to the inline end: mirrored under the nearest dir="rtl".
+   Custom properties rather than :dir(), which minifiers may lower to :lang(). */
+:where([dir="ltr"]) {
+  --uf-button-inline-sign: 1;
+}
+:where([dir="rtl"]) {
+  --uf-button-inline-sign: -1;
+}
+.uf-button[data-selector-direction="side"] > [data-part="indicator"] {
+  transform: scaleX(var(--uf-button-inline-sign, 1));
+}
 .uf-button[data-selector-direction="side"][data-selector-open] > [data-part="indicator"] {
-  transform: rotate(180deg);
+  transform: scaleX(calc(-1 * var(--uf-button-inline-sign, 1)));
 }
 
 .uf-button[data-scope]:focus-visible {
@@ -164,13 +175,13 @@
 }
 
 /* Text alignment */
-.uf-button[data-scope][data-align="left"] {
+.uf-button[data-scope][data-align="start"] {
   justify-content: flex-start;
-  text-align: left;
+  text-align: start;
 }
-.uf-button[data-scope][data-align="right"] {
+.uf-button[data-scope][data-align="end"] {
   justify-content: flex-end;
-  text-align: right;
+  text-align: end;
 }
 .uf-button[data-scope][data-align="center"] {
   justify-content: center;
@@ -193,8 +204,8 @@
   padding-inline: var(--uf-control-pad-icon);
 }
 
-/* Level (nesting indent) */
-.uf-button[data-scope][data-level] {
+/* Nesting indent */
+.uf-button[data-scope][data-indent] {
   padding-inline-start: calc(var(--uf-control-pad-start) + (var(--face-runtime-option-level, 0) * var(--uf-option-indent)));
 }
 
@@ -323,12 +334,12 @@
   opacity: 1;
 }
 
-/* Right text */
-.uf-button__rightText {
+/* Meta: secondary text at the inline end of the label area */
+.uf-button__meta {
   flex: 0 0 auto;
   min-width: max-content;
-  margin-left: auto;
-  padding-left: var(--uf-control-pad-text);
+  margin-inline-start: auto;
+  padding-inline-start: var(--uf-control-pad-text);
   white-space: nowrap;
 }
 

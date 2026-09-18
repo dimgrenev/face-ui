@@ -4,15 +4,15 @@
   "name": "Button",
   "description": "Action component with variants, icons, and clipboard support",
   "props": {
-    "text": {
-      "type": "string",
-      "required": false,
-      "description": "Button label text."
-    },
-    "rightText": {
+    "children": {
       "type": "ReactNode",
       "required": false,
-      "description": "Optional secondary text, rendered at the far right inside the text area."
+      "description": "Label of the button; with `iconOnly` it stays as the accessible name only."
+    },
+    "meta": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Secondary text at the inline end of the label area, such as a shortcut or count."
     },
     "variant": {
       "type": "enum",
@@ -65,15 +65,16 @@
     "stretchText": {
       "type": "boolean",
       "required": false,
-      "description": "Stretch text area (flex:1)."
+      "description": "Stretch text area (flex:1).",
+      "default": false
     },
     "chevron": {
       "type": "enum",
       "required": false,
-      "description": "Trailing disclosure chevron. aria-expanded reverses its direction when open.",
+      "description": "Trailing disclosure chevron: `down` flips with aria-expanded; `end` points to the inline end and mirrors in right-to-left text.",
       "options": [
         "down",
-        "right"
+        "end"
       ]
     },
     "aria-expanded": {
@@ -94,17 +95,17 @@
     "align": {
       "type": "enum",
       "required": false,
-      "description": "Text alignment.",
+      "description": "Inline alignment of the content, following text direction.",
       "options": [
-        "left",
+        "start",
         "center",
-        "right"
+        "end"
       ]
     },
-    "level": {
+    "indent": {
       "type": "number",
       "required": false,
-      "description": "Nesting level for option-like rows: 0..9"
+      "description": "Indent steps for nested option-like rows, an integer from 0 to 9."
     },
     "membrane": {
       "type": "boolean",
@@ -116,18 +117,13 @@
       "type": "string",
       "required": false,
       "description": "Copy text to clipboard on click (Clipboard integration)."
-    },
-    "children": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Label content, overriding text. Icon and secondary text remain separate slots."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "text": "Create",
+        "children": "Create",
         "icon": "plus",
         "fullWidth": false
       }
@@ -135,71 +131,71 @@
     {
       "name": "Primary",
       "props": {
-        "text": "Primary",
+        "children": "Primary",
         "variant": "primary"
       }
     },
     {
       "name": "Secondary",
       "props": {
-        "text": "Secondary",
+        "children": "Secondary",
         "variant": "secondary"
       }
     },
     {
       "name": "Accent",
       "props": {
-        "text": "Accent",
+        "children": "Accent",
         "variant": "accent"
       }
     },
     {
       "name": "Outline",
       "props": {
-        "text": "Outline",
+        "children": "Outline",
         "variant": "outline"
       }
     },
     {
       "name": "Ghost",
       "props": {
-        "text": "Ghost",
+        "children": "Ghost",
         "variant": "ghost"
       }
     },
     {
       "name": "Destructive",
       "props": {
-        "text": "Delete",
+        "children": "Delete",
         "variant": "destructive"
       }
     },
     {
       "name": "Disabled",
       "props": {
-        "text": "Disabled",
+        "children": "Disabled",
         "disabled": true
       }
     },
     {
       "name": "Full Width",
       "props": {
-        "text": "Full Width",
+        "children": "Full Width",
         "fullWidth": true
       }
     },
     {
       "name": "Selector",
       "props": {
-        "text": "GPT-5.5",
+        "children": "GPT-5.5",
         "chevron": "down"
       }
     },
     {
       "name": "Side Selector",
       "props": {
-        "text": "Nested",
-        "chevron": "right"
+        "children": "Nested",
+        "chevron": "end"
       }
     }
   ],

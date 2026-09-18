@@ -532,10 +532,10 @@ describe('taxonomy and governance', () => {
       root.render(
         <div>
           {textSizeOptions.map((size) => (
-            <Text key={size} text={size} size={size} />
+            <Text key={size} size={size}>{size}</Text>
           ))}
-          <Text text="Markdown text" variant="markdown" />
-          <Text text="Label text" variant="label" />
+          <Text variant="markdown">Markdown text</Text>
+          <Text variant="label">Label text</Text>
         </div>,
       )
     })
@@ -857,7 +857,7 @@ describe('taxonomy and governance', () => {
   it('honors an explicit flush inset for label text', async () => {
     await act(async () => {
       root.render(
-        <Text as="span" variant="label" inset="none" text="Flush label" />,
+        <Text as="span" variant="label" inset="none">Flush label</Text>,
       )
     })
 

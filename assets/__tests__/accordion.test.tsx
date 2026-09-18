@@ -545,7 +545,7 @@ describe('component smoke', () => {
             {
               value: 'getting-started',
               label: 'Getting started',
-              content: <Button text="Install package" fullWidth />,
+              content: <Button fullWidth>Install package</Button>,
             },
           ]}
         />,

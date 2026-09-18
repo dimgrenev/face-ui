@@ -138,11 +138,11 @@ function PanelItemRenderer(props: PanelItemRendererProps) {
         icon={iconNode}
         iconOnly={collapsed}
         fullWidth
-        align="left"
+        align="start"
         stretchText
         membrane
         variant="default"
-        level={level}
+        indent={level}
         aria-label={
           collapsed && typeof item.label === 'string' ? item.label : undefined
         }
@@ -185,11 +185,11 @@ function PanelItemRenderer(props: PanelItemRendererProps) {
         icon={iconNode}
         iconOnly={collapsed}
         fullWidth
-        align="left"
+        align="start"
         stretchText
         membrane
         variant="default"
-        level={level}
+        indent={level}
         className={cn(
           'uf-sidebar-itemButton',
           'uf-sidebar-groupButton',
@@ -201,7 +201,7 @@ function PanelItemRenderer(props: PanelItemRendererProps) {
         }
         onClick={() => toggleGroup?.()}
         onKeyDown={onGroupKeyDown}
-        chevron={!collapsed ? 'right' : undefined}
+        chevron={!collapsed ? 'end' : undefined}
         aria-expanded={isGroupOpen}
       >
         {!collapsed && (

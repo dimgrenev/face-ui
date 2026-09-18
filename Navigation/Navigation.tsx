@@ -128,7 +128,7 @@ function DropdownItemRenderer(props: DropdownItemRendererProps) {
     <Button
       {...linkProps}
       fullWidth
-      align="left"
+      align="start"
       stretchText
       variant={api.activeId === item.id ? 'default' : 'ghost'}
       className="uf-navigation-dropdownItem"
@@ -292,13 +292,8 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
           <Button
             key={item.id}
             disabled={item.disabled}
-            text={
-              typeof item.label === 'string' || typeof item.label === 'number'
-                ? String(item.label)
-                : undefined
-            }
             fullWidth
-            align="left"
+            align="start"
             stretchText
             membrane
             variant={isActive ? 'default' : 'ghost'}
@@ -317,9 +312,7 @@ export const Navigation = forwardRef<HTMLDivElement, NavigationProps>(
               setSheetOpen(false)
             }}
           >
-            {typeof item.label === 'string' || typeof item.label === 'number'
-              ? undefined
-              : item.label}
+            {item.label}
           </Button>
         )
       }

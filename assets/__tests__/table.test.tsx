@@ -29,7 +29,7 @@ describe('component smoke', () => {
     })
 
     const rowNumberHeader = container.querySelector(
-      '.uf-table__row-number-header [data-scope="text"][data-align="left"]',
+      '.uf-table__row-number-header [data-scope="text"][data-align="start"]',
     ) as HTMLElement | null
     expect(rowNumberHeader?.textContent).toContain('#')
     const table = container.querySelector(
@@ -41,13 +41,13 @@ describe('component smoke', () => {
     expect(componentStyles).toContain('max-inline-size: 100%;')
 
     const rowNumberCell = container.querySelector(
-      'td[data-row-number] [data-scope="text"][data-align="left"]',
+      'td[data-row-number] [data-scope="text"][data-align="start"]',
     ) as HTMLElement | null
     expect(rowNumberCell?.textContent).toContain('1')
 
     const rightAlignedCells = Array.from(
       container.querySelectorAll<HTMLElement>(
-        'td [data-scope="text"][data-align="right"]',
+        'td [data-scope="text"][data-align="end"]',
       ),
     )
     expect(

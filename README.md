@@ -42,7 +42,7 @@ Use the primary barrel for normal application code:
 import { Button, Text } from '@userface/face-ui-react'
 
 export function Example() {
-  return <Button text="Create project" variant="accent" />
+  return <Button variant="accent">Create project</Button>
 }
 ```
 

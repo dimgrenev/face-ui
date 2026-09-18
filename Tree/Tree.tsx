@@ -141,12 +141,6 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
     activePath: isInActivePath,
   }
 
-  const renderLabel = () => {
-    if (typeof node.label === 'string' || typeof node.label === 'number')
-      return undefined
-    return node.label
-  }
-
   const renderDefaultRow = (
     rowProps: Record<string, any>,
     className: string,
@@ -174,21 +168,17 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
       )
     }
 
-    const text =
-      typeof node.label === 'string' || typeof node.label === 'number'
-        ? String(node.label)
-        : undefined
     const commonProps = {
       ...rowProps,
       'data-tree-node-id': node.id,
       'data-active-path': isInActivePath ? '' : undefined,
-      level: depth,
-      align: 'left' as const,
+      indent: Math.min(depth, 9),
+      align: 'start' as const,
       stretchText: true,
       fullWidth: true,
       membrane: true,
       icon: node.icon,
-      rightText: node.rightText,
+      meta: node.rightText,
       className,
     }
 
@@ -196,13 +186,12 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
       return (
         <Tile
           {...commonProps}
-          text={text}
           active={isSelected || isInActivePath}
           chevron={hasChildren ? 'down' : undefined}
           aria-expanded={hasChildren ? isExpanded : undefined}
           actions={node.actions}
         >
-          {renderLabel()}
+          {node.label}
         </Tile>
       )
     }
@@ -210,12 +199,11 @@ function TreeNodeRenderer(props: TreeNodeRendererProps) {
     return (
       <Button
         {...commonProps}
-        text={text}
         variant="default"
         chevron={hasChildren ? 'down' : undefined}
         aria-expanded={hasChildren ? isExpanded : undefined}
       >
-        {renderLabel()}
+        {node.label}
       </Button>
     )
   }

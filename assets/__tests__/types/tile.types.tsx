@@ -21,3 +21,14 @@ export const oldTileIntent = <Tile intent="tab" />
 export const tileHtml = <Tile dangerouslySetInnerHTML={{ __html: 'x' }} />
 // @ts-expect-error A row is not an input.
 export const tileDefault = <Tile defaultValue="x" />
+export const nestedTile = <Tile indent={1} meta="12" chevron="end" align="start">Project</Tile>
+// @ts-expect-error Content is children; the text prop was removed.
+export const tileText = <Tile text="Project" />
+// @ts-expect-error Secondary text is meta.
+export const tileRightText = <Tile rightText="12" />
+// @ts-expect-error Nesting is indent; level belongs to Toc.
+export const tileLevel = <Tile level={1} />
+// @ts-expect-error The side chevron points to the inline end.
+export const tileChevronRight = <Tile chevron="right" />
+// @ts-expect-error Alignment follows reading direction: start, center or end.
+export const tileAlignRight = <Tile align="right" />

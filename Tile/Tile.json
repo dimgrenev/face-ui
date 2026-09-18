@@ -4,15 +4,10 @@
   "name": "Tile",
   "description": "Composed row with an optional primary action and independent leading/action controls. A composed button-like row uses a real sibling button; structural rows keep their explicit role.",
   "props": {
-    "text": {
-      "type": "string",
-      "required": false,
-      "description": "Primary label."
-    },
-    "rightText": {
+    "children": {
       "type": "ReactNode",
       "required": false,
-      "description": "Optional secondary text at the far right of the label area."
+      "description": "Label of the row; plain text truncates, rich content keeps its own layout."
     },
     "variant": {
       "type": "enum",
@@ -83,7 +78,7 @@
     "meta": {
       "type": "ReactNode",
       "required": false,
-      "description": "Non-interactive trailing metadata rendered before actions."
+      "description": "Secondary text or status at the inline end of the row, before actions."
     },
     "disabled": {
       "type": "boolean",
@@ -100,7 +95,7 @@
     "interactive": {
       "type": "boolean",
       "required": false,
-      "description": "Enable a primary action; inferred from onClick or an explicit button/tab role."
+      "description": "Enable a primary action; inferred from onClick, aria-expanded or an explicit button/tab role."
     },
     "stretchText": {
       "type": "boolean",
@@ -109,21 +104,21 @@
     },
     "chevron": {
       "type": "enum",
-      "description": "Trailing disclosure chevron, matching Button. Down follows aria-expanded.",
+      "description": "Trailing disclosure chevron: `down` flips with aria-expanded; `end` points to the inline end, mirrors in right-to-left text and turns down when expanded.",
       "enum": [
         "down",
-        "right"
+        "end"
       ],
       "required": false,
       "options": [
         "down",
-        "right"
+        "end"
       ]
     },
     "aria-expanded": {
       "type": "boolean",
       "required": false,
-      "description": "Expanded state of the controlled region; also orients chevron.",
+      "description": "Expanded state of the controlled region; makes the row a disclosure button and orients the chevron.",
       "options": [
         "false",
         "true"
@@ -147,18 +142,18 @@
     "align": {
       "type": "enum",
       "required": false,
-      "description": "Text alignment.",
+      "description": "Inline alignment of the content, following text direction. Default: start.",
       "options": [
-        "left",
+        "start",
         "center",
-        "right"
+        "end"
       ],
-      "default": "left"
+      "default": "start"
     },
-    "level": {
+    "indent": {
       "type": "number",
       "required": false,
-      "description": "Nesting level for option-like rows: 0..9"
+      "description": "Indent steps for nested rows, an integer from 0 to 9."
     },
     "truncate": {
       "type": "boolean",
@@ -175,26 +170,21 @@
     "actions": {
       "type": "ReactNode",
       "required": false,
-      "description": "Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile."
-    },
-    "children": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Custom label content. Overrides text; icon/rightText/other slots remain independent."
+      "description": "Nested action buttons at the inline end; their clicks do not reach the tile."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "text": "Page title",
+        "children": "Page title",
         "icon": "file"
       }
     },
     {
       "name": "Navigation Active",
       "props": {
-        "text": "Current page",
+        "children": "Current page",
         "icon": "file",
         "active": true
       }
@@ -202,10 +192,9 @@
     {
       "name": "Disclosure Parent",
       "props": {
-        "text": "Project",
+        "children": "Project",
         "icon": "folder",
         "chevron": "down",
-        "interactive": true,
         "aria-expanded": true,
         "actionVisibility": "hover",
         "actions": "[Button icon=plus]"
@@ -214,23 +203,23 @@
     {
       "name": "Tree Row",
       "props": {
-        "text": "src/components/Button.tsx",
+        "children": "src/components/Button.tsx",
         "icon": "file",
-        "level": 2
+        "indent": 2
       }
     },
     {
       "name": "Section",
       "props": {
         "tone": "muted",
-        "text": "Collections",
+        "children": "Collections",
         "interactive": false
       }
     },
     {
       "name": "Busy Destructive",
       "props": {
-        "text": "Delete chat?",
+        "children": "Delete chat?",
         "tone": "destructive",
         "aria-busy": true,
         "actionVisibility": "always",
@@ -327,9 +316,9 @@
       "--uf-option-indent"
     ],
     "notes": [
-      "Tile text and rightText render through Text; nested actions should remain Button or UF action components.",
+      "Tile label and meta are plain slots; nested actions should remain Button or UF action components.",
       "Selector mode renders a compact indicator inside the text slot and defaults stretchText to false unless explicitly overridden.",
-      "Level indentation is driven by --face-runtime-option-level from the level prop and shared option indentation tokens.",
+      "Indentation is driven by --face-runtime-option-level from the indent prop and shared option indentation tokens.",
       "Hover font-weight feedback and action reveal transitions consume shared Face UI motion tokens."
     ]
   },

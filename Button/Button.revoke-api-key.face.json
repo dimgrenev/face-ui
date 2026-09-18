@@ -7,11 +7,11 @@
   "root": {
     "type": "Button",
     "props": {
-      "text": {
-        "$ref": "props.text"
+      "children": {
+        "$ref": "props.children"
       },
-      "rightText": {
-        "$ref": "props.rightText"
+      "meta": {
+        "$ref": "props.meta"
       },
       "variant": {
         "$ref": "props.variant"
@@ -46,24 +46,21 @@
       "align": {
         "$ref": "props.align"
       },
-      "level": {
-        "$ref": "props.level"
+      "indent": {
+        "$ref": "props.indent"
       },
       "membrane": {
         "$ref": "props.membrane"
       },
       "copyText": {
         "$ref": "props.copyText"
-      },
-      "children": {
-        "$ref": "props.children"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "text": "Revoke key",
+      "children": "Revoke key",
       "icon": "close",
       "variant": "destructive",
       "fullWidth": false,
@@ -73,16 +70,16 @@
   },
   "controls": [
     {
-      "name": "text",
-      "type": "string",
-      "required": false,
-      "description": "Button label text."
-    },
-    {
-      "name": "rightText",
+      "name": "children",
       "type": "any",
       "required": false,
-      "description": "Optional secondary text, rendered at the far right inside the text area."
+      "description": "Label of the button; with `iconOnly` it stays as the accessible name only."
+    },
+    {
+      "name": "meta",
+      "type": "any",
+      "required": false,
+      "description": "Secondary text at the inline end of the label area, such as a shortcut or count."
     },
     {
       "name": "variant",
@@ -142,16 +139,17 @@
       "name": "stretchText",
       "type": "boolean",
       "required": false,
-      "description": "Stretch text area (flex:1)."
+      "description": "Stretch text area (flex:1).",
+      "defaultValue": false
     },
     {
       "name": "chevron",
       "type": "select",
       "required": false,
-      "description": "Trailing disclosure chevron. aria-expanded reverses its direction when open.",
+      "description": "Trailing disclosure chevron: `down` flips with aria-expanded; `end` points to the inline end and mirrors in right-to-left text.",
       "options": [
         "down",
-        "right"
+        "end"
       ]
     },
     {
@@ -175,18 +173,18 @@
       "name": "align",
       "type": "select",
       "required": false,
-      "description": "Text alignment.",
+      "description": "Inline alignment of the content, following text direction.",
       "options": [
-        "left",
+        "start",
         "center",
-        "right"
+        "end"
       ]
     },
     {
-      "name": "level",
+      "name": "indent",
       "type": "number",
       "required": false,
-      "description": "Nesting level for option-like rows: 0..9"
+      "description": "Indent steps for nested option-like rows, an integer from 0 to 9."
     },
     {
       "name": "membrane",
@@ -200,12 +198,6 @@
       "type": "string",
       "required": false,
       "description": "Copy text to clipboard on click (Clipboard integration)."
-    },
-    {
-      "name": "children",
-      "type": "any",
-      "required": false,
-      "description": "Label content, overriding text. Icon and secondary text remain separate slots."
     }
   ],
   "meta": {

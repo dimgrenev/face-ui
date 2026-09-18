@@ -4,15 +4,15 @@
   "name": "Badge",
   "description": "Status indicator label",
   "props": {
-    "text": {
-      "type": "string",
+    "children": {
+      "type": "ReactNode",
       "required": false,
-      "description": "Plain status text. Rich children take precedence when provided."
+      "description": "Content of the badge: status text, a formatted count or a status icon."
     },
-    "appearance": {
+    "variant": {
       "type": "enum",
       "required": false,
-      "description": "Fill or outline treatment.",
+      "description": "Fill or outline treatment. Default: outline.",
       "options": [
         "fill",
         "outline"
@@ -22,7 +22,7 @@
     "tone": {
       "type": "enum",
       "required": false,
-      "description": "Semantic status tone, independent from appearance.",
+      "description": "Semantic status tone, independent from the variant.",
       "options": [
         "neutral",
         "accent",
@@ -31,60 +31,55 @@
         "destructive"
       ],
       "default": "neutral"
-    },
-    "children": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Custom inline content, including a status icon or formatted count."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "text": "Badge"
+        "children": "Badge"
       }
     },
     {
       "name": "Neutral Fill",
       "props": {
-        "text": "Neutral",
-        "appearance": "fill"
+        "children": "Neutral",
+        "variant": "fill"
       }
     },
     {
       "name": "Accent Outline",
       "props": {
-        "text": "Accent",
+        "children": "Accent",
         "tone": "accent"
       }
     },
     {
       "name": "Positive Outline",
       "props": {
-        "text": "Positive",
+        "children": "Positive",
         "tone": "positive"
       }
     },
     {
       "name": "Warning Outline",
       "props": {
-        "text": "Warning",
+        "children": "Warning",
         "tone": "warning"
       }
     },
     {
       "name": "Destructive Outline",
       "props": {
-        "text": "Destructive",
+        "children": "Destructive",
         "tone": "destructive"
       }
     },
     {
       "name": "Destructive Fill",
       "props": {
-        "text": "Destructive",
-        "appearance": "fill",
+        "children": "Destructive",
+        "variant": "fill",
         "tone": "destructive"
       }
     }

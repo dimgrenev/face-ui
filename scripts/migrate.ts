@@ -156,8 +156,8 @@ const transforms: Record<MigrationTransform, (usage: Usage) => string | undefine
     if (!usage.has('chevron') && !('literal' in shown && !shown.literal)) {
       const direction: Value =
         'literal' in side
-          ? { literal: side.literal === 'side' ? 'right' : 'down' }
-          : { code: `${js(side)} === 'side' ? 'right' : 'down'` }
+          ? { literal: side.literal === 'side' ? 'end' : 'down' }
+          : { code: `${js(side)} === 'side' ? 'end' : 'down'` }
       usage.set('chevron', 'literal' in shown ? direction : { code: `${js(shown)} ? ${js(direction)} : undefined` })
     }
     usage.remove('selector')

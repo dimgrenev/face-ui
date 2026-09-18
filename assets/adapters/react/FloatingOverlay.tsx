@@ -223,7 +223,7 @@ export const FloatingOverlay = forwardRef<HTMLDivElement, FloatingOverlayProps>(
     const contentAttributes = api.getContentProps()
     const contentNode =
       typeof content === 'string' || typeof content === 'number' ? (
-        <Text as="div" fullWidth membrane={false} inset="none" align="left">
+        <Text as="div" fullWidth membrane={false} inset="none" align="start">
           {content}
         </Text>
       ) : (

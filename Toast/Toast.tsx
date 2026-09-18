@@ -171,7 +171,6 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(
             <div className="uf-toast-actionRow">
               <Button
                 {...toastAnatomy.getPartAttrs('action')}
-                text={action.label}
                 variant="ghost"
                 fullWidth={false}
                 className="uf-toast-action"
@@ -182,7 +181,9 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(
                     onDismiss?.()
                   }
                 }}
-              />
+              >
+                {action.label}
+              </Button>
             </div>
           ) : null}
         </div>

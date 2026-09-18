@@ -16,7 +16,7 @@ test('Bar preserves native tab order and activation without claiming toolbar foc
       children: ['First', 'Second', 'Third'].map((text) =>
         R.createElement(Button, {
           key: text,
-          text,
+          children: text,
           onClick: () => (window as any).propEvents.push(text),
         }),
       ),
@@ -67,12 +67,12 @@ test('BarSection logical alignment follows RTL direction', { tag: ['@layout'] },
         R.createElement(
           BarSection,
           { key: 'start' },
-          R.createElement(Button, { text: 'Start' }),
+          R.createElement(Button, { children: 'Start' }),
         ),
         R.createElement(
           BarSection,
           { key: 'end', align: 'end' },
-          R.createElement(Button, { text: 'End' }),
+          R.createElement(Button, { children: 'End' }),
         ),
       ],
     })
@@ -104,13 +104,13 @@ test('BarSection start/end occupy the correct edges in both orientations and pre
           R.createElement(
             BarSection,
             { key: 'start' },
-            R.createElement(Button, { text: 'First' }),
-            R.createElement(Button, { text: 'Second' }),
+            R.createElement(Button, { children: 'First' }),
+            R.createElement(Button, { children: 'Second' }),
           ),
           R.createElement(
             BarSection,
             { key: 'end', align: 'end' },
-            R.createElement(Button, { text: 'Last' }),
+            R.createElement(Button, { children: 'Last' }),
           ),
         ],
       })
@@ -151,13 +151,13 @@ test('Bar vertical orientation accommodates visible text and named actions inste
         R.createElement(
           Bar.Section,
           { key: 'start', grow: true },
-          R.createElement(Button, { text: 'Save workspace' }),
-          R.createElement(Button, { text: 'Open settings' }),
+          R.createElement(Button, { children: 'Save workspace' }),
+          R.createElement(Button, { children: 'Open settings' }),
         ),
         R.createElement(
           Bar.Section,
           { key: 'end', align: 'end' },
-          R.createElement(Button, { text: 'Publish' }),
+          R.createElement(Button, { children: 'Publish' }),
         ),
       ],
     })
@@ -206,7 +206,7 @@ test('Bar.Section grow independently fills the remaining main axis in both direc
                   R.createElement(
                     Bar.Section,
                     { key: 'actions', align: 'end' },
-                    R.createElement(Button, { text: 'Save' }),
+                    R.createElement(Button, { children: 'Save' }),
                   ),
                 ],
               })
@@ -274,7 +274,7 @@ test('Bar growing content truncates long text without obscuring end actions', { 
           R.createElement(
             Bar.Section,
             { key: 'actions', align: 'end' },
-            R.createElement(Button, { text: 'Publish changes' }),
+            R.createElement(Button, { children: 'Publish changes' }),
           ),
         ],
       })
@@ -312,8 +312,8 @@ test('nested Bars keep their own orientation through consumer section components
       return R.createElement(
         Bar.Section,
         null,
-        R.createElement(Button, { text: 'One' }),
-        R.createElement(Button, { text: 'Two' }),
+        R.createElement(Button, { children: 'One' }),
+        R.createElement(Button, { children: 'Two' }),
       )
     }
     renderProps('Bar', {
@@ -327,8 +327,8 @@ test('nested Bars keep their own orientation through consumer section components
         R.createElement(
           Bar.Section,
           { key: 'outer' },
-          R.createElement(Button, { text: 'Three' }),
-          R.createElement(Button, { text: 'Four' }),
+          R.createElement(Button, { children: 'Three' }),
+          R.createElement(Button, { children: 'Four' }),
         ),
       ],
     })

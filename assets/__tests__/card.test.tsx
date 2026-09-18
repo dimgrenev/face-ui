@@ -15,48 +15,35 @@ beforeEach(() => {
 })
 it('Card convenience slots update, preserve zero and rich nodes, and omit empty sections', async () => {
   await render(
-    <Card
-      title="Title"
-      description="Description"
-      content={<b>Content</b>}
-      footer="Footer"
-    />,
+    <Card title="Title" description="Description" footer="Footer">
+      <b>Content</b>
+    </Card>,
   )
   expect(host.textContent).toBe('TitleDescriptionContentFooter')
   expect(host.querySelector('[data-part="content"] b')?.textContent).toBe(
     'Content',
   )
   await render(
-    <Card title={0} description={false} content={0} footer={false} />,
+    <Card title={0} description={false} footer={false}>{0}</Card>,
   )
   expect(host.textContent).toBe('00')
   expect(host.querySelector('[data-part="description"]')).toBeNull()
   expect(host.querySelector('[data-part="footer"]')).toBeNull()
   await render(
-    <Card
-      title={false}
-      description=""
-      content={<span>Kept</span>}
-      footer={<></>}
-    />,
+    <Card title={false} description="" footer={<></>}>
+      <span>Kept</span>
+    </Card>,
   )
   expect(host.querySelector('[data-part="header"]')).toBeNull()
   expect(host.querySelector('[data-part="footer"]')).toBeNull()
   expect(host.textContent).toBe('Kept')
 })
-it('Card children form the content fallback when convenience slots are used, or the compound tree otherwise', async () => {
-  await render(<Card title="Title">Fallback</Card>)
-  expect(host.querySelector('[data-part="content"]')?.textContent).toBe(
-    'Fallback',
-  )
-  await render(
-    <Card title="Title" content="Preferred">
-      Fallback
-    </Card>,
-  )
-  expect(host.querySelector('[data-part="content"]')?.textContent).toBe(
-    'Preferred',
-  )
+it('Card children are the content part beside convenience slots, or the compound tree otherwise', async () => {
+  await render(<Card title="Title">Body</Card>)
+  expect(host.querySelector('[data-part="content"]')?.textContent).toBe('Body')
+  await render(<Card>Body</Card>)
+  expect(host.querySelector('[data-part="content"]')).toBeNull()
+  expect(host.querySelector('.uf-card')?.textContent).toBe('Body')
   await render(
     <Card>
       <Card.Header>
@@ -175,17 +162,18 @@ describe('component smoke', () => {
         <Card
           title="Card Title"
           description="Card description text"
-          content={bodyText}
           footer={
             {
               __componentName__: 'Button',
-              text: 'Open',
+              children: 'Open',
               icon: 'arrow-right',
               iconPosition: 'end',
               fullWidth: false,
             } as any
           }
-        />,
+        >
+          {bodyText}
+        </Card>,
       )
     })
 
@@ -283,8 +271,8 @@ describe('component smoke', () => {
           <Card.Content>Shared content shell.</Card.Content>
           <Card.Footer align="between">
             <Card.Actions align="between">
-              <Button text="Cancel" variant="outline" fullWidth={false} />
-              <Button text="Continue" variant="accent" fullWidth={false} />
+              <Button variant="outline" fullWidth={false}>Cancel</Button>
+              <Button variant="accent" fullWidth={false}>Continue</Button>
             </Card.Actions>
           </Card.Footer>
         </Card>,
