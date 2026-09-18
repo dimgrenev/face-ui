@@ -1,7 +1,11 @@
 export interface Layer {
+  /** Elements that count as inside the layer: its surface, then its trigger. */
   elements: () => Array<Element | null>
+  /** The surface of a modal layer: content below it becomes inert and Tab stays inside. */
   modal?: () => HTMLElement | null
+  /** Escape pressed while this layer is the top of the stack. */
   onEscape?: (event: KeyboardEvent) => void
+  /** A press outside this layer and every layer above it, down to the nearest modal layer. */
   onOutside?: (event: Event) => void
 }
 
@@ -10,6 +14,7 @@ const documents = new WeakMap<
   { layers: Layer[]; update: () => void }
 >()
 
+/** Available elements in `container` that are in the tab order, in DOM order. */
 export function getFocusableElements(container: HTMLElement): HTMLElement[] {
   return Array.from(
     container.querySelectorAll<HTMLElement>(
@@ -18,9 +23,8 @@ export function getFocusableElements(container: HTMLElement): HTMLElement[] {
   ).filter((node) => node.tabIndex >= 0 && isAvailable(node))
 }
 
-// Availability is distinct from tab order: a focused heading or surface may
-// intentionally have tabIndex=-1 and must keep its programmatic focus.
-function isAvailable(node: HTMLElement): boolean {
+/** True when `node` is connected, enabled and rendered: it can hold focus, whatever its tab order. */
+export function isAvailable(node: HTMLElement): boolean {
   if (
     !node.isConnected ||
     node.matches(':disabled, input[type="hidden"]') ||
@@ -120,37 +124,40 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
       focused.set(boundary.modal, { element, root })
       return true
     }
-    let pointerLayer: Layer | null | undefined
+    // 'mouse': a mouse or pen press dismissed already; its click completes it.
+    // 'touch': the press may become a scroll, so its click dismisses instead.
+    let gesture: 'mouse' | 'touch' | undefined
     const dismissOutside = (event: Event) => {
-      const entry = top()
-      if (!entry || event.defaultPrevented) return
+      if (event.defaultPrevented) return
+      // Layers below the nearest modal are inert. From the top down, each layer
+      // the press is outside of is dismissed; the first layer containing it is
+      // inside every layer below it, so the walk stops there.
+      const floor = layers.findLastIndex((entry) => !!entry.modal?.())
       const path = event.composedPath()
-      if (
-        entry
-          .elements()
-          .some(
-            (node) =>
-              node &&
-              (path.includes(node) || node.contains(event.target as Node)),
-          )
-      )
-        return
-      entry.onOutside?.(event)
+      for (const entry of layers.slice(Math.max(0, floor)).reverse()) {
+        if (holds(entry, event.target as Node, path)) return
+        entry.onOutside?.(event)
+      }
+      // Outside a modal only inert content can be hit. Its mousedown would blur
+      // focus after the modal kept or returned it, so it does not happen.
+      if (floor >= 0 && event.type === 'pointerdown') event.preventDefault()
     }
-    const onPointerDown = (event: Event) => {
-      pointerLayer = top() ?? null
-      dismissOutside(event)
+    const onPointerDown = (event: PointerEvent) => {
+      gesture = event.pointerType === 'touch' ? 'touch' : 'mouse'
+      if (gesture === 'mouse') dismissOutside(event)
+    }
+    const onPointerCancel = () => {
+      gesture = undefined
     }
     const onClick = (event: Event) => {
-      const startedLayer = pointerLayer
-      pointerLayer = undefined
-      // A click completing the gesture that closed a child cannot close its
-      // parent. Keyboard/assistive clicks still get outside-dismiss behavior.
-      if (startedLayer !== undefined) return
-      dismissOutside(event)
+      const started = gesture
+      gesture = undefined
+      // A click completing a mouse press that closed a child cannot close its
+      // parent. Touch taps and keyboard/assistive clicks dismiss here.
+      if (started !== 'mouse') dismissOutside(event)
     }
     const onKeyDown = (event: KeyboardEvent) => {
-      pointerLayer = undefined
+      gesture = undefined
       const entry = top()
       if (!entry || event.defaultPrevented) return
       if (event.key === 'Escape' && entry.onEscape) {
@@ -204,6 +211,7 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
       target.focus({ preventScroll: true })
     }
     doc.addEventListener('pointerdown', onPointerDown, true)
+    doc.addEventListener('pointercancel', onPointerCancel, true)
     doc.addEventListener('click', onClick, true)
     doc.addEventListener('keydown', onKeyDown)
     doc.addEventListener('focusin', onFocusIn)
@@ -231,6 +239,7 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
       observer.disconnect()
       restoreInert()
       doc.removeEventListener('pointerdown', onPointerDown, true)
+      doc.removeEventListener('pointercancel', onPointerCancel, true)
       doc.removeEventListener('click', onClick, true)
       doc.removeEventListener('keydown', onKeyDown)
       doc.removeEventListener('focusin', onFocusIn)
@@ -241,13 +250,7 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
   }
   // Child effects mount first. Insert a parent below layers already inside it.
   const childIndex = state.layers.findIndex((existing) =>
-    layer
-      .elements()
-      .some(
-        (parent) =>
-          parent &&
-          existing.elements().some((child) => child && parent.contains(child)),
-      ),
+    existing.elements().some((child) => !!child && holds(layer, child)),
   )
   if (childIndex < 0) state.layers.push(layer)
   else state.layers.splice(childIndex, 0, layer)
@@ -263,3 +266,43 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
 }
 
 const cleanups = new WeakMap<object, () => void>()
+
+const holds = (layer: Layer, node: Node, path: EventTarget[] = []) =>
+  layer
+    .elements()
+    .some(
+      (element) =>
+        !!element && (path.includes(element) || element.contains(node)),
+    )
+
+/**
+ * True when `node` is inside `layer` or inside a layer nested in it (stacked
+ * above it with its trigger inside), such as a portaled child popover.
+ */
+export function layerContains(layer: Layer, node: Node | null): boolean {
+  if (!node?.ownerDocument) return false
+  const stack = documents.get(node.ownerDocument)?.layers ?? []
+  const nested = [layer]
+  const index = stack.indexOf(layer)
+  for (const entry of index < 0 ? [] : stack.slice(index + 1))
+    if (
+      entry
+        .elements()
+        .some((child) => !!child && nested.some((one) => holds(one, child)))
+    )
+      nested.push(entry)
+  return nested.some((entry) => holds(entry, node))
+}
+
+let restoring = 0
+/** Focuses `element` without scrolling; isRestoringFocus() is true meanwhile. */
+export function restoreFocus(element: HTMLElement): void {
+  restoring++
+  try {
+    element.focus({ preventScroll: true })
+  } finally {
+    restoring--
+  }
+}
+/** True during focus events caused by restoreFocus(): a programmatic return, not the user entering. */
+export const isRestoringFocus = (): boolean => restoring > 0

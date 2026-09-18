@@ -1,7 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { flushSync } from 'react-dom'
-import { Modal, Popover } from '../../../../index'
+import { Modal, Popover, Tooltip } from '../../../../index'
+// Deprecated, so not exported from the index: the interactive hover card.
+import { Overlay } from '../../../../Overlay/Overlay'
 
 const root = createRoot(document.getElementById('root')!)
 function Actions({
@@ -61,6 +63,7 @@ function Fixture(props: Options) {
       <Modal
         open={props.open}
         autoFocusOnOpen={props.autoFocus !== false}
+        scrollLock
         title="Parent"
         closable={!props.empty}
         trigger={<button>Open parent</button>}
@@ -91,5 +94,75 @@ function renderLayers(options: Options = {}) {
     ),
   )
 }
-Object.assign(window, { renderLayers })
-export type Hooks = { renderLayers: typeof renderLayers }
+
+// The layer stack across components: Escape, outside presses, focus return,
+// scroll lock and touch. `tall` makes the document scroll.
+type StackOptions = {
+  scene: 'popover' | 'modal' | 'hover-card'
+  dir?: 'ltr' | 'rtl'
+  tall?: boolean
+}
+function Stack({ scene, tall }: StackOptions) {
+  const nested = (
+    <Popover content={<button>Nested action</button>}>
+      <button>More</button>
+    </Popover>
+  )
+  const hinted = (
+    <Tooltip content="Copy link" openDelay={0}>
+      <button>Copy</button>
+    </Tooltip>
+  )
+  return (
+    <>
+      <style>{'.stack-edge { height: 20px; background: currentColor; }'}</style>
+      <div className="stack-edge" />
+      <input aria-label="Outside field" />
+      <p>Page text</p>
+      {scene === 'popover' && (
+        <Popover
+          content={
+            <>
+              <p>Popover text</p>
+              {hinted}
+              {nested}
+            </>
+          }
+        >
+          <button>Share</button>
+        </Popover>
+      )}
+      {scene === 'modal' && (
+        <Modal title="Parent" scrollLock trigger={<button>Open modal</button>}>
+          <p>Modal text</p>
+          {hinted}
+          {nested}
+          <Modal title="Child" scrollLock trigger={<button>Open child</button>}>
+            <p>Child text</p>
+          </Modal>
+        </Modal>
+      )}
+      {scene === 'hover-card' && (
+        <Overlay interactive openDelay={0} content={<button>Card action</button>}>
+          <button>Profile</button>
+        </Overlay>
+      )}
+      {tall && <div style={{ height: 3000 }} />}
+    </>
+  )
+}
+function renderStack(options: StackOptions) {
+  document.documentElement.dir = options.dir ?? 'ltr'
+  flushSync(() =>
+    root.render(
+      <StrictMode>
+        <Stack {...options} />
+      </StrictMode>,
+    ),
+  )
+}
+Object.assign(window, { renderLayers, renderStack })
+export type Hooks = {
+  renderLayers: typeof renderLayers
+  renderStack: typeof renderStack
+}
