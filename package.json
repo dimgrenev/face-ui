@@ -630,7 +630,7 @@
     "check": "pnpm run tokens:check && pnpm run contracts:check && pnpm run gallery:check && pnpm run build && pnpm run test && pnpm run test:types && pnpm run smoke && pnpm run pack:dry",
     "pack:dry": "npm pack --dry-run",
     "prepublishOnly": "pnpm run check",
-    "test:browser": "playwright test -c scripts/browser/playwright.config.ts",
-    "test:types": "tsc -p tsconfig.props-tests.json"
+    "test:browser": "playwright test -c assets/__tests__/browser/playwright.config.ts",
+    "test:types": "tsc -p assets/__tests__/tsconfig.json && tsc -p assets/__tests__/tsconfig.react19.json"
   }
 }

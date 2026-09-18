@@ -1,0 +1,224 @@
+/* =================================================================
+ * MODAL
+ * ================================================================= */
+.uf-modal-backdrop[data-scope] {
+  --uf-modal-zero-blur: 0;
+  position: fixed;
+  inset: 0;
+  background: var(--uf-overlay-backdrop-bg);
+  z-index: var(--uf-z-modal);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  backdrop-filter: blur(var(--uf-modal-zero-blur)) saturate(1);
+  -webkit-backdrop-filter: blur(var(--uf-modal-zero-blur)) saturate(1);
+  transition:
+    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
+    -webkit-backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--uf-duration-exit);
+}
+.uf-modal-inlineHost {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: calc(var(--uf-control-height) * 8);
+  overflow: hidden;
+  border-radius: var(--uf-radius-md);
+}
+.uf-modal-backdrop[data-scope][data-portal="false"],
+.uf-modal-positioner[data-scope][data-portal="false"] {
+  position: absolute;
+  inset: 0;
+}
+.uf-modal-backdrop[data-scope][data-state="open"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  backdrop-filter: blur(var(--uf-overlay-backdrop-blur)) saturate(1.12);
+  -webkit-backdrop-filter: blur(var(--uf-overlay-backdrop-blur)) saturate(1.12);
+  transition:
+    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
+    -webkit-backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear 0s;
+}
+.uf-modal-backdrop[data-scope][data-state="closed"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.uf-modal-positioner[data-scope] {
+  --uf-modal-edge-inset: var(--uf-spacing-1);
+  position: fixed;
+  inset: 0;
+  display: flex;
+  z-index: var(--uf-z-modal);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--uf-duration-exit);
+}
+.uf-modal-positioner[data-scope][data-state="open"] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear 0s;
+}
+.uf-modal-positioner[data-scope][data-state="closed"] {
+  opacity: 0;
+  visibility: hidden;
+}
+.uf-modal-positioner[data-scope][data-variant="center"] {
+  align-items: center;
+  justify-content: center;
+}
+.uf-modal-positioner[data-scope][data-variant="left"] {
+  align-items: center;
+  justify-content: flex-start;
+}
+.uf-modal-positioner[data-scope][data-variant="right"] {
+  align-items: center;
+  justify-content: flex-end;
+}
+.uf-modal-positioner[data-scope][data-variant="top"] {
+  align-items: flex-start;
+  justify-content: center;
+}
+.uf-modal-positioner[data-scope][data-variant="bottom"] {
+  align-items: flex-end;
+  justify-content: center;
+}
+.uf-modal[data-scope] {
+  --uf-modal-max-w: 52.5rem;
+  --uf-modal-viewport-gap: var(--uf-spacing-12);
+  --uf-modal-enter-y: var(--uf-spacing-4);
+  --uf-modal-side-enter-x: var(--uf-spacing-6);
+  --uf-modal-side-w-default: 20rem;
+  pointer-events: auto;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  width: max-content;
+  min-width: 0;
+  max-width: min(var(--uf-modal-max-w), calc(100vw - var(--uf-modal-viewport-gap)));
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  color: var(--uf-color-fg);
+  transform: translateY(var(--uf-modal-enter-y)) scale(0.98);
+  opacity: 0;
+  transition:
+    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    transform var(--uf-duration-enter) var(--uf-ease-enter);
+}
+.uf-modal[data-scope][data-variant="center"] {
+  width: min(var(--face-runtime-modal-w, 32rem), calc(100vw - var(--uf-modal-viewport-gap)));
+  height: var(--face-runtime-modal-h, auto);
+}
+.uf-modal-positioner[data-scope][data-state="open"] .uf-modal[data-scope] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.uf-modal-positioner[data-scope][data-variant="left"] .uf-modal[data-scope] {
+  transform: translateX(calc(var(--uf-modal-side-enter-x) * -1));
+}
+.uf-modal-positioner[data-scope][data-variant="right"] .uf-modal[data-scope] {
+  transform: translateX(var(--uf-modal-side-enter-x));
+}
+.uf-modal-positioner[data-scope][data-variant="top"] .uf-modal[data-scope] {
+  transform: translateY(calc(var(--uf-modal-side-enter-x) * -1));
+}
+.uf-modal-positioner[data-scope][data-variant="bottom"] .uf-modal[data-scope] {
+  transform: translateY(var(--uf-modal-side-enter-x));
+}
+.uf-modal-positioner[data-scope][data-state="open"][data-variant="left"] .uf-modal[data-scope],
+.uf-modal-positioner[data-scope][data-state="open"][data-variant="right"] .uf-modal[data-scope],
+.uf-modal-positioner[data-scope][data-state="open"][data-variant="top"] .uf-modal[data-scope],
+.uf-modal-positioner[data-scope][data-state="open"][data-variant="bottom"] .uf-modal[data-scope] {
+  transform: translateX(0) translateY(0) scale(1);
+}
+.uf-modal[data-scope][data-variant="left"],
+.uf-modal[data-scope][data-variant="right"] {
+  height: var(--face-runtime-modal-h, 100%);
+  max-height: 100vh;
+  width: min(var(--face-runtime-modal-w, var(--uf-modal-side-w-default)), 100%);
+  min-width: auto;
+}
+.uf-modal[data-scope][data-variant="top"],
+.uf-modal[data-scope][data-variant="bottom"] {
+  width: min(var(--face-runtime-modal-w, 100%), 100%);
+  max-width: none;
+  min-width: auto;
+  height: var(--face-runtime-modal-h, auto);
+  max-height: 85vh;
+}
+.uf-modal-positioner[data-scope].uf-modal-positioner--edge-flush {
+  padding: 0;
+}
+.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="center"] {
+  padding: var(--uf-spacing-6);
+}
+.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="left"] {
+  padding: calc(var(--uf-modal-edge-inset) + env(safe-area-inset-top, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-right, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-bottom, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-left, 0));
+}
+.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="right"] {
+  padding: calc(var(--uf-modal-edge-inset) + env(safe-area-inset-top, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-right, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-bottom, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-left, 0));
+}
+.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="top"] {
+  padding: calc(var(--uf-modal-edge-inset) + env(safe-area-inset-top, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-right, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-bottom, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-left, 0));
+}
+.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="bottom"] {
+  padding: calc(var(--uf-modal-edge-inset) + env(safe-area-inset-top, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-right, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-bottom, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-left, 0));
+}
+.uf-modal[data-scope].uf-modal--edge-inset:is([data-variant="left"], [data-variant="right"]) {
+  max-height: calc(100vh - var(--uf-modal-edge-inset) - var(--uf-modal-edge-inset));
+}
+.uf-modal[data-scope].uf-modal--edge-inset:is([data-variant="top"], [data-variant="bottom"]) {
+  max-height: calc(100vh - var(--uf-modal-edge-inset) - var(--uf-modal-edge-inset));
+}
+.uf-modal[data-scope].uf-modal--edge-flush:is([data-variant="left"], [data-variant="right"]) {
+  max-height: 100vh;
+}
+.uf-modal[data-scope].uf-modal--edge-flush:is([data-variant="top"], [data-variant="bottom"]) {
+  max-height: 100vh;
+}
+.uf-modal-bar {
+  padding: 0;
+  gap: 0;
+}
+.uf-modal-title {
+  width: 100%;
+}
+.uf-modal-description {
+  color: var(--uf-color-fg-muted);
+  font-size: var(--uf-font-size);
+  text-align: left;
+  width: 100%;
+}
+.uf-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  text-align: left;
+  width: 100%;
+}
+.uf-modal-actionsBar {
+  margin-top: auto;
+  padding: 0;
+  gap: 0;
+  min-height: auto;
+}
+.uf-modal-actionsBar [data-part="actions"] {
+  width: 100%;
+}
+.uf-modal-closeButton[data-scope="button"][data-icon-only] {
+  --uf-icon-only-size: var(--uf-control-height);
+}

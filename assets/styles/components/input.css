@@ -1,0 +1,251 @@
+/* =================================================================
+ * INPUT
+ * ================================================================= */
+.uf-input[data-scope="input"] {
+  --uf-input-icon-size: var(--uf-control-line-height);
+  --uf-input-required-gap: calc(var(--uf-membrane) * 2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--uf-membrane);
+  width: 100%;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: var(--uf-color-black-0);
+}
+.uf-input[data-scope="input"][data-label-orientation="horizontal"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--uf-control-gap);
+  row-gap: 0;
+}
+.uf-input[data-scope="input"][hidden] {
+  display: none;
+}
+.uf-input[data-label-orientation="horizontal"] > .uf-membrane,
+.uf-input[data-label-orientation="horizontal"] .uf-input__control,
+.uf-input[data-label-orientation="horizontal"] > .uf-input__description,
+.uf-input[data-label-orientation="horizontal"] > .uf-input__error {
+  grid-column: 2;
+}
+.uf-input[data-label-orientation="horizontal"] [data-part="label"] {
+  grid-column: 1;
+  grid-row: 1;
+}
+[data-scope="input"] [data-part="label"] {
+  font-size: var(--uf-font-size-sm);
+  font-weight: var(--uf-font-weight-bold);
+  color: var(--uf-color-fg);
+}
+.uf-input[data-scope="input"][data-invalid] [data-part="label"] {
+  color: var(--uf-color-destructive);
+}
+.uf-input[data-scope="input"][data-label-orientation="horizontal"] [data-part="label"] {
+  font-size: var(--uf-control-font-size);
+  font-weight: var(--uf-font-weight);
+  min-height: var(--uf-control-height);
+  height: auto;
+  display: flex;
+  align-items: center;
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+}
+[data-scope="input"] .uf-input__control {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: var(--uf-color-black-0);
+  border-radius: var(--uf-radius);
+}
+.uf-input__control:has(> [dir="auto"]:dir(rtl)) {
+  direction: rtl;
+}
+.uf-input__control:has(> [dir="auto"]:dir(ltr)) {
+  direction: ltr;
+}
+[data-scope="input"] [data-part="input"],
+[data-scope="input"] [data-part="textarea"] {
+  min-height: var(--uf-control-height);
+  height: auto;
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+  border: none;
+  border-radius: var(--uf-radius);
+  background: var(--uf-color-black-0);
+  color: var(--uf-color-fg);
+  font: inherit;
+  font-size: var(--uf-control-font-size);
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+[data-scope="input"] [data-part="input"]:hover,
+[data-scope="input"] [data-part="textarea"]:hover {
+  background: var(--uf-color-hover-bg);
+}
+[data-scope="input"] [data-part="input"]:focus,
+[data-scope="input"] [data-part="textarea"]:focus {
+  background: var(--uf-color-hover-bg);
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+[data-scope="input"] [data-part="input"]:focus-visible,
+[data-scope="input"] [data-part="textarea"]:focus-visible {
+  box-shadow: none;
+  outline: none;
+  border: none;
+}
+[data-scope="input"] [data-part="input"]::placeholder,
+[data-scope="input"] [data-part="textarea"]::placeholder {
+  color: var(--uf-color-fg-muted);
+}
+.uf-input__description,
+.uf-input__error {
+  padding-inline: var(--uf-control-pad-text);
+}
+.uf-input__description {
+  --uf-text-size-font-size: var(--uf-font-size-xs);
+  font-size: var(--uf-font-size-xs);
+  color: var(--uf-color-fg-muted);
+  min-height: 1em;
+}
+.uf-input__error {
+  --uf-text-size-font-size: var(--uf-font-size-xs);
+  font-size: var(--uf-font-size-xs);
+  color: var(--uf-color-destructive);
+  min-height: 1em;
+}
+.uf-input__description .uf-text[data-scope],
+.uf-input__error .uf-text[data-scope],
+[data-scope="command"] [data-part="empty"] .uf-text[data-scope],
+[data-scope="command"] [data-part="groupLabel"] .uf-text[data-scope],
+.uf-menu-group-label .uf-text[data-scope] {
+  color: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+}
+[data-scope="input"] [data-part="input"]:disabled,
+[data-scope="input"] [data-part="textarea"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+/* Multiline sizing stays intrinsic: values, fonts and container width participate. */
+[data-scope="input"] [data-part="textarea"] {
+  min-height: max(var(--uf-control-height), calc(var(--face-runtime-input-rows, 1) * 1lh + 2 * var(--uf-control-pad-y)));
+  height: auto;
+  resize: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  overflow-y: auto;
+}
+[data-scope="input"] [data-part="textarea"][data-auto-grow] {
+  field-sizing: content;
+}
+/* Single-line editing */
+[data-scope="input"] input::-webkit-search-cancel-button {
+  display: none;
+}
+[data-scope="input"] [data-part="input"] {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-scope="input"] [data-part="input"]:focus {
+  text-overflow: clip;
+  overflow-x: auto;
+}
+/* Icon support */
+.uf-input__icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--uf-input-icon-size);
+  height: var(--uf-input-icon-size);
+  pointer-events: none;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.uf-input__icon[data-position="start"] {
+  inset-inline-start: var(--uf-control-pad-icon);
+}
+.uf-input__icon[data-position="end"] {
+  inset-inline-end: var(--uf-control-pad-icon);
+}
+.uf-input[data-scope="input"][data-icon-position="start"] [data-part="input"],
+.uf-input[data-scope="input"][data-icon-position="start"] [data-part="textarea"] {
+  padding-inline-start: calc(var(--uf-control-pad-icon) + var(--uf-input-icon-size) + var(--uf-control-gap));
+}
+.uf-input[data-scope="input"][data-icon-position="end"] [data-part="input"],
+.uf-input[data-scope="input"][data-icon-position="end"] [data-part="textarea"] {
+  padding-inline-end: calc(var(--uf-control-pad-icon) + var(--uf-input-icon-size) + var(--uf-control-gap));
+}
+/* Required indicator */
+.uf-input__required {
+  color: var(--uf-color-destructive, var(--uf-color-error));
+  font-weight: var(--uf-font-weight-bold);
+  margin-inline-start: var(--uf-input-required-gap);
+}
+/* Number spinners hidden */
+[data-scope="input"] [data-part="input"][type="number"]::-webkit-outer-spin-button,
+[data-scope="input"] [data-part="input"][type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+[data-scope="input"] [data-part="input"][type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Clear button */
+.uf-input__clear {
+  position: absolute;
+  inset-inline-end: var(--uf-control-pad-icon);
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--uf-input-icon-size);
+  height: var(--uf-input-icon-size);
+  padding: 0;
+  border: none;
+  background: var(--uf-color-black-0);
+  color: var(--uf-color-fg-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--uf-motion-duration-short) var(--uf-motion-ease-standard);
+  box-shadow: none;
+  outline: none;
+}
+.uf-input__clear[hidden] {
+  display: none;
+}
+.uf-input__control:hover .uf-input__clear:not([hidden]),
+.uf-input__control:focus-within .uf-input__clear:not([hidden]) {
+  opacity: 1;
+}
+.uf-input__clear:hover {
+  color: var(--uf-color-fg);
+}
+.uf-input__clear:focus-visible {
+  outline: var(--uf-membrane) solid var(--uf-button-ring-color);
+  outline-offset: var(--uf-membrane);
+}
+/* Only visible controls reserve space; a trailing icon precedes clear. */
+.uf-input__control:has(> .uf-input__clear:not([hidden])) > :is(input, textarea) {
+  padding-inline-end: calc(var(--uf-control-pad-icon) + var(--uf-input-icon-size) + var(--uf-control-gap));
+}
+.uf-input__control:has(> .uf-input__clear:not([hidden])) > .uf-input__icon[data-position="end"] {
+  inset-inline-end: calc(var(--uf-control-pad-icon) + var(--uf-input-icon-size) + var(--uf-control-gap));
+}
+.uf-input__control:has(> .uf-input__clear:not([hidden])):has(> .uf-input__icon[data-position="end"]) > :is(input, textarea) {
+  padding-inline-end: calc(var(--uf-control-pad-icon) + 2 * (var(--uf-input-icon-size) + var(--uf-control-gap)));
+}

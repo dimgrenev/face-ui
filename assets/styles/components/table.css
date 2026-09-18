@@ -1,0 +1,228 @@
+/* =================================================================
+ * TABLE
+ * ================================================================= */
+.uf-table[data-scope] {
+  --uf-table-row-number-width: var(--uf-spacing-12);
+  --uf-table-resize-hit-width: var(--uf-workspace-resize-hit-size, var(--uf-spacing-5));
+  --uf-table-resize-line-width: var(--uf-workspace-resize-line-width, var(--uf-table-divider-width));
+  --uf-table-resize-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-chat-border-focus, var(--uf-color-border-hover, var(--uf-color-border))));
+  --uf-table-resize-line-offset-x: calc(var(--uf-table-resize-hit-width) - var(--uf-table-resize-line-width));
+  --uf-table-resize-line-inset-y: var(--uf-spacing-2);
+  --uf-table-divider-width: var(--uf-membrane);
+  --uf-table-membrane-cell-pad-x: calc(var(--uf-membrane) * 3);
+  --uf-table-sort-icon-gap: calc(var(--uf-membrane) * 2);
+  width: 100%;
+  inline-size: 100%;
+  min-width: 0;
+  max-width: 100%;
+  max-inline-size: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: var(--uf-control-font-size);
+  background: var(--uf-color-black-0);
+  border-radius: 0;
+  overflow: visible;
+}
+/* Sticky header (controlled by stickyHeader prop) */
+.uf-table[data-scope][data-sticky-header] thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--uf-color-black-0);
+}
+.uf-table[data-scope] th {
+  text-align: left;
+  font-weight: inherit;
+  padding: 0;
+  color: var(--uf-color-fg);
+  font-size: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+  border: none;
+  position: relative;
+  background: var(--uf-color-black-0);
+  vertical-align: middle;
+  min-width: 0;
+}
+.uf-table[data-scope] th[data-sortable] {
+  cursor: pointer;
+  user-select: none;
+}
+.uf-table[data-scope] th[data-sortable]:hover {
+  color: var(--uf-color-fg);
+}
+.uf-table[data-scope] td {
+  padding: 0;
+  color: var(--uf-color-fg);
+  border: none;
+  background: var(--uf-color-black-0);
+  vertical-align: middle;
+  min-width: 0;
+}
+.uf-table[data-scope] tr[data-selected] td,
+.uf-table[data-scope] tr[data-active] td {
+  background: var(--uf-color-hover-bg);
+}
+/* Row numbers column */
+.uf-table[data-scope] td[data-row-number] {
+  opacity: 0.6;
+  text-align: left;
+  font-size: var(--uf-font-size-xs);
+  width: var(--uf-table-row-number-width);
+  min-width: var(--uf-table-row-number-width);
+}
+/* Truncate cells */
+.uf-table[data-scope] td[data-truncate] {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 0;
+}
+/* Resize handle on header cells */
+.uf-table__resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: var(--uf-table-resize-hit-width);
+  height: 100%;
+  cursor: col-resize;
+  z-index: 3;
+}
+.uf-table__resize-handle::after {
+  content: "";
+  position: absolute;
+  left: var(--uf-table-resize-line-offset-x);
+  top: var(--uf-table-resize-line-inset-y);
+  bottom: var(--uf-table-resize-line-inset-y);
+  width: var(--uf-table-resize-line-width);
+  background: var(--uf-table-resize-line-color);
+  opacity: 0;
+  transition: none;
+}
+.uf-table[data-scope] th:hover .uf-table__resize-handle::after,
+.uf-table[data-scope] th:focus-within .uf-table__resize-handle::after {
+  opacity: 1;
+}
+/* Divider lines between rows */
+.uf-table[data-scope][data-show-dividers] td {
+  border-bottom: var(--uf-table-divider-width) solid var(--uf-color-border);
+}
+.uf-table[data-scope][data-show-dividers] th {
+  border-bottom: var(--uf-table-divider-width) solid var(--uf-color-border);
+}
+/* Membrane (tile-like) row styles — mirrors .uf-tile[data-scope="tile"] */
+.uf-table[data-scope][data-row-style="tile"] {
+  border-spacing: 0;
+  border-collapse: separate;
+}
+.uf-table[data-scope][data-row-style="tile"] tbody tr {
+  height: var(--uf-control-height);
+  cursor: pointer;
+  user-select: none;
+  transition: font-weight var(--uf-motion-duration-emphasis) var(--uf-motion-ease-emphasized);
+}
+.uf-table[data-scope][data-row-style="tile"] tbody tr:hover td {
+  background: var(--uf-color-hover-bg);
+}
+.uf-table[data-scope][data-row-style="tile"] tbody tr td:first-child {
+  border-radius: var(--uf-radius) 0 0 var(--uf-radius);
+  padding-left: var(--uf-table-membrane-cell-pad-x);
+}
+.uf-table[data-scope][data-row-style="tile"] tbody tr td:last-child {
+  border-radius: 0 var(--uf-radius) var(--uf-radius) 0;
+  padding-right: var(--uf-table-membrane-cell-pad-x);
+}
+.uf-table[data-scope][data-row-style="tile"] tbody tr[data-active] td {
+  background: var(--uf-color-hover-bg);
+}
+.uf-table[data-scope][data-row-style="tile"] td {
+  padding: 0 var(--uf-table-membrane-cell-pad-x);
+  height: var(--uf-control-height);
+  font-size: var(--uf-control-font-size);
+  line-height: var(--uf-control-line-height);
+  vertical-align: middle;
+}
+.uf-table[data-scope][data-row-style="tile"] th {
+  padding: 0 var(--uf-table-membrane-cell-pad-x);
+  height: var(--uf-control-height);
+  font-size: var(--uf-control-font-size);
+  line-height: var(--uf-control-line-height);
+  vertical-align: middle;
+}
+/* Row number header */
+.uf-table__row-number-header {
+  width: var(--uf-table-row-number-width);
+  min-width: var(--uf-table-row-number-width);
+  opacity: 0.6;
+  font-size: var(--uf-font-size-xs);
+  text-align: left;
+}
+/* Sort indicator icon */
+.uf-table__sort-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: inherit;
+}
+.uf-table__sort-button:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 calc(var(--uf-membrane) * 2) var(--uf-button-ring-color);
+}
+.uf-table__sort-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--uf-table-sort-icon-gap);
+  opacity: 0.7;
+}
+.uf-table__cellSlot {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+  min-height: var(--uf-control-height);
+  padding: 0 var(--uf-control-pad-text);
+  box-sizing: border-box;
+}
+.uf-table__cellSlot[data-align="center"] {
+  justify-content: center;
+}
+.uf-table__cellSlot[data-align="right"] {
+  justify-content: flex-end;
+}
+.uf-table__cellSlot > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.uf-table__cellSlot > svg {
+  flex-shrink: 0;
+  max-width: none;
+}
+.uf-table__cellSlot[data-truncate] > * {
+  width: 100%;
+}
+.uf-table__cellSlot[data-truncate] > .uf-membrane > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+.uf-table__headerText[data-scope="text"],
+.uf-table__cellText[data-scope="text"] {
+  width: 100%;
+  min-width: 0;
+}
+.uf-table__headerText[data-scope="text"] .uf-text__content,
+.uf-table__cellText[data-scope="text"] .uf-text__content {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

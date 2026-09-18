@@ -193,7 +193,7 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Tab definitions. Each item supports value, label, content, disabled, panelId, leadingIcon, trailingIcon, and an optional overlay action via actionIcon, actionLabel, actionVisibility, actionPosition, and onAction.",
+      "description": "Tabs in order: unique value, label, optional content, disabled, panelId, leadingIcon, trailingIcon and native naming (id, title, aria-*).",
       "defaultValue": []
     }
   ],

@@ -86,10 +86,12 @@ export type TabsProps = TabsBaseProps &
   (
     | {
         /** Render persistent internal panels. */ renderPanels?: true
+        /** Tabs in order: unique value, label, optional content, disabled, panelId, leadingIcon, trailingIcon and native naming (id, title, aria-*). */
         items?: readonly TabItem[]
       }
     | {
         /** External panels are owned and labelled by the consumer. */ renderPanels: false
+        /** Tabs in order; each panelId names a consumer-owned tabpanel and content is not accepted. */
         items?: readonly ExternalTabItem[]
       }
   )

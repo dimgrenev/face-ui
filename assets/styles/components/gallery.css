@@ -1,0 +1,189 @@
+/* =================================================================
+ * GALLERY (face-ui-react root showcase)
+ * Keep structure/API aligned with the canonical face-ui-react gallery.
+ * ================================================================= */
+.uf-text-body {
+  font-family: var(--uf-font-family-base);
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-text-body-size, var(--uf-control-font-size))));
+  line-height: var(--uf-text-line-height, var(--uf-text-body-line-height, var(--uf-control-line-height)));
+  letter-spacing: var(--uf-text-letter-spacing, var(--uf-control-letter-spacing));
+  font-weight: var(--uf-text-font-weight, var(--uf-font-weight));
+}
+
+.uf-gallery {
+  --face-gallery-header-height: var(--uf-spacing-12);
+  --face-gallery-inset: var(--uf-gallery-inset);
+  --face-gallery-header-inset: 0px;
+  --face-gallery-header-action-gap: 0px;
+  --face-gallery-header-control-height: var(--uf-control-height);
+  --face-gallery-grid-gap: var(--uf-spacing-3);
+  --face-gallery-grid-pad-top: 0px;
+  --face-gallery-surface-radius: var(--uf-radius-lg);
+  --face-gallery-surface-min-height: 11.25rem;
+  --face-gallery-surface-pad: var(--uf-spacing-5);
+  --face-gallery-frame-min-height: 100dvh;
+  --face-gallery-date-min-height: 32.5rem;
+  --face-gallery-modal-min-height: 22.5rem;
+  --face-gallery-frame-bg: transparent;
+  --face-gallery-surface-bg: var(--uf-overlay-surface-bg);
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  height: 100%;
+  min-height: var(--face-gallery-frame-min-height);
+  max-height: none;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: var(--face-gallery-inset);
+  gap: 0;
+  background: var(--face-gallery-frame-bg);
+  color: var(--uf-color-foreground);
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.uf-gallery[data-theme="dark"] {
+  background: var(--face-gallery-frame-bg);
+}
+
+.uf-gallery-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: var(--face-gallery-header-height);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--face-gallery-header-inset);
+  box-sizing: border-box;
+  background: var(--face-gallery-frame-bg);
+}
+
+.uf-gallery-header > .uf-bar-section[data-align="end"] > .uf-membrane {
+  flex: 0 0 auto;
+}
+
+.uf-gallery-icon-button[data-scope="button"][data-icon-only] {
+  --uf-icon-only-size: var(--face-gallery-header-control-height);
+  background: var(--uf-color-black-0);
+  border: none;
+  margin: 0;
+  color: var(--uf-color-foreground);
+  box-shadow: none;
+  transition: none;
+}
+
+.uf-gallery-icon-button[data-scope="button"][data-icon-only]:hover {
+  background: var(--uf-color-hover-bg);
+}
+
+.uf-gallery-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--face-gallery-grid-gap);
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  align-items: start;
+  align-content: start;
+  padding: 0;
+  padding-top: var(--face-gallery-grid-pad-top);
+  box-sizing: border-box;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  overflow: auto;
+}
+
+.uf-gallery-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.uf-gallery-itemTitle {
+  margin: 0;
+  width: 100%;
+}
+
+.uf-gallery-item > .uf-membrane {
+  width: 100%;
+}
+
+.uf-gallery-itemPreview {
+  padding: 0;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+}
+
+.uf-gallery-itemSurface {
+  --uf-card-bg: var(--face-gallery-surface-bg, var(--uf-overlay-surface-bg));
+  --uf-card-underlay-bg: var(--uf-overlay-surface-underlay-bg);
+  --uf-card-background: linear-gradient(var(--uf-card-bg), var(--uf-card-bg)), var(--uf-card-underlay-bg);
+  --uf-card-pad: var(--face-gallery-surface-pad, calc(var(--uf-control-height) / 2));
+  --uf-card-radius: var(--face-gallery-surface-radius, calc(var(--uf-radius-xl) + var(--uf-spacing-1)));
+  --uf-card-shadow: none;
+  --uf-card-blur: 0px;
+  min-height: var(--face-gallery-surface-min-height);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.uf-gallery-itemSurface:has(.uf-date[data-scope="date"]) {
+  min-height: var(--face-gallery-date-min-height);
+  overflow: visible;
+}
+.uf-gallery-itemSurface > .uf-separator-membrane {
+  flex: 1 1 100%;
+  inline-size: 100%;
+}
+.uf-gallery-itemSurface:has(> .uf-carousel[data-scope]) {
+  min-height: var(--uf-carousel-preview-min-height);
+}
+.uf-gallery-itemSurface:has(.uf-modal-positioner) {
+  min-height: var(--face-gallery-modal-min-height);
+  padding: var(--face-gallery-header-inset);
+  overflow: visible;
+}
+
+/* Constrain overlay components (e.g. modal) to the preview surface. */
+.uf-gallery-itemSurface .uf-modal-backdrop,
+.uf-gallery-itemSurface .uf-modal-positioner {
+  position: absolute;
+  inset: 0;
+}
+.uf-gallery-itemSurface .uf-modal-positioner {
+  padding: var(--face-gallery-header-inset);
+  box-sizing: border-box;
+}
+.uf-gallery-itemSurface .uf-modal-positioner[data-variant="bottom"] {
+  padding: 0 var(--uf-spacing-1) var(--uf-spacing-1);
+}
+.uf-gallery-itemSurface .uf-modal[data-scope] {
+  max-width: 100%;
+  max-height: 100%;
+}
+.uf-gallery-itemSurface .uf-modal[data-scope][data-variant="bottom"] {
+  width: 100%;
+  max-width: none;
+}
+
+.uf-gallery[data-theme="dark"] .uf-table[data-scope] th,
+.uf-gallery[data-theme="dark"] .uf-table[data-scope] td {
+  background: var(--uf-color-bg);
+}

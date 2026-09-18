@@ -1,0 +1,90 @@
+/* =================================================================
+ * TOC (Table of Contents)
+ * ================================================================= */
+.uf-toc[data-scope] {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  --uf-toc-line-inset: var(--uf-spacing-2);
+  --uf-toc-line-gap: calc(var(--uf-membrane) * 2);
+  --uf-toc-rail-w: var(--uf-membrane);
+  --uf-toc-indicator-w: calc(var(--uf-membrane) * 2);
+}
+.uf-toc-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.uf-toc-slot {
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+}
+.uf-toc-slot > .uf-membrane {
+  width: 100%;
+}
+.uf-toc-item[data-scope="button"] {
+  width: 100%;
+}
+.uf-toc-item[data-scope="button"][data-active],
+.uf-toc-item[data-scope="button"][aria-current] {
+  background: var(--uf-color-hover-bg);
+  color: var(--uf-color-fg);
+}
+.uf-toc-item[data-scope="button"][data-disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+/* Indicator line (animated, tracks active item position) */
+.uf-toc-indicator {
+  position: absolute;
+  width: var(--uf-toc-indicator-w);
+  background: var(--uf-color-fg);
+  transition:
+    transform var(--uf-motion-duration-control) var(--uf-motion-ease-standard),
+    height var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
+  pointer-events: none;
+}
+/* Without line — hide indicator and rail */
+.uf-toc[data-scope]:not([data-with-line]) .uf-toc-indicator {
+  display: none;
+}
+/* Line on left side */
+.uf-toc[data-scope][data-line-side="left"] .uf-toc-list {
+  padding-left: calc(var(--uf-toc-line-inset) + var(--uf-toc-line-gap));
+  border-left: none;
+}
+.uf-toc[data-scope][data-line-side="left"] .uf-toc-list::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--uf-toc-line-inset) - var(--uf-toc-rail-w));
+  width: var(--uf-toc-rail-w);
+  background: var(--uf-color-border);
+}
+.uf-toc[data-scope][data-line-side="left"] .uf-toc-indicator {
+  left: calc(var(--uf-toc-line-inset) - var(--uf-toc-indicator-w));
+  top: 0;
+}
+/* Line on right side */
+.uf-toc[data-scope][data-line-side="right"] .uf-toc-list {
+  padding-right: calc(var(--uf-toc-line-inset) + var(--uf-toc-line-gap));
+  border-right: none;
+}
+.uf-toc[data-scope][data-line-side="right"] .uf-toc-list::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc(var(--uf-toc-line-inset) - var(--uf-toc-rail-w));
+  width: var(--uf-toc-rail-w);
+  background: var(--uf-color-border);
+}
+.uf-toc[data-scope][data-line-side="right"] .uf-toc-indicator {
+  right: calc(var(--uf-toc-line-inset) - var(--uf-toc-indicator-w));
+  top: 0;
+}

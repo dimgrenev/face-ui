@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   computeSelectSideOptionViewportHeight,
   computeSelectSidePosition,
-} from '../../Select/Select'
+} from '../../Select/select-side-position'
 
 describe('Select side positioning', () => {
   it('aligns the selected side option with the trigger row', () => {

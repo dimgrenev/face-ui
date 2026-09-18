@@ -50,7 +50,7 @@ const testMachine = createMachine<TestSchema>({
     doubleCount: (ctx) => ctx.count * 2,
   },
   watch: {
-    count(ctx, prev) {
+    count() {
       // watched externally in tests
     },
   },

@@ -1,0 +1,188 @@
+/* =================================================================
+ * DATE
+ * ================================================================= */
+.uf-date[data-scope="date"] {
+  --uf-date-content-max-width: 23.75rem;
+  --uf-date-content-max-height: 40rem;
+  --uf-date-content-viewport-gap: var(--uf-spacing-8);
+  --uf-date-sheet-inset: var(--uf-spacing-1);
+  --uf-date-sheet-gap: calc(var(--uf-date-sheet-inset) * 2);
+  --uf-date-panel-pad: var(--uf-membrane);
+  --uf-date-sheet-enter-y: 1.125rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.uf-date[data-scope="date"]:not([data-full-width]) {
+  width: auto;
+}
+.uf-date__triggerWrap {
+  position: relative;
+  width: 100%;
+}
+.uf-date__label {
+  margin: 0;
+}
+.uf-date__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--uf-control-height);
+  width: 100%;
+  padding-top: var(--uf-control-pad-y);
+  padding-bottom: var(--uf-control-pad-y);
+  padding-left: var(--uf-control-pad-text);
+  padding-right: var(--uf-control-pad-icon);
+  border: none;
+  border-radius: var(--uf-radius);
+  background: var(--uf-color-black-0);
+  color: var(--uf-color-fg);
+  gap: var(--uf-control-gap);
+  cursor: pointer;
+  font: inherit;
+}
+.uf-date__trigger:hover {
+  background: var(--uf-color-hover-bg);
+}
+.uf-date__trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.uf-date__value {
+  flex: 1;
+  min-width: 0;
+}
+.uf-date__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+}
+.uf-date__content {
+  position: fixed;
+  width: fit-content;
+  min-width: 0;
+  max-width: min(var(--uf-date-content-max-width), calc(100vw - var(--uf-date-content-viewport-gap)));
+  max-height: min(80vh, var(--uf-date-content-max-height));
+  overflow: visible;
+  background: var(--uf-color-black-0);
+  border-radius: 0;
+  z-index: var(--uf-z-dropdown);
+  padding: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--uf-duration-exit);
+}
+.uf-date__content[data-surface="sheet"] {
+  position: fixed;
+  inset-inline: var(--uf-date-sheet-inset);
+  top: auto;
+  bottom: calc(var(--uf-date-sheet-inset) + env(safe-area-inset-bottom, 0));
+  width: auto;
+  max-width: none;
+  max-height: min(70vh, calc(100vh - var(--uf-date-sheet-gap) - env(safe-area-inset-bottom, 0)));
+  transform: none;
+  z-index: calc(var(--uf-z-overlay) + 1);
+}
+.uf-date__content[data-state="open"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear 0s;
+}
+.uf-date__content[data-state="closed"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.uf-date__contentPanel {
+  --uf-card-bg: var(--uf-dropdown-surface-bg);
+  --uf-card-border: var(--uf-dropdown-surface-border);
+  --uf-card-underlay-bg: var(--uf-dropdown-surface-underlay-bg);
+  --uf-card-background: var(--uf-dropdown-surface-background);
+  --uf-card-pad: var(--uf-dropdown-surface-padding);
+  --uf-card-radius: var(--uf-dropdown-surface-radius);
+  --uf-card-border-width: var(--uf-dropdown-surface-border-width);
+  --uf-card-shadow: var(--uf-dropdown-surface-shadow);
+  --uf-card-blur: var(--uf-dropdown-surface-blur);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: fit-content;
+  min-width: 0;
+  max-width: min(var(--uf-date-content-max-width), calc(100vw - var(--uf-date-content-viewport-gap)));
+  max-height: min(80vh, var(--uf-date-content-max-height));
+  overflow: auto;
+  box-sizing: border-box;
+  transform: translateY(var(--uf-overlay-enter-y)) scale(var(--uf-overlay-enter-scale));
+  transform-origin: top center;
+  opacity: 0;
+  transition:
+    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    transform var(--uf-duration-enter) var(--uf-ease-enter);
+}
+.uf-date__content[data-surface="sheet"] .uf-date__contentPanel {
+  width: 100%;
+  max-width: none;
+  transform: translateY(var(--uf-date-sheet-enter-y));
+  transform-origin: bottom center;
+}
+.uf-date__content[data-state="open"] .uf-date__contentPanel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.uf-date__toolbar,
+.uf-date__footer,
+.uf-date__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  align-self: stretch;
+}
+.uf-date__panel {
+  display: block;
+  margin: 0;
+  align-self: center;
+  width: fit-content;
+  max-width: 100%;
+}
+.uf-date__content[data-surface="sheet"] .uf-date__panel {
+  width: 100%;
+  align-self: stretch;
+}
+.uf-date__content[data-surface="sheet"] .uf-date__grid,
+.uf-date__content[data-surface="sheet"] .uf-calendar[data-scope="calendar"] {
+  width: 100%;
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+.uf-date__content[data-surface="sheet"] .uf-date__grid > .uf-membrane {
+  display: flex;
+  width: 100%;
+}
+.uf-date__grid {
+  display: grid;
+  gap: 0;
+}
+.uf-date__grid--month {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.uf-date__grid--year {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.uf-date__grid--time {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.uf-date__description,
+.uf-date__error {
+  margin: 0;
+}
+.uf-date__error {
+  color: var(--uf-color-destructive, var(--uf-color-error));
+}

@@ -1,5 +1,6 @@
 packages:
   - .
+  - assets/__tests__/react-19
 
 onlyBuiltDependencies:
   - esbuild

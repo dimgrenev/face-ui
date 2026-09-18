@@ -1,9 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import { getAdvancedPropParser, type ParsedProp } from './lib/advancedPropParser'
-import { PRODUCT_SCENARIOS, type ProductScenario } from './product-scenarios'
 import { extractReactTsPropsFromSource, getPropOptions, type ExtractedProp } from './lib/tsPropExtractor'
 import { getTypeEnricher, type EnrichedProp } from './lib/typeEnricher'
 
@@ -25,6 +24,13 @@ export interface FaceJsonContract {
   states?: Array<{ name: string; props: Record<string, unknown> }>
   [key: string]: unknown
 }
+
+export interface ProductScenario {
+  name: string
+  props: Record<string, unknown>
+}
+
+export type ProductScenarioPair = readonly [ProductScenario, ProductScenario]
 
 export interface ProductScenarioFaceContract {
   schema: 'face'
@@ -101,6 +107,20 @@ const THIS_FILE = fileURLToPath(import.meta.url)
 const CONTRACTS_DIR = path.dirname(THIS_FILE)
 const FACE_UI_ROOT = path.resolve(CONTRACTS_DIR, '../..')
 const PRODUCT_SCENARIO_GENERATOR = 'face-ui-product-scenario@1' as const
+const PRODUCT_SCENARIOS_DIR = path.join(CONTRACTS_DIR, 'scenarios')
+
+/** Product scenarios per component, discovered from `scenarios/<Name>.ts` (default export). */
+export const PRODUCT_SCENARIOS: Record<string, ProductScenarioPair> = Object.fromEntries(
+  await Promise.all(
+    fs.readdirSync(PRODUCT_SCENARIOS_DIR)
+      .filter((fileName) => fileName.endsWith('.ts'))
+      .sort()
+      .map(async (fileName) => [
+        path.basename(fileName, '.ts'),
+        (await import(pathToFileURL(path.join(PRODUCT_SCENARIOS_DIR, fileName)).href)).default as ProductScenarioPair,
+      ]),
+  ),
+)
 const GLOBAL_CONTRACT_OMIT_PROPS = new Set([
   'className',
   'style',

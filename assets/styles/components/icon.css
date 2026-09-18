@@ -1,0 +1,23 @@
+/* =================================================================
+ * SHARED ICON RUNTIME
+ * ================================================================= */
+.uf-icon {
+  display: block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  user-select: none;
+}
+
+.uf-button [data-part="indicator"],
+[data-scope="tile"][data-part="indicator"],
+.uf-select[data-scope="select"] [data-part="indicator"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--uf-selector-indicator-size);
+  height: var(--uf-selector-indicator-size);
+  margin-inline-start: var(--uf-selector-indicator-offset-inline-start, 0px);
+  opacity: 0.7;
+  transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-out);
+}

@@ -1,0 +1,26 @@
+/* =================================================================
+ * UPLOAD
+ * ================================================================= */
+.uf-upload[data-scope] [data-part="dropzone"] {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  border-radius: var(--uf-radius-md);
+  padding: var(--uf-spacing-3) var(--uf-spacing-3);
+  text-align: left;
+  cursor: default;
+  color: var(--uf-color-fg);
+  background: var(--uf-color-black-0);
+  border: none;
+}
+.uf-upload[data-scope] [data-part="dropzone"][data-dragging] {
+  background: var(--uf-color-hover-bg);
+}
+.uf-upload-dropHint {
+  color: var(--uf-color-fg-muted);
+}
+.uf-upload-trigger[data-scope="button"] {
+  width: auto;
+  color: var(--uf-color-fg);
+}

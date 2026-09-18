@@ -97,7 +97,7 @@
     "items": {
       "type": "array",
       "required": false,
-      "description": "Tab definitions. Each item supports value, label, content, disabled, panelId, leadingIcon, trailingIcon, and an optional overlay action via actionIcon, actionLabel, actionVisibility, actionPosition, and onAction.",
+      "description": "Tabs in order: unique value, label, optional content, disabled, panelId, leadingIcon, trailingIcon and native naming (id, title, aria-*).",
       "default": []
     }
   },
@@ -274,29 +274,26 @@
     }
   },
   "tokenMapping": {
-    "component": [
-      "--uf-tabs-rail-h",
-      "--uf-tabs-indicator-h",
-      "--uf-tabs-line-gap"
-    ],
+    "component": [],
     "semanticFallbacks": [
       "--uf-control-height",
+      "--uf-control-gap",
       "--uf-control-pad-y",
       "--uf-control-pad-text",
       "--uf-radius-full",
+      "--uf-border-width-base",
+      "--uf-icon-size-sm",
       "--uf-membrane",
-      "--uf-font-weight-bold",
       "--uf-color-fg",
       "--uf-color-fg-muted",
       "--uf-color-hover-bg",
-      "--uf-color-border",
-      "--uf-motion-duration-fast",
-      "--uf-motion-duration-control",
-      "--uf-motion-ease-standard"
+      "--uf-color-ring",
+      "--uf-duration-enter",
+      "--uf-ease-enter"
     ],
     "notes": [
-      "Tab labels render through Text when they are primitive strings; custom labels must preserve tab semantics.",
-      "Line indicator styling stays tokenized through tabs variables, and trigger/indicator motion uses shared Face UI motion tokens."
+      "Tab labels are plain slot content inside the native tab button; primitive panel content renders through Text.",
+      "The underline indicator is the selected slot border (--uf-border-width-base, --uf-color-fg); forced colors switch the selected tab to Highlight/HighlightText."
     ]
   },
   "platform": {},

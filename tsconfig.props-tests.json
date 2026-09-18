@@ -1,6 +1,0 @@
-{
-  "extends": "./tsconfig.build.esm.json",
-  "compilerOptions": { "noEmit": true },
-  "include": ["assets/__tests__/props-types.tsx", "scripts/browser/*.tsx", "package-types.d.ts"],
-  "exclude": ["node_modules", "dist"]
-}

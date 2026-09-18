@@ -1,0 +1,311 @@
+/* =================================================================
+ * TILE — interactive row with nested actions
+ * ================================================================= */
+.uf-tile[data-scope="tile"] {
+  --uf-tile-content-gap: calc(var(--uf-control-gap) - var(--uf-spacing-1, 4px));
+  --uf-tile-pad: calc(var(--uf-membrane) * 3);
+  --uf-tile-pad-y: var(--uf-tile-pad);
+  --uf-tile-pad-x: var(--uf-tile-pad);
+  --uf-tile-pad-start: var(--uf-tile-pad-x);
+  --uf-tile-pad-end: var(--uf-tile-pad-x);
+  --uf-tile-level-compensation: calc(var(--uf-membrane) * 6);
+  --uf-tile-action-size: calc(var(--uf-control-height) - (var(--uf-tile-pad) * 2) - (var(--uf-membrane) * 2));
+  --uf-tile-focus-ring-width: calc(var(--uf-membrane) * 2);
+  --uf-tile-selector-indicator-opacity: 0;
+  --uf-tile-selector-indicator-hover-opacity: 0.7;
+  --uf-tile-indicator-opacity: var(--uf-tile-selector-indicator-opacity);
+  --uf-tile-bg: var(--uf-color-black-0);
+  --uf-tile-fg: var(--uf-color-fg);
+  --uf-tile-hover-bg: var(--uf-color-hover-bg);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--uf-control-height);
+  height: auto;
+  gap: var(--uf-tile-content-gap);
+  box-sizing: border-box;
+  padding-top: var(--uf-tile-pad-y);
+  padding-bottom: var(--uf-tile-pad-y);
+  padding-inline-start: var(--uf-tile-pad-start);
+  padding-inline-end: var(--uf-tile-pad-end);
+  border-radius: var(--uf-radius);
+  outline: none;
+  border: none;
+  font: inherit;
+  font-family: var(--uf-font-family-base);
+  font-size: var(--uf-control-font-size);
+  font-weight: var(--uf-font-weight);
+  line-height: var(--uf-control-line-height);
+  cursor: default;
+  user-select: text;
+  transition: font-weight var(--uf-motion-duration-emphasis) var(--uf-motion-ease-emphasized);
+  text-decoration: none;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  box-shadow: none;
+  background: var(--uf-tile-bg);
+  color: var(--uf-tile-fg);
+}
+.uf-tile[data-scope="tile"][data-interactive] {
+  cursor: pointer;
+  user-select: none;
+}
+.uf-tile[data-scope="tile"][data-density="spacious"] {
+  --uf-tile-content-gap: var(--uf-control-gap);
+  --uf-tile-pad: var(--uf-control-pad-y);
+  --uf-tile-pad-y: var(--uf-tile-pad);
+  --uf-tile-pad-x: calc(var(--uf-control-pad-text) + var(--uf-spacing-1, 4px));
+}
+.uf-tile[data-scope="tile"][data-icon-start] {
+  --uf-tile-pad-start: var(--uf-control-pad-icon);
+}
+.uf-tile[data-scope="tile"][data-icon-end] {
+  --uf-tile-pad-end: var(--uf-control-pad-icon);
+}
+.uf-tile[data-scope="tile"][data-full-width] {
+  width: 100%;
+}
+.uf-tile[data-scope="tile"][data-align="left"] {
+  justify-content: flex-start;
+  text-align: left;
+}
+.uf-tile[data-scope="tile"][data-align="center"] {
+  justify-content: center;
+  text-align: center;
+}
+.uf-tile[data-scope="tile"][data-align="right"] {
+  justify-content: flex-end;
+  text-align: right;
+}
+/* Tile level indent: base pad plus one-step compensation so rows with leading
+   icons align with Button text on the shared option indent rhythm. */
+.uf-tile[data-scope="tile"][data-level] {
+  padding-inline-start: calc(var(--uf-tile-pad-start) + var(--face-runtime-option-level, 0) * var(--uf-option-indent) + min(var(--face-runtime-option-level, 0), 1) * var(--uf-tile-level-compensation));
+}
+.uf-tile[data-scope="tile"][data-interactive]:not([data-primary-disabled]):hover {
+  background: var(--uf-tile-hover-bg);
+}
+.uf-tile[data-scope="tile"]:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 var(--uf-tile-focus-ring-width) var(--uf-button-ring-color);
+}
+.uf-tile[data-scope="tile"][data-active] {
+  background: var(--uf-tile-hover-bg);
+}
+.uf-tile[data-scope="tile"][data-primary-disabled] {
+  cursor: not-allowed;
+}
+.uf-tile[data-scope="tile"][data-busy] {
+  cursor: wait;
+}
+
+/* Variants */
+.uf-tile[data-scope="tile"][data-variant="default"] {
+  --uf-tile-bg: var(--uf-color-black-0);
+}
+.uf-tile[data-scope="tile"][data-tone="muted"] {
+  --uf-tile-fg: var(--uf-color-fg-muted);
+}
+.uf-tile[data-scope="tile"][data-tone="accent"] {
+  --uf-tile-hover-bg: var(--uf-color-active-bg);
+}
+.uf-tile[data-scope="tile"][data-tone="positive"] {
+  --uf-tile-fg: var(--uf-color-success);
+}
+.uf-tile[data-scope="tile"][data-tone="warning"] {
+  --uf-tile-fg: var(--uf-color-warning);
+}
+.uf-tile[data-scope="tile"][data-tone="destructive"] {
+  --uf-tile-fg: var(--uf-color-destructive);
+  --uf-tile-hover-bg: var(--uf-color-destructive-soft);
+}
+
+.uf-tile[data-scope="tile"][data-variant="ghost"] {
+  --uf-tile-hover-bg: var(--uf-color-black-0);
+}
+
+.uf-tile[data-scope="tile"][data-primary-disabled] {
+  --uf-tile-fg: var(--uf-color-fg-muted);
+}
+
+/* Parts */
+[data-scope="tile"] > [data-part="leading"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+[data-scope="tile"] > [data-part="icon"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--uf-icon-size, var(--uf-control-line-height));
+  height: var(--uf-icon-size, var(--uf-control-line-height));
+}
+[data-scope="tile"] > [data-part="text"] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--uf-tile-content-gap, var(--uf-control-gap));
+  flex: 0 1 auto;
+  min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-scope="tile"][data-stretch-text] > [data-part="text"] {
+  flex: 1 1 auto;
+}
+.uf-tile[data-scope="tile"][data-selector] > [data-part="text"] {
+  gap: var(--uf-selector-indicator-gap);
+  width: auto;
+}
+.uf-tile__indicator[data-scope] {
+  opacity: var(--uf-tile-indicator-opacity);
+}
+.uf-tile__indicator[data-direction="right"][data-open] {
+  transform: rotate(90deg);
+}
+.uf-tile__label {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uf-tile[data-scope="tile"][data-selector]:not([data-stretch-text]) > [data-part="text"] > .uf-tile__label {
+  flex: 0 1 auto;
+}
+.uf-tile__labelSlot {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--uf-tile-content-gap, var(--uf-control-gap));
+}
+.uf-tile__rightText {
+  color: var(--uf-color-fg-muted);
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+.uf-tile[data-scope="tile"][data-selector] > [data-part="text"] > .uf-tile__rightText {
+  margin-inline-start: var(--uf-selector-indicator-gap);
+}
+[data-scope="tile"] > [data-part="meta"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  min-width: 0;
+  margin-inline-start: auto;
+  color: var(--uf-color-fg-muted);
+}
+[data-scope="tile"] > [data-part="text"] > .uf-membrane,
+[data-scope="tile"] > [data-part="text"] > .uf-text[data-scope] {
+  min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
+  max-inline-size: 100%;
+}
+[data-scope="tile"] > [data-part="text"] > .uf-membrane:not(.uf-membrane--truncate) {
+  flex: 0 0 auto;
+}
+[data-scope="tile"] > [data-part="text"] > .uf-membrane--truncate,
+[data-scope="tile"] > [data-part="text"] > .uf-text[data-scope][data-truncate] {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+.uf-tile[data-scope="tile"][data-selector] > [data-part="text"] > .uf-membrane--truncate,
+.uf-tile[data-scope="tile"][data-selector] > [data-part="text"] > .uf-text[data-scope][data-truncate] {
+  flex: 0 1 auto;
+}
+[data-scope="tile"] > [data-part="text"] > .uf-membrane {
+  display: flex;
+  overflow: hidden;
+}
+[data-scope="tile"] > [data-part="text"] > .uf-membrane > .uf-text[data-scope],
+[data-scope="tile"] > [data-part="text"] > .uf-text[data-scope] {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
+  max-inline-size: 100%;
+  overflow: hidden;
+}
+.uf-tile[data-scope="tile"][data-selector] > [data-part="text"] > .uf-membrane > .uf-text[data-scope],
+.uf-tile[data-scope="tile"][data-selector] > [data-part="text"] > .uf-text[data-scope] {
+  flex: 0 1 auto;
+}
+.uf-tile[data-scope="tile"][data-selector]:is(:hover, :focus-within) {
+  --uf-tile-indicator-opacity: var(--uf-tile-selector-indicator-hover-opacity);
+}
+[data-scope="tile"] > [data-part="text"] > .uf-membrane > .uf-text[data-scope][data-truncate] > .uf-text__content,
+[data-scope="tile"] > [data-part="text"] > .uf-text[data-scope][data-truncate] > .uf-text__content {
+  display: block;
+}
+[data-scope="tile"] > [data-part="actions"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+}
+.uf-tile[data-scope="tile"][data-meta] > [data-part="actions"] {
+  margin-inline-start: var(--uf-tile-content-gap);
+}
+/* Icon-only buttons inside tile fit the control height after membrane and tile padding. */
+[data-scope="tile"] > :is([data-part="leading"], [data-part="actions"]) .uf-button[data-scope][data-icon-only] {
+  --uf-icon-only-size: var(--uf-tile-action-size);
+  inline-size: var(--uf-icon-only-size);
+  block-size: var(--uf-icon-only-size);
+  min-inline-size: var(--uf-icon-only-size);
+  min-block-size: var(--uf-icon-only-size);
+}
+/* Show actions only on hover by default, always when active */
+[data-scope="tile"] > [data-part="actions"] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-standard);
+}
+.uf-tile[data-scope="tile"][data-action-visibility="always"] > [data-part="actions"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.uf-tile[data-scope="tile"][data-action-visibility="hidden"] > [data-part="actions"] {
+  opacity: 0;
+  pointer-events: none;
+}
+.uf-tile[data-scope="tile"][data-action-visibility="hover"]:hover > [data-part="actions"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.uf-tile[data-scope="tile"][data-action-visibility="reveal"]:hover > [data-part="actions"],
+.uf-tile[data-scope="tile"][data-action-visibility="reveal"]:focus-within > [data-part="actions"],
+.uf-tile[data-scope="tile"][data-action-visibility="reveal"][data-active] > [data-part="actions"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Membrane hover pass-through for Tile */
+.uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > .uf-tile[data-scope="tile"][data-interactive]:not([data-primary-disabled]),
+.uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > .uf-membrane[data-membrane-disabled] > .uf-tile[data-scope="tile"][data-interactive]:not([data-primary-disabled]) {
+  background: var(--uf-tile-hover-bg);
+}
+
+.uf-tile[data-scope="tile"] > [data-part="text"] {
+  --uf-text-color: var(--uf-tile-fg);
+  color: inherit;
+  text-align: inherit;
+}
+.uf-tile[data-scope="tile"]:not([data-truncate]) > [data-part="text"],
+.uf-tile[data-scope="tile"]:not([data-truncate]) > [data-part="text"] > .uf-tile__label {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,19 @@
+/* =================================================================
+ * COMPATIBILITY PARITY PATCHES (components-like visuals)
+ * ================================================================= */
+
+/* Table sticky right parity */
+.uf-table[data-scope] td[data-sticky-right] {
+  position: sticky;
+  right: 0;
+  z-index: 3;
+  background: var(--uf-color-bg);
+}
+
+/* Media variants parity */
+.uf-media[data-scope] .uf-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: var(--uf-color-hover-bg);
+}

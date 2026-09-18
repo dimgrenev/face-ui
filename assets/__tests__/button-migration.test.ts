@@ -39,7 +39,7 @@ export const view = <>
     const names = (node: ts.JsxSelfClosingElement) =>
       node.attributes.properties
         .filter(ts.isJsxAttribute)
-        .map((attribute) => attribute.name.text)
+        .map((attribute) => attribute.name.getText(source))
     expect(names(elements[0])).toEqual(['chevron', 'aria-expanded'])
     expect(elements[0].getText(source)).toContain('aria-expanded={open}')
     expect(elements[1].getText(source)).toContain('aria-expanded={native}')

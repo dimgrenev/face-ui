@@ -1,0 +1,89 @@
+/* =================================================================
+ * TREE (TreeView)
+ * ================================================================= */
+.uf-tree[data-scope] {
+  --uf-tree-branch-indicator-size: var(--uf-spacing-4);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  max-height: none;
+  overflow: visible;
+  overscroll-behavior: auto;
+}
+.uf-tree[data-scope] [data-part="branch"],
+.uf-tree[data-scope] .uf-tree-branch {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]),
+.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]),
+.uf-tree[data-scope] .uf-tree-custom-node {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: var(--uf-control-height);
+  height: auto;
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+  gap: var(--uf-control-gap);
+  cursor: pointer;
+  color: var(--uf-color-fg);
+  font-size: var(--uf-font-size-sm);
+  border-radius: var(--uf-radius);
+  border: none;
+  background: var(--uf-color-black-0);
+  font: inherit;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+}
+.uf-tree[data-scope] .uf-tree-custom-node {
+  padding-inline-start: calc(var(--uf-control-pad-start) + (var(--face-runtime-option-level, 0) * var(--uf-option-indent)));
+}
+.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]):hover,
+.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]):hover,
+.uf-tree[data-scope] .uf-tree-custom-node:hover {
+  background: var(--uf-color-hover-bg);
+}
+.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"])[aria-selected="true"],
+.uf-tree[data-scope] .uf-tree-custom-node[aria-selected="true"] {
+  background: var(--uf-color-hover-bg);
+}
+.uf-tree[data-scope] [data-part="branchIndicator"] {
+  width: var(--uf-tree-branch-indicator-size);
+  height: var(--uf-tree-branch-indicator-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.uf-tree[data-scope] [data-part="branchContent"] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+  padding-left: 0;
+}
+.uf-tree[data-scope] .uf-tree-item-button,
+.uf-tree[data-scope] .uf-tree-branch-button,
+.uf-tree[data-scope] .uf-tree-custom-node {
+  width: 100%;
+}
+.uf-tree[data-scope] .uf-tree-item-button[aria-selected="true"],
+.uf-tree[data-scope] .uf-tree-branch-button[aria-selected="true"],
+.uf-tree[data-scope] .uf-tree-custom-node[aria-selected="true"],
+.uf-tree[data-scope] .uf-tree-item-button[data-active-path],
+.uf-tree[data-scope] .uf-tree-branch-button[data-active-path],
+.uf-tree[data-scope] .uf-tree-custom-node[data-active-path] {
+  background: var(--uf-color-hover-bg);
+}
+.uf-tree[data-scope] [data-part="branchContent"][hidden] {
+  display: none;
+}

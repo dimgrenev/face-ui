@@ -859,9 +859,6 @@
   --uf-table-resize-line-offset-x: calc(var(--uf-table-resize-hit-width) - var(--uf-table-resize-line-width));
   --uf-table-resize-line-inset-y: 6px;
   --uf-table-membrane-cell-pad-x: var(--uf-spacing-2);
-  --uf-tabs-rail-h: 32px;
-  --uf-tabs-indicator-h: 2px;
-  --uf-tabs-line-gap: var(--uf-spacing-2);
   --uf-toast-border-width: var(--uf-membrane);
   --uf-toast-compact-inset: var(--uf-spacing-1);
   --uf-toast-viewport-inset: calc(var(--uf-spacing-2) + (var(--uf-spacing-1) / 2));

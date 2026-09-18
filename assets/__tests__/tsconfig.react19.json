@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "paths": {
+      "react": ["assets/__tests__/react-19/node_modules/@types/react"],
+      "react/*": ["assets/__tests__/react-19/node_modules/@types/react/*"],
+      "react-dom": ["assets/__tests__/react-19/node_modules/@types/react-dom"],
+      "react-dom/*": ["assets/__tests__/react-19/node_modules/@types/react-dom/*"]
+    }
+  }
+}

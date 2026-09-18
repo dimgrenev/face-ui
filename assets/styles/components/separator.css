@@ -1,0 +1,62 @@
+/* =================================================================
+ * SEPARATOR
+ * ================================================================= */
+.uf-separator[data-scope] {
+  border: none;
+  background: var(--uf-color-border);
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  flex: 1 1 auto;
+  box-sizing: border-box;
+  padding: 0;
+}
+.uf-separator-membrane {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  align-self: stretch;
+}
+.uf-separator-membrane--vertical {
+  align-self: stretch;
+  flex: none;
+  min-height: var(--uf-control-height);
+}
+.uf-separator[data-scope][data-orientation="horizontal"] {
+  display: block;
+  height: var(--uf-separator-line-width);
+  min-height: var(--uf-separator-line-width);
+  max-height: var(--uf-separator-line-width);
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin: 0;
+  align-self: center;
+  border-top: none;
+  background: var(--uf-color-border);
+}
+.uf-separator-membrane > .uf-separator[data-scope][data-orientation="horizontal"] {
+  flex: 1 1 auto;
+  width: 100%;
+  inline-size: 100%;
+}
+.uf-separator[data-scope][data-orientation="vertical"] {
+  width: var(--uf-separator-line-width);
+  min-width: var(--uf-separator-line-width);
+  max-width: var(--uf-separator-line-width);
+  inline-size: var(--uf-separator-line-width);
+  min-inline-size: var(--uf-separator-line-width);
+  max-inline-size: var(--uf-separator-line-width);
+  align-self: stretch;
+  border-left: none;
+  background: var(--uf-color-border);
+}

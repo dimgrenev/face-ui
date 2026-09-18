@@ -1,22 +1,15 @@
-// @vitest-environment jsdom
-import React, { act } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
-import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { act } from 'react'
+import type { Root } from 'react-dom/client'
+import { beforeEach, expect, it, vi } from 'vitest'
 import { Membrane } from '../adapters/react/Membrane'
 import { Button } from '../../Button/Button'
 import { Input } from '../../Input/Input'
+import { mount } from './harness'
 
 let root: Root
 let container: HTMLDivElement
 beforeEach(() => {
-  Object.assign(globalThis, { React, IS_REACT_ACT_ENVIRONMENT: true })
-  container = document.createElement('div')
-  document.body.append(container)
-  root = createRoot(container)
-})
-afterEach(async () => {
-  await act(async () => root.unmount())
-  container.remove()
+  ;({ host: container, root } = mount())
 })
 
 it('forwards a control padding click once, with focus, modifiers and the actual target', async () => {

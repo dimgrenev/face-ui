@@ -1,0 +1,111 @@
+/* =================================================================
+ * STEPS
+ * ================================================================= */
+.uf-steps[data-scope] {
+  --uf-steps-indicator-width: var(--uf-icon-size);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+.uf-steps-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.uf-steps-item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+.uf-steps-item > .uf-membrane {
+  min-width: 0;
+  max-width: 100%;
+}
+[data-scope="steps"][data-part="content"] {
+  box-sizing: border-box;
+  width: 100%;
+  text-align: inherit;
+  align-self: stretch;
+  padding: 0;
+}
+[data-scope="steps"][data-part="trigger"] {
+  --uf-button-content-gap: var(--uf-control-gap);
+  --uf-control-pad-start: var(--uf-control-pad-icon);
+  --uf-control-pad-end: var(--uf-control-pad-text);
+  --uf-button-focus-ring-width: calc(var(--uf-membrane) * 2);
+  --uf-button-bg: var(--uf-color-black-0);
+  --uf-button-fg: var(--uf-color-fg-muted);
+  --uf-button-hover-bg: var(--uf-color-hover-bg);
+  --uf-button-hover-fg: var(--uf-color-fg);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--uf-button-content-gap);
+  min-height: var(--uf-control-height);
+  height: auto;
+  padding-top: var(--uf-control-pad-y);
+  padding-bottom: var(--uf-control-pad-y);
+  padding-inline-start: var(--uf-control-pad-start);
+  padding-inline-end: var(--uf-control-pad-end);
+  border-radius: var(--uf-radius);
+  border: none;
+  background: var(--uf-button-bg);
+  font-family: var(--uf-font-family-base);
+  font-size: var(--uf-control-font-size);
+  font-weight: var(--uf-font-weight);
+  line-height: var(--uf-control-line-height);
+  cursor: pointer;
+  user-select: none;
+  transition: font-weight var(--uf-motion-duration-emphasis) var(--uf-motion-ease-emphasized);
+  text-decoration: none;
+  white-space: normal;
+  min-width: 0;
+  outline: none;
+  box-shadow: none;
+  color: var(--uf-button-fg);
+}
+[data-scope="steps"][data-part="trigger"] .uf-steps-label {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: start;
+}
+[data-scope="steps"][data-part="trigger"]:hover:not(:disabled) {
+  background: var(--uf-button-hover-bg);
+  color: var(--uf-button-hover-fg);
+}
+[data-scope="steps"][data-part="trigger"]:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 var(--uf-button-focus-ring-width) var(--uf-button-ring-color);
+}
+[data-scope="steps"][data-part="trigger"][data-state="active"] {
+  background: var(--uf-button-hover-bg);
+  color: var(--uf-button-hover-fg);
+}
+[data-scope="steps"][data-part="trigger"][data-state="previous"] {
+  color: var(--uf-color-fg);
+}
+[data-scope="steps"][data-part="indicator"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: var(--uf-steps-indicator-width);
+  min-height: var(--uf-steps-indicator-width);
+  padding-inline: var(--uf-membrane);
+  border: 1px solid currentColor;
+  border-radius: var(--uf-radius-full);
+  font-size: var(--uf-font-size-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  flex-shrink: 0;
+  color: inherit;
+}

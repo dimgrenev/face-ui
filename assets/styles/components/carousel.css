@@ -1,0 +1,125 @@
+/* =================================================================
+ * CAROUSEL
+ * ================================================================= */
+.uf-carousel[data-scope] {
+  --uf-carousel-viewport-pad: 0px;
+  --uf-carousel-controls-inset: 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  align-self: stretch;
+  overflow: hidden;
+}
+[data-scope="carousel"] [data-part="viewport"] {
+  display: block;
+  overflow: hidden;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  position: relative;
+  touch-action: pan-y pinch-zoom;
+  padding: var(--uf-carousel-viewport-pad);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+.uf-carousel-track {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  transition: transform var(--uf-motion-duration-medium) var(--uf-motion-ease-standard);
+  will-change: transform;
+}
+[data-scope="carousel"] [data-part="slide"],
+[data-scope="carousel"] [data-part="item"] {
+  flex: 0 0 calc(100% / var(--face-runtime-carousel-slides-per-view, 1));
+  min-width: 0;
+  max-width: calc(100% / var(--face-runtime-carousel-slides-per-view, 1));
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.uf-carousel-slideTitle {
+  font-weight: var(--uf-font-weight-bold);
+}
+.uf-carousel-slideMedia[data-scope="media"] {
+  width: 100%;
+  min-height: calc(var(--uf-control-height) * 5);
+  aspect-ratio: 16 / 9;
+  display: flex;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.uf-carousel [data-part="slide"] > .uf-mediaMembrane {
+  width: 100%;
+}
+.uf-carousel-slideMedia[data-scope="media"] [data-part="element"] {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uf-carousel-controls {
+  position: static;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0;
+  padding: var(--uf-carousel-controls-inset);
+  pointer-events: auto;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.uf-carousel-navSlot {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.uf-carousel-navSlot--prev {
+  grid-column: 1;
+  justify-self: start;
+  justify-content: flex-start;
+}
+.uf-carousel-navSlot--next {
+  grid-column: 3;
+  justify-self: end;
+  justify-content: flex-end;
+}
+.uf-carousel-indicators {
+  grid-column: 2;
+  position: static;
+  transform: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+  justify-self: center;
+}
+.uf-carousel-nav[data-scope="button"][data-icon-only] {
+  --uf-icon-only-size: var(--uf-control-height);
+  position: static;
+  transform: none;
+}
+
+.uf-button[data-scope] [data-part="icon"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  flex: 0 0 auto;
+}
+.uf-button[data-scope] [data-part="icon"] :is(svg, img) {
+  display: block;
+}
+.uf-button[data-scope][data-icon-only]:not([data-selector]) [data-part="icon"] {
+  inline-size: 100%;
+  block-size: 100%;
+}
+.uf-button[data-scope][data-icon-only] [data-part="icon"] > :is(svg, img, .icon) {
+  margin: auto;
+  flex: 0 0 auto;
+}

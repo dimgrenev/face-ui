@@ -1,0 +1,45 @@
+/* =================================================================
+ * TOGGLE
+ * ================================================================= */
+/* Spacing and forwarding belong to Membrane; this root only lays out choices. */
+.uf-toggle[data-scope] {
+  display: inline-flex;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  align-items: stretch;
+  border-radius: var(--uf-radius);
+  border: var(--uf-toggle-border-width) solid var(--uf-overlay-surface-border);
+}
+.uf-toggle[data-scope][data-orientation="vertical"] { flex-direction: column; }
+.uf-toggle[data-scope] > .uf-membrane {
+  flex: 1 1 auto;
+  min-inline-size: min-content;
+}
+.uf-toggle[data-scope] .uf-toggle-item {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-block-size: max(24px, var(--uf-control-height));
+  min-inline-size: 24px;
+  block-size: auto;
+  inline-size: 100%;
+  margin: 0;
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+  font: inherit;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+  transition: none;
+  border: var(--uf-border-width-thin) solid transparent;
+}
+.uf-toggle[data-scope] .uf-toggle-item[data-state="on"] {
+  background: var(--uf-color-active-bg);
+  border-color: currentColor;
+}
+.uf-toggle[data-scope] .uf-toggle-item:hover:not(:disabled) {
+  background: var(--uf-color-hover-bg);
+}
+/* Root and individual disabled controls must not multiply opacity. */
+.uf-toggle[data-scope][data-disabled] { opacity: 1; pointer-events: auto; }
+.uf-toggle[data-scope] .uf-toggle-item:disabled { pointer-events: auto; }

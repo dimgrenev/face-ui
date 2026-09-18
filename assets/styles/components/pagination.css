@@ -1,0 +1,51 @@
+/* =================================================================
+ * PAGINATION
+ * ================================================================= */
+.uf-pagination[data-scope] {
+  container: uf-pagination / inline-size;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+.uf-pagination-pages {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  justify-self: center;
+  gap: 0;
+  min-width: 0;
+}
+.uf-pagination-pages > .uf-membrane { flex-shrink: 0; }
+.uf-pagination[data-scope] > .uf-membrane { min-width: 0; max-width: 100%; }
+.uf-pagination-nav[data-scope] { align-self: stretch; white-space: normal; overflow-wrap: anywhere; }
+.uf-pagination-nav[data-scope] .uf-button__label { white-space: normal; overflow-wrap: anywhere; }
+.uf-pagination-trailing {
+  display: inline-flex;
+  align-items: stretch;
+  justify-self: end;
+  gap: 0;
+  min-width: 0;
+  max-width: 100%;
+}
+.uf-pagination-trailing > .uf-membrane { min-width: 0; }
+.uf-pagination-trailing > .uf-membrane:has(> .uf-pagination-more) { flex-shrink: 0; }
+@container uf-pagination (width < 560px) {
+  .uf-pagination[data-scope] > .uf-membrane { grid-column: 1; grid-row: 1; justify-self: start; }
+  .uf-pagination-trailing { grid-column: 3; grid-row: 1; }
+  .uf-pagination-pages { grid-column: 1 / -1; grid-row: 2; }
+}
+.uf-pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--uf-control-height);
+  min-height: var(--uf-control-height);
+  height: auto;
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+  color: var(--uf-color-fg-muted);
+}
+[data-scope="pagination"][data-part="root"][hidden] { display: none; }

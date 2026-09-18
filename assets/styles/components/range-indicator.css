@@ -1,0 +1,120 @@
+/* =================================================================
+ * RANGE INDICATORS — Progress and Meter share one presentation.
+ * ================================================================= */
+.uf-range-indicator[data-scope] {
+  --uf-range-fill-bg: var(--uf-range-indicator-bg);
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: var(--uf-control-height);
+  font-variant-numeric: tabular-nums;
+}
+.uf-range-indicator[hidden] { display: none; }
+.uf-range-indicator__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--uf-control-gap);
+  min-block-size: var(--uf-control-height);
+  min-inline-size: 0;
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+  box-sizing: border-box;
+}
+.uf-range-indicator__title[data-scope][data-align] {
+  text-align: start;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.uf-range-indicator__value[data-scope][data-align] {
+  justify-content: flex-end;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin-inline-start: auto;
+  --uf-text-color: var(--uf-color-fg-muted);
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+.uf-range-indicator__track-wrap {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  min-block-size: var(--uf-control-height);
+  padding-inline: var(--uf-control-pad-text);
+}
+.uf-range-indicator__track {
+  inline-size: 100%;
+  block-size: var(--uf-range-track-height);
+  min-inline-size: 0;
+  border-radius: var(--uf-radius-full);
+  background: var(--uf-range-track-bg);
+  overflow: hidden;
+}
+.uf-range-indicator__indicator {
+  inline-size: var(--uf-range-percent);
+  block-size: 100%;
+  border-radius: var(--uf-radius-full);
+  background: var(--uf-range-fill-bg);
+  transition: inline-size var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
+}
+.uf-range-indicator[data-tone="positive"] {
+  --uf-range-fill-bg: var(--uf-range-indicator-positive-bg);
+}
+.uf-range-indicator[data-tone="warning"] {
+  --uf-range-fill-bg: var(--uf-range-indicator-warning-bg);
+}
+.uf-range-indicator[data-tone="destructive"] {
+  --uf-range-fill-bg: var(--uf-range-indicator-destructive-bg);
+}
+.uf-range-indicator__indicator[data-state="indeterminate"] {
+  position: relative;
+  animation: uf-range-indeterminate var(--uf-motion-duration-loading) var(--uf-motion-ease-in-out) var(--uf-motion-iteration-indefinite);
+}
+/* Percentages refer to the track, and logical inset follows inherited direction. */
+@keyframes uf-range-indeterminate {
+  from { inset-inline-start: -40%; }
+  to { inset-inline-start: 100%; }
+}
+.uf-range-indicator[data-shape="circle"] {
+  inline-size: auto;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--uf-control-gap);
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+}
+.uf-range-indicator[data-shape="circle"] > .uf-range-indicator__value[data-scope][data-align] {
+  justify-content: flex-end;
+  margin-inline-start: 0;
+}
+.uf-range-indicator[data-shape="circle"] > .uf-range-indicator__track {
+  inline-size: var(--uf-range-circle-size);
+  block-size: var(--uf-range-circle-size);
+  flex: 0 0 var(--uf-range-circle-size);
+  background: transparent;
+}
+.uf-range-indicator[data-shape="circle"] > .uf-range-indicator__track > .uf-range-indicator__indicator {
+  inline-size: 100%;
+  background: conic-gradient(var(--uf-range-fill-bg) var(--uf-range-percent), var(--uf-range-track-bg) 0);
+  -webkit-mask: radial-gradient(circle, transparent 52%, var(--uf-color-black-100) 54%);
+  mask: radial-gradient(circle, transparent 52%, var(--uf-color-black-100) 54%);
+}
+.uf-range-indicator[data-shape="circle"] > .uf-range-indicator__track > .uf-range-indicator__indicator[data-state="indeterminate"] {
+  animation-name: uf-range-circle-indeterminate;
+  animation-timing-function: linear;
+}
+@keyframes uf-range-circle-indeterminate {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .uf-range-indicator__indicator { animation: none !important; transition: none !important; }
+}
+@media (forced-colors: active) {
+  .uf-range-indicator[data-scope] {
+    --uf-range-track-bg: GrayText;
+    --uf-range-fill-bg: Highlight;
+  }
+  .uf-range-indicator__track,
+  .uf-range-indicator__indicator { forced-color-adjust: none; }
+}

@@ -1,0 +1,31 @@
+/* =================================================================
+ * SCROLL (ScrollArea)
+ * ================================================================= */
+.uf-scroll[data-scope] {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+[data-scope="scroll"] [data-part="viewport"] {
+  width: 100%;
+  height: 100%;
+  padding: var(--uf-scroll-card-inset);
+  box-sizing: border-box;
+}
+.uf-scroll__text[data-scope="text"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  text-align: left;
+}
+.uf-scroll__text[data-scope="text"] .uf-text__content {
+  display: block;
+  white-space: inherit;
+}
+.uf-scroll[data-orientation="horizontal"] .uf-scroll__text[data-scope="text"],
+.uf-scroll[data-orientation="both"] .uf-scroll__text[data-scope="text"] {
+  min-width: calc(var(--uf-control-height) * 12);
+}

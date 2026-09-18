@@ -1,0 +1,148 @@
+/* =================================================================
+ * TABS
+ * ================================================================= */
+/* Only the canonical root owns these rules; nested tabs and composed app strips
+   must not inherit each other's orientation, selection or panel styling.
+   Horizontal tabs wrap header actions onto their own line before the tab list
+   drops below a usable width. */
+.uf-tabs[data-variant] {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--uf-control-gap);
+  min-inline-size: 0;
+}
+.uf-tabs[data-variant] > .uf-tabs-header {
+  flex: 1 1 12rem;
+  display: flex;
+  align-items: stretch;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: auto;
+}
+.uf-tabs[data-variant][data-wrap] > .uf-tabs-header {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+.uf-tabs[data-variant] > .uf-tabs-header > .uf-tabs-tabSlot {
+  display: inline-flex;
+  position: relative;
+  flex: 0 0 auto;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  border-block-end: var(--uf-border-width-base) solid transparent;
+}
+.uf-tabs[data-variant] > .uf-tabs-header > .uf-tabs-tabSlot > .uf-membrane {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tab {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--uf-control-gap);
+  min-inline-size: 24px;
+  min-block-size: max(24px, var(--uf-control-height));
+  max-inline-size: 100%;
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+  border: 0;
+  border-radius: var(--uf-radius-full);
+  font: inherit;
+  white-space: nowrap;
+  background: transparent;
+  color: var(--uf-color-fg-muted);
+}
+.uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tab:focus-visible {
+  outline: var(--uf-border-width-base) solid var(--uf-color-ring);
+  outline-offset: calc(-1 * var(--uf-border-width-base));
+}
+.uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tab:not(:disabled):hover,
+.uf-tabs[data-variant="pill"] > .uf-tabs-header .uf-tabs-tab[aria-selected="true"] {
+  background: var(--uf-color-hover-bg);
+  color: var(--uf-color-fg);
+}
+.uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tabLabel {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tabIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tabIcon svg {
+  inline-size: var(--uf-icon-size-sm);
+  block-size: var(--uf-icon-size-sm);
+}
+.uf-tabs[data-variant="underline"] > .uf-tabs-header > .uf-tabs-tabSlot[data-state="active"] {
+  border-block-end-color: var(--uf-color-fg);
+}
+.uf-tabs[data-variant="underline"] > .uf-tabs-header .uf-tabs-tab[aria-selected="true"] {
+  color: var(--uf-color-fg);
+}
+.uf-tabs[data-variant] > .uf-tabs-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.uf-tabs[data-variant] > .uf-tabs-content {
+  flex: 1 1 100%;
+  min-inline-size: 0;
+  padding: 0;
+}
+.uf-tabs[data-variant] > .uf-tabs-content[hidden] { display: none; }
+.uf-tabs[data-variant][data-orientation="vertical"] {
+  display: grid;
+  grid-template-columns: fit-content(40%) minmax(0, 1fr);
+  column-gap: 0;
+}
+.uf-tabs[data-variant][data-orientation="vertical"] > .uf-tabs-header {
+  grid-column: 1;
+  grid-row: 1;
+  flex-direction: column;
+}
+.uf-tabs[data-variant][data-orientation="vertical"] > .uf-tabs-header > .uf-tabs-tabSlot {
+  border-block-end: 0;
+  border-inline-end: var(--uf-border-width-base) solid transparent;
+}
+.uf-tabs[data-variant="underline"][data-orientation="vertical"] > .uf-tabs-header > .uf-tabs-tabSlot[data-state="active"] {
+  border-inline-end-color: var(--uf-color-fg);
+}
+.uf-tabs[data-variant][data-orientation="vertical"] > .uf-tabs-content {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+.uf-tabs[data-variant][data-orientation="vertical"] > .uf-tabs-actions {
+  grid-column: 1;
+  grid-row: 2;
+}
+/* Forced colors turn every transparent slot border into CanvasText and drop the
+   author selection surface; the selected tab takes the system selection pair
+   in both variants and only the underline indicator keeps a visible border.
+   The selected tab opts out of adjustment so no Canvas text backplate hides
+   HighlightText. */
+@media (forced-colors: active) {
+  .uf-tabs[data-variant] > .uf-tabs-header > .uf-tabs-tabSlot {
+    border-color: Canvas;
+  }
+  .uf-tabs[data-variant="underline"] > .uf-tabs-header > .uf-tabs-tabSlot[data-state="active"] {
+    border-color: Highlight;
+  }
+  .uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tab[aria-selected="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    outline-color: HighlightText;
+  }
+  .uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tab[aria-selected="true"] * {
+    color: HighlightText;
+  }
+}

@@ -68,8 +68,6 @@ function shouldSkipDir(relPath) {
     relPath === 'dist' ||
     relPath === '.git' ||
     relPath.startsWith('.git/') ||
-    relPath === '.artifacts' ||
-    relPath.includes('/.artifacts') ||
     relPath === '.cache' ||
     relPath.startsWith('.cache/') ||
     relPath === '.github' ||
@@ -94,14 +92,40 @@ function shouldSkipDir(relPath) {
     relPath === 'scripts' ||
     relPath.endsWith('/__tests__') ||
     relPath === 'assets/__tests__' ||
-    relPath === 'assets/contracts'
+    relPath === 'assets/contracts' ||
+    // Inlined into the flat styles/{index,components}.css entries below.
+    relPath === 'assets/styles/components'
   )
+}
+
+const CSS_IMPORT = /^@import\s+(['"])([^'"]+)\1\s*;[^\S\n]*\n?/gm
+const FLAT_CSS_ENTRIES = ['assets/styles/index.css', 'assets/styles/components.css']
+
+/**
+ * Inline local `@import`s depth-first, in source order (import order = cascade
+ * order), so the published entry stylesheets work without a CSS bundler.
+ * Only same-directory or components/ files are imported and they carry no url(),
+ * so relative URLs keep resolving from the flat file's location.
+ */
+function flattenCss(filePath, stack = []) {
+  if (stack.includes(filePath)) throw new Error(`Circular @import: ${[...stack, filePath].join(' -> ')}`)
+  const css = fs
+    .readFileSync(filePath, 'utf8')
+    .replace(CSS_IMPORT, (_match, _quote, spec) =>
+      flattenCss(path.resolve(path.dirname(filePath), spec), [...stack, filePath]),
+    )
+  if (/@import\b/.test(css.replace(/\/\*[\s\S]*?\*\//g, ''))) throw new Error(`Unsupported @import left in ${filePath}`)
+  return css
+}
+
+function writeFlatStyles(targetRoot) {
+  for (const entry of FLAT_CSS_ENTRIES) {
+    fs.writeFileSync(path.join(targetRoot, entry), flattenCss(path.join(PACKAGE_ROOT, entry)), 'utf8')
+  }
 }
 
 function shouldCopyAsset(relPath) {
   if (!relPath || relPath.split('/').some((part) => part.startsWith('.')))
-    return false
-  if (relPath === '.artifacts' || relPath.startsWith('.artifacts/'))
     return false
   if (relPath.includes('копия')) return false
   if (/\.(test|spec)\./.test(relPath)) return false
@@ -168,8 +192,10 @@ function main() {
   runNode(tsc, ['-p', path.join(PACKAGE_ROOT, 'tsconfig.build.cjs.json')])
   runNode(tsc, ['-p', path.join(PACKAGE_ROOT, 'tsconfig.build.types.json')])
 
-  copyRuntimeAssets(path.join(PACKAGE_ROOT, 'dist', 'esm'))
-  copyRuntimeAssets(path.join(PACKAGE_ROOT, 'dist', 'cjs'))
+  for (const format of ['esm', 'cjs']) {
+    copyRuntimeAssets(path.join(PACKAGE_ROOT, 'dist', format))
+    writeFlatStyles(path.join(PACKAGE_ROOT, 'dist', format))
+  }
 
   writeJson(path.join(PACKAGE_ROOT, 'dist', 'esm', 'package.json'), {
     type: 'module',
@@ -182,8 +208,10 @@ function main() {
   console.log(
     '[face-ui-react:npm] fixed ESM import extensions and JSON attributes',
   )
-  console.log('[face-ui-react:npm] copied runtime assets')
+  console.log('[face-ui-react:npm] copied runtime assets, flattened entry styles')
   console.log('[face-ui-react:npm] done.')
 }
+
+module.exports = { flattenCss }
 
 if (require.main === module) main()

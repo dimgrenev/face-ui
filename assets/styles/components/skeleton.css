@@ -1,0 +1,32 @@
+/* =================================================================
+ * SKELETON
+ * ================================================================= */
+.uf-skeleton[data-scope] {
+  background: var(--uf-color-hover-bg);
+  border-radius: var(--uf-radius);
+  width: var(--uf-control-height);
+  min-width: var(--uf-control-height);
+  height: var(--uf-control-height);
+  min-height: var(--uf-control-height);
+}
+.uf-skeleton[data-scope][data-variant="text"] {
+  width: calc(var(--uf-control-height) * 4);
+  height: var(--uf-control-height);
+  min-height: var(--uf-control-height);
+}
+.uf-skeleton[data-scope][data-variant="circle"] {
+  border-radius: var(--uf-radius-full);
+}
+
+@keyframes uf-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+.uf-skeleton[data-scope] {
+  animation: uf-skeleton-pulse var(--uf-motion-duration-skeleton) var(--uf-motion-ease-in-out) var(--uf-motion-iteration-indefinite);
+}

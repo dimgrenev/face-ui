@@ -1,0 +1,52 @@
+/* =================================================================
+ * BAR (Toolbar)
+ * ================================================================= */
+.uf-bar[data-scope="bar"] {
+  display: flex;
+  align-items: center;
+  min-height: var(--uf-control-height);
+  height: auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  gap: var(--uf-control-gap);
+}
+.uf-bar[data-scope="bar"].uf-gallery-header {
+  padding: 0;
+}
+.uf-bar[data-scope="bar"].uf-gallery-header > .uf-bar-section {
+  gap: 0;
+}
+.uf-bar[data-scope="bar"][data-orientation="vertical"] {
+  flex-direction: column;
+  align-items: stretch;
+  height: auto;
+  width: fit-content;
+  max-width: 100%;
+}
+.uf-bar-section {
+  display: flex;
+  align-items: center;
+  gap: var(--uf-control-gap);
+  min-width: 0;
+  min-height: var(--uf-control-height);
+  max-width: 100%;
+  flex: 0 0 auto;
+}
+.uf-bar-section[data-grow] {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow: hidden;
+}
+.uf-bar[data-scope="bar"][data-orientation="vertical"] > .uf-bar-section {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.uf-bar-section[data-align="end"] {
+  margin-inline-start: auto;
+  justify-content: flex-end;
+}
+.uf-bar[data-scope="bar"][data-orientation="vertical"] > .uf-bar-section[data-align="end"] {
+  margin-inline-start: 0;
+  margin-block-start: auto;
+}

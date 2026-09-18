@@ -67,7 +67,6 @@ export class AdvancedPropParser {
     enums: new Map(),
     interfaces: new Map(),
   };
-  private maxImportDepth = 5;
   private pathMap = new Map<string, string>();
   private cwd = process.cwd();
 

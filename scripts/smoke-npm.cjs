@@ -91,6 +91,12 @@ async function main() {
       for (const pattern of forbiddenPatterns) {
         assert(!pattern.test(file), `Forbidden artifact copied to dist: ${file}`);
       }
+      // Published styles are flat: build-npm inlines the @import list (components/ stays in source).
+      if (/^dist\/(esm|cjs)\/assets\/styles\//.test(file)) {
+        assert(!file.includes('/styles/components/'), `Unflattened style part copied to dist: ${file}`);
+        const css = fs.readFileSync(path.join(root, file), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+        assert(!/@import\b/.test(css), `@import left in published stylesheet: ${file}`);
+      }
     }
   } else {
     assert(false, 'Missing dist directory. Run pnpm build first.');

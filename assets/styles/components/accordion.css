@@ -1,0 +1,147 @@
+/* =================================================================
+ * ACCORDION
+ * ================================================================= */
+[data-scope="accordion"][data-part="trigger"] {
+  --uf-accordion-trigger-pad-start: var(--uf-control-pad-text);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--uf-control-gap);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--uf-control-height);
+  height: auto;
+  margin: 0;
+  padding-top: var(--uf-control-pad-y);
+  padding-bottom: var(--uf-control-pad-y);
+  padding-inline-start: var(--uf-accordion-trigger-pad-start);
+  padding-inline-end: var(--uf-control-pad-icon);
+  border: none;
+  background: var(--uf-color-black-0);
+  color: var(--uf-color-fg);
+  font: inherit;
+  font-weight: var(--uf-font-weight);
+  cursor: pointer;
+  border-radius: var(--uf-radius);
+  box-shadow: none;
+  outline: none;
+  text-align: start;
+}
+[data-scope="accordion"][data-part="trigger"][data-icon-start] {
+  --uf-accordion-trigger-pad-start: var(--uf-control-pad-icon);
+}
+[data-scope="accordion"][data-part="root"] {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+[data-scope="accordion"][data-part="item"] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+}
+[data-scope="accordion"][data-part="item"] > * {
+  margin: 0;
+}
+.uf-accordion-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+.uf-accordion-icon :is(svg, img) {
+  display: block;
+}
+[data-scope="accordion"][data-part="trigger"] .uf-accordion-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+[data-scope="accordion"][data-part="trigger"]:hover:not([aria-disabled="true"]) {
+  background: var(--uf-color-hover-bg);
+}
+[data-scope="accordion"][data-part="trigger"]:disabled {
+  opacity: var(--uf-color-disabled-opacity);
+  cursor: not-allowed;
+}
+[data-scope="accordion"][data-part="trigger"][aria-disabled="true"]:not(:disabled) {
+  cursor: default;
+}
+/* Inherit from the nearest HTML direction boundary, including nested overrides.
+   CSS minifiers may lower :dir() to :lang(), which loses explicit dir values. */
+:where([dir="ltr"]) {
+  --uf-accordion-closed-angle: 0deg;
+}
+:where([dir="rtl"]) {
+  --uf-accordion-closed-angle: 180deg;
+}
+/* Accordion arrow icon — rotates 90° when item is expanded */
+.uf-accordion-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transform: rotate(var(--uf-accordion-closed-angle, 0deg));
+  transition: transform var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
+}
+[data-scope="accordion"][data-part="item"][data-state="open"] > .uf-membrane > [data-part="trigger"] > .uf-accordion-arrow {
+  transform: rotate(90deg);
+}
+[data-scope="accordion"][data-part="content"] {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  contain: inline-size;
+  margin: 0;
+  padding: 0;
+  color: var(--uf-color-fg-muted);
+  font-size: var(--uf-font-size);
+  overflow-wrap: anywhere;
+}
+[data-scope="accordion"][data-part="content"] > * {
+  margin: 0;
+}
+[data-scope="accordion"] .uf-accordion-content-inner {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+[data-scope="accordion"] .uf-accordion-slot {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+[data-scope="accordion"] .uf-accordion-slot > .uf-membrane,
+[data-scope="accordion"] .uf-accordion-slot > .uf-button[data-scope],
+[data-scope="accordion"] .uf-accordion-slot > .uf-tile[data-scope="tile"],
+[data-scope="accordion"] .uf-accordion-slot > .uf-text[data-scope="text"] {
+  width: 100%;
+}
+[data-scope="accordion"] .uf-accordion-slot > .uf-membrane > :is(.uf-button[data-scope], .uf-tile[data-scope="tile"], .uf-text[data-scope="text"]) {
+  width: 100%;
+}
+[data-scope="accordion"] .uf-accordion-slot + .uf-accordion-slot {
+  margin-top: 0;
+}
+[data-scope="accordion"][data-part="content"][hidden] {
+  display: none;
+}

@@ -19,6 +19,13 @@ import { Button } from '../Button/Button'
 // Types
 // ---------------------------------------------------------------------------
 
+export type {
+  UploadFile,
+  UploadRejectedFile,
+  UploadRejectReason,
+  UploadSourceFile,
+} from '../assets/machines/upload.machine'
+
 export interface UploadLabels {
   idle: string
   dragging: string

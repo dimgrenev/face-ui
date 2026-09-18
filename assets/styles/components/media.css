@@ -1,0 +1,49 @@
+/* =================================================================
+ * MEDIA
+ * ================================================================= */
+.uf-media[data-scope] {
+  --uf-media-fallback-size: calc((var(--uf-control-height) * 2) + var(--uf-spacing-4));
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--uf-radius);
+}
+.uf-media[data-scope][data-type="image"][data-variant="rounded"] {
+  border-radius: var(--uf-radius-md);
+}
+.uf-media[data-scope][data-type="image"][data-variant="circle"] {
+  aspect-ratio: 1;
+  border-radius: var(--uf-radius-full);
+}
+.uf-media[data-scope][data-type="image"][data-variant="thumbnail"] {
+  box-sizing: border-box;
+  padding: calc(var(--uf-membrane) * 2);
+  border-radius: var(--uf-radius-sm);
+  box-shadow: inset 0 0 0 var(--uf-membrane) var(--uf-color-border);
+}
+.uf-mediaMembrane {
+  display: flex;
+  width: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+.uf-mediaMembrane--full {
+  width: 100%;
+}
+.uf-media[data-scope] img,
+.uf-media[data-scope] video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+[data-scope="media"] [data-part="fallback"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--uf-color-hover-bg);
+  color: var(--uf-color-fg-muted);
+  min-height: var(--uf-media-fallback-size);
+  min-width: var(--uf-media-fallback-size);
+}
