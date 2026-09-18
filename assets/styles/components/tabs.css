@@ -128,12 +128,13 @@
    author selection surface; the selected tab takes the system selection pair
    in both variants and only the underline indicator keeps a visible border.
    The selected tab opts out of adjustment so no Canvas text backplate hides
-   HighlightText. */
+   HighlightText. [data-orientation] matches the vertical rules' specificity,
+   so these later rules win in both orientations. */
 @media (forced-colors: active) {
-  .uf-tabs[data-variant] > .uf-tabs-header > .uf-tabs-tabSlot {
+  .uf-tabs[data-variant][data-orientation] > .uf-tabs-header > .uf-tabs-tabSlot {
     border-color: Canvas;
   }
-  .uf-tabs[data-variant="underline"] > .uf-tabs-header > .uf-tabs-tabSlot[data-state="active"] {
+  .uf-tabs[data-variant="underline"][data-orientation] > .uf-tabs-header > .uf-tabs-tabSlot[data-state="active"] {
     border-color: Highlight;
   }
   .uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tab[aria-selected="true"] {

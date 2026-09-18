@@ -1,43 +1,46 @@
 /** Tabs select a persistent content panel. Header actions are ordinary controls. */
 import {
   forwardRef,
-  useEffect,
-  useLayoutEffect,
   useId,
   useRef,
-  useState,
-  version,
-  type HTMLAttributes,
   type ButtonHTMLAttributes,
+  type HTMLAttributes,
+  type MouseEvent,
   type ReactNode,
 } from 'react'
 import { cn } from '../assets/utils'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 import { Membrane } from '../assets/adapters/react/Membrane'
-import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
+import { inertProp } from '../assets/adapters/react/inert-prop'
+import { composeHandlers } from '../assets/adapters/react/merge-props'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
+import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
+import type { CollectionItem } from '../assets/internal/item'
+import { domId, nearest, readCollection } from '../assets/runtime/collection'
+import { invalidProp } from '../assets/runtime/props'
 import { hasSlotContent } from '../assets/slot-content'
 
-export interface TabItem extends Pick<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  'id' | 'title' | 'aria-label' | 'aria-labelledby' | 'aria-describedby'
-> {
-  /** Stable unique key, including the empty string. */
-  value: string
-  /** Visible noninteractive tab content. Use native ARIA naming for icons. */
+export interface TabItem
+  extends Omit<CollectionItem, 'textValue'>,
+    Pick<
+      ButtonHTMLAttributes<HTMLButtonElement>,
+      'id' | 'title' | 'aria-label' | 'aria-labelledby' | 'aria-describedby'
+    > {
+  /** Visible noninteractive tab content; name an icon-only tab with `aria-label`. */
   label: ReactNode
-  /** Persistent internal panel content; hidden panels remain mounted. */
-  content?: ReactNode
-  /** Prevent activation; an already selected panel stays readable. */
+  /** Icon before the label; a string is a registered icon name. */
+  icon?: ReactNode
+  /** Keeps the tab out of activation and arrow navigation; a selected disabled tab still shows its panel. */
   disabled?: boolean
-  /** Internal panel ID, or the required existing panel ID in external mode. */
+  /** Persistent panel content; hidden panels stay mounted. */
+  content?: ReactNode
+  /** Id of the rendered panel; generated when omitted. */
   panelId?: string
-  /** File/category icon before the label; strings are registered icon names. */
-  leadingIcon?: ReactNode
-  /** Status icon after the label; independent of the leading icon. */
-  trailingIcon?: ReactNode
 }
 export type ExternalTabItem = Omit<TabItem, 'content' | 'panelId'> & {
+  /** Id of the consumer's tabpanel this tab controls. */
   panelId: string
   content?: never
 }
@@ -53,27 +56,27 @@ interface TabsBaseProps extends Omit<
   | 'aria-selected'
   | 'autoFocus'
 > {
-  /** Controlled selected key. Unknown keys show no panel until they exist. */
+  /** Controlled selected key; a key missing from `items` shows the first enabled tab until it appears. */
   value?: string
-  /** Mount-only selected key. Otherwise use the first enabled tab. */
+  /** Selected key on mount, else the first enabled tab; a key that `items` do not contain yet waits for them. */
   defaultValue?: string
-  /** Axis of keyboard navigation and the tab list. */
+  /** Axis of the tab list and of its arrow keys. */
   orientation?: 'horizontal' | 'vertical'
-  /** Automatic activates on focus; manual requires a click, Space or Enter. */
+  /** Automatic selects the tab an arrow key reaches; manual waits for a click, Space or Enter. */
   activationMode?: 'automatic' | 'manual'
-  /** Disable tab navigation and header actions, retaining the visible panel. */
+  /** Disables the tabs and header actions; the selected panel stays visible. */
   disabled?: boolean
-  /** User activation request; external updates and removal recovery are silent. */
+  /** Called once per user selection; `value` updates and recovery from a removed tab never call it. */
   onValueChange?: (details: { value: string }) => void
   /** Pill background or an underline that follows the selected tab's geometry. */
   variant?: 'pill' | 'underline'
-  /** Wrap the tab list instead of scrolling along its axis. */
+  /** Wraps the tab list instead of scrolling along its axis. */
   wrap?: boolean
   /** Shared outer spacing around each tab; toggling preserves DOM and focus. */
   membrane?: boolean
-  /** Header controls outside tablist, such as New, Close selected, or More. */
+  /** Header controls outside the tablist, such as New, Close selected or More. */
   actions?: ReactNode
-  /** Focus the selected enabled tab, or first enabled tab, once on mount. */
+  /** Focuses the selected enabled tab, else the first enabled one, once on mount. */
   autoFocus?: boolean
   /** Accessible name of the tablist, not the generic outer wrapper. */
   'aria-label'?: string
@@ -85,22 +88,18 @@ interface TabsBaseProps extends Omit<
 export type TabsProps = TabsBaseProps &
   (
     | {
-        /** Render persistent internal panels. */ renderPanels?: true
-        /** Tabs in order: unique value, label, optional content, disabled, panelId, leadingIcon, trailingIcon and native naming (id, title, aria-*). */
+        /** Renders a persistent panel per tab; `false` leaves panels to the consumer, referenced by each item's `panelId`. */
+        renderPanels?: true
+        /** The tabs in order, keyed by `value`: label, icon, content, disabled, panelId and native naming (id, title, aria-*). */
         items?: readonly TabItem[]
       }
     | {
-        /** External panels are owned and labelled by the consumer. */ renderPanels: false
-        /** Tabs in order; each panelId names a consumer-owned tabpanel and content is not accepted. */
+        /** Renders a persistent panel per tab; `false` leaves panels to the consumer, referenced by each item's `panelId`. */
+        renderPanels: false
+        /** The tabs in order, keyed by `value`: label, icon, content, disabled, panelId and native naming (id, title, aria-*). */
         items?: readonly ExternalTabItem[]
       }
   )
-const useCommitEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
-const hasIcon = (icon: ReactNode) =>
-  hasSlotContent(typeof icon === 'string' ? icon.trim() : icon)
-const renderIcon = (icon: ReactNode) =>
-  typeof icon === 'string' ? <Icon name={icon} /> : icon
 
 export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
   function Tabs(props, ref) {
@@ -122,185 +121,92 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       'aria-label': label,
       'aria-labelledby': labelledBy,
       'aria-describedby': describedBy,
+      onClick,
+      onKeyDown,
+      onFocus,
+      onBlur,
       ...nativeProps
     } = props
-    if (
-      !Array.isArray(items) ||
-      items.some((item) => !item || typeof item.value !== 'string')
-    )
-      throw new TypeError('Tabs items must have string values')
-    if (new Set(items.map((item) => item.value)).size !== items.length)
-      throw new TypeError('Tabs item values must be unique')
-    for (const candidate of [value, defaultValue])
-      if (candidate !== undefined && typeof candidate !== 'string')
-        throw new TypeError('Tabs values must be strings')
-    for (const item of items) {
-      if (item.id !== undefined && (!item.id || /\s/.test(item.id)))
-        throw new TypeError('Tabs item id must be a nonempty HTML ID')
-      if (
-        item.panelId !== undefined &&
-        (!item.panelId || /\s/.test(item.panelId))
-      )
-        throw new TypeError('Tabs panelId must be a nonempty HTML ID')
-      if (
-        !renderPanels &&
-        (!item.panelId || Object.prototype.hasOwnProperty.call(item, 'content'))
-      )
-        throw new TypeError(
-          'External Tabs items require panelId and must not supply ignored content',
-        )
-    }
-    const explicitIds = items
-      .flatMap((item) => [item.id, ...(renderPanels ? [item.panelId] : [])])
-      .filter((id): id is string => id !== undefined)
-    if (new Set(explicitIds).size !== explicitIds.length)
-      throw new TypeError('Tabs internal IDs must be unique')
-    const firstEnabled = items.find((item) => !item.disabled)?.value ?? null
-    const [internal, setInternal] = useState<string | null>(
-      () => defaultValue ?? firstEnabled,
-    )
-    const previousOrder = useRef(items.map((item) => item.value))
-    const previousSelected = useRef<string | null>(null)
-    const nearest = (key: string | null) => {
-      const index =
-        key === null ? 0 : Math.max(0, previousOrder.current.indexOf(key))
+    const collection = readCollection<TabItem>(items, {
+      component: 'Tabs',
+      key: (item) => item.value,
+    })
+    const { keys } = collection
+    const enabled = (key: string) => collection.get(key)?.disabled === false
+    const firstEnabled = keys.find(enabled) ?? null
+    const [current, setValue, replaceValue] = useControllableState<
+      string | null
+    >({
+      value,
+      defaultValue: () => defaultValue ?? firstEnabled,
+      onChange: (next) => onValueChange?.({ value: next as string }),
+      name: ['Tabs', 'value'],
+    })
+    // Only a removal moves an uncontrolled selection, to its enabled neighbour; a key that is
+    // not there yet (async or momentarily empty items) keeps waiting while the first tab shows.
+    const previous = useRef(keys)
+    const lost =
+      value === undefined &&
+      current !== null &&
+      keys.length > 0 &&
+      !keys.includes(current) &&
+      previous.current.includes(current)
+    const neighbour = (key: string) => {
+      const at = keys.indexOf(nearest(previous.current, keys, key)!)
       return (
-        [...items.slice(index), ...items.slice(0, index).reverse()].find(
-          (item) => !item.disabled,
-        )?.value ?? null
+        [...keys.slice(at), ...keys.slice(0, at).reverse()].find(enabled) ??
+        null
       )
     }
     const selected =
-      value !== undefined
-        ? items.some((item) => item.value === value)
-          ? value
-          : null
-        : internal !== null && items.some((item) => item.value === internal)
-          ? internal
-          : nearest(internal)
-    const rootRef = useRef<HTMLDivElement>(null)
-    const listRef = useRef<HTMLDivElement>(null)
-    const composedRef = useComposedRefs(rootRef, ref)
-    const triggers = useRef(new Map<string, HTMLButtonElement>())
-    const focusedNode = useRef<HTMLElement | null>(null)
-    const focusedTab = useRef(false)
-    const focusedKey = useRef<string | null>(null)
-    const [focused, setFocused] = useState<string | null>(null)
-    const pointerFocus = useRef<HTMLButtonElement | null>(null)
-    const suppressFocusActivation = useRef(false)
-    const mounted = useRef(false)
-    const enabled = items
-      .filter((item) => !disabled && !item.disabled)
-      .map((item) => item.value)
-    const roving =
-      focused !== null && enabled.includes(focused)
-        ? focused
-        : selected !== null && enabled.includes(selected)
-          ? selected
-          : (enabled[0] ?? null)
-    const triggerFrom = (target: EventTarget | null) => {
-      const ElementClass = rootRef.current?.ownerDocument.defaultView?.Element
-      if (!ElementClass || !(target instanceof ElementClass)) return null
-      const button = target.closest<HTMLButtonElement>(
-        'button[data-scope="tabs"][data-part="trigger"]',
-      )
-      return button?.closest('[data-scope="tabs"][data-part="root"]') ===
-        rootRef.current
-        ? button
-        : null
-    }
-    const available = () =>
-      enabled.filter((key) => !triggers.current.get(key)?.matches(':disabled'))
-    const propose = (key: string) => {
-      if (!available().includes(key) || selected === key) return
-      if (value === undefined) setInternal(key)
-      onValueChange?.({ value: key })
-    }
-    const focus = (key: string | null, silent = false) => {
-      const button = key === null ? undefined : triggers.current.get(key)
-      if (!button || button.matches(':disabled')) return
-      suppressFocusActivation.current = silent
-      try {
-        button.focus({ preventScroll: true })
-      } finally {
-        suppressFocusActivation.current = false
-      }
-      const list = listRef.current
-      if (!list) return
-      const box = button.getBoundingClientRect(),
-        viewport = list.getBoundingClientRect()
-      const left =
-        box.left < viewport.left
-          ? box.left - viewport.left
-          : box.right > viewport.right
-            ? box.right - viewport.right
-            : 0
-      const top =
-        box.top < viewport.top
-          ? box.top - viewport.top
-          : box.bottom > viewport.bottom
-            ? box.bottom - viewport.bottom
-            : 0
-      if (left || top) list.scrollBy?.({ left, top, behavior: 'instant' })
-    }
-    useCommitEffect(() => {
-      // Release only the last accepted selection, never a controlled proposal.
-      if (internal !== selected) setInternal(selected)
-      const root = rootRef.current
-      if (!root) return
-      const active = root.ownerDocument.activeElement
-      const previous = focusedNode.current
-      const panelBecameHidden =
-        selected !== previousSelected.current &&
-        active !== null &&
-        Array.from(root.children).some(
-          (node) =>
-            node.getAttribute('data-part') === 'content' &&
-            (node as HTMLElement).hidden &&
-            node.contains(active),
-        )
-      if (!mounted.current) {
-        mounted.current = true
-        if (autoFocus && !root.closest('[inert], [hidden]')) focus(roving, true)
-      } else if (panelBecameHidden) {
-        focus(roving, true)
-      } else if (
-        previous &&
-        ((!previous.isConnected &&
-          (focusedTab.current || selected !== previousSelected.current)) ||
-          (focusedTab.current && previous.matches(':disabled'))) &&
-        (active === previous || active === root.ownerDocument.body) &&
-        !root.closest('[inert], [hidden]')
-      ) {
-        focusedNode.current = null
-        const nearby = nearest(focusedKey.current)
-        const next =
-          nearby !== null && available().includes(nearby)
-            ? nearby
-            : (available()[0] ?? null)
-        focus(next, true)
-      }
-      previousOrder.current = items.map((item) => item.value)
-      previousSelected.current = selected
+      current !== null && keys.includes(current)
+        ? current
+        : lost
+          ? neighbour(current!)
+          : firstEnabled
+    useIsomorphicLayoutEffect(() => {
+      if (lost) replaceValue(selected)
+      previous.current = keys
     })
-    const instanceId = useId()
-    const keyId = (key: string) =>
-      Array.from(key, (char) => char.codePointAt(0)!.toString(16)).join('-')
-    const triggerId = (item: TabItem) =>
-      item.id ?? `tabs-${instanceId}-tab-${keyId(item.value)}`
-    const panelId = (item: TabItem) =>
-      item.panelId ?? `tabs-${instanceId}-panel-${keyId(item.value)}`
-    const inertProps: Record<string, unknown> = {
-      inert: disabled
-        ? Number(version.split('.')[0]) >= 19
-          ? true
-          : ''
-        : undefined,
+
+    const listRef = useRef<HTMLDivElement>(null)
+    const roving = useRovingFocus({
+      keys,
+      disabled: (key) => disabled || !enabled(key),
+      active: selected,
+      orientation,
+      activateOnMove: activationMode === 'automatic',
+      scrollRef: listRef,
+      autoFocus,
+    })
+    const select = (event: MouseEvent<HTMLDivElement>) => {
+      const tab = (event.target as Element).closest?.('[role="tab"]') ?? null
+      const key = roving.keyOf(tab)
+      if (key !== null && !event.defaultPrevented && !tab!.matches(':disabled'))
+        setValue(key)
     }
+
+    const scope = `tabs-${useId()}`
+    const tabId = (item: TabItem, key: string) =>
+      item.id || domId(scope, 'tab', key)
+    const panelId = (item: TabItem, key: string) =>
+      item.panelId || domId(scope, 'panel', key)
+    const controls = (item: TabItem, key: string) => {
+      if (renderPanels) return panelId(item, key)
+      if (!item.panelId)
+        invalidProp(
+          'Tabs',
+          'items[].panelId',
+          item.panelId,
+          `rendering tab ${JSON.stringify(key)} without aria-controls`,
+        )
+      return item.panelId || undefined
+    }
+    const entries = collection.children(null)
     return (
       <div
         {...nativeProps}
-        ref={composedRef}
+        ref={ref}
         className={cn('uf-tabs', className)}
         data-scope="tabs"
         data-part="root"
@@ -308,95 +214,10 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
         data-variant={variant}
         data-wrap={wrap || undefined}
         data-disabled={disabled || undefined}
-        onPointerDown={(event) => {
-          nativeProps.onPointerDown?.(event)
-          if (!event.defaultPrevented)
-            pointerFocus.current = triggerFrom(event.target)
-        }}
-        onPointerCancel={(event) => {
-          pointerFocus.current = null
-          nativeProps.onPointerCancel?.(event)
-        }}
-        onFocus={(event) => {
-          nativeProps.onFocus?.(event)
-          const button = triggerFrom(event.target)
-          focusedTab.current = button !== null
-          if (!button) {
-            focusedNode.current = event.target as HTMLElement
-            focusedKey.current = selected
-            return
-          }
-          focusedNode.current = button
-          const key = button.dataset.value!
-          focusedKey.current = key
-          setFocused(key)
-          const fromPointer = pointerFocus.current === button
-          pointerFocus.current = null
-          if (
-            !event.defaultPrevented &&
-            !fromPointer &&
-            !suppressFocusActivation.current &&
-            activationMode === 'automatic'
-          )
-            propose(key)
-        }}
-        onBlur={(event) => {
-          nativeProps.onBlur?.(event)
-          if (!listRef.current?.contains(event.relatedTarget as Node | null)) {
-            setFocused(null)
-            if (event.relatedTarget) focusedNode.current = null
-          }
-        }}
-        onClick={(event) => {
-          nativeProps.onClick?.(event)
-          pointerFocus.current = null
-          const button = triggerFrom(event.target)
-          if (button && !event.defaultPrevented && !button.matches(':disabled'))
-            propose(button.dataset.value!)
-        }}
-        onKeyDown={(event) => {
-          nativeProps.onKeyDown?.(event)
-          const button = triggerFrom(event.target)
-          if (
-            !button ||
-            event.defaultPrevented ||
-            event.altKey ||
-            event.ctrlKey ||
-            event.metaKey ||
-            button.matches(':disabled')
-          )
-            return
-          const rtl =
-            button.ownerDocument.defaultView?.getComputedStyle(button)
-              .direction === 'rtl'
-          const nextKey =
-            orientation === 'vertical'
-              ? 'ArrowDown'
-              : rtl
-                ? 'ArrowLeft'
-                : 'ArrowRight'
-          const previousKey =
-            orientation === 'vertical'
-              ? 'ArrowUp'
-              : rtl
-                ? 'ArrowRight'
-                : 'ArrowLeft'
-          const delta =
-            event.key === nextKey ? 1 : event.key === previousKey ? -1 : null
-          if (delta === null && event.key !== 'Home' && event.key !== 'End')
-            return
-          const keys = available()
-          if (!keys.length) return
-          event.preventDefault()
-          const index = keys.indexOf(button.dataset.value!)
-          const next =
-            event.key === 'Home'
-              ? 0
-              : event.key === 'End'
-                ? keys.length - 1
-                : (Math.max(0, index) + delta! + keys.length) % keys.length
-          focus(keys[next])
-        }}
+        onClick={composeHandlers(onClick, select)}
+        onKeyDown={composeHandlers(onKeyDown, roving.root.onKeyDown)}
+        onFocus={composeHandlers(onFocus, roving.root.onFocus)}
+        onBlur={composeHandlers(onBlur, roving.root.onBlur)}
       >
         <div
           ref={listRef}
@@ -410,60 +231,44 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
           aria-orientation={orientation}
           aria-disabled={disabled || undefined}
         >
-          {items.map((item) => (
-            <span
-              key={item.value}
-              className="uf-tabs-tabSlot"
-              data-state={item.value === selected ? 'active' : 'inactive'}
-            >
-              <Membrane enabled={membrane} interactive>
-                <button
-                  id={triggerId(item)}
-                  title={item.title}
-                  aria-label={item['aria-label']}
-                  aria-labelledby={item['aria-labelledby']}
-                  aria-describedby={item['aria-describedby']}
-                  ref={(node) => {
-                    if (node) triggers.current.set(item.value, node)
-                    else triggers.current.delete(item.value)
-                  }}
-                  type="button"
-                  role="tab"
-                  className="uf-tabs-tab uf-control"
-                  data-scope="tabs"
-                  data-part="trigger"
-                  data-value={item.value}
-                  data-state={item.value === selected ? 'active' : 'inactive'}
-                  aria-controls={panelId(item)}
-                  aria-selected={item.value === selected}
-                  disabled={disabled || item.disabled}
-                  tabIndex={item.value === roving ? 0 : -1}
-                >
-                  {hasIcon(item.leadingIcon) && (
-                    <span
-                      className="uf-tabs-tabIcon"
-                      data-position="start"
-                      aria-hidden="true"
-                    >
-                      {renderIcon(item.leadingIcon)}
-                    </span>
-                  )}
-                  {hasSlotContent(item.label) && (
-                    <span className="uf-tabs-tabLabel">{item.label}</span>
-                  )}
-                  {hasIcon(item.trailingIcon) && (
-                    <span
-                      className="uf-tabs-tabIcon"
-                      data-position="end"
-                      aria-hidden="true"
-                    >
-                      {renderIcon(item.trailingIcon)}
-                    </span>
-                  )}
-                </button>
-              </Membrane>
-            </span>
-          ))}
+          {entries.map(({ key, item, disabled: off }) => {
+            const state = key === selected ? 'active' : 'inactive'
+            const icon =
+              typeof item.icon === 'string' ? item.icon.trim() : item.icon
+            return (
+              <span key={key} className="uf-tabs-tabSlot" data-state={state}>
+                <Membrane enabled={membrane} interactive>
+                  <button
+                    {...roving.item(key)}
+                    id={tabId(item, key)}
+                    title={item.title}
+                    aria-label={item['aria-label']}
+                    aria-labelledby={item['aria-labelledby']}
+                    aria-describedby={item['aria-describedby']}
+                    type="button"
+                    role="tab"
+                    className="uf-tabs-tab uf-control"
+                    data-scope="tabs"
+                    data-part="trigger"
+                    data-value={key}
+                    data-state={state}
+                    aria-controls={controls(item, key)}
+                    aria-selected={key === selected}
+                    disabled={disabled || off}
+                  >
+                    {hasSlotContent(icon) && (
+                      <span className="uf-tabs-tabIcon" aria-hidden="true">
+                        {typeof icon === 'string' ? <Icon name={icon} /> : icon}
+                      </span>
+                    )}
+                    {hasSlotContent(item.label) && (
+                      <span className="uf-tabs-tabLabel">{item.label}</span>
+                    )}
+                  </button>
+                </Membrane>
+              </span>
+            )
+          })}
         </div>
         {hasSlotContent(actions) && (
           <fieldset
@@ -471,23 +276,23 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
             data-scope="tabs"
             data-part="actions"
             disabled={disabled}
-            {...inertProps}
+            {...inertProp(disabled)}
           >
             {actions}
           </fieldset>
         )}
         {renderPanels &&
-          items.map((item) => (
+          entries.map(({ key, item }) => (
             <div
-              key={item.value}
-              id={panelId(item)}
+              key={key}
+              id={panelId(item, key)}
               role="tabpanel"
-              aria-labelledby={triggerId(item)}
+              aria-labelledby={tabId(item, key)}
               className="uf-tabs-content"
               data-scope="tabs"
               data-part="content"
-              data-value={item.value}
-              hidden={item.value !== selected}
+              data-value={key}
+              hidden={key !== selected}
               tabIndex={0}
             >
               {typeof item.content === 'string' ||

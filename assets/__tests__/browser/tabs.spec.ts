@@ -111,34 +111,71 @@ for (const membrane of [true, false])
       (await buttons.first().boundingBox())!.y,
     )
   })
-for (const activationMode of ['automatic', 'manual'] as const)
-  test(`real keyboard, disabled skip and empty key ${activationMode}`, { tag: ['@focus'] }, async ({
-    page,
-  }) => {
-    await render(page, {
-      activationMode,
-      defaultValue: 'a',
-      items: [
-        { value: '', label: 'Empty', content: 'Zero' },
-        { value: 'a', label: 'Alpha', content: 'A' },
-        { value: 'disabled', label: 'Disabled', disabled: true },
-        { value: 'b', label: 'Beta', content: 'B' },
-      ],
+for (const orientation of ['horizontal', 'vertical'] as const)
+  for (const activationMode of ['automatic', 'manual'] as const)
+    test(`APG keyboard ${orientation} ${activationMode}: arrows skip disabled and wrap, Home, End, Space, Enter, Tab`, { tag: ['@focus'] }, async ({
+      page,
+    }) => {
+      const [next, previous] =
+        orientation === 'vertical'
+          ? ['ArrowDown', 'ArrowUp']
+          : ['ArrowRight', 'ArrowLeft']
+      const automatic = activationMode === 'automatic'
+      await render(page, {
+        orientation,
+        activationMode,
+        defaultValue: 'a',
+        items: [
+          { value: '', label: 'Empty', content: 'Zero' },
+          { value: 'a', label: 'Alpha', content: 'A' },
+          { value: 'disabled', label: 'Disabled', disabled: true },
+          { value: 'b', label: 'Beta', content: 'B' },
+        ],
+      })
+      // One tab stop: the selected tab.
+      expect(
+        await tabs(page).evaluateAll((nodes) =>
+          nodes.map((node) => (node as HTMLElement).tabIndex),
+        ),
+      ).toEqual([-1, 0, -1, -1])
+      await tabs(page).nth(1).focus()
+      await page.keyboard.press(next)
+      await expect(tabs(page).nth(3)).toBeFocused()
+      await expect(tabs(page).nth(automatic ? 3 : 1)).toHaveAttribute(
+        'aria-selected',
+        'true',
+      )
+      await page.keyboard.press('Space')
+      await expect(tabs(page).nth(3)).toHaveAttribute('aria-selected', 'true')
+      await page.keyboard.press(next)
+      await expect(tabs(page).first()).toBeFocused()
+      await page.keyboard.press(previous)
+      await expect(tabs(page).nth(3)).toBeFocused()
+      await page.keyboard.press('Home')
+      await expect(tabs(page).first()).toBeFocused()
+      await page.keyboard.press('Enter')
+      await expect(tabs(page).first()).toHaveAttribute('aria-selected', 'true')
+      await page.keyboard.press('End')
+      await expect(tabs(page).nth(3)).toBeFocused()
+      await page.keyboard.press('Tab')
+      await expect(page.getByRole('tabpanel')).toBeFocused()
+      await expect(page.getByRole('tabpanel')).toHaveText(automatic ? 'B' : 'Zero')
+      expect(await events(page)).toEqual(
+        automatic
+          ? [{ value: 'b' }, { value: '' }, { value: 'b' }, { value: '' }, { value: 'b' }]
+          : [{ value: 'b' }, { value: '' }],
+      )
     })
-    await tabs(page).nth(1).focus()
-    await page.keyboard.press('ArrowRight')
-    await expect(tabs(page).nth(3)).toBeFocused()
-    await expect(
-      tabs(page).nth(activationMode === 'automatic' ? 3 : 1),
-    ).toHaveAttribute('aria-selected', 'true')
-    await page.keyboard.press('Space')
-    await expect(tabs(page).nth(3)).toHaveAttribute('aria-selected', 'true')
-    await page.keyboard.press('Home')
-    await expect(tabs(page).first()).toBeFocused()
-    await page.keyboard.press('Enter')
-    await expect(tabs(page).first()).toHaveAttribute('aria-selected', 'true')
-    expect(await events(page)).toEqual([{ value: 'b' }, { value: '' }])
-  })
+test('a disabled fieldset keeps autoFocus and clicks away from the tabs', { tag: ['@focus', '@native'] }, async ({
+  page,
+}) => {
+  await render(page, { autoFocus: true }, { fieldset: true })
+  await expect(tabs(page).first()).toBeDisabled()
+  expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true)
+  await tabs(page).nth(1).click({ force: true })
+  await expect(tabs(page).first()).toHaveAttribute('aria-selected', 'true')
+  expect(await events(page)).toEqual([])
+})
 test('direction uses inherited computed CSS and ignores the other axis/modifiers', { tag: ['@focus', '@css'] }, async ({
   page,
 }) => {
@@ -275,39 +312,48 @@ test('keyboard reveals clipped tabs instantly without scrolling the page', { tag
   expect(await page.evaluate(() => window.scrollY)).toBe(0)
   await expect(page.getByRole('tablist')).toHaveCSS('scroll-behavior', 'auto')
 })
-for (const variant of ['pill', 'underline'] as const) {
-  test(`forced colors keeps ${variant} selection visible apart from focus`, { tag: ['@forced-colors', '@css'] }, async ({
-    page,
-  }) => {
-    await page.emulateMedia({ forcedColors: 'active' })
-    await render(page, {
-      variant,
-      defaultValue: 'a',
-      activationMode: 'manual',
+for (const orientation of ['horizontal', 'vertical'] as const)
+  for (const variant of ['pill', 'underline'] as const)
+    test(`forced colors keeps ${orientation} ${variant} selection visible apart from focus`, { tag: ['@forced-colors', '@css'] }, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ forcedColors: 'active' })
+      await render(page, {
+        orientation,
+        variant,
+        defaultValue: 'a',
+        activationMode: 'manual',
+      })
+      await tabs(page).first().focus()
+      const states = await tabs(page).evaluateAll(
+        (nodes, orientation) =>
+          nodes.map((node) => {
+            const style = getComputedStyle(node)
+            const slot = getComputedStyle(node.closest('.uf-tabs-tabSlot')!)
+            return {
+              background: style.backgroundColor,
+              color: style.color,
+              decoration: style.textDecorationLine,
+              // The indicator side: block end, or inline end (right in LTR) when vertical.
+              border:
+                orientation === 'vertical'
+                  ? slot.borderRightColor
+                  : slot.borderBottomColor,
+            }
+          }),
+        orientation,
+      )
+      expect(states[1]).not.toEqual(states[2])
+      // Forced colors would otherwise paint every transparent slot border.
+      const canvas = await page.evaluate(
+        () => getComputedStyle(document.body).backgroundColor,
+      )
+      expect(states[2].border).toBe(canvas)
+      if (variant === 'underline') expect(states[1].border).not.toBe(canvas)
+      // An adjusted tab gets a Canvas text backplate that hides HighlightText.
+      await expect(tabs(page).nth(1)).toHaveCSS('forced-color-adjust', 'none')
+      await expect(tabs(page).first()).toHaveCSS('outline-style', 'solid')
     })
-    await tabs(page).first().focus()
-    const states = await tabs(page).evaluateAll((nodes) =>
-      nodes.map((node) => {
-        const style = getComputedStyle(node)
-        return {
-          background: style.backgroundColor,
-          color: style.color,
-          decoration: style.textDecorationLine,
-          border: getComputedStyle(node.closest('.uf-tabs-tabSlot')!)
-            .borderBottomColor,
-        }
-      }),
-    )
-    expect(states[1]).not.toEqual(states[2])
-    // Forced colors would otherwise paint every transparent slot border.
-    expect(states[2].border).toBe(
-      await page.evaluate(() => getComputedStyle(document.body).backgroundColor),
-    )
-    // An adjusted tab gets a Canvas text backplate that hides HighlightText.
-    await expect(tabs(page).nth(1)).toHaveCSS('forced-color-adjust', 'none')
-    await expect(tabs(page).first()).toHaveCSS('outline-style', 'solid')
-  })
-}
 test('header actions leave usable tab targets on a narrow screen', { tag: ['@layout'] }, async ({
   page,
 }) => {

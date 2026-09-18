@@ -141,7 +141,7 @@ const PENDING = {
   'hostile props': [
     'Accordion', 'Avatar', 'Breadcrumb', 'Calendar', 'Code', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
     'Overlay', 'Pagination', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps', 'Table',
-    'Tabs', 'Toc', 'Toggle', 'Tooltip', 'Tree', 'Upload',
+    'Toc', 'Toggle', 'Tooltip', 'Tree', 'Upload',
   ],
   'scenario reports': [],
 } satisfies Record<string, readonly string[]>

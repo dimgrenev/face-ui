@@ -16,3 +16,8 @@ const readonlyTabs: readonly AuditedTabItem[] = [{ value: '', label: 'Empty', co
 ;<AuditedTabs value={['a']} />
 // @ts-expect-error The component owns its children and panel structure.
 ;<AuditedTabs children={<div/>} />
+;<AuditedTabs items={[{ value: 'a', label: 'A', icon: 'file' }]} />
+// @ts-expect-error The start icon is the shared item field `icon`.
+;<AuditedTabs items={[{ value: 'a', label: 'A', leadingIcon: 'file' }]} />
+// @ts-expect-error A trailing status icon belongs in the label or in actions.
+;<AuditedTabs items={[{ value: 'a', label: 'A', trailingIcon: 'check' }]} />

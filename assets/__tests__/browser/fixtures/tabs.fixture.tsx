@@ -22,6 +22,8 @@ type Options = {
   /** true: one default action; a list: one action per text */
   actions?: boolean | string[]
   accept?: boolean
+  /** Render the tabs inside a disabled fieldset. */
+  fieldset?: boolean
 }
 function renderTabs(props: Flat<TabsProps> = {}, options: Options = {}) {
   if (options.fresh) {
@@ -52,6 +54,44 @@ function renderTabs(props: Flat<TabsProps> = {}, options: Options = {}) {
         }
       : item,
   )
+  const tabs = (
+    <Tabs
+      key={sequence}
+      aria-label="Record sections"
+      {...(props as TabsProps)}
+      items={items}
+      onClickCapture={
+        options.cancelClick ? (e) => e.preventDefault() : undefined
+      }
+      onKeyDownCapture={
+        options.cancelKeys ? (e) => e.preventDefault() : undefined
+      }
+      actions={
+        options.actions
+          ? (Array.isArray(options.actions)
+              ? options.actions
+              : ['Close selected']
+            ).map((text: string) => (
+              <Button
+                key={text}
+                icon="close"
+                onClick={() => events.push('action')}
+              >
+                {text}
+              </Button>
+            ))
+          : undefined
+      }
+      onValueChange={(details) => {
+        events.push(details)
+        if (options.accept)
+          renderTabs(
+            { ...props, value: details.value },
+            { ...options, fresh: false },
+          )
+      }}
+    />
+  )
   flushSync(() =>
     root.render(
       <StrictMode>
@@ -62,42 +102,7 @@ function renderTabs(props: Flat<TabsProps> = {}, options: Options = {}) {
           </button>
           <span id="heading">Record sections</span>
           <p id="description">Read and edit a record</p>
-          <Tabs
-            key={sequence}
-            aria-label="Record sections"
-            {...(props as TabsProps)}
-            items={items}
-            onClickCapture={
-              options.cancelClick ? (e) => e.preventDefault() : undefined
-            }
-            onKeyDownCapture={
-              options.cancelKeys ? (e) => e.preventDefault() : undefined
-            }
-            actions={
-              options.actions
-                ? (Array.isArray(options.actions)
-                    ? options.actions
-                    : ['Close selected']
-                  ).map((text: string) => (
-                    <Button
-                      key={text}
-                      icon="close"
-                      onClick={() => events.push('action')}
-                    >
-                      {text}
-                    </Button>
-                  ))
-                : undefined
-            }
-            onValueChange={(details) => {
-              events.push(details)
-              if (options.accept)
-                renderTabs(
-                  { ...props, value: details.value },
-                  { ...options, fresh: false },
-                )
-            }}
-          />
+          {options.fieldset ? <fieldset disabled>{tabs}</fieldset> : tabs}
           <button tabIndex={0} id="after">
             After
           </button>

@@ -88,19 +88,19 @@
       "name": "value",
       "type": "string",
       "required": false,
-      "description": "Controlled selected key. Unknown keys show no panel until they exist."
+      "description": "Controlled selected key; a key missing from `items` shows the first enabled tab until it appears."
     },
     {
       "name": "defaultValue",
       "type": "string",
       "required": false,
-      "description": "Mount-only selected key. Otherwise use the first enabled tab."
+      "description": "Selected key on mount, else the first enabled tab; a key that `items` do not contain yet waits for them."
     },
     {
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Axis of keyboard navigation and the tab list.",
+      "description": "Axis of the tab list and of its arrow keys.",
       "options": [
         "horizontal",
         "vertical"
@@ -111,7 +111,7 @@
       "name": "activationMode",
       "type": "select",
       "required": false,
-      "description": "Automatic activates on focus; manual requires a click, Space or Enter.",
+      "description": "Automatic selects the tab an arrow key reaches; manual waits for a click, Space or Enter.",
       "options": [
         "automatic",
         "manual"
@@ -122,7 +122,7 @@
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable tab navigation and header actions, retaining the visible panel.",
+      "description": "Disables the tabs and header actions; the selected panel stays visible.",
       "defaultValue": false
     },
     {
@@ -140,7 +140,7 @@
       "name": "wrap",
       "type": "boolean",
       "required": false,
-      "description": "Wrap the tab list instead of scrolling along its axis.",
+      "description": "Wraps the tab list instead of scrolling along its axis.",
       "defaultValue": false
     },
     {
@@ -154,13 +154,13 @@
       "name": "actions",
       "type": "any",
       "required": false,
-      "description": "Header controls outside tablist, such as New, Close selected, or More."
+      "description": "Header controls outside the tablist, such as New, Close selected or More."
     },
     {
       "name": "autoFocus",
       "type": "boolean",
       "required": false,
-      "description": "Focus the selected enabled tab, or first enabled tab, once on mount.",
+      "description": "Focuses the selected enabled tab, else the first enabled one, once on mount.",
       "defaultValue": false
     },
     {
@@ -185,14 +185,14 @@
       "name": "renderPanels",
       "type": "boolean",
       "required": false,
-      "description": "Render persistent internal panels.",
+      "description": "Renders a persistent panel per tab; `false` leaves panels to the consumer, referenced by each item's `panelId`.",
       "defaultValue": true
     },
     {
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Tabs in order: unique value, label, optional content, disabled, panelId, leadingIcon, trailingIcon and native naming (id, title, aria-*).",
+      "description": "The tabs in order, keyed by `value`: label, icon, content, disabled, panelId and native naming (id, title, aria-*).",
       "defaultValue": []
     }
   ],

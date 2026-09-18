@@ -168,7 +168,7 @@ const oneImplementation = (component: string) =>
 const PENDING = {
   'D2 throw': [
     'Accordion', 'Breadcrumb', 'Calendar', 'Date', 'Menu', 'Overlay', 'Pagination', 'Popover', 'Rating', 'SegmentedControl',
-    'Select', 'Slider', 'Steps', 'Tabs', 'Toggle', 'Tooltip',
+    'Select', 'Slider', 'Steps', 'Toggle', 'Tooltip',
   ],
   'D3 machines': [
     'Accordion', 'Avatar', 'Carousel', 'Checkbox', 'Command', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Pagination',
@@ -177,17 +177,17 @@ const PENDING = {
   'D3 isomorphic layout effect': [
     'Accordion', 'Avatar', 'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
     'Overlay', 'Pagination', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps',
-    'Switcher', 'Table', 'Tabs', 'Toc', 'Tooltip', 'Tree', 'Upload',
+    'Switcher', 'Table', 'Toc', 'Tooltip', 'Tree', 'Upload',
   ],
-  'D3 direction': ['Calendar', 'Date', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Tabs'],
-  'D3 isConnected': ['Breadcrumb', 'Rating', 'SegmentedControl', 'Slider', 'Steps', 'Tabs'],
+  'D3 direction': ['Calendar', 'Date', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider'],
+  'D3 isConnected': ['Breadcrumb', 'Rating', 'SegmentedControl', 'Slider', 'Steps'],
   'D3 machine-era hooks': [
     'Accordion', 'Calendar', 'Carousel', 'Command', 'Date', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Radio', 'Select',
     'Steps', 'Toc', 'Tree',
   ],
   'D5 one implementation': [
     'Accordion', 'Breadcrumb', 'Calendar', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Panel',
-    'Popover', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps', 'Tabs', 'Tooltip', 'Tree', 'Upload',
+    'Popover', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps', 'Tooltip', 'Tree', 'Upload',
   ],
 } satisfies Record<string, readonly string[]>
 
