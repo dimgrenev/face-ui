@@ -360,27 +360,27 @@ export function interpret<S extends MachineSchema>(
     start: () => {
       if (running) return service
       running = true
-      started = true
-
       processing = true
-      // Run entry actions of initial state
-      const initialNode = config.states[currentState] as
-        | StateNode<S>
-        | undefined
-      const dummyEvent = { type: '__init__' } as S['event']
-      runActions(
-        initialNode?.entry as (string | ActionFn<S>)[] | undefined,
-        dummyEvent,
-      )
 
-      initializing = true
-      for (const event of pendingEvents.splice(0)) transition(event)
-      initializing = false
+      // The initial entry actions and the events sent before the first start
+      // run once. A later start() resumes a stopped service (StrictMode replay,
+      // Suspense reveal) in its current state: it only re-arms the effects.
+      if (!started) {
+        started = true
+        const initialNode = config.states[currentState] as
+          | StateNode<S>
+          | undefined
+        const dummyEvent = { type: '__init__' } as S['event']
+        runActions(
+          initialNode?.entry as (string | ActionFn<S>)[] | undefined,
+          dummyEvent,
+        )
+        initializing = true
+        for (const event of pendingEvents.splice(0)) transition(event)
+        initializing = false
+      }
 
-      // Start effects of initial state
       runEffects()
-
-      // Initial notification
       notify()
       processing = false
       drainEvents()
@@ -388,11 +388,13 @@ export function interpret<S extends MachineSchema>(
       return service
     },
 
+    // Subscribers own their subscriptions: a stopped service keeps them so a
+    // resumed one is still observed (Suspense keeps the useSyncExternalStore
+    // subscription of hidden content while its layout effects are destroyed).
     stop: () => {
       running = false
       eventQueue.length = 0
       cleanupEffects()
-      listeners.clear()
     },
   }
 

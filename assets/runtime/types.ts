@@ -112,6 +112,14 @@ export interface MachineService<S extends MachineSchema> {
   syncContext: (patch: Partial<S['context']>) => void
   getSnapshot: () => MachineSnapshot<S>
   subscribe: (listener: SubscribeFn<S>) => () => void
+  /**
+   * The first call enters the initial state and replays queued events; a call
+   * after stop() resumes the current state by re-arming its effects.
+   */
   start: () => MachineService<S>
+  /**
+   * Cleans up the current state's effects and drops events until the next
+   * start(); state and subscribers are kept.
+   */
   stop: () => void
 }

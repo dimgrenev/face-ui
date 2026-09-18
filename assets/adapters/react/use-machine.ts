@@ -10,7 +10,6 @@ import {
   useRef,
   useEffect,
   useLayoutEffect,
-  useMemo,
 } from 'react'
 import { interpret, areContextValuesEqual } from '../../create-machine'
 import type {
@@ -65,8 +64,12 @@ export function useMachine<S extends MachineSchema>(
     optionsRef.current = options
   })
 
-  // Effects belong to the committed tree. Keep the same service across React's
-  // setup/cleanup replay so event handlers and subscriptions remain connected.
+  // The machine runs while its content is committed and visible. React replays
+  // this layout effect on StrictMode's simulated remount and when a Suspense
+  // boundary hides and reveals the content; the same service survives, and the
+  // next start() resumes it in its current state. The subscription below is a
+  // separate, passive lifecycle owned by useSyncExternalStore: Suspense keeps
+  // it while hidden, so stop() never drops subscribers.
   useIsomorphicLayoutEffect(() => {
     service.start()
     return () => {
@@ -93,14 +96,12 @@ export function useMachine<S extends MachineSchema>(
     svc.syncContext(patch)
   })
 
-  // Subscribe via useSyncExternalStore
-  const subscribe = useMemo(
-    () => (cb: () => void) => service.subscribe(cb),
-    [service],
+  // The service's methods are stable for its lifetime.
+  const state = useSyncExternalStore(
+    service.subscribe,
+    service.getSnapshot,
+    service.getSnapshot,
   )
-  const getSnapshot = useMemo(() => () => service.getSnapshot(), [service])
-
-  const state = useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
 
   return { state, send: service.send, syncContext: service.syncContext }
 }
