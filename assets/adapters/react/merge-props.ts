@@ -9,6 +9,18 @@
 
 type AnyProps = Record<string, unknown>
 
+/** Runs the consumer's handler first; its `preventDefault()` skips the built-in `internal` one. */
+export function composeHandlers<E extends { defaultPrevented: boolean }>(
+  consumer: ((event: E) => void) | undefined,
+  internal: (event: E) => void,
+): (event: E) => void {
+  if (!consumer) return internal
+  return (event) => {
+    consumer(event)
+    if (!event.defaultPrevented) internal(event)
+  }
+}
+
 export function mergeProps<T extends AnyProps>(
   ...sources: (T | undefined)[]
 ): T {
