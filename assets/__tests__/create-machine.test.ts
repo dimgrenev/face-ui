@@ -190,6 +190,53 @@ describe('interpret', () => {
     expect(svc.getSnapshot().value).toBe('idle')
   })
 
+  it('resumes after stop: keeps subscribers and state, re-arms effects, skips entry and queued events', () => {
+    const entry = vi.fn()
+    const cleanup = vi.fn()
+    const effect = vi.fn(() => cleanup)
+    const machine = createMachine<TestSchema>({
+      id: 'resume',
+      initial: 'idle',
+      context: { count: 0, disabled: false },
+      states: {
+        idle: { on: { ACTIVATE: 'active' } },
+        active: {
+          entry: [entry],
+          effects: ['observe'],
+          on: { INCREMENT: { actions: ['increment'] } },
+        },
+      },
+      implementations: {
+        actions: testMachine.implementations!.actions,
+        effects: { observe: effect },
+      },
+    })
+    const svc = interpret(machine)
+    svc.send('ACTIVATE')
+    svc.start()
+    const listener = vi.fn()
+    svc.subscribe(listener)
+    svc.send('INCREMENT')
+
+    svc.stop()
+    expect(cleanup).toHaveBeenCalledTimes(1)
+    svc.send('INCREMENT')
+    svc.start()
+
+    expect(entry).toHaveBeenCalledTimes(1)
+    expect(effect).toHaveBeenCalledTimes(2)
+    expect(listener).toHaveBeenCalledTimes(2)
+    expect(svc.getSnapshot()).toMatchObject({
+      value: 'active',
+      context: { count: 1 },
+    })
+    svc.send('INCREMENT')
+    expect(listener).toHaveBeenCalledTimes(3)
+    expect(svc.getSnapshot().context.count).toBe(2)
+    svc.stop()
+    expect(cleanup).toHaveBeenCalledTimes(2)
+  })
+
   it('string events work', () => {
     const svc = interpret(testMachine).start()
     svc.send('ACTIVATE')
