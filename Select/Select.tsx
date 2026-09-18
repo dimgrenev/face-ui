@@ -929,7 +929,8 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       </div>
     )
     return (
-      <div
+      // Phrasing root and wrapper: a select can sit in running text such as a <p>.
+      <span
         {...api.getRootProps()}
         className={cn('uf-select', className)}
         style={style}
@@ -977,19 +978,20 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             {label}
           </Text>
         )}
-        <div className="uf-select-wrapper">
+        <span className="uf-select-wrapper">
           <Membrane enabled={membrane} fullWidth interactive>
             {triggerNode}
           </Membrane>
           {isOpen && isSheet && (
             <div className="uf-responsive-overlay-backdrop" data-state="open" />
           )}
+          {/* Before mount (server, hydration) a popover has nowhere to portal. */}
           {isOpen &&
-            (isSheet || !portalTarget
+            (isSheet
               ? contentElement
-              : createPortal(contentElement, portalTarget))}
-        </div>
-      </div>
+              : portalTarget && createPortal(contentElement, portalTarget))}
+        </span>
+      </span>
     )
   },
 )

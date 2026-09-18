@@ -43,4 +43,10 @@ export default [
     before: '`ref` pointed to the wrapper `<div>`',
     after: '`ref` points to the native trigger `<button>`',
   },
+  {
+    kind: 'behavior',
+    component: 'Select',
+    before: 'The `.uf-select` root and `.uf-select-wrapper` were `<div>`s',
+    after: 'Both are `<span>`s, so a Select is valid inside a `<p>`; select them by class',
+  },
 ] satisfies Migration[]

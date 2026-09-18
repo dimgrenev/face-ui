@@ -10,8 +10,6 @@ import {
   forwardRef,
   useId,
   useCallback,
-  useEffect,
-  useState,
   useRef,
   type MutableRefObject,
   type ReactNode,
@@ -23,6 +21,7 @@ import { createPortal } from 'react-dom'
 import { useControllableOpenState } from '../assets/adapters/react/use-controllable-open-state'
 import { Trigger } from '../assets/adapters/react/Trigger'
 import { useLayer } from '../assets/adapters/react/use-layer'
+import { usePortalTarget } from '../assets/adapters/react/use-portal-target'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
 import { connectModal } from '../assets/machines/modal.machine'
 import { cn } from '../assets/utils'
@@ -145,12 +144,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
     const titleId = useId()
     const descriptionId = useId()
-    const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null)
-
-    useEffect(() => {
-      if (typeof document === 'undefined') return
-      setPortalTarget(document.body)
-    }, [])
+    const portalTarget = usePortalTarget()
 
     const [isOpen, setOpen] = useControllableOpenState(
       open,
@@ -347,8 +341,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
           </Trigger>
         )}
 
-        {portal && portalTarget ? (
-          createPortal(overlay, portalTarget)
+        {/* A portaled surface mounts once, in the portal: nothing before mount. */}
+        {portal ? (
+          portalTarget && createPortal(overlay, portalTarget)
         ) : (
           <span className="uf-modal-inlineHost">{overlay}</span>
         )}

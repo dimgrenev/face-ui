@@ -1,8 +1,10 @@
 /* =================================================================
  * TOGGLE
  * ================================================================= */
-/* Spacing and forwarding belong to Membrane; this root only lays out choices. */
+/* Spacing and forwarding belong to Membrane; this root only lays out choices.
+   It is positioned: the form proxy covers it to anchor validation bubbles. */
 .uf-toggle[data-scope] {
+  position: relative;
   display: inline-flex;
   max-inline-size: 100%;
   min-inline-size: 0;

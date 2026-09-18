@@ -389,10 +389,8 @@ export function connectCommand(
               event.preventDefault()
               send({ type: 'SELECT' })
               break
-            case 'Escape':
-              event.preventDefault()
-              send({ type: 'BLUR' })
-              break
+            // Escape belongs to the layer: a Command dialog closes, and an
+            // inline field keeps focus and its keyboard.
           }
         },
       }

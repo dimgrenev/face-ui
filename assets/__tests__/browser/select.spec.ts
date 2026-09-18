@@ -632,3 +632,62 @@ test('required validation can focus a select while its options are unavailable',
     })),
   ).toEqual({ valid: true, value: 'ready' })
 })
+
+test.describe('§5 #4/#10: interactive validation reports a required select', () => {
+  const submits = (page: Page) =>
+    page.evaluate(() => (window as unknown as { submits: number }).submits)
+  const form = (page: Page) => page.locator('#form')
+  test.beforeEach(async ({ page }) => {
+    await render(page, { surface: 'popover', name: 'plan', required: true })
+    // A native required field after the select: the report must stay on the
+    // first invalid control instead of the last one.
+    await form(page).evaluate((node: HTMLFormElement) => {
+      const counter = window as unknown as { submits: number }
+      counter.submits = 0
+      node.addEventListener('submit', () => counter.submits++)
+      node.append(
+        Object.assign(document.createElement('input'), {
+          id: 'note',
+          name: 'note',
+          required: true,
+        }),
+      )
+    })
+  })
+  for (const [name, submit] of [
+    ['a submit click', (page: Page) => page.getByRole('button', { name: 'Submit', exact: true }).click()],
+    ['requestSubmit()', (page: Page) => form(page).evaluate((node: HTMLFormElement) => node.requestSubmit())],
+    ['reportValidity()', (page: Page) => form(page).evaluate((node: HTMLFormElement) => void node.reportValidity())],
+    ['Enter in a text field', (page: Page) => page.locator('#note').press('Enter')],
+  ] as const)
+    test(`${name} focuses the select trigger, again on a repeated submit`, { tag: ['@native', '@focus'] }, async ({ page }) => {
+      for (let round = 0; round < 2; round++) {
+        await page.locator('#before').focus()
+        await submit(page)
+        await expect(page.getByRole('combobox')).toBeFocused()
+      }
+      expect(await submits(page)).toBe(0)
+    })
+  test('checkValidity() leaves focus in the field being edited', { tag: ['@native', '@focus'] }, async ({ page }) => {
+    await page.locator('#note').focus()
+    expect(await form(page).evaluate((node: HTMLFormElement) => node.checkValidity())).toBe(false)
+    await page.evaluate(() => new Promise(requestAnimationFrame))
+    await expect(page.locator('#note')).toBeFocused()
+  })
+  test('a chosen value passes the report on to the next invalid field, then the form submits', { tag: ['@native', '@focus'] }, async ({ page }) => {
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'Beta', exact: true }).click()
+    await page.getByRole('button', { name: 'Submit', exact: true }).click()
+    await expect(page.locator('#note')).toBeFocused()
+    await page.locator('#note').fill('Soon')
+    await page.getByRole('button', { name: 'Submit', exact: true }).click()
+    await expect.poll(() => submits(page)).toBe(1)
+  })
+  test('the proxy covers the select, so the browser anchors its bubble there', { tag: ['@layout'] }, async ({ page }) => {
+    const [proxy, root] = await Promise.all([
+      page.locator('#form select').boundingBox(),
+      page.locator('.uf-select').boundingBox(),
+    ])
+    expect(proxy).toEqual(root)
+  })
+})

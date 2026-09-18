@@ -386,6 +386,7 @@ export function connectMenu(
         'data-state': isOpen ? 'open' : 'closed',
         tabIndex: 0,
 
+        // Escape is left to the layer stack, which dismisses the top layer only.
         onKeyDown(e: MenuKeyboardEvent) {
           switch (e.key) {
             case 'ArrowUp': {
@@ -396,11 +397,6 @@ export function connectMenu(
             case 'ArrowDown': {
               e.preventDefault()
               send({ type: 'NAVIGATE_DOWN' })
-              break
-            }
-            case 'Escape': {
-              e.preventDefault()
-              send({ type: 'DISMISS' })
               break
             }
             case 'Home': {
