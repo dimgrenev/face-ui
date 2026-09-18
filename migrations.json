@@ -9,8 +9,20 @@
     },
     {
       "kind": "export",
+      "from": "assets/adapters/react/normalize-props#NormalizedProps",
+      "to": "The props type itself",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
       "from": "assets/adapters/react/use-dismiss-outside#useDismissOutside",
       "to": "`useLayer` from `assets/adapters/react/use-layer`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/use-dismiss-outside#UseDismissOutsideOptions",
+      "to": "The options of `useLayer` from `assets/adapters/react/use-layer`",
       "codemod": "manual"
     },
     {
@@ -62,7 +74,8 @@
       "component": "Breadcrumb",
       "from": "collapseAfter",
       "to": "maxItems",
-      "codemod": "auto"
+      "codemod": "auto",
+      "transform": "breadcrumb-max-items"
     },
     {
       "kind": "remove-prop",
@@ -74,22 +87,24 @@
     {
       "kind": "behavior",
       "component": "Breadcrumb",
-      "before": "`collapseAfter` below 3 disabled collapsing",
-      "after": "`maxItems={null}` disables collapsing; a number must be at least 3"
+      "before": "`collapseAfter` below 3, or not finite, turned collapsing off",
+      "after": "`maxItems={null}` turns it off, and the codemod writes it for such literals; a number must be an integer of at least 3"
     },
     {
       "kind": "remove-prop",
       "component": "Button",
       "prop": "selector",
       "use": "`chevron=\"down\"`, or `chevron=\"right\"` with `selectorDirection=\"side\"`",
-      "codemod": "auto"
+      "codemod": "auto",
+      "transform": "button-chevron"
     },
     {
       "kind": "remove-prop",
       "component": "Button",
       "prop": "selectorDirection",
       "use": "The `chevron` value",
-      "codemod": "auto"
+      "codemod": "auto",
+      "transform": "button-chevron"
     },
     {
       "kind": "rename-prop",
@@ -113,6 +128,65 @@
       "from": "ButtonSelectorDirection",
       "to": "`ButtonChevron` (`down` | `right`)",
       "codemod": "manual"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "value",
+      "before": "`Date`, or `{ start, end }` of `Date`",
+      "after": "A `YYYY-MM-DD` string, or `{ start, end }` of them; a `Date` or a date-time string is invalid",
+      "codemod": "manual",
+      "legacy": "\\bnew Date\\b|\\d{4}-\\d{2}-\\d{2}T\\d"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "defaultValue",
+      "before": "`Date`, or `{ start, end }` of `Date`",
+      "after": "A `YYYY-MM-DD` string, or `{ start, end }` of them; a `Date` or a date-time string is invalid",
+      "codemod": "manual",
+      "legacy": "\\bnew Date\\b|\\d{4}-\\d{2}-\\d{2}T\\d"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "min",
+      "before": "`Date`",
+      "after": "A `YYYY-MM-DD` string; a `Date` or a date-time string is invalid",
+      "codemod": "manual",
+      "legacy": "\\bnew Date\\b|\\d{4}-\\d{2}-\\d{2}T\\d"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "max",
+      "before": "`Date`",
+      "after": "A `YYYY-MM-DD` string; a `Date` or a date-time string is invalid",
+      "codemod": "manual",
+      "legacy": "\\bnew Date\\b|\\d{4}-\\d{2}-\\d{2}T\\d"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "disabledDates",
+      "before": "`Date[]`",
+      "after": "`YYYY-MM-DD` strings",
+      "codemod": "manual",
+      "legacy": "\\bnew Date\\b|\\d{4}-\\d{2}-\\d{2}T\\d"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "onValueChange",
+      "before": "`details.value` was a `Date` or a range of them",
+      "after": "`details.value` is a `YYYY-MM-DD` string or a range of them",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Calendar",
+      "before": "`weekStartsOn` defaulted to 0 (Sunday)",
+      "after": "The first weekday follows `locale`; set `weekStartsOn` to pin it"
     },
     {
       "kind": "rename-prop",
@@ -171,6 +245,12 @@
       "codemod": "manual"
     },
     {
+      "kind": "behavior",
+      "component": "Checkbox",
+      "before": "`ref` pointed to the `<label>`",
+      "after": "`ref` points to the native checkbox `<input>`; `className` and `style` still style the label"
+    },
+    {
       "kind": "remove-prop",
       "component": "Date",
       "prop": "showPresets",
@@ -204,6 +284,26 @@
       "from": "closeLabel",
       "key": "close",
       "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Date",
+      "prop": "presets",
+      "before": "`{ label, value }` items",
+      "after": "Each item also needs an `id`, unique within the picker",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Date",
+      "before": "`weekStartsOn` defaulted to 1 (Monday)",
+      "after": "The first weekday follows `locale`; set `weekStartsOn` to pin it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Date",
+      "before": "`ref` pointed to the wrapper `<div>`",
+      "after": "`ref` points to the trigger `<button>`; `className` and `style` still style the whole field"
     },
     {
       "kind": "rename-prop",
@@ -491,18 +591,32 @@
       "codemod": "manual"
     },
     {
+      "kind": "export",
+      "from": "Slider/SliderAdvanced#SliderAdvancedProps",
+      "to": "`SliderProps`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Slider/SliderAdvanced#SliderCropRange",
+      "to": "Slider/Slider#SliderCropRange",
+      "codemod": "auto"
+    },
+    {
       "kind": "remove-prop",
       "component": "Switcher",
       "prop": "text",
       "use": "`label`, provided only when it should show",
-      "codemod": "auto"
+      "codemod": "auto",
+      "transform": "switcher-label"
     },
     {
       "kind": "remove-prop",
       "component": "Switcher",
       "prop": "withText",
       "use": "Provide or omit `label`",
-      "codemod": "auto"
+      "codemod": "auto",
+      "transform": "switcher-label"
     },
     {
       "kind": "remove-prop",
@@ -526,6 +640,12 @@
       "component": "Switcher",
       "before": "A long label was cut to one line with an ellipsis",
       "after": "A long label wraps; set `truncate` to keep one line"
+    },
+    {
+      "kind": "behavior",
+      "component": "Switcher",
+      "before": "`ref` pointed to the wrapper `<div>`",
+      "after": "`ref` points to the native checkbox `<input>`; `className` and `style` still style the visible row"
     },
     {
       "kind": "behavior",

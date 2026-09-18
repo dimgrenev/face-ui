@@ -74,6 +74,8 @@ function describe(row: Migration, section: MigrationSection): [string, string, s
       return [code(`${scope(row.component)}${row.from}`), code(`labels.${row.key}`), row.codemod]
     case 'text-to-children':
       return [code(`${scope(row.component)}${row.from}`), 'children', row.codemod]
+    case 'retype-prop':
+      return [`${code(`${scope(row.component)}${row.prop}`)}: ${row.before}`, row.after, row.codemod]
     case 'export': {
       const [module, name] = row.from.includes('#') ? row.from.split('#') : [undefined, row.from]
       const before = module ? `${code(name)} from ${code(module)}` : code(name)

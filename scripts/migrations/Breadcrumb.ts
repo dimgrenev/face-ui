@@ -1,7 +1,14 @@
 import type { Migration } from './types'
 
 export default [
-  { kind: 'rename-prop', component: 'Breadcrumb', from: 'collapseAfter', to: 'maxItems', codemod: 'auto' },
+  {
+    kind: 'rename-prop',
+    component: 'Breadcrumb',
+    from: 'collapseAfter',
+    to: 'maxItems',
+    codemod: 'auto',
+    transform: 'breadcrumb-max-items',
+  },
   {
     kind: 'remove-prop',
     component: 'Breadcrumb',
@@ -12,7 +19,7 @@ export default [
   {
     kind: 'behavior',
     component: 'Breadcrumb',
-    before: '`collapseAfter` below 3 disabled collapsing',
-    after: '`maxItems={null}` disables collapsing; a number must be at least 3',
+    before: '`collapseAfter` below 3, or not finite, turned collapsing off',
+    after: '`maxItems={null}` turns it off, and the codemod writes it for such literals; a number must be an integer of at least 3',
   },
 ] satisfies Migration[]

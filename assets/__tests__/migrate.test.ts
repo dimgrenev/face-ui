@@ -27,11 +27,13 @@ const REMOVED: Record<string, Record<string, unknown>> = {
   Tile: { selector: true, selectorOpen: true, busy: true, intent: 'section', selectedDescendant: true },
 }
 const pairs = Object.entries(REMOVED).flatMap(([component, props]) => Object.keys(props).map((prop) => `${component}.${prop}`))
+// Props that kept their name but changed type.
+const RETYPED = ['value', 'defaultValue', 'min', 'max', 'disabledDates', 'onValueChange'].map((prop) => `Calendar.${prop}`)
 
 const oldProp = (row: Migration) =>
   row.kind === 'rename-prop' || row.kind === 'move-to-labels'
     ? row.from
-    : row.kind === 'remove-prop' || row.kind === 'rename-value'
+    : row.kind === 'remove-prop' || row.kind === 'rename-value' || row.kind === 'retype-prop'
       ? row.prop
       : undefined
 const covered = (findings: Finding[], file: string) =>
@@ -60,7 +62,7 @@ describe('migrations', () => {
   it('cover every removed prop and render deterministically', async () => {
     const rows = (await loadMigrationSections()).flatMap((section) => section.migrations)
     const listed = new Set(rows.map((row) => ('component' in row ? `${row.component}.${oldProp(row)}` : '')))
-    expect(pairs.filter((pair) => !listed.has(pair))).toEqual([])
+    expect([...pairs, ...RETYPED].filter((pair) => !listed.has(pair))).toEqual([])
     const [first, second] = [await loadMigrationSections(), await loadMigrationSections()]
     expect(renderMarkdown(second)).toBe(renderMarkdown(first))
     expect(renderJson(second)).toBe(renderJson(first))
@@ -150,7 +152,7 @@ export const view = <>
     expect(tsx).toContain(`<Date labels={{ close: 'Done', clear: 'Clear', now: t('now') }} />`)
     expect(tsx).toContain(`<UI.Bar.Section align="end">Actions</UI.Bar.Section>`)
     expect(tsx).toContain(`<Bar.Section grow />`)
-    expect(tsx).toContain(`<Action selector />`)
+    expect(tsx).toContain(`{/* @ts-expect-error selector is gone */}\n  <Action chevron="down" />`)
     expect(JSON.parse(read(at('setting.json')))).toEqual({
       schema: 'face',
       root: { type: 'Card', props: { footerAlign: 'end' }, children: [] },
@@ -163,6 +165,78 @@ export const view = <>
       ['13', undefined],
       ['14', 'the value is computed'],
     ])
+  })
+
+  it('reads values as the old API did and keeps the file layout', async () => {
+    const at = fixture({
+      'View.tsx': `import { Breadcrumb, Calendar, Button, Date } from '@userface/face-ui-react'
+import { Select, computeSelectSidePosition, type SelectSidePosition } from '@userface/face-ui-react/Select'
+import { computeSelectSideOptionViewportHeight } from '@userface/face-ui-react/Select/select-side-position'
+export const view = <>
+  <Breadcrumb collapseAfter={0} />
+  <Breadcrumb collapseAfter={Infinity} />
+  <Breadcrumb collapseAfter={5} />
+  <Breadcrumb collapseAfter={4.5} />
+  <Breadcrumb collapseAfter={count} />
+  <Calendar value={new Date()} min="2024-01-01" />
+  <Button iconPosition={rtl ? 'left' : 'right'} />
+  <Button iconPosition={rtl ? 'start' : 'end'} />
+  <Date labels={{
+      close: 'Done',
+    }} clearLabel="Clear" />
+</>
+`,
+      'Button.json': `{\n  "name": "Button",\n  "states": [{ "name": "Default", "props": { "iconPosition": "left", "selector": true } }]\n}\n`,
+      'doc.json': JSON.stringify({
+        crumbs: [
+          { __componentName__: 'Breadcrumb', collapseAfter: 2 },
+          { __componentName__: 'Breadcrumb', collapseAfter: '5' },
+        ],
+        calendar: { __componentName__: 'Calendar', value: '2024-01-02T00:00:00.000Z', min: '2024-01-01' },
+      }),
+      'face/component-registry.json': '{}',
+      'face/face-ui-react.json': '{}',
+      'face/types.tsx': `import { Button } from './Button/Button'\n// @ts-expect-error selector is gone\nexport const legacy = <Button selector />\n`,
+    })
+    const { findings } = await migrate({ paths: [directory], mode: 'write' })
+    const tsx = read(at('View.tsx'))
+    expect(tsx).toContain(`import { Select } from '@userface/face-ui-react/Select'
+import { computeSelectSidePosition, type SelectSidePosition, computeSelectSideOptionViewportHeight } from '@userface/face-ui-react/Select/select-side-position'
+export const view`)
+    expect(tsx).toContain(`<Breadcrumb maxItems={null} />
+  <Breadcrumb maxItems={null} />
+  <Breadcrumb maxItems={5} />
+  <Breadcrumb maxItems={4} />
+  <Breadcrumb collapseAfter={count} />`)
+    expect(tsx).toContain(`<Date labels={{
+      close: 'Done',
+      clear: 'Clear',
+    }} />`)
+    expect(read(at('Button.json'))).toBe(
+      `{\n  "name": "Button",\n  "states": [\n    {\n      "name": "Default",\n      "props": {\n        "iconPosition": "start",\n        "chevron": "down"\n      }\n    }\n  ]\n}\n`,
+    )
+    expect(read(at('doc.json'))).toBe(
+      JSON.stringify({
+        crumbs: [
+          { __componentName__: 'Breadcrumb', maxItems: null },
+          { __componentName__: 'Breadcrumb', maxItems: 5 },
+        ],
+        calendar: { __componentName__: 'Calendar', value: '2024-01-02T00:00:00.000Z', min: '2024-01-01' },
+      }),
+    )
+    const manual = findings
+      .filter((finding) => finding.fix === 'manual')
+      .map((finding) => `${path.basename(finding.file)}:${finding.at} ${oldProp(finding.migration)} ${finding.reason ?? ''}`)
+    expect(manual).toEqual([
+      'View.tsx:9 collapseAfter the value is computed',
+      'View.tsx:10 value ',
+      'View.tsx:11 iconPosition the value is computed',
+      'doc.json:/calendar value ',
+    ])
+
+    // Face UI's own negative type tests stay as written.
+    const own = await migrate({ paths: [at('face')], mode: 'check' })
+    expect(own.findings).toEqual([])
   })
 
   it('exits non-zero from --check while legacy usages remain', () => {

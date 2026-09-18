@@ -12,7 +12,9 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Before | After | Codemod |
 | --- | --- | --- |
 | `normalizeProps` from `assets/adapters/react/normalize-props` | Spread the props onto the element directly | manual |
+| `NormalizedProps` from `assets/adapters/react/normalize-props` | The props type itself | manual |
 | `useDismissOutside` from `assets/adapters/react/use-dismiss-outside` | `useLayer` from `assets/adapters/react/use-layer` | manual |
+| `UseDismissOutsideOptions` from `assets/adapters/react/use-dismiss-outside` | The options of `useLayer` from `assets/adapters/react/use-layer` | manual |
 | `useFocusTrap` from `assets/adapters/react/use-focus-trap` | `useLayer` from `assets/adapters/react/use-layer` | manual |
 | `installMembraneInteractions` from `assets/membrane-interactions` | Remove the call; each component owns its membrane | manual |
 
@@ -37,7 +39,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | --- | --- | --- |
 | `collapseAfter` | `maxItems` | auto |
 | `allowNavigation` | Links always navigate; cancel the click in your own handler to stay on the page | manual |
-| `collapseAfter` below 3 disabled collapsing | `maxItems={null}` disables collapsing; a number must be at least 3 | — |
+| `collapseAfter` below 3, or not finite, turned collapsing off | `maxItems={null}` turns it off, and the codemod writes it for such literals; a number must be an integer of at least 3 | — |
 
 ### Button
 
@@ -48,6 +50,18 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `selectorOpen` | `aria-expanded` | auto |
 | `iconPosition="left"`, `iconPosition="right"` | `iconPosition="start"`, `iconPosition="end"` | auto |
 | `ButtonSelectorDirection` | `ButtonChevron` (`down` \| `right`) | manual |
+
+### Calendar
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `value`: `Date`, or `{ start, end }` of `Date` | A `YYYY-MM-DD` string, or `{ start, end }` of them; a `Date` or a date-time string is invalid | manual |
+| `defaultValue`: `Date`, or `{ start, end }` of `Date` | A `YYYY-MM-DD` string, or `{ start, end }` of them; a `Date` or a date-time string is invalid | manual |
+| `min`: `Date` | A `YYYY-MM-DD` string; a `Date` or a date-time string is invalid | manual |
+| `max`: `Date` | A `YYYY-MM-DD` string; a `Date` or a date-time string is invalid | manual |
+| `disabledDates`: `Date[]` | `YYYY-MM-DD` strings | manual |
+| `onValueChange`: `details.value` was a `Date` or a range of them | `details.value` is a `YYYY-MM-DD` string or a range of them | manual |
+| `weekStartsOn` defaulted to 0 (Sunday) | The first weekday follows `locale`; set `weekStartsOn` to pin it | — |
 
 ### Card
 
@@ -62,6 +76,12 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `CardActionAlign` | `CardAlign` | auto |
 | `CardHeaderLayout` | `CardHeaderOrientation` (`vertical` \| `horizontal`) | manual |
 
+### Checkbox
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `ref` pointed to the `<label>` | `ref` points to the native checkbox `<input>`; `className` and `style` still style the label | — |
+
 ### Date
 
 | Before | After | Codemod |
@@ -71,6 +91,9 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `clearLabel` | `labels.clear` | auto |
 | `nowLabel` | `labels.now` | auto |
 | `closeLabel` | `labels.close` | auto |
+| `presets`: `{ label, value }` items | Each item also needs an `id`, unique within the picker | manual |
+| `weekStartsOn` defaulted to 1 (Monday) | The first weekday follows `locale`; set `weekStartsOn` to pin it | — |
+| `ref` pointed to the wrapper `<div>` | `ref` points to the trigger `<button>`; `className` and `style` still style the whole field | — |
 
 ### Input
 
@@ -155,6 +178,8 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `cropLocksValue` | `clampToCrop` | auto |
 | `SliderVariant` | The boolean `showValue` prop | manual |
 | `SliderAdvanced` from `Slider/SliderAdvanced` | `Slider` with `showValue` and `crop` | manual |
+| `SliderAdvancedProps` from `Slider/SliderAdvanced` | `SliderProps` | manual |
+| `SliderCropRange` from `Slider/SliderAdvanced` | `SliderCropRange` from `Slider/Slider` | auto |
 
 ### Switcher
 
@@ -165,6 +190,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `textWrap` | `truncate` instead of `"truncate"`; omit `"wrap"` | auto |
 | `SwitcherTextWrap` | The boolean `truncate` prop | manual |
 | A long label was cut to one line with an ellipsis | A long label wraps; set `truncate` to keep one line | — |
+| `ref` pointed to the wrapper `<div>` | `ref` points to the native checkbox `<input>`; `className` and `style` still style the visible row | — |
 
 ### Table
 

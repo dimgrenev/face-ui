@@ -16,7 +16,7 @@ import {
   ts,
 } from 'ts-morph'
 import { loadMigrations } from './generate-migration'
-import type { Migration } from './migrations/types'
+import type { Migration, MigrationTransform } from './migrations/types'
 
 /** `dry-run` reports, `write` applies automatic fixes, `check` reports and fails while usages remain. */
 export type MigrateMode = 'dry-run' | 'write' | 'check'
@@ -144,43 +144,59 @@ function replaceByValue(usage: Usage, prop: string, values: Record<string, strin
   return undefined
 }
 
-// Removed props whose replacement depends on each other, rewritten together.
-// `apply` returns why it could not migrate.
-const transforms: Record<string, { props: string[]; apply(usage: Usage): string | undefined }> = {
-  Button: {
-    props: ['selector', 'selectorDirection'],
-    apply(usage) {
-      const shown = usage.get('selector') ?? { literal: false }
-      const side = usage.get('selectorDirection') ?? { literal: 'vertical' }
-      if ((!('literal' in shown) || !('literal' in side)) && !usage.code) return 'the value is computed'
-      if (!usage.has('chevron') && !('literal' in shown && !shown.literal)) {
-        const direction: Value =
-          'literal' in side
-            ? { literal: side.literal === 'side' ? 'right' : 'down' }
-            : { code: `${js(side)} === 'side' ? 'right' : 'down'` }
-        usage.set('chevron', 'literal' in shown ? direction : { code: `${js(shown)} ? ${js(direction)} : undefined` })
-      }
-      usage.remove('selector')
-      usage.remove('selectorDirection')
-      return undefined
-    },
+const NON_FINITE = /^-?(Infinity|NaN|Number\.(POSITIVE_INFINITY|NEGATIVE_INFINITY|NaN))$/
+
+// Rewrites for rows whose new value depends on more than one prop or on a range of values.
+// Each returns why it could not migrate.
+const transforms: Record<MigrationTransform, (usage: Usage) => string | undefined> = {
+  'button-chevron'(usage) {
+    const shown = usage.get('selector') ?? { literal: false }
+    const side = usage.get('selectorDirection') ?? { literal: 'vertical' }
+    if ((!('literal' in shown) || !('literal' in side)) && !usage.code) return 'the value is computed'
+    if (!usage.has('chevron') && !('literal' in shown && !shown.literal)) {
+      const direction: Value =
+        'literal' in side
+          ? { literal: side.literal === 'side' ? 'right' : 'down' }
+          : { code: `${js(side)} === 'side' ? 'right' : 'down'` }
+      usage.set('chevron', 'literal' in shown ? direction : { code: `${js(shown)} ? ${js(direction)} : undefined` })
+    }
+    usage.remove('selector')
+    usage.remove('selectorDirection')
+    return undefined
   },
-  Switcher: {
-    props: ['text', 'withText'],
-    apply(usage) {
-      const text = usage.get('text')
-      const shown = usage.get('withText') ?? { literal: true }
-      if (text && !usage.has('label') && !('literal' in shown && !shown.literal)) {
-        if ('literal' in shown) usage.set('label', text)
-        else if (!usage.code) return 'the value is computed'
-        else usage.set('label', { code: `${js(shown)} ? ${js(text)} : undefined` })
-      }
-      usage.remove('text')
-      usage.remove('withText')
-      return undefined
-    },
+  'switcher-label'(usage) {
+    const text = usage.get('text')
+    const shown = usage.get('withText') ?? { literal: true }
+    if (text && !usage.has('label') && !('literal' in shown && !shown.literal)) {
+      if ('literal' in shown) usage.set('label', text)
+      else if (!usage.code) return 'the value is computed'
+      else usage.set('label', { code: `${js(shown)} ? ${js(text)} : undefined` })
+    }
+    usage.remove('text')
+    usage.remove('withText')
+    return undefined
+  },
+  // The old check `collapseAfter >= 3` coerced the value, and anything else never collapsed:
+  // `maxItems` spells that `null`.
+  'breadcrumb-max-items'(usage) {
+    const value = usage.get('collapseAfter')!
+    if (!('literal' in value) && !NON_FINITE.test(value.code)) return 'the value is computed'
+    if (usage.has('maxItems')) return 'maxItems is already set'
+    const count = 'literal' in value ? Number(value.literal) : Infinity
+    const next = count >= 3 && count <= Number.MAX_SAFE_INTEGER ? Math.floor(count) : null
+    usage.rename('collapseAfter', 'maxItems')
+    if (!('literal' in value) || next !== value.literal) usage.set('maxItems', { literal: next })
+    return undefined
   },
 }
+
+/** The prop a row reads, if it names one. */
+const propOf = (row: Migration) =>
+  row.kind === 'rename-prop' || row.kind === 'move-to-labels' || row.kind === 'text-to-children'
+    ? row.from
+    : 'prop' in row
+      ? row.prop
+      : undefined
 
 function applyRow(usage: Usage, row: Migration, report: Report) {
   switch (row.kind) {
@@ -200,10 +216,20 @@ function applyRow(usage: Usage, row: Migration, report: Report) {
     }
     case 'rename-value': {
       const value = usage.get(row.prop)
-      const next = value && 'literal' in value ? row.values[String(value.literal)] : undefined
+      if (!value) return
+      if (!('literal' in value)) {
+        const quoted = Object.keys(row.values).some((old) => ["'", '"', '`'].some((q) => value.code.includes(q + old + q)))
+        return quoted ? report('manual', 'the value is computed') : undefined
+      }
+      const next = row.values[String(value.literal)]
       if (next === undefined) return
       usage.set(row.prop, { literal: next })
       return report('auto')
+    }
+    case 'retype-prop': {
+      const value = usage.get(row.prop)
+      const text = value && ('literal' in value ? String(value.literal) : value.code)
+      return text !== undefined && row.legacy && new RegExp(row.legacy).test(text) ? report('manual') : undefined
     }
     case 'move-to-labels': {
       if (!usage.has(row.from)) return
@@ -233,16 +259,19 @@ function applyRows(usage: Usage, rows: Migration[], found: Found) {
     found(part, 'auto')
   }
   const own = rows.filter((row) => row.kind !== 'export' && row.kind !== 'behavior' && row.component === usage.component)
-  const transform = transforms[usage.component]
-  const joint = own.filter(
-    (row) =>
-      row.kind === 'remove-prop' && row.codemod === 'auto' && transform?.props.includes(row.prop) && usage.has(row.prop),
-  )
-  if (joint.length) {
-    const reason = transform.apply(usage)
-    for (const row of joint) found(row, reason ? 'manual' : 'auto', reason)
+  const applied = new Set<MigrationTransform>()
+  for (const row of own) {
+    const transform = 'transform' in row ? row.transform : undefined
+    if (!transform) {
+      applyRow(usage, row, (fix, reason) => found(row, fix, reason))
+      continue
+    }
+    if (applied.has(transform)) continue
+    applied.add(transform)
+    const joint = own.filter((other) => 'transform' in other && other.transform === transform && usage.has(propOf(other)!))
+    const reason = joint.length ? transforms[transform](usage) : undefined
+    for (const other of joint) found(other, reason ? 'manual' : 'auto', reason)
   }
-  for (const row of own) if (!joint.includes(row)) applyRow(usage, row, (fix, reason) => found(row, fix, reason))
 }
 
 // ---------------------------------------------------------------------------
@@ -250,6 +279,20 @@ function applyRows(usage: Usage, rows: Migration[], found: Found) {
 // ---------------------------------------------------------------------------
 
 type JsxTag = JsxOpeningElement | JsxSelfClosingElement
+
+/** Replaces a node's text as given; ts-morph would otherwise re-indent every line after the first. */
+function replaceVerbatim(node: Node, text: string) {
+  return node.replaceWithText((writer) => {
+    writer.queueIndentationLevel(0)
+    writer.write(text)
+  })
+}
+
+/** The whitespace that starts the line a node starts on. */
+function lineIndent(node: Node) {
+  const text = node.getSourceFile().getFullText()
+  return /^[ \t]*/.exec(text.slice(text.lastIndexOf('\n', node.getStart()) + 1))![0]
+}
 
 function jsxValue(attribute: JsxAttribute): Value {
   const initializer = attribute.getInitializer()
@@ -260,6 +303,12 @@ function jsxValue(attribute: JsxAttribute): Value {
   if (Node.isStringLiteral(expression) || Node.isNoSubstitutionTemplateLiteral(expression))
     return { literal: expression.getLiteralValue() }
   if (Node.isNumericLiteral(expression)) return { literal: expression.getLiteralValue() }
+  if (
+    Node.isPrefixUnaryExpression(expression) &&
+    expression.getOperatorToken() === SyntaxKind.MinusToken &&
+    Node.isNumericLiteral(expression.getOperand())
+  )
+    return { literal: -Number(expression.getOperand().getText()) }
   if (Node.isTrueLiteral(expression) || Node.isFalseLiteral(expression))
     return { literal: expression.getLiteralValue() }
   if (Node.isNullLiteral(expression)) return { literal: null }
@@ -331,7 +380,8 @@ class JsxUsage implements Usage {
     const body = this.body()
     if (body) return void body.setBodyTextInline(text)
     const tag = this.element.getTagNameNode().getText()
-    const element = this.element.replaceWithText(
+    const element = replaceVerbatim(
+      this.element,
       this.element.getText().replace(/\s*\/>$/, `>${text}</${tag}>`),
     ) as JsxElement
     this.element = element.getOpeningElement()
@@ -345,14 +395,19 @@ class JsxUsage implements Usage {
     if (!expression) return 'labels is not an expression'
     if (Node.isObjectLiteralExpression(expression)) {
       if (expression.getProperty(key)) return `labels.${key} is already set`
+      const last = expression.getProperties().at(-1)
+      if (!last) return void expression.replaceWithText(`{ ${key}: ${initializer} }`)
+      // Append after the last entry in the object's own layout, keeping a trailing comma.
       const text = expression.getText()
-      if (text.includes('\n')) expression.addPropertyAssignment({ name: key, initializer })
-      else
-        expression.replaceWithText(
-          expression.getProperties().length
-            ? text.replace(/,?\s*\}$/, `, ${key}: ${initializer} }`)
-            : `{ ${key}: ${initializer} }`,
-        )
+      const entry = `${text.includes('\n') ? `\n${lineIndent(last)}` : ' '}${key}: ${initializer}`
+      const end = last.getEnd() - expression.getStart()
+      const comma = /^\s*,/.exec(text.slice(end))?.[0]
+      replaceVerbatim(
+        expression,
+        comma
+          ? `${text.slice(0, end + comma.length)}${entry},${text.slice(end + comma.length)}`
+          : `${text.slice(0, end)},${entry}${text.slice(end)}`,
+      )
       return undefined
     }
     this.set('labels', { code: `{ ...${expression.getText()}, ${key}: ${initializer} }` })
@@ -428,29 +483,50 @@ function moveImport(declaration: ImportDeclaration, specifier: ImportSpecifier, 
     moved = path.relative(directory, path.join(root, target)).split(path.sep).join('/')
     if (!moved.startsWith('.')) moved = `./${moved}`
   } else return `cannot rewrite ${current}`
+  const source = declaration.getSourceFile()
+  const alias = specifier.getAliasNode()?.getText() ?? (name === specifier.getName() ? undefined : specifier.getName())
+  const typeOnly = declaration.isTypeOnly()
+  // Join an import of the target module, so no file imports one module twice.
+  const existing = source.getImportDeclaration(
+    (other) =>
+      other !== declaration &&
+      other.getModuleSpecifierValue() === moved &&
+      !other.getNamespaceImport() &&
+      (typeOnly || !other.isTypeOnly()),
+  )
+  if (existing) {
+    // Imports are rewritten last to first, so inserting in front keeps their order.
+    existing.insertNamedImport(0, { name, alias, isTypeOnly: (typeOnly && !existing.isTypeOnly()) || specifier.isTypeOnly() })
+    if (declaration.getNamedImports().length > 1 || declaration.getDefaultImport()) specifier.remove()
+    else declaration.remove()
+    return undefined
+  }
   if (declaration.getNamedImports().length === 1 && !declaration.getDefaultImport()) {
     declaration.setModuleSpecifier(moved)
     return void rename()
   }
-  const alias = specifier.getAliasNode()?.getText() ?? (name === specifier.getName() ? undefined : specifier.getName())
   declaration.getProject().manipulationSettings.set({ quoteKind: declaration.getModuleSpecifier().getQuoteKind() })
-  declaration.getSourceFile().insertImportDeclaration(declaration.getChildIndex() + 1, {
+  // Above the original, since ts-morph separates an import from a following statement with a blank line.
+  const created = source.insertImportDeclaration(declaration.getChildIndex(), {
     moduleSpecifier: moved,
     namedImports: [{ name, alias, isTypeOnly: specifier.isTypeOnly() }],
-    isTypeOnly: declaration.isTypeOnly(),
+    isTypeOnly: typeOnly,
   })
+  // ts-morph ends the statement with a semicolon; follow the file instead.
+  if (!declaration.getText().endsWith(';')) replaceVerbatim(created, created.getText().replace(/;$/, ''))
   specifier.remove()
   return undefined
 }
 
 function migrateTsx(source: SourceFile, rows: Migration[], found: (row: Migration, at: string, fix: Finding['fix'], reason?: string) => void) {
   const file = source.getFilePath()
-  // Deliberate negative type tests keep their removed props.
+  // Face UI's own negative type tests keep their removed props; consumers get no such exemption.
   const expected = new Set<number>()
-  source
-    .getFullText()
-    .split('\n')
-    .forEach((line, index) => line.includes('@ts-expect-error') && expected.add(index + 2))
+  if (faceRootOf(path.dirname(file)))
+    source
+      .getFullText()
+      .split('\n')
+      .forEach((line, index) => line.includes('@ts-expect-error') && expected.add(index + 2))
   const components = new Map<string, string>()
   const namespaces = new Set<string>()
   const imports: (() => void)[] = []
@@ -572,12 +648,20 @@ function jsonUsages(document: unknown): JsonUsage[] {
       walk(child, `${pointer}/${key.replace(/~/g, '~0').replace(/\//g, '~1')}`)
   }
   walk(document, '')
+  if (!isObject(document)) return usages
   // A face document keeps the root component's current prop values beside the tree.
-  if (isObject(document) && document.schema === 'face' && isObject(document.root) && isObject(document.currentState)) {
+  if (document.schema === 'face' && isObject(document.root) && isObject(document.currentState)) {
     const { type } = document.root
     const { props } = document.currentState
     if (typeof type === 'string' && isObject(props)) usages.push(new JsonUsage(props, type, '/currentState/props'))
   }
+  // A component contract lists example prop values per state.
+  const { name, states } = document
+  if (typeof name === 'string' && !isObject(document.root) && Array.isArray(states))
+    states.forEach((state, index) => {
+      if (isObject(state) && isObject(state.props))
+        usages.push(new JsonUsage(state.props, name, `/states/${index}/props`))
+    })
   return usages
 }
 
@@ -652,7 +736,8 @@ export async function migrate(options: MigrateOptions): Promise<MigrateResult> {
       }
       for (const usage of jsonUsages(document))
         applyRows(usage, rows, (row, fix, reason) => found(row, usage.at, fix, reason))
-      const indent = /^([ \t]+)"/m.exec(text)?.[1] ?? '  '
+      // Keep the file's indentation, or none for a single-line document.
+      const indent = text.trim().includes('\n') ? (/^([ \t]+)"/m.exec(text)?.[1] ?? '  ') : undefined
       if (JSON.stringify(document) !== JSON.stringify(JSON.parse(text)))
         next = JSON.stringify(document, null, indent) + (text.endsWith('\n') ? '\n' : '')
     } else {
@@ -689,6 +774,8 @@ function describeMigration(row: Migration): string {
       return `${row.component} ${row.from} → labels.${row.key}`
     case 'text-to-children':
       return `${row.component} ${row.from} → children`
+    case 'retype-prop':
+      return `${row.component} ${row.prop} type`
     case 'export':
       return `${row.from} ${row.codemod === 'auto' && row.to ? `→ ${row.to}` : 'removed'}`
     case 'behavior':

@@ -16,4 +16,6 @@ export default [
   { kind: 'rename-prop', component: 'Slider', from: 'cropLocksValue', to: 'clampToCrop', codemod: 'auto' },
   { kind: 'export', from: 'SliderVariant', to: 'The boolean `showValue` prop', codemod: 'manual' },
   { kind: 'export', from: 'Slider/SliderAdvanced#SliderAdvanced', to: '`Slider` with `showValue` and `crop`', codemod: 'manual' },
+  { kind: 'export', from: 'Slider/SliderAdvanced#SliderAdvancedProps', to: '`SliderProps`', codemod: 'manual' },
+  { kind: 'export', from: 'Slider/SliderAdvanced#SliderCropRange', to: 'Slider/Slider#SliderCropRange', codemod: 'auto' },
 ] satisfies Migration[]
