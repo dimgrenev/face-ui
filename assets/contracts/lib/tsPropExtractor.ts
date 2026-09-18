@@ -7,9 +7,12 @@ export type ExtractedProp = {
   options?: Array<string | number | boolean>
   defaultValue?: unknown
   description?: string
+  /** Distinct JSDoc texts ('' for none) of union branches that disagree. */
+  docConflict?: string[]
 }
 
-type SourceBundle = {
+/** One authored source file and the resolver for its relative imports. */
+export type SourceBundle = {
   fileName: string
   code: string
   /** Resolve authored local types; platform declarations stay outside the editor. */
@@ -32,6 +35,84 @@ export function getPropOptions(
   )
 }
 
+/** A declaration's JSDoc on one line without tags; undefined when absent. */
+function readDoc(node: ts.Node): string | undefined {
+  const text = ts
+    .getJSDocCommentsAndTags(node)
+    .filter(ts.isJSDoc)
+    .map((doc) => ts.getTextOfJSDocComment(doc.comment) ?? '')
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return text || undefined
+}
+
+function parse({ fileName, code }: SourceBundle): ts.SourceFile {
+  return ts.createSourceFile(
+    fileName,
+    code,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX,
+  )
+}
+
+/** The component a file is named after: `Tile.tsx` exports `Tile`. */
+function componentNameOf(fileName: string): string {
+  return fileName.replace(/^.*[\\/]/, '').replace(/\.[^.]+$/, '')
+}
+
+/** Top-level functions and variables by name. */
+function topLevelBindings(source: ts.SourceFile) {
+  const bindings = new Map<
+    string,
+    ts.FunctionDeclaration | ts.VariableDeclaration
+  >()
+  for (const statement of source.statements) {
+    if (ts.isFunctionDeclaration(statement) && statement.name)
+      bindings.set(statement.name.text, statement)
+    if (ts.isVariableStatement(statement)) {
+      for (const variable of statement.declarationList.declarations) {
+        if (ts.isIdentifier(variable.name))
+          bindings.set(variable.name.text, variable)
+      }
+    }
+  }
+  return bindings
+}
+
+/** Read the JSDoc of the component declaration a file exports under its own
+ * name, following `export { Name } from './local'` to the declaring file. */
+export function extractComponentDescription(
+  bundle: SourceBundle,
+  componentName = componentNameOf(bundle.fileName),
+): string | undefined {
+  const source = parse(bundle)
+  const declaration = topLevelBindings(source).get(componentName)
+  if (declaration) return readDoc(declaration)
+  for (const statement of source.statements) {
+    if (
+      !ts.isExportDeclaration(statement) ||
+      !statement.moduleSpecifier ||
+      !ts.isStringLiteral(statement.moduleSpecifier) ||
+      !statement.exportClause ||
+      !ts.isNamedExports(statement.exportClause)
+    )
+      continue
+    const specifier = statement.exportClause.elements.find(
+      (element) => element.name.text === componentName,
+    )
+    const target =
+      specifier && bundle.resolveImport?.(statement.moduleSpecifier.text)
+    if (target)
+      return extractComponentDescription(
+        target,
+        (specifier.propertyName ?? specifier.name).text,
+      )
+  }
+  return undefined
+}
+
 /** Read the authored TypeScript contract without interpreting comments as code. */
 export function extractReactTsPropsFromSource(
   { fileName, code, resolveImport }: SourceBundle,
@@ -41,13 +122,7 @@ export function extractReactTsPropsFromSource(
   const identity = `${fileName}#${interfaceName ?? ''}`
   if (visited.has(identity)) return []
   const nextVisited = new Set([...visited, identity])
-  const source = ts.createSourceFile(
-    fileName,
-    code,
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TSX,
-  )
+  const source = parse({ fileName, code })
   const declarations = source.statements.filter(
     (node): node is ts.InterfaceDeclaration | ts.TypeAliasDeclaration =>
       ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node),
@@ -258,26 +333,11 @@ export function extractReactTsPropsFromSource(
   }
 
   const defaults = new Map<string, unknown>()
-  const componentName = fileName
-    .replaceAll('\\', '/')
-    .split('/')
-    .pop()
-    ?.replace(/\.[^.]+$/, '')
   type ComponentFunction =
     | ts.FunctionDeclaration
     | ts.FunctionExpression
     | ts.ArrowFunction
-  const bindings = new Map<string, ts.Node>()
-  for (const statement of source.statements) {
-    if (ts.isFunctionDeclaration(statement) && statement.name)
-      bindings.set(statement.name.text, statement)
-    if (ts.isVariableStatement(statement)) {
-      for (const variable of statement.declarationList.declarations) {
-        if (ts.isIdentifier(variable.name))
-          bindings.set(variable.name.text, variable)
-      }
-    }
-  }
+  const bindings = topLevelBindings(source)
   function resolveComponent(
     node: ts.Node | undefined,
     seen = new Set<ts.Node>(),
@@ -316,7 +376,7 @@ export function extractReactTsPropsFromSource(
     }
     return undefined
   }
-  const component = resolveComponent(bindings.get(componentName ?? ''))
+  const component = resolveComponent(bindings.get(componentNameOf(fileName)))
   function readBindingDefaults(binding: ts.BindingName) {
     if (!ts.isObjectBindingPattern(binding)) return
     for (const element of binding.elements) {
@@ -359,22 +419,12 @@ export function extractReactTsPropsFromSource(
       return []
     if (!member.name || ts.isComputedPropertyName(member.name)) return []
     const name = member.name.getText(source).replace(/^['"]|['"]$/g, '')
+    const description = readDoc(member)
     return [
       {
         name,
         ...classify(member.type),
-        ...(ts.getJSDocCommentsAndTags(member).length
-          ? {
-              description: ts
-                .getJSDocCommentsAndTags(member)
-                .filter(ts.isJSDoc)
-                .map((doc) =>
-                  typeof doc.comment === 'string' ? doc.comment : '',
-                )
-                .filter(Boolean)
-                .join('\n'),
-            }
-          : {}),
+        ...(description ? { description } : {}),
         required:
           !member.questionToken &&
           !(
@@ -399,9 +449,19 @@ export function extractReactTsPropsFromSource(
       )
       const last = props[props.length - 1]
       const sameType = props.every((prop) => prop.type === last.type)
+      // A contract has one description per prop, so union branches must agree;
+      // a disagreement inside a nested union survives any outer merge.
+      const docs = [
+        ...new Set(
+          props.flatMap((prop) => prop.docConflict ?? [prop.description ?? '']),
+        ),
+      ]
+      const conflict =
+        docs.length > 1 && (union || props.some((prop) => prop.docConflict))
       return {
         ...last,
         description: props.find((prop) => prop.description)?.description,
+        ...(conflict ? { docConflict: docs } : {}),
         type: sameType
           ? last.type
           : props.every((prop) =>

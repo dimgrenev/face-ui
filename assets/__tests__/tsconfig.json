@@ -6,6 +6,7 @@
     "./**/*.tsx",
     "../../*.ts",
     "../../*.tsx",
+    "../contracts/**/*.ts",
     "../../scripts/browser/**/*.ts",
     "../../scripts/browser/**/*.tsx"
   ],

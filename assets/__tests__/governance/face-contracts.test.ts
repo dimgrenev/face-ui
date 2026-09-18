@@ -1,6 +1,17 @@
-import { describe, expect, it } from 'vitest'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { createElement, type ComponentType } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { afterAll, describe, expect, it } from 'vitest'
 
-import { collectFaceJsonContracts, collectProductScenarioContracts, PRODUCT_SCENARIOS } from '../../contracts/sync-face-json'
+import {
+  buildFaceJsonContract,
+  collectFaceJsonContracts,
+  collectJsdocReport,
+  collectProductScenarioContracts,
+  PRODUCT_SCENARIOS,
+} from '../../contracts/sync-face-json'
 import { FELD_GALLERY_META } from '../../../utils/__generated__/render_gallery.meta.generated'
 
 describe('face-ui-react contracts', () => {
@@ -218,5 +229,96 @@ describe('face-ui-react contracts', () => {
     expect(contracts.has('Drawer')).toBe(false)
     expect(contracts.has('Sheet')).toBe(false)
     expect(contracts.get('Slider')?.props).not.toHaveProperty('leading')
+  })
+})
+
+describe('contract generator', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'face-contract-'))
+  afterAll(() => fs.rmSync(root, { recursive: true, force: true }))
+  function fixture(source: string, contract: Record<string, unknown> = {}) {
+    const componentDir = path.join(fs.mkdtempSync(path.join(root, 'case-')), 'Fixture')
+    fs.mkdirSync(componentDir)
+    const entry = {
+      componentName: 'Fixture',
+      componentDir,
+      sourcePath: path.join(componentDir, 'Fixture.tsx'),
+      contractPath: path.join(componentDir, 'Fixture.json'),
+    }
+    fs.writeFileSync(entry.sourcePath, source)
+    fs.writeFileSync(entry.contractPath, JSON.stringify({ name: 'Fixture', props: {}, ...contract }))
+    return entry
+  }
+
+  it('takes component and prop descriptions from JSDoc over the stored contract text', () => {
+    const stored = {
+      description: 'Stored component text.',
+      props: {
+        tone: { type: 'enum', required: false, description: 'Stored tone text.' },
+        size: { type: 'number', required: false, description: 'Stored size text.' },
+      },
+    }
+    const documented = fixture(`
+      export interface FixtureProps {
+        /** Semantic tone of the row. */
+        tone?: 'neutral' | 'accent'
+        size?: number
+      }
+      /** Row with an optional primary action. */
+      export function Fixture(props: FixtureProps) { return null }
+    `, stored)
+    const contract = buildFaceJsonContract(documented)
+    expect(contract.description).toBe('Row with an optional primary action.')
+    expect(contract.props.tone.description).toBe('Semantic tone of the row.')
+    // Undocumented props keep their stored text until W4-03 makes JSDoc mandatory.
+    expect(contract.props.size.description).toBe('Stored size text.')
+    expect(collectJsdocReport([documented])).toEqual(['Fixture.size'])
+
+    const undocumented = fixture(`
+      export interface FixtureProps {
+        /** Semantic tone of the row. */
+        tone?: 'neutral' | 'accent'
+      }
+      export function Fixture(props: FixtureProps) { return null }
+    `, stored)
+    expect(buildFaceJsonContract(undocumented).description).toBe('Stored component text.')
+    expect(collectJsdocReport([undocumented])).toEqual(['Fixture (component)'])
+  })
+
+  it('fails when union branches document the same prop differently', () => {
+    const entry = fixture(`
+      interface Single {
+        /** Select one option. */
+        multiple?: false
+      }
+      interface Multiple {
+        /** Select any number of options. */
+        multiple: true
+      }
+      export type FixtureProps = Single | Multiple
+      /** Option picker. */
+      export function Fixture(props: FixtureProps) { return null }
+    `)
+    expect(() => buildFaceJsonContract(entry)).toThrow(
+      'Fixture: union branches must share one JSDoc per prop:\n  multiple: "Select one option." vs "Select any number of options."',
+    )
+    expect(collectJsdocReport([entry])).toEqual(['Fixture.multiple (union branches differ)'])
+  })
+
+  it('renders every disclosure example as a focusable control, not an inert element with aria-expanded', async () => {
+    const examples = [
+      ...collectFaceJsonContracts().flatMap(({ componentName, nextContract }) =>
+        (nextContract.states ?? []).map((state) => ({ componentName, name: state.name, props: state.props }))),
+      ...collectProductScenarioContracts().map(({ componentName, scenarioName, nextContract }) =>
+        ({ componentName, name: scenarioName, props: nextContract.currentState.props })),
+    ].filter(({ props }) => 'aria-expanded' in props)
+    expect(examples.length).toBeGreaterThan(0)
+
+    for (const { componentName, name, props } of examples) {
+      const module = await import(`../../../${componentName}/${componentName}.tsx`)
+      const html = renderToStaticMarkup(createElement(module[componentName] as ComponentType, props))
+      const inert = (html.match(/<[a-z]+\b[^>]*\saria-expanded="[^"]*"[^>]*>/g) ?? [])
+        .filter((tag) => !tag.startsWith('<button') && !/\stabindex="0"/.test(tag))
+      expect(inert, `${componentName}: ${name}`).toEqual([])
+    }
   })
 })
