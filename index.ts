@@ -85,7 +85,7 @@ export { Tree } from './Tree/Tree'
 export type { TreeProps, TreeNode } from './Tree/Tree'
 
 // Shared utilities and types
-export type { FormControlProps } from './assets/form-control-props'
+export type { FieldProps } from './assets/internal/field'
 export type { NavItemBase } from './assets/nav-item'
 export type { RangeValueDetails } from './assets/internal/range-indicator'
 export { cn } from './assets/utils'

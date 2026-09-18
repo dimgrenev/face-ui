@@ -37,4 +37,10 @@ export default [
     to: 'Remove the call; each component owns its membrane',
     codemod: 'manual',
   },
+  {
+    kind: 'export',
+    from: 'FormControlProps',
+    to: '`FieldProps` for label, description, error and labelPosition; each control declares disabled, required, name, membrane and className itself',
+    codemod: 'manual',
+  },
 ] satisfies Migration[]
