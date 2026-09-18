@@ -2,12 +2,12 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Tooltip",
-  "description": "Non-interactive floating text hint anchored to a trigger element",
+  "description": "Non-interactive floating text hint anchored to a trigger element, shown on hover and keyboard focus.",
   "props": {
     "content": {
       "type": "ReactNode",
       "required": false,
-      "description": "Floating content. Empty content leaves the trigger without a layer. Tooltip content must be noninteractive."
+      "description": "Content of the floating surface; empty content renders the trigger alone. Tooltip content must stay noninteractive."
     },
     "children": {
       "type": "ReactNode",
@@ -17,12 +17,12 @@
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled visibility. Changes from the parent do not emit onOpenChange."
+      "description": "Controlled visibility; updates from the parent never call onOpenChange."
     },
     "defaultOpen": {
       "type": "boolean",
       "required": false,
-      "description": "Initial uncontrolled visibility; later changes do not reset the layer."
+      "description": "Visibility on mount when `open` is not set; read once."
     },
     "side": {
       "type": "enum",
@@ -48,22 +48,22 @@
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Additional nonnegative gap in pixels before the content membrane."
+      "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2."
     },
     "dir": {
       "type": "string",
       "required": false,
-      "description": "Content direction. Omitted inherits the trigger; auto follows the content."
+      "description": "Content direction; omitted inherits the trigger's, auto follows the content."
     },
     "openDelay": {
       "type": "number",
       "required": false,
-      "description": "Hover/focus opening delay in milliseconds (0–2147483647); default 200."
+      "description": "Milliseconds from hover or focus to showing the surface, 0–2147483647; default 200."
     },
     "closeDelay": {
       "type": "number",
       "required": false,
-      "description": "Closing delay after hover and focus leave (0–2147483647); default 0."
+      "description": "Milliseconds from hover and focus leaving to hiding the surface, 0–2147483647; default 0."
     }
   },
   "states": [

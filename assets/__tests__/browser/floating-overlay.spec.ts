@@ -127,6 +127,54 @@ test('Escape dismisses focused Tooltip and it stays closed until a new intent', 
   await page.locator('#trigger').focus()
   await expect(page.getByRole('tooltip')).toBeVisible()
 })
+test('hover card: Escape returns focus to the trigger and the card stays closed until a new hover', { tag: ['@pointer', '@focus'] }, async ({
+  page,
+}) => {
+  await render(page, {
+    kind: 'hovercard',
+    reset: true,
+    props: { openDelay: 0, closeDelay: 100, side: 'bottom', sideOffset: 12 },
+  })
+  const trigger = page.locator('#trigger'),
+    card = page.getByRole('dialog')
+  await trigger.hover()
+  await expect(card).toBeVisible()
+  const action = card.getByRole('button', { name: 'Action' })
+  const box = await action.boundingBox()
+  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2, { steps: 12 })
+  await expect(card).toBeVisible()
+  await action.focus()
+  await page.keyboard.press('Escape')
+  await expect(card).toBeHidden()
+  await expect(trigger).toBeFocused()
+  await page.waitForTimeout(400)
+  await expect(card).toBeHidden()
+  await trigger.hover()
+  await expect(card).toBeVisible()
+  expect(await page.evaluate(() => (window as any).floatingEvents)).toEqual([
+    { open: true },
+    { open: false },
+    { open: true },
+  ])
+})
+test('hover card: leaving with the pointer closes it after closeDelay without taking focus', { tag: ['@pointer', '@focus'] }, async ({
+  page,
+}) => {
+  await render(page, {
+    kind: 'hovercard',
+    reset: true,
+    props: { openDelay: 0, closeDelay: 600, side: 'bottom' },
+  })
+  const card = page.getByRole('dialog')
+  await page.locator('#trigger').hover()
+  await expect(card).toBeVisible()
+  await page.locator('h1').hover()
+  await expect(card).toBeVisible()
+  await expect(card).toBeHidden()
+  await expect(page.locator('body')).toBeFocused()
+  await page.waitForTimeout(700)
+  await expect(card).toBeHidden()
+})
 for (const triggerKind of ['native-disabled', 'face-disabled'] as const)
   test(`Tooltip can explain a ${triggerKind} action with pointer hover`, { tag: ['@pointer', '@layout'] }, async ({
     page,

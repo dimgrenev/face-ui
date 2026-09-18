@@ -7,7 +7,6 @@ import {
   type ReactNode,
 } from 'react'
 import type { Root } from 'react-dom/client'
-import { renderToString } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Tooltip } from '../../Tooltip/Tooltip'
 import { Popover } from '../../Popover/Popover'
@@ -15,7 +14,11 @@ import { Overlay } from '../../Overlay/Overlay'
 import { Menu } from '../../Menu/Menu'
 import { Select } from '../../Select/Select'
 import { Modal } from '../../Modal/Modal'
-import { hydrate, mount } from './harness'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { expectDevError, hydrate, mount } from './harness'
+import { describeControlled } from './harness/controlled'
+import { modulesOf, repo } from './governance/gates'
 
 let root: Root, host: HTMLDivElement
 const render = async (node: ReactNode) => act(async () => root.render(node))
@@ -218,67 +221,96 @@ for (const [name, Component] of [
     })
   })
 
-it('Popover rejects hover-only props at runtime for untyped consumers', async () => {
-  for (const props of [
-    { openDelay: 1 },
-    { closeDelay: 1 },
-    { interactive: true },
-  ]) {
-    expect(() =>
-      renderToString(
-        <Popover {...(props as any)} content="Help">
-          Trigger
-        </Popover>,
-      ),
-    ).toThrow(/Click overlays/)
-  }
+it('Popover ignores hover-only props from untyped consumers', async () => {
+  await render(
+    <Popover {...({ openDelay: 500, closeDelay: 500, interactive: false } as any)} content="Help">
+      <button>Trigger</button>
+    </Popover>,
+  )
+  expect(surface()?.getAttribute('role')).toBe('dialog')
+  await focus()
+  expect(visible()).toBe(false)
+  await click()
+  expect(visible()).toBe(true)
 })
-it.each([
-  { side: 'above' },
-  { align: 'left' },
-  { sideOffset: -1 },
-  { sideOffset: NaN },
-  { sideOffset: Infinity },
-  { sideOffset: '4' },
-  { open: null },
-  { defaultOpen: 1 },
-  { dir: 'sideways' },
-  { openDelay: -1 },
-  { openDelay: Infinity },
-  { openDelay: NaN },
-  { openDelay: null },
-  { closeDelay: '1' },
-  { closeDelay: 2147483648 },
-])(
-  'rejects invalid props %s instead of broken positions or overflowing timers',
-  (props) => {
-    expect(() =>
-      renderToString(
-        <Tooltip {...(props as any)} content="Help">
-          Trigger
-        </Tooltip>,
-      ),
-    ).toThrow()
-  },
-)
-it('legacy hovercard validates interactive and click discrimination', () => {
-  expect(() =>
-    renderToString(
-      <Overlay {...({ interactive: 'yes' } as any)} content="Help">
-        Trigger
+describe('invalid props render normalized (§2 #48-58)', () => {
+  const tooltip = (props: Record<string, unknown>) => (
+    <Tooltip open content="Help" {...props}>
+      <button>Trigger</button>
+    </Tooltip>
+  )
+  it.each([
+    { side: 'above' },
+    { align: 'left' },
+    { dir: 'sideways' },
+    { open: null },
+    { defaultOpen: 1 },
+  ])('%o renders without a report', async (props) => {
+    await render(tooltip(props))
+    expect(surface()).not.toBeNull()
+  })
+  it.each([
+    ['sideOffset', NaN, 'using 2'],
+    ['sideOffset', Infinity, 'using 2'],
+    ['sideOffset', '4', 'using 2'],
+    ['openDelay', -1, 'using 0'],
+    ['openDelay', Infinity, 'using 200'],
+    ['openDelay', NaN, 'using 200'],
+    ['openDelay', null, 'using 200'],
+    ['closeDelay', '1', 'using 0'],
+    ['closeDelay', 2147483648, 'using 2147483647'],
+  ])('%s %s is reported and replaced (%s)', async (prop, value, outcome) => {
+    await expectDevError(
+      () => render(tooltip({ [prop]: value })),
+      new RegExp(`^Face UI Tooltip: invalid ${prop} .*; ${outcome}\\.$`),
+    )
+    expect(visible()).toBe(true)
+  })
+  it('a negative sideOffset is a legal overlap', async () => {
+    await render(tooltip({ sideOffset: -4 }))
+    expect(visible()).toBe(true)
+  })
+  it('reports name the component that renders', async () => {
+    await expectDevError(
+      () =>
+        render(
+          <Popover open content="Help" sideOffset={'x' as any}>
+            <button>Trigger</button>
+          </Popover>,
+        ),
+      /^Face UI Popover: invalid sideOffset "x"; using 2\.$/,
+    )
+    await expectDevError(
+      () =>
+        render(
+          <Overlay open content="Help" openDelay={-5}>
+            <button>Trigger</button>
+          </Overlay>,
+        ),
+      /^Face UI Overlay: invalid openDelay -5; using 0\.$/,
+    )
+  })
+  it('hover delays of a click overlay are ignored, not reported', async () => {
+    await render(
+      <Overlay {...({ openOn: 'click', openDelay: -1, interactive: 'yes' } as any)} content="Help">
+        <button>Trigger</button>
       </Overlay>,
-    ),
-  ).toThrow(/interactive/)
-  expect(() =>
-    renderToString(
-      <Overlay
-        {...({ trigger: 'click', interactive: true } as any)}
-        content="Help"
-      >
-        Trigger
-      </Overlay>,
-    ),
-  ).toThrow(/Click overlays/)
+    )
+    await click()
+    expect(visible()).toBe(true)
+  })
+})
+it('Overlay reads interactive by truthiness and openOn other than click as hover', async () => {
+  vi.useFakeTimers()
+  await render(
+    <Overlay {...({ openOn: 'focus', interactive: 'yes' } as any)} openDelay={0} content="Help">
+      <button>Trigger</button>
+    </Overlay>,
+  )
+  expect(surface()?.getAttribute('role')).toBe('dialog')
+  expect(surface()?.getAttribute('data-trigger')).toBe('hover')
+  await focus()
+  expect(visible()).toBe(true)
 })
 it('Popover uses its trigger for an accessible name unless the caller provides one', async () => {
   await render(
@@ -538,7 +570,10 @@ describe('hover timing and combined intent', () => {
 it('releasing controlled mode retains the last externally selected visibility', async () => {
   const change = vi.fn()
   await render(<Popover open content="Content" onOpenChange={change}><button>Trigger</button></Popover>)
-  await render(<Popover content="Content" onOpenChange={change}><button>Trigger</button></Popover>)
+  await expectDevError(
+    () => render(<Popover content="Content" onOpenChange={change}><button>Trigger</button></Popover>),
+    /^Face UI Popover: missing open; keeping the last controlled value\.$/,
+  )
   expect(visible()).toBe(true)
   await click(); expect(visible()).toBe(false)
   expect(change.mock.calls).toEqual([[{ open: false }]])
@@ -567,11 +602,11 @@ it('hovercard focus can move between trigger and content before leaving the pair
   await act(async () => outside.focus())
   expect(visible()).toBe(false); outside.remove()
 })
-it('changing legacy hover to click cancels a pending hover opening', async () => {
+it('changing Overlay openOn from hover to click cancels a pending hover opening', async () => {
   vi.useFakeTimers()
   await render(<Overlay openDelay={100} content="Help"><button>Trigger</button></Overlay>)
   await focus(); await advance(20)
-  await render(<Overlay trigger="click" content="Help"><button>Trigger</button></Overlay>)
+  await render(<Overlay openOn="click" content="Help"><button>Trigger</button></Overlay>)
   await advance(200); expect(visible()).toBe(false)
   await click(); expect(visible()).toBe(true)
 })
@@ -579,9 +614,16 @@ it('external open during a pending hover opens immediately and remains on contro
   vi.useFakeTimers()
   await render(<Tooltip openDelay={100} content="Help"><button>Trigger</button></Tooltip>)
   await focus(); await advance(20)
-  await render(<Tooltip open openDelay={100} content="Help"><button>Trigger</button></Tooltip>)
+  await expectDevError(
+    () => render(<Tooltip open openDelay={100} content="Help"><button>Trigger</button></Tooltip>),
+    /^Face UI Tooltip: invalid open true; switching from uncontrolled to controlled\.$/,
+  )
   expect(visible()).toBe(true)
-  await render(<Tooltip openDelay={100} content="Help"><button>Trigger</button></Tooltip>)
+  await expectDevError(
+    () => render(<Tooltip openDelay={100} content="Help"><button>Trigger</button></Tooltip>),
+    /^Face UI Tooltip: missing open; /,
+  )
+  await advance(200)
   expect(visible()).toBe(true)
 })
 it('content native pointer cancellation is respected', async () => {
@@ -591,10 +633,10 @@ it('content native pointer cancellation is respected', async () => {
   await pointer(surface()!, 'pointerover', trigger()); await advance(20)
   expect(visible()).toBe(false)
 })
-it('fixed Tooltip/Popover modes survive untyped trigger spreads', async () => {
-  await render(<Tooltip {...{ trigger: 'click', interactive: true } as any} openDelay={0} content="Help"><button>Trigger</button></Tooltip>)
+it('fixed Tooltip/Popover modes survive untyped openOn spreads', async () => {
+  await render(<Tooltip {...{ openOn: 'click', interactive: true } as any} openDelay={0} content="Help"><button>Trigger</button></Tooltip>)
   await focus(); expect(surface()?.getAttribute('role')).toBe('tooltip')
-  await render(<Popover {...{ trigger: 'hover' } as any} content="Help"><button>Trigger</button></Popover>)
+  await render(<Popover {...{ openOn: 'hover' } as any} content="Help"><button>Trigger</button></Popover>)
   await focus(); expect(visible()).toBe(false)
   await click(); expect(visible()).toBe(true)
 })
@@ -702,4 +744,156 @@ it('§5 #5: Tooltip, Popover, Menu, Select and Modal inside <p> hydrate without 
   expect(server.querySelector('[role="tooltip"], [role="dialog"], [role="menu"]')).toBeNull()
   expect(document.querySelectorAll('.uf-overlay-content')).toHaveLength(2)
   expect(document.querySelectorAll('[role="menu"], .uf-modal')).toHaveLength(2)
+})
+
+const shownIn = () => {
+  const node = document.querySelector<HTMLElement>('.uf-overlay-content')
+  return !!node && !node.hidden
+}
+const dispatchPointer = (node: Element, type: 'pointerover' | 'pointerout') => {
+  const event = new MouseEvent(type, { bubbles: true, cancelable: true })
+  Object.defineProperty(event, 'pointerType', { value: 'mouse' })
+  node.dispatchEvent(event)
+}
+const escape = () => {
+  document.dispatchEvent(
+    new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+  )
+}
+describeControlled({
+  name: 'Tooltip',
+  prop: 'open',
+  values: [false, true],
+  render: (props) => (
+    <Tooltip content="Help" openDelay={0} closeDelay={0} {...props}>
+      <button>Trigger</button>
+    </Tooltip>
+  ),
+  change: (host, to) => {
+    const button = host.querySelector('button')!
+    if (!to) return escape()
+    dispatchPointer(button, 'pointerout')
+    dispatchPointer(button, 'pointerover')
+  },
+  read: shownIn,
+})
+describeControlled({
+  name: 'Popover',
+  prop: 'open',
+  values: [false, true],
+  render: (props) => (
+    <Popover content="Details" {...props}>
+      <button>Trigger</button>
+    </Popover>
+  ),
+  change: (host) => host.querySelector('button')!.click(),
+  read: shownIn,
+})
+
+describe('open is stored in exactly one place', () => {
+  it('no machine: the overlays reach no state machine and keep open in one useControllableState', () => {
+    for (const name of ['Tooltip', 'Popover', 'Overlay'])
+      expect(
+        modulesOf(name).filter((path) => /machines\/|use-machine|create-machine/.test(path)),
+      ).toEqual([])
+    const source = readFileSync(join(repo, 'assets/adapters/react/FloatingOverlay.tsx'), 'utf8')
+    expect(source.match(/useControllableState[<(]/g)).toHaveLength(1)
+    expect(source).not.toMatch(/\buse(State|Reducer|SyncExternalStore)\b/)
+  })
+  it('a parent-controlled open wins over pending hover timers in both directions', async () => {
+    vi.useFakeTimers()
+    const change = vi.fn()
+    const view = (open: boolean) => (
+      <Tooltip open={open} openDelay={100} closeDelay={100} content="Help" onOpenChange={change}>
+        <button>Trigger</button>
+      </Tooltip>
+    )
+    await render(view(false))
+    await pointer(trigger(), 'pointerover')
+    await render(view(true))
+    await advance(1000)
+    expect(visible()).toBe(true)
+    await pointer(trigger(), 'pointerout')
+    await render(view(false))
+    await advance(1000)
+    expect(visible()).toBe(false)
+    expect(change).not.toHaveBeenCalled()
+  })
+})
+
+describe('§5 #3: an interactive hover card neither steals focus nor reopens', () => {
+  const log = vi.fn()
+  const card = (
+    <Overlay
+      interactive
+      openDelay={200}
+      closeDelay={300}
+      onOpenChange={log}
+      content={<button id="card-action">Action</button>}
+    >
+      <button id="card-trigger">Trigger</button>
+    </Overlay>
+  )
+  const cardTrigger = () => document.getElementById('card-trigger')!
+  const action = () => document.getElementById('card-action')!
+  beforeEach(() => {
+    vi.useFakeTimers()
+    log.mockClear()
+  })
+
+  it('pointer leave: the card closes after closeDelay and focus stays on <body>', async () => {
+    await render(card)
+    await pointer(cardTrigger(), 'pointerover')
+    await advance(200)
+    expect(visible()).toBe(true)
+    await pointer(cardTrigger(), 'pointerout', document.body)
+    await advance(299)
+    expect(visible()).toBe(true)
+    await advance(1)
+    expect(visible()).toBe(false)
+    expect(document.activeElement).toBe(document.body)
+    await advance(1000)
+    expect(visible()).toBe(false)
+    expect(log.mock.calls).toEqual([[{ open: true }], [{ open: false }]])
+  })
+
+  it('Escape from inside a hover-opened card: focus returns to the trigger and the card stays closed', async () => {
+    await render(card)
+    await pointer(cardTrigger(), 'pointerover')
+    await advance(200)
+    await pointer(cardTrigger(), 'pointerout', surface())
+    await pointer(surface()!, 'pointerover', cardTrigger())
+    await act(async () => action().focus())
+    await act(async () => {
+      action().dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+      )
+    })
+    expect(visible()).toBe(false)
+    expect(document.activeElement).toBe(cardTrigger())
+    await advance(1000)
+    expect(visible()).toBe(false)
+    expect(log.mock.calls).toEqual([[{ open: true }], [{ open: false }]])
+  })
+
+  it('Escape from inside a focus-opened card: focus returns to the trigger and the card stays closed', async () => {
+    await render(card)
+    await act(async () => cardTrigger().focus())
+    await advance(200)
+    await act(async () => action().focus())
+    await act(async () => {
+      action().dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+      )
+    })
+    expect([visible(), document.activeElement]).toEqual([false, cardTrigger()])
+    await advance(1000)
+    expect(visible()).toBe(false)
+    // A later deliberate focus is a new intent.
+    await act(async () => document.body.focus())
+    await act(async () => (document.activeElement as HTMLElement).blur())
+    await act(async () => cardTrigger().focus())
+    await advance(200)
+    expect(visible()).toBe(true)
+  })
 })

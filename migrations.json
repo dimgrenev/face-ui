@@ -545,6 +545,13 @@
       "after": "`scrollLock` defaults to `portal`: a portaled modal locks page scroll unless `scrollLock={false}`"
     },
     {
+      "kind": "rename-prop",
+      "component": "Overlay",
+      "from": "trigger",
+      "to": "openOn",
+      "codemod": "auto"
+    },
+    {
       "kind": "remove-prop",
       "component": "Popover",
       "prop": "interactive",

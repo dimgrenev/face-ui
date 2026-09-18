@@ -167,12 +167,12 @@ const oneImplementation = (component: string) =>
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
   'D2 throw': [
-    'Accordion', 'Breadcrumb', 'Calendar', 'Date', 'Menu', 'Overlay', 'Pagination', 'Popover', 'Rating', 'SegmentedControl',
-    'Select', 'Slider', 'Steps', 'Tabs', 'Toggle', 'Tooltip',
+    'Accordion', 'Breadcrumb', 'Calendar', 'Date', 'Pagination', 'Rating', 'SegmentedControl', 'Slider', 'Steps', 'Tabs',
+    'Toggle',
   ],
   'D3 machines': [
-    'Accordion', 'Avatar', 'Carousel', 'Checkbox', 'Command', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Pagination',
-    'Panel', 'Popover', 'Radio', 'Select', 'Steps', 'Switcher', 'Table', 'Toast', 'Toc', 'Tooltip', 'Tree', 'Upload',
+    'Accordion', 'Avatar', 'Carousel', 'Checkbox', 'Command', 'Input', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel',
+    'Radio', 'Select', 'Steps', 'Switcher', 'Table', 'Toast', 'Toc', 'Tree', 'Upload',
   ],
   'D3 isomorphic layout effect': [
     'Accordion', 'Avatar', 'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
@@ -186,8 +186,8 @@ const PENDING = {
     'Steps', 'Toc', 'Tree',
   ],
   'D5 one implementation': [
-    'Accordion', 'Breadcrumb', 'Calendar', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Panel',
-    'Popover', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps', 'Tabs', 'Tooltip', 'Tree', 'Upload',
+    'Accordion', 'Breadcrumb', 'Calendar', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Panel', 'Rating',
+    'SegmentedControl', 'Select', 'Slider', 'Steps', 'Tabs', 'Tree', 'Upload',
   ],
 } satisfies Record<string, readonly string[]>
 

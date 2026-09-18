@@ -153,6 +153,12 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | --- | --- | --- |
 | `scrollLock` defaulted to `false` | `scrollLock` defaults to `portal`: a portaled modal locks page scroll unless `scrollLock={false}` | — |
 
+### Overlay
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `trigger` | `openOn` | auto |
+
 ### Popover
 
 | Before | After | Codemod |

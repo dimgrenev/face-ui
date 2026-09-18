@@ -90,8 +90,6 @@ describeGate('reachability: component CSS classes', PENDING.css, (component) =>
 const PENDING_SHARED = {
   modules: [
     'assets/adapters/react/inert-prop.ts',
-    'assets/adapters/react/use-controllable-state.ts',
-    'assets/adapters/react/use-event-callback.ts',
     'assets/adapters/react/use-focus-recovery.ts',
     'assets/adapters/react/use-roving-focus.ts',
     'assets/internal/item.ts',

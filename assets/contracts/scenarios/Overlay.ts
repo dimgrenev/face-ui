@@ -4,7 +4,7 @@ export default [
   {
     name: 'Product / Hover Help',
     props: {
-      trigger: 'hover',
+      openOn: 'hover',
       children: 'API limits',
       content: 'Limits reset at the start of each billing cycle.',
       side: 'top',
@@ -16,7 +16,7 @@ export default [
   {
     name: 'Product / Click Inspector',
     props: {
-      trigger: 'click',
+      openOn: 'click',
       children: 'Inspect run',
       content: 'Latency: 1.8s. Tokens: 2,460. Cache hit: 72%.',
       side: 'right',
