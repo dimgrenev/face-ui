@@ -1,14 +1,15 @@
 import React from 'react';
+import { invalidProp } from './runtime/props';
 
 export interface IconProps {
-  /** Built-in Face UI icon name. Unknown names render the notdef glyph. */
+  /** Built-in Face UI icon name. An unknown name renders the notdef glyph; an empty one renders nothing. */
   name: IconName | string;
   className?: string;
   /** Paint/transform styles. The design-system box is fixed at 20px; width/height are not configurable. */
   style?: Omit<React.CSSProperties, 'width' | 'height'>;
-  /** Accessible label. If omitted, icon is decorative. */
-  label?: string;
-  /** SVG title: native pointer hint and accessible name when label is absent. */
+  /** Accessible name of a meaningful icon; without it and `title` the icon is decorative. */
+  'aria-label'?: string;
+  /** SVG title: native pointer hint and accessible name when aria-label is absent. */
   title?: string;
 }
 
@@ -756,25 +757,22 @@ const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
 
 const BUILTIN_ICON_FALLBACK: IconName = 'notdef';
 
-function resolveBuiltinIconName(requestedName: string | undefined): IconName | undefined {
-  if (!requestedName) return undefined;
-  return Object.prototype.hasOwnProperty.call(icons, requestedName)
-    ? requestedName as IconName
-    : BUILTIN_ICON_FALLBACK;
-}
+/** Trimmed text of a string attribute; blank or non-string values count as absent. */
+const textOf = (value: unknown) => (typeof value === 'string' ? value.trim() : '') || undefined;
 
 /** Face UI icon renderer. Built-in icons always render at 20x20; unsupported sources render notdef. */
 export const Icon: React.FC<IconProps> = ({
   name,
   className = '',
   style = {},
-  label,
+  'aria-label': ariaLabel,
   title,
 }) => {
-  const requestedName = typeof name === 'string' && name.trim().length > 0 ? name.trim() : undefined;
-  const builtinName = resolveBuiltinIconName(requestedName);
-
-  if (!builtinName) return null;
+  const requestedName = textOf(name);
+  if (!requestedName) return null;
+  const known = Object.prototype.hasOwnProperty.call(icons, requestedName);
+  if (!known) invalidProp('Icon', 'name', requestedName, 'rendering notdef');
+  const builtinName = known ? requestedName as IconName : BUILTIN_ICON_FALLBACK;
 
   const mergedStyle: React.CSSProperties = {
     ...style,
@@ -783,8 +781,8 @@ export const Icon: React.FC<IconProps> = ({
   };
 
   const mergedClassName = ['uf-icon', className].filter(Boolean).join(' ');
-  const accessibleLabel = label?.trim() || undefined;
-  const accessibleTitle = title?.trim() || undefined;
+  const accessibleLabel = textOf(ariaLabel);
+  const accessibleTitle = textOf(title);
   const ariaProps = accessibleLabel || accessibleTitle
     ? { role: 'img' as const, 'aria-label': accessibleLabel }
     : { 'aria-hidden': true as const };

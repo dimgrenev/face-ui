@@ -1,7 +1,7 @@
 /**
  * Card — composable contained surface.
  *
- * `<Card title="Settings" content={<Form />} />`
+ * `<Card title="Settings"><Form /></Card>`
  * `<Card><Card.Header><Card.Title>Settings</Card.Title></Card.Header></Card>`
  */
 
@@ -45,18 +45,27 @@ export interface CardProps
     | 'defaultChecked'
     | 'defaultValue'
   > {
+  /** Heading of the card header, rendered through Card.Title. With `title`, `description` or `footer` set, children fill the content part. */
   title?: ReactNode
+  /** Secondary text under the title, rendered through Card.Description. */
   description?: ReactNode
-  content?: SlotContent
+  /** Footer content: text, elements, component descriptors or arrays of them. */
   footer?: SlotContent
+  /** Surface role: a standard contained surface, an unframed composition (`plain`) or a code canvas (`code`). Default: default. */
   variant?: CardVariant
+  /** Inner surface inset, from the standard 7px rhythm down to flush. Default: default. */
   padding?: CardPadding
+  /** Corner geometry for contained, compact, dialog or flush surfaces. Default: md. */
   radius?: CardRadius
+  /** Draw the surface border, independently of padding, radius and variant. Default: true. */
   border?: boolean
   /** Highlight the surface on hover or focus within; does not create an action. */
   hoverable?: boolean
+  /** Stretch to the available inline size; `false` fits the content and keeps the parent's alignment. Default: true. */
   fullWidth?: boolean
+  /** Alignment of the `footer` content; compound usage sets `Card.Footer align` instead. Default: end. */
   footerAlign?: CardAlign
+  /** Body of the card: the content part beside `title`/`description`/`footer`, or free composition of Card parts. */
   children?: SlotContent
 }
 
@@ -65,18 +74,22 @@ export interface CardSlotProps
     HTMLAttributes<HTMLDivElement>,
     'children' | 'dangerouslySetInnerHTML' | 'defaultChecked' | 'defaultValue'
   > {
+  /** Content of the part; a string renders as body text. */
   children?: SlotContent
 }
 
 export interface CardHeaderProps extends CardSlotProps {
+  /** Stack title and description, or lay the header out in a row. Default: vertical. */
   orientation?: CardHeaderOrientation
 }
 
 export interface CardFooterProps extends CardSlotProps {
+  /** Placement of the footer content along the inline axis. Default: end. */
   align?: CardAlign
 }
 
 export interface CardActionsProps extends CardSlotProps {
+  /** Placement of the actions along the inline axis. Default: end. */
   align?: CardAlign
 }
 
@@ -233,7 +246,6 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
     const {
       title,
       description,
-      content,
       footer,
       variant = 'default',
       padding = 'default',
@@ -248,12 +260,9 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
     } = props
 
     const hasStructuredProps =
-      title != null || description != null || content != null || footer != null
+      title != null || description != null || footer != null
     const hasTitle = hasSlotContent(title)
     const hasDescription = hasSlotContent(description)
-    const hasHeader = hasTitle || hasDescription
-    const hasContent = hasSlotContent(content ?? children)
-    const hasFooter = hasSlotContent(footer)
 
     return (
       <div
@@ -264,7 +273,7 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
       >
         {hasStructuredProps ? (
           <>
-            {hasHeader ? (
+            {hasTitle || hasDescription ? (
               <CardHeader>
                 {hasTitle ? <CardTitle>{title}</CardTitle> : null}
                 {hasDescription ? (
@@ -272,10 +281,10 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
                 ) : null}
               </CardHeader>
             ) : null}
-            {hasContent ? (
-              <CardContent>{content ?? children}</CardContent>
+            {hasSlotContent(children) ? (
+              <CardContent>{children}</CardContent>
             ) : null}
-            {hasFooter ? (
+            {hasSlotContent(footer) ? (
               <CardFooter align={footerAlign}>{footer}</CardFooter>
             ) : null}
           </>

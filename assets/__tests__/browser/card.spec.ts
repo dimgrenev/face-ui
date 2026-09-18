@@ -19,7 +19,7 @@ test('Card border remains independent of all padding, radius and variant combina
       for (const radius of ['none', 'md', 'lg'] as const) {
         for (const border of [true, false]) {
           await render(page, {
-            content: 'Surface',
+            children: 'Surface',
             variant,
             padding,
             radius,
@@ -83,10 +83,10 @@ test('Card fullWidth changes width without silently changing alignment', { tag: 
   page,
 }) => {
   const card = page.locator('[data-scope="card"][data-part="root"]')
-  await render(page, { content: 'Short', fullWidth: true })
+  await render(page, { children: 'Short', fullWidth: true })
   await expect(card).toHaveAttribute('data-full-width', '')
   const full = (await card.boundingBox())!
-  await render(page, { content: 'Short', fullWidth: false })
+  await render(page, { children: 'Short', fullWidth: false })
   await expect(card).not.toHaveAttribute('data-full-width')
   const compact = (await card.boundingBox())!
   expect(compact.width).toBeLessThan(full.width)
@@ -98,7 +98,7 @@ test('Card footerAlign positions primitive footer text as well as composed contr
   const positions: number[] = []
   for (const footerAlign of ['start', 'end'] as const) {
     await render(page, {
-      content: 'Card content',
+      children: 'Card content',
       footer: 'Updated today',
       footerAlign,
     })
@@ -120,7 +120,7 @@ test('Card hoverable styling has an actual hover effect for every variant', { ta
   const card = page.locator('[data-scope="card"][data-part="root"]')
   for (const variant of ['default', 'plain', 'code'] as const) {
     await page.mouse.move(1000, 500)
-    await render(page, { content: 'Card content', variant, hoverable: true })
+    await render(page, { children: 'Card content', variant, hoverable: true })
     await expect(card).toHaveAttribute('data-card-variant', variant)
     const before = await card.evaluate((node) => {
       const s = getComputedStyle(node)
@@ -161,7 +161,7 @@ test('Card header orientation places a long title and actions on the requested a
                 R.createElement(
                   Card.Actions,
                   { align },
-                  R.createElement(Button, { text: 'Edit' }),
+                  R.createElement(Button, { children: 'Edit' }),
                 ),
               ),
             })
@@ -236,8 +236,8 @@ test('Card footer and actions alignment works for multiple controls in LTR and R
               children: R.createElement(
                 Card[part],
                 { align },
-                R.createElement(Button, { text: 'One' }),
-                R.createElement(Button, { text: 'Two' }),
+                R.createElement(Button, { children: 'One' }),
+                R.createElement(Button, { children: 'Two' }),
               ),
             })
           },
@@ -281,10 +281,10 @@ test('Card wraps long primitive body content inside the available width', { tag:
 }) => {
   for (const fullWidth of [true, false]) {
     await render(page, {
-      content: 'LongUnbrokenWorkspaceIdentifier'.repeat(15),
+      children: 'LongUnbrokenWorkspaceIdentifier'.repeat(15),
       fullWidth,
     })
-    const body = page.locator('[data-part="content"]')
+    const body = page.locator('[data-scope="card"][data-part="root"]')
     const metrics = await body.evaluate((node) => {
       const content = node.querySelector('.uf-text__content')!
       return {
@@ -322,7 +322,7 @@ test('Card typography slots preserve icon, inset, membrane, width, alignment and
       for (const inset of ['control', 'none'] as const) {
         for (const iconPosition of ['start', 'end'] as const) {
           await renderPart({
-            text: 'Slot',
+            children: 'Slot',
             icon: 'user',
             iconPosition,
             inset,
@@ -353,8 +353,8 @@ test('Card typography slots preserve icon, inset, membrane, width, alignment and
       }
     }
     const positions: number[] = []
-    for (const align of ['left', 'center', 'right'] as const) {
-      await renderPart({ text: 'Slot', align, fullWidth: true })
+    for (const align of ['start', 'center', 'end'] as const) {
+      await renderPart({ children: 'Slot', align, fullWidth: true })
       await expect(text).toHaveAttribute('data-align', align)
       positions.push((await text.locator('.uf-text__content').boundingBox())!.x)
     }
@@ -362,7 +362,7 @@ test('Card typography slots preserve icon, inset, membrane, width, alignment and
     expect(positions[2]).toBeGreaterThan(positions[1] + 50)
     const widths: number[] = []
     for (const fullWidth of [false, true]) {
-      await renderPart({ text: 'Slot', fullWidth })
+      await renderPart({ children: 'Slot', fullWidth })
       if (fullWidth) await expect(text).toHaveAttribute('data-full-width', '')
       else await expect(text).not.toHaveAttribute('data-full-width')
       widths.push((await text.boundingBox())!.width)
@@ -371,7 +371,7 @@ test('Card typography slots preserve icon, inset, membrane, width, alignment and
     const contentWidths: number[] = []
     for (const stretchText of [false, true]) {
       await renderPart({
-        text: 'Slot',
+        children: 'Slot',
         icon: 'user',
         fullWidth: true,
         stretchText,
@@ -384,8 +384,6 @@ test('Card typography slots preserve icon, inset, membrane, width, alignment and
       )
     }
     expect(contentWidths[1]).toBeGreaterThan(contentWidths[0] + 100)
-    await renderPart({ text: 'Fallback', children: 'Chosen' })
-    await expect(text).toHaveText('Chosen')
   }
 })
 
@@ -408,7 +406,7 @@ test('Card hoverable responds to focus within and can be disabled in both themes
         renderProps('Card', {
           variant,
           hoverable: true,
-          content: R.createElement(Button, { text: 'Edit' }),
+          children: R.createElement(Button, { children: 'Edit' }),
         })
       }, variant)
       await expect(card).toHaveAttribute('data-card-variant', variant)
@@ -433,7 +431,7 @@ test('Card hoverable responds to focus within and can be disabled in both themes
         renderProps('Card', {
           variant,
           hoverable: false,
-          content: R.createElement(Button, { text: 'Edit' }),
+          children: R.createElement(Button, { children: 'Edit' }),
         })
       }, variant)
       await expect(card).not.toHaveAttribute('data-hoverable')

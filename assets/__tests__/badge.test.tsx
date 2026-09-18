@@ -13,21 +13,19 @@ beforeEach(() => {
   ;({ host, root } = mount())
 })
 
-describe('Text and Badge content contracts', () => {
-  it('Badge renders text or rich children with predictable precedence and forwards native root props', async () => {
+describe('Badge content contract', () => {
+  it('Badge renders its children, omits an empty content slot and forwards native root props', async () => {
     const ref = createRef<HTMLElement>()
     const click = vi.fn()
-    await render(<Badge text="Plain" />)
+    await render(<Badge>Plain</Badge>)
     expect(host.textContent).toBe('Plain')
-    await render(<Badge text="Fallback">{0}</Badge>)
+    await render(<Badge>{0}</Badge>)
     expect(host.textContent).toBe('0')
-    await render(<Badge text="Fallback">{false}</Badge>)
-    expect(host.textContent).toBe('')
-    expect(host.querySelector('.uf-text__content')).toBeNull()
-    await render(<Badge text="Fallback">{''}</Badge>)
-    expect(host.textContent).toBe('')
-    await render(<Badge text="Fallback">{null}</Badge>)
-    expect(host.textContent).toBe('Fallback')
+    for (const empty of [false, '', null]) {
+      await render(<Badge>{empty}</Badge>)
+      expect(host.textContent).toBe('')
+      expect(host.querySelector('.uf-text__content')).toBeNull()
+    }
     await render(
       <Badge
         ref={ref}
@@ -57,5 +55,15 @@ describe('Text and Badge content contracts', () => {
     await act(async () => node.click())
     expect(click).toHaveBeenCalledTimes(1)
     expect(host.querySelectorAll('.uf-membrane:not([data-membrane-disabled])')).toHaveLength(1)
+  })
+
+  it('variant sets the fill or outline treatment independently of tone', async () => {
+    await render(<Badge tone="positive">Ready</Badge>)
+    const badge = () => host.querySelector('.uf-badge')!
+    expect(badge().getAttribute('data-variant')).toBe('outline')
+    expect(badge().getAttribute('data-tone')).toBe('positive')
+    await render(<Badge variant="fill" tone="positive">Ready</Badge>)
+    expect(badge().getAttribute('data-variant')).toBe('fill')
+    expect(badge().getAttribute('data-tone')).toBe('positive')
   })
 })

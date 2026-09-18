@@ -13,6 +13,7 @@ import {
   useCallback,
   useId,
   useRef,
+  type CSSProperties,
   type ReactNode,
   type HTMLAttributes,
   type KeyboardEvent,
@@ -23,6 +24,7 @@ import { cn } from '../assets/utils'
 import { Icon } from '../Icon/Icon'
 import { hasSlotContent } from '../assets/slot-content'
 import { Membrane } from '../assets/adapters/react/Membrane'
+import { readNumber } from '../assets/runtime/props'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -61,10 +63,8 @@ export interface TileProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
   'children' | 'dangerouslySetInnerHTML' | 'defaultValue' | 'defaultChecked'
 > {
-  /** Primary label. */
-  text?: string
-  /** Optional secondary text at the far right of the label area. */
-  rightText?: ReactNode
+  /** Label of the row; plain text truncates, rich content keeps its own layout. */
+  children?: ReactNode
   /** Visual variant. */
   variant?: TileVariant
   /** Density adjusts internal padding while keeping the shared control rhythm. */
@@ -79,36 +79,34 @@ export interface TileProps extends Omit<
   iconPosition?: 'start' | 'end'
   /** Isolated leading slot for nested controls such as disclosure or file action buttons. */
   leading?: ReactNode
-  /** Non-interactive trailing metadata rendered before actions. */
+  /** Secondary text or status at the inline end of the row, before actions. */
   meta?: ReactNode
   /** Disable the primary action. Nested controls own their disabled state. */
   disabled?: boolean
   /** Active / selected state. */
   active?: boolean
-  /** Enable a primary action; inferred from onClick or an explicit button/tab role. */
+  /** Enable a primary action; inferred from onClick, aria-expanded or an explicit button/tab role. */
   interactive?: boolean
   /** Stretch text area (flex:1). */
   stretchText?: boolean
-  /** Trailing disclosure chevron, matching Button. Down follows aria-expanded. */
-  chevron?: 'down' | 'right'
-  /** Expanded state of the controlled region; also orients chevron. */
+  /** Trailing disclosure chevron: `down` flips with aria-expanded; `end` points to the inline end, mirrors in right-to-left text and turns down when expanded. */
+  chevron?: 'down' | 'end'
+  /** Expanded state of the controlled region; makes the row a disclosure button and orients the chevron. */
   'aria-expanded'?: HTMLAttributes<HTMLDivElement>['aria-expanded']
   /** Busy state of the row region, reflected by the wait cursor. */
   'aria-busy'?: HTMLAttributes<HTMLDivElement>['aria-busy']
   /** Full width tile. */
   fullWidth?: boolean
-  /** Text alignment. */
-  align?: 'left' | 'center' | 'right'
-  /** Nesting level for option-like rows: 0..9 */
-  level?: number
+  /** Inline alignment of the content, following text direction. Default: start. */
+  align?: 'start' | 'center' | 'end'
+  /** Indent steps for nested rows, an integer from 0 to 9. */
+  indent?: number
   /** Truncate overflowing text content with ellipsis. */
   truncate?: boolean
   /** Membrane spacing around the tile. */
   membrane?: boolean
-  /** Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile. */
+  /** Nested action buttons at the inline end; their clicks do not reach the tile. */
   actions?: ReactNode
-  /** Custom label content. Overrides text; icon/rightText/other slots remain independent. */
-  children?: ReactNode
 }
 
 // ---------------------------------------------------------------------------
@@ -128,8 +126,6 @@ const isControlAria = (name: string) =>
 export const Tile = forwardRef<HTMLDivElement, TileProps>(
   function Tile(props, ref) {
     const {
-      text,
-      rightText,
       variant = 'default',
       density = 'default',
       tone = 'neutral',
@@ -144,8 +140,8 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
       stretchText: rawStretchText,
       chevron,
       fullWidth = true,
-      align = 'left',
-      level,
+      align = 'start',
+      indent,
       truncate = true,
       membrane = true,
       actions,
@@ -161,12 +157,17 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
       ...rest
     } = props
 
-    const clampedLevel =
-      level != null && Number.isFinite(Number(level))
-        ? Math.max(0, Math.min(9, Math.floor(Number(level))))
-        : undefined
+    const steps =
+      indent == null
+        ? undefined
+        : readNumber('Tile', 'indent', indent, 0, { integer: true, min: 0, max: 9 })
+    // A disclosure is a control: aria-expanded alone makes the row a button.
     const resolvedInteractive =
-      rawInteractive ?? (onClick != null || role === 'button' || role === 'tab')
+      rawInteractive ??
+      (onClick != null ||
+        role === 'button' ||
+        role === 'tab' ||
+        rest['aria-expanded'] != null)
     const resolvedRole = role ?? (resolvedInteractive ? 'button' : undefined)
     const resolvedTabIndex =
       tabIndex ?? (resolvedInteractive ? (disabled ? -1 : 0) : undefined)
@@ -235,8 +236,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
     )
     const hasLeading = hasSlotContent(leading)
     const hasMeta = hasSlotContent(meta)
-    const hasText =
-      hasSlotContent(children ?? text) || hasSlotContent(rightText)
+    const hasText = hasSlotContent(children)
     const busy = ariaBusy === true || ariaBusy === 'true'
     const expanded =
       rest['aria-expanded'] === true || rest['aria-expanded'] === 'true'
@@ -254,7 +254,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
       >
         <Icon
           name={
-            chevron === 'right'
+            chevron === 'end'
               ? 'select-chevron-right'
               : expanded
                 ? 'select-chevron-up'
@@ -263,14 +263,6 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
         />
       </span>
     ) : null
-
-    const levelStyle =
-      clampedLevel != null
-        ? ({
-            ...style,
-            '--face-runtime-option-level': clampedLevel,
-          } as React.CSSProperties)
-        : style
 
     const tileNode = (
       <div
@@ -293,7 +285,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
         data-full-width={fullWidth ? '' : undefined}
         data-align={align}
         data-selector={hasSelectorIndicator ? '' : undefined}
-        data-level={clampedLevel != null ? '' : undefined}
+        data-indent={steps != null ? '' : undefined}
         data-truncate={truncate ? '' : undefined}
         data-membrane={membrane ? '' : undefined}
         data-leading={hasLeading ? '' : undefined}
@@ -301,7 +293,11 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
         data-icon-start={hasIcon && iconPosition === 'start' ? '' : undefined}
         data-icon-end={hasIcon && iconPosition === 'end' ? '' : undefined}
         className={cn('uf-tile', className)}
-        style={levelStyle}
+        style={
+          steps != null
+            ? ({ ...style, '--face-runtime-option-level': steps } as CSSProperties)
+            : style
+        }
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         {...rootRest}
@@ -340,21 +336,14 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(
             id={labelId}
             className="uf-tile__content"
           >
-            {children != null && !childrenArePlainText ? (
-              hasSelectorIndicator ? (
-                <div className="uf-tile__label uf-tile__labelSlot">
-                  {children}
-                </div>
-              ) : (
-                children
-              )
+            {childrenArePlainText || !hasText ? (
+              <span className="uf-tile__label">{hasText ? children : null}</span>
+            ) : hasSelectorIndicator ? (
+              <div className="uf-tile__label uf-tile__labelSlot">
+                {children}
+              </div>
             ) : (
-              <span className="uf-tile__label">
-                {childrenArePlainText ? children : text}
-              </span>
-            )}
-            {hasSlotContent(rightText) && (
-              <span className="uf-tile__rightText">{rightText}</span>
+              children
             )}
             {selectorIndicator}
           </div>

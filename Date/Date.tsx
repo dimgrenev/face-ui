@@ -564,11 +564,12 @@ export const Date = forwardRef<HTMLButtonElement, DateProps>(
               <Membrane key={view} interactive>
                 <Button
                   {...api.getViewSwitchProps(view)}
-                  text={resolvedLabels[view]}
                   fullWidth={false}
                   membrane={false}
                   variant={api.view === view ? 'secondary' : 'ghost'}
-                />
+                >
+                  {resolvedLabels[view]}
+                </Button>
               </Membrane>
             ))}
           </div>
@@ -584,13 +585,14 @@ export const Date = forwardRef<HTMLButtonElement, DateProps>(
             {(['start', 'end'] as const).map((part) => (
               <Membrane key={part} interactive>
                 <Button
-                  text={resolvedLabels[part]}
                   aria-pressed={api.rangePart === part}
                   fullWidth={false}
                   membrane={false}
                   variant={api.rangePart === part ? 'secondary' : 'ghost'}
                   onClick={() => send({ type: 'SET_RANGE_PART', part })}
-                />
+                >
+                  {resolvedLabels[part]}
+                </Button>
               </Membrane>
             ))}
           </div>
@@ -697,11 +699,12 @@ export const Date = forwardRef<HTMLButtonElement, DateProps>(
               <Membrane key={preset.id} interactive>
                 <Button
                   {...api.getPresetProps(preset.value)}
-                  text={preset.label}
                   fullWidth
                   membrane={false}
                   variant="ghost"
-                />
+                >
+                  {preset.label}
+                </Button>
               </Membrane>
             ))}
           </div>
@@ -713,22 +716,24 @@ export const Date = forwardRef<HTMLButtonElement, DateProps>(
               <Membrane interactive>
                 <Button
                   {...api.getClearProps()}
-                  text={resolvedLabels.clear}
                   fullWidth={false}
                   membrane={false}
                   variant="ghost"
-                />
+                >
+                  {resolvedLabels.clear}
+                </Button>
               </Membrane>
             ) : null}
             {showNow ? (
               <Membrane interactive>
                 <Button
                   {...api.getNowProps()}
-                  text={resolvedLabels.now}
                   fullWidth={false}
                   membrane={false}
                   variant="default"
-                />
+                >
+                  {resolvedLabels.now}
+                </Button>
               </Membrane>
             ) : null}
           </div>

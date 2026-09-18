@@ -17,12 +17,12 @@ test('Tile owns the design-system font in a host with unrelated typography', { t
     probe.remove()
     return family
   })
-  await mount(page, 'Tile', { text: 'Label', rightText: 'Secondary' })
+  await mount(page, 'Tile', { children: 'Label', meta: 'Secondary' })
   const tile = page.locator('[data-scope="tile"][data-part="root"]')
   await expect(tile).toBeVisible()
   await expect(tile.locator('.uf-tile__label')).toHaveCSS('font-family', family)
-  await expect(tile.locator('.uf-tile__rightText')).toHaveCSS('font-family', family)
-  await mount(page, 'Tile', { text: 'Label', style: { fontFamily: 'monospace' } })
+  await expect(tile.locator('[data-part="meta"]')).toHaveCSS('font-family', family)
+  await mount(page, 'Tile', { children: 'Label', style: { fontFamily: 'monospace' } })
   await expect(tile.locator('.uf-tile__label')).toHaveCSS('font-family', 'monospace')
 })
 test('Tile tone reaches its own label without repainting a nested Button', { tag: ['@css'] }, async ({
@@ -43,9 +43,9 @@ test('Tile tone reaches its own label without repainting a nested Button', { tag
       } = window as unknown as MountWindow
       renderProps('Tile', {
         tone,
-        text: 'Status',
+        children: 'Status',
         icon: 'folder',
-        actions: R.createElement(Button, { text: 'Edit', variant: 'primary' }),
+        actions: R.createElement(Button, { children: 'Edit', variant: 'primary' }),
         actionVisibility: 'always',
       })
     }, tone)
@@ -66,7 +66,7 @@ test('Tile stretchText works when a disclosure indicator is present', { tag: ['@
 }) => {
   const widths: number[] = []
   for (const stretchText of [false, true]) {
-    await mount(page, 'Tile', { text: 'Title', chevron: 'down', stretchText })
+    await mount(page, 'Tile', { children: 'Title', chevron: 'down', stretchText })
     const tile = page.locator('.uf-tile')
     await expect(tile).toHaveAttribute('data-selector', '')
     if (stretchText) await expect(tile).toHaveAttribute('data-stretch-text', '')
@@ -80,8 +80,8 @@ test('Tile stretchText works when a disclosure indicator is present', { tag: ['@
 test('Tile truncate=false wraps the label and align affects stretched text', { tag: ['@layout'] }, async ({
   page,
 }) => {
-  for (const align of ['left', 'center', 'right'] as const) {
-    await mount(page, 'Tile', { text: 'Short label', align, stretchText: true })
+  for (const align of ['start', 'center', 'end'] as const) {
+    await mount(page, 'Tile', { children: 'Short label', align, stretchText: true })
     await expect(page.locator('.uf-tile')).toHaveAttribute('data-align', align)
     const x = await page.locator('.uf-tile__label').evaluate((node) => {
       const r = document.createRange()
@@ -97,13 +97,13 @@ test('Tile truncate=false wraps the label and align affects stretched text', { t
           (x.label.left + x.label.right) / 2 - (x.text.left + x.text.right) / 2,
         ),
       ).toBeLessThan(2)
-    if (align === 'right')
+    if (align === 'end')
       expect(Math.abs(x.label.right - x.text.right)).toBeLessThan(2)
   }
   const heights: number[] = []
   for (const truncate of [true, false]) {
     await mount(page, 'Tile', {
-      text: 'A long description with enough words to wrap to multiple lines inside this narrow row.',
+      children: 'A long description with enough words to wrap to multiple lines inside this narrow row.',
       style: { width: 180 },
       truncate,
     })
@@ -114,10 +114,10 @@ test('Tile truncate=false wraps the label and align affects stretched text', { t
   }
   expect(heights[1] - heights[0]).toBeGreaterThan(20)
 })
-test('Tile level indents at the logical start in RTL', { tag: ['@css'] }, async ({ page }) => {
+test('Tile indent applies at the logical start in RTL', { tag: ['@css'] }, async ({ page }) => {
   const rows: { left: number; right: number }[] = []
   for (const level of [0, 2]) {
-    await mount(page, 'Tile', { text: 'Project', dir: 'rtl', level })
+    await mount(page, 'Tile', { children: 'Project', dir: 'rtl', indent: level })
     await expect(page.locator('.uf-tile')).toHaveCSS(
       '--face-runtime-option-level',
       String(level),
@@ -145,10 +145,10 @@ test('Tile state styles do not leak into nested Tile and Text components', { tag
       'aria-busy': true,
       actionVisibility: 'hidden',
       children: R.createElement(Tile, {
-        text: 'Inner',
-        actions: R.createElement(Button, { text: 'Edit' }),
+        children: 'Inner',
+        actions: R.createElement(Button, { children: 'Edit' }),
         actionVisibility: 'always',
-        meta: R.createElement(Text, { text: 'Meta', variant: 'code' }),
+        meta: R.createElement(Text, { children: 'Meta', variant: 'code' }),
       }),
     })
   })
@@ -175,15 +175,15 @@ test('Tile primary names, keyboard activation and isolated controls agree across
       ;(window as any).propEvents = []
       renderProps('Tile', {
         membrane,
-        text: 'Visible title',
+        children: 'Visible title',
         'aria-label': 'Open project',
         onClick: () => (window as any).propEvents.push('open'),
         leading: R.createElement(Button, {
-          text: 'Pin',
+          children: 'Pin',
           onClick: () => (window as any).propEvents.push('pin'),
         }),
         actions: R.createElement(Button, {
-          text: 'Edit',
+          children: 'Edit',
           onClick: () => (window as any).propEvents.push('edit'),
         }),
       })
@@ -226,11 +226,11 @@ test('Tile disabled blocks the primary action while independent nested controls 
     } = window as unknown as MountWindow
     renderProps('Tile', {
       disabled: true,
-      text: 'Unavailable',
+      children: 'Unavailable',
       onClick: () => (window as any).propEvents.push('open'),
       actionVisibility: 'always',
       actions: R.createElement(Button, {
-        text: 'Remove',
+        children: 'Remove',
         onClick: () => (window as any).propEvents.push('remove'),
       }),
     })
@@ -258,11 +258,11 @@ test('Tile action visibility distinguishes active reveal from hover and supports
         propComponents: { Button },
       } = window as unknown as MountWindow
       renderProps('Tile', {
-        text: 'Title',
+        children: 'Title',
         onClick: () => {},
         active: true,
         actionVisibility,
-        actions: R.createElement(Button, { text: 'Edit' }),
+        actions: R.createElement(Button, { children: 'Edit' }),
       })
     }, visibility)
     await expect(page.locator('.uf-tile')).toHaveAttribute(
@@ -292,7 +292,7 @@ test('Tile variants, tones and passive rows have distinct and coherent hover beh
     ghost: { variant: 'ghost', interactive: true },
     accent: { tone: 'accent', interactive: true },
   } satisfies Record<string, MountProps<'Tile'>>)) {
-    await mount(page, 'Tile', { text: 'Title', 'data-case': key, ...props })
+    await mount(page, 'Tile', { children: 'Title', 'data-case': key, ...props })
     const tile = page.locator('.uf-tile')
     await expect(tile).toHaveAttribute('data-case', key)
     await tile.hover()
@@ -319,7 +319,7 @@ test('Tile density, fullWidth, iconPosition and membrane change actual geometry'
     right: { iconPosition: 'end' },
     bare: { membrane: false },
   } satisfies Record<string, MountProps<'Tile'>>)) {
-    await mount(page, 'Tile', { text: 'Title', icon: 'folder', 'data-case': key, ...props })
+    await mount(page, 'Tile', { children: 'Title', icon: 'folder', 'data-case': key, ...props })
     await expect(page.locator('.uf-tile')).toHaveAttribute('data-case', key)
     rows[key] = await page.locator('.uf-tile').evaluate((node) => ({
       row: node.getBoundingClientRect().width,
@@ -361,8 +361,7 @@ for (const theme of ['light', 'dark']) {
       'destructive',
     ] as const) {
       await mount(page, 'Tile', {
-        text: 'Project name',
-        rightText: 'Ready',
+        children: 'Project name',
         meta: '12 items',
         tone,
         'aria-busy': true,
@@ -398,11 +397,7 @@ for (const theme of ['light', 'dark']) {
               return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4
             })
             .reduce((sum, x, i) => sum + x * [0.2126, 0.7152, 0.0722][i], 0)
-        return [
-          '.uf-tile__label',
-          '.uf-tile__rightText',
-          '[data-part="meta"]',
-        ].map((selector) => {
+        return ['.uf-tile__label', '[data-part="meta"]'].map((selector) => {
           const node = row.querySelector(selector)!
           let opacity = 1
           for (
@@ -449,12 +444,11 @@ test('Tile chevron follows focus, hover, side expansion and nested ownership', {
         propComponents: { Button },
       } = window as unknown as MountWindow
       renderProps('Tile', {
-        text: 'Title',
-        children: rich ? R.createElement('strong', null, 'Title') : undefined,
-        chevron: 'right',
+        children: rich ? R.createElement('strong', null, 'Title') : 'Title',
+        chevron: 'end',
         'aria-expanded': true,
         onClick: () => {},
-        actions: R.createElement(Button, { text: 'Edit' }),
+        actions: R.createElement(Button, { children: 'Edit' }),
       })
     }, rich)
     const indicator = page.locator('.uf-tile__indicator')
@@ -469,7 +463,7 @@ test('Native hidden removes the whole membrane boundary for Tile and Button', { 
 }) => {
   for (const component of ['Tile', 'Button'] as const) {
     for (const membrane of [true, false]) {
-      await mount(page, component, { text: 'Hidden', hidden: true, membrane })
+      await mount(page, component, { children: 'Hidden', hidden: true, membrane })
       const root = page.locator(
         `[data-scope="${component.toLowerCase()}"][data-part="root"]`,
       )
@@ -486,4 +480,54 @@ test('Native hidden removes the whole membrane boundary for Tile and Button', { 
       await expect(root.locator('..')).toHaveCSS('display', 'none')
     }
   }
+})
+test('Tile align start and the end chevron follow the inline direction in RTL', { tag: ['@layout'] }, async ({
+  page,
+}) => {
+  const tile = page.locator('.uf-tile')
+  const measured = []
+  for (const dir of ['ltr', 'rtl'] as const)
+    for (const expanded of [false, true]) {
+      await mount(page, 'Tile', {
+        key: `${dir}-${expanded}`,
+        children: 'Project',
+        align: 'start',
+        chevron: 'end',
+        stretchText: true,
+        'aria-expanded': expanded,
+        dir,
+        style: { width: 240 },
+      })
+      await expect(tile).toHaveAttribute('dir', dir)
+      measured.push(
+        await tile.evaluate((node) => {
+          const box = node.getBoundingClientRect()
+          const label = node.querySelector('.uf-tile__label')!
+          const range = document.createRange()
+          range.selectNodeContents(label)
+          const text = range.getBoundingClientRect()
+          const indicator = node.querySelector('[data-part="indicator"]')!
+          return {
+            textStart: text.left - box.left,
+            textEnd: box.right - text.right,
+            indicatorLeft: indicator.getBoundingClientRect().left - box.left,
+            indicatorRight: box.right - indicator.getBoundingClientRect().right,
+            transform: getComputedStyle(indicator).transform,
+          }
+        }),
+      )
+    }
+  const [ltr, ltrOpen, rtl, rtlOpen] = measured
+  // The label starts at the inline start and the chevron sits at the inline end.
+  expect(ltr.textStart).toBeLessThan(ltr.textEnd)
+  expect(rtl.textEnd).toBeLessThan(rtl.textStart)
+  expect(rtl.textEnd).toBeCloseTo(ltr.textStart, 0)
+  expect(ltr.indicatorLeft).toBeGreaterThan(ltr.indicatorRight)
+  expect(rtl.indicatorRight).toBeGreaterThan(rtl.indicatorLeft)
+  expect(rtl.indicatorLeft).toBeCloseTo(ltr.indicatorRight, 0)
+  // Closed, the chevron points to the inline end; expanded, it points down in both directions.
+  expect(ltr.transform).toBe('matrix(1, 0, 0, 1, 0, 0)')
+  expect(rtl.transform).toBe('matrix(-1, 0, 0, 1, 0, 0)')
+  expect(ltrOpen.transform).toBe('matrix(0, 1, -1, 0, 0, 0)')
+  expect(rtlOpen.transform).toBe('matrix(0, 1, -1, 0, 0, 0)')
 })

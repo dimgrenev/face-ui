@@ -7,11 +7,8 @@
   "root": {
     "type": "Tile",
     "props": {
-      "text": {
-        "$ref": "props.text"
-      },
-      "rightText": {
-        "$ref": "props.rightText"
+      "children": {
+        "$ref": "props.children"
       },
       "variant": {
         "$ref": "props.variant"
@@ -64,8 +61,8 @@
       "align": {
         "$ref": "props.align"
       },
-      "level": {
-        "$ref": "props.level"
+      "indent": {
+        "$ref": "props.indent"
       },
       "truncate": {
         "$ref": "props.truncate"
@@ -75,41 +72,31 @@
       },
       "actions": {
         "$ref": "props.actions"
-      },
-      "children": {
-        "$ref": "props.children"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "text": "Customer success",
-      "rightText": "12",
+      "children": "Customer success",
+      "meta": "12",
       "tone": "neutral",
       "icon": "folder",
       "chevron": "down",
-      "interactive": true,
       "aria-expanded": false,
       "active": true,
       "fullWidth": true,
-      "align": "left",
+      "align": "start",
       "actionVisibility": "reveal",
       "membrane": true
     }
   },
   "controls": [
     {
-      "name": "text",
-      "type": "string",
-      "required": false,
-      "description": "Primary label."
-    },
-    {
-      "name": "rightText",
+      "name": "children",
       "type": "any",
       "required": false,
-      "description": "Optional secondary text at the far right of the label area."
+      "description": "Label of the row; plain text truncates, rich content keeps its own layout."
     },
     {
       "name": "variant",
@@ -188,7 +175,7 @@
       "name": "meta",
       "type": "any",
       "required": false,
-      "description": "Non-interactive trailing metadata rendered before actions."
+      "description": "Secondary text or status at the inline end of the row, before actions."
     },
     {
       "name": "disabled",
@@ -208,7 +195,7 @@
       "name": "interactive",
       "type": "boolean",
       "required": false,
-      "description": "Enable a primary action; inferred from onClick or an explicit button/tab role."
+      "description": "Enable a primary action; inferred from onClick, aria-expanded or an explicit button/tab role."
     },
     {
       "name": "stretchText",
@@ -220,17 +207,17 @@
       "name": "chevron",
       "type": "select",
       "required": false,
-      "description": "Trailing disclosure chevron, matching Button. Down follows aria-expanded.",
+      "description": "Trailing disclosure chevron: `down` flips with aria-expanded; `end` points to the inline end, mirrors in right-to-left text and turns down when expanded.",
       "options": [
         "down",
-        "right"
+        "end"
       ]
     },
     {
       "name": "aria-expanded",
       "type": "boolean",
       "required": false,
-      "description": "Expanded state of the controlled region; also orients chevron.",
+      "description": "Expanded state of the controlled region; makes the row a disclosure button and orients the chevron.",
       "options": [
         "false",
         "true"
@@ -257,19 +244,19 @@
       "name": "align",
       "type": "select",
       "required": false,
-      "description": "Text alignment.",
+      "description": "Inline alignment of the content, following text direction. Default: start.",
       "options": [
-        "left",
+        "start",
         "center",
-        "right"
+        "end"
       ],
-      "defaultValue": "left"
+      "defaultValue": "start"
     },
     {
-      "name": "level",
+      "name": "indent",
       "type": "number",
       "required": false,
-      "description": "Nesting level for option-like rows: 0..9"
+      "description": "Indent steps for nested rows, an integer from 0 to 9."
     },
     {
       "name": "truncate",
@@ -289,13 +276,7 @@
       "name": "actions",
       "type": "any",
       "required": false,
-      "description": "Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile."
-    },
-    {
-      "name": "children",
-      "type": "any",
-      "required": false,
-      "description": "Custom label content. Overrides text; icon/rightText/other slots remain independent."
+      "description": "Nested action buttons at the inline end; their clicks do not reach the tile."
     }
   ],
   "meta": {

@@ -4,18 +4,18 @@ export default [
   {
     name: 'Product / Create Workspace',
     props: {
-      text: 'Create workspace',
+      children: 'Create workspace',
       icon: 'plus',
       variant: 'accent',
       fullWidth: false,
-      align: 'left',
+      align: 'start',
       membrane: true,
     },
   },
   {
     name: 'Product / Revoke API Key',
     props: {
-      text: 'Revoke key',
+      children: 'Revoke key',
       icon: 'close',
       variant: 'destructive',
       fullWidth: false,

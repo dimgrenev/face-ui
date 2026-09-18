@@ -192,11 +192,12 @@ export const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
           <Text
             {...api.getTitleProps()}
             as="div"
-            text={api.monthLabel}
             align="center"
             fullWidth
             className="uf-calendar-titleText"
-          />
+          >
+            {api.monthLabel}
+          </Text>
           <Button
             {...api.getNextMonthProps()}
             icon={<Icon name="arrow-right" />}
@@ -235,10 +236,11 @@ export const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
                   <th key={i} {...api.getWeekdayProps(i)}>
                     <Text
                       as="span"
-                      text={label}
                       inset="none"
                       className="uf-calendar-weekdayText"
-                    />
+                    >
+                      {label}
+                    </Text>
                   </th>
                 )
               })}
@@ -284,14 +286,15 @@ export const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
                     >
                       <Button
                         {...dayProps}
-                        text={numbers.format(day.dayOfMonth)}
                         fullWidth
                         className="uf-calendar-dayButton"
                         data-range-start={isRangeStart || undefined}
                         data-range-end={isRangeEnd || undefined}
                         data-range-between={isRangeBetween || undefined}
                         onClick={(event) => selectDate(day.date, event)}
-                      />
+                      >
+                        {numbers.format(day.dayOfMonth)}
+                      </Button>
                     </td>
                   )
                 })}

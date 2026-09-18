@@ -58,6 +58,35 @@
       "codemod": "manual"
     },
     {
+      "kind": "remove-prop",
+      "component": "Badge",
+      "prop": "appearance",
+      "use": "`variant=\"fill\"`; omit `\"outline\"`, the default",
+      "codemod": "auto",
+      "values": {
+        "fill": "variant=\"fill\"",
+        "outline": ""
+      }
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Badge",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "BadgeAppearance",
+      "to": "BadgeVariant",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Badge",
+      "before": "The root carried the fill or outline treatment as `data-appearance`",
+      "after": "The root carries it as `data-variant`"
+    },
+    {
       "kind": "export",
       "from": "Bar.LeftEllipsis",
       "to": "Bar.Section grow",
@@ -100,7 +129,7 @@
       "kind": "remove-prop",
       "component": "Button",
       "prop": "selector",
-      "use": "`chevron=\"down\"`, or `chevron=\"right\"` with `selectorDirection=\"side\"`",
+      "use": "`chevron=\"down\"`, or `chevron=\"end\"` with `selectorDirection=\"side\"`",
       "codemod": "auto",
       "transform": "button-chevron"
     },
@@ -132,8 +161,53 @@
     {
       "kind": "export",
       "from": "ButtonSelectorDirection",
-      "to": "`ButtonChevron` (`down` | `right`)",
+      "to": "`ButtonChevron` (`down` | `end`)",
       "codemod": "manual"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Button",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Button",
+      "prop": "align",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Button",
+      "from": "rightText",
+      "to": "meta",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Button",
+      "prop": "chevron",
+      "values": {
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Button",
+      "from": "level",
+      "to": "indent",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Button",
+      "before": "`chevron=\"right\"` and `align=\"left\"`/`\"right\"` pointed to the physical side in right-to-left text",
+      "after": "`chevron=\"end\"` mirrors and `align=\"start\"`/`\"end\"` follow the text direction"
     },
     {
       "kind": "retype-prop",
@@ -251,6 +325,50 @@
       "codemod": "manual"
     },
     {
+      "kind": "text-to-children",
+      "component": "Card",
+      "from": "content",
+      "codemod": "auto"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Card.Title",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Card.Description",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Card.Title",
+      "prop": "align",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Card.Description",
+      "prop": "align",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Card",
+      "before": "`content` without `title`, `description` or `footer` was wrapped in the content part",
+      "after": "Children without `title`, `description` or `footer` render directly in the card; wrap them in `Card.Content` to keep the part"
+    },
+    {
       "kind": "behavior",
       "component": "Checkbox",
       "before": "`ref` pointed to the `<label>`",
@@ -310,6 +428,13 @@
       "component": "Date",
       "before": "`ref` pointed to the wrapper `<div>`",
       "after": "`ref` points to the trigger `<button>`; `className` and `style` still style the whole field"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Icon",
+      "from": "label",
+      "to": "aria-label",
+      "codemod": "auto"
     },
     {
       "kind": "rename-prop",
@@ -724,10 +849,32 @@
       "codemod": "auto"
     },
     {
+      "kind": "text-to-children",
+      "component": "Text",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Text",
+      "prop": "align",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
       "kind": "behavior",
       "component": "Text",
       "before": "`variant=\"blockquote\"` rendered a `<div>`",
       "after": "`variant=\"blockquote\"` renders `<blockquote>`; set `as` to choose another element"
+    },
+    {
+      "kind": "behavior",
+      "component": "Text",
+      "before": "`align=\"left\"` and `align=\"right\"` stayed on the physical side in right-to-left text",
+      "after": "`align=\"start\"` and `align=\"end\"` follow the text direction"
     },
     {
       "kind": "remove-prop",
@@ -783,6 +930,57 @@
       "from": "TileIntent",
       "to": "The `interactive`, `tone` and `role` props",
       "codemod": "manual"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Tile",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tile",
+      "from": "rightText",
+      "to": "meta",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Tile",
+      "prop": "align",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Tile",
+      "prop": "chevron",
+      "values": {
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tile",
+      "from": "level",
+      "to": "indent",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tile",
+      "before": "`rightText` sat inside the label area and joined a button row's accessible name",
+      "after": "`meta` renders in its own part before the actions and is not part of the row's name"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tile",
+      "before": "A Tile with `aria-expanded` but no `onClick`, `role` or `interactive` rendered an inert `<div aria-expanded>`",
+      "after": "`aria-expanded` makes the row a disclosure button; pass `interactive={false}` to opt out"
     },
     {
       "kind": "export",

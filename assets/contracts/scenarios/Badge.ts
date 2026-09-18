@@ -3,13 +3,13 @@ import type { ProductScenarioPair } from '../sync-face-json'
 export default [
   {
     name: 'Product / Deployment Ready',
-    props: { text: 'Ready to deploy', appearance: 'fill', tone: 'positive' },
+    props: { children: 'Ready to deploy', variant: 'fill', tone: 'positive' },
   },
   {
     name: 'Product / Usage Warning',
     props: {
-      text: '82% of quota used',
-      appearance: 'outline',
+      children: '82% of quota used',
+      variant: 'outline',
       tone: 'warning',
     },
   },

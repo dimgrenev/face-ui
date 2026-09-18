@@ -40,7 +40,7 @@ test('Text size changes actual typography for every variant', { tag: ['@css'] },
   for (const variant of variants) {
     const sizes: number[] = []
     for (const size of ['xs', 'sm', 'md', 'lg', 'xl'] as const) {
-      await render(page, 'Text', { text: 'Typography', variant, size })
+      await render(page, 'Text', { children: 'Typography', variant, size })
       await expect(node).toHaveAttribute('data-size', size)
       const metrics = await node.evaluate((node) => {
         const s = getComputedStyle(node)
@@ -63,7 +63,7 @@ test('Text inset none removes padding for every variant and either icon position
   for (const variant of variants) {
     for (const iconPosition of ['start', 'end'] as const) {
       await render(page, 'Text', {
-        text: 'Flush',
+        children: 'Flush',
         variant,
         inset: 'none',
         icon: 'user',
@@ -74,7 +74,7 @@ test('Text inset none removes padding for every variant and either icon position
         '0px',
       )
       await render(page, 'Text', {
-        text: 'Inset',
+        children: 'Inset',
         variant,
         inset: 'control',
         icon: 'user',
@@ -93,7 +93,7 @@ for (const width of [240, 800]) {
       for (const inset of ['control', 'none'] as const) {
         for (const icon of [undefined, 'user']) {
           const props = {
-            text: 'A heading or paragraph that wraps naturally when the available space becomes narrow.',
+            children: 'A heading or paragraph that wraps naturally when the available space becomes narrow.',
             variant,
             inset,
             icon,
@@ -152,9 +152,9 @@ test('Text alignment, width, membrane, stretching and truncation have independen
 }) => {
   const node = page.locator('[data-scope="text"]')
   for (const membrane of [true, false]) {
-    for (const align of ['left', 'center', 'right'] as const) {
+    for (const align of ['start', 'center', 'end'] as const) {
       await render(page, 'Text', {
-        text: 'Text',
+        children: 'Text',
         fullWidth: true,
         align,
         membrane,
@@ -164,7 +164,7 @@ test('Text alignment, width, membrane, stretching and truncation have independen
       await expect(node).toHaveCSS('width', `${membrane ? 398 : 400}px`)
       const small = await node.locator('.uf-text__content').boundingBox()
       await render(page, 'Text', {
-        text: 'Text',
+        children: 'Text',
         fullWidth: true,
         align,
         membrane,
@@ -176,7 +176,7 @@ test('Text alignment, width, membrane, stretching and truncation have independen
       expect(stretched!.width).toBeGreaterThan(small!.width + 200)
     }
     await render(page, 'Text', {
-      text: 'A long piece of text that cannot fit on a single line '.repeat(5),
+      children: 'A long piece of text that cannot fit on a single line '.repeat(5),
       fullWidth: true,
       truncate: true,
       membrane,
@@ -189,7 +189,7 @@ test('Text alignment, width, membrane, stretching and truncation have independen
     )
     expect((await node.boundingBox())!.width).toBeLessThanOrEqual(400)
     await render(page, 'Text', {
-      text: 'A long piece of text that cannot fit on a single line '.repeat(5),
+      children: 'A long piece of text that cannot fit on a single line '.repeat(5),
       fullWidth: true,
       truncate: false,
       membrane,
@@ -202,7 +202,7 @@ test('Text htmlFor focuses a real input and as preserves semantic elements', { t
   page,
 }) => {
   await render(page, 'Text', {
-    text: 'Email',
+    children: 'Email',
     variant: 'label',
     htmlFor: 'email',
   })
@@ -213,10 +213,10 @@ test('Text htmlFor focuses a real input and as preserves semantic elements', { t
   })
   await page.getByText('Email', { exact: true }).click()
   await expect(page.locator('#email')).toBeFocused()
-  await render(page, 'Text', { text: 'Quotation', variant: 'blockquote' })
+  await render(page, 'Text', { children: 'Quotation', variant: 'blockquote' })
   await expect(page.locator('blockquote[data-scope="text"]')).toBeVisible()
   await render(page, 'Text', {
-    text: 'Display heading',
+    children: 'Display heading',
     variant: 'h1',
     as: 'span',
   })
@@ -231,7 +231,7 @@ for (const theme of ['light', 'dark']) {
     )
     await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') })
     for (const variant of variants) {
-      await render(page, 'Text', { text: 'Readable text', variant })
+      await render(page, 'Text', { children: 'Readable text', variant })
       await expect(page.locator('[data-scope="text"]')).toHaveAttribute(
         'data-variant',
         variant,
@@ -249,3 +249,32 @@ for (const theme of ['light', 'dark']) {
     }
   })
 }
+test('Text align start and end follow the inline direction in RTL', { tag: ['@layout'] }, async ({
+  page,
+}) => {
+  const node = page.locator('[data-scope="text"]')
+  const offsets: Record<string, { start: number; end: number }> = {}
+  for (const dir of ['ltr', 'rtl'] as const)
+    for (const align of ['start', 'end'] as const) {
+      await render(page, 'Text', {
+        key: `${dir}-${align}`,
+        children: 'Aligned',
+        align,
+        dir,
+        fullWidth: true,
+        membrane: false,
+      })
+      await expect(node).toHaveAttribute('dir', dir)
+      offsets[`${dir}-${align}`] = await node.evaluate((node) => {
+        const box = node.getBoundingClientRect()
+        const content = node.querySelector('.uf-text__content')!.getBoundingClientRect()
+        return { start: content.left - box.left, end: box.right - content.right }
+      })
+    }
+  // start hugs the left edge in LTR and the right edge in RTL; end is the mirror image.
+  expect(offsets['ltr-start'].start).toBeLessThan(offsets['ltr-start'].end)
+  expect(offsets['rtl-start'].end).toBeLessThan(offsets['rtl-start'].start)
+  expect(offsets['rtl-start'].end).toBeCloseTo(offsets['ltr-start'].start, 0)
+  expect(offsets['ltr-end'].end).toBeLessThan(offsets['ltr-end'].start)
+  expect(offsets['rtl-end'].start).toBeCloseTo(offsets['ltr-end'].end, 0)
+})

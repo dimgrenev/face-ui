@@ -51,7 +51,7 @@ function Fixture() {
           <div
             style={{ display: 'flex', alignItems: 'start', flexWrap: 'wrap' }}
           >
-            <Button text="Button" membrane={membrane} />
+            <Button membrane={membrane}>Button</Button>
             <Text membrane={membrane}>Text</Text>
             <Checkbox label="Checkbox" membrane={membrane} />
             <Radio
@@ -71,7 +71,7 @@ function Fixture() {
               options={options}
             />
             <Switcher membrane={membrane} label="Switcher" />
-            <Button fullWidth membrane={membrane} text="Full width" />
+            <Button fullWidth membrane={membrane}>Full width</Button>
           </div>
         </section>
       ))}
@@ -89,7 +89,7 @@ function Fixture() {
             'ghost',
             'destructive',
           ].map((variant) => (
-            <Button key={variant} variant={variant as any} text={variant} />
+            <Button key={variant} variant={variant as any}>{variant}</Button>
           ))}
         </div>
       </section>
@@ -141,15 +141,16 @@ function Fixture() {
         <Text size="xl" variant="h3">
           Nested large heading
         </Text>
-        <Button text="Nested button" />
+        <Button>Nested button</Button>
         <Separator orientation="vertical" />
       </Card>
       <Tile
-        text="Keyboard actions"
         onClick={() => {}}
         actionVisibility="hover"
-        actions={<Button text="Action" />}
-      />
+        actions={<Button>Action</Button>}
+      >
+        Keyboard actions
+      </Tile>
       <Tabs
         aria-label="Sections"
         items={[
@@ -264,9 +265,9 @@ function Fixture() {
         <Rating label="Quality" allowHalf defaultValue={2.5} />
       </section>
       <Carousel ariaLabel="Multiple slides" slidesPerView={2}>
-        <Button text="Slide one" />
-        <Button text="Slide two" />
-        <Button text="Slide three" />
+        <Button>Slide one</Button>
+        <Button>Slide two</Button>
+        <Button>Slide three</Button>
       </Carousel>
       <Markdown
         content={
@@ -277,13 +278,13 @@ function Fixture() {
         <Input label="Inside parent" />
         <Popover
           aria-label="Parent options"
-          content={<Button text="Popover action" />}
+          content={<Button>Popover action</Button>}
         >
-          <Button text="Open popover" />
+          <Button>Open popover</Button>
         </Popover>
         <Select aria-label="Nested select" options={options} />
         <Modal trigger="Open child" title="Child">
-          <Button text="Inside child" />
+          <Button>Inside child</Button>
         </Modal>
       </Modal>
     </div>

@@ -4,20 +4,20 @@ export default [
   {
     name: 'Product / Dashboard Heading',
     props: {
-      text: 'Revenue overview',
+      children: 'Revenue overview',
       variant: 'h2',
       size: 'xl',
       as: 'h2',
       inset: 'control',
       fullWidth: true,
-      align: 'left',
+      align: 'start',
       membrane: true,
     },
   },
   {
     name: 'Product / Keyboard Shortcut',
     props: {
-      text: 'Cmd K',
+      children: 'Cmd K',
       variant: 'kbd',
       size: 'sm',
       as: 'kbd',

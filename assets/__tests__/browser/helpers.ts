@@ -19,8 +19,8 @@ export async function open(page: Page, name: string, query = '') {
 }
 
 /** What survives page.evaluate: callbacks and elements are dropped (a spec
- * that needs them builds them in the page), so a ReactNode prop takes text.
- * `style` also takes custom properties. */
+ * that needs them builds them in the page), so a ReactNode prop, `children`
+ * included, takes text. `style` also takes custom properties. */
 type Serial<T> = T extends (...args: any[]) => any
   ? never
   : T extends ReactElement
@@ -41,7 +41,7 @@ type Serial<T> = T extends (...args: any[]) => any
 type Omitted<T, P extends PropertyKey> = T extends unknown ? Omit<T, P> : never
 type Extra = { key?: string; [data: `data-${string}`]: string }
 export type MountProps<K extends keyof MountRegistry> = Serial<
-  Omitted<ComponentProps<MountRegistry[K]>, 'ref' | 'children'>
+  Omitted<ComponentProps<MountRegistry[K]>, 'ref'>
 > &
   Extra
 

@@ -30,13 +30,13 @@ beforeEach(() => {
 const cases: [string, (membrane: boolean) => React.ReactNode, string][] = [
   [
     'Button',
-    (membrane) => <Button membrane={membrane} text="Save" />,
+    (membrane) => <Button membrane={membrane}>Save</Button>,
     'button',
   ],
   [
     'Tile',
     (membrane) => (
-      <Tile membrane={membrane} text="Project" onClick={() => {}} />
+      <Tile membrane={membrane} onClick={() => {}}>Project</Tile>
     ),
     '[data-part="primary"]',
   ],

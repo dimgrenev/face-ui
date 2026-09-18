@@ -81,10 +81,11 @@ function renderTabs(props: Flat<TabsProps> = {}, options: Options = {}) {
                   ).map((text: string) => (
                     <Button
                       key={text}
-                      text={text}
                       icon="close"
                       onClick={() => events.push('action')}
-                    />
+                    >
+                      {text}
+                    </Button>
                   ))
                 : undefined
             }

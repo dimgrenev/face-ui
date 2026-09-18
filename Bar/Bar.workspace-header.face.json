@@ -22,7 +22,7 @@
       "children": [
         {
           "__componentName__": "Text",
-          "text": "Acme Workspace",
+          "children": "Acme Workspace",
           "truncate": true
         },
         {
@@ -31,7 +31,7 @@
           "children": [
             {
               "__componentName__": "Button",
-              "text": "Invite",
+              "children": "Invite",
               "icon": "plus",
               "fullWidth": false
             }

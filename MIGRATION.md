@@ -26,6 +26,15 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `icon` | `fallback={<Icon name="…" />}` | manual |
 | `children` | `fallback={content}` | manual |
 
+### Badge
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `appearance` | `variant="fill"`; omit `"outline"`, the default | auto |
+| `text` | children | auto |
+| `BadgeAppearance` | `BadgeVariant` | auto |
+| The root carried the fill or outline treatment as `data-appearance` | The root carries it as `data-variant` | — |
+
 ### Bar
 
 | Before | After | Codemod |
@@ -46,11 +55,17 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 
 | Before | After | Codemod |
 | --- | --- | --- |
-| `selector` | `chevron="down"`, or `chevron="right"` with `selectorDirection="side"` | auto |
+| `selector` | `chevron="down"`, or `chevron="end"` with `selectorDirection="side"` | auto |
 | `selectorDirection` | The `chevron` value | auto |
 | `selectorOpen` | `aria-expanded` | auto |
 | `iconPosition="left"`, `iconPosition="right"` | `iconPosition="start"`, `iconPosition="end"` | auto |
-| `ButtonSelectorDirection` | `ButtonChevron` (`down` \| `right`) | manual |
+| `ButtonSelectorDirection` | `ButtonChevron` (`down` \| `end`) | manual |
+| `text` | children | auto |
+| `align="left"`, `align="right"` | `align="start"`, `align="end"` | auto |
+| `rightText` | `meta` | auto |
+| `chevron="right"` | `chevron="end"` | auto |
+| `level` | `indent` | auto |
+| `chevron="right"` and `align="left"`/`"right"` pointed to the physical side in right-to-left text | `chevron="end"` mirrors and `align="start"`/`"end"` follow the text direction | — |
 
 ### Calendar
 
@@ -76,6 +91,12 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `CardFooterLayout` | `CardAlign` | auto |
 | `CardActionAlign` | `CardAlign` | auto |
 | `CardHeaderLayout` | `CardHeaderOrientation` (`vertical` \| `horizontal`) | manual |
+| `content` | children | auto |
+| `Card.Title text` | children | auto |
+| `Card.Description text` | children | auto |
+| `Card.Title align="left"`, `Card.Title align="right"` | `align="start"`, `align="end"` | auto |
+| `Card.Description align="left"`, `Card.Description align="right"` | `align="start"`, `align="end"` | auto |
+| `content` without `title`, `description` or `footer` was wrapped in the content part | Children without `title`, `description` or `footer` render directly in the card; wrap them in `Card.Content` to keep the part | — |
 
 ### Checkbox
 
@@ -95,6 +116,12 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `presets`: `{ label, value }` items | Each item also needs an `id`, unique within the picker | manual |
 | `weekStartsOn` defaulted to 1 (Monday) | The first weekday follows `locale`; set `weekStartsOn` to pin it | — |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the trigger `<button>`; `className` and `style` still style the whole field | — |
+
+### Icon
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `label` | `aria-label` | auto |
 
 ### Input
 
@@ -222,7 +249,10 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Before | After | Codemod |
 | --- | --- | --- |
 | `iconPosition="left"`, `iconPosition="right"` | `iconPosition="start"`, `iconPosition="end"` | auto |
+| `text` | children | auto |
+| `align="left"`, `align="right"` | `align="start"`, `align="end"` | auto |
 | `variant="blockquote"` rendered a `<div>` | `variant="blockquote"` renders `<blockquote>`; set `as` to choose another element | — |
+| `align="left"` and `align="right"` stayed on the physical side in right-to-left text | `align="start"` and `align="end"` follow the text direction | — |
 
 ### Tile
 
@@ -235,6 +265,13 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `intent` | `interactive={false} tone="muted"` for a section heading; an explicit `role` and its ARIA state for a custom control | manual |
 | `iconPosition="left"`, `iconPosition="right"` | `iconPosition="start"`, `iconPosition="end"` | auto |
 | `TileIntent` | The `interactive`, `tone` and `role` props | manual |
+| `text` | children | auto |
+| `rightText` | `meta` | auto |
+| `align="left"`, `align="right"` | `align="start"`, `align="end"` | auto |
+| `chevron="right"` | `chevron="end"` | auto |
+| `level` | `indent` | auto |
+| `rightText` sat inside the label area and joined a button row's accessible name | `meta` renders in its own part before the actions and is not part of the row's name | — |
+| A Tile with `aria-expanded` but no `onClick`, `role` or `interactive` rendered an inert `<div aria-expanded>` | `aria-expanded` makes the row a disclosure button; pass `interactive={false}` to opt out | — |
 
 ### Toggle
 

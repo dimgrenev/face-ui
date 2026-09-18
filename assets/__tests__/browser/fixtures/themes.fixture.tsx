@@ -8,13 +8,13 @@ createRoot(document.getElementById('root')!).render(
       data-theme="light"
       style={{ background: 'var(--uf-color-bg)', padding: 16 }}
     >
-      <Text text="Light island" />
+      <Text>Light island</Text>
       <Switcher label="Light setting" />
       <section
         data-theme="dark"
         style={{ background: 'var(--uf-color-bg)', padding: 16 }}
       >
-        <Text text="Nested dark island" />
+        <Text>Nested dark island</Text>
         <Switcher label="Dark setting" />
       </section>
     </section>

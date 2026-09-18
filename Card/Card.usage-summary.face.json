@@ -13,9 +13,6 @@
       "description": {
         "$ref": "props.description"
       },
-      "content": {
-        "$ref": "props.content"
-      },
       "footer": {
         "$ref": "props.footer"
       },
@@ -49,14 +46,14 @@
   "currentState": {
     "props": {
       "title": "API usage",
-      "content": "1.8M of 2M monthly tokens used across production agents.",
+      "children": "1.8M of 2M monthly tokens used across production agents.",
       "padding": "default",
       "radius": "lg",
       "border": true,
       "footerAlign": "between",
       "footer": {
         "__componentName__": "Button",
-        "text": "View usage",
+        "children": "View usage",
         "icon": "arrow-right",
         "iconPosition": "end",
         "fullWidth": false
@@ -68,32 +65,26 @@
       "name": "title",
       "type": "any",
       "required": false,
-      "description": "Convenience title slot rendered through Card.Title and Face UI Text."
+      "description": "Heading of the card header, rendered through Card.Title. With `title`, `description` or `footer` set, children fill the content part."
     },
     {
       "name": "description",
       "type": "any",
       "required": false,
-      "description": "Convenience description slot rendered through Card.Description and Face UI Text."
-    },
-    {
-      "name": "content",
-      "type": "any",
-      "required": false,
-      "description": "Convenience body slot rendered through Card.Content; primitive values use Face UI Text."
+      "description": "Secondary text under the title, rendered through Card.Description."
     },
     {
       "name": "footer",
       "type": "any",
       "required": false,
-      "description": "Convenience footer slot: text, React content, component descriptors or arrays. The JSON editor accepts every serializable form.",
+      "description": "Footer content: text, elements, component descriptors or arrays of them.",
       "controlType": "object"
     },
     {
       "name": "variant",
       "type": "select",
       "required": false,
-      "description": "Meaningful surface role: standard contained surface, unframed composition, or code canvas.",
+      "description": "Surface role: a standard contained surface, an unframed composition (`plain`) or a code canvas (`code`). Default: default.",
       "options": [
         "default",
         "plain",
@@ -106,7 +97,7 @@
       "name": "padding",
       "type": "select",
       "required": false,
-      "description": "Internal surface inset, from the standard 7px rhythm down to a flush composition.",
+      "description": "Inner surface inset, from the standard 7px rhythm down to flush. Default: default.",
       "options": [
         "default",
         "control",
@@ -120,7 +111,7 @@
       "name": "radius",
       "type": "select",
       "required": false,
-      "description": "Corner geometry for contained, compact, dialog, or flush surfaces.",
+      "description": "Corner geometry for contained, compact, dialog or flush surfaces. Default: md.",
       "options": [
         "md",
         "lg",
@@ -133,7 +124,7 @@
       "name": "border",
       "type": "boolean",
       "required": false,
-      "description": "Draw the surface border independently of padding, radius and variant.",
+      "description": "Draw the surface border, independently of padding, radius and variant. Default: true.",
       "defaultValue": true
     },
     {
@@ -147,14 +138,14 @@
       "name": "fullWidth",
       "type": "boolean",
       "required": false,
-      "description": "Stretch to the available inline size. False uses intrinsic width and preserves parent alignment.",
+      "description": "Stretch to the available inline size; `false` fits the content and keeps the parent's alignment. Default: true.",
       "defaultValue": true
     },
     {
       "name": "footerAlign",
       "type": "select",
       "required": false,
-      "description": "Alignment used by the convenience footer slot. Compound usage configures Card.Footer directly.",
+      "description": "Alignment of the `footer` content; compound usage sets `Card.Footer align` instead. Default: end.",
       "options": [
         "start",
         "end",
@@ -166,7 +157,7 @@
       "name": "children",
       "type": "any",
       "required": false,
-      "description": "Compound children or custom content escape hatch."
+      "description": "Body of the card: the content part beside `title`/`description`/`footer`, or free composition of Card parts."
     }
   ],
   "meta": {

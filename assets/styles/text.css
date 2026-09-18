@@ -152,17 +152,17 @@
   padding-left: var(--uf-control-pad-text);
 }
 /* Alignment */
-.uf-text[data-scope][data-align="left"] {
+.uf-text[data-scope][data-align="start"] {
   justify-content: flex-start;
-  text-align: left;
+  text-align: start;
 }
 .uf-text[data-scope][data-align="center"] {
   justify-content: center;
   text-align: center;
 }
-.uf-text[data-scope][data-align="right"] {
+.uf-text[data-scope][data-align="end"] {
   justify-content: flex-end;
-  text-align: right;
+  text-align: end;
 }
 /* Stretch */
 .uf-text[data-scope][data-stretch-text] .uf-text__content {

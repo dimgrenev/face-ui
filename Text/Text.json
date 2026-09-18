@@ -4,10 +4,10 @@
   "name": "Text",
   "description": "Typography component unifying body, heading, label, kbd, and code",
   "props": {
-    "text": {
-      "type": "string",
+    "children": {
+      "type": "ReactNode",
       "required": false,
-      "description": "Text content."
+      "description": "Content of the text; a string is the common case. Empty content renders no content slot."
     },
     "variant": {
       "type": "enum",
@@ -116,13 +116,13 @@
     "align": {
       "type": "enum",
       "required": false,
-      "description": "Text alignment.",
+      "description": "Inline alignment of the content, following text direction. Default: start.",
       "options": [
-        "left",
+        "start",
         "center",
-        "right"
+        "end"
       ],
-      "default": "left"
+      "default": "start"
     },
     "membrane": {
       "type": "boolean",
@@ -136,11 +136,6 @@
       "description": "Truncate text with ellipsis when it overflows.",
       "default": false
     },
-    "children": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Custom children (overrides text)."
-    },
     "htmlFor": {
       "type": "string",
       "required": false,
@@ -151,20 +146,20 @@
     {
       "name": "Default (Body)",
       "props": {
+        "children": "Text",
         "variant": "body",
         "iconPosition": "start",
         "inset": "control",
         "stretchText": false,
         "fullWidth": false,
-        "align": "left",
-        "membrane": true,
-        "text": "Text"
+        "align": "start",
+        "membrane": true
       }
     },
     {
       "name": "Heading",
       "props": {
-        "text": "Heading Text",
+        "children": "Heading Text",
         "variant": "heading",
         "inset": "control"
       }
@@ -172,7 +167,7 @@
     {
       "name": "Label",
       "props": {
-        "text": "Label Text",
+        "children": "Label Text",
         "variant": "label",
         "inset": "control"
       }
@@ -180,28 +175,28 @@
     {
       "name": "Kbd",
       "props": {
-        "text": "⌘K",
+        "children": "⌘K",
         "variant": "kbd"
       }
     },
     {
       "name": "Code",
       "props": {
-        "text": "const x = 1",
+        "children": "const x = 1",
         "variant": "code"
       }
     },
     {
       "name": "Muted",
       "props": {
-        "text": "Muted text",
+        "children": "Muted text",
         "variant": "muted"
       }
     },
     {
       "name": "With Icon",
       "props": {
-        "text": "With left icon",
+        "children": "With left icon",
         "icon": "search",
         "iconPosition": "start"
       }
@@ -209,7 +204,7 @@
     {
       "name": "Stretch + Full Width",
       "props": {
-        "text": "Pinned right icon",
+        "children": "Pinned right icon",
         "icon": "arrow-right",
         "iconPosition": "end",
         "stretchText": true,
@@ -219,7 +214,7 @@
     {
       "name": "Inset None",
       "props": {
-        "text": "Flush text",
+        "children": "Flush text",
         "inset": "none",
         "membrane": false
       }

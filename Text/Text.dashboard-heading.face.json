@@ -7,8 +7,8 @@
   "root": {
     "type": "Text",
     "props": {
-      "text": {
-        "$ref": "props.text"
+      "children": {
+        "$ref": "props.children"
       },
       "variant": {
         "$ref": "props.variant"
@@ -46,9 +46,6 @@
       "truncate": {
         "$ref": "props.truncate"
       },
-      "children": {
-        "$ref": "props.children"
-      },
       "htmlFor": {
         "$ref": "props.htmlFor"
       }
@@ -57,22 +54,22 @@
   },
   "currentState": {
     "props": {
-      "text": "Revenue overview",
+      "children": "Revenue overview",
       "variant": "h2",
       "size": "xl",
       "as": "h2",
       "inset": "control",
       "fullWidth": true,
-      "align": "left",
+      "align": "start",
       "membrane": true
     }
   },
   "controls": [
     {
-      "name": "text",
-      "type": "string",
+      "name": "children",
+      "type": "any",
       "required": false,
-      "description": "Text content."
+      "description": "Content of the text; a string is the common case. Empty content renders no content slot."
     },
     {
       "name": "variant",
@@ -191,13 +188,13 @@
       "name": "align",
       "type": "select",
       "required": false,
-      "description": "Text alignment.",
+      "description": "Inline alignment of the content, following text direction. Default: start.",
       "options": [
-        "left",
+        "start",
         "center",
-        "right"
+        "end"
       ],
-      "defaultValue": "left"
+      "defaultValue": "start"
     },
     {
       "name": "membrane",
@@ -212,12 +209,6 @@
       "required": false,
       "description": "Truncate text with ellipsis when it overflows.",
       "defaultValue": false
-    },
-    {
-      "name": "children",
-      "type": "any",
-      "required": false,
-      "description": "Custom children (overrides text)."
     },
     {
       "name": "htmlFor",

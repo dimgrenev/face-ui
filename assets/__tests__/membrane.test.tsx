@@ -18,7 +18,7 @@ it('forwards a control padding click once, with focus, modifiers and the actual 
   await act(async () =>
     root.render(
       <div onClick={onParentClick}>
-        <Button onClick={onClick} text="Save" />
+        <Button onClick={onClick}>Save</Button>
       </div>,
     ),
   )
@@ -84,7 +84,11 @@ it('does not steal a nested action or activate disabled controls', async () => {
   expect(action).toHaveBeenCalledTimes(1)
   expect(row).not.toHaveBeenCalled()
   await act(async () =>
-    root.render(<Button disabled onClick={row} text="Save" />),
+    root.render(
+      <Button disabled onClick={row}>
+        Save
+      </Button>,
+    ),
   )
   await act(async () =>
     container.querySelector<HTMLElement>('.uf-membrane')!.click(),
@@ -105,7 +109,7 @@ it('forwards through an inactive child membrane to its actual control', async ()
   await act(async () =>
     root.render(
       <Membrane interactive>
-        <Button membrane={false} text="Choose month" onClick={onClick} />
+        <Button membrane={false} onClick={onClick}>Choose month</Button>
       </Membrane>,
     ),
   )

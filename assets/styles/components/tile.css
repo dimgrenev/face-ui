@@ -66,21 +66,21 @@
 .uf-tile[data-scope="tile"][data-full-width] {
   width: 100%;
 }
-.uf-tile[data-scope="tile"][data-align="left"] {
+.uf-tile[data-scope="tile"][data-align="start"] {
   justify-content: flex-start;
-  text-align: left;
+  text-align: start;
 }
 .uf-tile[data-scope="tile"][data-align="center"] {
   justify-content: center;
   text-align: center;
 }
-.uf-tile[data-scope="tile"][data-align="right"] {
+.uf-tile[data-scope="tile"][data-align="end"] {
   justify-content: flex-end;
-  text-align: right;
+  text-align: end;
 }
-/* Tile level indent: base pad plus one-step compensation so rows with leading
+/* Tile indent: base pad plus one-step compensation so rows with leading
    icons align with Button text on the shared option indent rhythm. */
-.uf-tile[data-scope="tile"][data-level] {
+.uf-tile[data-scope="tile"][data-indent] {
   padding-inline-start: calc(var(--uf-tile-pad-start) + var(--face-runtime-option-level, 0) * var(--uf-option-indent) + min(var(--face-runtime-option-level, 0), 1) * var(--uf-tile-level-compensation));
 }
 .uf-tile[data-scope="tile"][data-interactive]:not([data-primary-disabled]):hover {
@@ -168,7 +168,18 @@
 .uf-tile__indicator[data-scope] {
   opacity: var(--uf-tile-indicator-opacity);
 }
-.uf-tile__indicator[data-direction="right"][data-open] {
+/* The end chevron points to the inline end: mirrored under the nearest dir="rtl".
+   Custom properties rather than :dir(), which minifiers may lower to :lang(). */
+:where([dir="ltr"]) {
+  --uf-tile-inline-sign: 1;
+}
+:where([dir="rtl"]) {
+  --uf-tile-inline-sign: -1;
+}
+.uf-tile__indicator[data-direction="end"] {
+  transform: scaleX(var(--uf-tile-inline-sign, 1));
+}
+.uf-tile__indicator[data-direction="end"][data-open] {
   transform: rotate(90deg);
 }
 .uf-tile__label {
@@ -189,14 +200,6 @@
   display: inline-flex;
   align-items: center;
   gap: var(--uf-tile-content-gap, var(--uf-control-gap));
-}
-.uf-tile__rightText {
-  color: var(--uf-color-fg-muted);
-  margin-inline-start: auto;
-  flex-shrink: 0;
-}
-.uf-tile[data-scope="tile"][data-selector] > [data-part="text"] > .uf-tile__rightText {
-  margin-inline-start: var(--uf-selector-indicator-gap);
 }
 [data-scope="tile"] > [data-part="meta"] {
   display: inline-flex;

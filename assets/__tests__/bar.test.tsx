@@ -70,12 +70,12 @@ it('Bar preserves mixed ordinary nodes and named slots, including fragments and 
 })
 it('Bar descriptor composition preserves all content and does not stringify false', async () => {
   const children = [
-    { __componentName__: 'Button', text: 'Attach' },
-    { __componentName__: 'Text', text: 'Agent mode' },
+    { __componentName__: 'Button', children: 'Attach' },
+    { __componentName__: 'Text', children: 'Agent mode' },
     {
       __componentName__: 'Bar.Section',
       align: 'end',
-      children: [false, { __componentName__: 'Button', text: 'Run' }],
+      children: [false, { __componentName__: 'Button', children: 'Run' }],
     },
   ]
   await render(<Bar>{children as unknown as React.ReactNode}</Bar>)

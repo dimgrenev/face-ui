@@ -270,8 +270,9 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
                       size="xs"
                       inset="none"
                       membrane={false}
-                      text={section.group.label}
-                    />
+                    >
+                      {section.group.label}
+                    </Text>
                   </div>
                   {section.items.map((item) => {
                     const currentIndex = globalIndex++
@@ -306,7 +307,7 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
                           {...itemProps}
                           membrane={false}
                           fullWidth
-                          align="left"
+                          align="start"
                           stretchText
                           className={cn(
                             'uf-command-item',
@@ -355,7 +356,7 @@ export const Command = forwardRef<HTMLDivElement, CommandProps>(
                     {...itemProps}
                     membrane={false}
                     fullWidth
-                    align="left"
+                    align="start"
                     stretchText
                     className={cn(
                       'uf-command-item',

@@ -2,7 +2,7 @@ import React, { act, createRef } from 'react'
 import type { Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Button, ButtonGroup } from '../../Button/Button'
-import { libraryCss, mount } from './harness'
+import { expectDevError, libraryCss, mount } from './harness'
 import { installMatchMedia, type MatchMediaRestore } from './harness/match-media'
 
 let host: HTMLDivElement
@@ -22,25 +22,46 @@ afterEach(() => {
 })
 
 describe('Button prop contract', () => {
-  it('text, children and rightText have explicit content ownership and update after mount', async () => {
-    await render({ text: 'Save', rightText: '⌘S' })
+  it('children label and meta own separate slots and update after mount', async () => {
+    await render({ children: 'Save', meta: '⌘S' })
     expect(button().textContent).toBe('Save⌘S')
-    await render({
-      text: 'Ignored',
-      children: <strong>Publish</strong>,
-      rightText: 'Live',
-    })
+    expect(button().querySelector('[data-part="meta"]')?.textContent).toBe('⌘S')
+    await render({ children: <strong>Publish</strong>, meta: 'Live' })
     expect(button().textContent).toBe('PublishLive')
     expect(button().querySelector('strong')).not.toBeNull()
-    await render({ text: 'Restore', children: 0 })
+    await render({ children: 0 })
     expect(button().textContent).toBe('0')
-    await render({ text: 'Restore' })
-    expect(button().textContent).toBe('Restore')
+    expect(button().querySelector('[data-part="meta"]')).toBeNull()
+  })
+
+  it('align is logical and indent is an integer step from 0 to 9', async () => {
+    for (const align of ['start', 'center', 'end'] as const) {
+      await render({ children: 'Save', align })
+      expect(button().getAttribute('data-align')).toBe(align)
+    }
+    for (const indent of [0, 9]) {
+      await render({ children: 'Row', indent })
+      expect(button().hasAttribute('data-indent')).toBe(true)
+      expect(button().style.getPropertyValue('--face-runtime-option-level')).toBe(String(indent))
+    }
+    for (const [indent, expected] of [
+      [2.8, '2'],
+      [12, '9'],
+      [-1, '0'],
+    ] as const) {
+      await expectDevError(
+        () => render({ children: 'Row', indent }),
+        new RegExp(`^Face UI Button: invalid indent ${indent}; using ${expected}\\.$`),
+      )
+      expect(button().style.getPropertyValue('--face-runtime-option-level')).toBe(expected)
+    }
+    await render({ children: 'Row' })
+    expect(button().hasAttribute('data-indent')).toBe(false)
   })
 
   it('icon and iconPosition remain independent of the disclosure indicator', async () => {
     await render({
-      text: 'Account',
+      children: 'Account',
       icon: 'user',
       iconPosition: 'end',
       chevron: 'down',
@@ -52,7 +73,7 @@ describe('Button prop contract', () => {
     ).toBeTruthy()
     expect(icon.querySelector('svg')?.getAttribute('data-icon')).toBe('user')
     await render({
-      text: 'Account',
+      children: 'Account',
       icon: <span data-custom-icon />,
       iconPosition: 'start',
     })
@@ -64,7 +85,7 @@ describe('Button prop contract', () => {
   })
 
   it('iconOnly hides the visual label while keeping it available to assistive technology', async () => {
-    await render({ text: 'Search', icon: 'search', iconOnly: true })
+    await render({ children: 'Search', icon: 'search', iconOnly: true })
     expect(button().textContent).toBe('Search')
     expect(button().querySelector('.uf-visually-hidden')?.textContent).toBe(
       'Search',
@@ -72,25 +93,25 @@ describe('Button prop contract', () => {
     await render({ icon: 'search', 'aria-label': 'Find' })
     expect(button().hasAttribute('data-icon-only')).toBe(true)
     expect(button().getAttribute('aria-label')).toBe('Find')
-    await render({ text: 'Search', icon: 'search', iconOnly: false })
+    await render({ children: 'Search', icon: 'search', iconOnly: false })
     expect(button().querySelector('.uf-visually-hidden')).toBeNull()
   })
 
   it('chevron follows aria-expanded while preserving the native state declaration', async () => {
-    await render({ text: 'Options', chevron: 'down', 'aria-expanded': false })
+    await render({ children: 'Options', chevron: 'down', 'aria-expanded': false })
     expect(
       button()
         .querySelector('[data-part="indicator"] svg')
         ?.getAttribute('data-icon'),
     ).toBe('select-chevron-down')
-    await render({ text: 'Options', chevron: 'down', 'aria-expanded': 'true' })
+    await render({ children: 'Options', chevron: 'down', 'aria-expanded': 'true' })
     expect(
       button()
         .querySelector('[data-part="indicator"] svg')
         ?.getAttribute('data-icon'),
     ).toBe('select-chevron-up')
     expect(button().getAttribute('aria-expanded')).toBe('true')
-    await render({ text: 'Options', 'aria-expanded': false })
+    await render({ children: 'Options', 'aria-expanded': false })
     expect(button().querySelector('[data-part="indicator"]')).toBeNull()
     expect(button().getAttribute('aria-expanded')).toBe('false')
   })
@@ -98,7 +119,7 @@ describe('Button prop contract', () => {
   it('disabled and loading block activation independently and preserve the label', async () => {
     const onClick = vi.fn()
     for (const state of [{ disabled: true }, { loading: true }]) {
-      await render({ text: 'Save', onClick, ...state })
+      await render({ children: 'Save', onClick, ...state })
       await act(async () => {
         button().click()
       })
@@ -107,7 +128,7 @@ describe('Button prop contract', () => {
     }
     expect(onClick).not.toHaveBeenCalled()
     expect(button().getAttribute('aria-busy')).toBe('true')
-    await render({ text: 'Save', onClick, loading: false })
+    await render({ children: 'Save', onClick, loading: false })
     await act(async () => {
       button().click()
     })
@@ -124,14 +145,14 @@ describe('Button prop contract', () => {
       get: () => ({ writeText }),
     })
     const copied = vi.fn()
-    await render({ text: 'Copy', copyText: '', onCopied: copied })
+    await render({ children: 'Copy', copyText: '', onCopied: copied })
     await act(async () => {
       button().click()
     })
     expect(writeText).toHaveBeenLastCalledWith('')
     expect(copied).toHaveBeenCalledTimes(1)
     await render({
-      text: 'Copy',
+      children: 'Copy',
       copyText: 'secret',
       onCopied: copied,
       onClick: (event) => event.preventDefault(),
@@ -140,14 +161,14 @@ describe('Button prop contract', () => {
       button().click()
     })
     expect(writeText).toHaveBeenCalledTimes(1)
-    await render({ text: 'Copy', copyText: 'new' })
+    await render({ children: 'Copy', copyText: 'new' })
     await act(async () => {
       button().click()
     })
     expect(writeText).toHaveBeenLastCalledWith('new')
     expect(copied).toHaveBeenCalledTimes(1)
     writeText.mockRejectedValue(new Error('Denied'))
-    await render({ text: 'Copy', copyText: 'failed', onCopied: copied })
+    await render({ children: 'Copy', copyText: 'failed', onCopied: copied })
     await act(async () => {
       button().click()
     })
@@ -160,7 +181,7 @@ describe('Button prop contract', () => {
     const ref = createRef<HTMLButtonElement>()
     for (const membrane of [true, false]) {
       await render({
-        text: 'Save',
+        children: 'Save',
         id: 'save',
         type: 'submit',
         name: 'action',
@@ -194,7 +215,7 @@ describe('Button prop contract', () => {
     async () => {
       const cleanup = vi.fn()
       const ref = vi.fn((node) => (node ? cleanup : undefined))
-      await render({ text: 'Save', ref })
+      await render({ children: 'Save', ref })
       await act(async () => {
         root.render(null)
       })
@@ -214,8 +235,8 @@ describe('Button prop contract', () => {
             aria-label="Formatting"
             className="toolbar"
           >
-            <Button text="Bold" />
-            <Button text="Italic" />
+            <Button>Bold</Button>
+            <Button>Italic</Button>
           </ButtonGroup>,
         )
       })
@@ -254,7 +275,11 @@ describe('component smoke', () => {
 
   it('Button selector mode renders a compact system indicator', async () => {
     await act(async () => {
-      root.render(<Button text="GPT-5.5" fullWidth={false} chevron={'down'} />)
+      root.render(
+        <Button fullWidth={false} chevron="down">
+          GPT-5.5
+        </Button>,
+      )
     })
 
     const button = container.querySelector(
@@ -269,12 +294,9 @@ describe('component smoke', () => {
 
     await act(async () => {
       root.render(
-        <Button
-          text="GPT-5.5"
-          fullWidth={false}
-          chevron={'down'}
-          aria-expanded={true}
-        />,
+        <Button fullWidth={false} chevron="down" aria-expanded>
+          GPT-5.5
+        </Button>,
       )
     })
 
@@ -285,7 +307,11 @@ describe('component smoke', () => {
     ).not.toBeNull()
 
     await act(async () => {
-      root.render(<Button text="Nested" fullWidth={false} chevron={'right'} />)
+      root.render(
+        <Button fullWidth={false} chevron="end">
+          Nested
+        </Button>,
+      )
     })
 
     const sideButton = container.querySelector(
@@ -309,11 +335,12 @@ describe('component smoke', () => {
         <div style={{ width: 96 }}>
           <Button
             icon="account"
-            text="Dmitry Grer With A Very Long Account Name"
             fullWidth
             stretchText
-            rightText="Pro"
-          />
+            meta="Pro"
+          >
+            Dmitry Grer With A Very Long Account Name
+          </Button>
         </div>,
       )
     })
@@ -330,9 +357,7 @@ describe('component smoke', () => {
     expect(button?.getAttribute('data-stretch-text')).toBe('')
     expect(textSlot).not.toBeNull()
     expect(label?.textContent).toBe('Dmitry Grer With A Very Long Account Name')
-    expect(button?.querySelector('.uf-button__rightText')?.textContent).toBe(
-      'Pro',
-    )
+    expect(button?.querySelector('.uf-button__meta')?.textContent).toBe('Pro')
 
     const componentStyles = libraryCss()
     expect(componentStyles).toContain(
@@ -370,11 +395,12 @@ describe('responsive overlay surfaces', () => {
       root.render(
         <form onSubmit={handleSubmit}>
           <Button
-            text="Run action"
             onClick={handleClick}
             fullWidth={false}
             membrane={false}
-          />
+          >
+            Run action
+          </Button>
         </form>,
       )
     })

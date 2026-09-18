@@ -29,7 +29,7 @@
         },
         {
           "__componentName__": "Text",
-          "text": "Agent mode",
+          "children": "Agent mode",
           "variant": "muted",
           "truncate": true
         },
@@ -39,7 +39,7 @@
           "children": [
             {
               "__componentName__": "Button",
-              "text": "Run",
+              "children": "Run",
               "variant": "accent",
               "fullWidth": false
             }

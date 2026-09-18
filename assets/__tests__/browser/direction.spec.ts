@@ -28,7 +28,7 @@ for (const component of ['Button', 'Text', 'Tile', 'Input'] as const) {
               ...shared,
             })
           : mount(page, component, {
-              text: 'Label',
+              children: 'Label',
               fullWidth: true,
               stretchText: false,
               ...shared,

@@ -288,9 +288,6 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
           {autoPlay && (
             <Button
               data-carousel-play
-              text={
-                paused || reducedMotion ? 'Start rotation' : 'Pause rotation'
-              }
               fullWidth={false}
               onClick={() => {
                 if (paused || reducedMotion) {
@@ -298,7 +295,9 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
                   setReducedMotion(false)
                 } else setPaused(true)
               }}
-            />
+            >
+              {paused || reducedMotion ? 'Start rotation' : 'Pause rotation'}
+            </Button>
           )}
           <div className="uf-carousel-navSlot uf-carousel-navSlot--prev">
             <Button

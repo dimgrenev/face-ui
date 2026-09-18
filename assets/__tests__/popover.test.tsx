@@ -104,8 +104,8 @@ describe('responsive overlay surfaces', () => {
     await act(async () => {
       root.render(
         <Modal open title="Parent">
-          <Popover aria-label="Parent options" content={<Button text="Popover action" />}>
-            <Button text="Open popover" />
+          <Popover aria-label="Parent options" content={<Button>Popover action</Button>}>
+            <Button>Open popover</Button>
           </Popover>
         </Modal>,
       )

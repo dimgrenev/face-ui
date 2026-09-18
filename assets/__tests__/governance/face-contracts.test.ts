@@ -213,10 +213,10 @@ describe('face-ui-react contracts', () => {
     expect(contracts.get('Button')?.props.membrane?.default).toBe(true)
     expect(contracts.get('Button')?.props.variant?.options).not.toContain('suggestion')
     expect(contracts.get('Text')?.props.variant?.options).not.toContain('default')
-    for (const removed of ['intent', 'selector', 'selectorOpen', 'busy', 'selectedDescendant']) {
+    for (const removed of ['intent', 'selector', 'selectorOpen', 'busy', 'selectedDescendant', 'text', 'rightText', 'level']) {
       expect(contracts.get('Tile')?.props).not.toHaveProperty(removed)
     }
-    expect(contracts.get('Tile')?.props.chevron?.options).toEqual(['down', 'right'])
+    expect(contracts.get('Tile')?.props.chevron?.options).toEqual(['down', 'end'])
     expect(contracts.get('Tile')?.props['aria-expanded']?.type).toBe('boolean')
     expect(contracts.get('Tile')?.props['aria-busy']?.type).toBe('boolean')
     expect(contracts.get('Modal')?.props).not.toHaveProperty('variant')

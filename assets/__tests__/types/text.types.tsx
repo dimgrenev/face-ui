@@ -11,3 +11,7 @@ export const quote = (
 )
 // @ts-expect-error Text owns its content slot.
 export const textHtml = <Text dangerouslySetInnerHTML={{ __html: 'Text' }} />
+// @ts-expect-error Content is children; the text prop was removed.
+export const textProp = <Text text="Hello" />
+// @ts-expect-error Alignment follows reading direction: start, center or end.
+export const physicalTextAlign = <Text align="left">Hello</Text>

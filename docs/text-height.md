@@ -3,8 +3,8 @@
 `heightMode` separates vertical sizing from horizontal inset and typography.
 
 ```tsx
-<Text text="Control label" />
-<Text as="p" heightMode="content" membrane={false} text="A paragraph with horizontal breathing room." />
+<Text>Control label</Text>
+<Text as="p" heightMode="content" membrane={false}>A paragraph with horizontal breathing room.</Text>
 <Text as="span" heightMode="content" inset="none" membrane={false}>An inline run</Text>
 ```
 

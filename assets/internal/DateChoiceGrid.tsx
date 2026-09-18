@@ -140,7 +140,6 @@ export function DateChoiceGrid({
             ref={(node) => {
               buttons.current[index] = node
             }}
-            text={item.label}
             fullWidth
             membrane={false}
             tabIndex={index === activeIndex ? 0 : -1}
@@ -149,7 +148,9 @@ export function DateChoiceGrid({
             variant={item.selected ? 'secondary' : 'ghost'}
             onFocus={() => setFocusedIndex(index)}
             onClick={() => onSelect(item.value)}
-          />
+          >
+            {item.label}
+          </Button>
         </Membrane>
       ))}
     </div>

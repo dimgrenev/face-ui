@@ -2,7 +2,7 @@ import React, { act, createRef } from 'react'
 import type { Root } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Text, type TextElement, type TextVariant } from '../../Text/Text'
-import { mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 let host: HTMLDivElement
 let root: Root
@@ -28,20 +28,18 @@ describe('Text and Badge content contracts', () => {
     expect(host.querySelector('[data-scope="text"]')?.getAttribute('data-inset')).toBe('none')
   })
 
-  it('Text renders text or rich children with predictable precedence and forwards native root props', async () => {
+  it('Text renders its children, omits an empty content slot and forwards native root props', async () => {
     const ref = createRef<HTMLElement>()
     const click = vi.fn()
-    await render(<Text text="Plain" />)
+    await render(<Text>Plain</Text>)
     expect(host.textContent).toBe('Plain')
-    await render(<Text text="Fallback">{0}</Text>)
+    await render(<Text>{0}</Text>)
     expect(host.textContent).toBe('0')
-    await render(<Text text="Fallback">{false}</Text>)
-    expect(host.textContent).toBe('')
-    expect(host.querySelector('.uf-text__content')).toBeNull()
-    await render(<Text text="Fallback">{''}</Text>)
-    expect(host.textContent).toBe('')
-    await render(<Text text="Fallback">{null}</Text>)
-    expect(host.textContent).toBe('Fallback')
+    for (const empty of [false, '', null, undefined]) {
+      await render(<Text>{empty}</Text>)
+      expect(host.textContent).toBe('')
+      expect(host.querySelector('.uf-text__content')).toBeNull()
+    }
     await render(
       <Text
         ref={ref}
@@ -91,7 +89,7 @@ describe('Text and Badge content contracts', () => {
       blockquote: 'BLOCKQUOTE',
     }
     for (const [variant, tag] of Object.entries(tags)) {
-      await render(<Text text="Content" variant={variant as TextVariant} />)
+      await render(<Text variant={variant as TextVariant}>Content</Text>)
       expect(host.querySelector('[data-scope="text"]')?.tagName, variant).toBe(
         tag,
       )
@@ -116,12 +114,13 @@ describe('Text and Badge content contracts', () => {
     ]) {
       await render(
         <Text
-          text="Content"
           as={as as TextElement}
           variant="muted"
           membrane={false}
           htmlFor="field"
-        />,
+        >
+          Content
+        </Text>,
       )
       const node = host.querySelector('.uf-text')!
       expect(node.tagName).toBe(as.toUpperCase())
@@ -132,7 +131,7 @@ describe('Text and Badge content contracts', () => {
   it('Text icon can change side, accept rich nodes, and disappear without an empty slot', async () => {
     for (const iconPosition of ['start', 'end'] as const) {
       await render(
-        <Text text="Content" icon="user" iconPosition={iconPosition} />,
+        <Text icon="user" iconPosition={iconPosition}>Content</Text>,
       )
       const node = host.querySelector('[data-scope="text"]')!
       expect(node.querySelector('svg')?.getAttribute('data-icon')).toBe('user')
@@ -143,11 +142,30 @@ describe('Text and Badge content contracts', () => {
         )?.className,
       ).toBe('uf-text__icon')
     }
-    await render(<Text text="Content" icon={<b>!</b>} />)
+    await render(<Text icon={<b>!</b>}>Content</Text>)
     expect(host.querySelector('.uf-text__icon b')?.textContent).toBe('!')
     for (const icon of [null, undefined, false, '']) {
-      await render(<Text text="Content" icon={icon} />)
+      await render(<Text icon={icon}>Content</Text>)
       expect(host.querySelector('.uf-text__icon')).toBeNull()
     }
+  })
+
+  it('align is logical: start and end follow the text direction', async () => {
+    for (const align of ['start', 'center', 'end'] as const) {
+      await render(<Text align={align}>Aligned</Text>)
+      const node = host.querySelector('.uf-text')!
+      expect(node.getAttribute('data-align')).toBe(align)
+      expect(node.classList.contains(`uf-text--align-${align}`)).toBe(true)
+    }
+    await render(<Text>Default</Text>)
+    expect(host.querySelector('.uf-text')?.getAttribute('data-align')).toBe('start')
+  })
+
+  it('an unknown element in as renders the variant element and is reported', async () => {
+    await expectDevError(
+      () => render(<Text as={'section' as TextElement} variant="h3">Title</Text>),
+      /^Face UI Text: invalid as "section"; rendering <h3>\.$/,
+    )
+    expect(host.querySelector('.uf-text')?.tagName).toBe('H3')
   })
 })

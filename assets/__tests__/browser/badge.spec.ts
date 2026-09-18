@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
   await open(page, 'mount')
 })
 for (const theme of ['light', 'dark']) {
-  test(`Badge tone and appearance combinations are readable in ${theme}`, { tag: ['@css', '@a11y'] }, async ({
+  test(`Badge tone and variant combinations are readable in ${theme}`, { tag: ['@css', '@a11y'] }, async ({
     page,
   }) => {
     await page.evaluate(
@@ -19,7 +19,7 @@ for (const theme of ['light', 'dark']) {
     )
     await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') })
     const signatures: string[] = []
-    for (const appearance of ['fill', 'outline'] as const) {
+    for (const variant of ['fill', 'outline'] as const) {
       for (const tone of [
         'neutral',
         'accent',
@@ -28,9 +28,9 @@ for (const theme of ['light', 'dark']) {
         'destructive',
       ] as const) {
         await render(page, {
-          text: 'Deployment ready',
+          children: 'Deployment ready',
           tone,
-          appearance,
+          variant,
         })
         const node = page.locator('[data-scope="badge"]')
         await expect(node).toHaveAttribute('data-tone', tone)
@@ -49,7 +49,7 @@ for (const theme of ['light', 'dark']) {
               )
             ).violations,
         )
-        expect(violations, `${appearance}/${tone}`).toEqual([])
+        expect(violations, `${variant}/${tone}`).toEqual([])
       }
     }
     // The authored monochrome palette intentionally aliases accent/destructive
@@ -69,7 +69,7 @@ test('Badge tones bind independent semantic tokens when the host supplies a colo
     }))
       document.documentElement.style.setProperty(`--uf-color-${name}`, color)
   })
-  for (const appearance of ['fill', 'outline'] as const) {
+  for (const variant of ['fill', 'outline'] as const) {
     const colors = new Set<string>()
     for (const tone of [
       'neutral',
@@ -78,14 +78,14 @@ test('Badge tones bind independent semantic tokens when the host supplies a colo
       'warning',
       'destructive',
     ] as const) {
-      await render(page, { text: 'Status', tone, appearance })
+      await render(page, { children: 'Status', tone, variant })
       const node = page.locator('[data-scope="badge"]')
       await expect(node).toHaveAttribute('data-tone', tone)
       colors.add(
-        await node.evaluate((node, appearance) => {
+        await node.evaluate((node, variant) => {
           const s = getComputedStyle(node)
-          return appearance === 'fill' ? s.backgroundColor : s.boxShadow
-        }, appearance),
+          return variant === 'fill' ? s.backgroundColor : s.boxShadow
+        }, variant),
       )
     }
     expect(colors.size).toBe(5)

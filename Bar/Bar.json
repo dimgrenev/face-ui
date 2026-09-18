@@ -26,17 +26,17 @@
         "children": [
           {
             "__componentName__": "Text",
-            "text": "Workspace",
-            "membrane": false
+            "membrane": false,
+            "children": "Workspace"
           },
           {
             "__componentName__": "Bar.Section",
             "children": [
               {
                 "__componentName__": "Button",
-                "text": "Share",
                 "icon": "link",
-                "fullWidth": false
+                "fullWidth": false,
+                "children": "Share"
               }
             ],
             "align": "end"

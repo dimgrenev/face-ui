@@ -285,7 +285,7 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
           key={`${key}:button`}
           {...itemProps}
           fullWidth
-          align="left"
+          align="start"
           stretchText
           className={cn(
             'uf-menu-item',
@@ -329,8 +329,9 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
                   size="xs"
                   inset="none"
                   membrane={false}
-                  text={entry.label}
-                />
+                >
+                  {entry.label}
+                </Text>
               </div>
               {entry.items.map((subItem, j) =>
                 isSeparator(subItem)

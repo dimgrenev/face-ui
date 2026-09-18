@@ -153,12 +153,13 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
           </Text>
           <Button
             {...triggerProps}
-            text={resolvedLabels.trigger}
             variant="default"
-            align="left"
+            align="start"
             className="uf-upload-trigger"
             onClick={handleTriggerClick}
-          />
+          >
+            {resolvedLabels.trigger}
+          </Button>
         </div>
 
         {api.files.length > 0 && (
@@ -178,10 +179,11 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(
                 <Button
                   {...(api.getFileRemoveProps(file.id) as any)}
                   aria-label={`${resolvedLabels.remove} ${file.name}`}
-                  text={resolvedLabels.remove}
                   fullWidth={false}
                   membrane={false}
-                />
+                >
+                  {resolvedLabels.remove}
+                </Button>
               </li>
             ))}
           </ul>

@@ -2,7 +2,7 @@ import React, { act } from 'react'
 import type { Root } from 'react-dom/client'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { Icon, ICON_NAMES } from '../../Icon/Icon'
-import { mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 let host: HTMLDivElement
 let root: Root
@@ -32,7 +32,10 @@ describe('Icon prop contract', () => {
       '__proto__',
       'https://example.com/icon.svg',
     ]) {
-      await render(<Icon name={name} />)
+      await expectDevError(
+        () => render(<Icon name={name} />),
+        /^Face UI Icon: invalid name ".+"; rendering notdef\.$/,
+      )
       expect(host.querySelector('svg')?.innerHTML, name).toBe(fallback)
     }
     await render(<Icon name="  user  " />)
@@ -40,19 +43,19 @@ describe('Icon prop contract', () => {
     await render(<Icon name="  " />)
     expect(host.firstChild).toBeNull()
   })
-  it('label and title have distinct accessible and visible-hint roles and can be removed', async () => {
+  it('aria-label and title have distinct accessible and visible-hint roles and can be removed', async () => {
     await render(<Icon name="user" />)
     expect(host.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
     await render(<Icon name="user" title="Account" />)
     expect(host.querySelector('title')?.textContent).toBe('Account')
     expect(host.querySelector('svg')?.getAttribute('aria-hidden')).toBeNull()
     expect(host.querySelector('svg')?.getAttribute('role')).toBe('img')
-    await render(<Icon name="user" label="Profile" title="Account" />)
+    await render(<Icon name="user" aria-label="Profile" title="Account" />)
     expect(host.querySelector('svg')?.getAttribute('aria-label')).toBe(
       'Profile',
     )
     expect(host.querySelector('title')?.textContent).toBe('Account')
-    await render(<Icon name="user" label=" " title=" " />)
+    await render(<Icon name="user" aria-label=" " title=" " />)
     expect(host.querySelector('title')).toBeNull()
     expect(host.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
   })
@@ -109,9 +112,10 @@ describe('component smoke', () => {
   })
 
   it('Icon wrapper renders unsupported legacy runtime names as notdef', async () => {
-    await act(async () => {
-      root.render(<Icon name="git" />)
-    })
+    await expectDevError(
+      () => act(async () => root.render(<Icon name="git" />)),
+      /^Face UI Icon: invalid name "git"; rendering notdef\.$/,
+    )
 
     const icon = container.querySelector('svg[data-icon="git"]')
     expect(icon).not.toBeNull()

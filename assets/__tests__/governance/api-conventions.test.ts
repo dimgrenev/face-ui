@@ -369,13 +369,13 @@ function stringViolations(component: string): string[] {
 const PENDING = {
   'R-triple': ['Accordion', 'Code', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Slider', 'Table', 'Toc', 'Tree'],
   'R-names': [
-    'Accordion', 'Avatar', 'Badge', 'Button', 'Code', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay',
-    'Pagination', 'Panel', 'Radio', 'Select', 'Table', 'Tabs', 'Tile', 'Toast', 'Toc', 'Toggle', 'Tree',
+    'Accordion', 'Avatar', 'Code', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Pagination',
+    'Panel', 'Radio', 'Select', 'Table', 'Tabs', 'Toast', 'Toc', 'Toggle', 'Tree',
   ],
-  'R-dup': ['Badge', 'Button', 'Card', 'Carousel', 'Code', 'Date', 'Markdown', 'Progress', 'Select', 'Text', 'Tile', 'Toc'],
+  'R-dup': ['Carousel', 'Code', 'Date', 'Markdown', 'Progress', 'Select', 'Toc'],
   'R-label': ['Breadcrumb', 'Input', 'Modal', 'Select', 'Toast'],
   'R-aria': ['Carousel', 'Media', 'Scroll', 'Table'],
-  'R-logical': ['Button', 'Card', 'Modal', 'Table', 'Text', 'Tile', 'Toast', 'Toc'],
+  'R-logical': ['Modal', 'Table', 'Toast', 'Toc'],
   'R-bool': [],
   'R-field': ['Date', 'Input', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider'],
   'R-strings': [

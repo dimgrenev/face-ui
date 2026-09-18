@@ -423,7 +423,7 @@ describe('component smoke', () => {
           fullWidth={false}
           surface="popover"
           aria-label="Change type"
-          displayValue={<Icon name="brackets-curly" />}
+          displayValue={<Icon name="type" />}
           contentMinWidth="10rem"
           options={[
             { value: 'string', label: 'String' },
@@ -445,7 +445,7 @@ describe('component smoke', () => {
     expect(trigger?.querySelector('[data-part="indicator"]')).toBeNull()
     expect(
       trigger?.querySelector(
-        '.uf-select__value svg[data-icon="brackets-curly"]',
+        '.uf-select__value svg[data-icon="type"]',
       ),
     ).not.toBeNull()
 

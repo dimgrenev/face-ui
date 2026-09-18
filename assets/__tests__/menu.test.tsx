@@ -69,7 +69,7 @@ describe('responsive overlay surfaces', () => {
             { value: 'paste', label: 'Paste' },
           ]}
         >
-          <Button text="Open menu" fullWidth={false} membrane={false} />
+          <Button fullWidth={false} membrane={false}>Open menu</Button>
         </Menu>,
       )
     })
@@ -118,7 +118,7 @@ describe('responsive overlay surfaces', () => {
           sideOffset={4}
           items={[{ value: 'copy', label: 'Copy' }]}
         >
-          <Button text="Open menu" fullWidth={false} membrane={false} />
+          <Button fullWidth={false} membrane={false}>Open menu</Button>
         </Menu>,
       )
     })
@@ -199,7 +199,7 @@ describe('responsive overlay surfaces', () => {
       root.render(
         <>
           <Menu surface="popover" items={[{ value: 'copy', label: 'Copy' }]}>
-            <Button text="Open menu" fullWidth={false} membrane={false} />
+            <Button fullWidth={false} membrane={false}>Open menu</Button>
           </Menu>
           <button
             type="button"
@@ -245,7 +245,7 @@ describe('responsive overlay surfaces', () => {
       root.render(
         <>
           <Menu surface="popover" items={[{ value: 'copy', label: 'Copy' }]}>
-            <Button text="Open menu" fullWidth={false} membrane={false} />
+            <Button fullWidth={false} membrane={false}>Open menu</Button>
           </Menu>
           <button type="button" data-testid="outside-click">
             Outside
@@ -290,7 +290,7 @@ describe('responsive overlay surfaces', () => {
           surface="popover"
           items={[{ value: 'inspect', label: 'Inspect' }]}
         >
-          <Button text="Context target" fullWidth={false} membrane={false} />
+          <Button fullWidth={false} membrane={false}>Context target</Button>
         </Menu>,
       )
     })
@@ -328,7 +328,7 @@ describe('responsive overlay surfaces', () => {
           ]}
           onSelect={handleSelect}
         >
-          <Button text="Open menu" fullWidth={false} membrane={false} />
+          <Button fullWidth={false} membrane={false}>Open menu</Button>
         </Menu>,
       )
     })
@@ -457,7 +457,7 @@ describe('responsive overlay surfaces', () => {
             },
           ]}
         >
-          <Button text="Open menu" fullWidth={false} membrane={false} />
+          <Button fullWidth={false} membrane={false}>Open menu</Button>
         </Menu>,
       )
     })
