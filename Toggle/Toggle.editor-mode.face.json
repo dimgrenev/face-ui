@@ -124,7 +124,7 @@
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Lays the choices out in a row or a column; a single choice answers to all four arrows.",
+      "description": "Lays the choices out in a row or a column; without `multiple`, all four arrow keys move between choices.",
       "options": [
         "horizontal",
         "vertical"
@@ -158,7 +158,7 @@
       "name": "required",
       "type": "boolean",
       "required": false,
-      "description": "Blocks form submission until a choice is selected and marks the label."
+      "description": "Blocks form submission until a choice is selected and marks the group required; a group with no enabled choice never blocks."
     },
     {
       "name": "autoFocus",

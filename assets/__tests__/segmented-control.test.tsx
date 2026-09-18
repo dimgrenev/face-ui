@@ -310,11 +310,18 @@ it('accepts native item names for icons, and item descriptions come first', asyn
     id: 'mode',
     description: 'Help',
     items: [
-      { value: 'a', label: <svg />, id: 'grid', 'aria-label': 'Grid', 'aria-describedby': 'tip' },
+      { value: 'a', label: <svg />, id: 'grid', title: 'Grid view', 'aria-label': 'Grid', 'aria-labelledby': 'l', 'aria-describedby': 'tip' },
+      // Untyped data: only the documented native fields reach the button.
+      { value: 'b', label: 'B', onClick: 'x', 'data-x': 1 } as any,
     ],
   })
   expect(buttons()[0].id).toBe('grid')
+  expect(buttons()[0].title).toBe('Grid view')
   expect(buttons()[0].getAttribute('aria-label')).toBe('Grid')
+  expect(buttons()[0].getAttribute('aria-labelledby')).toBe('l')
+  expect(buttons()[1].hasAttribute('data-x')).toBe(false)
+  await click(1)
+  expect(selected()).toEqual(['B'])
   expect(buttons()[0].getAttribute('aria-describedby')).toBe('tip mode-description')
 })
 it('copies callback arrays before exposing them', async () => {
@@ -603,6 +610,32 @@ it('required blocks submission until a choice is made and marks the label', asyn
   await click(1)
   expect(form().checkValidity()).toBe(true)
 })
+it('required is exposed as aria-required on the radiogroup only', async () => {
+  const group = () => host.querySelector('.uf-toggle')!
+  await renderForm({ name: 'view', required: true, label: 'View', items: abc })
+  expect(group().getAttribute('role')).toBe('radiogroup')
+  expect(group().getAttribute('aria-required')).toBe('true')
+  await renderForm({ name: 'view', label: 'View', items: abc })
+  expect(group().hasAttribute('aria-required')).toBe(false)
+  // role=group does not support aria-required; the proxy still validates.
+  await renderForm({ multiple: true, name: 'view', required: true, items: abc })
+  expect(group().getAttribute('role')).toBe('group')
+  expect(group().hasAttribute('aria-required')).toBe(false)
+})
+it('required with no enabled choice does not block submission, as a native radio group', async () => {
+  await renderForm({ name: 'view', required: true, items: [] })
+  expect(form().checkValidity()).toBe(true)
+  await renderForm({
+    name: 'view',
+    required: true,
+    items: abc.map((item) => ({ ...item, disabled: true })),
+  })
+  expect(form().checkValidity()).toBe(true)
+  await renderForm({ name: 'view', required: true, disabled: true, items: abc })
+  expect(form().checkValidity()).toBe(true)
+  await renderForm({ name: 'view', required: true, items: abc })
+  expect(form().checkValidity()).toBe(false)
+})
 it('interactive validation shows the browser message as the error and focuses the tab stop', async () => {
   await renderForm({
     id: 'view',
@@ -644,6 +677,26 @@ it('invalid items and duplicate keys are skipped with a report', async () => {
     /^Face UI SegmentedControl: invalid items null; using \[\]\.$/,
   )
   expect(buttons()).toEqual([])
+})
+it('groups and separators are dropped with a report: the strip is flat', async () => {
+  await expectDevError(
+    () =>
+      render({
+        items: [
+          { value: 'a', label: 'A' },
+          { type: 'separator' },
+          { type: 'group', label: 'G', items: [{ value: 'g1', label: 'G1' }] },
+          { value: 'b', label: 'B' },
+        ],
+      }),
+    /^Face UI SegmentedControl: invalid item type "(separator|group)"; dropping the item\.$/,
+  )
+  expect(buttons().map((button) => [button.textContent, button.tabIndex])).toEqual([
+    ['A', 0],
+    ['B', -1],
+  ])
+  await key(0, 'ArrowRight')
+  expect(selected()).toEqual(['B'])
 })
 it('empty items do not create phantom choices or keyboard targets', async () => {
   await render({ items: [], value: 'a' })

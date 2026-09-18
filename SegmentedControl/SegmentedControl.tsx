@@ -16,6 +16,7 @@ import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
 import { FieldLayout, idList, useField, type FieldProps } from '../assets/internal/field'
 import type { CollectionItem } from '../assets/internal/item'
 import { readCollection, readKeys } from '../assets/runtime/collection'
+import { invalidProp } from '../assets/runtime/props'
 
 /** One choice of the strip; `id` and native `aria-*` name the choice's button. */
 export interface SegmentedControlItem
@@ -45,7 +46,7 @@ interface SegmentedControlBaseProps
   items?: readonly SegmentedControlItem[]
   /** Disables every choice and leaves the value out of FormData. */
   disabled?: boolean
-  /** Lays the choices out in a row or a column; a single choice answers to all four arrows. */
+  /** Lays the choices out in a row or a column; without `multiple`, all four arrow keys move between choices. */
   orientation?: 'horizontal' | 'vertical'
   /** Names the group when there is no visible label. */
   'aria-label'?: string
@@ -55,7 +56,7 @@ interface SegmentedControlBaseProps
   name?: string
   /** Id of the form that submits and resets the value, when it is not an ancestor. */
   form?: string
-  /** Blocks form submission until a choice is selected and marks the label. */
+  /** Blocks form submission until a choice is selected and marks the group required; a group with no enabled choice never blocks. */
   required?: boolean
   /** Focuses the selected enabled choice, or the first enabled one, on mount. */
   autoFocus?: boolean
@@ -127,6 +128,14 @@ export const SegmentedControl = forwardRef<
     component: 'SegmentedControl',
     key: (item) => item.value,
   })
+  // The strip is flat: groups and separators (K9) have no place in it.
+  const choices = collection.children(null).filter(({ item }) => {
+    const { type } = item as { type?: unknown }
+    if (type !== 'group' && type !== 'separator') return true
+    invalidProp('SegmentedControl', 'item type', type, 'dropping the item')
+    return false
+  })
+  const keys = choices.map((entry) => entry.key)
   const off = (key: string) =>
     disabled || collection.get(key)?.disabled === true
   // The stored value is the intent; what is shown is its projection onto the current items and
@@ -139,11 +148,11 @@ export const SegmentedControl = forwardRef<
           ? readKeys(intent, 'SegmentedControl', 'value')
           : [],
     )
-    const keys = collection.keys.filter((key) => wanted.has(key))
-    return multiple ? keys : keys.slice(0, 1)
+    const shown = keys.filter((key) => wanted.has(key))
+    return multiple ? shown : shown.slice(0, 1)
   }
-  const toValue = (keys: readonly string[]): Value =>
-    multiple ? keys : (keys[0] ?? null)
+  const toValue = (shown: readonly string[]): Value =>
+    multiple ? shown : (shown[0] ?? null)
   // A copy: the default is read once, so later mutation of the caller's array changes nothing.
   const [initial] = useState<Value>(() =>
     Array.isArray(defaultValue) ? [...defaultValue] : (defaultValue ?? null),
@@ -158,8 +167,8 @@ export const SegmentedControl = forwardRef<
     name: ['SegmentedControl', 'value'],
   })
   const selected = project(intent)
-  const propose = (keys: readonly string[]) => {
-    const next = project(keys)
+  const propose = (candidate: readonly string[]) => {
+    const next = project(candidate)
     if (!disabled && !same(next, selected)) setIntent(toValue(next))
   }
   const [nativeError, setNativeError] = useState<string | null>(null)
@@ -178,7 +187,7 @@ export const SegmentedControl = forwardRef<
     'aria-invalid': ariaInvalid,
   })
   const roving = useRovingFocus({
-    keys: collection.keys,
+    keys,
     disabled: off,
     active: selected.find((key) => !off(key)) ?? null,
     orientation: multiple ? orientation : 'both',
@@ -211,6 +220,7 @@ export const SegmentedControl = forwardRef<
       aria-orientation={multiple ? undefined : orientation}
       aria-disabled={disabled || undefined}
       aria-invalid={!multiple && field.invalid ? true : undefined}
+      aria-required={!multiple && required ? true : undefined}
       data-scope="toggle"
       data-part="root"
       data-type={multiple ? 'multiple' : 'single'}
@@ -219,32 +229,23 @@ export const SegmentedControl = forwardRef<
       className={cn('uf-field uf-toggle', className)}
       onClick={composeHandlers(onClick, choose)}
       onKeyDown={composeHandlers(onKeyDown, roving.root.onKeyDown)}
-      onFocus={(event) => {
-        onFocus?.(event)
-        roving.root.onFocus(event)
-      }}
-      onBlur={(event) => {
-        onBlur?.(event)
-        roving.root.onBlur(event)
-      }}
+      onFocus={composeHandlers(onFocus, roving.root.onFocus)}
+      onBlur={composeHandlers(onBlur, roving.root.onBlur)}
     >
       <FieldLayout field={field}>
         <div className="uf-toggle-list" data-scope="toggle" data-part="list">
-          {collection.entries.map(({ key, item }) => {
-            const {
-              value: _value,
-              label: itemLabel,
-              disabled: _disabled,
-              ...itemProps
-            } = item
+          {choices.map(({ key, item }) => {
             const checked = selected.includes(key)
             const itemDisabled = off(key)
             const tab = roving.item(key)
             return (
               <Membrane enabled={membrane} key={key} interactive>
                 <button
-                  {...itemProps}
                   {...tab}
+                  id={item.id}
+                  title={item.title}
+                  aria-label={item['aria-label']}
+                  aria-labelledby={item['aria-labelledby']}
                   type="button"
                   role={multiple ? undefined : 'radio'}
                   disabled={itemDisabled}
@@ -265,7 +266,7 @@ export const SegmentedControl = forwardRef<
                   data-autofocus={autoFocus && tab.tabIndex === 0 ? '' : undefined}
                   className="uf-toggle-item uf-option uf-control"
                 >
-                  {itemLabel}
+                  {item.label}
                 </button>
               </Membrane>
             )
@@ -276,8 +277,9 @@ export const SegmentedControl = forwardRef<
         name={name}
         form={form}
         disabled={disabled}
-        required={required}
-        options={collection.entries.map(({ key, disabled }) => ({
+        // Like a native radio group, nothing enabled to choose cannot block submission.
+        required={required && keys.some((key) => !off(key))}
+        options={choices.map(({ key, disabled }) => ({
           value: key,
           disabled,
         }))}
@@ -298,10 +300,10 @@ export const SegmentedControl = forwardRef<
           return toValue(project(value === undefined ? initial : intent))
         }}
         onChange={(candidate) => {
-          const keys = project(candidate)
+          const next = project(candidate)
           // A native candidate may only add choices a user could press.
-          if (keys.every((key) => selected.includes(key) || !off(key)))
-            propose(keys)
+          if (next.every((key) => selected.includes(key) || !off(key)))
+            propose(next)
         }}
         onReport={setNativeError}
       />

@@ -264,6 +264,9 @@ for (const multiple of [false, true])
     const field = page.locator('.uf-toggle')
     const error = field.locator('[data-part="error"]')
     await expect(field).toHaveAccessibleName('View')
+    // Only a radiogroup supports aria-required; the proxy validates both modes.
+    if (multiple) await expect(field).not.toHaveAttribute('aria-required')
+    else await expect(field).toHaveAttribute('aria-required', 'true')
     await expect(error).toHaveCount(0)
     await page.locator('#edit').evaluate((form: HTMLFormElement) => form.requestSubmit())
     await expect(error).not.toBeEmpty()
@@ -277,6 +280,17 @@ for (const multiple of [false, true])
     await page.locator('#edit').evaluate((form: HTMLFormElement) => form.requestSubmit())
     await expect(error).toHaveCount(0)
   })
+test('a root width sizes the field; the strip fills it only with inline-size: 100%', { tag: ['@layout', '@css'] }, async ({
+  page,
+}) => {
+  await render(page, { style: { inlineSize: '320px' } })
+  const width = (selector: string) =>
+    page.locator(selector).evaluate((n) => n.getBoundingClientRect().width)
+  expect(await width('.uf-toggle')).toBeCloseTo(320, 0)
+  expect(await width('.uf-toggle-list')).toBeLessThan(320)
+  await page.addStyleTag({ content: '.uf-toggle-list { inline-size: 100% }' })
+  expect(await width('.uf-toggle-list')).toBeCloseTo(320, 0)
+})
 test('forced colors preserves selected border and keyboard focus', { tag: ['@forced-colors', '@css', '@focus'] }, async ({
   page,
 }) => {

@@ -190,7 +190,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Single selection used a one-element array | Single selection is a string or `null`; only `multiple` uses an array | — |
 | An item without a string `value`, a repeated `value`, or a malformed `items`/`value` threw a TypeError | The item or key is skipped and a development report names it | — |
 | A selected choice missing from `items` was discarded, so it stayed unselected when the item returned | The value is kept and the choice shows as selected again once its item is back; `onValueChange` is not called | — |
-| The root was the bordered strip of choices | The root is a field (`uf-field`) with `label`, `description` and `error`; the border is on the `.uf-toggle-list` strip, which keeps its natural width | — |
+| The root was the bordered strip of choices | The root is a field (`uf-field`) with `label`, `description` and `error`; the border is on the `.uf-toggle-list` strip, which keeps its natural width, so a width set on the root no longer stretches it: also give `.uf-toggle-list` `inline-size: 100%` | — |
 | Removing or disabling the focused choice moved focus to the selected or first choice | Focus moves to the choice now at its place, else the one before it | — |
 
 ### Select

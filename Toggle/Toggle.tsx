@@ -4,7 +4,10 @@ import type {
 } from '../SegmentedControl/SegmentedControl'
 
 export {
-  /** @deprecated Use SegmentedControl: Toggle is the same component, and `type="multiple"` is `multiple`. */
+  /**
+   * Deprecated alias of SegmentedControl: the same component, with `multiple` in place of `type="multiple"`.
+   * @deprecated Use SegmentedControl.
+   */
   SegmentedControl as Toggle,
 } from '../SegmentedControl/SegmentedControl'
 /** @deprecated Use SegmentedControlProps. */

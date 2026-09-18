@@ -41,7 +41,7 @@
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Lays the choices out in a row or a column; a single choice answers to all four arrows.",
+      "description": "Lays the choices out in a row or a column; without `multiple`, all four arrow keys move between choices.",
       "options": [
         "horizontal",
         "vertical"
@@ -71,7 +71,7 @@
     "required": {
       "type": "boolean",
       "required": false,
-      "description": "Blocks form submission until a choice is selected and marks the label.",
+      "description": "Blocks form submission until a choice is selected and marks the group required; a group with no enabled choice never blocks.",
       "default": false
     },
     "autoFocus": {
@@ -196,8 +196,10 @@
   },
   "aria": {
     "role": "radiogroup",
-    "required": [
-      "aria-label"
+    "notes": [
+      "Name the group with label, aria-label or aria-labelledby; description and error describe every choice.",
+      "Without multiple the root is a radiogroup of radio buttons (aria-checked); required sets aria-required on it and the visible marker is hidden from assistive technology.",
+      "With multiple the root is a group of toggle buttons (aria-pressed)."
     ]
   },
   "composition": {

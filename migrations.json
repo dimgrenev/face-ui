@@ -639,7 +639,7 @@
       "kind": "behavior",
       "component": "SegmentedControl",
       "before": "The root was the bordered strip of choices",
-      "after": "The root is a field (`uf-field`) with `label`, `description` and `error`; the border is on the `.uf-toggle-list` strip, which keeps its natural width"
+      "after": "The root is a field (`uf-field`) with `label`, `description` and `error`; the border is on the `.uf-toggle-list` strip, which keeps its natural width, so a width set on the root no longer stretches it: also give `.uf-toggle-list` `inline-size: 100%`"
     },
     {
       "kind": "behavior",
