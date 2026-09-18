@@ -1,0 +1,674 @@
+{
+  "version": "0.2.0",
+  "migrations": [
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/normalize-props#normalizeProps",
+      "to": "Spread the props onto the element directly",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/use-dismiss-outside#useDismissOutside",
+      "to": "`useLayer` from `assets/adapters/react/use-layer`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/use-focus-trap#useFocusTrap",
+      "to": "`useLayer` from `assets/adapters/react/use-layer`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/membrane-interactions#installMembraneInteractions",
+      "to": "Remove the call; each component owns its membrane",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Avatar",
+      "prop": "icon",
+      "use": "`fallback={<Icon name=\"…\" />}`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Avatar",
+      "prop": "children",
+      "use": "`fallback={content}`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Bar.LeftEllipsis",
+      "to": "Bar.Section grow",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Bar.Right",
+      "to": "Bar.Section align=\"end\"",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Bar.LeftOverlap",
+      "to": "`Bar.Section grow` for the content and `Bar.Section align=\"end\"` for the actions",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Breadcrumb",
+      "from": "collapseAfter",
+      "to": "maxItems",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Breadcrumb",
+      "prop": "allowNavigation",
+      "use": "Links always navigate; cancel the click in your own handler to stay on the page",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Breadcrumb",
+      "before": "`collapseAfter` below 3 disabled collapsing",
+      "after": "`maxItems={null}` disables collapsing; a number must be at least 3"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Button",
+      "prop": "selector",
+      "use": "`chevron=\"down\"`, or `chevron=\"right\"` with `selectorDirection=\"side\"`",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Button",
+      "prop": "selectorDirection",
+      "use": "The `chevron` value",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Button",
+      "from": "selectorOpen",
+      "to": "aria-expanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Button",
+      "prop": "iconPosition",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "ButtonSelectorDirection",
+      "to": "`ButtonChevron` (`down` | `right`)",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Card",
+      "from": "interactive",
+      "to": "hoverable",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Card",
+      "from": "footerLayout",
+      "to": "footerAlign",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Card.Header",
+      "from": "layout",
+      "to": "orientation",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Card.Header",
+      "prop": "orientation",
+      "values": {
+        "stack": "vertical",
+        "bar": "horizontal"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Card.Footer",
+      "from": "layout",
+      "to": "align",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "CardFooterLayout",
+      "to": "CardAlign",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "CardActionAlign",
+      "to": "CardAlign",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "CardHeaderLayout",
+      "to": "`CardHeaderOrientation` (`vertical` | `horizontal`)",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Date",
+      "prop": "showPresets",
+      "use": "Pass `presets`; they render whenever the list is not empty",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Date",
+      "prop": "views",
+      "use": "`mode` and `openTo`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Date",
+      "from": "clearLabel",
+      "key": "clear",
+      "codemod": "auto"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Date",
+      "from": "nowLabel",
+      "key": "now",
+      "codemod": "auto"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Date",
+      "from": "closeLabel",
+      "key": "close",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "controlRole",
+      "to": "role",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaControls",
+      "to": "aria-controls",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaActiveDescendant",
+      "to": "aria-activedescendant",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaAutoComplete",
+      "to": "aria-autocomplete",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaExpanded",
+      "to": "aria-expanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaHasPopup",
+      "to": "aria-haspopup",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "controlRef",
+      "to": "ref",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Input",
+      "prop": "textLayout",
+      "use": "`multiline` instead of `\"wrap\"`; omit `\"scroll\"`",
+      "codemod": "auto",
+      "values": {
+        "wrap": "multiline",
+        "scroll": ""
+      }
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Input",
+      "prop": "stretchText",
+      "use": "Remove it; it had no effect",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Input",
+      "prop": "iconPosition",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "InputTextLayout",
+      "to": "The boolean `multiline` prop",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Input",
+      "before": "`ref` pointed to the wrapper `<div>`",
+      "after": "`ref` points to the native input or textarea; `className` and `style` still style the outer layout"
+    },
+    {
+      "kind": "behavior",
+      "component": "Modal",
+      "before": "`scrollLock` defaulted to `false`",
+      "after": "`scrollLock` defaults to `portal`: a portaled modal locks page scroll unless `scrollLock={false}`"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Popover",
+      "prop": "interactive",
+      "use": "Remove it; Popover opens on click, use Tooltip for hover content",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Popover",
+      "prop": "openDelay",
+      "use": "Remove it; Popover opens on click, use Tooltip for hover content",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Popover",
+      "prop": "closeDelay",
+      "use": "Remove it; Popover opens on click, use Tooltip for hover content",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Progress",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Radio",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Radio",
+      "from": "ariaLabelledBy",
+      "to": "aria-labelledby",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Rating",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Rating",
+      "before": "Pressing the selected star again or Home cleared the value",
+      "after": "Neither clears it; reset the value yourself. Show a fixed score with `readOnly`, not `disabled`"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "SegmentedControl",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "SegmentedControl",
+      "prop": "selectionMode",
+      "use": "`multiple` instead of `\"multiple\"`; omit `\"single\"`",
+      "codemod": "auto",
+      "values": {
+        "multiple": "multiple",
+        "single": ""
+      }
+    },
+    {
+      "kind": "behavior",
+      "component": "SegmentedControl",
+      "before": "Single selection used a one-element array",
+      "after": "Single selection is a string or `null`; only `multiple` uses an array"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Select",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Select",
+      "prop": "type",
+      "use": "`multiple` instead of `\"multiselect\"`; omit `\"select\"`",
+      "codemod": "auto",
+      "values": {
+        "multiselect": "multiple",
+        "select": ""
+      }
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Select",
+      "prop": "variant",
+      "use": "`surface=\"side\"` or `iconOnly fullWidth={false}`; omit `\"default\"`",
+      "codemod": "auto",
+      "values": {
+        "side": "surface=\"side\"",
+        "iconOnly": "iconOnly fullWidth={false}",
+        "default": ""
+      }
+    },
+    {
+      "kind": "export",
+      "from": "SelectVariant",
+      "to": "The `surface` and `iconOnly` props",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Select/Select#computeSelectSidePosition",
+      "to": "Select/select-side-position#computeSelectSidePosition",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Select/Select#computeSelectSideOptionViewportHeight",
+      "to": "Select/select-side-position#computeSelectSideOptionViewportHeight",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Select/Select#SelectSidePosition",
+      "to": "Select/select-side-position#SelectSidePosition",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "`ref` pointed to the wrapper `<div>`",
+      "after": "`ref` points to the native trigger `<button>`"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Slider",
+      "prop": "variant",
+      "use": "`showValue` instead of `\"advanced\"`; omit `\"simple\"`",
+      "codemod": "auto",
+      "values": {
+        "advanced": "showValue",
+        "simple": ""
+      }
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Slider",
+      "prop": "leadingIcon",
+      "use": "Put leading content in `label` or next to the slider",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Slider",
+      "prop": "leadingText",
+      "use": "Put leading content in `label` or next to the slider",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Slider",
+      "from": "cropLocksValue",
+      "to": "clampToCrop",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "SliderVariant",
+      "to": "The boolean `showValue` prop",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Slider/SliderAdvanced#SliderAdvanced",
+      "to": "`Slider` with `showValue` and `crop`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Switcher",
+      "prop": "text",
+      "use": "`label`, provided only when it should show",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Switcher",
+      "prop": "withText",
+      "use": "Provide or omit `label`",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Switcher",
+      "prop": "textWrap",
+      "use": "`truncate` instead of `\"truncate\"`; omit `\"wrap\"`",
+      "codemod": "auto",
+      "values": {
+        "truncate": "truncate",
+        "wrap": ""
+      }
+    },
+    {
+      "kind": "export",
+      "from": "SwitcherTextWrap",
+      "to": "The boolean `truncate` prop",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Switcher",
+      "before": "A long label was cut to one line with an ellipsis",
+      "after": "A long label wraps; set `truncate` to keep one line"
+    },
+    {
+      "kind": "behavior",
+      "component": "Table",
+      "before": "`membrane` styled rows as tiles",
+      "after": "`rowStyle=\"tile\"` styles rows; `membrane` adds outer spacing only"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tabs",
+      "prop": "withLine",
+      "use": "`variant=\"underline\"`",
+      "codemod": "auto",
+      "values": {
+        "true": "variant=\"underline\"",
+        "false": ""
+      }
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tabs",
+      "prop": "items[].actionIcon",
+      "use": "Put controls in `actions`; the other `action*` fields and `onAction` go with it",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/tabs.machine#tabsMachine",
+      "to": "Use `Tabs`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/tabs.machine#tabsAnatomy",
+      "to": "Use `Tabs`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/tabs.machine#connectTabs",
+      "to": "Use `Tabs`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/tabs.machine#TabsSchema",
+      "to": "Use `Tabs`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Text",
+      "prop": "iconPosition",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Text",
+      "before": "`variant=\"blockquote\"` rendered a `<div>`",
+      "after": "`variant=\"blockquote\"` renders `<blockquote>`; set `as` to choose another element"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tile",
+      "prop": "selector",
+      "use": "`chevron=\"down\"`",
+      "codemod": "auto",
+      "values": {
+        "true": "chevron=\"down\"",
+        "false": ""
+      }
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tile",
+      "from": "selectorOpen",
+      "to": "aria-expanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tile",
+      "from": "busy",
+      "to": "aria-busy",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tile",
+      "prop": "selectedDescendant",
+      "use": "`active={active || selectedDescendant}`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tile",
+      "prop": "intent",
+      "use": "`interactive={false} tone=\"muted\"` for a section heading; an explicit `role` and its ARIA state for a custom control",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Tile",
+      "prop": "iconPosition",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "TileIntent",
+      "to": "The `interactive`, `tone` and `role` props",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/toggle.machine#toggleMachine",
+      "to": "Use `SegmentedControl`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/toggle.machine#toggleAnatomy",
+      "to": "Use `SegmentedControl`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/toggle.machine#connectToggle",
+      "to": "Use `SegmentedControl`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/toggle.machine#ToggleSchema",
+      "to": "Use `SegmentedControl`; the state machine is internal",
+      "codemod": "manual"
+    }
+  ]
+}
