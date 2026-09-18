@@ -397,7 +397,7 @@ The subsequent per-prop audit simplifies additional contracts:
 
 - Avatar has one `fallback` slot. Replace `icon="user"` with `fallback={<Icon name="user" />}` and custom children with `fallback={content}`. Use native `aria-label`, `aria-labelledby` or `aria-hidden` on its root for accessible or decorative identity displays.
 - Tile uses `chevron="down" | "right"` and native `aria-expanded` instead of `selector`/`selectorOpen`. Replace `busy` with `aria-busy`, and merge `selectedDescendant` into `active`. `intent`/`TileIntent` are removed: use `interactive={false}` with `tone="muted"` for headings; use an explicit `role` and its ARIA state for custom controls. The row class is `uf-tile`; it no longer borrows `uf-option`/`uf-control`. `disabled` disables the primary action; nested actions own their disabled state. The row exposes `data-primary-disabled`. Button-like rows always render a native primary button: `id`, role, control ARIA and tabIndex target it; ref/class/style/data attributes remain on the layout container.
-- Button uses `chevron="down"` or `chevron="right"` instead of `selector`/`selectorDirection`. Replace `selectorOpen` with native `aria-expanded`. The indicator and accessible state now share one source. `scripts/migrate-button-props.mjs` defaults to dry run and supports `--write`.
+- Button uses `chevron="down"` or `chevron="right"` instead of `selector`/`selectorDirection`. Replace `selectorOpen` with native `aria-expanded`. The indicator and accessible state now share one source. `pnpm migrate` defaults to dry run and supports `--write`.
 - Button `iconOnly` retains the label for assistive technology; `fullWidth` can expand an icon-only control. A right-side chevron no longer overrides `iconPosition`, `align` or `stretchText`.
 - Button, Text, Tile and Input use `iconPosition="start" | "end"` (default `start`), following reading direction. Migrate `left` to `start` and `right` to `end`. The former values are removed. CSS overrides use `--uf-control-pad-start/end` and `--uf-tile-pad-start/end`; Button/Tile icon markers are `data-icon-start/end`.
 - Avatar initials preserve complete graphemes, including combining marks and compound emoji, with the same segmentation implementation during SSR and client rendering. Custom `fallback` still takes precedence.
@@ -418,7 +418,7 @@ The subsequent per-prop audit simplifies additional contracts:
 | Global membrane listener installation/import | Remove it; each component owns its explicit boundary                         |
 | Nested global text overrides                 | Theme documented tokens; let each nested component own its typography        |
 
-Run `node scripts/migrate-quality-api.mjs <source-directory>` for a dry run; add `--write` to update explicit JSX attributes. Review spreads, wrappers and generated content manually. The script preserves aliases of named imports but does not infer arbitrary user-defined components.
+Run `pnpm migrate <source-directory>` for a dry run; add `--write` to update explicit JSX attributes and JSON descriptors. Review spreads, wrappers and generated content manually. The script preserves aliases of named imports but does not infer arbitrary user-defined components.
 
 ### Input native field contract
 

@@ -625,6 +625,8 @@
     "gallery:sync": "node ./scripts/generate-components-gallery.mjs --write",
     "tokens:check": "node ./scripts/generate-runtime-tokens.mjs",
     "tokens:sync": "node ./scripts/generate-runtime-tokens.mjs --write",
+    "migrate": "tsx ./scripts/migrate.ts",
+    "migration:sync": "tsx ./scripts/generate-migration.ts --write",
     "test": "vitest run",
     "smoke": "node ./scripts/smoke-npm.cjs",
     "check": "pnpm run tokens:check && pnpm run contracts:check && pnpm run gallery:check && pnpm run build && pnpm run test && pnpm run test:types && pnpm run smoke && pnpm run pack:dry",
