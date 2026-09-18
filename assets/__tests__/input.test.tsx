@@ -1,9 +1,10 @@
 import React, { act, createRef, StrictMode, useState } from 'react'
 import type { Root } from 'react-dom/client'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Input } from '../../Input/Input'
-import { installMatchMedia, type MatchMediaRestore } from './harness/match-media'
-import { mount } from './harness'
+import { describeControlled } from './harness/controlled'
+import { describeField } from './harness/field'
+import { expectDevError, mount } from './harness'
 
 let root: Root
 let host: HTMLDivElement
@@ -11,29 +12,46 @@ const field = () =>
   host.querySelector<HTMLInputElement | HTMLTextAreaElement>('input, textarea')!
 const clear = () =>
   host.querySelector<HTMLButtonElement>('[data-part="clear"]')!
+const part = (name: string) =>
+  host.querySelector(`[data-scope="field"][data-part="${name}"]`)
 const render = async (props: Record<string, unknown>) => {
   await act(async () => root.render(<Input {...props} />))
 }
-const enter = async (value: string) => {
-  const input = field()
+/** A user edit: the browser changes the value, then fires input. */
+const edit = (
+  input: HTMLInputElement | HTMLTextAreaElement,
+  value: string,
+  init?: EventInit & { isComposing?: boolean },
+) => {
   const prototype =
     input.tagName === 'TEXTAREA'
       ? HTMLTextAreaElement.prototype
       : HTMLInputElement.prototype
-  await act(async () => {
-    Object.getOwnPropertyDescriptor(prototype, 'value')!.set!.call(input, value)
-    input.dispatchEvent(new Event('input', { bubbles: true }))
-  })
+  Object.getOwnPropertyDescriptor(prototype, 'value')!.set!.call(input, value)
+  input.dispatchEvent(new InputEvent('input', { bubbles: true, ...init }))
 }
+const enter = (value: string) => act(async () => edit(field(), value))
 beforeEach(() => {
   ;({ host, root } = mount())
 })
 
+describeControlled<string>({
+  name: 'Input',
+  prop: 'value',
+  values: ['Alpha', 'Beta'],
+  render: (props) => <Input aria-label="Field" {...props} />,
+  change: (host, to) => edit(host.querySelector('input')!, to),
+  read: (host) => host.querySelector('input')!.value,
+  handler: 'onChange',
+  formReset: true,
+})
+
+describeField('Input', (props) => <Input {...props} />)
+
 describe('Input prop contract', () => {
   for (const multiline of [false, true]) {
-    it(`editing and clear deliver one native change and one value change (${multiline ? 'textarea' : 'input'})`, async () => {
-      const native = vi.fn(),
-        values = vi.fn()
+    it(`editing and clear deliver one native change, then one value change (${multiline ? 'textarea' : 'input'})`, async () => {
+      const calls: unknown[][] = []
       function Controlled() {
         const [value, setValue] = useState('Initial')
         return (
@@ -41,49 +59,41 @@ describe('Input prop contract', () => {
             {...{ multiline }}
             value={value}
             onChange={(event) => {
-              native(event.target, event.target.value)
+              calls.push(['change', event.target, event.target.value])
               setValue(event.target.value)
             }}
-            onValueChange={values}
+            onValueChange={(details) => calls.push(['value', details])}
           />
         )
       }
       await act(async () => root.render(<Controlled />))
       await enter('Edited')
-      expect(native).toHaveBeenCalledExactlyOnceWith(field(), 'Edited')
-      expect(values).toHaveBeenCalledExactlyOnceWith({ value: 'Edited' })
-      native.mockClear()
-      values.mockClear()
+      expect(calls).toEqual([
+        ['change', field(), 'Edited'],
+        ['value', { value: 'Edited' }],
+      ])
+      calls.length = 0
       await act(async () => clear().click())
       expect(field().value).toBe('')
-      expect(native).toHaveBeenCalledExactlyOnceWith(field(), '')
-      expect(values).toHaveBeenCalledExactlyOnceWith({ value: '' })
+      expect(calls).toEqual([
+        ['change', field(), ''],
+        ['value', { value: '' }],
+      ])
       expect(document.activeElement).toBe(field())
     })
   }
 
-  it('controlled parent updates are silent, and current callbacks replace removed callbacks', async () => {
+  it('a removed callback is never called', async () => {
     const old = vi.fn(),
       next = vi.fn(),
       native = vi.fn()
     await render({ value: 'First', onValueChange: old, onChange: native })
     await render({ value: 'Second', onValueChange: next })
-    expect(field().value).toBe('Second')
-    expect(old).not.toHaveBeenCalled()
-    expect(next).not.toHaveBeenCalled()
-    expect(native).not.toHaveBeenCalled()
     await enter('Attempt')
     expect(field().value).toBe('Second')
     expect(next).toHaveBeenCalledExactlyOnceWith({ value: 'Attempt' })
     expect(old).not.toHaveBeenCalled()
     expect(native).not.toHaveBeenCalled()
-  })
-
-  it('defaultValue is the uncontrolled initial value across rerenders and unrelated props', async () => {
-    await render({ defaultValue: 'Initial' })
-    await enter('Draft')
-    await render({ defaultValue: 'Replacement', label: 'Name', icon: 'search' })
-    expect(field().value).toBe('Draft')
   })
 
   it('ordinary ref targets the native control and follows multiline changes', async () => {
@@ -176,54 +186,48 @@ describe('Input prop contract', () => {
     }
   })
 
-  it('description and error ids compose with external descriptions without dropping or duplicating ids', async () => {
-    await render({
-      id: 'name',
-      label: 'Name',
-      required: true,
-      description: 'Help',
-      error: 'Required',
-      'aria-describedby': 'outside name-description outside',
-    })
-    expect(field().getAttribute('aria-describedby')?.split(/\s+/)).toEqual([
-      'outside',
-      'name-description',
-      'name-error',
-    ])
-    expect(field().getAttribute('aria-invalid')).toBe('true')
-    expect(host.querySelector<HTMLLabelElement>('label')?.htmlFor).toBe('name')
-    expect(
-      host.querySelector('.uf-input__required')?.getAttribute('aria-hidden'),
-    ).toBe('true')
-    await render({ id: 'name', label: 'Name', 'aria-describedby': 'outside' })
-    expect(field().getAttribute('aria-describedby')).toBe('outside')
-    expect(field().hasAttribute('aria-invalid')).toBe(false)
+  it('the error is a described message, never an alert', async () => {
+    await render({ id: 'name', label: 'Name', error: 'Required' })
+    expect(part('error')!.id).toBe('name-error')
+    expect(part('error')!.hasAttribute('role')).toBe(false)
+    expect(host.querySelector('[role="alert"], [aria-live]')).toBeNull()
+    expect(field().getAttribute('aria-describedby')).toBe('name-error')
   })
 
-  it('empty slots do not create affordances or descriptions; scalar zero remains content', async () => {
-    await render({ label: false, description: <></>, error: '', icon: <></> })
-    expect(host.querySelector('label')).toBeNull()
-    expect(host.querySelector('.uf-input__description')).toBeNull()
+  it('an empty icon adds no affordance; zero remains content', async () => {
+    await render({ icon: <></> })
     expect(host.querySelector('.uf-input__icon')).toBeNull()
-    expect(field().hasAttribute('aria-describedby')).toBe(false)
-    await render({ label: 0, description: 0, icon: 0 })
-    expect(host.querySelector('label')?.textContent).toBe('0')
-    expect(host.querySelector('.uf-input__description')?.textContent).toBe('0')
+    await render({ icon: 0 })
     expect(host.querySelector('.uf-input__icon')?.textContent).toBe('0')
   })
 
-  it('clearable, clearLabel, disabled and readOnly govern the same native action', async () => {
+  it('clearable, labels.clear, disabled and readOnly govern the same native action', async () => {
     await render({ defaultValue: 'Draft', clearable: false })
     expect(clear().hidden).toBe(true)
-    await render({ clearable: true, clearLabel: 'Очистить поле' })
+    await render({ clearable: true, labels: { clear: 'Очистить поле' } })
     expect(clear().hidden).toBe(false)
     expect(clear().getAttribute('aria-label')).toBe('Очистить поле')
+    await render({ labels: { clear: '  ' } })
+    expect(clear().getAttribute('aria-label')).toBe('Clear input')
     for (const state of ['disabled', 'readOnly']) {
       await render({ [state]: true })
       expect(clear().hidden).toBe(true)
       await act(async () => clear().click())
       expect(field().value).toBe('Draft')
     }
+  })
+
+  it('invalid labels and rows are reported and replaced by defaults', async () => {
+    await expectDevError(
+      () => render({ labels: 'Clear', defaultValue: 'Draft' }),
+      /^Face UI Input: invalid labels "Clear"; using defaults\.$/,
+    )
+    expect(clear().getAttribute('aria-label')).toBe('Clear input')
+    await expectDevError(
+      () => render({ multiline: true, rows: 2.5 }),
+      /^Face UI Input: invalid rows 2\.5; using 2\.$/,
+    )
+    expect((field() as HTMLTextAreaElement).rows).toBe(2)
   })
 
   it('className and style affect the field layout while focus/input events target its native control', async () => {
@@ -239,9 +243,9 @@ describe('Input prop contract', () => {
       onKeyDown: key,
       onInput: input,
     })
-    expect(host.querySelector<HTMLElement>('.field-layout')?.style.width).toBe(
-      '280px',
-    )
+    const layout = host.querySelector<HTMLElement>('.field-layout')!
+    expect(layout.style.width).toBe('280px')
+    expect(layout.classList).toContain('uf-field')
     await act(async () => {
       field().focus()
       field().dispatchEvent(
@@ -255,6 +259,7 @@ describe('Input prop contract', () => {
     expect(key).toHaveBeenCalledTimes(1)
     expect(input).toHaveBeenCalledTimes(1)
   })
+
   it('explicit ARIA states remain native attributes without mutating editability', async () => {
     await render({
       'aria-invalid': 'grammar',
@@ -269,12 +274,8 @@ describe('Input prop contract', () => {
     expect(host.querySelector('.uf-input')?.hasAttribute('data-invalid')).toBe(
       true,
     )
-    await render({ error: 'Message', 'aria-invalid': false })
-    expect(field().getAttribute('aria-invalid')).toBe('false')
-    expect(host.querySelector('.uf-input')?.hasAttribute('data-invalid')).toBe(
-      false,
-    )
   })
+
   it('textarea does not leak input-only attributes from untyped consumers', async () => {
     await render({
       multiline: true,
@@ -296,148 +297,95 @@ describe('Input prop contract', () => {
     ])
       expect(field().hasAttribute(attribute)).toBe(false)
   })
-})
 
-describe('component smoke', () => {
-  let container: HTMLDivElement
-  let root: Root
-
-  beforeEach(() => {
-    ;({ host: container, root } = mount())
+  it('fullWidth and membrane default on; either can be turned off without remounting the control', async () => {
+    await render({ defaultValue: 'Draft' })
+    const control = field()
+    const layout = host.querySelector('.uf-input')!
+    const membrane = host.querySelector('.uf-membrane')!
+    expect(layout.hasAttribute('data-full-width')).toBe(true)
+    expect(membrane.classList).toContain('uf-membrane--full')
+    expect(membrane.hasAttribute('data-membrane-disabled')).toBe(false)
+    await render({ fullWidth: false, membrane: false })
+    expect(field()).toBe(control)
+    expect(layout.hasAttribute('data-full-width')).toBe(false)
+    expect(membrane.hasAttribute('data-membrane-disabled')).toBe(true)
   })
 
-  it('Input syncs controlled value updates from props', async () => {
-    const handleValueChange = vi.fn()
-
-    await act(async () => {
-      root.render(
-        <Input type="text" value="Alpha" onValueChange={handleValueChange} />,
-      )
-    })
-
-    const input = container.querySelector(
-      '.uf-input input',
-    ) as HTMLInputElement | null
-    expect(input?.value).toBe('Alpha')
-    expect(handleValueChange).not.toHaveBeenCalled()
-
-    await act(async () => {
-      root.render(
-        <Input type="text" value="Beta" onValueChange={handleValueChange} />,
-      )
-    })
-
-    const updatedInput = container.querySelector(
-      '.uf-input input',
-    ) as HTMLInputElement | null
-    expect(updatedInput?.value).toBe('Beta')
-    expect(handleValueChange).not.toHaveBeenCalled()
-  })
-
-  it('Input exposes the native textarea through ref', async () => {
-    const controlRef = React.createRef<HTMLInputElement | HTMLTextAreaElement>()
-
-    await act(async () => {
-      root.render(<Input value="Note" multiline ref={controlRef} />)
-    })
-
-    expect(controlRef.current).toBeInstanceOf(HTMLTextAreaElement)
-    expect(controlRef.current?.value).toBe('Note')
+  it('labelPosition start sets the field layout', async () => {
+    await render({ label: 'Name', labelPosition: 'start' })
+    expect(host.querySelector('.uf-input')!.getAttribute('data-label-position')).toBe('start')
+    expect(part('label')!.className).toBe('uf-field__label')
   })
 })
 
-describe('responsive overlay surfaces', () => {
-  let container: HTMLDivElement
-  let root: Root
-  let restoreMatchMedia: MatchMediaRestore | null
-
-  beforeEach(() => {
-    ;({ host: container, root } = mount())
-    restoreMatchMedia = installMatchMedia(true)
-  })
-
-  afterEach(() => {
-    restoreMatchMedia?.()
-    restoreMatchMedia = null
-    document.body.style.overflow = ''
-    document.body.style.paddingRight = ''
-    document.body.style.touchAction = ''
-  })
-
-  it('Input binds visible labels, descriptions and invalid disabled state to the native control', async () => {
-    await act(async () => {
-      root.render(
-        <Input
-          id="profile-notes"
-          label="Profile notes"
-          description="Shown to workspace admins."
-          error="Profile notes are required."
-          disabled
-          multiline
-        />,
-      )
+describe('Input editing', () => {
+  /** Counts programmatic writes to the control's value; a user edit writes through the prototype. */
+  function countWrites(node: HTMLInputElement) {
+    let writes = 0
+    const own = Object.getOwnPropertyDescriptor(node, 'value')
+    const base = own ?? Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!
+    Object.defineProperty(node, 'value', {
+      configurable: true,
+      get() {
+        return base.get!.call(this)
+      },
+      set(value) {
+        writes++
+        base.set!.call(this, value)
+      },
     })
-
-    const label = container.querySelector(
-      '.uf-input label',
-    ) as HTMLLabelElement | null
-    const textarea = container.querySelector(
-      '.uf-input textarea',
-    ) as HTMLTextAreaElement | null
-    const description = container.querySelector(
-      '.uf-input__description',
-    ) as HTMLElement | null
-    const error = container.querySelector(
-      '.uf-input__error',
-    ) as HTMLElement | null
-
-    expect(label).not.toBeNull()
-    expect(textarea).not.toBeNull()
-    expect(label?.htmlFor).toBe('profile-notes')
-    expect(textarea?.id).toBe('profile-notes')
-    expect(textarea?.getAttribute('aria-label')).toBeNull()
-    expect(textarea?.disabled).toBe(true)
-    expect(textarea?.getAttribute('aria-disabled')).toBe('true')
-    expect(textarea?.getAttribute('aria-invalid')).toBe('true')
-    expect(textarea?.getAttribute('aria-describedby')).toBe(
-      'profile-notes-description profile-notes-error',
+    return () => writes
+  }
+  function Accepting() {
+    const [value, setValue] = useState('Hello world')
+    return (
+      <Input
+        aria-label="Field"
+        value={value}
+        onValueChange={({ value }) => setValue(value)}
+      />
     )
-    expect(description?.id).toBe('profile-notes-description')
-    expect(description?.textContent).toContain('Shown to workspace admins.')
-    expect(error?.id).toBe('profile-notes-error')
-    expect(error?.getAttribute('role')).toBe('alert')
-    expect(error?.hasAttribute('aria-live')).toBe(false)
-    expect(error?.textContent).toContain('Profile notes are required.')
-  })
-})
+  }
 
-describe('controlled form regressions', () => {
-  let root: Root
-  let container: HTMLDivElement
-  beforeEach(() => {
-    ;({ host: container, root } = mount())
-  })
+  for (const [mode, ui] of [
+    ['uncontrolled', <Input aria-label="Field" defaultValue="Hello world" />],
+    ['controlled', <Accepting />],
+  ] as const) {
+    it(`keeps the caret and never rewrites the control while it is edited (${mode})`, async () => {
+      await act(async () => root.render(ui))
+      const input = field() as HTMLInputElement
+      const writes = countWrites(input)
+      await act(async () => {
+        edit(input, 'HelloX world')
+        input.setSelectionRange(6, 6)
+      })
+      expect(input.value).toBe('HelloX world')
+      expect(input.selectionStart).toBe(6)
+      // IME composition: intermediate input events carry isComposing.
+      await act(async () => {
+        input.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }))
+        edit(input, 'HelloXk world', { isComposing: true })
+        input.setSelectionRange(7, 7)
+      })
+      await act(async () => {
+        edit(input, 'HelloXか world', { isComposing: true })
+        input.setSelectionRange(7, 7)
+      })
+      await act(async () => {
+        input.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: 'か' }))
+      })
+      expect(input.value).toBe('HelloXか world')
+      expect(input.selectionStart).toBe(7)
+      expect(writes()).toBe(0)
+    })
+  }
 
-  it('does not echo parent input updates or call a removed callback', async () => {
+  it('a refused edit restores the shown value', async () => {
     const onValueChange = vi.fn()
-    await act(async () =>
-      root.render(<Input value="first" onValueChange={onValueChange} />),
-    )
-    await act(async () =>
-      root.render(<Input value="second" onValueChange={onValueChange} />),
-    )
-    expect(onValueChange).not.toHaveBeenCalled()
-    expect(container.querySelector('input')?.value).toBe('second')
-    await act(async () => root.render(<Input value="second" />))
-    const input = container.querySelector('input')!
-    await act(async () => {
-      Object.getOwnPropertyDescriptor(
-        HTMLInputElement.prototype,
-        'value',
-      )!.set!.call(input, 'third')
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-    })
-    expect(onValueChange).not.toHaveBeenCalled()
-    expect(input.value).toBe('second')
+    await render({ value: 'second', onValueChange })
+    await enter('third')
+    expect(onValueChange).toHaveBeenCalledExactlyOnceWith({ value: 'third' })
+    expect(field().value).toBe('second')
   })
 })

@@ -90,8 +90,6 @@ describeGate('reachability: component CSS classes', PENDING.css, (component) =>
 const PENDING_SHARED = {
   modules: [
     'assets/adapters/react/inert-prop.ts',
-    'assets/adapters/react/use-controllable-state.ts',
-    'assets/adapters/react/use-event-callback.ts',
     'assets/adapters/react/use-focus-recovery.ts',
     'assets/adapters/react/use-roving-focus.ts',
     'assets/internal/item.ts',
@@ -101,7 +99,6 @@ const PENDING_SHARED = {
   classes: [
     'animations.css: .uf-animated is never rendered',
     'base.css: .is-active is never rendered',
-    'components/field.css: .uf-field is never rendered',
   ],
 } satisfies Record<string, readonly string[]>
 

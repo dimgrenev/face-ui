@@ -129,7 +129,7 @@
   "behavior": {
     "controlledValue": "checked controls the binary setting. Parent updates and form reset do not emit user change notifications.",
     "uncontrolledValue": "defaultChecked initializes selection and is restored by form reset.",
-    "nativeEvents": "Space and pointer activation use the native input. onChange and onCheckedChange each notify once; prevented activation changes nothing."
+    "nativeEvents": "Space and pointer activation use the native input. onChange runs first, then onCheckedChange, each once; preventDefault() in onClick or onChange cancels the activation and changes nothing."
   },
   "keyboard": {
     "Space": {

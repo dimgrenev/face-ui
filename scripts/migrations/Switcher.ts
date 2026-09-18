@@ -38,4 +38,10 @@ export default [
     before: '`ref` pointed to the wrapper `<div>`',
     after: '`ref` points to the native checkbox `<input>`; `className` and `style` still style the visible row',
   },
+  {
+    kind: 'behavior',
+    component: 'Switcher',
+    before: '`onCheckedChange` ran before the native `onChange`',
+    after: '`onChange` runs first, and its `preventDefault()` cancels the change',
+  },
 ] satisfies Migration[]

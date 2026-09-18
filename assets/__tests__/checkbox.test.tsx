@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Checkbox } from '../../Checkbox/Checkbox'
 import contract from '../../Checkbox/Checkbox.json'
 import { installMatchMedia, type MatchMediaRestore } from './harness/match-media'
+import { describeControlled } from './harness/controlled'
 import { mount } from './harness'
 
 let host: HTMLDivElement, root: Root
@@ -14,10 +15,25 @@ beforeEach(() => {
   ;({ host, root } = mount())
 })
 
+const shown = (host: HTMLElement) => {
+  const input = host.querySelector('input')!
+  return input.indeterminate ? ('indeterminate' as const) : input.checked
+}
+describeControlled<boolean | 'indeterminate'>({
+  name: 'Checkbox',
+  prop: 'checked',
+  values: [false, true],
+  render: (props) => <Checkbox label="Choice" {...props} />,
+  change: (host) => host.querySelector('input')!.click(),
+  read: shown,
+  handler: 'onChange',
+  formReset: true,
+})
+
 describe('Checkbox prop contract', () => {
   it('ref exposes the native control and stays attached across checked/label updates', async () => {
     const ref = vi.fn()
-    await render({ ref, label: 'Choice' })
+    await render({ ref, label: 'Choice', checked: false })
     expect(ref.mock.calls[0][0]).toBe(control())
     ref.mockClear()
     await render({ ref, label: 'Updated', checked: true })
@@ -156,34 +172,52 @@ describe('Checkbox prop contract', () => {
     expect(control().checked).toBe(false)
     expect(control().getAttribute('aria-checked')).toBe('mixed')
   })
-  it('defaultChecked is initial only; disabled controlled updates and callback replacement stay silent', async () => {
+  it('disabled controlled updates and callback replacement stay silent', async () => {
     const first = vi.fn(),
       second = vi.fn()
-    await render({ defaultChecked: 'indeterminate', onCheckedChange: first })
-    await act(async () => control().click())
-    expect(first).toHaveBeenCalledExactlyOnceWith({ checked: true })
-    await render({ defaultChecked: false, onCheckedChange: second })
-    expect(control().checked).toBe(true)
+    await render({ checked: false, onCheckedChange: first })
     await render({
       checked: 'indeterminate',
       disabled: true,
       onCheckedChange: second,
     })
     expect(control().indeterminate).toBe(true)
+    expect(first).not.toHaveBeenCalled()
     expect(second).not.toHaveBeenCalled()
   })
-  it('consumer preventDefault can cancel pointer activation without an internal value change', async () => {
-    const onCheckedChange = vi.fn()
+  it('a click canceled by onClick changes nothing, and the next click still reports', async () => {
+    const onCheckedChange = vi.fn(),
+      onChange = vi.fn()
+    let cancel = true
     await render({
       onCheckedChange,
-      onClick: (event: React.MouseEvent) => event.preventDefault(),
+      onChange,
+      onClick: (event: React.MouseEvent) => cancel && event.preventDefault(),
     })
-    await act(async () => {
-      control().click()
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
+    await act(async () => control().click())
     expect(control().checked).toBe(false)
+    expect(onChange).not.toHaveBeenCalled()
     expect(onCheckedChange).not.toHaveBeenCalled()
+    cancel = false
+    await act(async () => control().click())
+    expect(control().checked).toBe(true)
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onCheckedChange).toHaveBeenCalledExactlyOnceWith({ checked: true })
+  })
+  it('onChange runs before onCheckedChange and its preventDefault rolls the click back', async () => {
+    const order: string[] = []
+    await render({
+      defaultChecked: 'indeterminate',
+      onChange: (event: React.ChangeEvent) => {
+        order.push('onChange')
+        event.preventDefault()
+      },
+      onCheckedChange: () => order.push('onCheckedChange'),
+    })
+    await act(async () => control().click())
+    expect(control().indeterminate).toBe(true)
+    expect(control().checked).toBe(false)
+    expect(order).toEqual(['onChange'])
   })
   it('JSON does not invent a controlled null value outside the checked domain', () => {
     expect(contract.props.checked).not.toHaveProperty('default')

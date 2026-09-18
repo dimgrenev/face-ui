@@ -143,7 +143,8 @@
     "stateModel": "A boolean choice or indeterminate collection summary. Native activation changes to true or false.",
     "controlledValue": "Parent checked updates apply while disabled without emitting user callbacks.",
     "uncontrolledValue": "defaultChecked initializes selection and is restored by form reset.",
-    "disabled": "Native disabled inputs do not activate or submit."
+    "disabled": "Native disabled inputs do not activate or submit.",
+    "nativeEvents": "onChange runs before onCheckedChange. preventDefault() in onClick or onChange cancels the activation: the browser rolls it back and nothing is reported."
   },
   "keyboard": {
     "Space": {

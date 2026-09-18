@@ -25,3 +25,11 @@ export const incompatibleInputRows = <Input rows={4} />
 export const incompatibleInputGrowth = <Input autoGrow />
 // @ts-expect-error textarea has no pattern validation
 export const incompatibleInputPattern = <Input multiline pattern="[A-Z]+" />
+
+export const fieldInput = <Input label="Name" labelPosition="start" labels={{ clear: 'Очистить' }} fullWidth={false} membrane={false} />
+// @ts-expect-error the clear button's name lives in labels.clear
+export const obsoleteInputClearLabel = <Input clearLabel="Clear" />
+// @ts-expect-error labelPosition replaces labelOrientation
+export const obsoleteInputLabelOrientation = <Input labelOrientation="horizontal" />
+// @ts-expect-error labelPosition is top or start
+export const physicalInputLabelPosition = <Input labelPosition="left" />

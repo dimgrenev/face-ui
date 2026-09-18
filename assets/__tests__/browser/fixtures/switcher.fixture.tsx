@@ -5,12 +5,14 @@ import { Switcher, type SwitcherProps } from '../../../../Switcher/Switcher'
 import type { Flat } from '../helpers'
 const root = createRoot(document.getElementById('root')!),
   events: Record<string, unknown>[] = []
+/** Which consumer handler cancels the next activations: set by the spec. */
+const cancel: { current: 'click' | 'change' | null } = { current: null }
 function Fixture({
   props,
   controlled,
 }: {
   props: Flat<SwitcherProps>
-  controlled: boolean | 'change'
+  controlled: boolean | 'change' | 'refuse'
 }) {
   const [checked, setChecked] = useState(Boolean(props.defaultChecked))
   return (
@@ -36,13 +38,16 @@ function Fixture({
                   type: 'change',
                   checked: e.currentTarget.checked,
                 })
-                if (controlled === 'change') setChecked(e.currentTarget.checked)
+                if (cancel.current === 'change') e.preventDefault()
+                else if (controlled === 'change')
+                  setChecked(e.currentTarget.checked)
               },
               onClick: (e: React.MouseEvent<HTMLInputElement>) => {
                 events.push({
                   type: 'click',
                   target: (e.target as HTMLElement).tagName,
                 })
+                if (cancel.current === 'click') e.preventDefault()
                 ;(
                   props.onClick as
                     | ((e: React.MouseEvent<HTMLInputElement>) => void)
@@ -72,7 +77,7 @@ function Fixture({
 }
 function renderSwitcher(
   props: Flat<SwitcherProps> = {},
-  controlled: boolean | 'change' = false,
+  controlled: boolean | 'change' | 'refuse' = false,
   key = 'field',
 ) {
   flushSync(() =>
@@ -86,6 +91,7 @@ function renderSwitcher(
 Object.assign(window, {
   React,
   switcherEvents: events,
+  switcherCancel: cancel,
   renderSwitcher,
 })
 export type Hooks = { renderSwitcher: typeof renderSwitcher }

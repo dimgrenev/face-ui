@@ -7,6 +7,18 @@
   "root": {
     "type": "Input",
     "props": {
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "error": {
+        "$ref": "props.error"
+      },
+      "labelPosition": {
+        "$ref": "props.labelPosition"
+      },
       "placeholder": {
         "$ref": "props.placeholder"
       },
@@ -43,18 +55,6 @@
       "defaultValue": {
         "$ref": "props.defaultValue"
       },
-      "label": {
-        "$ref": "props.label"
-      },
-      "description": {
-        "$ref": "props.description"
-      },
-      "error": {
-        "$ref": "props.error"
-      },
-      "labelOrientation": {
-        "$ref": "props.labelOrientation"
-      },
       "icon": {
         "$ref": "props.icon"
       },
@@ -64,8 +64,11 @@
       "clearable": {
         "$ref": "props.clearable"
       },
-      "clearLabel": {
-        "$ref": "props.clearLabel"
+      "labels": {
+        "$ref": "props.labels"
+      },
+      "fullWidth": {
+        "$ref": "props.fullWidth"
       },
       "membrane": {
         "$ref": "props.membrane"
@@ -110,11 +113,38 @@
       "placeholder": "Describe how the assistant should behave...",
       "multiline": true,
       "autoGrow": true,
-      "maxLength": 4000,
-      "membrane": true
+      "maxLength": 4000
     }
   },
   "controls": [
+    {
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    {
+      "name": "description",
+      "type": "any",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    {
+      "name": "error",
+      "type": "any",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    {
+      "name": "labelPosition",
+      "type": "select",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
+    },
     {
       "name": "placeholder",
       "type": "string",
@@ -188,36 +218,8 @@
       "name": "defaultValue",
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial value, also restored by form reset."
-    },
-    {
-      "name": "label",
-      "type": "any",
-      "required": false,
-      "description": "Visible label associated with the native control."
-    },
-    {
-      "name": "description",
-      "type": "any",
-      "required": false,
-      "description": "Help associated with the native control. Empty content adds no spacing or ARIA id."
-    },
-    {
-      "name": "error",
-      "type": "any",
-      "required": false,
-      "description": "Validation message; also marks the control invalid unless aria-invalid is explicit."
-    },
-    {
-      "name": "labelOrientation",
-      "type": "select",
-      "required": false,
-      "description": "Label placement; has no effect without a label.",
-      "options": [
-        "vertical",
-        "horizontal"
-      ],
-      "defaultValue": "vertical"
+      "description": "Uncontrolled initial value, also restored by form reset.",
+      "defaultValue": ""
     },
     {
       "name": "icon",
@@ -244,18 +246,24 @@
       "defaultValue": true
     },
     {
-      "name": "clearLabel",
-      "type": "string",
+      "name": "labels",
+      "type": "object",
       "required": false,
-      "description": "Accessible name of the clear action.",
-      "defaultValue": "Clear input"
+      "description": "Accessible names of the field's own controls."
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch the field to its container; false keeps the control's native width.",
+      "defaultValue": true
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
       "description": "Outer spacing around the native control, independent of label and help.",
-      "defaultValue": false
+      "defaultValue": true
     },
     {
       "name": "multiline",

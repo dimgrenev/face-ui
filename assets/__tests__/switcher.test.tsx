@@ -3,6 +3,7 @@ import type { Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Switcher } from '../../Switcher/Switcher'
 import { installMatchMedia, type MatchMediaRestore } from './harness/match-media'
+import { describeControlled } from './harness/controlled'
 import { mount } from './harness'
 let host: HTMLDivElement, root: Root
 const control = () => host.querySelector<HTMLInputElement>('input')!
@@ -12,10 +13,21 @@ beforeEach(() => {
   ;({ host, root } = mount())
 })
 
+describeControlled<boolean>({
+  name: 'Switcher',
+  prop: 'checked',
+  values: [false, true],
+  render: (props) => <Switcher label="Setting" {...props} />,
+  change: (host) => host.querySelector('input')!.click(),
+  read: (host) => host.querySelector('input')!.checked,
+  handler: 'onChange',
+  formReset: true,
+})
+
 describe('Switcher prop contract', () => {
   it('ref exposes the native switch without detaching on parent updates', async () => {
     const ref = vi.fn()
-    await render({ ref, label: 'Setting' })
+    await render({ ref, label: 'Setting', checked: false })
     expect(ref.mock.calls[0][0]).toBe(control())
     ref.mockClear()
     await render({ ref, label: 'Renamed', checked: true })
@@ -145,21 +157,13 @@ describe('Switcher prop contract', () => {
     expect(onChange).not.toHaveBeenCalled()
     expect(onCheckedChange).not.toHaveBeenCalled()
   })
-  it('defaultChecked is initial-only and disabled controlled changes are quiet', async () => {
-    const first = vi.fn(),
-      second = vi.fn()
-    await render({ defaultChecked: true, onCheckedChange: first })
-    expect(control().checked).toBe(true)
-    await render({ defaultChecked: false, onCheckedChange: second })
-    expect(control().checked).toBe(true)
-    await render({ checked: false, disabled: true, onCheckedChange: second })
+  it('disabled controlled changes are quiet', async () => {
+    const onCheckedChange = vi.fn()
+    await render({ checked: true, onCheckedChange })
+    await render({ checked: false, disabled: true, onCheckedChange })
     expect(control().checked).toBe(false)
-    expect(first).not.toHaveBeenCalled()
-    expect(second).not.toHaveBeenCalled()
-    await render({ disabled: false, onCheckedChange: second })
-    await act(async () => control().click())
-    expect(first).not.toHaveBeenCalled()
-    expect(second).toHaveBeenCalledExactlyOnceWith({ checked: true })
+    expect(control().getAttribute('aria-checked')).toBe('false')
+    expect(onCheckedChange).not.toHaveBeenCalled()
   })
 })
 

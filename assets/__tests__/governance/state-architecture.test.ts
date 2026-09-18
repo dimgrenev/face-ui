@@ -171,8 +171,8 @@ const PENDING = {
     'Select', 'Slider', 'Steps', 'Tabs', 'Toggle', 'Tooltip',
   ],
   'D3 machines': [
-    'Accordion', 'Avatar', 'Carousel', 'Checkbox', 'Command', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Pagination',
-    'Panel', 'Popover', 'Radio', 'Select', 'Steps', 'Switcher', 'Table', 'Toast', 'Toc', 'Tooltip', 'Tree', 'Upload',
+    'Accordion', 'Avatar', 'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Pagination',
+    'Panel', 'Popover', 'Radio', 'Select', 'Steps', 'Table', 'Toast', 'Toc', 'Tooltip', 'Tree', 'Upload',
   ],
   'D3 isomorphic layout effect': [
     'Accordion', 'Avatar', 'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
@@ -186,7 +186,7 @@ const PENDING = {
     'Steps', 'Toc', 'Tree',
   ],
   'D5 one implementation': [
-    'Accordion', 'Breadcrumb', 'Calendar', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Panel',
+    'Accordion', 'Breadcrumb', 'Calendar', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Panel',
     'Popover', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps', 'Tabs', 'Tooltip', 'Tree', 'Upload',
   ],
 } satisfies Record<string, readonly string[]>

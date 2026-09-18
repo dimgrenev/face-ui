@@ -1,22 +1,8 @@
 /** Switcher — a native binary setting with a visible on/off track. */
-import {
-  forwardRef,
-  useMemo,
-  useRef,
-  type CSSProperties,
-  type ReactNode,
-} from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import {
-  switcherMachine,
-  connectSwitcher,
-} from '../assets/machines/switcher.machine'
+import { forwardRef, type CSSProperties, type ReactNode } from 'react'
 import { cn } from '../assets/utils'
-import { useFormReset } from '../assets/adapters/react/use-form-reset'
-import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
 import {
   useCheckedInput,
-  syncCheckedInput,
   type CheckedInputAttributes,
 } from '../assets/adapters/react/use-checked-input'
 import { hasSlotContent } from '../assets/slot-content'
@@ -63,20 +49,19 @@ export interface SwitcherProps extends CheckedInputAttributes {
 }
 
 export const Switcher = forwardRef<HTMLInputElement, SwitcherProps>(
-  function Switcher(props, ref) {
-    const {
-      checked,
+  function Switcher(
+    {
+      checked: checkedProp,
       defaultChecked = false,
+      onCheckedChange,
+      onChange,
       disabled = false,
       required = false,
-      name,
       value = 'on',
       label,
       truncate = false,
       fullWidth = false,
       membrane = true,
-      onCheckedChange,
-      onChange,
       className,
       style,
       hidden,
@@ -84,44 +69,25 @@ export const Switcher = forwardRef<HTMLInputElement, SwitcherProps>(
       lang,
       title,
       ...nativeProps
-    } = props
-    const initial = useRef({
-      checked: checked ?? defaultChecked,
+    },
+    ref,
+  ) {
+    const { checked, inputProps } = useCheckedInput({
+      component: 'Switcher',
+      checked: checkedProp,
       defaultChecked,
-    })
-    const machineConfig = useMemo(
-      () => ({
-        ...switcherMachine,
-        initial: initial.current.checked
-          ? ('checked' as const)
-          : ('unchecked' as const),
-        context: {
-          ...switcherMachine.context,
-          checked: initial.current.checked,
-        },
-      }),
-      [],
-    )
-    const { state, send, syncContext } = useMachine(machineConfig, {
-      checked,
-      disabled,
-      required,
-      name: name ?? '',
-      value,
       onCheckedChange,
+      onChange,
+      ref,
     })
-    const inputRef = useRef<HTMLInputElement>(null)
-    const composedRef = useComposedRefs(inputRef, ref)
-    useCheckedInput(inputRef, state.context.checked)
-    useFormReset(inputRef, () => {
-      const next =
-        checked !== undefined ? checked : initial.current.defaultChecked
-      syncContext({ checked: next })
-      syncCheckedInput(inputRef.current, next)
+    const part = (name: string) => ({
+      'data-scope': 'switcher',
+      'data-part': name,
+      'data-state': checked ? 'checked' : 'unchecked',
+      'data-disabled': disabled || undefined,
     })
-    const api = connectSwitcher(state, send),
-      inputProps = api.getInputProps(),
-      hasLabel = hasSlotContent(label)
+    const hasLabel = hasSlotContent(label)
+    const shared = { hidden, dir, lang, title }
     return (
       <Membrane
         enabled={membrane}
@@ -130,11 +96,8 @@ export const Switcher = forwardRef<HTMLInputElement, SwitcherProps>(
         target="input"
       >
         <label
-          {...api.getRootProps()}
-          hidden={hidden}
-          dir={dir}
-          lang={lang}
-          title={title}
+          {...part('root')}
+          {...shared}
           style={style}
           className={cn('uf-switcher', className)}
           data-switch-only={!hasLabel || undefined}
@@ -142,7 +105,7 @@ export const Switcher = forwardRef<HTMLInputElement, SwitcherProps>(
         >
           {hasLabel && (
             <Text
-              {...api.getLabelProps()}
+              {...part('label')}
               as="span"
               inset="none"
               membrane={false}
@@ -151,36 +114,23 @@ export const Switcher = forwardRef<HTMLInputElement, SwitcherProps>(
               {label}
             </Text>
           )}
-          <span {...api.getTrackProps()} aria-hidden="true">
-            <span {...api.getThumbProps()} />
+          <span {...part('track')} aria-hidden="true">
+            <span {...part('thumb')} />
           </span>
           <input
+            // Explicit, so WebKit's Tab order includes the checkbox.
+            tabIndex={disabled ? -1 : 0}
+            aria-disabled={disabled || undefined}
+            aria-required={required || undefined}
             {...nativeProps}
+            {...part('input')}
+            {...shared}
             {...inputProps}
-            ref={composedRef}
-            checked={undefined}
-            defaultChecked={initial.current.checked}
-            name={name}
+            role="switch"
+            aria-checked={checked}
+            disabled={disabled}
+            required={required}
             value={value}
-            hidden={hidden}
-            dir={dir}
-            lang={lang}
-            title={title}
-            aria-disabled={
-              nativeProps['aria-disabled'] ?? inputProps['aria-disabled']
-            }
-            aria-required={
-              nativeProps['aria-required'] ?? inputProps['aria-required']
-            }
-            tabIndex={disabled ? -1 : (nativeProps.tabIndex ?? 0)}
-            onChange={(event) => {
-              if (event.nativeEvent.defaultPrevented) {
-                event.stopPropagation()
-                return
-              }
-              inputProps.onChange(event)
-              onChange?.(event)
-            }}
           />
         </label>
       </Membrane>

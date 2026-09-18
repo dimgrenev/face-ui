@@ -11,7 +11,6 @@ export default [
       autoComplete: 'email',
       required: true,
       name: 'email',
-      membrane: true,
     },
   },
   {
@@ -23,7 +22,6 @@ export default [
       multiline: true,
       autoGrow: true,
       maxLength: 4000,
-      membrane: true,
     },
   },
 ] satisfies ProductScenarioPair
