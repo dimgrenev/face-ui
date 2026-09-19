@@ -193,24 +193,25 @@ function Fixture() {
         />
         <Navigation
           surface="inline"
+          aria-label="Composition"
           items={[
             {
-              id: 'nav-action',
+              value: 'nav-action',
               label: 'Run navigation',
               onClick: () => setNavAction((n) => n + 1),
             },
             {
-              id: 'nav-disabled',
+              value: 'nav-disabled',
               label: 'Disabled navigation',
               disabled: true,
               onClick: () => setNavAction(999),
             },
             {
-              id: 'nav-group',
+              value: 'nav-group',
               label: 'Navigation group',
               items: [
                 {
-                  id: 'nav-child',
+                  value: 'nav-child',
                   label: 'Child action',
                   onClick: () => setNavAction((n) => n + 1),
                 },
@@ -220,9 +221,10 @@ function Fixture() {
         />
         <Panel
           surface="inline"
+          aria-label="Composition panel"
           items={[
             {
-              id: 'panel-action',
+              value: 'panel-action',
               label: 'Run panel',
               onClick: () => setNavAction((n) => n + 1),
             },
@@ -231,13 +233,13 @@ function Fixture() {
         <output aria-label="Navigation actions">{navAction}</output>
         <Panel
           surface="sheet"
-          surfaceTitle="Project panel"
-          items={[{ id: 'project', label: 'Project' }]}
+          aria-label="Project panel"
+          items={[{ value: 'project', label: 'Project' }]}
         />
         <Navigation
           surface="sheet"
-          surfaceTitle="Project navigation"
-          items={[{ id: 'project', label: 'Project' }]}
+          aria-label="Project navigation"
+          items={[{ value: 'project', label: 'Project' }]}
         />
       </section>
       <section data-fixture="pagination">

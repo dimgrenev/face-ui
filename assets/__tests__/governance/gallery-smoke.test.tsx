@@ -282,18 +282,13 @@ describe('face-ui-react gallery smoke', () => {
     ).not.toBeNull()
 
     const navigationCard = getGalleryCard(container, 'Navigation')
-    const settingsButton =
-      Array.from(
-        navigationCard.querySelectorAll<HTMLButtonElement>('button'),
-      ).find((button) => button.textContent?.includes('Settings')) ?? null
+    const settingsItem = navigationCard.querySelector<HTMLElement>(
+      '[data-scope="navigation"][data-part="link"][data-value="settings"]',
+    )
     await act(async () => {
-      settingsButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      settingsItem?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
-    const activeSettingsButton =
-      Array.from(
-        navigationCard.querySelectorAll<HTMLButtonElement>('button'),
-      ).find((button) => button.textContent?.includes('Settings')) ?? null
-    expect(activeSettingsButton?.getAttribute('data-variant')).toBe('default')
+    expect(settingsItem?.getAttribute('aria-current')).toBe('page')
 
     const paginationCard = getGalleryCard(container, 'Pagination')
     const nextPage = paginationCard.querySelector(
@@ -435,20 +430,13 @@ describe('face-ui-react gallery smoke', () => {
     const panelCard = getGalleryCard(container, 'Panel')
     expect(panelCard.contains(document.activeElement)).toBe(false)
 
-    const panelButtons = Array.from(
-      panelCard.querySelectorAll<HTMLButtonElement>(
-        '.uf-sidebar-itemButton[data-scope="button"]',
-      ),
+    const panelRows = Array.from(
+      panelCard.querySelectorAll<HTMLElement>('.uf-sidebar-item[data-scope="sidebar"]'),
     )
-    expect(panelButtons).toHaveLength(4)
+    expect(panelRows).toHaveLength(4)
     expect(
-      panelButtons.every(
-        (button) => button.getAttribute('data-variant') === 'default',
-      ),
-    ).toBe(true)
-    expect(
-      panelButtons.some((button) => button.hasAttribute('data-selected')),
-    ).toBe(true)
+      panelRows.filter((row) => row.getAttribute('aria-current') === 'page'),
+    ).toHaveLength(1)
     expect(panelCard.textContent).toContain('Overview')
     expect(panelCard.textContent).toContain('Projects')
     expect(panelCard.textContent).toContain('Automations')

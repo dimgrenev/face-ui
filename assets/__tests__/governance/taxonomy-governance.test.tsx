@@ -312,7 +312,7 @@ describe('taxonomy and governance', () => {
       '[data-scope="steps"][data-part="trigger"]',
       '.uf-command__trigger',
       '.uf-breadcrumb-label[data-scope]',
-      '.uf-sidebar-item',
+      '.uf-sidebar-item[data-scope]',
       '[data-scope="navigation"] [data-part="trigger"],\n[data-scope="navigation"] [data-part="link"]',
       '.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]),\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]),\n.uf-tree[data-scope] .uf-tree-custom-node',
     ]
@@ -498,7 +498,7 @@ describe('taxonomy and governance', () => {
       '[data-scope="calendar"] [data-part="prevButton"]:hover,\n[data-scope="calendar"] [data-part="nextButton"]:hover',
       '.uf-command__trigger:hover',
       '.uf-breadcrumb-label.uf-control:hover',
-      '.uf-sidebar-item:hover',
+      '.uf-sidebar-item[data-scope]:hover',
       '[data-scope="navigation"] [data-part="trigger"]:hover,\n[data-scope="navigation"] [data-part="link"]:hover',
       '.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]):hover,\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]):hover,\n.uf-tree[data-scope] .uf-tree-custom-node:hover',
     ]

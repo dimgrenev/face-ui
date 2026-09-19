@@ -955,6 +955,112 @@
     },
     {
       "kind": "rename-prop",
+      "component": "Navigation",
+      "from": "activeId",
+      "to": "value",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Navigation",
+      "from": "defaultActiveId",
+      "to": "defaultValue",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Navigation",
+      "from": "onActiveChange",
+      "to": "onValueChange",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Navigation",
+      "prop": "onValueChange",
+      "before": "`details.id`",
+      "after": "`details.value`",
+      "codemod": "manual",
+      "legacy": "\\.id\\b|\\{\\s*id\\s*\\}"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Navigation",
+      "prop": "items[].id",
+      "use": "`items[].value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Navigation",
+      "prop": "orientation",
+      "use": "Remove it: the bar is horizontal; a vertical navigation is `Panel`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Navigation",
+      "prop": "surfaceBreakpoint",
+      "use": "Remove it; `surface=\"auto\"` becomes a sheet below 900px",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Navigation",
+      "from": "surfaceTitle",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "A `<div role=\"navigation\">` with a `menubar` of `menuitem`s; `className` and `ref` moved to the sheet host and dialog on narrow screens",
+      "after": "A `<nav>` landmark of links and disclosure buttons (APG disclosure navigation) on every surface; native attributes, `className`, `style` and `ref` stay on it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "`items[].onClick()` took no event and cancelled the item's `href`",
+      "after": "`items[].onClick(event)` runs first; the link is followed unless it calls `event.preventDefault()`, and the item still becomes current"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "Items nested two levels deep rendered as a labelled section of the dropdown",
+      "after": "A dropdown section is `{ type: \"group\", label, items }`; `items` of a dropdown link are ignored"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "Hovering a dropdown item opened it at once, and `onActiveChange` also fired when `activeId` changed from the parent",
+      "after": "Hover opens after 200 ms and closes 150 ms after leaving; `onValueChange` reports only user activations"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "In the sheet, links were buttons that called `location.assign`, and the sheet was titled \"Navigation\"",
+      "after": "The sheet is a modal bottom sheet of real links, titled by `aria-label`; `labels.open` and `labels.close` name its buttons"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "The landmark had no name unless `surfaceTitle` was set",
+      "after": "The `<nav>` and its sheet are named \"Main\" until `aria-label` or `aria-labelledby` names them"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "A click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed its dropdown or the sheet",
+      "after": "Such a click opens the link elsewhere and leaves the current item, the dropdown and the sheet as they are"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "Items had `data-active`; bar buttons were `.uf-navigation-trigger`, dropdown links `.uf-navigation-dropdownItem` Buttons, and the sheet used `.uf-navigation-sheet*` classes",
+      "after": "The current link has `aria-current=\"page\"` and the bar button holding it `data-current`; style `[data-part=\"trigger\"]`, `[data-part=\"link\"]` and `.uf-navigation-section` instead"
+    },
+    {
+      "kind": "rename-prop",
       "component": "Overlay",
       "from": "trigger",
       "to": "openOn",
@@ -993,6 +1099,123 @@
       "component": "Pagination",
       "before": "The nav's `onClick` ran after the page changed",
       "after": "`onClick` runs first, and its `preventDefault()` cancels the change"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Panel",
+      "from": "selectedId",
+      "to": "value",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Panel",
+      "from": "defaultSelectedId",
+      "to": "defaultValue",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Panel",
+      "from": "onSelectedChange",
+      "to": "onValueChange",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Panel",
+      "prop": "onValueChange",
+      "before": "`details.selectedId`",
+      "after": "`details.value`",
+      "codemod": "manual",
+      "legacy": "\\bselectedId\\b"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Panel",
+      "prop": "items[].id",
+      "use": "`items[].value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Panel",
+      "prop": "surfaceBreakpoint",
+      "use": "Remove it; `surface=\"auto\"` becomes a sheet below 900px",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Panel",
+      "from": "surfaceTitle",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Panel/Panel#Sidebar",
+      "to": "compat#Sidebar",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Panel/Panel#SidebarProps",
+      "to": "compat#SidebarProps",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Panel/Panel#SidebarItem",
+      "to": "compat#SidebarItem",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "Rows were Buttons (`.uf-sidebar-itemButton`) with `aria-pressed`; `href` rows called `location.assign`, and `onClick()` took no event",
+      "after": "Rows are links or buttons (`.uf-sidebar-item`) with `aria-current=\"page\"`; `onClick(event)` runs first and `preventDefault()` cancels only the link"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "Group rows always showed their children; the group button only flipped `aria-expanded`",
+      "after": "A group shows its rows while expanded (`expanded`); on mount the groups holding the current row are expanded"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "The rail hid the rows of every group, and only string labels named icon-only rows",
+      "after": "A group in the rail expands the panel at that group (in a rail without the toggle it shows its rows in place); every label stays as the accessible name"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "A disabled group's rows stayed usable, and a click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed the sheet",
+      "after": "Disabling a group disables its rows; such a click opens the link elsewhere and leaves the current row and the sheet as they are"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "Rows had `data-selected` and `data-state`; parts were `itemIcon`, `itemLabel` and `groupContent`, and a group's button was `groupLabel`",
+      "after": "The current row has `aria-current=\"page\"`; parts are `icon`, `label`, `group` (the rows of a group) and `trigger` (its button)"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "The header always held the collapse toggle, an empty footer followed the rows, and \"[\" toggled the rail",
+      "after": "`collapsible={false}` removes the toggle; there is no footer and no keyboard shortcut"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "The sheet covered the whole viewport, titled \"Panel\"; `className` and `ref` moved to its host and dialog",
+      "after": "The sheet is a modal drawer at the start edge, titled by `aria-label`; the `<nav>` and the sheet are named \"Sidebar\" until `aria-label` or `aria-labelledby` names them; the `<nav>` keeps native attributes, `className`, `style` and `ref`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "`onSelectedChange` and `onCollapsedChange` also fired when the parent changed `selectedId` or `collapsed`",
+      "after": "`onValueChange` and `onCollapsedChange` report only user actions"
     },
     {
       "kind": "remove-prop",

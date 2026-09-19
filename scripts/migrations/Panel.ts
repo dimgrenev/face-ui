@@ -1,0 +1,82 @@
+import type { Migration } from './types'
+
+export default [
+  { kind: 'rename-prop', component: 'Panel', from: 'selectedId', to: 'value', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Panel', from: 'defaultSelectedId', to: 'defaultValue', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Panel', from: 'onSelectedChange', to: 'onValueChange', codemod: 'auto' },
+  {
+    kind: 'retype-prop',
+    component: 'Panel',
+    prop: 'onValueChange',
+    before: '`details.selectedId`',
+    after: '`details.value`',
+    codemod: 'manual',
+    legacy: String.raw`\bselectedId\b`,
+  },
+  {
+    kind: 'remove-prop',
+    component: 'Panel',
+    prop: 'items[].id',
+    use: '`items[].value`',
+    codemod: 'manual',
+  },
+  {
+    kind: 'remove-prop',
+    component: 'Panel',
+    prop: 'surfaceBreakpoint',
+    use: 'Remove it; `surface="auto"` becomes a sheet below 900px',
+    codemod: 'auto',
+  },
+  { kind: 'rename-prop', component: 'Panel', from: 'surfaceTitle', to: 'aria-label', codemod: 'auto' },
+  { kind: 'export', from: 'Panel/Panel#Sidebar', to: 'compat#Sidebar', codemod: 'auto' },
+  { kind: 'export', from: 'Panel/Panel#SidebarProps', to: 'compat#SidebarProps', codemod: 'auto' },
+  { kind: 'export', from: 'Panel/Panel#SidebarItem', to: 'compat#SidebarItem', codemod: 'auto' },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: 'Rows were Buttons (`.uf-sidebar-itemButton`) with `aria-pressed`; `href` rows called `location.assign`, and `onClick()` took no event',
+    after: 'Rows are links or buttons (`.uf-sidebar-item`) with `aria-current="page"`; `onClick(event)` runs first and `preventDefault()` cancels only the link',
+  },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: 'Group rows always showed their children; the group button only flipped `aria-expanded`',
+    after: 'A group shows its rows while expanded (`expanded`); on mount the groups holding the current row are expanded',
+  },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: 'The rail hid the rows of every group, and only string labels named icon-only rows',
+    after: 'A group in the rail expands the panel at that group (in a rail without the toggle it shows its rows in place); every label stays as the accessible name',
+  },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: "A disabled group's rows stayed usable, and a click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed the sheet",
+    after: 'Disabling a group disables its rows; such a click opens the link elsewhere and leaves the current row and the sheet as they are',
+  },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: 'Rows had `data-selected` and `data-state`; parts were `itemIcon`, `itemLabel` and `groupContent`, and a group\'s button was `groupLabel`',
+    after: 'The current row has `aria-current="page"`; parts are `icon`, `label`, `group` (the rows of a group) and `trigger` (its button)',
+  },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: 'The header always held the collapse toggle, an empty footer followed the rows, and "[" toggled the rail',
+    after: '`collapsible={false}` removes the toggle; there is no footer and no keyboard shortcut',
+  },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: 'The sheet covered the whole viewport, titled "Panel"; `className` and `ref` moved to its host and dialog',
+    after: 'The sheet is a modal drawer at the start edge, titled by `aria-label`; the `<nav>` and the sheet are named "Sidebar" until `aria-label` or `aria-labelledby` names them; the `<nav>` keeps native attributes, `className`, `style` and `ref`',
+  },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: '`onSelectedChange` and `onCollapsedChange` also fired when the parent changed `selectedId` or `collapsed`',
+    after: '`onValueChange` and `onCollapsedChange` report only user actions',
+  },
+] satisfies Migration[]

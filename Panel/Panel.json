@@ -2,50 +2,67 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Panel",
-  "description": "Collapsible panel navigation with nested groups",
+  "description": "Side navigation: links in expandable groups that collapses to a rail, or a sheet on narrow screens.",
   "props": {
     "items": {
       "type": "array",
       "required": false,
-      "description": "Panel item definitions (supports nested groups)."
+      "description": "Rows in order, groups nesting their rows; an item repeating an earlier value is dropped."
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Value of the current page's row, marked `aria-current=\"page\"`; `null` marks none, and an unknown value marks none."
+    },
+    "defaultValue": {
+      "type": "string",
+      "required": false,
+      "description": "Current row on mount when `value` is not set; read once.",
+      "default": null
+    },
+    "expanded": {
+      "type": "array",
+      "required": false,
+      "description": "Values of the groups showing their rows; unknown values are kept but show nothing."
+    },
+    "defaultExpanded": {
+      "type": "array",
+      "required": false,
+      "description": "Expanded groups on mount when `expanded` is not set; read once. Default: the groups that hold the current row."
     },
     "collapsed": {
       "type": "boolean",
       "required": false,
-      "description": "Whether the panel is collapsed."
+      "description": "Whether the inline panel is a rail of icons, labels kept as accessible names; a sheet never collapses."
     },
     "defaultCollapsed": {
       "type": "boolean",
       "required": false,
-      "description": "Uncontrolled initial collapsed state.",
+      "description": "Whether the panel is collapsed on mount when `collapsed` is not set; read once.",
       "default": false
     },
-    "selectedId": {
-      "type": "string",
+    "collapsible": {
+      "type": "boolean",
       "required": false,
-      "description": "Currently selected item ID."
-    },
-    "defaultSelectedId": {
-      "type": "string",
-      "required": false,
-      "description": "Uncontrolled initial selected item ID."
+      "description": "Shows the button that collapses the panel to a rail, and lets a group in the rail open the panel at it; false leaves `collapsed` to the parent, and groups then open in the rail. Default true.",
+      "default": true
     },
     "width": {
       "type": "any",
       "required": false,
-      "description": "Width when expanded.",
+      "description": "Width of the expanded inline panel: pixels, or any CSS length. Default 260. It and `collapsedWidth` own the width, so `style.width` is ignored.",
       "default": 260
     },
     "collapsedWidth": {
       "type": "any",
       "required": false,
-      "description": "Width when collapsed.",
+      "description": "Width of the collapsed rail: pixels, or any CSS length. Default 60.",
       "default": 60
     },
     "surface": {
       "type": "enum",
       "required": false,
-      "description": "Surface behavior on compact viewports.",
+      "description": "`inline` shows the panel; `sheet` shows a trigger that opens the rows in a drawer at the start edge; `auto` is a sheet below 900px.",
       "options": [
         "auto",
         "inline",
@@ -53,31 +70,31 @@
       ],
       "default": "auto"
     },
-    "surfaceBreakpoint": {
-      "type": "number",
-      "required": false,
-      "description": "Breakpoint where auto surfaces switch to sheet mode."
-    },
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled drawer state for sheet mode."
+      "description": "Whether the sheet is open; only a sheet surface opens, and leaving it closes an uncontrolled sheet."
     },
     "defaultOpen": {
       "type": "boolean",
       "required": false,
-      "description": "Uncontrolled initial drawer state for sheet mode.",
+      "description": "Whether the sheet is open on mount when `open` is not set; read once.",
       "default": false
     },
     "trigger": {
       "type": "ReactNode",
       "required": false,
-      "description": "Optional trigger for sheet mode."
+      "description": "Element that opens the sheet, keeping its own props; text renders as a Button. Default: an icon button named `labels.open`."
     },
-    "surfaceTitle": {
-      "type": "ReactNode",
+    "aria-label": {
+      "type": "string",
       "required": false,
-      "description": "Optional title used in compact sheet header."
+      "description": "Names the navigation landmark (default \"Sidebar\") and titles the sheet."
+    },
+    "labels": {
+      "type": "object",
+      "required": false,
+      "description": "Strings Panel renders itself: `open` names the default sheet trigger, `close` the sheet's close button, `expand` and `collapse` the rail toggle."
     }
   },
   "states": [
@@ -86,27 +103,38 @@
       "props": {
         "items": [
           {
-            "id": "overview",
+            "value": "overview",
             "label": "Overview",
             "icon": "layout-sidebar-left-open"
           },
           {
-            "id": "projects",
+            "value": "projects",
             "label": "Projects",
             "icon": "folder"
           },
           {
-            "id": "automations",
+            "value": "automations",
             "label": "Automations",
             "icon": "component"
           },
           {
-            "id": "settings",
+            "value": "settings",
             "label": "Settings",
-            "icon": "settings"
+            "icon": "settings",
+            "items": [
+              {
+                "value": "members",
+                "label": "Members"
+              },
+              {
+                "value": "billing",
+                "label": "Billing"
+              }
+            ]
           }
         ],
-        "defaultSelectedId": "overview",
+        "defaultValue": "overview",
+        "aria-label": "Workspace",
         "surface": "inline",
         "width": 260
       }
@@ -116,27 +144,38 @@
       "props": {
         "items": [
           {
-            "id": "overview",
+            "value": "overview",
             "label": "Overview",
             "icon": "layout-sidebar-left-open"
           },
           {
-            "id": "projects",
+            "value": "projects",
             "label": "Projects",
             "icon": "folder"
           },
           {
-            "id": "automations",
+            "value": "automations",
             "label": "Automations",
             "icon": "component"
           },
           {
-            "id": "settings",
+            "value": "settings",
             "label": "Settings",
-            "icon": "settings"
+            "icon": "settings",
+            "items": [
+              {
+                "value": "members",
+                "label": "Members"
+              },
+              {
+                "value": "billing",
+                "label": "Billing"
+              }
+            ]
           }
         ],
-        "defaultSelectedId": "projects",
+        "defaultValue": "projects",
+        "aria-label": "Workspace",
         "surface": "inline",
         "defaultCollapsed": true
       }
@@ -146,50 +185,94 @@
       "props": {
         "items": [
           {
-            "id": "overview",
+            "value": "overview",
             "label": "Overview",
             "icon": "layout-sidebar-left-open"
           },
           {
-            "id": "projects",
+            "value": "projects",
             "label": "Projects",
             "icon": "folder"
           },
           {
-            "id": "automations",
+            "value": "automations",
             "label": "Automations",
             "icon": "component"
           },
           {
-            "id": "settings",
+            "value": "settings",
             "label": "Settings",
-            "icon": "settings"
+            "icon": "settings",
+            "items": [
+              {
+                "value": "members",
+                "label": "Members"
+              },
+              {
+                "value": "billing",
+                "label": "Billing"
+              }
+            ]
           }
         ],
-        "defaultSelectedId": "automations",
+        "defaultValue": "automations",
         "surface": "sheet",
         "defaultOpen": true,
-        "surfaceTitle": "Workspace"
+        "aria-label": "Workspace"
       }
     }
   ],
-  "behavior": {},
-  "keyboard": {},
+  "behavior": {
+    "rovingFocus": true,
+    "pattern": "APG disclosure navigation, vertical: links and group disclosure buttons.",
+    "stateModel": "value holds the current row; expanded holds the open groups (on mount, those holding the current row); collapsed turns the inline panel into a rail.",
+    "rail": "Labels stay as accessible names; a group in the rail expands the panel at that group.",
+    "sheet": "Below 900px with surface auto: a trigger opens the rows in a modal drawer at the start edge; activating a row closes it."
+  },
+  "keyboard": {
+    "Tab": {
+      "action": "focusNextFocusable",
+      "condition": "every enabled row is in the tab sequence"
+    },
+    "ArrowDown": {
+      "action": "focusNext"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious"
+    },
+    "Home": {
+      "action": "focusFirst"
+    },
+    "End": {
+      "action": "focusLast"
+    },
+    "Enter": {
+      "action": "activate",
+      "condition": "toggles a group"
+    },
+    "Space": {
+      "action": "activate",
+      "condition": "toggles a group"
+    }
+  },
   "aria": {
-    "role": "complementary",
-    "required": [
-      "aria-label"
+    "role": "navigation",
+    "notes": [
+      "The root is a <nav> landmark; aria-label names it.",
+      "The current page's row has aria-current=\"page\"; groups are buttons with aria-expanded and aria-controls."
     ]
   },
   "composition": {
     "required": [
-      "root"
+      "root",
+      "content",
+      "item"
     ],
     "recommended": [
       "header",
-      "content",
-      "footer",
-      "collapseButton"
+      "link",
+      "trigger",
+      "group"
     ],
     "parts": {
       "root": {
@@ -203,13 +286,34 @@
         "slot": "content",
         "parent": "root"
       },
-      "footer": {
-        "slot": "footer",
-        "parent": "root"
+      "item": {
+        "slot": "item",
+        "parent": "content",
+        "multiple": true
       },
-      "collapseButton": {
-        "slot": "collapseButton",
-        "parent": "header"
+      "link": {
+        "slot": "link",
+        "parent": "item"
+      },
+      "trigger": {
+        "slot": "trigger",
+        "parent": "item"
+      },
+      "group": {
+        "slot": "group",
+        "parent": "item"
+      },
+      "icon": {
+        "slot": "icon",
+        "parent": "link"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "link"
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "trigger"
       }
     }
   },
@@ -218,52 +322,44 @@
       "--uf-sidebar-bg",
       "--uf-sidebar-fg",
       "--uf-sidebar-muted",
-      "--uf-sidebar-hover-bg",
       "--uf-sidebar-active-bg",
       "--uf-sidebar-row-radius",
-      "--uf-sidebar-section-gap",
-      "--face-runtime-sidebar-sheet-w",
-      "--uf-sidebar-sheet-w-default",
-      "--uf-sidebar-sheet-viewport-gap"
+      "--uf-sidebar-inset"
     ],
     "semanticFallbacks": [
-      "--uf-content-inset",
-      "--uf-membrane",
       "--uf-control-height",
-      "--uf-control-pad-y",
       "--uf-control-pad-text",
       "--uf-control-gap",
-      "--uf-font-size-sm",
-      "--uf-font-weight",
-      "--uf-font-weight-bold",
-      "--uf-color-bg",
+      "--uf-option-indent",
+      "--uf-radius-sm",
       "--uf-color-panel",
       "--uf-color-surface-sidebar",
       "--uf-color-fg",
       "--uf-color-fg-muted",
       "--uf-color-hover-bg",
       "--uf-color-active-bg",
-      "--uf-color-border"
+      "--uf-duration-enter",
+      "--uf-ease-enter"
     ],
     "notes": [
-      "Panel uses Button, Icon and Text for item rendering and compact-overlay triggers.",
-      "width and collapsedWidth are layout inputs; compact-overlay width is bridged through --face-runtime-sidebar-sheet-w.",
-      "Panel remains a higher-risk navigation primitive; behavior refactors require baseline coverage."
+      "width and collapsedWidth size the inline panel; the compact sheet is a Modal at the start edge."
     ]
   },
   "platform": {},
   "usage": {
     "whenToUse": [
-      "Sidebar content area",
-      "Split-view detail pane",
-      "Collapsible side section"
+      "Side navigation of an app or settings area",
+      "Sections grouped under expandable headings",
+      "A narrow icon rail that expands"
     ],
     "whenNotToUse": [
-      "Overlay content (use Modal)",
-      "Simple content block (use Card)"
+      "Header navigation (use Navigation)",
+      "A hierarchy of data such as files (use Tree)",
+      "Overlay content (use Modal)"
     ],
     "alternatives": [
-      "Card",
+      "Navigation",
+      "Tree",
       "Modal"
     ],
     "context": "app"

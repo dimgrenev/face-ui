@@ -1,20 +1,30 @@
 /* =================================================================
- * NAVIGATION (Horizontal nav with dropdowns)
+ * NAVIGATION (a bar of links with dropdowns; a sheet when compact)
  * ================================================================= */
 .uf-navigation[data-scope] {
   --uf-navigation-content-min-width: calc(var(--uf-spacing-10) * 5);
-  --uf-navigation-sheet-viewport-gap: var(--uf-spacing-2);
-  --uf-navigation-nested-inset: var(--uf-spacing-3);
   display: flex;
   align-items: center;
+  min-width: 0;
 }
-[data-scope="navigation"] [data-part="list"] {
+.uf-navigation-list[data-scope],
+.uf-navigation-menu,
+.uf-navigation-groupList,
+.uf-navigation-sheetList[data-scope] {
   display: flex;
-  align-items: center;
   gap: 0;
   list-style: none;
   margin: 0;
   padding: 0;
+}
+.uf-navigation-list[data-scope] {
+  align-items: center;
+  flex-wrap: wrap;
+}
+.uf-navigation-menu,
+.uf-navigation-groupList,
+.uf-navigation-sheetList[data-scope] {
+  flex-direction: column;
 }
 [data-scope="navigation"] [data-part="item"] {
   position: relative;
@@ -23,10 +33,12 @@
 [data-scope="navigation"] [data-part="link"] {
   display: flex;
   align-items: center;
+  gap: var(--uf-control-gap);
   min-height: var(--uf-control-height);
   height: auto;
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   border: none;
+  border-radius: var(--uf-radius);
   background: var(--uf-color-black-0);
   font: inherit;
   color: var(--uf-color-fg-muted);
@@ -39,82 +51,69 @@
   background: var(--uf-color-hover-bg);
   color: var(--uf-color-fg);
 }
-[data-scope="navigation"] [data-part="link"][aria-current="page"] {
+[data-scope="navigation"] [data-part="link"][aria-current="page"],
+[data-scope="navigation"] [data-part="trigger"][data-current] {
   color: var(--uf-color-fg);
 }
-[data-scope="navigation"] [data-part="content"] {
+[data-scope="navigation"] [data-part="link"][aria-disabled="true"] {
+  opacity: var(--uf-color-disabled-opacity);
+  cursor: not-allowed;
+}
+/* Rows of a dropdown or the sheet span its width and may wrap. */
+.uf-navigation-menu [data-part="link"],
+.uf-navigation-sheetList [data-part="link"] {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: start;
+  white-space: normal;
+}
+[data-scope="navigation"] [data-part="icon"],
+[data-scope="navigation"] [data-part="indicator"] {
+  display: inline-flex;
+  flex: none;
+}
+[data-scope="navigation"] [data-part="indicator"] {
+  transition: transform var(--uf-duration-enter) var(--uf-ease-enter);
+}
+[data-scope="navigation"] [data-part="trigger"][aria-expanded="true"] [data-part="indicator"] {
+  transform: rotate(180deg);
+}
+.uf-navigation-label {
+  min-width: 0;
+}
+/* The dropdown opens under its item, from the item's inline start. */
+[data-scope="navigation"][data-part="content"] {
   position: absolute;
   top: 100%;
-  left: 0;
-  min-width: var(--uf-navigation-content-min-width);
+  inset-inline-start: 0;
   z-index: var(--uf-z-dropdown);
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(var(--uf-overlay-enter-y)) scale(var(--uf-overlay-enter-scale));
-  transform-origin: top left;
+  inline-size: max-content;
+  min-inline-size: var(--uf-navigation-content-min-width);
+  max-inline-size: calc(100vw - var(--uf-spacing-4));
+  transform-origin: top;
   transition:
     opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    transform var(--uf-duration-enter) var(--uf-ease-enter),
-    visibility 0s linear var(--uf-duration-exit);
+    transform var(--uf-duration-enter) var(--uf-ease-enter);
 }
-[data-scope="navigation"] [data-part="content"][data-state="open"] {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translateY(0) scale(1);
-  transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    transform var(--uf-duration-enter) var(--uf-ease-enter),
-    visibility 0s linear 0s;
+[data-scope="navigation"][data-part="content"][hidden] {
+  display: none;
 }
-[data-scope="navigation"] [data-part="content"][data-state="closed"] {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+@starting-style {
+  [data-scope="navigation"][data-part="content"] {
+    opacity: 0;
+    transform: translateY(var(--uf-overlay-enter-y)) scale(var(--uf-overlay-enter-scale));
+  }
 }
-.uf-navigation-trigger[data-scope="button"],
-.uf-navigation-dropdownItem[data-scope="button"] {
-  opacity: 1;
-}
-.uf-navigation-trigger[data-scope="button"] {
-  width: auto;
-}
-.uf-navigation-dropdownItem[data-scope="button"] {
-  width: 100%;
-}
-.uf-navigation-sheetHost {
-  --uf-navigation-sheet-viewport-gap: var(--uf-spacing-2);
-  --uf-navigation-nested-inset: var(--uf-spacing-3);
-  display: inline-flex;
-}
-.uf-navigation-sheet {
-  max-height: min(72vh, calc(100vh - var(--uf-navigation-sheet-viewport-gap) - env(safe-area-inset-bottom, 0)));
-}
-.uf-navigation-sheetList {
+.uf-navigation-groupLabel,
+.uf-navigation-sectionLabel {
   display: flex;
-  flex-direction: column;
-  gap: 0;
+  align-items: center;
+  gap: var(--uf-control-gap);
+  padding: var(--uf-spacing-1) var(--uf-control-pad-text);
+  font-size: var(--uf-font-size-xs);
+  font-weight: var(--uf-font-weight-bold);
+  color: var(--uf-color-fg-muted);
 }
-.uf-navigation-sheetGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.uf-navigation-sheetGroupTitle[data-scope="text"] {
-  width: 100%;
-}
-.uf-navigation-sheetGroupItems {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.uf-navigation-sheetItem[data-scope="button"] {
-  width: 100%;
-}
-.uf-navigation-sheetItem--nested[data-scope="button"] {
-  padding-left: calc(var(--uf-control-pad-text) + var(--uf-navigation-nested-inset));
+.uf-navigation-section[data-disabled] > .uf-navigation-sectionLabel {
+  opacity: var(--uf-color-disabled-opacity);
 }

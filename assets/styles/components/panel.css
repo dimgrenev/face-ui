@@ -1,14 +1,12 @@
 /* =================================================================
- * SIDEBAR
+ * PANEL (side navigation; data-scope "sidebar")
  * ================================================================= */
 .uf-sidebar[data-scope] {
   --uf-sidebar-bg: var(--uf-color-surface-sidebar, var(--uf-color-panel));
   --uf-sidebar-fg: var(--uf-color-fg);
   --uf-sidebar-muted: var(--uf-color-fg-muted);
-  --uf-sidebar-hover-bg: var(--uf-color-hover-bg);
   --uf-sidebar-active-bg: var(--uf-color-active-bg, var(--uf-color-hover-bg));
   --uf-sidebar-row-radius: var(--uf-radius-sm);
-  --uf-sidebar-section-gap: var(--uf-spacing-2);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -16,53 +14,85 @@
   box-sizing: border-box;
   color: var(--uf-sidebar-fg);
   background: var(--uf-sidebar-bg);
-  border: 0;
-  box-shadow: none;
   overflow: hidden;
+}
+/* On a sheet surface the root holds only the trigger. */
+.uf-sidebar[data-scope][data-surface="sheet"] {
+  display: inline-flex;
+  height: auto;
+  background: none;
+  overflow: visible;
 }
 [data-scope="sidebar"] [data-part="header"] {
   display: flex;
-  flex-direction: column;
-  gap: 0;
   box-sizing: border-box;
   padding: var(--uf-sidebar-inset);
 }
-[data-scope="sidebar"] [data-part="content"] {
+.uf-sidebar-content[data-scope],
+.uf-sidebar-group[data-scope] {
   display: flex;
   flex-direction: column;
   gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.uf-sidebar-content[data-scope] {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   padding: var(--uf-sidebar-inset);
   box-sizing: border-box;
 }
-[data-scope="sidebar"] [data-part="footer"] {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  box-sizing: border-box;
-  padding: var(--uf-sidebar-inset);
-}
-.uf-sidebar-item {
+.uf-sidebar-item[data-scope] {
   display: flex;
   align-items: center;
   width: 100%;
   min-height: var(--uf-control-height);
   height: auto;
-  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
   gap: var(--uf-control-gap);
-  color: var(--uf-color-fg-muted);
+  padding-inline-start: calc(var(--uf-control-pad-text) + var(--face-runtime-option-level, 0) * var(--uf-option-indent));
+  justify-content: flex-start;
+  text-align: start;
   text-decoration: none;
-  cursor: pointer;
+  color: var(--uf-sidebar-muted);
   border-radius: var(--uf-sidebar-row-radius);
-  font-size: var(--uf-font-size-sm);
 }
-.uf-sidebar [data-part="groupContent"] {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding-left: 0;
+.uf-sidebar-item[data-scope]:hover {
+  background: var(--uf-color-hover-bg);
+  color: var(--uf-sidebar-fg);
+}
+.uf-sidebar-item[data-scope][aria-current="page"],
+.uf-sidebar-item[data-scope][data-current] {
+  background: var(--uf-sidebar-active-bg);
+  color: var(--uf-sidebar-fg);
+}
+/* The rail shows each row's icon, centered; labels stay as accessible names. */
+.uf-sidebar[data-state="collapsed"] .uf-sidebar-item[data-scope] {
+  justify-content: center;
+  padding-inline: 0;
+}
+.uf-sidebar-itemIcon {
+  display: inline-flex;
+  flex: none;
+}
+.uf-sidebar-itemLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uf-sidebar-itemIndicator {
+  display: inline-flex;
+  flex: none;
+  transition: transform var(--uf-duration-enter) var(--uf-ease-enter);
+}
+.uf-sidebar-itemIndicator:dir(rtl) {
+  transform: scaleX(-1);
+}
+[aria-expanded="true"] > .uf-sidebar-itemIndicator {
+  transform: rotate(90deg);
 }
 .uf-sidebar-toggleButton[data-scope="button"] {
   width: auto;
@@ -71,76 +101,12 @@
   background: var(--uf-color-black-0);
   box-shadow: none;
 }
-.uf-sidebar-itemButton[data-scope="button"] {
-  width: 100%;
-  opacity: 1;
-  color: var(--uf-sidebar-muted);
-  background: var(--uf-color-black-0);
-  border-radius: var(--uf-sidebar-row-radius);
-  font-weight: var(--uf-font-weight);
-  box-shadow: none;
-}
-.uf-sidebar-toggleButton[data-scope="button"]:hover,
-.uf-sidebar-itemButton[data-scope="button"]:hover {
+.uf-sidebar-toggleButton[data-scope="button"]:hover {
   color: var(--uf-sidebar-fg);
-  background: var(--uf-sidebar-hover-bg);
-}
-.uf-sidebar-itemButton[data-scope="button"][data-selected],
-.uf-sidebar-itemButton[data-scope="button"][aria-selected="true"] {
-  color: var(--uf-sidebar-fg);
-  background: var(--uf-sidebar-active-bg);
-}
-.uf-sidebar-groupButton[data-scope="button"] {
-  font-weight: var(--uf-font-weight);
-}
-.uf-sidebar-item:hover {
   background: var(--uf-color-hover-bg);
-  color: var(--uf-sidebar-fg);
 }
-.uf-sidebar-item[data-state="selected"] {
-  background: var(--uf-sidebar-active-bg);
-  color: var(--uf-sidebar-fg);
-}
-[data-scope="sidebar"] [data-part="toggle"] {
-  width: auto;
-  border: none;
-  background: var(--uf-color-black-0);
-  padding: var(--uf-spacing-2) var(--uf-content-inset);
-  cursor: pointer;
-  color: var(--uf-sidebar-muted);
-  border-radius: var(--uf-sidebar-row-radius);
-}
-[data-scope="sidebar"] [data-part="toggle"]:hover {
-  background: var(--uf-sidebar-hover-bg);
-}
-.uf-sidebar-sheetHost {
-  display: inline-flex;
-}
-.uf-sidebar-sheet {
-  overflow: hidden;
-  border: 0;
-  box-shadow: none;
-  background: var(--uf-color-surface-sidebar, var(--uf-color-panel));
-}
-.uf-sidebar-sheet.uf-responsive-panel[data-placement="left"] {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
-  max-width: 100vw;
-  box-sizing: border-box;
-  border-radius: 0;
-  padding: 0;
-}
-.uf-sidebar-sheet .uf-sidebar[data-scope] {
-  background: var(--uf-color-surface-sidebar, var(--uf-color-panel));
-  flex: 1 1 auto;
-  min-height: 0;
-  padding: 0;
-  box-sizing: border-box;
-  overflow: auto;
-}
-.uf-sidebar-sheet .uf-responsive-sheetHeader[data-scope="bar"] {
-  padding: var(--uf-sidebar-inset);
+/* Sidebar icons point at the start edge, which is on the right in right-to-left text. */
+.uf-sidebar-toggleButton [data-part="icon"]:dir(rtl),
+.uf-sidebar .uf-nav-sheetTrigger [data-part="icon"]:dir(rtl) {
+  transform: scaleX(-1);
 }

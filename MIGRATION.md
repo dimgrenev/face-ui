@@ -231,6 +231,27 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `placement="left"`/`"right"` sat on the right/left in right-to-left documents | `start`/`end` follow the dialog direction (`dir`, else the document), and the surface slides in from that side | — |
 | A dialog without a title had no accessible name and no warning | An open dialog without `title`, `aria-label` or `aria-labelledby` is reported once in development | — |
 
+### Navigation
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `activeId` | `value` | auto |
+| `defaultActiveId` | `defaultValue` | auto |
+| `onActiveChange` | `onValueChange` | auto |
+| `onValueChange`: `details.id` | `details.value` | manual |
+| `items[].id` | `items[].value` | manual |
+| `orientation` | Remove it: the bar is horizontal; a vertical navigation is `Panel` | manual |
+| `surfaceBreakpoint` | Remove it; `surface="auto"` becomes a sheet below 900px | auto |
+| `surfaceTitle` | `aria-label` | auto |
+| A `<div role="navigation">` with a `menubar` of `menuitem`s; `className` and `ref` moved to the sheet host and dialog on narrow screens | A `<nav>` landmark of links and disclosure buttons (APG disclosure navigation) on every surface; native attributes, `className`, `style` and `ref` stay on it | — |
+| `items[].onClick()` took no event and cancelled the item's `href` | `items[].onClick(event)` runs first; the link is followed unless it calls `event.preventDefault()`, and the item still becomes current | — |
+| Items nested two levels deep rendered as a labelled section of the dropdown | A dropdown section is `{ type: "group", label, items }`; `items` of a dropdown link are ignored | — |
+| Hovering a dropdown item opened it at once, and `onActiveChange` also fired when `activeId` changed from the parent | Hover opens after 200 ms and closes 150 ms after leaving; `onValueChange` reports only user activations | — |
+| In the sheet, links were buttons that called `location.assign`, and the sheet was titled "Navigation" | The sheet is a modal bottom sheet of real links, titled by `aria-label`; `labels.open` and `labels.close` name its buttons | — |
+| The landmark had no name unless `surfaceTitle` was set | The `<nav>` and its sheet are named "Main" until `aria-label` or `aria-labelledby` names them | — |
+| A click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed its dropdown or the sheet | Such a click opens the link elsewhere and leaves the current item, the dropdown and the sheet as they are | — |
+| Items had `data-active`; bar buttons were `.uf-navigation-trigger`, dropdown links `.uf-navigation-dropdownItem` Buttons, and the sheet used `.uf-navigation-sheet*` classes | The current link has `aria-current="page"` and the bar button holding it `data-current`; style `[data-part="trigger"]`, `[data-part="link"]` and `.uf-navigation-section` instead | — |
+
 ### Overlay
 
 | Before | After | Codemod |
@@ -246,6 +267,29 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | A `page`, `defaultPage`, `total`, `pageSize` or `siblingCount` out of range or not an integer threw during render | Pagination renders it normalized (integers clamped, non-numbers such as `"50"` replaced by the default) and reports once in development | — |
 | `labels.page` without exactly one `{page}` threw during render | Every `{page}` is replaced by the number; a template without one gets the number appended after a space | — |
 | The nav's `onClick` ran after the page changed | `onClick` runs first, and its `preventDefault()` cancels the change | — |
+
+### Panel
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `selectedId` | `value` | auto |
+| `defaultSelectedId` | `defaultValue` | auto |
+| `onSelectedChange` | `onValueChange` | auto |
+| `onValueChange`: `details.selectedId` | `details.value` | manual |
+| `items[].id` | `items[].value` | manual |
+| `surfaceBreakpoint` | Remove it; `surface="auto"` becomes a sheet below 900px | auto |
+| `surfaceTitle` | `aria-label` | auto |
+| `Sidebar` from `Panel/Panel` | `Sidebar` from `compat` | auto |
+| `SidebarProps` from `Panel/Panel` | `SidebarProps` from `compat` | auto |
+| `SidebarItem` from `Panel/Panel` | `SidebarItem` from `compat` | auto |
+| Rows were Buttons (`.uf-sidebar-itemButton`) with `aria-pressed`; `href` rows called `location.assign`, and `onClick()` took no event | Rows are links or buttons (`.uf-sidebar-item`) with `aria-current="page"`; `onClick(event)` runs first and `preventDefault()` cancels only the link | — |
+| Group rows always showed their children; the group button only flipped `aria-expanded` | A group shows its rows while expanded (`expanded`); on mount the groups holding the current row are expanded | — |
+| The rail hid the rows of every group, and only string labels named icon-only rows | A group in the rail expands the panel at that group (in a rail without the toggle it shows its rows in place); every label stays as the accessible name | — |
+| A disabled group's rows stayed usable, and a click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed the sheet | Disabling a group disables its rows; such a click opens the link elsewhere and leaves the current row and the sheet as they are | — |
+| Rows had `data-selected` and `data-state`; parts were `itemIcon`, `itemLabel` and `groupContent`, and a group's button was `groupLabel` | The current row has `aria-current="page"`; parts are `icon`, `label`, `group` (the rows of a group) and `trigger` (its button) | — |
+| The header always held the collapse toggle, an empty footer followed the rows, and "[" toggled the rail | `collapsible={false}` removes the toggle; there is no footer and no keyboard shortcut | — |
+| The sheet covered the whole viewport, titled "Panel"; `className` and `ref` moved to its host and dialog | The sheet is a modal drawer at the start edge, titled by `aria-label`; the `<nav>` and the sheet are named "Sidebar" until `aria-label` or `aria-labelledby` names them; the `<nav>` keeps native attributes, `className`, `style` and `ref` | — |
+| `onSelectedChange` and `onCollapsedChange` also fired when the parent changed `selectedId` or `collapsed` | `onValueChange` and `onCollapsedChange` report only user actions | — |
 
 ### Popover
 
