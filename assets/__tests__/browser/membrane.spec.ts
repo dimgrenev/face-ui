@@ -22,7 +22,7 @@ const selectors = {
   Date: '[data-part="trigger"]',
   Breadcrumb: 'a',
   Separator: '[role="separator"]',
-  Media: '[data-scope="media"][data-part="root"]',
+  Media: '[data-scope="media"][data-part="element"]',
   Markdown: 'a',
   Table: 'button',
 } satisfies Partial<Record<Case, string>>

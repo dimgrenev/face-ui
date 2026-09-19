@@ -112,6 +112,23 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `Card.Description align="left"`, `Card.Description align="right"` | `align="start"`, `align="end"` | auto |
 | `content` without `title`, `description` or `footer` was wrapped in the content part | Children without `title`, `description` or `footer` render directly in the card; wrap them in `Card.Content` to keep the part | — |
 
+### Carousel
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `slides` | One child per slide: `<Media src alt />` for each former `{ src, alt }` (in JSON, `{ "__componentName__": "Media", "src": …, "alt": … }`) | manual |
+| `CarouselMediaSlide` from `Carousel/Carousel` | `MediaImageProps` of the `Media` children | manual |
+| `useControllableMachineProp` from `assets/adapters/react/use-controllable-machine-prop` | `useControllableState` from `assets/adapters/react/use-controllable-state` | manual |
+| `ariaLabel` | `aria-label` | auto |
+| `orientation` | Remove it; a carousel moves horizontally. Content that scrolls vertically belongs in `Scroll` | auto |
+| A text or number child became an image whose URL was that text | A text child is a text slide; images are `Media` children, and any other JSON descriptor is reported and left out | — |
+| Control names, slide names, the rotation button text and the announced kinds were fixed English strings | `labels` renames them: `previous`, `next`, `play`, `pause`, `slide` (`{index}`, `{count}`), `goToSlide` (`{index}`), `roleCarousel`, `roleSlide` | — |
+| The root took only `className`; every indicator was a tab stop marked `aria-pressed`; one slide still showed two disabled arrows and a dot | The root takes native attributes; the indicators are one tab stop whose arrows move and activate, the current one marked `aria-current`; a single position shows no controls | — |
+| Without `loop`, autoplay stopped at the last slide while its button still read "Pause rotation"; focus paused it, a click did not | Autoplay returns to the first slide after the last; a move by the user, keyboard focus inside (on the rotation control too) or a press outside the rotation control stops it until the rotation control starts it, hover pauses it; the rotation control is an icon button named `labels.play`/`labels.pause` | — |
+| In right-to-left text the track slid the wrong way and showed nothing; arrows and swipes did not mirror | The track, ArrowLeft/ArrowRight and swipes follow the computed text direction, however it is set; the arrow icons follow the nearest `dir` attribute; the track follows the pointer while dragged | — |
+| `slidesPerView` above the number of slides stretched the slides to fill the width | Each slide keeps its `1 / slidesPerView` share; a fractional or zero `slidesPerView` is reported and becomes a whole number from 1 | — |
+| The root and viewport carried `data-state` (`idle`, `dragging`, `auto-playing`); slides carried `aria-hidden` and `data-state` | Slides outside the view are `inert` (also on React 19) and marked by the absence of `data-current`; the root carries no state attribute | — |
+
 ### Checkbox
 
 | Before | After | Codemod |
@@ -217,23 +234,21 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Label, help, error and required marker were `.uf-input__description`, `.uf-input__error`, `.uf-input__required` and `[data-scope="input"][data-part="label"]` | They are the shared Field parts `.uf-field__label`, `.uf-field__description`, `.uf-field__error` and `.uf-field__required` (`[data-scope="field"]`) | — |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the native input or textarea; `className` and `style` still style the outer layout | — |
 
-### Markdown
+### Media
 
 | Before | After | Codemod |
 | --- | --- | --- |
-| `content` | children | auto |
-| `allowRawHtml` | `html` | auto |
-| `safeMode` | Remove it: sanitization is always on, and `html` alone decides whether raw HTML renders (`safeMode={false}` without `allowRawHtml` changed nothing) | auto |
-| `fullWidth` | Remove it: Markdown always fills its container; `fullWidth={false}` narrowed it only inside a membrane | auto |
-| Markdown had the 1px outer spacing box of `membrane` by default | Block content has none by default, like Table and Media; pass `membrane` to keep it | — |
-| Without `allowRawHtml`, a raw HTML block vanished with its text and inline tags were dropped; with it, `safeMode` chose between Markdown tags only and a wider set | Without `html`, raw HTML shows as the text it was typed as; with `html` it renders through one allowlist of text and block tags (details, kbd, sup, div, …), never scripts, styles, forms, frames, ids or classes | — |
-| With `gfm` on, a newline inside a paragraph was always a line break, as in GitHub comments | It is a space, as in Markdown files and CommonMark; pass `breaks` to keep line breaks, with or without `gfm` | — |
-| Markdown parsed with the global `marked` instance, so extensions registered with `marked.use()` (highlighting, footnotes, custom renderers) changed its output | Markdown parses with its own instances; `marked.use()` never changes what it renders | — |
-| A source marked could not parse, such as quotes nested thousands of levels deep, rendered an empty block without a report | It shows as the text it was typed as, and development builds report it | — |
-| `linkTarget` applied to every link not starting with `/` or `#` (a relative `docs/x` opened in a new tab, `//host` in place), and `linkRel` only to links opening in a new tab | `linkTarget` and `linkRel` apply to absolute links: http(s) and protocol-relative URLs, read as browsers read them (surrounding spaces, `\` for `/`). `linkRel` (default `noopener noreferrer`) applies whatever the target; a link that opens in place has no `target` | — |
-| A task checkbox was named "Completed task" or "Incomplete task" | A task checkbox and its text share a `<label>`, so the checkbox is named by its task and announces its own checked state | — |
-| The HTML sat in an inner `[data-part="content"]` element, and the root carried `data-full-width` | The root holds the HTML itself; there is no content part and no `data-full-width` | — |
-| Table cells were always left-aligned, overriding GFM column alignment; lists and quotes were indented from the left and task lists lost their indent | Columns follow their alignment and unaligned cells start at the inline start; lists, quotes and task checkboxes follow the text direction, a task checkbox takes its bullet’s place, and code blocks read left to right | — |
+| `ariaLabel` | `aria-label` | auto |
+| `ref`, `id`, `role`, `tabIndex` and `aria-label` went to the wrapping box, `title` to both the box and the element; other native attributes were dropped | `ref` and every native attribute go to the `<img>`, `<video>` or `<audio>` element; only `className` and `style` stay on the box | — |
+| `alt` defaulted to `""`, so an image without it was silently decorative; any type accepted every prop | `type` selects the props: an image requires `alt` (`""` marks it decorative) and takes `variant`; video and audio take player attributes and `<track>` children | — |
+| `variant="rounded"` | `variant="default"` | auto |
+| `onLoad()` and `onError()` received no event; on video and audio `onLoad` ran on `loadeddata` | `onLoad(event)` and `onError(event)` are the element's native events; video and audio report loading through the native `onLoadedData(event)` | — |
+| An image in a box with a height stretched to fill it unless `objectFit` was set; a video kept its own width | Images default to `objectFit="cover"`; video and audio fill the box width and video keeps `contain` | — |
+| A failed load replaced the element with the fallback and set `data-error` on the box; an empty `src` requested the page | The box carries `data-state` (`loading`, `loaded`, `error`), a player counting as loaded once its metadata arrives or the browser holds off fetching until playback; a missing or empty `src` counts as failed; the fallback shows beside the element, which is hidden | — |
+| The JSON contract listed `title` | `title` is left out of the contract, as it names nothing reliably; an image is named by `alt` and a player by `aria-label`. In TSX it still reaches the element as a native attribute | — |
+| `MediaLoading` from `Media/Media` | `ImgHTMLAttributes<HTMLImageElement>['loading']` | manual |
+| `MediaDecoding` from `Media/Media` | `ImgHTMLAttributes<HTMLImageElement>['decoding']` | manual |
+| `mediaAnatomy` from `Media/Media` | The `[data-scope="media"][data-part="root" \| "element" \| "fallback"]` attributes | manual |
 
 ### Menu
 
@@ -604,23 +619,3 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | The selected item and all its ancestors had the hover background; a controlled selection could not be cleared | Only the selected item is marked (active background, bold); `value={null}` selects nothing | — |
 | A branch showed a down or up chevron at the end of its row | A branch shows an arrow at the start that points to the inline end and turns down when expanded | — |
 | With the selected item inside a collapsed branch, Tab could not enter the tree | Tab enters at the selected item, or at the collapsed item that holds it | — |
-
-### Upload
-
-| Before | After | Codemod |
-| --- | --- | --- |
-| `labels`: `idle`, `dragging` and `trigger` keys; `remove` was the visible text of a text button | `drop` (the instruction), `open` (the picker button); the drop area is highlighted while dragging instead of changing its text; `remove` is a template, `"Remove {name}"`, naming an icon button | manual |
-| `maxSize`: `0` meant no limit | Leave it out for no limit; `0` is reported and read as 1 byte | manual |
-| `maxFiles`: `0` meant no limit | Leave it out for no limit; `0` is reported and read as 1 | manual |
-| `onReject`: `details.files` held `{ id, name, size, type, source, reason }` with reasons `type`, `size`, `count` and `multiple` | `details.files` holds `{ file, reason }`, `file` being the browser File, with reasons `invalidType`, `tooLarge` and `tooMany` (a second file without `multiple` included) | manual |
-| `files[].source` | `files[].file` | manual |
-| `files[].status` | `files[].progress` shows a bar while it is set, `files[].error` marks the entry failed; neither means done | manual |
-| `files[].type` | `files[].file.type` | manual |
-| `UploadRejectedFile` | `UploadRejection` (`{ file, reason }`) | manual |
-| `UploadSourceFile` | `UploadFile`, whose `size`, `file`, `progress` and `error` are optional | manual |
-| `progress`, `status` and `error` of an entry were never shown | `progress` shows a bar named by the file (`null`: an unknown amount), `error` a message under the entry that also describes its remove button | — |
-| Rejected files only reached `onReject`; the user saw nothing | The field also shows why, one line per reason, from `labels.invalidType`, `tooLarge` and `tooMany`, until the next pick, drop or removal; a consumer `error` wins | — |
-| Without `multiple`, a drop of several files kept only the first one, even when it was rejected; picking or dropping the same file again listed it twice | Without `multiple`, the first acceptable file replaces the listed one and the rest are `tooMany`; a file already listed (same size, date and name) is not added again | — |
-| Upload took no native attributes and never joined a form: `name`, `required` and the listed files were not submitted | Native attributes and `ref` reach the root `role="group"`; `label`, `description`, `error` and `labelPosition` make it a Field; `name`, `form`, `required`, `disabled` and `autoFocus` work as on native controls, and the listed browser files are submitted | — |
-| Only the borderless drop area took drops and carried `data-dragging`; text and link drags highlighted it too | The whole field takes file drags and carries `data-dragging` (nested enters are counted); the drop area has a dashed border; text and link drags are left to the browser | — |
-| `files` that was not an array crashed the render; entries without an `id` or repeating one rendered with React key warnings | A non-array list renders as empty, and entries without a string `id` or repeating one are dropped, each with a development report | — |

@@ -117,8 +117,8 @@ const cases: [string, (membrane: boolean) => React.ReactNode, string][] = [
   ],
   [
     'Media',
-    (membrane) => <Media membrane={membrane} src="/image.png" tabIndex={0} />,
-    '[data-part="root"]',
+    (membrane) => <Media membrane={membrane} src="/image.png" alt="" tabIndex={0} />,
+    '[data-scope="media"][data-part="element"]',
   ],
   [
     'Markdown',

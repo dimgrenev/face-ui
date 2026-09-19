@@ -2,12 +2,38 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Media",
-  "description": "Unified image, video, and audio renderer",
+  "description": "An image, video or audio source in a box sized by `width` and `height`, with `fallback` content when it fails. Native attributes and `ref` go to the `<img>`, `<video>` or `<audio>` element. The box's `data-state` is `loading`, then `loaded` or `error`; a player counts as loaded once its metadata arrives or the browser holds off fetching until playback (`preload=\"none\"`).",
   "props": {
+    "src": {
+      "type": "string",
+      "required": true,
+      "description": "URL of the source; a missing or empty one counts as a failed load."
+    },
+    "width": {
+      "type": "any",
+      "required": false,
+      "description": "Width of the box, pixels or a CSS length; wins over `style.width`. Default: the full available width."
+    },
+    "height": {
+      "type": "any",
+      "required": false,
+      "description": "Height of the box, pixels or a CSS length, which the media then fills; wins over `style.height`. Default: the media's own ratio."
+    },
+    "fallback": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Content shown in place of the media while its source is missing or failed to load."
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around the box, for media aligned with a row of controls.",
+      "default": false
+    },
     "type": {
       "type": "enum",
       "required": false,
-      "description": "Media type. Defaults to \"image\".",
+      "description": "Element that renders the source: `image` (default), `video` or `audio`; the other props follow it.",
       "options": [
         "image",
         "video",
@@ -15,33 +41,37 @@
       ],
       "default": "image"
     },
-    "src": {
-      "type": "string",
-      "required": true,
-      "description": "Source URL."
-    },
     "alt": {
       "type": "string",
       "required": false,
-      "description": "Alt text (for images).",
-      "default": ""
+      "description": "Text that stands for the image to people who cannot see it; `\"\"` marks the image decorative."
     },
     "variant": {
       "type": "enum",
       "required": false,
-      "description": "Image presentation variant.",
+      "description": "Frame of the image: the system radius (default), a circle cut from its center, or a bordered thumbnail.",
       "options": [
         "default",
-        "rounded",
         "circle",
         "thumbnail"
       ],
       "default": "default"
     },
+    "objectFit": {
+      "type": "enum",
+      "required": false,
+      "description": "How the media fills a box whose height is set: `cover` crops, `contain` letterboxes. Default: cover for images, contain for video.",
+      "options": [
+        "cover",
+        "contain",
+        "fill",
+        "none"
+      ]
+    },
     "loading": {
       "type": "enum",
       "required": false,
-      "description": "Browser loading strategy for images.",
+      "description": "`lazy` waits to fetch the image until it nears the viewport; `eager` (default) fetches it at once.",
       "options": [
         "eager",
         "lazy"
@@ -50,79 +80,53 @@
     "decoding": {
       "type": "enum",
       "required": false,
-      "description": "Browser decoding strategy for images.",
+      "description": "`async` (default) decodes the image off the main thread; `sync` shows it in the same frame as the content around it.",
       "options": [
         "async",
         "sync",
         "auto"
-      ]
-    },
-    "poster": {
-      "type": "string",
-      "required": false,
-      "description": "Poster image (for video)."
+      ],
+      "default": "async"
     },
     "controls": {
       "type": "boolean",
       "required": false,
-      "description": "Show native controls (for video/audio)."
+      "description": "Shows the browser's playback controls; without them only `autoPlay` or script can play the media."
     },
     "autoPlay": {
       "type": "boolean",
       "required": false,
-      "description": "Auto-play media."
+      "description": "Starts playback as soon as it can; most browsers block it unless the media is `muted`."
     },
     "loop": {
       "type": "boolean",
       "required": false,
-      "description": "Loop playback."
+      "description": "Starts playback over from the beginning when it reaches the end."
     },
     "muted": {
       "type": "boolean",
       "required": false,
-      "description": "Start muted."
+      "description": "Starts with the sound off."
     },
-    "width": {
-      "type": "any",
+    "aria-label": {
+      "type": "string",
       "required": false,
-      "description": "Explicit width."
+      "description": "Names the player for assistive technology."
     },
-    "height": {
-      "type": "any",
-      "required": false,
-      "description": "Explicit height."
-    },
-    "objectFit": {
-      "type": "enum",
-      "required": false,
-      "description": "CSS object-fit for images/video.",
-      "options": [
-        "cover",
-        "contain",
-        "fill",
-        "none"
-      ]
-    },
-    "fallback": {
+    "children": {
       "type": "ReactNode",
       "required": false,
-      "description": "Fallback content shown on error."
+      "description": "Native `<track>` elements for captions, subtitles, descriptions or chapters."
     },
-    "membrane": {
+    "poster": {
+      "type": "string",
+      "required": false,
+      "description": "URL of the image shown until playback starts."
+    },
+    "playsInline": {
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing around media.",
-      "default": false
-    },
-    "ariaLabel": {
-      "type": "string",
-      "required": false,
-      "description": "Accessible label for the wrapper role. Sets aria-label."
-    },
-    "title": {
-      "type": "string",
-      "required": false,
-      "description": "title prop"
+      "description": "Plays inside the page on iPhone instead of switching to fullscreen, as a background video needs."
     }
   },
   "states": [
@@ -142,8 +146,8 @@
         "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
         "alt": "Office lobby with glass-block wall, seating, and a person standing by the window",
         "objectFit": "cover",
-        "width": "200",
-        "height": "200"
+        "width": 200,
+        "height": 200
       }
     },
     {
@@ -152,18 +156,28 @@
         "src": "/assets/media/examples/office-core/skyline-window-day.webp",
         "alt": "Two people looking out from a high-rise office window during the day",
         "objectFit": "contain",
-        "width": "200",
-        "height": "200"
+        "width": 200,
+        "height": 200
+      }
+    },
+    {
+      "name": "Circle",
+      "props": {
+        "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
+        "alt": "Office lobby portrait",
+        "variant": "circle",
+        "width": 96
       }
     }
   ],
   "behavior": {},
   "keyboard": {},
   "aria": {
-    "nativeElement": "Root is a <div> container whose ARIA role is the pass-through `role` prop (no default → none). The `element` part is a native <img>/<video>/<audio>; for images the accessible name comes from `alt`, and playback semantics come from the native <video>/<audio> element.",
+    "nativeElement": "The element part is a native <img>, <video> or <audio> and receives every native attribute and the ref; the root box takes only className and style and has no role.",
     "notes": [
-      "No fixed root role is emitted. Pass `role` explicitly (e.g. \"img\") only when the container itself should expose one.",
-      "For images provide `alt` for an accessible name; an empty `alt` marks the image presentational. `aria-label` is an optional wrapper label, not the image name."
+      "An image is named by alt, which it requires; alt=\"\" marks it decorative.",
+      "Name a player with aria-label or aria-labelledby; captions go in <track> children.",
+      "When the source fails and a fallback is given, the element is hidden and the fallback shows in its place."
     ]
   },
   "composition": {
@@ -195,7 +209,6 @@
     "semanticFallbacks": [
       "--uf-control-height",
       "--uf-radius",
-      "--uf-radius-md",
       "--uf-radius-sm",
       "--uf-radius-full",
       "--uf-membrane",
@@ -204,7 +217,7 @@
       "--uf-color-border"
     ],
     "notes": [
-      "Media fallback geometry is tokenized; width, height and objectFit remain product media layout inputs.",
+      "Media fallback geometry is tokenized; width and height size the box, which the media fills, and objectFit decides how.",
       "Native audio/video controls are browser-owned and intentionally outside Face UI control styling."
     ]
   },

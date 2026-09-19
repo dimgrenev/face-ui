@@ -389,19 +389,25 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           ...state,
           props: {
             ...state.props,
-            ariaLabel: 'Office gallery',
-            slides: [
+            'aria-label': 'Office gallery',
+            children: [
               {
+                __componentName__: 'Media',
                 src: '/assets/media/examples/office-core/lobby-day.webp',
                 alt: 'Bright office lobby with glass-block wall, seating, and plants',
+                height: 240,
               },
               {
+                __componentName__: 'Media',
                 src: '/assets/media/examples/office-core/lobby-glass-blocks.webp',
                 alt: 'Office lobby with glass-block wall, seating, and a person by the window',
+                height: 240,
               },
               {
+                __componentName__: 'Media',
                 src: '/assets/media/examples/office-core/skyline-window-day.webp',
                 alt: 'Two people looking out from a high-rise office window',
+                height: 240,
               },
             ],
           },

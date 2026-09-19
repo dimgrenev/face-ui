@@ -256,7 +256,7 @@ describe('face-ui-react gallery smoke', () => {
       '[data-part="slide"][data-index="1"]',
     ) as HTMLElement | null
     const mediaSlide = carouselCard.querySelector(
-      '[data-scope="media"].uf-carousel-slideMedia',
+      '[data-part="slide"] [data-scope="media"][data-part="root"]',
     ) as HTMLElement | null
     const mediaImage =
       mediaSlide?.querySelector<HTMLImageElement>('img') ?? null

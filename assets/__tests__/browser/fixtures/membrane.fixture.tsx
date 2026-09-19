@@ -109,6 +109,7 @@ const cases = {
     <Media
       membrane={membrane}
       src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3C/svg%3E"
+      alt=""
       width={80}
       height={80}
       tabIndex={0}

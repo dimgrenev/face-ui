@@ -78,7 +78,7 @@ const stylesheetsOf = (component: string) =>
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
   modules: [],
-  css: ['Carousel'],
+  css: [],
 } satisfies Record<string, readonly string[]>
 
 describeGate('reachability: component modules', PENDING.modules, unreachableModules)

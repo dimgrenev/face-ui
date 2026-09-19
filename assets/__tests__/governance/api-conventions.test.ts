@@ -370,14 +370,14 @@ function stringViolations(component: string): string[] {
 const PENDING = {
   'R-triple': ['Table'],
   'R-names': ['Table'],
-  'R-dup': ['Carousel'],
+  'R-dup': [],
   'R-label': [],
-  'R-aria': ['Carousel', 'Media', 'Scroll', 'Table'],
+  'R-aria': ['Scroll', 'Table'],
   'R-logical': ['Table'],
   'R-bool': [],
   'R-field': [],
   'R-strings': [
-    'Carousel', 'Date', 'Menu', 'Scroll', 'Select',
+    'Date', 'Menu', 'Scroll', 'Select',
   ],
 } satisfies Record<string, readonly string[]>
 
