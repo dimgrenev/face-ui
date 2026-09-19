@@ -366,7 +366,7 @@ Composite widgets move actual DOM focus along with their active index. Calendar 
 
 Carousel only exposes visible slides to focus and assistive technology, accounts for `slidesPerView` at the last position and offers an explicit rotation control when autoplay is enabled. Hover pauses rotation; focus stops it until restarted. Reduced motion disables automatic rotation by default. CSS motion also respects reduced-motion and forced-color focus requirements.
 
-Markdown always sanitizes its rendered HTML, even with `safeMode={false}`. The latter expands allowed structure; it is not a trusted-HTML escape hatch. `allowRawHtml` controls whether source HTML is parsed, and `gfm` controls GFM independently. Task-list checkboxes are inert. Upload acceptance/size/count checks are client-side UX and do not replace server validation.
+Markdown always sanitizes its rendered HTML; no prop turns that off. Raw HTML in the source shows as the text it was typed as unless `html` is set, and then it renders only through an allowlist of text and block tags, never scripts, styles, forms, frames or event handlers. `gfm` (GitHub Flavored Markdown) and `breaks` (a newline as a line break) are independent. `linkTarget` and `linkRel` apply to absolute links. Task-list checkboxes are inert. Upload acceptance/size/count checks are client-side UX and do not replace server validation.
 
 ## Extending the system
 

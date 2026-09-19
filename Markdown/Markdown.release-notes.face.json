@@ -7,17 +7,17 @@
   "root": {
     "type": "Markdown",
     "props": {
-      "content": {
-        "$ref": "props.content"
+      "children": {
+        "$ref": "props.children"
       },
       "gfm": {
         "$ref": "props.gfm"
       },
-      "safeMode": {
-        "$ref": "props.safeMode"
+      "breaks": {
+        "$ref": "props.breaks"
       },
-      "allowRawHtml": {
-        "$ref": "props.allowRawHtml"
+      "html": {
+        "$ref": "props.html"
       },
       "linkTarget": {
         "$ref": "props.linkTarget"
@@ -27,58 +27,51 @@
       },
       "membrane": {
         "$ref": "props.membrane"
-      },
-      "fullWidth": {
-        "$ref": "props.fullWidth"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "content": "# Version 2.4\n\n- Added workspace templates\n- Improved audit logs\n- Fixed SSO session renewal\n\n[Read the upgrade guide](https://example.com/upgrade).",
-      "gfm": true,
-      "safeMode": true,
+      "children": "# Version 2.4\n\n- [x] Workspace templates\n- [x] Audit log export\n- [ ] SSO session renewal\n\n<details><summary>Upgrade notes</summary>Press <kbd>Ctrl</kbd>+<kbd>R</kbd> after updating.</details>\n\n[Read the upgrade guide](https://example.com/upgrade).",
+      "html": true,
       "linkTarget": "_blank",
-      "linkRel": "noopener noreferrer",
-      "membrane": false,
-      "fullWidth": true
+      "linkRel": "noopener"
     }
   },
   "controls": [
     {
-      "name": "content",
+      "name": "children",
       "type": "string",
       "required": false,
-      "description": "Markdown source text.",
-      "defaultValue": ""
+      "description": "Markdown source, rendered as HTML that never carries scripts, styles, event handlers or unsafe URLs."
     },
     {
       "name": "gfm",
       "type": "boolean",
       "required": false,
-      "description": "Enable GitHub Flavored Markdown extensions.",
+      "description": "GitHub Flavored Markdown: tables, task lists, strikethrough and autolinks; `false` parses plain CommonMark.",
       "defaultValue": true
     },
     {
-      "name": "safeMode",
+      "name": "breaks",
       "type": "boolean",
       "required": false,
-      "description": "Strict sanitization mode for product-safe rendering.",
-      "defaultValue": true
+      "description": "A newline inside a paragraph breaks the line, as in GitHub comments and chat messages; otherwise it is a space, as in Markdown files.",
+      "defaultValue": false
     },
     {
-      "name": "allowRawHtml",
+      "name": "html",
       "type": "boolean",
       "required": false,
-      "description": "Allow raw HTML blocks from markdown source (still sanitized).",
+      "description": "Render raw HTML in the source through an allowlist of text and block tags (no scripts, styles, forms, frames or attributes that run code); otherwise it shows as typed.",
       "defaultValue": false
     },
     {
       "name": "linkTarget",
       "type": "select",
       "required": false,
-      "description": "Link target behavior for rendered anchors.",
+      "description": "Where absolute links (http(s) and protocol-relative URLs, which can lead to other sites) open; relative links, anchors and mailto/tel links always open in place.",
       "options": [
         "_self",
         "_blank"
@@ -89,22 +82,15 @@
       "name": "linkRel",
       "type": "string",
       "required": false,
-      "description": "Link rel value for rendered anchors.",
+      "description": "`rel` of every absolute link, whatever its target, such as `nofollow ugc noopener` for user content; an empty string adds none.",
       "defaultValue": "noopener noreferrer"
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around component geometry.",
-      "defaultValue": true
-    },
-    {
-      "name": "fullWidth",
-      "type": "boolean",
-      "required": false,
-      "description": "Expand component to full width.",
-      "defaultValue": true
+      "description": "Wrap the block in the 1px outer spacing box that Face UI controls share, to line it up with controls in a row.",
+      "defaultValue": false
     }
   ],
   "meta": {

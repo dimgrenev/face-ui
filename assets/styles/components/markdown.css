@@ -11,7 +11,7 @@
   --uf-markdown-h5-size: var(--uf-font-size-md);
   --uf-markdown-list-indent: var(--uf-spacing-3);
   --uf-markdown-list-item-gap: calc(var(--uf-spacing-2) - (var(--uf-membrane) * 2));
-  --uf-markdown-task-gap: var(--uf-spacing-2);
+  --uf-markdown-task-gap: var(--uf-spacing-1);
   --uf-markdown-checkbox-size: var(--uf-font-size);
   --uf-markdown-underline-offset: calc(var(--uf-membrane) * 2);
   --uf-markdown-blockquote-border-width: calc(var(--uf-membrane) * 2);
@@ -24,24 +24,16 @@
   width: 100%;
   min-width: 0;
   color: var(--uf-color-fg);
-}
-.uf-markdown[data-scope="markdown"][data-full-width] {
-  width: 100%;
-}
-[data-scope="markdown"] [data-part="content"] {
-  display: block;
-  width: 100%;
-  min-width: 0;
   font-weight: var(--uf-font-weight);
 }
 [data-scope="markdown"] :where(p, li, td, th, a, blockquote, code, pre, span, strong, em, del) {
   font-weight: var(--uf-font-weight);
   letter-spacing: normal;
 }
-[data-scope="markdown"] [data-part="content"] > *:first-child {
+[data-scope="markdown"] > :first-child {
   margin-top: 0;
 }
-[data-scope="markdown"] [data-part="content"] > *:last-child {
+[data-scope="markdown"] > :last-child {
   margin-bottom: 0;
 }
 [data-scope="markdown"] p,
@@ -84,22 +76,14 @@
 }
 [data-scope="markdown"] ul,
 [data-scope="markdown"] ol {
-  padding-left: calc(var(--uf-control-pad-text) + var(--uf-markdown-list-indent));
+  padding-inline-start: calc(var(--uf-control-pad-text) + var(--uf-markdown-list-indent));
 }
 [data-scope="markdown"] li {
   margin: 0 0 var(--uf-markdown-list-item-gap) 0;
 }
-[data-scope="markdown"] li:has(> input[type="checkbox"]) {
+/* A task's checkbox leads its item and takes its bullet's place, so wrapped task text stays aligned. */
+[data-scope="markdown"] li:has(> label:first-child > input[type="checkbox"]:first-child, > p:first-child > label:first-child > input[type="checkbox"]:first-child) {
   list-style: none;
-  display: flex;
-  align-items: flex-start;
-  gap: var(--uf-markdown-task-gap);
-  margin-left: calc(-1 * var(--uf-control-pad-text));
-  padding-left: var(--uf-control-pad-text);
-}
-[data-scope="markdown"] ul:has(> li > input[type="checkbox"]) {
-  list-style: none;
-  padding-left: 0;
 }
 [data-scope="markdown"] li > ul,
 [data-scope="markdown"] li > ol {
@@ -108,8 +92,12 @@
 [data-scope="markdown"] input[type="checkbox"] {
   width: var(--uf-markdown-checkbox-size);
   height: var(--uf-markdown-checkbox-size);
-  margin-right: var(--uf-markdown-task-gap);
+  margin-block: 0;
   vertical-align: middle;
+}
+[data-scope="markdown"] li > label:first-child > input[type="checkbox"]:first-child,
+[data-scope="markdown"] li > p:first-child > label:first-child > input[type="checkbox"]:first-child {
+  margin-inline: calc(-1 * (var(--uf-markdown-checkbox-size) + var(--uf-markdown-task-gap))) var(--uf-markdown-task-gap);
 }
 [data-scope="markdown"] a {
   color: var(--uf-color-fg);
@@ -122,8 +110,8 @@
   text-decoration-color: var(--uf-color-fg);
 }
 [data-scope="markdown"] blockquote {
-  border-left: var(--uf-markdown-blockquote-border-width) solid var(--uf-color-border);
-  padding-left: var(--uf-markdown-block-gap);
+  border-inline-start: var(--uf-markdown-blockquote-border-width) solid var(--uf-color-border);
+  padding-inline-start: var(--uf-markdown-block-gap);
   color: var(--uf-color-fg-muted);
 }
 [data-scope="markdown"] code {
@@ -139,9 +127,11 @@
   border-radius: var(--uf-radius-md);
   padding: var(--uf-markdown-block-gap);
   overflow-x: auto;
+  /* Source code reads left to right on any page. */
+  direction: ltr;
 }
 [data-scope="markdown"] pre code {
-  background: var(--uf-color-black-0);
+  background: none;
   border-radius: 0;
   padding: 0;
 }
@@ -154,9 +144,12 @@
 }
 [data-scope="markdown"] th,
 [data-scope="markdown"] td {
-  text-align: left;
   padding: var(--uf-markdown-table-pad-y) var(--uf-markdown-table-pad-x);
   vertical-align: top;
+}
+/* A column's GFM alignment arrives as the align attribute; only unaligned cells start at the inline start. */
+[data-scope="markdown"] :is(th, td):not([align]) {
+  text-align: start;
 }
 [data-scope="markdown"] tbody tr + tr td {
   border-top: var(--uf-markdown-table-border-width) solid var(--uf-color-border);

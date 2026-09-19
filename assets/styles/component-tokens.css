@@ -151,7 +151,7 @@
   --uf-markdown-heading-gap: var(--uf-spacing-2);
   --uf-markdown-list-indent: var(--uf-spacing-5);
   --uf-markdown-list-item-gap: var(--uf-spacing-1);
-  --uf-markdown-task-gap: var(--uf-spacing-2);
+  --uf-markdown-task-gap: var(--uf-spacing-1);
   --uf-markdown-code-pad-x: 6px;
   --uf-markdown-code-pad-y: 2px;
   --uf-markdown-table-pad-x: var(--uf-spacing-2);
