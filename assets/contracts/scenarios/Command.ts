@@ -5,33 +5,40 @@ export default [
     name: 'Product / AI Command Palette',
     props: {
       surface: 'inline',
+      'aria-label': 'Commands',
       placeholder: 'Ask or run a command...',
-      defaultValue: '',
-      groups: [
-        { id: 'create', label: 'Create' },
-        { id: 'navigate', label: 'Navigate' },
-      ],
       items: [
         {
-          id: 'new-agent',
-          label: 'Create a new agent',
-          keywords: ['assistant', 'bot'],
-          group: 'create',
+          type: 'group',
+          label: 'Create',
+          items: [
+            {
+              value: 'new-agent',
+              label: 'Create a new agent',
+              icon: 'plus',
+              keywords: ['assistant', 'bot'],
+            },
+            {
+              value: 'new-workflow',
+              label: 'Create workflow',
+              keywords: ['automation'],
+            },
+          ],
         },
         {
-          id: 'new-workflow',
-          label: 'Create workflow',
-          keywords: ['automation'],
-          group: 'create',
-        },
-        {
-          id: 'settings',
-          label: 'Open settings',
-          keywords: ['preferences'],
-          group: 'navigate',
+          type: 'group',
+          label: 'Navigate',
+          items: [
+            {
+              value: 'settings',
+              label: 'Open settings',
+              icon: 'settings',
+              keywords: ['preferences'],
+            },
+          ],
         },
       ],
-      emptyContent: 'No matching commands.',
+      labels: { empty: 'No matching commands.' },
     },
   },
   {
@@ -39,12 +46,13 @@ export default [
     props: {
       surface: 'dialog',
       defaultOpen: true,
+      'aria-label': 'Search documentation',
       placeholder: 'Search documentation...',
-      defaultValue: 'auth',
+      defaultSearch: 'auth',
       items: [
-        { id: 'oauth', label: 'OAuth setup', keywords: ['auth', 'login'] },
-        { id: 'sso', label: 'Enterprise SSO', keywords: ['auth', 'saml'] },
-        { id: 'tokens', label: 'API tokens', keywords: ['auth', 'key'] },
+        { value: 'oauth', label: 'OAuth setup', keywords: ['auth', 'login'] },
+        { value: 'sso', label: 'Enterprise SSO', keywords: ['auth', 'saml'] },
+        { value: 'tokens', label: 'API tokens', keywords: ['auth', 'key'] },
       ],
     },
   },

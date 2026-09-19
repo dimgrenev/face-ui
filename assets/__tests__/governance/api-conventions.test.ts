@@ -368,8 +368,8 @@ function stringViolations(component: string): string[] {
 
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
-  'R-triple': ['Command', 'Navigation', 'Panel', 'Table', 'Toc', 'Tree'],
-  'R-names': ['Command', 'Navigation', 'Panel', 'Table', 'Toc', 'Tree'],
+  'R-triple': ['Navigation', 'Panel', 'Table', 'Toc', 'Tree'],
+  'R-names': ['Navigation', 'Panel', 'Table', 'Toc', 'Tree'],
   'R-dup': ['Carousel', 'Markdown', 'Toc'],
   'R-label': [],
   'R-aria': ['Carousel', 'Media', 'Scroll', 'Table'],
@@ -377,7 +377,7 @@ const PENDING = {
   'R-bool': [],
   'R-field': [],
   'R-strings': [
-    'Carousel', 'Command', 'Date', 'Menu', 'Navigation', 'Panel', 'Scroll', 'Select',
+    'Carousel', 'Date', 'Menu', 'Navigation', 'Panel', 'Scroll', 'Select',
   ],
 } satisfies Record<string, readonly string[]>
 

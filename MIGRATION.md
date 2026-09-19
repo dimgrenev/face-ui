@@ -135,6 +135,30 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | A final line break rendered an empty, numbered last line | A final line break ends the last line; the copy button still copies it | — |
 | The root carried `data-language`; lines carried `data-line` and `data-highlight`; the `pre` carried `is-collapsed`/`is-scrollable` | `<code>` carries the `language-*` class; highlighted lines are `<mark>` elements; the root carries `data-state="collapsed" \| "expanded"` when the source can collapse; the `pre` is `dir="ltr"`, `translate="no"`, and `tabindex="0"` while it scrolls, `-1` otherwise | — |
 
+### Command
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `value` | `search` | auto |
+| `defaultValue` | `defaultSearch` | auto |
+| `onValueChange` | `onSearchChange` | manual |
+| `onValueChange({ value })` reported the search text | `onSearchChange({ search })` reports it; read `search` from the details | — |
+| `surfaceBreakpoint` | Remove it; `surface="auto"` becomes a dialog below 900px | auto |
+| `emptyContent` | `labels.empty` | auto |
+| `groups` | Group items: `{ type: "group", label, items }` inside `items`, in list order | manual |
+| `items[].group` | Move the item into its group item: `{ type: "group", label, items: [item] }` | manual |
+| `items[].id` | `items[].value` | manual |
+| `items[].onSelect` | Command `onSelect({ value })`, branching on `value` | manual |
+| `onSelect({ item })` received a copy of the item with its label turned into a string | `onSelect({ value })` receives the item value | — |
+| `CommandGroup` | `CommandItemEntry`, which includes `{ type: "group", label, items }` | manual |
+| An element `label` was searched as the text "[object Object]" | The search reads `textValue`, else a text `label`, plus `keywords`; give an element label a `textValue` | — |
+| The whole search had to occur as one piece of the label or of a keyword | Every word of the search must occur in the item text or a keyword, ignoring case and accents | — |
+| `placeholder` defaulted to "Search..." and named the field, the list ("Command items") and the dialog ("Commands") | There is no default text; `aria-label`, `aria-labelledby` or `placeholder` names the field, its list, the dialog and its trigger | — |
+| `ref` and `className` went on the `.uf-command` box, and the component took no other native attributes | `ref` and native attributes (`id`, `autoFocus`, `onKeyDown`, `aria-describedby`…) go on the search field, which a dialog renders only while open; `className` and `style` stay on `.uf-command` | — |
+| The empty text showed only for a search without results; the empty part sat inside the listbox | It shows whenever no item is listed, after the listbox | — |
+| Items were grouped after the ungrouped ones, and Enter could pick another item than the highlighted one | Items and groups keep their order in `items`; Enter picks the highlighted item | — |
+| The root carried `data-state="focused\|idle"`; group labels had `role="presentation"` | No focus state attribute (use `:focus-within`); group labels are `aria-hidden` and name their group | — |
+
 ### Date
 
 | Before | After | Codemod |
