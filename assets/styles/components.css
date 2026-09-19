@@ -18,6 +18,7 @@
 @import "./text.css";
 @import "./components/icon.css";
 @import "./components/button.css";
+@import "./components/membrane.css";
 @import "./components/tile.css";
 @import "./components/separator.css";
 @import "./components/badge.css";
@@ -28,6 +29,7 @@
 @import "./components/field.css";
 @import "./components/radio.css";
 @import "./components/input.css";
+@import "./components/sheet.css";
 @import "./components/select.css";
 @import "./components/date.css";
 @import "./components/slider.css";
@@ -58,6 +60,5 @@
 @import "./components/navigation.css";
 @import "./components/tree.css";
 @import "./components/carousel.css";
-@import "./components/compat.css";
 @import "./components/gallery.css";
 @import "./components/interaction.css";

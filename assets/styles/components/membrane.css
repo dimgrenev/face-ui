@@ -1,0 +1,65 @@
+/* =================================================================
+ * MEMBRANE — the spacing wrapper every control is rendered in.
+ * Imported right after button.css: Button is the control these rules
+ * were written against, and every later component file styles its own
+ * membranes through its own scope.
+ * ================================================================= */
+/* The membrane token sits outside the control rhythm and never mutates the
+   inner control's own padding. */
+.uf-membrane {
+  display: inline-flex;
+  box-sizing: border-box;
+  padding: var(--uf-membrane);
+}
+.uf-membrane[data-membrane-interactive] {
+  cursor: pointer;
+}
+/* Links need native hit testing: synthetic forwarded clicks lose browser link
+   commands in WebKit. Extend the anchor into its membrane without changing layout. */
+.uf-membrane[data-membrane-interactive] > a[href] { position: relative; }
+.uf-membrane[data-membrane-interactive] > a[href]::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--uf-membrane));
+}
+.uf-membrane[data-membrane-interactive] > a[href]:is(
+  [inert], [disabled], [data-disabled], [aria-disabled="true"],
+  [inert] *, [disabled] *, [data-disabled] *, [aria-disabled="true"] *
+)::before { content: none; }
+
+.uf-membrane[data-membrane-interactive] > :is([disabled], [data-disabled], [aria-disabled="true"]) {
+  cursor: not-allowed;
+}
+.uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > :is(.uf-option, .uf-control, [data-part="trigger"], [data-part="item"], [data-part="option"]):not([disabled]):not([data-disabled]):not([aria-disabled="true"]),
+.uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > .uf-membrane[data-membrane-disabled] > :is(.uf-option, .uf-control, [data-part="trigger"], [data-part="item"], [data-part="option"]):not([disabled]):not([data-disabled]):not([aria-disabled="true"]) {
+  background: var(--uf-color-hover-bg);
+}
+.uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > .uf-button[data-scope]:not([disabled]):not([data-disabled]):not([aria-disabled="true"]),
+.uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > .uf-membrane[data-membrane-disabled] > .uf-button[data-scope]:not([disabled]):not([data-disabled]):not([aria-disabled="true"]) {
+  background: var(--uf-button-hover-bg);
+  color: var(--uf-button-hover-fg);
+}
+.uf-membrane--full {
+  display: flex;
+  width: 100%;
+}
+.uf-membrane--full > *,
+.uf-membrane--full > .uf-membrane[data-membrane-disabled] > * {
+  width: 100%;
+}
+/* Keep the React/DOM position stable while removing only the spacing box.
+   The wrapper has no semantics; roles, names and focus stay on its child. */
+.uf-membrane[data-membrane-disabled]:not([hidden]):not(:has(> [hidden])) {
+  display: contents;
+  padding: 0;
+}
+
+/* Truncate — ellipsis overflow.
+   Membrane is inline-flex and grows to intrinsic size, ignoring parent overflow.
+   --truncate switches it to a shrinkable flex item so the parent can constrain it.
+   The Text element inside clips the text with ellipsis. */
+.uf-membrane.uf-membrane--truncate {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+}

@@ -161,3 +161,12 @@
   color: var(--uf-color-fg-muted);
   font-size: var(--uf-font-size);
 }
+
+/* A label slot renders a Text; the slot's own typography wins, so the Text
+   inherits rather than imposing its own weight, color and rhythm. */
+[data-scope="command"] [data-part="empty"] .uf-text[data-scope],
+[data-scope="command"] [data-part="groupLabel"] .uf-text[data-scope] {
+  color: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+}

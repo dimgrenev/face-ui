@@ -227,3 +227,12 @@
   border-start-end-radius: var(--uf-radius);
   border-end-end-radius: var(--uf-radius);
 }
+
+/* Parity with the reference library: a consumer marks its own sticky
+   end column. Face UI never renders data-sticky-right itself. */
+.uf-table[data-scope] td[data-sticky-right] {
+  position: sticky;
+  right: 0;
+  z-index: 3;
+  background: var(--uf-color-bg);
+}

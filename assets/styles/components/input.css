@@ -62,13 +62,6 @@
 [data-scope="input"] [data-part="textarea"]::placeholder {
   color: var(--uf-color-fg-muted);
 }
-[data-scope="command"] [data-part="empty"] .uf-text[data-scope],
-[data-scope="command"] [data-part="groupLabel"] .uf-text[data-scope],
-.uf-menu-group-label .uf-text[data-scope] {
-  color: inherit;
-  line-height: inherit;
-  font-weight: inherit;
-}
 [data-scope="input"] [data-part="input"]:disabled,
 [data-scope="input"] [data-part="textarea"]:disabled {
   opacity: 0.6;

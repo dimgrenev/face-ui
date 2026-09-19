@@ -141,3 +141,11 @@
     transform: translateY(var(--uf-menu-sheet-enter-y));
   }
 }
+
+/* A label slot renders a Text; the slot's own typography wins, so the Text
+   inherits rather than imposing its own weight, color and rhythm. */
+.uf-menu-group-label .uf-text[data-scope] {
+  color: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+}

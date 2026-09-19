@@ -38,15 +38,6 @@
 .uf-text[data-scope][data-size="xl"] {
   --uf-text-size-font-size: var(--uf-font-size-xl);
 }
-/* Truncate — ellipsis overflow.
-   Membrane is inline-flex and grows to intrinsic size, ignoring parent overflow.
-   --truncate switches it to a shrinkable flex item so the parent can constrain it.
-   The Text element inside clips the text with ellipsis. */
-.uf-membrane.uf-membrane--truncate {
-  display: flex;
-  min-width: 0;
-  overflow: hidden;
-}
 .uf-text[data-scope][data-truncate] {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -196,4 +187,15 @@
   height: auto;
   min-height: 0;
   padding-block: 0;
+}
+
+/* The class a consumer puts on non-Text markup to take body typography.
+   Lower specificity than every .uf-text[data-scope] rule above, so its
+   position inside text.css cannot change what a Text renders. */
+.uf-text-body {
+  font-family: var(--uf-font-family-base);
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-text-body-size, var(--uf-control-font-size))));
+  line-height: var(--uf-text-line-height, var(--uf-text-body-line-height, var(--uf-control-line-height)));
+  letter-spacing: var(--uf-text-letter-spacing, var(--uf-control-letter-spacing));
+  font-weight: var(--uf-text-font-weight, var(--uf-font-weight));
 }
