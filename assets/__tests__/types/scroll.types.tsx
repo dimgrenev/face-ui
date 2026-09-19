@@ -1,0 +1,38 @@
+import { createRef } from 'react'
+import { Scroll } from '../../../index'
+
+const viewport = createRef<HTMLDivElement>()
+export const scroll = (
+  <Scroll
+    ref={viewport}
+    orientation="both"
+    height="50vh"
+    aria-label="Build log"
+    aria-labelledby="log-heading"
+    id="log"
+    onScroll={(event) => event.currentTarget.scrollTop}
+    className="log"
+    style={{ maxHeight: 240 }}
+  >
+    rows
+  </Scroll>
+)
+export const scrollNumberHeight = <Scroll height={240}>{42}</Scroll>
+// @ts-expect-error The region is named by the native aria-label.
+export const scrollAriaLabel = <Scroll ariaLabel="Build log">rows</Scroll>
+// @ts-expect-error The component owns the role.
+export const scrollRole = <Scroll role="log">rows</Scroll>
+// @ts-expect-error The component owns the tab stop.
+export const scrollTabIndex = <Scroll tabIndex={-1}>rows</Scroll>
+// @ts-expect-error The component owns the viewport's visibility.
+export const scrollHidden = <Scroll hidden>rows</Scroll>
+// @ts-expect-error Content is children.
+export const scrollInnerHtml = <Scroll dangerouslySetInnerHTML={{ __html: '<b>rows</b>' }} />
+// @ts-expect-error React focuses no div on mount.
+export const scrollAutoFocus = <Scroll autoFocus>rows</Scroll>
+// @ts-expect-error The content is React's, not the user's to edit.
+export const scrollEditable = <Scroll contentEditable>rows</Scroll>
+// @ts-expect-error A div has no form value.
+export const scrollDefaultValue = <Scroll defaultValue="rows">rows</Scroll>
+// @ts-expect-error Only vertical, horizontal or both.
+export const scrollOrientation = <Scroll orientation="diagonal">rows</Scroll>

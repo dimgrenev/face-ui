@@ -6,7 +6,6 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type ReactNode,
-  type RefObject,
 } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
@@ -14,6 +13,7 @@ import { hasSlotContent } from '../assets/slot-content'
 import { getCardSurfaceProps } from '../assets/internal/card-surface'
 import { useControllableState } from '../assets/adapters/react/use-controllable-state'
 import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
+import { useScrollable } from '../assets/adapters/react/use-scrollable'
 import { resolveLabels, type CommonLabels } from '../assets/runtime/labels'
 import { invalidProp, readNumber } from '../assets/runtime/props'
 import { Text } from '../Text/Text'
@@ -117,25 +117,6 @@ function readMarked(highlightedLines: unknown): ReadonlySet<number> {
   return new Set(marked)
 }
 
-/** Whether the user can scroll `pre`: true while it overflows, kept current as its box or content resizes. */
-function useScrollable(pre: RefObject<HTMLPreElement | null>, enabled: boolean) {
-  const [scrollable, setScrollable] = useState(false)
-  useEffect(() => {
-    const node = pre.current
-    if (!enabled || !node || typeof ResizeObserver === 'undefined') {
-      setScrollable(false)
-      return
-    }
-    const observer = new ResizeObserver(() =>
-      setScrollable(node.scrollWidth > node.clientWidth || node.scrollHeight > node.clientHeight),
-    )
-    observer.observe(node)
-    if (node.firstElementChild) observer.observe(node.firstElementChild)
-    return () => observer.disconnect()
-  }, [enabled])
-  return scrollable
-}
-
 /** A block of source code with an optional title, line numbers, marked lines, syntax colors, copy and collapse. */
 export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
   {
@@ -172,8 +153,9 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
   const collapsed = collapsible && Boolean(collapsedIntent)
 
   const preRef = useRef<HTMLPreElement>(null)
-  const scrollable = useScrollable(preRef, !collapsed)
-  // A collapsed source cannot scroll (overflow: clip); expanding it starts again from its first line.
+  // Collapsing switches the pre to overflow: clip, which its size alone may not reveal.
+  const scrollable = useScrollable(preRef, [collapsed])
+  // A collapsed source cannot scroll; expanding it starts again from its first line.
   useIsomorphicLayoutEffect(() => {
     const pre = preRef.current
     if (!collapsed && pre) pre.scrollTop = pre.scrollLeft = 0

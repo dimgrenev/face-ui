@@ -2,17 +2,17 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Scroll",
-  "description": "Native scroll area",
+  "description": "A framed box whose content scrolls natively; it is a named tab stop only while it can scroll.",
   "props": {
     "children": {
       "type": "ReactNode",
       "required": false,
-      "description": "Content to make scrollable."
+      "description": "Content to scroll; text keeps its line breaks and wraps only while the content cannot scroll sideways."
     },
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Which axes can scroll.",
+      "description": "Axes the content scrolls along; overflow along the other axis is clipped.",
       "options": [
         "vertical",
         "horizontal",
@@ -23,14 +23,12 @@
     "height": {
       "type": "any",
       "required": false,
-      "description": "Viewport height.",
-      "default": 240
+      "description": "Height of the box: pixels, or any CSS length. Without it the box is as tall as its content, or as its layout makes it."
     },
-    "ariaLabel": {
+    "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Accessible label for the scrollable region.",
-      "default": "Scrollable text"
+      "description": "Names the scrolling region; a tab stop without `aria-label` or `aria-labelledby` is named \"Scrollable content\"."
     }
   },
   "states": [
@@ -46,14 +44,13 @@
       "name": "Horizontal",
       "props": {
         "children": "Длинная строка для горизонтального скролла: вечер, пустая гостиная, закрытые двери, дальний стук в саду, чемоданы у стены, письмо на столе и молчание людей, которые уже все поняли.",
-        "orientation": "horizontal",
-        "height": 80
+        "orientation": "horizontal"
       }
     },
     {
       "name": "Both Axes",
       "props": {
-        "children": "По мотивам Чехова: «Вся Россия - наш сад».\n\nВечером в доме стало так тихо, что слышно было, как в соседней комнате остывает самовар. Лампа горела ровно, но каждый ее круг света казался тревожным: за столом сидели люди, которые давно знали правду и все еще делали вид, будто можно отложить разговор до завтра.\n\nОна смотрела в окно, где чернели ветви, и думала не о дороге, не о деньгах, не о письме, лежавшем в ящике, а о том странном мгновении, когда прошлое вдруг становится вещью: его можно потрогать, потерять, продать или оставить чужим людям.\n\nОн сказал несколько простых слов, почти будничных, и от этого всем стало тяжелее. Никто не спорил. В передней скрипнула дверь, где-то в саду ударил топор, и в этой сухой паузе каждый понял: прежняя жизнь уже закончилась, только в комнате еще продолжали сидеть как прежде.",
+        "children": "09:31:02 build   apps/workspace/src/features/agent-runtime/components/ThreadComposer.tsx compiled in 184 ms\n09:31:03 build   apps/workspace/src/features/agent-runtime/state/thread-store.ts compiled in 92 ms\n09:31:05 test    packages/engine/src/face-ui/__tests__/compositionValidator.test.ts passed 48 of 48\n09:31:07 test    packages/engine/src/prop-analysis/__tests__/advancedPropParser.test.ts passed 31 of 31\n09:31:09 bundle  dist/assets/workspace-7f3a9c.js 412.6 kB (gzip 128.4 kB) written\n09:31:10 bundle  dist/assets/workspace-7f3a9c.css 64.1 kB (gzip 11.2 kB) written\n09:31:12 upload  sourcemaps for release 2026.07.10-rc.3 uploaded to the error tracker\n09:31:15 deploy  release 2026.07.10-rc.3 promoted to production after health checks passed",
         "orientation": "both",
         "height": 120
       }
@@ -63,14 +60,15 @@
   "keyboard": {},
   "aria": {
     "role": "region",
-    "required": [
-      "aria-label"
-    ]
+    "defaultName": "Scrollable content",
+    "label": "Native aria-label/aria-labelledby name the viewport; a tab stop without either is named by default, and without a name it is no region.",
+    "focus": "The viewport is a tab stop only while its content overflows along an axis it scrolls, and stays focusable by script after; Scroll owns role, tabIndex and hidden. Until measured (server HTML, no ResizeObserver) it has no tabindex, so the browser's own rule for scrollers applies."
   },
   "composition": {
     "required": [
       "root",
-      "viewport"
+      "viewport",
+      "content"
     ],
     "recommended": [],
     "parts": {
@@ -80,32 +78,40 @@
       "viewport": {
         "slot": "viewport",
         "parent": "root"
+      },
+      "content": {
+        "slot": "content",
+        "parent": "viewport"
       }
     }
   },
   "tokenMapping": {
-    "component": [],
+    "component": [
+      "--uf-scroll-card-inset"
+    ],
     "semanticFallbacks": [
-      "--uf-control-pad-y",
-      "--uf-control-pad-text"
+      "--uf-card-padding-default"
     ],
     "notes": [
-      "Scroll currently owns viewport padding and clipping only; native scrollbar visuals are browser-owned.",
-      "height is a layout input and remains product data rather than a visual token."
+      "The outer box is a code card; --uf-scroll-card-inset pads the viewport, and native scrollbars are browser-owned.",
+      "height and style size the outer box; the viewport fills it and scrolls, so a max-height lets the box grow with its content up to a limit."
     ]
   },
   "platform": {},
   "usage": {
     "whenToUse": [
-      "Scrollable panels",
-      "Virtualized long lists",
-      "Horizontal scroll containers"
+      "Logs, feeds and previews in a box of fixed or capped height",
+      "Wide rows or tables that scroll sideways",
+      "A list that fills the rest of a flex column"
     ],
     "whenNotToUse": [
       "Standard page scroll",
-      "Full-page layout"
+      "Full-page layout",
+      "Source code (use Code)"
     ],
-    "alternatives": [],
+    "alternatives": [
+      "Code"
+    ],
     "context": "app"
   }
 }

@@ -16,8 +16,8 @@
       "height": {
         "$ref": "props.height"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "aria-label": {
+        "$ref": "props.aria-label"
       }
     },
     "children": []
@@ -25,8 +25,8 @@
   "currentState": {
     "props": {
       "orientation": "vertical",
-      "height": 240,
-      "ariaLabel": "Recent workspace activity",
+      "height": 120,
+      "aria-label": "Recent workspace activity",
       "children": "09:42 Deployment completed\n09:38 Smoke tests passed\n09:31 Build started\n09:27 Pull request approved\n09:16 Security scan passed\n09:04 Database backup completed\n08:55 Release candidate created"
     }
   },
@@ -35,13 +35,13 @@
       "name": "children",
       "type": "any",
       "required": false,
-      "description": "Content to make scrollable."
+      "description": "Content to scroll; text keeps its line breaks and wraps only while the content cannot scroll sideways."
     },
     {
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Which axes can scroll.",
+      "description": "Axes the content scrolls along; overflow along the other axis is clipped.",
       "options": [
         "vertical",
         "horizontal",
@@ -53,15 +53,13 @@
       "name": "height",
       "type": "any",
       "required": false,
-      "description": "Viewport height.",
-      "defaultValue": 240
+      "description": "Height of the box: pixels, or any CSS length. Without it the box is as tall as its content, or as its layout makes it."
     },
     {
-      "name": "ariaLabel",
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Accessible label for the scrollable region.",
-      "defaultValue": "Scrollable text"
+      "description": "Names the scrolling region; a tab stop without `aria-label` or `aria-labelledby` is named \"Scrollable content\"."
     }
   ],
   "meta": {
