@@ -13,6 +13,7 @@ import { cn } from '../assets/utils'
 import { hasSlotContent } from '../assets/slot-content'
 import { getCardSurfaceProps } from '../assets/internal/card-surface'
 import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
 import { resolveLabels, type CommonLabels } from '../assets/runtime/labels'
 import { invalidProp, readNumber } from '../assets/runtime/props'
 import { Text } from '../Text/Text'
@@ -60,13 +61,13 @@ export interface CodeProps
   language?: string
   /** Syntax colors from a highlighter, one token array per line of `children`; a line whose tokens spell other text renders plain. */
   tokenizedLines?: readonly (readonly CodeToken[])[]
-  /** Header text such as a file name; without it the copy and collapse buttons sit beside the source. */
+  /** Header text such as a file name; without it a one-line source keeps its copy button beside it instead of a header. */
   title?: ReactNode
   /** Number each line in a gutter that is never selected, copied or read aloud. */
   showLineNumbers?: boolean
-  /** Numbers of the lines to mark, from 1; each renders as a highlighted `<mark>`. */
+  /** Numbers of the lines to mark, whole and from 1; each renders as a highlighted `<mark>`. */
   highlightedLines?: readonly number[]
-  /** Controlled collapse: a source longer than `collapsedLines` shows only its first lines; a shorter one always shows in full. */
+  /** Controlled collapse: a source longer than `collapsedLines` shows only its first lines and cannot scroll; a shorter one always shows in full. */
   collapsed?: boolean
   /** Uncontrolled `collapsed` on mount; read once. */
   defaultCollapsed?: boolean
@@ -100,20 +101,20 @@ function readTokens(tokenizedLines: unknown, lines: readonly string[]) {
       : null
   })
   if (tokens.includes(null))
-    invalidProp(
-      'Code',
-      'tokenizedLines',
-      tokenizedLines,
-      'rendering lines whose tokens do not spell children as plain text',
-    )
+    invalidProp('Code', 'tokenizedLines', tokenizedLines, 'rendering lines whose tokens do not spell children as plain text')
   return tokens
 }
 
-function readMarked(highlightedLines: unknown): ReadonlySet<unknown> {
+function readMarked(highlightedLines: unknown): ReadonlySet<number> {
   if (highlightedLines === undefined) return new Set()
-  if (Array.isArray(highlightedLines)) return new Set(highlightedLines)
-  invalidProp('Code', 'highlightedLines', highlightedLines, 'marking no line')
-  return new Set()
+  if (!Array.isArray(highlightedLines)) {
+    invalidProp('Code', 'highlightedLines', highlightedLines, 'marking no line')
+    return new Set()
+  }
+  const marked = highlightedLines.filter((line) => Number.isInteger(line) && line > 0)
+  if (marked.length < highlightedLines.length)
+    invalidProp('Code', 'highlightedLines', highlightedLines, 'marking only its whole line numbers from 1')
+  return new Set(marked)
 }
 
 /** Whether the user can scroll `pre`: true while it overflows, kept current as its box or content resizes. */
@@ -126,10 +127,7 @@ function useScrollable(pre: RefObject<HTMLPreElement | null>, enabled: boolean) 
       return
     }
     const observer = new ResizeObserver(() =>
-      setScrollable(
-        node.scrollWidth > node.clientWidth ||
-          node.scrollHeight > node.clientHeight,
-      ),
+      setScrollable(node.scrollWidth > node.clientWidth || node.scrollHeight > node.clientHeight),
     )
     observer.observe(node)
     if (node.firstElementChild) observer.observe(node.firstElementChild)
@@ -160,10 +158,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
   const lines = readLines(children)
   const tokens = readTokens(tokenizedLines, lines)
   const marked = readMarked(highlightedLines)
-  const visibleLines = readNumber('Code', 'collapsedLines', collapsedLines, 8, {
-    integer: true,
-    min: 1,
-  })
+  const visibleLines = readNumber('Code', 'collapsedLines', collapsedLines, 8, { integer: true, min: 1 })
   const text = resolveLabels(defaultLabels, labels, 'Code')
 
   const [collapsedIntent, setCollapsed] = useControllableState({
@@ -178,6 +173,11 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
 
   const preRef = useRef<HTMLPreElement>(null)
   const scrollable = useScrollable(preRef, !collapsed)
+  // A collapsed source cannot scroll (overflow: clip); expanding it starts again from its first line.
+  useIsomorphicLayoutEffect(() => {
+    const pre = preRef.current
+    if (!collapsed && pre) pre.scrollTop = pre.scrollLeft = 0
+  }, [collapsed])
 
   // Successful copies since the confirmation last ended; each one restarts it.
   const [copies, setCopies] = useState(0)
@@ -187,6 +187,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
     return () => clearTimeout(timer)
   }, [copies])
 
+  const titled = hasSlotContent(title)
   const toggleName = collapsed ? text.expand : text.collapse
   const actions = (
     <div className="uf-code-actions">
@@ -212,7 +213,8 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
         </Button>
       )}
       <span role="status" className="uf-visually-hidden">
-        {copies ? text.copied : null}
+        {/* A new node per copy, so a repeated copy is announced again. */}
+        {copies ? <span key={copies}>{text.copied}</span> : null}
       </span>
     </div>
   )
@@ -233,11 +235,13 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
       })}
       data-state={collapsible ? (collapsed ? 'collapsed' : 'expanded') : undefined}
     >
-      {hasSlotContent(title) ? (
+      {titled || lines.length > 1 ? (
         <div className="uf-code-header">
-          <Text as="span" fullWidth className="uf-code-title">
-            {title}
-          </Text>
+          {titled && (
+            <Text as="span" fullWidth className="uf-code-title">
+              {title}
+            </Text>
+          )}
           {actions}
         </div>
       ) : (

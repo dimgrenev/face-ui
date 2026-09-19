@@ -7,11 +7,12 @@ const root = createRoot(document.getElementById('root')!)
 let generation = 0
 /**
  * Mounts a fresh subject Code between two tabbable buttons, and optionally a
- * reference Code below it, in a column of `width` pixels.
+ * reference Code below it, in a column of `width` pixels; `update` re-renders
+ * the mounted one with the new props instead.
  */
 const renderCode = (
   props: CodeProps,
-  options: { direction?: 'ltr' | 'rtl'; width?: number; reference?: CodeProps } = {},
+  options: { direction?: 'ltr' | 'rtl'; width?: number; reference?: CodeProps; update?: boolean } = {},
 ) => {
   document.documentElement.dir = options.direction ?? 'ltr'
   Object.assign(document.body.style, {
@@ -21,7 +22,7 @@ const renderCode = (
   })
   flushSync(() =>
     root.render(
-      <StrictMode key={++generation}>
+      <StrictMode key={options.update ? generation : ++generation}>
         <button id="before" tabIndex={0}>
           Before
         </button>

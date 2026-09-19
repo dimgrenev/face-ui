@@ -454,6 +454,12 @@
       "codemod": "auto"
     },
     {
+      "kind": "behavior",
+      "component": "Code",
+      "before": "A wrapper typed with `CodeProps` (such as a syntax-highlighting one) took and passed the source as `code`",
+      "after": "The wrapper reads and passes `children` and is fixed by hand: the codemod rewrites only `<Code code>` elements, and the type checker reports the wrapper and each of its `code` call sites"
+    },
+    {
       "kind": "rename-prop",
       "component": "Code",
       "from": "highlight",
@@ -478,13 +484,13 @@
       "kind": "behavior",
       "component": "Code",
       "before": "A source collapsed when it had more than 8 lines or 240 characters, to `collapsedHeight` pixels",
-      "after": "A source collapses when it has more lines than `collapsedLines` (default 8), to exactly that many lines"
+      "after": "A source collapses when it has more lines than `collapsedLines` (default 8), to exactly its first that many lines; it cannot scroll while collapsed and expands from its first line"
     },
     {
       "kind": "behavior",
       "component": "Code",
       "before": "Without `title`, a short source had no copy button",
-      "after": "The copy button is always there: in the header with `title`, otherwise at the inline end beside the source; a successful copy shows a check and announces `labels.copied`"
+      "after": "The copy button is always there: in the header, which an untitled source of more than one line also gets, or at the inline end beside an untitled one-line source; a successful copy shows a check and announces `labels.copied`"
     },
     {
       "kind": "behavior",

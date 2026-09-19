@@ -75,7 +75,7 @@
       "name": "title",
       "type": "any",
       "required": false,
-      "description": "Header text such as a file name; without it the copy and collapse buttons sit beside the source."
+      "description": "Header text such as a file name; without it a one-line source keeps its copy button beside it instead of a header."
     },
     {
       "name": "showLineNumbers",
@@ -88,13 +88,13 @@
       "name": "highlightedLines",
       "type": "array",
       "required": false,
-      "description": "Numbers of the lines to mark, from 1; each renders as a highlighted `<mark>`."
+      "description": "Numbers of the lines to mark, whole and from 1; each renders as a highlighted `<mark>`."
     },
     {
       "name": "collapsed",
       "type": "boolean",
       "required": false,
-      "description": "Controlled collapse: a source longer than `collapsedLines` shows only its first lines; a shorter one always shows in full."
+      "description": "Controlled collapse: a source longer than `collapsedLines` shows only its first lines and cannot scroll; a shorter one always shows in full."
     },
     {
       "name": "defaultCollapsed",

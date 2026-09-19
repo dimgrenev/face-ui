@@ -22,7 +22,7 @@
     "title": {
       "type": "ReactNode",
       "required": false,
-      "description": "Header text such as a file name; without it the copy and collapse buttons sit beside the source."
+      "description": "Header text such as a file name; without it a one-line source keeps its copy button beside it instead of a header."
     },
     "showLineNumbers": {
       "type": "boolean",
@@ -33,12 +33,12 @@
     "highlightedLines": {
       "type": "array",
       "required": false,
-      "description": "Numbers of the lines to mark, from 1; each renders as a highlighted `<mark>`."
+      "description": "Numbers of the lines to mark, whole and from 1; each renders as a highlighted `<mark>`."
     },
     "collapsed": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled collapse: a source longer than `collapsedLines` shows only its first lines; a shorter one always shows in full."
+      "description": "Controlled collapse: a source longer than `collapsedLines` shows only its first lines and cannot scroll; a shorter one always shows in full."
     },
     "defaultCollapsed": {
       "type": "boolean",
@@ -139,7 +139,8 @@
       "--uf-code-scroll-max-height",
       "--uf-code-fade-height",
       "--uf-code-fade-h",
-      "--uf-code-line-number-width"
+      "--uf-code-line-number-width",
+      "--uf-code-pad"
     ],
     "semanticFallbacks": [
       "--uf-control-height",
@@ -151,7 +152,8 @@
     "notes": [
       "Code is an approved mono-content exception and intentionally uses mono typography tokens.",
       "Title and action labels route through Text/Button; tokenizedLines may carry syntax-highlighter colors as source-code data.",
-      "A collapsed source is exactly collapsedLines line boxes tall (1lh each plus the block padding), capped by --uf-code-scroll-max-height."
+      "A collapsed source is exactly collapsedLines line boxes tall (1lh each plus --uf-code-pad above and below), capped by --uf-code-scroll-max-height.",
+      "--uf-code-collapsed-lines is written inline on the pre from the collapsedLines prop; it is not a theme token."
     ]
   },
   "platform": {},

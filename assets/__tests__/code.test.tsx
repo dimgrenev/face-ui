@@ -85,6 +85,18 @@ describe('Code copy', () => {
     expect([status().textContent, icon()]).toEqual(['', 'copy'])
   })
 
+  it('every successful copy announces labels.copied again, as a new node', async () => {
+    writeText.mockResolvedValue(undefined)
+    await render({ children: 'npm install', labels: { copied: 'Скопировано' } })
+    await copy()
+    const first = status().firstElementChild
+    expect(first?.textContent).toBe('Скопировано')
+    await copy()
+    expect(status().textContent).toBe('Скопировано')
+    expect(status().firstElementChild).not.toBe(first)
+    expect(status().childElementCount).toBe(1)
+  })
+
   it('a refused clipboard confirms nothing', async () => {
     writeText.mockRejectedValue(new Error('Denied'))
     Object.assign(document, { execCommand: () => false })
@@ -97,10 +109,14 @@ describe('Code copy', () => {
     Reflect.deleteProperty(document, 'execCommand')
   })
 
-  it('the copy button is there without a title, beside the source', async () => {
-    await render({ children: 'npm install' })
+  it('without a title the copy button sits beside a one-line source and in a header above a longer one', async () => {
+    await render({ children: 'npm install\n' })
     expect($('.uf-code-header')).toBeNull()
     expect(button('Copy code')!.closest('.uf-code-actions')?.parentElement).toBe(root())
+    await render({ children: 'npm install\nnpm test' })
+    expect($('.uf-code-header')?.nextElementSibling).toBe(pre())
+    expect($('.uf-code-title')).toBeNull()
+    expect(button('Copy code')!.closest('.uf-code-header')).not.toBeNull()
   })
 })
 
@@ -166,7 +182,7 @@ describe('Code props', () => {
     expect(lines().map(lineText)).toEqual(['line 1', 'line 2', 'line 3'])
   })
 
-  it('highlightedLines render the numbered lines, from 1, as <mark>', async () => {
+  it('highlightedLines render the whole line numbers they list, from 1, as <mark>; anything else is reported', async () => {
     await render({ children: source(3), highlightedLines: [2, 7] })
     expect(lines().map((line) => line.tagName)).toEqual(['SPAN', 'MARK', 'SPAN'])
     await expectDevError(
@@ -174,6 +190,15 @@ describe('Code props', () => {
       /^Face UI Code: invalid highlightedLines 2; marking no line\.$/,
     )
     expect(lines().map((line) => line.tagName)).toEqual(['SPAN', 'SPAN', 'SPAN'])
+    await expectDevError(
+      () =>
+        render({
+          children: source(3),
+          highlightedLines: ['1', 2.5, 0, 3] as unknown as number[],
+        }),
+      /^Face UI Code: invalid highlightedLines array; marking only its whole line numbers from 1\.$/,
+    )
+    expect(lines().map((line) => line.tagName)).toEqual(['SPAN', 'SPAN', 'MARK'])
   })
 
   it('the source reads left to right in any page direction and is never machine-translated', async () => {

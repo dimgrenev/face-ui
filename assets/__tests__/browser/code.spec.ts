@@ -54,6 +54,44 @@ test('a collapsed source is exactly as tall as collapsedLines lines and expands 
   expect((await box(pre)).height).toBeCloseTo(clip.height, 0)
 })
 
+for (const by of ['the user', 'the collapsed prop'] as const)
+  test(`collapsed by ${by}, a scrolled source shows its first lines, cannot scroll, and expands from line 1`, { tag: ['@layout'] }, async ({
+    page,
+  }) => {
+    const props = { children: `${source(40)}\n${'x'.repeat(300)}`, title: 'build.log' }
+    await render(page, by === 'the user' ? props : { ...props, collapsed: false })
+    const pre = subject(page).locator('pre')
+    const first = pre.locator('[data-part="line"]').first()
+    /** Line 1 relative to the source box: where it sits unscrolled. */
+    const offset = async () => {
+      const [outer, line] = [await box(pre), await box(first)]
+      return [Math.round(line.top - outer.top), Math.round(line.left - outer.left)]
+    }
+    const scrollTo = (to: number) =>
+      pre.evaluate((node, to) => {
+        node.scrollTop = node.scrollLeft = to
+        return [node.scrollTop, node.scrollLeft]
+      }, to)
+    const toggle = (collapsed: boolean) =>
+      by === 'the user'
+        ? subject(page).getByRole('button', { name: collapsed ? 'Collapse code' : 'Expand code' }).click()
+        : render(page, { ...props, collapsed }, { update: true })
+    const home = await offset()
+    expect(Math.min(...(await scrollTo(10_000)))).toBeGreaterThan(0)
+
+    await toggle(true)
+    expect(await subject(page).getAttribute('data-state')).toBe('collapsed')
+    expect(await offset()).toEqual(home)
+    // Neither script nor scrollIntoView (as find in page does) moves it while collapsed.
+    expect(await scrollTo(10_000)).toEqual([0, 0])
+    await pre.locator('[data-part="line"]').nth(30).evaluate((node) => node.scrollIntoView())
+    expect(await offset()).toEqual(home)
+
+    await toggle(false)
+    expect(await pre.evaluate((node) => [node.scrollTop, node.scrollLeft])).toEqual([0, 0])
+    expect(await offset()).toEqual(home)
+  })
+
 test('the scroll limit caps the expanded source, and a collapsed one is never taller', { tag: ['@layout'] }, async ({
   page,
 }) => {
@@ -76,7 +114,7 @@ test('the scroll limit caps the expanded source, and a collapsed one is never ta
 })
 
 for (const direction of ['ltr', 'rtl'] as const)
-  test(`without a title the actions sit at the inline end beside the source (${direction})`, { tag: ['@layout'] }, async ({
+  test(`an untitled one-line source has its copy button at the inline end beside it (${direction})`, { tag: ['@layout'] }, async ({
     page,
   }) => {
     await render(page, { children: 'npm install @userface/engine' }, { direction })
@@ -103,6 +141,29 @@ for (const direction of ['ltr', 'rtl'] as const)
     // The source itself still reads from the left edge.
     const text = await textBox(subject(page).locator('[data-part="line"]').first())
     expect(text.left - pre.left).toBeLessThan(pre.right - text.right)
+  })
+
+for (const direction of ['ltr', 'rtl'] as const)
+  test(`an untitled source of several lines keeps the full width, its buttons in a header above it (${direction})`, { tag: ['@layout'] }, async ({
+    page,
+  }) => {
+    await render(page, { children: source(30) }, { direction })
+    const root = await subject(page).evaluate((node) => {
+      const { left, top } = node.getBoundingClientRect()
+      const start = left + node.clientLeft
+      return { left: start, right: start + node.clientWidth, top: top + node.clientTop }
+    })
+    const pre = await box(subject(page).locator('pre'))
+    const copy = await box(subject(page).getByRole('button', { name: 'Copy code' }))
+    const collapse = await box(subject(page).getByRole('button', { name: 'Collapse code' }))
+    expect(pre.left).toBeCloseTo(root.left, 0)
+    expect(pre.right).toBeCloseTo(root.right, 0)
+    expect(Math.max(copy.bottom, collapse.bottom)).toBeLessThanOrEqual(pre.top + 0.5)
+    expect(Math.min(copy.top, collapse.top)).toBeGreaterThanOrEqual(root.top)
+    // Grouped at the header's inline end.
+    const middle = (root.left + root.right) / 2
+    if (direction === 'ltr') expect(Math.min(copy.left, collapse.left)).toBeGreaterThan(middle)
+    else expect(Math.max(copy.right, collapse.right)).toBeLessThan(middle)
   })
 
 for (const direction of ['ltr', 'rtl'] as const)
@@ -147,14 +208,45 @@ test('copy puts children on the clipboard and then confirms', { tag: ['@native']
   context,
   browserName,
 }) => {
-  test.skip(browserName !== 'chromium', 'only Chromium lets a test read the clipboard back')
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await render(page, { children: 'npm install\n', showLineNumbers: true, title: 'install.sh' })
+  const copy = subject(page).getByRole('button', { name: 'Copy code' })
   await expect(subject(page).getByRole('status')).toHaveText('')
-  await subject(page).getByRole('button', { name: 'Copy code' }).click()
+  await expect(copy.locator('[data-icon]')).toHaveAttribute('data-icon', 'copy')
+  // From the keyboard, so the button holds focus in every engine (WebKit does not focus a clicked button).
+  await copy.focus()
+  await page.keyboard.press('Enter')
   await expect(subject(page).getByRole('status')).toHaveText('Copied')
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('npm install\n')
-  await expect(subject(page).getByRole('button', { name: 'Copy code' })).toBeFocused()
+  await expect(copy.locator('[data-icon]')).toHaveAttribute('data-icon', 'check')
+  // Only Chromium lets a test read the clipboard back.
+  if (browserName === 'chromium')
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('npm install\n')
+  await expect(copy).toBeFocused()
+})
+
+test('a refused copy confirms nothing', { tag: ['@native'] }, async ({ page }) => {
+  await render(page, { children: 'secret' })
+  await page.evaluate(() => {
+    const attempts: string[] = Object.assign(window, { copyAttempts: [] as string[] }).copyAttempts
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async () => {
+          attempts.push('clipboard')
+          throw new DOMException('Denied', 'NotAllowedError')
+        },
+      },
+    })
+    document.execCommand = () => (attempts.push('execCommand'), false)
+  })
+  const copy = subject(page).getByRole('button', { name: 'Copy code' })
+  await copy.click()
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { copyAttempts: string[] }).copyAttempts))
+    .toEqual(['clipboard', 'execCommand'])
+  await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))))
+  await expect(subject(page).getByRole('status')).toHaveText('')
+  await expect(copy.locator('[data-icon]')).toHaveAttribute('data-icon', 'copy')
 })
 
 test('the source takes keyboard focus only while it can scroll', { tag: ['@focus'] }, async ({

@@ -11,12 +11,10 @@
   inline-size: 100%;
   min-inline-size: 0;
   max-inline-size: 100%;
-  width: 100%;
-  max-width: 100%;
   align-self: stretch;
   color: var(--uf-color-text-code);
   overflow: hidden;
-  /* Titled: header row above the source. Untitled: actions at the inline end beside it. */
+  /* A header row above the source, except for an untitled one-line source: its copy button sits at its inline end. */
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
@@ -27,7 +25,6 @@
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   min-inline-size: 0;
   max-inline-size: 100%;
   min-height: var(--uf-control-height);
@@ -53,6 +50,7 @@
   align-items: center;
   gap: 0;
   flex-shrink: 0;
+  margin-inline-start: auto;
 }
 .uf-code[data-scope] > .uf-code-actions {
   grid-column: 2;
@@ -97,13 +95,13 @@
   min-inline-size: 100%;
   width: max-content;
 }
-/* Collapsed: exactly `collapsedLines` lines, never taller than the expanded source, faded out. */
+/* Collapsed: exactly the first `collapsedLines` lines, never taller than the expanded source, faded out; clip, not hidden, so nothing can scroll it. */
 .uf-code[data-scope][data-state="collapsed"] pre {
   max-block-size: min(
     calc(var(--uf-code-collapsed-lines) * 1lh + 2 * var(--uf-code-pad)),
     var(--uf-code-scroll-max-height)
   );
-  overflow: hidden;
+  overflow: clip;
   position: relative;
 }
 .uf-code[data-scope][data-state="collapsed"] pre::after {
