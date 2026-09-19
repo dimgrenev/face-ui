@@ -10,81 +10,103 @@
   --uf-toc-rail-w: var(--uf-membrane);
   --uf-toc-indicator-w: calc(var(--uf-membrane) * 2);
 }
-.uf-toc-list {
-  position: relative;
+.uf-toc-list[data-scope] {
   display: flex;
   flex-direction: column;
   width: 100%;
-}
-.uf-toc-slot {
+  min-width: 0;
+  margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  list-style: none;
+}
+.uf-toc-item[data-scope] {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+/* One row per entry: the control rhythm of a full-width option; nesting indents the text only. */
+.uf-toc .uf-toc-link[data-scope] {
   display: flex;
   width: 100%;
-}
-.uf-toc-slot > .uf-membrane {
-  width: 100%;
-}
-.uf-toc-item[data-scope="button"] {
-  width: 100%;
-}
-.uf-toc-item[data-scope="button"][data-active],
-.uf-toc-item[data-scope="button"][aria-current] {
-  background: var(--uf-color-hover-bg);
+  justify-content: flex-start;
+  text-align: start;
+  text-decoration: none;
+  font-family: var(--uf-font-family-base);
+  font-size: var(--uf-control-font-size);
+  line-height: var(--uf-control-line-height);
   color: var(--uf-color-fg);
+  padding-inline-start: calc(var(--uf-control-pad-text) + var(--uf-toc-depth, 0) * var(--uf-option-indent));
 }
-.uf-toc-item[data-scope="button"][data-disabled] {
-  opacity: 0.6;
-  cursor: not-allowed;
+.uf-toc .uf-toc-link[data-scope][aria-current] {
+  background: var(--uf-color-hover-bg);
+}
+/* Long headings wrap instead of hiding behind an ellipsis. */
+.uf-toc-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* The rail is the list's ::before; the marker is its ::after, placed by Toc on the current entry. */
+.uf-toc > .uf-toc-list[data-scope] {
+  position: relative;
+}
+.uf-toc[data-line="start"] > .uf-toc-list[data-scope] {
+  padding-inline-start: calc(var(--uf-toc-line-inset) + var(--uf-toc-line-gap));
+}
+.uf-toc[data-line="end"] > .uf-toc-list[data-scope] {
+  padding-inline-end: calc(var(--uf-toc-line-inset) + var(--uf-toc-line-gap));
+}
+.uf-toc:is([data-line="start"], [data-line="end"]) > .uf-toc-list::before,
+.uf-toc:is([data-line="start"], [data-line="end"]) > .uf-toc-list[data-indicator]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
   pointer-events: none;
 }
-/* Indicator line (animated, tracks active item position) */
-.uf-toc-indicator {
-  position: absolute;
+.uf-toc:is([data-line="start"], [data-line="end"]) > .uf-toc-list::before {
+  inset-block-end: 0;
+  width: var(--uf-toc-rail-w);
+  background: var(--uf-color-border);
+}
+.uf-toc:is([data-line="start"], [data-line="end"]) > .uf-toc-list[data-indicator]::after {
   width: var(--uf-toc-indicator-w);
+  height: var(--uf-toc-indicator-h);
+  transform: translateY(var(--uf-toc-indicator-y));
   background: var(--uf-color-fg);
+}
+.uf-toc > .uf-toc-list[data-indicator="moving"]::after {
   transition:
     transform var(--uf-motion-duration-control) var(--uf-motion-ease-standard),
     height var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
-  pointer-events: none;
 }
-/* Without line — hide indicator and rail */
-.uf-toc[data-scope]:not([data-with-line]) .uf-toc-indicator {
-  display: none;
+.uf-toc[data-line="start"] > .uf-toc-list::before {
+  inset-inline-start: calc(var(--uf-toc-line-inset) - var(--uf-toc-rail-w));
 }
-/* Line on left side */
-.uf-toc[data-scope][data-line-side="left"] .uf-toc-list {
-  padding-left: calc(var(--uf-toc-line-inset) + var(--uf-toc-line-gap));
-  border-left: none;
+.uf-toc[data-line="start"] > .uf-toc-list::after {
+  inset-inline-start: calc(var(--uf-toc-line-inset) - var(--uf-toc-indicator-w));
 }
-.uf-toc[data-scope][data-line-side="left"] .uf-toc-list::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: calc(var(--uf-toc-line-inset) - var(--uf-toc-rail-w));
-  width: var(--uf-toc-rail-w);
-  background: var(--uf-color-border);
+.uf-toc[data-line="end"] > .uf-toc-list::before {
+  inset-inline-end: calc(var(--uf-toc-line-inset) - var(--uf-toc-rail-w));
 }
-.uf-toc[data-scope][data-line-side="left"] .uf-toc-indicator {
-  left: calc(var(--uf-toc-line-inset) - var(--uf-toc-indicator-w));
-  top: 0;
+.uf-toc[data-line="end"] > .uf-toc-list::after {
+  inset-inline-end: calc(var(--uf-toc-line-inset) - var(--uf-toc-indicator-w));
 }
-/* Line on right side */
-.uf-toc[data-scope][data-line-side="right"] .uf-toc-list {
-  padding-right: calc(var(--uf-toc-line-inset) + var(--uf-toc-line-gap));
-  border-right: none;
-}
-.uf-toc[data-scope][data-line-side="right"] .uf-toc-list::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: calc(var(--uf-toc-line-inset) - var(--uf-toc-rail-w));
-  width: var(--uf-toc-rail-w);
-  background: var(--uf-color-border);
-}
-.uf-toc[data-scope][data-line-side="right"] .uf-toc-indicator {
-  right: calc(var(--uf-toc-line-inset) - var(--uf-toc-indicator-w));
-  top: 0;
+
+@media (forced-colors: active) {
+  .uf-toc > .uf-toc-list::before,
+  .uf-toc > .uf-toc-list::after {
+    forced-color-adjust: none;
+  }
+  .uf-toc > .uf-toc-list::before {
+    background: GrayText;
+  }
+  .uf-toc > .uf-toc-list::after {
+    background: Highlight;
+  }
+  .uf-toc .uf-toc-link[data-scope][aria-current] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
 }

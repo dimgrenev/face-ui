@@ -487,6 +487,25 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `placement="bottom-left"`, `placement="bottom-right"`, `placement="top-left"`, `placement="top-right"` | `placement="bottom-start"`, `placement="bottom-end"`, `placement="top-start"`, `placement="top-end"` | auto |
 | The newest toast was last in every placement | The newest toast sits nearest the viewport edge: last at the bottom, first at the top | — |
 
+### Toc
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `activeId` | `value` | auto |
+| `defaultActiveId` | `defaultValue` | auto |
+| `onActiveChange` | `onValueChange` | auto |
+| `onValueChange`: `details.id` | `details.value` | manual |
+| `lineSide` | `line` | auto |
+| `lineSide="left"`, `lineSide="right"` | `line="start"`, `line="end"` | auto |
+| `withLine` | `line="none"` hides the rail; `line` defaults to `"start"` | auto |
+| `items[].id` | `items[].value` | manual |
+| `items[].disabled` | Leave out an entry whose section is not in the document | manual |
+| Entries were buttons: a click only reported the id, and the page scrolled if the handler did it; clicking the current entry reported nothing | Entries are links to `#value`: the browser scrolls to the section and updates the hash; `onSelect({ value, event })` fires on every follow, the current entry included, and `event.preventDefault()` there keeps the page still (for a scroll of your own) | — |
+| Without `activeId` or `defaultActiveId` the first entry was current | No entry is current until one is followed or `value`/`defaultValue` names it; a `defaultValue` waits for items that arrive later | — |
+| `level` only indented a flat list of Face UI buttons, `button.uf-toc-item[data-scope="button"]`, with a `.uf-toc-indicator` element | A deeper entry nests in a `<ul>` under the previous shallower one: `nav > ul[data-part="list"] > li.uf-toc-item > a.uf-toc-link[data-part="link"]`; the marker is the top list's `::after` | — |
+| The contract promised ArrowUp/ArrowDown between entries, but only Tab worked; long labels were cut with an ellipsis | Tab and Enter work as for any links and arrow keys scroll the page; long labels wrap | — |
+| The nav was always named "Table of contents" and took no native attributes | Native attributes and `ref` reach the `<nav>`; `aria-label` or `aria-labelledby` replaces the default name | — |
+
 ### Toggle
 
 | Before | After | Codemod |
