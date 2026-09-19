@@ -1,5 +1,5 @@
 /* =================================================================
- * SCROLL (ScrollArea)
+ * SCROLL
  * ================================================================= */
 .uf-scroll[data-scope] {
   position: relative;
@@ -7,11 +7,17 @@
   width: 100%;
   max-width: 100%;
 }
-[data-scope="scroll"] [data-part="viewport"] {
-  width: 100%;
-  height: 100%;
+/* The card is a flex column: the viewport fills a box given a height and shrinks inside one given a max-height. */
+.uf-scroll[data-scope] > [data-part="viewport"] {
+  flex: 1 1 auto;
+  min-height: 0;
   padding: var(--uf-scroll-card-inset);
   box-sizing: border-box;
+}
+/* Content that scrolls sideways is at least as wide as the viewport and as wide as what cannot wrap. */
+.uf-scroll[data-scope]:is([data-orientation="horizontal"], [data-orientation="both"]) > [data-part="viewport"] > [data-part="content"] {
+  width: fit-content;
+  min-width: 100%;
 }
 .uf-scroll__text[data-scope="text"] {
   display: block;
@@ -19,13 +25,12 @@
   max-width: 100%;
   box-sizing: border-box;
   white-space: pre-wrap;
-  text-align: left;
 }
 .uf-scroll__text[data-scope="text"] .uf-text__content {
   display: block;
   white-space: inherit;
 }
-.uf-scroll[data-orientation="horizontal"] .uf-scroll__text[data-scope="text"],
-.uf-scroll[data-orientation="both"] .uf-scroll__text[data-scope="text"] {
-  min-width: calc(var(--uf-control-height) * 12);
+/* Text that can scroll sideways keeps each line whole. */
+.uf-scroll__text--nowrap[data-scope="text"] {
+  white-space: pre;
 }

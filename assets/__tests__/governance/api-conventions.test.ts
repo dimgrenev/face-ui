@@ -372,12 +372,12 @@ const PENDING = {
   'R-names': ['Table'],
   'R-dup': ['Carousel', 'Markdown'],
   'R-label': [],
-  'R-aria': ['Carousel', 'Media', 'Scroll', 'Table'],
+  'R-aria': ['Carousel', 'Media', 'Table'],
   'R-logical': ['Table'],
   'R-bool': [],
   'R-field': [],
   'R-strings': [
-    'Carousel', 'Date', 'Menu', 'Scroll', 'Select',
+    'Carousel', 'Date', 'Menu', 'Select',
   ],
 } satisfies Record<string, readonly string[]>
 
