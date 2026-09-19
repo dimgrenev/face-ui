@@ -34,6 +34,8 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | --- | --- | --- |
 | `icon` | `fallback={<Icon name="…" />}` | manual |
 | `children` | `fallback={content}` | manual |
+| `fallbackDelayMs` | `fallbackDelay` | auto |
+| The root, image and fallback carried `data-state="loading"` while a pending image waited out the delay | Only the root carries `data-state`: `idle` inside the delay, then `loading`, `loaded` or `error` | — |
 
 ### Badge
 

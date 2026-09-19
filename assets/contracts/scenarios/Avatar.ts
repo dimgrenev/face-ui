@@ -7,7 +7,7 @@ export default [
       src: '/assets/media/examples/office-core/lobby-glass-blocks.webp',
       name: 'Maya Chen',
       fallback: 'MC',
-      fallbackDelayMs: 150,
+      fallbackDelay: 150,
     },
   },
   {
@@ -15,7 +15,6 @@ export default [
     props: {
       name: 'Research assistant',
       fallback: 'AI',
-      fallbackDelayMs: 0,
     },
   },
 ] satisfies ProductScenarioPair

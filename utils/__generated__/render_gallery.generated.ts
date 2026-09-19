@@ -55,7 +55,7 @@ export type FeldGalleryEntry = {
 
 export const FELD_GALLERY_ENTRIES: FeldGalleryEntry[] = [
   { name: "Accordion", Component: Accordion, sampleProps: {"items":[{"value":"getting-started","label":"Getting Started","icon":"folder","content":"Install the package, configure the provider, and begin with the default components."},{"value":"usage","label":"Usage Guide","icon":"folder","content":"Composition and controlled-state guidance for production interfaces."},{"value":"api","label":"API Reference","icon":"file","content":"Props, events, keyboard behavior, and accessibility contracts."}],"multiple":true,"collapsible":true,"disabled":false,"icon":"folder","defaultExpanded":["getting-started"]} },
-  { name: "Avatar", Component: Avatar, sampleProps: {"src":"","name":"Userface","fallbackDelayMs":0} },
+  { name: "Avatar", Component: Avatar, sampleProps: {"src":"","name":"Userface"} },
   { name: "Badge", Component: Badge, sampleProps: {"children":"Badge"} },
   { name: "Bar", Component: Bar, sampleProps: {"children":[{"__componentName__":"Text","membrane":false,"children":"Workspace"},{"__componentName__":"Bar.Section","children":[{"__componentName__":"Button","icon":"link","fullWidth":false,"children":"Share"}],"align":"end"}]} },
   { name: "Breadcrumb", Component: Breadcrumb, sampleProps: {"separator":"/","membrane":true,"items":[{"label":"Home","href":"#"},{"label":"Design","href":"#"},{"label":"System","href":"#"},{"label":"Components","href":"#"},{"label":"Navigation","href":"#"},{"label":"Breadcrumb"}],"maxItems":4} },

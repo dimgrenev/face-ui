@@ -54,7 +54,7 @@ test('Avatar preserves Unicode initials during server rendering, hydration, and 
   expect(errors).toEqual([])
 })
 
-test('Avatar src and fallbackDelayMs follow actual requests, including pending replacement and failure', { tag: ['@native'] }, async ({
+test('Avatar src and fallbackDelay follow actual requests, including pending replacement, failure and a cached image', { tag: ['@native'] }, async ({
   page,
 }) => {
   let release: () => void = () => {}
@@ -78,15 +78,17 @@ test('Avatar src and fallbackDelayMs follow actual requests, including pending r
   await render(page, {
     name: 'Ada Lovelace',
     src: '/avatar-pending.svg',
-    fallbackDelayMs: 500,
+    fallbackDelay: 500,
   })
+  await expect(avatar).toHaveAttribute('data-state', 'idle')
   await expect(fallback).toBeHidden()
   await expect(fallback).toBeVisible({ timeout: 2000 })
+  await expect(avatar).toHaveAttribute('data-state', 'loading')
   await expect(avatar).toHaveAccessibleName('Ada Lovelace')
   await render(page, {
     name: 'Grace Hopper',
     src: '/avatar-ready.svg',
-    fallbackDelayMs: 500,
+    fallbackDelay: 500,
   })
   await expect(avatar).toHaveAttribute('data-state', 'loaded')
   await expect(avatar.locator('img')).toBeVisible()
@@ -100,11 +102,16 @@ test('Avatar src and fallbackDelayMs follow actual requests, including pending r
   await render(page, {
     name: 'Grace Hopper',
     src: '/avatar-error.svg',
-    fallbackDelayMs: 10000,
+    fallbackDelay: 10000,
   })
   await expect(fallback).toBeVisible()
   await expect(fallback).toHaveText('GH')
   await expect(avatar.locator('img')).toBeHidden()
+  await expect(avatar).toHaveAttribute('data-state', 'error')
+  await render(page, { name: 'Grace Hopper', src: '/avatar-ready.svg' })
+  await expect(avatar).toHaveAttribute('data-state', 'loaded')
+  await expect(avatar.locator('img')).toBeVisible()
+  await expect(fallback).toBeHidden()
   await render(page, { name: 'Grace Hopper', fallback: '?' })
   await expect(avatar.locator('img')).toHaveCount(0)
   await expect(fallback).toHaveText('?')

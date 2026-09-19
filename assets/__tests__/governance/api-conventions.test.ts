@@ -370,7 +370,7 @@ function stringViolations(component: string): string[] {
 const PENDING = {
   'R-triple': ['Code', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Slider', 'Table', 'Toc', 'Tree'],
   'R-names': [
-    'Avatar', 'Code', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Select', 'Table', 'Toast',
+    'Code', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Select', 'Table', 'Toast',
     'Toc', 'Tree',
   ],
   'R-dup': ['Carousel', 'Code', 'Date', 'Markdown', 'Progress', 'Select', 'Toc'],

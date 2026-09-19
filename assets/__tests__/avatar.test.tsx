@@ -1,9 +1,10 @@
 import React, { act, createRef } from 'react'
 import type { Root } from 'react-dom/client'
+import { renderToString } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Avatar } from '../../Avatar/Avatar'
 import { Icon } from '../../Icon/Icon'
-import { libraryCss, mount } from './harness'
+import { expectDevError, hydrate, libraryCss, mount } from './harness'
 
 let host: HTMLDivElement
 let root: Root
@@ -25,6 +26,7 @@ beforeEach(() => {
 })
 afterEach(() => {
   vi.useRealTimers()
+  vi.restoreAllMocks()
 })
 
 describe('Avatar prop contract', () => {
@@ -46,8 +48,11 @@ describe('Avatar prop contract', () => {
     expect(part('fallback').textContent).toBe(initials)
   })
 
-  it('src follows actual image events and reloads through success, failure, and replacement', async () => {
+  it('src follows the image element and starts over when it changes', async () => {
     await render({ src: '/one.png', name: 'Ada Lovelace' })
+    expect(part('root').dataset.state).toBe('loading')
+    expect(part('image').hidden).toBe(true)
+    expect(part('fallback').hidden).toBe(false)
     const oldImage = part('image')
     await event('load')
     expect(part('image').hidden).toBe(false)
@@ -58,6 +63,7 @@ describe('Avatar prop contract', () => {
     await event('load', oldImage)
     expect(part('root').dataset.state).toBe('loading')
     await event('error')
+    expect(part('root').dataset.state).toBe('error')
     expect(part('fallback').hidden).toBe(false)
     expect(part('image').hidden).toBe(true)
     await render({ src: '/three.png', name: 'Ada Lovelace' })
@@ -76,6 +82,10 @@ describe('Avatar prop contract', () => {
     await render({ name: '李雷' })
     expect(part('fallback').textContent).toBe('李')
     expect(part('root').getAttribute('aria-label')).toBe('李雷')
+    await render({ name: 'Grace Brewster Murray Hopper', src: '/grace.png' })
+    await event('load')
+    expect(part('fallback').textContent).toBe('GH')
+    expect(part('root').getAttribute('aria-label')).toBe('Grace Brewster Murray Hopper')
   })
 
   it('fallback replaces initials with text or rich content and can be removed after mount', async () => {
@@ -91,15 +101,16 @@ describe('Avatar prop contract', () => {
     expect(part('fallback').textContent).toBe('0')
   })
 
-  it('fallbackDelayMs delays only pending images and restarts when the delay or source changes', async () => {
+  it('fallbackDelay holds back the fallback of a pending image only, restarting on a new delay or source', async () => {
     vi.useFakeTimers()
-    await render({ src: '/pending.png', name: 'Ada', fallbackDelayMs: 200 })
+    await render({ src: '/pending.png', name: 'Ada', fallbackDelay: 200 })
+    expect(part('root').dataset.state).toBe('idle')
     expect(part('fallback').hidden).toBe(true)
     await act(async () => {
       vi.advanceTimersByTime(150)
     })
     expect(part('fallback').hidden).toBe(true)
-    await render({ src: '/pending.png', name: 'Ada', fallbackDelayMs: 300 })
+    await render({ src: '/pending.png', name: 'Ada', fallbackDelay: 300 })
     await act(async () => {
       vi.advanceTimersByTime(100)
     })
@@ -108,19 +119,77 @@ describe('Avatar prop contract', () => {
       vi.advanceTimersByTime(200)
     })
     expect(part('fallback').hidden).toBe(false)
-    await render({ src: '/another.png', name: 'Ada', fallbackDelayMs: 300 })
+    expect(part('root').dataset.state).toBe('loading')
+    await render({ src: '/another.png', name: 'Ada', fallbackDelay: 300 })
     expect(part('fallback').hidden).toBe(true)
     await event('error')
     expect(part('fallback').hidden).toBe(false)
-    await render({ name: 'Ada', fallbackDelayMs: 300 })
+    await render({ src: '/fast.png', name: 'Ada', fallbackDelay: 300 })
+    await event('load')
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(part('fallback').hidden).toBe(true)
+    await render({ name: 'Ada', fallbackDelay: 300 })
     expect(part('fallback').hidden).toBe(false)
+    await render({ src: '/pending.png', name: 'Ada', fallbackDelay: 300 })
+    await act(async () => root.render(null))
+    expect(vi.getTimerCount()).toBe(0)
   })
 
-  it.each([-1, Number.NaN, Number.POSITIVE_INFINITY])(
-    'fallbackDelayMs=%s behaves as no delay',
+  it.each([-1, Number.NaN, Number.POSITIVE_INFINITY, '50', null])(
+    'fallbackDelay=%s behaves as no delay and is reported',
     async (delay) => {
-      await render({ src: '/pending.png', name: 'Ada', fallbackDelayMs: delay })
+      await expectDevError(
+        () => render({ src: '/pending.png', name: 'Ada', fallbackDelay: delay as number }),
+        /^Face UI Avatar: invalid fallbackDelay .*; using 0\.$/,
+      )
       expect(part('fallback').hidden).toBe(false)
+    },
+  )
+
+  it('src and name that are not strings read as absent', async () => {
+    await render({ src: null, name: 0 } as never)
+    expect(host.querySelector('img')).toBeNull()
+    expect(part('root').getAttribute('role')).toBeNull()
+    expect(part('fallback').textContent).toBe('')
+  })
+
+  it.each([
+    [{ src: '/ada.png', name: 'Ada Lovelace' }, 'loading', false],
+    [{ name: 'Ada Lovelace' }, 'error', false],
+    [{ src: '/ada.png', name: 'Ada Lovelace', fallbackDelay: 300 }, 'idle', true],
+  ] as const)(
+    'server renders %o with the fallback decided by props alone and hydrates it unchanged',
+    async (props, state, fallbackHidden) => {
+      host = document.body.appendChild(document.createElement('div'))
+      host.innerHTML = renderToString(<Avatar {...props} />)
+      const html = host.innerHTML
+      expect(part('root').dataset.state).toBe(state)
+      expect(part('fallback').hidden).toBe(fallbackHidden)
+      expect(part('fallback').textContent).toBe('AL')
+      expect(host.querySelector('img')?.hidden ?? true).toBe(true)
+      const { recoverableErrors } = await hydrate(<Avatar {...props} />, host)
+      expect(recoverableErrors).toEqual([])
+      expect(host.innerHTML).toBe(html)
+    },
+  )
+
+  it.each([
+    [40, 'loaded'],
+    [0, 'error'],
+  ] as const)(
+    'hydration picks up an image that finished first (naturalWidth %s)',
+    async (width, state) => {
+      host = document.body.appendChild(document.createElement('div'))
+      const ui = <Avatar src="/ada.png" name="Ada Lovelace" fallbackDelay={300} />
+      host.innerHTML = renderToString(ui)
+      vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true)
+      vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(width)
+      await hydrate(ui, host)
+      expect(part('root').dataset.state).toBe(state)
+      expect(part('image').hidden).toBe(state !== 'loaded')
+      expect(part('fallback').hidden).toBe(state === 'loaded')
     },
   )
 

@@ -87,6 +87,19 @@
       "codemod": "manual"
     },
     {
+      "kind": "rename-prop",
+      "component": "Avatar",
+      "from": "fallbackDelayMs",
+      "to": "fallbackDelay",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Avatar",
+      "before": "The root, image and fallback carried `data-state=\"loading\"` while a pending image waited out the delay",
+      "after": "Only the root carries `data-state`: `idle` inside the delay, then `loading`, `loaded` or `error`"
+    },
+    {
       "kind": "remove-prop",
       "component": "Badge",
       "prop": "appearance",

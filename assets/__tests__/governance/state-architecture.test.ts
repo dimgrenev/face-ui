@@ -170,11 +170,11 @@ const PENDING = {
     'Breadcrumb', 'Calendar', 'Date', 'Pagination', 'Rating', 'Slider', 'Steps',
   ],
   'D3 machines': [
-    'Avatar', 'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Select', 'Steps', 'Table',
+    'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Select', 'Steps', 'Table',
     'Toast', 'Toc', 'Tree', 'Upload',
   ],
   'D3 isomorphic layout effect': [
-    'Avatar', 'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
+    'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
     'Overlay', 'Pagination', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps',
     'Switcher', 'Table', 'Toc', 'Tooltip', 'Tree', 'Upload',
   ],

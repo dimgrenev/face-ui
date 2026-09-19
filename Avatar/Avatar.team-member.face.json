@@ -16,8 +16,8 @@
       "fallback": {
         "$ref": "props.fallback"
       },
-      "fallbackDelayMs": {
-        "$ref": "props.fallbackDelayMs"
+      "fallbackDelay": {
+        "$ref": "props.fallbackDelay"
       }
     },
     "children": []
@@ -27,7 +27,7 @@
       "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
       "name": "Maya Chen",
       "fallback": "MC",
-      "fallbackDelayMs": 150
+      "fallbackDelay": 150
     }
   },
   "controls": [
@@ -35,15 +35,13 @@
       "name": "src",
       "type": "string",
       "required": false,
-      "description": "Image source URL.",
-      "defaultValue": ""
+      "description": "Image URL; the fallback stands in while it is missing, pending or broken."
     },
     {
       "name": "name",
       "type": "string",
       "required": false,
-      "description": "Person's full name, used for initials and the accessible name.",
-      "defaultValue": ""
+      "description": "The person's full name: the accessible name, and the initials when `fallback` is absent."
     },
     {
       "name": "fallback",
@@ -52,10 +50,10 @@
       "description": "Text or rich content shown instead of initials while the image is unavailable."
     },
     {
-      "name": "fallbackDelayMs",
+      "name": "fallbackDelay",
       "type": "number",
       "required": false,
-      "description": "Delay for a pending image. Missing/failed images show fallback immediately.",
+      "description": "Milliseconds a pending image waits before the fallback shows; a missing or broken image shows it at once.",
       "defaultValue": 0
     }
   ],
