@@ -234,6 +234,24 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Label, help, error and required marker were `.uf-input__description`, `.uf-input__error`, `.uf-input__required` and `[data-scope="input"][data-part="label"]` | They are the shared Field parts `.uf-field__label`, `.uf-field__description`, `.uf-field__error` and `.uf-field__required` (`[data-scope="field"]`) | — |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the native input or textarea; `className` and `style` still style the outer layout | — |
 
+### Markdown
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `content` | children | auto |
+| `allowRawHtml` | `html` | auto |
+| `safeMode` | Remove it: sanitization is always on, and `html` alone decides whether raw HTML renders (`safeMode={false}` without `allowRawHtml` changed nothing) | auto |
+| `fullWidth` | Remove it: Markdown always fills its container; `fullWidth={false}` narrowed it only inside a membrane | auto |
+| Markdown had the 1px outer spacing box of `membrane` by default | Block content has none by default, like Table and Media; pass `membrane` to keep it | — |
+| Without `allowRawHtml`, a raw HTML block vanished with its text and inline tags were dropped; with it, `safeMode` chose between Markdown tags only and a wider set | Without `html`, raw HTML shows as the text it was typed as; with `html` it renders through one allowlist of text and block tags (details, kbd, sup, div, …), never scripts, styles, forms, frames, ids or classes | — |
+| With `gfm` on, a newline inside a paragraph was always a line break, as in GitHub comments | It is a space, as in Markdown files and CommonMark; pass `breaks` to keep line breaks, with or without `gfm` | — |
+| Markdown parsed with the global `marked` instance, so extensions registered with `marked.use()` (highlighting, footnotes, custom renderers) changed its output | Markdown parses with its own instances; `marked.use()` never changes what it renders | — |
+| A source marked could not parse, such as quotes nested thousands of levels deep, rendered an empty block without a report | It shows as the text it was typed as, and development builds report it | — |
+| `linkTarget` applied to every link not starting with `/` or `#` (a relative `docs/x` opened in a new tab, `//host` in place), and `linkRel` only to links opening in a new tab | `linkTarget` and `linkRel` apply to absolute links: http(s) and protocol-relative URLs, read as browsers read them (surrounding spaces, `\` for `/`). `linkRel` (default `noopener noreferrer`) applies whatever the target; a link that opens in place has no `target` | — |
+| A task checkbox was named "Completed task" or "Incomplete task" | A task checkbox and its text share a `<label>`, so the checkbox is named by its task and announces its own checked state | — |
+| The HTML sat in an inner `[data-part="content"]` element, and the root carried `data-full-width` | The root holds the HTML itself; there is no content part and no `data-full-width` | — |
+| Table cells were always left-aligned, overriding GFM column alignment; lists and quotes were indented from the left and task lists lost their indent | Columns follow their alignment and unaligned cells start at the inline start; lists, quotes and task checkboxes follow the text direction, a task checkbox takes its bullet’s place, and code blocks read left to right | — |
+
 ### Media
 
 | Before | After | Codemod |
@@ -646,3 +664,23 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | The selected item and all its ancestors had the hover background; a controlled selection could not be cleared | Only the selected item is marked (active background, bold); `value={null}` selects nothing | — |
 | A branch showed a down or up chevron at the end of its row | A branch shows an arrow at the start that points to the inline end and turns down when expanded | — |
 | With the selected item inside a collapsed branch, Tab could not enter the tree | Tab enters at the selected item, or at the collapsed item that holds it | — |
+
+### Upload
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `labels`: `idle`, `dragging` and `trigger` keys; `remove` was the visible text of a text button | `drop` (the instruction), `open` (the picker button); the drop area is highlighted while dragging instead of changing its text; `remove` is a template, `"Remove {name}"`, naming an icon button | manual |
+| `maxSize`: `0` meant no limit | Leave it out for no limit; `0` is reported and read as 1 byte | manual |
+| `maxFiles`: `0` meant no limit | Leave it out for no limit; `0` is reported and read as 1 | manual |
+| `onReject`: `details.files` held `{ id, name, size, type, source, reason }` with reasons `type`, `size`, `count` and `multiple` | `details.files` holds `{ file, reason }`, `file` being the browser File, with reasons `invalidType`, `tooLarge` and `tooMany` (a second file without `multiple` included) | manual |
+| `files[].source` | `files[].file` | manual |
+| `files[].status` | `files[].progress` shows a bar while it is set, `files[].error` marks the entry failed; neither means done | manual |
+| `files[].type` | `files[].file.type` | manual |
+| `UploadRejectedFile` | `UploadRejection` (`{ file, reason }`) | manual |
+| `UploadSourceFile` | `UploadFile`, whose `size`, `file`, `progress` and `error` are optional | manual |
+| `progress`, `status` and `error` of an entry were never shown | `progress` shows a bar named by the file (`null`: an unknown amount), `error` a message under the entry that also describes its remove button | — |
+| Rejected files only reached `onReject`; the user saw nothing | The field also shows why, one line per reason, from `labels.invalidType`, `tooLarge` and `tooMany`, until the next pick, drop or removal; a consumer `error` wins | — |
+| Without `multiple`, a drop of several files kept only the first one, even when it was rejected; picking or dropping the same file again listed it twice | Without `multiple`, the first acceptable file replaces the listed one and the rest are `tooMany`; a file already listed (same size, date and name) is not added again | — |
+| Upload took no native attributes and never joined a form: `name`, `required` and the listed files were not submitted | Native attributes and `ref` reach the root `role="group"`; `label`, `description`, `error` and `labelPosition` make it a Field; `name`, `form`, `required`, `disabled` and `autoFocus` work as on native controls, and the listed browser files are submitted | — |
+| Only the borderless drop area took drops and carried `data-dragging`; text and link drags highlighted it too | The whole field takes file drags and carries `data-dragging` (nested enters are counted); the drop area has a dashed border; text and link drags are left to the browser | — |
+| `files` that was not an array crashed the render; entries without an `id` or repeating one rendered with React key warnings | A non-array list renders as empty, and entries without a string `id` or repeating one are dropped, each with a development report | — |
