@@ -183,6 +183,18 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Before | After | Codemod |
 | --- | --- | --- |
 | The `.uf-menu` root was a `<div>` | It is a `<span>`, so a Menu is valid inside a `<p>`; select it by class | — |
+| `trigger` | `openOn` | auto |
+| `surfaceTitle` | `aria-label` | auto |
+| `surfaceBreakpoint` | Remove it; `surface="auto"` becomes a sheet below 900px | auto |
+| `MenuItemDef` from `Menu/Menu` | `MenuItem` from `Menu/Menu` | auto |
+| `MenuSeparatorDef` from `Menu/Menu` | `MenuItemEntry`, which includes `{ type: "separator" }` | manual |
+| `MenuGroupDef` from `Menu/Menu` | `MenuItemEntry`, which includes `{ type: "group", label, items }` | manual |
+| Without children the trigger was an "Options" button, and "Options" titled the sheet | Without children nothing renders; the sheet is titled by `aria-label`, else by text children | — |
+| `surfaceTitle` only titled the sheet; the menu had no accessible name | `aria-label` names the menu and titles the sheet; without it a click menu is named by its trigger | — |
+| `ref` pointed to the `.uf-menu-content` surface, which stayed in the document while closed | `ref` and native attributes go on the `[role="menu"]` list, which exists only while open; `className` and `style` stay on `.uf-menu-content` | — |
+| Items were Face UI Buttons (`.uf-button`, `[data-scope="button"]`) | Items are `[data-scope="menu"][data-part="item"].uf-menu-item` buttons, or links with `href`; the label is `.uf-menu-itemLabel` | — |
+| A context menu opened below its trigger | It opens at the pointer; `side`, `align` and `sideOffset` place click menus only | — |
+| Opening by click kept focus on the trigger; Tab left the menu open; disabling an open menu left it open | A click focuses the menu list and a key opens at the first or last item; Tab closes it from the trigger; `disabled` closes it | — |
 
 ### Modal
 
