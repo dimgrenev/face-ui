@@ -7,120 +7,144 @@
     "value": {
       "type": "any",
       "required": false,
-      "description": "Controlled finite number or nonempty array. Values are snapped and sorted."
+      "description": "Controlled value: a number, or one number per thumb; callbacks answer in the same shape. Shown snapped, clamped and sorted."
     },
     "defaultValue": {
       "type": "any",
       "required": false,
-      "description": "Initial uncontrolled value(s), restored on reset. Defaults to min."
+      "description": "Value on mount, restored by form reset; a number or an array, as for value. Defaults to min."
+    },
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
     },
     "min": {
       "type": "number",
       "required": false,
-      "description": "Finite lower bound and step origin. Defaults to 0.",
+      "description": "Lower end of the scale and origin of the step grid; crossed or non-finite bounds use 0..100. Defaults to 0.",
       "default": 0
     },
     "max": {
       "type": "number",
       "required": false,
-      "description": "Finite upper bound, at least min. Defaults to 100.",
+      "description": "Upper end of the scale; crossed or non-finite bounds use 0..100. Defaults to 100.",
       "default": 100
     },
     "step": {
       "type": "number",
       "required": false,
-      "description": "Positive finite increment. End selects the last step at or below max. Defaults to 1.",
+      "description": "Distance between selectable values; End selects the last step at or below max. Defaults to 1.",
       "default": 1
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable editing and submission, including crop. Defaults to false.",
+      "description": "Blocks editing, crop included, and leaves every control out of FormData.",
       "default": false
     },
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Horizontal follows text direction; vertical increases upward. Defaults to horizontal.",
+      "description": "Horizontal follows the text direction; vertical increases upward. Defaults to horizontal.",
       "options": [
         "horizontal",
         "vertical"
       ],
       "default": "horizontal"
     },
-    "label": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Visible noninteractive name, including rich text."
-    },
     "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Name when there is no visible label, or override for it."
+      "description": "Names the group and its thumbs when there is no visible label."
     },
     "aria-labelledby": {
       "type": "string",
       "required": false,
-      "description": "External naming elements; takes precedence over label and aria-label."
+      "description": "Ids of elements that name the group and its thumbs; they take precedence over label and aria-label."
     },
     "labels": {
       "type": "object",
       "required": false,
-      "description": "Specific or localized names for individual controls."
+      "description": "Complete accessible names for individual thumbs and crop boundaries."
     },
     "showValue": {
       "type": "boolean",
       "required": false,
-      "description": "Display the value inside each primary handle. Defaults to false.",
+      "description": "Shows each primary value inside its thumb.",
       "default": false
     },
     "crop": {
       "type": "boolean",
       "required": false,
-      "description": "Enable two editable crop boundaries independently of value presentation. Defaults to false.",
+      "description": "Adds two crop boundaries on a second rail, edited independently of the value.",
       "default": false
     },
     "cropRange": {
       "type": "object",
       "required": false,
-      "description": "Controlled crop boundaries, sorted and snapped to the same step grid."
+      "description": "Controlled crop boundaries; undefined leaves them uncontrolled."
     },
     "defaultCropRange": {
       "type": "object",
       "required": false,
-      "description": "Initial uncontrolled crop, restored on reset. Defaults to the full range."
+      "description": "Crop boundaries on mount, restored by form reset. Defaults to the whole scale."
     },
     "clampToCrop": {
       "type": "boolean",
       "required": false,
-      "description": "Constrain primary values to the accepted crop. Defaults to true.",
+      "description": "Keeps the shown value inside the crop boundaries. Defaults to true.",
       "default": true
     },
     "name": {
       "type": "string",
       "required": false,
-      "description": "Native form key, repeated for ordered primary values."
+      "description": "FormData key of the value, repeated once per thumb in ascending order."
     },
     "cropName": {
       "type": "string",
       "required": false,
-      "description": "Native form key, repeated for crop start/end when crop is enabled."
+      "description": "FormData key of the crop boundaries, repeated for start and end while crop is on."
     },
     "form": {
       "type": "string",
       "required": false,
-      "description": "External form id for all controls."
+      "description": "Id of the form that submits and resets the controls, when it is not an ancestor."
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Shows the required marker on the label; a range always has a value, so it never blocks submission."
     },
     "autoFocus": {
       "type": "boolean",
       "required": false,
-      "description": "Focus the first primary thumb on mount. Defaults to false.",
+      "description": "Focuses the first thumb on mount.",
       "default": false
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Shared spacing around handles and label. Defaults to true.",
+      "description": "Shared outer spacing around each thumb; toggling it keeps the DOM and focus. Defaults to true.",
       "default": true
     }
   },
@@ -166,8 +190,8 @@
         "defaultValue": 40,
         "crop": true,
         "defaultCropRange": {
-          "min": 20,
-          "max": 80
+          "start": 20,
+          "end": 80
         }
       }
     },

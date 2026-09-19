@@ -13,6 +13,18 @@
       "defaultValue": {
         "$ref": "props.defaultValue"
       },
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "error": {
+        "$ref": "props.error"
+      },
+      "labelPosition": {
+        "$ref": "props.labelPosition"
+      },
       "min": {
         "$ref": "props.min"
       },
@@ -27,9 +39,6 @@
       },
       "orientation": {
         "$ref": "props.orientation"
-      },
-      "label": {
-        "$ref": "props.label"
       },
       "aria-label": {
         "$ref": "props.aria-label"
@@ -64,6 +73,9 @@
       "form": {
         "$ref": "props.form"
       },
+      "required": {
+        "$ref": "props.required"
+      },
       "autoFocus": {
         "$ref": "props.autoFocus"
       },
@@ -91,47 +103,75 @@
       "name": "value",
       "type": "any",
       "required": false,
-      "description": "Controlled finite number or nonempty array. Values are snapped and sorted."
+      "description": "Controlled value: a number, or one number per thumb; callbacks answer in the same shape. Shown snapped, clamped and sorted."
     },
     {
       "name": "defaultValue",
       "type": "any",
       "required": false,
-      "description": "Initial uncontrolled value(s), restored on reset. Defaults to min."
+      "description": "Value on mount, restored by form reset; a number or an array, as for value. Defaults to min."
+    },
+    {
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    {
+      "name": "description",
+      "type": "any",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    {
+      "name": "error",
+      "type": "any",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    {
+      "name": "labelPosition",
+      "type": "select",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
     },
     {
       "name": "min",
       "type": "number",
       "required": false,
-      "description": "Finite lower bound and step origin. Defaults to 0.",
+      "description": "Lower end of the scale and origin of the step grid; crossed or non-finite bounds use 0..100. Defaults to 0.",
       "defaultValue": 0
     },
     {
       "name": "max",
       "type": "number",
       "required": false,
-      "description": "Finite upper bound, at least min. Defaults to 100.",
+      "description": "Upper end of the scale; crossed or non-finite bounds use 0..100. Defaults to 100.",
       "defaultValue": 100
     },
     {
       "name": "step",
       "type": "number",
       "required": false,
-      "description": "Positive finite increment. End selects the last step at or below max. Defaults to 1.",
+      "description": "Distance between selectable values; End selects the last step at or below max. Defaults to 1.",
       "defaultValue": 1
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable editing and submission, including crop. Defaults to false.",
+      "description": "Blocks editing, crop included, and leaves every control out of FormData.",
       "defaultValue": false
     },
     {
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Horizontal follows text direction; vertical increases upward. Defaults to horizontal.",
+      "description": "Horizontal follows the text direction; vertical increases upward. Defaults to horizontal.",
       "options": [
         "horizontal",
         "vertical"
@@ -139,92 +179,92 @@
       "defaultValue": "horizontal"
     },
     {
-      "name": "label",
-      "type": "any",
-      "required": false,
-      "description": "Visible noninteractive name, including rich text."
-    },
-    {
       "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Name when there is no visible label, or override for it."
+      "description": "Names the group and its thumbs when there is no visible label."
     },
     {
       "name": "aria-labelledby",
       "type": "string",
       "required": false,
-      "description": "External naming elements; takes precedence over label and aria-label."
+      "description": "Ids of elements that name the group and its thumbs; they take precedence over label and aria-label."
     },
     {
       "name": "labels",
       "type": "object",
       "required": false,
-      "description": "Specific or localized names for individual controls."
+      "description": "Complete accessible names for individual thumbs and crop boundaries."
     },
     {
       "name": "showValue",
       "type": "boolean",
       "required": false,
-      "description": "Display the value inside each primary handle. Defaults to false.",
+      "description": "Shows each primary value inside its thumb.",
       "defaultValue": false
     },
     {
       "name": "crop",
       "type": "boolean",
       "required": false,
-      "description": "Enable two editable crop boundaries independently of value presentation. Defaults to false.",
+      "description": "Adds two crop boundaries on a second rail, edited independently of the value.",
       "defaultValue": false
     },
     {
       "name": "cropRange",
       "type": "object",
       "required": false,
-      "description": "Controlled crop boundaries, sorted and snapped to the same step grid."
+      "description": "Controlled crop boundaries; undefined leaves them uncontrolled."
     },
     {
       "name": "defaultCropRange",
       "type": "object",
       "required": false,
-      "description": "Initial uncontrolled crop, restored on reset. Defaults to the full range."
+      "description": "Crop boundaries on mount, restored by form reset. Defaults to the whole scale."
     },
     {
       "name": "clampToCrop",
       "type": "boolean",
       "required": false,
-      "description": "Constrain primary values to the accepted crop. Defaults to true.",
+      "description": "Keeps the shown value inside the crop boundaries. Defaults to true.",
       "defaultValue": true
     },
     {
       "name": "name",
       "type": "string",
       "required": false,
-      "description": "Native form key, repeated for ordered primary values."
+      "description": "FormData key of the value, repeated once per thumb in ascending order."
     },
     {
       "name": "cropName",
       "type": "string",
       "required": false,
-      "description": "Native form key, repeated for crop start/end when crop is enabled."
+      "description": "FormData key of the crop boundaries, repeated for start and end while crop is on."
     },
     {
       "name": "form",
       "type": "string",
       "required": false,
-      "description": "External form id for all controls."
+      "description": "Id of the form that submits and resets the controls, when it is not an ancestor."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Shows the required marker on the label; a range always has a value, so it never blocks submission."
     },
     {
       "name": "autoFocus",
       "type": "boolean",
       "required": false,
-      "description": "Focus the first primary thumb on mount. Defaults to false.",
+      "description": "Focuses the first thumb on mount.",
       "defaultValue": false
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Shared spacing around handles and label. Defaults to true.",
+      "description": "Shared outer spacing around each thumb; toggling it keeps the DOM and focus. Defaults to true.",
       "defaultValue": true
     }
   ],

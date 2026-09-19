@@ -57,7 +57,7 @@ for (const orientation of ['horizontal', 'vertical'] as const)
             showValue,
             defaultValue: 40,
             crop: true,
-            defaultCropRange: { min: 60, max: 80 },
+            defaultCropRange: { start: 60, end: 80 },
             clampToCrop: false,
           },
           { width: 240, direction },
@@ -142,7 +142,8 @@ for (const showValue of [false, true])
         await input.focus()
         await page.keyboard.press('ArrowUp')
         await expect(input).toHaveValue('41')
-        await page.keyboard.press(rtl ? 'ArrowLeft' : 'ArrowRight')
+        // Left and Right swap only on a horizontal RTL track.
+        await page.keyboard.press(rtl && !vertical ? 'ArrowLeft' : 'ArrowRight')
         await expect(input).toHaveValue('42')
         await page.keyboard.press('PageUp')
         await expect(input).toHaveValue('52')
@@ -152,13 +153,9 @@ for (const showValue of [false, true])
         await expect(input).toHaveValue('0')
         await click(page, 0.7, vertical, rtl)
         await expect(input).toHaveValue('70')
+        // A number value commits numbers.
         expect(await events(page, 'sliderCommits')).toEqual([
-          [41],
-          [42],
-          [52],
-          [100],
-          [0],
-          [70],
+          41, 42, 52, 100, 0, 70,
         ])
       })
     }
@@ -213,7 +210,7 @@ for (const showValue of [false, true]) {
     await render(page, {
       showValue,
       crop: true,
-      cropRange: { min: 20, max: 80 },
+      cropRange: { start: 20, end: 80 },
       defaultValue: 40,
     })
     await controls(page, 'crop').nth(0).focus()
@@ -223,7 +220,7 @@ for (const showValue of [false, true]) {
     expect(await events(page)).toEqual([])
     expect(await events(page, 'sliderCropCommits')).toEqual([])
     expect(await events(page, 'sliderCropEvents')).toEqual([
-      { min: 80, max: 80 },
+      { start: 80, end: 80 },
     ])
   })
   test(`independent crop playhead and accepted clamp ${showValue}`, { tag: ['@focus', '@native'] }, async ({
@@ -233,7 +230,7 @@ for (const showValue of [false, true]) {
       showValue,
       crop: true,
       clampToCrop: false,
-      defaultCropRange: { min: 20, max: 80 },
+      defaultCropRange: { start: 20, end: 80 },
       defaultValue: 10,
     })
     await controls(page, 'crop').nth(0).focus()
@@ -256,9 +253,27 @@ test('accepted controlled changes commit once; rejected proposals keep the nativ
   await render(page, { value: 40 }, { accept: true })
   await page.keyboard.press('ArrowUp')
   await expect(controls(page)).toHaveValue('41')
-  expect(await events(page, 'sliderCommits')).toEqual([[41]])
+  expect(await events(page, 'sliderCommits')).toEqual([41])
   await render(page, {})
   await expect(controls(page)).toHaveValue('41')
+})
+test('an array value commits arrays; a press that moves nothing commits nothing', { tag: ['@pointer', '@focus'] }, async ({
+  page,
+}) => {
+  await render(page, { defaultValue: [40] })
+  const input = controls(page),
+    box = (await input.boundingBox())!
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  await page.mouse.down()
+  await page.mouse.up()
+  await expect(input).toBeFocused()
+  await expect(input).toHaveValue('40')
+  expect(await events(page)).toEqual([])
+  expect(await events(page, 'sliderCommits')).toEqual([])
+  await page.keyboard.press('Home')
+  await page.keyboard.press('End')
+  expect(await events(page)).toEqual([[0], [100]])
+  expect(await events(page, 'sliderCommits')).toEqual([[0], [100]])
 })
 test('value text and track geometry update in the same layout commit', { tag: ['@layout'] }, async ({
   page,
@@ -288,7 +303,7 @@ test('native form names, crop keys, reset and external ownership', { tag: ['@nat
     {
       defaultValue: [20, 80],
       crop: true,
-      defaultCropRange: { min: 10, max: 90 },
+      defaultCropRange: { start: 10, end: 90 },
     },
     { external: true },
   )
@@ -474,7 +489,7 @@ for (const orientation of ['horizontal', 'vertical'] as const)
           showValue: true,
           clampToCrop: false,
           defaultValue: 10,
-          defaultCropRange: { min: 20, max: 80 },
+          defaultCropRange: { start: 20, end: 80 },
         },
         { direction },
       )
@@ -493,7 +508,7 @@ for (const orientation of ['horizontal', 'vertical'] as const)
       expect(await values(page, 'crop')).toEqual([30, 80])
       expect(await values(page)).toEqual([10])
       expect(await events(page, 'sliderCropCommits')).toEqual([
-        { min: 30, max: 80 },
+        { start: 30, end: 80 },
       ])
     })
   }
@@ -530,12 +545,12 @@ test('new accepted crop bounds constrain an already active value drag', { tag: [
   await render(page, {
     crop: true,
     defaultValue: 40,
-    cropRange: { min: 20, max: 80 },
+    cropRange: { start: 20, end: 80 },
   })
   const p = await point(page, 0.5)
   await page.mouse.move(p.x, p.y)
   await page.mouse.down()
-  await render(page, { crop: true, cropRange: { min: 50, max: 60 } })
+  await render(page, { crop: true, cropRange: { start: 50, end: 60 } })
   const next = await point(page, 0.9)
   await page.mouse.move(next.x, next.y)
   await page.mouse.up()
@@ -584,7 +599,7 @@ test('trusted touch tap edits the same native control', { tag: ['@pointer', '@la
     const p = await point(page, 0.7)
     await page.touchscreen.tap(p.x, p.y)
     await expect(controls(page)).toHaveValue('70')
-    expect(await events(page, 'sliderCommits')).toEqual([[70]])
+    expect(await events(page, 'sliderCommits')).toEqual([70])
   } finally {
     await context.close()
   }
