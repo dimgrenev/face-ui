@@ -1,9 +1,63 @@
 import { act, createRef, Fragment, StrictMode, version, type ReactNode } from 'react'
 import type { Root } from 'react-dom/client'
-import { renderToString } from 'react-dom/server'
 import { beforeEach, expect, it, vi, describe } from 'vitest'
 import { Rating, type RatingProps } from '../../Rating/Rating'
-import { formEntries, hydrate, mount } from './harness'
+import { expectDevError, formEntries, hydrate, mount } from './harness'
+import { describeControlled } from './harness/controlled'
+import { describeField } from './harness/field'
+import { describeRoving, type RovingItem } from './harness/roving'
+
+const radiosOf = (host: HTMLElement) =>
+  Array.from(host.querySelectorAll<HTMLInputElement>('input[type="radio"]'))
+const scoreOf = (host: HTMLElement) =>
+  Number(host.querySelector<HTMLInputElement>('input:checked')?.value ?? 0)
+
+describeControlled<number>({
+  name: 'Rating',
+  prop: 'value',
+  values: [2, 4],
+  render: (props) => <Rating aria-label="Score" name="score" {...props} />,
+  change: (host, to) =>
+    radiosOf(host)
+      .find((input) => Number(input.value) === to)!
+      .click(),
+  read: scoreOf,
+  normalizes: [9, 5],
+  handler: 'onClick',
+  formReset: true,
+})
+
+describeField('Rating', (props) => (
+  <Rating name="field-probe" {...(props as RatingProps)} />
+))
+
+// Rating has no per-star disabled state: the harness's disabled items are not
+// rendered as stars, and stand in the item list as detached placeholders.
+let rovingItems: readonly RovingItem[] = []
+const enabledItems = () => rovingItems.filter((item) => !item.disabled)
+describeRoving({
+  name: 'Rating',
+  orientation: 'both',
+  selects: true,
+  render: ({ items, defaultValue }) => {
+    rovingItems = items
+    const index = enabledItems().findIndex((item) => item.value === defaultValue)
+    return (
+      <Rating
+        aria-label="Score"
+        max={enabledItems().length}
+        defaultValue={index + 1}
+      />
+    )
+  },
+  items: (host) => {
+    const stars = radiosOf(host)
+    return rovingItems.map((item) =>
+      item.disabled ? document.createElement('span') : stars.shift()!,
+    )
+  },
+  activateOnMove: (host) => enabledItems()[scoreOf(host) - 1]?.value ?? null,
+})
 let host: HTMLDivElement, root: Root
 beforeEach(() => {
   ;({ host, root } = mount())
@@ -102,32 +156,49 @@ it('uncontrolled initial value is stable across new defaults', async () => {
   await render({ defaultValue: 4 })
   expect(checked()).toEqual([2])
 })
-it('uncontrolled shrink commits bounded score instead of resurrecting removed values', async () => {
+it('a shrunk scale shows the bounded score and keeps the stored one for when it grows back', async () => {
   const change = vi.fn()
-  await render({ defaultValue: 8, max: 10, onValueChange: change })
-  await render({ max: 3, onValueChange: change })
-  await render({ max: 10, onValueChange: change })
+  await renderNode(
+    <form>
+      <Rating defaultValue={8} max={10} name="score" onValueChange={change} />
+    </form>,
+  )
+  await renderNode(
+    <form>
+      <Rating max={3} name="score" onValueChange={change} />
+    </form>,
+  )
   expect(checked()).toEqual([3])
+  expect(submitted()).toEqual([['score', '3']])
+  await renderNode(
+    <form>
+      <Rating max={10} name="score" onValueChange={change} />
+    </form>,
+  )
+  expect(checked()).toEqual([8])
   expect(change).not.toHaveBeenCalled()
 })
 it('removing a focused half choice recovers focus without a change notification', async () => {
   const change = vi.fn()
   await render({ defaultValue: 2.5, allowHalf: true, onValueChange: change })
-  inputs()[4].focus()
+  await act(async () => inputs()[4].focus())
   await render({ allowHalf: false, onValueChange: change })
   expect(checked()).toEqual([3])
   expect(document.activeElement).toBe(inputs()[2])
   expect(change).not.toHaveBeenCalled()
 })
-it('whole/half conversion does not bring back a discarded half value', async () => {
-  await render({ defaultValue: 2.5, allowHalf: true })
-  await render({ allowHalf: false })
-  await render({ allowHalf: true })
+it('whole steps round a stored half score, and half steps show it again', async () => {
+  const change = vi.fn()
+  await render({ defaultValue: 2.5, allowHalf: true, onValueChange: change })
+  await render({ allowHalf: false, onValueChange: change })
   expect(checked()).toEqual([3])
+  await render({ allowHalf: true, onValueChange: change })
+  expect(checked()).toEqual([2.5])
+  expect(change).not.toHaveBeenCalled()
 })
 it('keyboard wraps and Home/End select real first/last options', async () => {
   await render({ allowHalf: true })
-  inputs()[0].focus()
+  await act(async () => inputs()[0].focus())
   await key('ArrowLeft')
   expect(checked()).toEqual([5])
   await key('ArrowRight')
@@ -142,7 +213,7 @@ it('consumer key cancellation retains the selected choice and focus', async () =
     defaultValue: 2,
     onKeyDown: (event) => event.preventDefault(),
   })
-  inputs()[1].focus()
+  await act(async () => inputs()[1].focus())
   await key('ArrowRight')
   expect(checked()).toEqual([2])
   expect(document.activeElement).toBe(inputs()[1])
@@ -173,7 +244,7 @@ for (const label of [
     const node = host.querySelector('[role="radiogroup"]')!
     expect(node.getAttribute('aria-label')).toBe('Review')
     expect(node.hasAttribute('aria-labelledby')).toBe(false)
-    expect(host.querySelector('[data-part="label"]')).toBeNull()
+    expect(host.querySelector('[data-scope="field"][data-part="label"]')).toBeNull()
   })
 it('visible/rich/zero labels get stable unique names, native overrides take precedence', async () => {
   await renderNode(
@@ -210,6 +281,7 @@ it('root identity, style, description, direction and ref forward without detach 
     'aria-describedby': 'help',
     className: 'custom',
     style: { width: 200 },
+    value: 2,
   } as RatingProps)
   const node = ref.mock.calls[0][0] as HTMLDivElement
   await render({
@@ -244,7 +316,7 @@ it('membrane toggling retains root, inputs, focus and current selection', async 
   await renderNode(<Rating ref={ref} defaultValue={2} />)
   const node = ref.current,
     control = inputs()[1]
-  control.focus()
+  await act(async () => control.focus())
   await renderNode(<Rating ref={ref} membrane={false} />)
   expect(ref.current).toBe(node)
   expect(inputs()[1]).toBe(control)
@@ -255,9 +327,13 @@ it('membrane toggling retains root, inputs, focus and current selection', async 
 it('autofocus runs on mount, never steals focus on later mode changes', async () => {
   await render({ defaultValue: 2, autoFocus: true })
   expect(document.activeElement).toBe(inputs()[1])
+  // The layer contract's autofocus marker sits on the focus target only (K27).
+  expect(
+    inputs().filter((input) => input.hasAttribute('data-autofocus')),
+  ).toEqual([inputs()[1]])
   const elsewhere = document.createElement('button')
   document.body.append(elsewhere)
-  elsewhere.focus()
+  await act(async () => elsewhere.focus())
   await render({ autoFocus: true, allowHalf: true })
   expect(document.activeElement).toBe(elsewhere)
   elsewhere.remove()
@@ -288,6 +364,7 @@ it('formatter localizes every option and the readonly score', async () => {
   expect(inputs()[0].getAttribute('aria-label')).toBe('0.5 из 5')
   expect(inputs()[9].getAttribute('aria-label')).toBe('5 из 5')
   formatValue.mockClear()
+  await renderNode(null)
   await render({ value: 4.2, readOnly: true, formatValue })
   expect(
     host.querySelector('[role="meter"]')?.getAttribute('aria-valuetext'),
@@ -438,28 +515,107 @@ it('external form association supports validation, submission and reset', async 
   await reset()
   expect(submitted()).toEqual([['score', '2']])
 })
-for (const props of [
-  { max: 0 },
-  { max: 1.5 },
-  { max: 11 },
-  { max: Infinity },
-  { max: NaN },
-  { max: 1e9 },
-  { value: NaN },
-  { value: Infinity },
-  { value: '3' },
-  { defaultValue: NaN },
-  { required: true },
-  { required: true, name: '' },
-  { formatValue: 'bad' },
-  { formatValue: () => '' },
-  { formatValue: () => null },
-])
-  it(`rejects invalid contract ${JSON.stringify(props)}`, () => {
-    expect(() =>
-      renderToString(<Rating {...(props as unknown as RatingProps)} />),
-    ).toThrow()
+for (const [max, stars, report] of [
+  [0, 1, /invalid max 0; using 1\./],
+  [1.5, 1, /invalid max 1\.5; using 1\./],
+  [11, 10, /invalid max 11; using 10\./],
+  [1e9, 10, /invalid max 1000000000; using 10\./],
+  [Infinity, 5, /invalid max Infinity; using 5\./],
+  [NaN, 5, /invalid max NaN; using 5\./],
+] as const)
+  it(`max ${max} renders ${stars} stars and reports`, async () => {
+    await expectDevError(() => render({ max }), report)
+    expect(inputs()).toHaveLength(stars)
   })
+for (const [props, report] of [
+  [{ value: NaN }, /^Face UI Rating: invalid value NaN; using 0\.$/],
+  [{ value: Infinity }, /^Face UI Rating: invalid value Infinity; using 0\.$/],
+  [{ value: '3' }, /^Face UI Rating: invalid value "3"; using 0\.$/],
+  [{ defaultValue: NaN }, /^Face UI Rating: invalid defaultValue NaN; using 0\.$/],
+] as const)
+  it(`unusable score ${JSON.stringify(props)} renders unrated and reports`, async () => {
+    const change = vi.fn()
+    await expectDevError(
+      () =>
+        render({ ...(props as unknown as RatingProps), onValueChange: change }),
+      report,
+    )
+    expect(checked()).toEqual([])
+    expect(change).not.toHaveBeenCalled()
+  })
+for (const [name, report] of [
+  [undefined, /^Face UI Rating: missing name; ignoring required\.$/],
+  ['', /^Face UI Rating: invalid name ""; ignoring required\.$/],
+  ['  ', /^Face UI Rating: invalid name "  "; ignoring required\.$/],
+] as const)
+  it(`required without a name (${JSON.stringify(name)}) is ignored and reported`, async () => {
+    await expectDevError(
+      () =>
+        renderNode(
+          <form>
+            <Rating {...({ required: true, name } as unknown as RatingProps)} />
+          </form>,
+        ),
+      report,
+    )
+    expect(inputs().some((input) => input.required)).toBe(false)
+    expect(
+      host.querySelector('[role="radiogroup"]')!.hasAttribute('aria-required'),
+    ).toBe(false)
+    expect(host.querySelector('[data-part="required"]')).toBeNull()
+    expect(form().checkValidity()).toBe(true)
+  })
+it('formatValue text that is blank falls back silently; non-text falls back with a report', async () => {
+  await render({ formatValue: () => '  ' })
+  expect(inputs()[1].getAttribute('aria-label')).toBe('2 stars')
+  await renderNode(null)
+  await expectDevError(
+    () =>
+      render({ formatValue: (() => null) as unknown as () => string, value: 1 }),
+    /^Face UI Rating: invalid formatValue null; ignoring it\.$/,
+  )
+  expect(inputs().map((input) => input.getAttribute('aria-label'))).toEqual([
+    '1 star',
+    '2 stars',
+    '3 stars',
+    '4 stars',
+    '5 stars',
+  ])
+  await render({ readOnly: true, value: 0 })
+  expect(
+    host.querySelector('[role="meter"]')?.getAttribute('aria-valuetext'),
+  ).toBe('Not rated')
+})
+it('readOnly required is neither marked nor validated', async () => {
+  await renderNode(
+    <form>
+      <Rating readOnly name="score" required label="Score" value={0} />
+    </form>,
+  )
+  const meter = host.querySelector('[role="meter"]')!
+  expect(meter.hasAttribute('aria-required')).toBe(false)
+  expect(meter.hasAttribute('aria-invalid')).toBe(false)
+  expect(host.querySelector('[data-part="required"]')).toBeNull()
+  expect(form().checkValidity()).toBe(true)
+})
+it('a read-only meter is named and described by the field, never marked invalid', async () => {
+  await render({
+    readOnly: true,
+    value: 4.2,
+    id: 'avg',
+    label: 'Average',
+    description: 'From 120 reviews',
+    error: 'Stale',
+    'aria-label': undefined,
+  })
+  const meter = host.querySelector('[role="meter"]')!
+  expect(meter.getAttribute('aria-labelledby')).toBe('avg-label')
+  expect(meter.getAttribute('aria-describedby')).toBe(
+    'avg-description avg-error',
+  )
+  expect(meter.hasAttribute('aria-invalid')).toBe(false)
+  expect(meter.hasAttribute('data-invalid')).toBe(true)
+})
 it('SSR hydration retains native form state and stable label ids', async () => {
   await act(async () => root.unmount())
   const node = (
@@ -481,13 +637,16 @@ it('releasing control continues from the last accepted bounded score', async () 
   const change = vi.fn()
   await render({ defaultValue: 1, value: 4, onValueChange: change })
   await click(2)
-  await render({ onValueChange: change })
+  await expectDevError(
+    () => render({ onValueChange: change }),
+    /^Face UI Rating: missing value; keeping the last controlled value\.$/,
+  )
   expect(checked()).toEqual([4])
   await click(3)
   expect(checked()).toEqual([3])
   expect(change.mock.calls).toEqual([[{ value: 2 }], [{ value: 3 }]])
 })
-it('editable/readOnly transitions preserve accepted state with their documented precision', async () => {
+it('editable/readOnly transitions keep the stored score and show it at each precision', async () => {
   const change = vi.fn()
   await render({ defaultValue: 4.2, readOnly: true, onValueChange: change })
   expect(
@@ -498,7 +657,7 @@ it('editable/readOnly transitions preserve accepted state with their documented 
   await render({ readOnly: true, onValueChange: change })
   expect(
     host.querySelector('[role="meter"]')?.getAttribute('aria-valuenow'),
-  ).toBe('4')
+  ).toBe('4.2')
   expect(change).not.toHaveBeenCalled()
 })
 

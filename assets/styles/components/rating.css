@@ -1,16 +1,9 @@
 /* =================================================================
- * RATING
+ * RATING — a field (field.css lays out the root); the list holds the stars.
  * ================================================================= */
-.uf-rating[data-scope="rating"] {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  max-width: 100%;
-  gap: var(--uf-membrane);
-}
-.uf-rating__label[data-scope="rating"] {
-  overflow-wrap: anywhere;
-  min-width: 0;
+/* Without membranes the first star has no outer spacing for the start label to center on. */
+.uf-rating.uf-field[data-label-position="start"]:has(> .uf-rating__list [data-membrane-disabled]) > .uf-field__label {
+  padding-block: calc((var(--uf-control-height) - var(--uf-text-label-line-height)) / 2);
 }
 .uf-rating__list[data-scope="rating"] {
   display: flex;

@@ -140,7 +140,7 @@ async function scenarioReports(name: string): Promise<string[]> {
 const PENDING = {
   'hostile props': [
     'Avatar', 'Breadcrumb', 'Calendar', 'Code', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel',
-    'Rating', 'Slider', 'Steps', 'Table', 'Toc', 'Tree', 'Upload',
+    'Slider', 'Steps', 'Table', 'Toc', 'Tree', 'Upload',
   ],
   'scenario reports': [],
 } satisfies Record<string, readonly string[]>

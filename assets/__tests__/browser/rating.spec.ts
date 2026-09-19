@@ -293,7 +293,7 @@ test('readOnly retains exact average and native form value without editing, dimm
       .evaluate((form: HTMLFormElement) => form.checkValidity()),
   ).toBe(true)
 })
-test('shrinking max recovers removed focus and does not resurrect the old score', { tag: ['@focus'] }, async ({
+test('shrinking max recovers removed focus; the stored score returns with the stars', { tag: ['@focus'] }, async ({
   page,
 }) => {
   await render(page, { max: 10, defaultValue: 8 }, { fresh: true })
@@ -301,8 +301,9 @@ test('shrinking max recovers removed focus and does not resurrect the old score'
   await render(page, { max: 3 })
   await expect(radio(page, 3)).toBeFocused()
   await expect(radio(page, 3)).toBeChecked()
+  expect(await data(page)).toEqual([['score', '3']])
   await render(page, { max: 10 })
-  await expect(radio(page, 3)).toBeChecked()
+  await expect(radio(page, 8)).toBeChecked()
   expect(await changes(page)).toEqual([])
 })
 test('removing a half choice preserves whole controls and recovers removed focus', { tag: ['@focus'] }, async ({
@@ -413,3 +414,83 @@ test('editable and readonly variants pass accessible-name/role checks', { tag: [
     expect(violations).toEqual([])
   }
 })
+
+test('with a shared name the browser never moves the selection by itself', { tag: ['@native', '@focus'] }, async ({
+  page,
+}) => {
+  const checked = page.locator('.uf-rating input:checked')
+  // A parent that refuses every change: arrows move focus, the selection stays.
+  await render(page, { value: 1 }, { fresh: true })
+  await radio(page, 1).focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(radio(page, 2)).toBeFocused()
+  await page.keyboard.press('ArrowDown')
+  await expect(radio(page, 3)).toBeFocused()
+  await page.keyboard.press('Space')
+  await expect(checked).toHaveCount(1)
+  await expect(radio(page, 1)).toBeChecked()
+  expect(await data(page)).toEqual([['score', '1']])
+  expect(await changes(page)).toEqual([2, 3, 3])
+  // A canceled click cancels the keyboard choice as it cancels the pointer one.
+  await render(page, { defaultValue: 1 }, { fresh: true, cancelCapture: true })
+  await radio(page, 1).focus()
+  await page.keyboard.press('ArrowUp')
+  await expect(radio(page, 5)).toBeFocused()
+  await radio(page, 2).locator('..').click()
+  await expect(radio(page, 1)).toBeChecked()
+  expect(await data(page)).toEqual([['score', '1']])
+  // Accepted: exactly one step per arrow, never a second native one.
+  await render(page, { defaultValue: 1 }, { fresh: true })
+  await radio(page, 1).focus()
+  await page.keyboard.press('ArrowDown')
+  await expect(radio(page, 2)).toBeChecked()
+  await page.keyboard.press('ArrowLeft')
+  await expect(radio(page, 1)).toBeChecked()
+  expect(await data(page)).toEqual([['score', '1']])
+  expect(await changes(page)).toEqual([2, 3, 3, 2, 1])
+})
+for (const direction of ['ltr', 'rtl'])
+  test(`${direction} field label, description and error name and describe the group`, { tag: ['@layout', '@a11y'] }, async ({
+    page,
+  }) => {
+    await render(
+      page,
+      {
+        required: true,
+        label: 'Quality',
+        description: 'Shared with the author',
+        error: 'Choose a score',
+        labelPosition: 'start',
+      },
+      { fresh: true, direction },
+    )
+    const group = page.getByRole('radiogroup', { name: 'Quality', exact: true })
+    await expect(group).toHaveAccessibleDescription(
+      'Shared with the author Choose a score',
+    )
+    await expect(group).toHaveAttribute('aria-invalid', 'true')
+    for (const choice of await radios(page).all())
+      await expect(choice).toHaveAccessibleDescription(
+        'Shared with the author Choose a score',
+      )
+    const label = (await group
+      .locator('[data-scope="field"][data-part="label"]')
+      .boundingBox())!
+    const list = (await page.locator('.uf-rating__list').boundingBox())!
+    // Beside the stars at their inline start, centered on the first star's line.
+    if (direction === 'ltr')
+      expect(label.x + label.width).toBeLessThanOrEqual(list.x + 1)
+    else expect(list.x + list.width).toBeLessThanOrEqual(label.x + 1)
+    const first = (await radio(page, 1).locator('..').boundingBox())!
+    expect(
+      Math.abs(label.y + label.height / 2 - (first.y + first.height / 2)),
+    ).toBeLessThanOrEqual(2)
+    await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') })
+    const violations = await page.evaluate(async () => {
+      const result = await (window as any).axe.run(
+        document.querySelector('[data-scope="rating"][data-part="root"]'),
+      )
+      return result.violations.map((v: any) => v.id)
+    })
+    expect(violations).toEqual([])
+  })
