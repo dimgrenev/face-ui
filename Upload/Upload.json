@@ -2,115 +2,176 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Upload",
-  "description": "File upload with drag-and-drop support",
+  "description": "A field that collects files picked from the system or dropped onto it, and lists them.",
   "props": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
+    },
+    "files": {
+      "type": "array",
+      "required": false,
+      "description": "Controlled list; an entry without a string `id`, or repeating an earlier one, is dropped."
+    },
+    "defaultFiles": {
+      "type": "array",
+      "required": false,
+      "description": "List on mount when `files` is not set, restored by form reset; read once."
+    },
     "accept": {
       "type": "string",
       "required": false,
-      "description": "Accepted file types (e.g. \"image/*\", \".pdf,.doc\").",
-      "default": ""
+      "description": "File types the picker offers and a drop accepts, as the native accept: `image/*`, `.pdf`, `text/csv`."
     },
     "multiple": {
       "type": "boolean",
       "required": false,
-      "description": "Allow multiple file selection.",
+      "description": "Lets the list hold several files; without it a new file replaces the listed one.",
       "default": false
     },
     "maxSize": {
       "type": "number",
       "required": false,
-      "description": "Maximum file size in bytes. 0 = unlimited.",
-      "default": 0
+      "description": "Largest accepted file in bytes; omitted means no limit."
     },
     "maxFiles": {
       "type": "number",
       "required": false,
-      "description": "Maximum number of files. 0 = unlimited.",
-      "default": 0
+      "description": "Most files the list holds with `multiple`; omitted means no limit."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Stops picking, dropping and removing, and leaves the files out of form submission.",
       "default": false
     },
-    "files": {
-      "type": "array",
+    "name": {
+      "type": "string",
       "required": false,
-      "description": "Controlled file list."
+      "description": "FormData key under which the listed browser files are submitted."
     },
-    "defaultFiles": {
-      "type": "array",
+    "form": {
+      "type": "string",
       "required": false,
-      "description": "Initial file list for uncontrolled usage.",
-      "default": []
+      "description": "Id of the form that submits and resets the files, when it is not an ancestor."
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Blocks form submission while the list is empty and marks the label.",
+      "default": false
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Focuses the button that opens the file picker on mount.",
+      "default": false
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Names the group when there is no visible `label`."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "Ids of the elements that name the group; they win over `label` and `aria-label`."
     },
     "labels": {
       "type": "object",
       "required": false,
-      "description": "Localized interface labels."
+      "description": "Strings Upload renders itself: the drop instruction, the button names and the rejection messages."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "accept": "",
-        "multiple": false,
-        "maxSize": 0,
-        "maxFiles": 0,
-        "disabled": false
+        "label": "Attachments"
       }
     },
     {
       "name": "Images Only",
       "props": {
-        "accept": "image/*"
-      }
-    },
-    {
-      "name": "Multiple",
-      "props": {
+        "label": "Images",
+        "accept": "image/*",
         "multiple": true
       }
     },
     {
       "name": "Limited",
       "props": {
+        "label": "Documents",
+        "description": "Up to 3 files, 5 MB each.",
         "multiple": true,
         "maxFiles": 3,
         "maxSize": 5242880
       }
     },
     {
+      "name": "Required",
+      "props": {
+        "label": "Signed contract",
+        "required": true,
+        "name": "contract"
+      }
+    },
+    {
       "name": "Disabled",
       "props": {
+        "label": "Attachments",
         "disabled": true
       }
     }
   ],
-  "behavior": {},
+  "behavior": {
+    "dropTarget": "The whole field takes file drags; other drags are left to the browser."
+  },
   "keyboard": {
     "Enter": {
-      "action": "openFilePicker"
+      "action": "openFilePicker",
+      "condition": "on the choose button"
     },
     "Space": {
-      "action": "openFilePicker"
+      "action": "openFilePicker",
+      "condition": "on the choose button"
     }
   },
   "aria": {
-    "role": "button",
-    "required": [
-      "aria-label"
+    "role": "group",
+    "notes": [
+      "Name the group with label, aria-label or aria-labelledby; description and error describe the group and the choose button.",
+      "The native file input is hidden from assistive tech and the tab order; remove buttons are named by labels.remove with the file name, and an entry's error describes its remove button.",
+      "An entry's progress bar is named by the file name."
     ]
   },
   "composition": {
     "required": [
       "root",
-      "dropzone"
+      "dropzone",
+      "trigger"
     ],
     "recommended": [
-      "label",
       "fileList"
     ],
     "parts": {
@@ -121,42 +182,74 @@
         "slot": "dropzone",
         "parent": "root"
       },
-      "label": {
-        "slot": "label",
+      "hint": {
+        "slot": "hint",
+        "parent": "dropzone"
+      },
+      "trigger": {
+        "slot": "trigger",
         "parent": "dropzone"
       },
       "fileList": {
         "slot": "fileList",
         "parent": "root"
+      },
+      "fileItem": {
+        "slot": "fileItem",
+        "parent": "fileList",
+        "multiple": true
+      },
+      "fileName": {
+        "slot": "fileName",
+        "parent": "fileItem"
+      },
+      "fileSize": {
+        "slot": "fileSize",
+        "parent": "fileItem"
+      },
+      "fileRemove": {
+        "slot": "fileRemove",
+        "parent": "fileItem"
+      },
+      "fileError": {
+        "slot": "fileError",
+        "parent": "fileItem"
       }
     }
   },
   "tokenMapping": {
     "component": [],
     "semanticFallbacks": [
-      "--uf-radius",
+      "--uf-border-width-thin",
+      "--uf-border-style-dashed",
+      "--uf-color-border",
       "--uf-radius-md",
-      "--uf-color-fg-muted",
-      "--uf-color-hover-bg"
+      "--uf-spacing-2",
+      "--uf-color-fg",
+      "--uf-color-hover-bg",
+      "--uf-color-destructive",
+      "--uf-control-pad-text",
+      "--uf-font-size-xs"
     ],
     "notes": [
-      "Upload labels, hints, file names and file sizes render through Text; file picker and remove actions render through Button.",
-      "accept, maxSize, maxFiles and file metadata are validation/product data and intentionally outside visual token ownership."
+      "Label, description and error come from the shared Field; the hint, file names and sizes render through Text, the picker and remove actions through Button, progress through Progress.",
+      "accept, maxSize, maxFiles and file metadata are validation and product data, outside visual token ownership."
     ]
   },
   "platform": {},
   "usage": {
     "whenToUse": [
-      "File upload with drag-and-drop",
-      "Image upload with preview",
-      "Document attachment"
+      "Attaching documents to a form",
+      "Importing a data file",
+      "Collecting product or profile images with upload progress"
     ],
     "whenNotToUse": [
-      "Text input (use Input)",
-      "URL input (use Input)"
+      "Text or URL input (use Input)",
+      "Choosing among stored files (use Select or a list)"
     ],
     "alternatives": [
-      "Input"
+      "Input",
+      "Select"
     ],
     "context": "both"
   }

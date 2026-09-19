@@ -586,3 +586,23 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | The selected item and all its ancestors had the hover background; a controlled selection could not be cleared | Only the selected item is marked (active background, bold); `value={null}` selects nothing | — |
 | A branch showed a down or up chevron at the end of its row | A branch shows an arrow at the start that points to the inline end and turns down when expanded | — |
 | With the selected item inside a collapsed branch, Tab could not enter the tree | Tab enters at the selected item, or at the collapsed item that holds it | — |
+
+### Upload
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `labels`: `idle`, `dragging` and `trigger` keys; `remove` was the visible text of a text button | `drop` (the instruction), `open` (the picker button); the drop area is highlighted while dragging instead of changing its text; `remove` is a template, `"Remove {name}"`, naming an icon button | manual |
+| `maxSize`: `0` meant no limit | Leave it out for no limit; `0` is reported and read as 1 byte | manual |
+| `maxFiles`: `0` meant no limit | Leave it out for no limit; `0` is reported and read as 1 | manual |
+| `onReject`: `details.files` held `{ id, name, size, type, source, reason }` with reasons `type`, `size`, `count` and `multiple` | `details.files` holds `{ file, reason }`, `file` being the browser File, with reasons `invalidType`, `tooLarge` and `tooMany` (a second file without `multiple` included) | manual |
+| `files[].source` | `files[].file` | manual |
+| `files[].status` | `files[].progress` shows a bar while it is set, `files[].error` marks the entry failed; neither means done | manual |
+| `files[].type` | `files[].file.type` | manual |
+| `UploadRejectedFile` | `UploadRejection` (`{ file, reason }`) | manual |
+| `UploadSourceFile` | `UploadFile`, whose `size`, `file`, `progress` and `error` are optional | manual |
+| `progress`, `status` and `error` of an entry were never shown | `progress` shows a bar named by the file (`null`: an unknown amount), `error` a message under the entry that also describes its remove button | — |
+| Rejected files only reached `onReject`; the user saw nothing | The field also shows why, one line per reason, from `labels.invalidType`, `tooLarge` and `tooMany`, until the next pick, drop or removal; a consumer `error` wins | — |
+| Without `multiple`, a drop of several files kept only the first one, even when it was rejected; picking or dropping the same file again listed it twice | Without `multiple`, the first acceptable file replaces the listed one and the rest are `tooMany`; a file already listed (same size, date and name) is not added again | — |
+| Upload took no native attributes and never joined a form: `name`, `required` and the listed files were not submitted | Native attributes and `ref` reach the root `role="group"`; `label`, `description`, `error` and `labelPosition` make it a Field; `name`, `form`, `required`, `disabled` and `autoFocus` work as on native controls, and the listed browser files are submitted | — |
+| Only the borderless drop area took drops and carried `data-dragging`; text and link drags highlighted it too | The whole field takes file drags and carries `data-dragging` (nested enters are counted); the drop area has a dashed border; text and link drags are left to the browser | — |
+| `files` that was not an array crashed the render; entries without an `id` or repeating one rendered with React key warnings | A non-array list renders as empty, and entries without a string `id` or repeating one are dropped, each with a development report | — |

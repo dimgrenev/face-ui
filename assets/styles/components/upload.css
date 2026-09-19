@@ -1,26 +1,57 @@
 /* =================================================================
- * UPLOAD
+ * UPLOAD — the whole field takes drops; the dashed box shows where.
  * ================================================================= */
-.uf-upload[data-scope] [data-part="dropzone"] {
+.uf-upload [data-scope="upload"][data-part="dropzone"] {
+  /* Anchors the covering file input, so validation bubbles point at the box. */
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0;
+  border: var(--uf-border-width-thin) var(--uf-border-style-dashed) var(--uf-color-border);
   border-radius: var(--uf-radius-md);
-  padding: var(--uf-spacing-3) var(--uf-spacing-3);
-  text-align: left;
-  cursor: default;
+  padding: var(--uf-spacing-2);
   color: var(--uf-color-fg);
-  background: var(--uf-color-black-0);
-  border: none;
 }
-.uf-upload[data-scope] [data-part="dropzone"][data-dragging] {
+.uf-upload[data-dragging] [data-scope="upload"][data-part="dropzone"] {
+  border-color: var(--uf-color-fg);
   background: var(--uf-color-hover-bg);
 }
-.uf-upload-dropHint {
-  color: var(--uf-color-fg-muted);
+.uf-upload[data-invalid] [data-scope="upload"][data-part="dropzone"] {
+  border-color: var(--uf-color-destructive);
 }
-.uf-upload-trigger[data-scope="button"] {
-  width: auto;
-  color: var(--uf-color-fg);
+/* Each rejection message is a line of its own. */
+.uf-upload > .uf-field__error {
+  white-space: pre-line;
+}
+.uf-upload [data-scope="upload"][data-part="fileList"] {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Name, size and remove on one line; progress and error below, full width. */
+.uf-upload [data-scope="upload"][data-part="fileItem"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+}
+.uf-upload [data-scope="upload"][data-part="fileItem"]:not(:has([data-scope="upload"][data-part="fileSize"])) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.uf-upload [data-scope="upload"][data-part="fileItem"] > * {
+  min-inline-size: 0;
+}
+.uf-upload [data-scope="upload"][data-part="fileName"] {
+  overflow-wrap: anywhere;
+}
+.uf-upload [data-scope="upload"][data-part="fileItem"] [data-scope="progress"][data-part="root"],
+.uf-upload [data-scope="upload"][data-part="fileError"] {
+  grid-column: 1 / -1;
+  padding-inline: var(--uf-control-pad-text);
+}
+.uf-upload [data-scope="upload"][data-part="fileError"] {
+  color: var(--uf-color-destructive);
+  font-size: var(--uf-font-size-xs);
+  overflow-wrap: anywhere;
 }
