@@ -368,12 +368,12 @@ function stringViolations(component: string): string[] {
 
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
-  'R-triple': ['Table'],
-  'R-names': ['Table'],
+  'R-triple': [],
+  'R-names': [],
   'R-dup': [],
   'R-label': [],
-  'R-aria': ['Table'],
-  'R-logical': ['Table'],
+  'R-aria': [],
+  'R-logical': [],
   'R-bool': [],
   'R-field': [],
   'R-strings': [],

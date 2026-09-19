@@ -167,9 +167,7 @@ const oneImplementation = (component: string) =>
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
   'D2 throw': [],
-  'D3 machines': [
-    'Table',
-  ],
+  'D3 machines': [],
   'D3 isomorphic layout effect': [],
   'D3 direction': [],
   'D3 isConnected': [],
