@@ -1,104 +1,80 @@
-/**
- * Avatar — user identity display.
- *
- * Shows an image with fallback to initials or custom fallback content.
- * Manages image loading state via the avatar machine.
- *
- * `<Avatar src="/photo.jpg" name="John Doe" />`
- * `<Avatar name="JD" fallback={<Icon />} />`
- */
-
-import {
-  forwardRef,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  type HTMLAttributes,
-  type ReactNode,
-} from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { avatarMachine, connectAvatar } from '../assets/machines/avatar.machine'
+/** Avatar — a person's image, with initials or custom content until it loads. */
+import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { splitGraphemes } from 'unicode-segmenter/grapheme'
+import { useImageStatus } from '../assets/adapters/react/use-image-status'
+import { readNumber } from '../assets/runtime/props'
 import { cn } from '../assets/utils'
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 
 export interface AvatarProps
   extends Omit<
     HTMLAttributes<HTMLSpanElement>,
     'children' | 'dangerouslySetInnerHTML' | 'defaultChecked' | 'defaultValue'
   > {
-  /** Image source URL. */
+  /** Image URL; the fallback stands in while it is missing, pending or broken. */
   src?: string
-  /** Person's full name, used for initials and the accessible name. */
+  /** The person's full name: the accessible name, and the initials when `fallback` is absent. */
   name?: string
   /** Text or rich content shown instead of initials while the image is unavailable. */
   fallback?: ReactNode
-  /** Delay for a pending image. Missing/failed images show fallback immediately. */
-  fallbackDelayMs?: number
+  /** Milliseconds a pending image waits before the fallback shows; a missing or broken image shows it at once. */
+  fallbackDelay?: number
 }
 
-const useIsomorphicLayoutEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
+/** The longest delay a timer can wait. */
+const MAX_DELAY = 2_147_483_647
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+/** A string prop's trimmed text; any other value reads as absent. */
+const textOf = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
 
-export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
-  function Avatar(props, ref) {
-    const {
-      src = '',
-      name = '',
-      fallback,
-      fallbackDelayMs = 0,
-      className,
-      ...rest
-    } = props
-    const imageSource = src.trim()
-    const accessibleName = name.trim().replace(/\s+/g, ' ')
-    const delay = Number.isFinite(fallbackDelayMs)
-      ? Math.max(0, fallbackDelayMs)
-      : 0
-    const previous = useRef({ src: imageSource, delay })
+/** First grapheme of the first and last words, upper-cased by the same rules on server and client, independent of ICU. */
+function initials(name: string) {
+  const words = name.split(' ')
+  return (words.length > 2 ? [words[0]!, words[words.length - 1]!] : words)
+    .map((word) => splitGraphemes(word).next().value ?? '')
+    .join('')
+    .toUpperCase()
+}
 
-    const { state, send } = useMachine(avatarMachine, {
-      src: imageSource,
-      name: accessibleName,
-      fallbackDelayMs: delay,
-    })
-    const api = connectAvatar(state, send)
-    useIsomorphicLayoutEffect(() => {
-      if (
-        previous.current.src !== imageSource ||
-        (api.isLoading && previous.current.delay !== delay)
-      ) {
-        send({ type: 'SRC_CHANGE', src: imageSource })
-      }
-      previous.current = { src: imageSource, delay }
-    }, [imageSource, delay, api.isLoading, send])
+/** A person's image with initials or custom fallback content while it is missing, pending or broken. */
+export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
+  { src, name, fallback, fallbackDelay = 0, className, ...rest },
+  ref,
+) {
+  const source = textOf(src)
+  const label = textOf(name).replace(/\s+/g, ' ')
+  const [status, image] = useImageStatus(source, {
+    delay: readNumber('Avatar', 'fallbackDelay', fallbackDelay, 0, { min: 0, max: MAX_DELAY }),
+  })
 
-    return (
+  return (
+    <span
+      ref={ref}
+      data-scope="avatar"
+      data-part="root"
+      data-state={status}
+      role={label || rest['aria-label'] || rest['aria-labelledby'] ? 'img' : undefined}
+      aria-label={label || undefined}
+      className={cn('uf-avatar', className)}
+      {...rest}
+    >
+      {source ? (
+        <img
+          key={source}
+          {...image}
+          data-scope="avatar"
+          data-part="image"
+          src={source}
+          alt=""
+          hidden={status !== 'loaded'}
+        />
+      ) : null}
       <span
-        ref={ref}
-        {...api.getRootProps()}
-        role={
-          accessibleName || rest['aria-label'] || rest['aria-labelledby']
-            ? 'img'
-            : undefined
-        }
-        aria-label={accessibleName || undefined}
-        className={cn('uf-avatar', className)}
-        {...rest}
+        data-scope="avatar"
+        data-part="fallback"
+        hidden={status === 'idle' || status === 'loaded'}
       >
-        {imageSource ? (
-          <img key={imageSource} {...api.getImageProps(imageSource)} alt="" />
-        ) : null}
-        <span key="fallback" {...api.getFallbackProps()}>
-          <span className="uf-avatar__content">{fallback ?? api.initials}</span>
-        </span>
+        <span className="uf-avatar__content">{fallback ?? initials(label)}</span>
       </span>
-    )
-  },
-)
+    </span>
+  )
+})

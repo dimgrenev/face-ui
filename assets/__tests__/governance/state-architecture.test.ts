@@ -168,12 +168,12 @@ const oneImplementation = (component: string) =>
 const PENDING = {
   'D2 throw': ['Calendar', 'Date'],
   'D3 machines': [
-    'Avatar', 'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Table', 'Toast', 'Toc', 'Tree', 'Upload',
+    'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Table', 'Toast', 'Toc', 'Tree', 'Upload',
   ],
   'D3 isomorphic layout effect': [
-    'Avatar', 'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
-    'Overlay', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider',
-    'Switcher', 'Table', 'Toc', 'Tooltip', 'Tree', 'Upload',
+    'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Panel',
+    'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Switcher', 'Table', 'Toc', 'Tooltip', 'Tree',
+    'Upload',
   ],
   'D3 direction': ['Calendar', 'Date'],
   'D3 isConnected': [],
