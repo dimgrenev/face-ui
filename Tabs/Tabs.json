@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Tabs",
-  "description": "Tabbed navigation with content panels",
+  "description": "Tabs that show one content panel at a time; header actions stay ordinary controls.",
   "props": {
     "value": {
       "type": "string",

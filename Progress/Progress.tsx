@@ -1,4 +1,3 @@
-/** Progress — completion of a task, with a known or unknown duration. */
 import { forwardRef } from 'react'
 import {
   RangeIndicator,
@@ -14,6 +13,7 @@ export interface ProgressProps extends RangeIndicatorProps {
   /** Finite positive total amount of work. Defaults to 100. */
   max?: number
 }
+/** Completion of a task of known or unknown duration, drawn as a linear bar or a circular ring. */
 export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
   function Progress({ value = 0, max = 100, ...props }, ref) {
     return (

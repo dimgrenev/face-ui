@@ -1,13 +1,3 @@
-/**
- * Tile — interactive row with nested actions.
- *
- * A container that acts as a single clickable target (like a Notion sidebar tab)
- * while allowing nested Button actions (more, close, etc.) that fire independently.
- *
- * Composed rows keep the primary button and action controls as siblings.
- * The outer element owns row layout and delegated click callbacks.
- */
-
 import {
   forwardRef,
   useCallback,
@@ -123,6 +113,7 @@ const regionAria = new Set([
 const isControlAria = (name: string) =>
   name.startsWith('aria-') && !regionAria.has(name)
 
+/** A row that acts as one clickable target while the controls nested in it keep their own clicks. */
 export const Tile = forwardRef<HTMLDivElement, TileProps>(
   function Tile(props, ref) {
     const {

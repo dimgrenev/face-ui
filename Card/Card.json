@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Card",
-  "description": "Composable contained surface for cards, modal bodies, drawers, popovers, toasts, and grouped content.",
+  "description": "A contained surface for grouped content, either filled by its title, description and footer props or composed from its parts.",
   "props": {
     "title": {
       "type": "ReactNode",

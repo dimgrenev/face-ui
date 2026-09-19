@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Meter",
-  "description": "A known measurement within a bounded range, such as storage or quota usage",
+  "description": "A measurement inside a known range, such as storage or quota usage, drawn as a bar or a ring.",
   "props": {
     "value": {
       "type": "number",

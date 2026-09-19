@@ -1,4 +1,3 @@
-/** Switcher — a native binary setting with a visible on/off track. */
 import { forwardRef, type CSSProperties, type ReactNode } from 'react'
 import { cn } from '../assets/utils'
 import {
@@ -48,6 +47,7 @@ export interface SwitcherProps extends CheckedInputAttributes {
   style?: CSSProperties
 }
 
+/** A native binary setting with a visible on/off track, which takes effect as soon as it is switched. */
 export const Switcher = forwardRef<HTMLInputElement, SwitcherProps>(
   function Switcher(
     {

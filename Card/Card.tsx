@@ -1,10 +1,3 @@
-/**
- * Card — composable contained surface.
- *
- * `<Card title="Settings"><Form /></Card>`
- * `<Card><Card.Header><Card.Title>Settings</Card.Title></Card.Header></Card>`
- */
-
 import { forwardRef, type ReactNode, type HTMLAttributes } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
@@ -306,6 +299,7 @@ export type CardCompoundComponent = typeof CardRoot & {
   Actions: typeof CardActions
 }
 
+/** A contained surface for grouped content, either filled by its title, description and footer props or composed from its parts. */
 export const Card = Object.assign(CardRoot, {
   Root: CardRoot,
   Header: CardHeader,

@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Input",
-  "description": "Native text field with labeling, validation, clear action and multiline sizing.",
+  "description": "A native text field with a label, help and error text, an optional clear action and multiline sizing.",
   "props": {
     "label": {
       "type": "ReactNode",

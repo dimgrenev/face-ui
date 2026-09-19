@@ -1,10 +1,3 @@
-/**
- * Badge — status indicator.
- *
- * `<Badge>New</Badge>`
- * `<Badge variant="fill" tone="positive">3</Badge>`
- */
-
 import { forwardRef, type ReactNode, type HTMLAttributes } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
@@ -33,6 +26,7 @@ export interface BadgeProps
   tone?: BadgeTone
 }
 
+/** A short status or count beside the thing it describes, as a filled or outlined chip in a semantic tone. */
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   function Badge(props, ref) {
     const {

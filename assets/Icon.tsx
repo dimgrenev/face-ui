@@ -4,6 +4,7 @@ import { invalidProp } from './runtime/props';
 export interface IconProps {
   /** Built-in Face UI icon name. An unknown name renders the notdef glyph; an empty one renders nothing. */
   name: IconName | string;
+  /** Class of the `<svg>`; the 20px box it draws in stays fixed. */
   className?: string;
   /** Paint/transform styles. The design-system box is fixed at 20px; width/height are not configurable. */
   style?: Omit<React.CSSProperties, 'width' | 'height'>;

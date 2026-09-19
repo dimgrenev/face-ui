@@ -1,4 +1,3 @@
-/** Input — a native text field with labels, validation, and optional multiline sizing. */
 import {
   forwardRef,
   useRef,
@@ -161,6 +160,7 @@ export type InputProps = InputSharedProps &
       }
   )
 
+/** A native text field with a label, help and error text, an optional clear action and multiline sizing. */
 export const Input = forwardRef<InputControl, InputProps>(
   function Input(props, ref) {
     const {

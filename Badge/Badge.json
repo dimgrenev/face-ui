@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Badge",
-  "description": "Status indicator label",
+  "description": "A short status or count beside the thing it describes, as a filled or outlined chip in a semantic tone.",
   "props": {
     "children": {
       "type": "ReactNode",

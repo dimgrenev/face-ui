@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Switcher",
-  "description": "Binary toggle control with thumb animation",
+  "description": "A native binary setting with a visible on/off track, which takes effect as soon as it is switched.",
   "props": {
     "checked": {
       "type": "boolean",

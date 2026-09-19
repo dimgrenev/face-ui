@@ -259,7 +259,7 @@ describe('contract generator', () => {
     return entry
   }
 
-  it('takes component and prop descriptions from JSDoc over the stored contract text', () => {
+  it('takes component and prop descriptions from JSDoc, and refuses to invent one', () => {
     const stored = {
       description: 'Stored component text.',
       props: {
@@ -271,6 +271,7 @@ describe('contract generator', () => {
       export interface FixtureProps {
         /** Semantic tone of the row. */
         tone?: 'neutral' | 'accent'
+        /** Height of the row in pixels. */
         size?: number
       }
       /** Row with an optional primary action. */
@@ -279,19 +280,31 @@ describe('contract generator', () => {
     const contract = buildFaceJsonContract(documented)
     expect(contract.description).toBe('Row with an optional primary action.')
     expect(contract.props.tone.description).toBe('Semantic tone of the row.')
-    // Undocumented props keep their stored text until W4-03 makes JSDoc mandatory.
-    expect(contract.props.size.description).toBe('Stored size text.')
-    expect(collectJsdocReport([documented])).toEqual(['Fixture.size'])
+    expect(contract.props.size.description).toBe('Height of the row in pixels.')
+    expect(collectJsdocReport([documented])).toEqual([])
 
-    const undocumented = fixture(`
+    // The stored contract is no second home: an undocumented prop stops the generator.
+    const undocumentedProp = fixture(`
+      export interface FixtureProps {
+        /** Semantic tone of the row. */
+        tone?: 'neutral' | 'accent'
+        size?: number
+      }
+      /** Row with an optional primary action. */
+      export function Fixture(props: FixtureProps) { return null }
+    `, stored)
+    expect(() => buildFaceJsonContract(undocumentedProp)).toThrow(/Undocumented:\n {2}size/)
+    expect(collectJsdocReport([undocumentedProp])).toEqual(['Fixture.size'])
+
+    const undocumentedComponent = fixture(`
       export interface FixtureProps {
         /** Semantic tone of the row. */
         tone?: 'neutral' | 'accent'
       }
       export function Fixture(props: FixtureProps) { return null }
     `, stored)
-    expect(buildFaceJsonContract(undocumented).description).toBe('Stored component text.')
-    expect(collectJsdocReport([undocumented])).toEqual(['Fixture (component)'])
+    expect(() => buildFaceJsonContract(undocumentedComponent)).toThrow(/Undocumented:\n {2}the component declaration/)
+    expect(collectJsdocReport([undocumentedComponent])).toEqual(['Fixture (component)'])
   })
 
   it('fails when union branches document the same prop differently', () => {

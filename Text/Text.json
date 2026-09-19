@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Text",
-  "description": "Typography component unifying body, heading, label, kbd, and code",
+  "description": "Every visible string the library renders: body copy, headings, labels, keyboard keys and inline code on one typographic scale.",
   "props": {
     "children": {
       "type": "ReactNode",
