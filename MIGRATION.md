@@ -212,6 +212,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Before | After | Codemod |
 | --- | --- | --- |
 | `ariaLabel` | `aria-label` | auto |
+| `indeterminate` | `value={null}` | auto |
 
 ### Radio
 

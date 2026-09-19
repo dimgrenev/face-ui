@@ -13,9 +13,6 @@
       "max": {
         "$ref": "props.max"
       },
-      "indeterminate": {
-        "$ref": "props.indeterminate"
-      },
       "aria-label": {
         "$ref": "props.aria-label"
       },
@@ -58,7 +55,7 @@
       "name": "value",
       "type": "number",
       "required": false,
-      "description": "Finite amount completed; values outside 0..max are bounded. Defaults to 0.",
+      "description": "Amount completed, bounded to 0..max; `null` is an unknown amount, shown and announced without a number. Defaults to 0.",
       "defaultValue": 0
     },
     {
@@ -67,13 +64,6 @@
       "required": false,
       "description": "Finite positive total amount of work. Defaults to 100.",
       "defaultValue": 100
-    },
-    {
-      "name": "indeterminate",
-      "type": "boolean",
-      "required": false,
-      "description": "Unknown duration: omit aria-valuenow and numeric text. Defaults to false.",
-      "defaultValue": false
     },
     {
       "name": "aria-label",

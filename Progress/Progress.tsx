@@ -9,18 +9,13 @@ import {
 export type ProgressTone = RangeIndicatorTone
 export type ProgressShape = RangeIndicatorShape
 export interface ProgressProps extends RangeIndicatorProps {
-  /** Finite amount completed; values outside 0..max are bounded. Defaults to 0. */
-  value?: number
+  /** Amount completed, bounded to 0..max; `null` is an unknown amount, shown and announced without a number. Defaults to 0. */
+  value?: number | null
   /** Finite positive total amount of work. Defaults to 100. */
   max?: number
-  /** Unknown duration: omit aria-valuenow and numeric text. Defaults to false. */
-  indeterminate?: boolean
 }
 export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
-  function Progress(
-    { value = 0, max = 100, indeterminate = false, ...props },
-    ref,
-  ) {
+  function Progress({ value = 0, max = 100, ...props }, ref) {
     return (
       <RangeIndicator
         {...props}
@@ -29,7 +24,6 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         min={0}
         max={max}
         value={value}
-        indeterminate={indeterminate}
       />
     )
   },

@@ -28,7 +28,6 @@ export const Meter = forwardRef<HTMLDivElement, MeterProps>(function Meter(
       min={min}
       max={max}
       value={value}
-      indeterminate={false}
     />
   )
 })

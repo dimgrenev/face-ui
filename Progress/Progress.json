@@ -7,7 +7,7 @@
     "value": {
       "type": "number",
       "required": false,
-      "description": "Finite amount completed; values outside 0..max are bounded. Defaults to 0.",
+      "description": "Amount completed, bounded to 0..max; `null` is an unknown amount, shown and announced without a number. Defaults to 0.",
       "default": 0
     },
     "max": {
@@ -15,12 +15,6 @@
       "required": false,
       "description": "Finite positive total amount of work. Defaults to 100.",
       "default": 100
-    },
-    "indeterminate": {
-      "type": "boolean",
-      "required": false,
-      "description": "Unknown duration: omit aria-valuenow and numeric text. Defaults to false.",
-      "default": false
     },
     "aria-label": {
       "type": "string",
@@ -136,7 +130,7 @@
     {
       "name": "Indeterminate",
       "props": {
-        "indeterminate": true,
+        "value": null,
         "label": "Loading assets"
       }
     }

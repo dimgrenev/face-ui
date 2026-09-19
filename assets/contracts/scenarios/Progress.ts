@@ -1,7 +1,7 @@
 import type { ProductScenarioPair } from '../sync-face-json'
 
 export default [
-  { name: 'Product / Background Task', props: { indeterminate: true, label: 'Analyzing documents' } },
+  { name: 'Product / Background Task', props: { value: null, label: 'Analyzing documents' } },
   {
     name: 'Product / File Upload',
     props: {
