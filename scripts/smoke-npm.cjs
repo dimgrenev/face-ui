@@ -59,9 +59,8 @@ async function main() {
     'dist/esm/uf.runtime.js',
     'dist/types/uf.runtime.d.ts',
     'docs.md',
-    'docs/component-map.md',
-    'docs/design-system-brief.md',
-    'docs/governance.md',
+    'MIGRATION.md',
+    'migrations.json',
   ];
 
   for (const file of requiredFiles) {
@@ -103,9 +102,16 @@ async function main() {
   }
 
   assert(packageJson.files?.includes('docs.md'), 'package files must include docs.md');
-  assert(packageJson.files?.includes('docs'), 'package files must include docs/');
+  assert(packageJson.files?.includes('MIGRATION.md'), 'package files must include MIGRATION.md');
+  assert(packageJson.files?.includes('migrations.json'), 'package files must include migrations.json');
   assert(packageJson.exports?.['./docs.md'] === './docs.md', 'package exports must expose docs.md');
-  assert(packageJson.exports?.['./docs/*'] === './docs/*', 'package exports must expose docs/* markdown files');
+  assert(packageJson.exports?.['./MIGRATION.md'] === './MIGRATION.md', 'package exports must expose MIGRATION.md');
+  assert(packageJson.exports?.['./migrations.json'] === './migrations.json', 'package exports must expose migrations.json');
+  // Guidance has one home each: docs.md, the JSDoc contracts and MIGRATION.md.
+  // The audit and the taxonomy notes stay in git history (commit 4fa2f77).
+  assert(!exists('docs'), 'docs/ must not come back: the guide is docs.md, props are JSDoc, breaks are MIGRATION.md');
+  assert(!packageJson.files?.some((entry) => /^!?docs\//.test(entry)), 'package files must not reference docs/');
+  assert(!packageJson.exports?.['./docs/*'], 'package exports must not expose docs/*');
   assert(packageJson.files?.includes('design-system'), 'package files must include design-system/');
   assert(packageJson.exports?.['./design-system/*'] === './dist/esm/design-system/*', 'package exports must expose design-system artifacts');
   assert(packageJson.exports?.['./assets/media/*'] === './dist/esm/assets/media/*', 'package exports must expose media example assets');

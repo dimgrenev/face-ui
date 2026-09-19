@@ -32,6 +32,7 @@
     "Button": {
       "category": "primitive",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -43,7 +44,8 @@
     "Tile": {
       "category": "primitive",
       "status": "beta",
-      "a11yReviewed": false,
+      "apiReviewed": true,
+      "a11yReviewed": true,
       "mobileReviewed": false,
       "related": [
         "Button",
@@ -54,7 +56,8 @@
     "Text": {
       "category": "primitive",
       "status": "stable",
-      "a11yReviewed": true,
+      "apiReviewed": true,
+      "a11yReviewed": false,
       "mobileReviewed": true,
       "related": [
         "Button",
@@ -64,7 +67,8 @@
     "Icon": {
       "category": "primitive",
       "status": "stable",
-      "a11yReviewed": true,
+      "apiReviewed": true,
+      "a11yReviewed": false,
       "mobileReviewed": true,
       "related": [
         "Button",
@@ -74,7 +78,8 @@
     "Separator": {
       "category": "primitive",
       "status": "stable",
-      "a11yReviewed": true,
+      "apiReviewed": true,
+      "a11yReviewed": false,
       "mobileReviewed": true,
       "related": [
         "Bar",
@@ -84,7 +89,8 @@
     "Badge": {
       "category": "display",
       "status": "stable",
-      "a11yReviewed": true,
+      "apiReviewed": true,
+      "a11yReviewed": false,
       "mobileReviewed": true,
       "related": [
         "Text"
@@ -93,7 +99,8 @@
     "Card": {
       "category": "display",
       "status": "stable",
-      "a11yReviewed": true,
+      "apiReviewed": true,
+      "a11yReviewed": false,
       "mobileReviewed": true,
       "related": [
         "Text",
@@ -103,7 +110,8 @@
     "Skeleton": {
       "category": "display",
       "status": "stable",
-      "a11yReviewed": true,
+      "apiReviewed": true,
+      "a11yReviewed": false,
       "mobileReviewed": true,
       "related": [
         "Card"
@@ -112,7 +120,8 @@
     "Avatar": {
       "category": "display",
       "status": "stable",
-      "a11yReviewed": true,
+      "apiReviewed": true,
+      "a11yReviewed": false,
       "mobileReviewed": true,
       "related": [
         "Badge",
@@ -122,6 +131,7 @@
     "Media": {
       "category": "display",
       "status": "beta",
+      "apiReviewed": true,
       "a11yReviewed": false,
       "mobileReviewed": true,
       "related": [
@@ -132,7 +142,8 @@
     "Markdown": {
       "category": "content",
       "status": "stable",
-      "a11yReviewed": true,
+      "apiReviewed": true,
+      "a11yReviewed": false,
       "mobileReviewed": true,
       "related": [
         "Text",
@@ -142,6 +153,7 @@
     "Code": {
       "category": "content",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -152,6 +164,7 @@
     "Input": {
       "category": "form",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -163,6 +176,7 @@
     "Checkbox": {
       "category": "form",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -173,6 +187,7 @@
     "Radio": {
       "category": "form",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -183,6 +198,7 @@
     "Switcher": {
       "category": "form",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -193,7 +209,8 @@
     "Toggle": {
       "category": "form",
       "status": "deprecated",
-      "a11yReviewed": true,
+      "apiReviewed": true,
+      "a11yReviewed": false,
       "mobileReviewed": true,
       "related": [
         "SegmentedControl"
@@ -205,6 +222,7 @@
     "SegmentedControl": {
       "category": "form",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "aliases": [
@@ -218,6 +236,7 @@
     "Slider": {
       "category": "form",
       "status": "beta",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -228,6 +247,7 @@
     "Rating": {
       "category": "form",
       "status": "beta",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -237,6 +257,7 @@
     "Select": {
       "category": "overlay-form",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "responsiveSurface": "auto->sheet",
@@ -250,6 +271,7 @@
     "Date": {
       "category": "overlay-form",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "responsiveSurface": "auto->sheet",
@@ -261,6 +283,7 @@
     "Calendar": {
       "category": "form",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -270,6 +293,7 @@
     "Tooltip": {
       "category": "overlay",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": false,
       "related": [
@@ -280,6 +304,7 @@
     "Popover": {
       "category": "overlay",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "responsiveSurface": "auto->sheet",
@@ -292,7 +317,8 @@
     "Overlay": {
       "category": "overlay-primitive",
       "status": "deprecated",
-      "a11yReviewed": true,
+      "apiReviewed": true,
+      "a11yReviewed": false,
       "mobileReviewed": true,
       "replacedBy": [
         "Tooltip",
@@ -306,6 +332,7 @@
     "Menu": {
       "category": "overlay",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "responsiveSurface": "auto->sheet",
@@ -318,6 +345,7 @@
     "Command": {
       "category": "overlay",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "responsiveSurface": "auto->sheet",
@@ -330,6 +358,7 @@
     "Modal": {
       "category": "overlay",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -340,6 +369,7 @@
     "Toast": {
       "category": "feedback",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -350,6 +380,7 @@
     "Progress": {
       "category": "feedback",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -360,6 +391,7 @@
     "Tabs": {
       "category": "navigation",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -370,6 +402,7 @@
     "Accordion": {
       "category": "navigation",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -379,6 +412,7 @@
     "Breadcrumb": {
       "category": "navigation",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -389,6 +423,7 @@
     "Pagination": {
       "category": "navigation",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -399,6 +434,7 @@
     "Steps": {
       "category": "navigation",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -408,6 +444,7 @@
     "Navigation": {
       "category": "navigation",
       "status": "beta",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "responsiveSurface": "auto->sheet",
@@ -419,6 +456,7 @@
     "Panel": {
       "category": "navigation",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "aliases": [
@@ -434,6 +472,7 @@
     "Tree": {
       "category": "navigation",
       "status": "beta",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -444,6 +483,7 @@
     "Toc": {
       "category": "navigation",
       "status": "beta",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -454,6 +494,7 @@
     "Bar": {
       "category": "layout",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -465,6 +506,7 @@
     "Scroll": {
       "category": "layout",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -475,6 +517,7 @@
     "Carousel": {
       "category": "pattern",
       "status": "beta",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -485,6 +528,7 @@
     "Table": {
       "category": "pattern",
       "status": "beta",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": false,
       "related": [
@@ -496,6 +540,7 @@
     "Upload": {
       "category": "pattern",
       "status": "beta",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [
@@ -506,6 +551,7 @@
     "Meter": {
       "category": "feedback",
       "status": "stable",
+      "apiReviewed": true,
       "a11yReviewed": true,
       "mobileReviewed": true,
       "related": [

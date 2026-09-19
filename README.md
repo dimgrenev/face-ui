@@ -58,25 +58,19 @@ Compatibility aliases live outside the primary barrel:
 import { Toggle } from '@userface/face-ui-react/compat'
 ```
 
-## Public Surface
+## Documentation
 
-Primitives: `Button`, `Text`, `Icon`, `Separator`, `Tile`.
+Each question has exactly one source. Nothing else documents props.
 
-Forms: `Input`, `Checkbox`, `Radio`, `Switcher`, `SegmentedControl`, `Slider`, `Rating`, `Select`, `Date`, `Calendar`, `Upload`.
+| Question | Source |
+| --- | --- |
+| Which component, and how do they compose? | [`docs.md`](docs.md): rules, API conventions, recipes, one article per component |
+| What does a prop do, and which values does it take? | its JSDoc, shipped as `.d.ts` and as the `<Name>/<Name>.json` contract |
+| What broke, and how do I move? | [`MIGRATION.md`](MIGRATION.md), with `migrations.json` behind `pnpm migrate` |
+| What is a component's status? | `component-registry.json`: `status`, `apiReviewed`, `a11yReviewed`, `mobileReviewed` |
+| Which token do I author, and where? | [`design-system/README.md`](design-system/README.md) |
 
-Overlays: `Tooltip`, `Popover`, `Menu`, `Modal`, `Command`.
-
-Navigation: `Tabs`, `Accordion`, `Breadcrumb`, `Pagination`, `Steps`, `Navigation`, `Panel`, `Tree`, `Toc`.
-
-Display and patterns: `Avatar`, `Badge`, `Card`, `Skeleton`, `Progress`, `Carousel`, `Table`, `Code`, `Markdown`, `Media`, `Scroll`, `Toast`, `Bar`.
-
-Deprecated compatibility names are still shipped for migration, but new code should use the canonical names:
-
-| Compatibility | Use instead            |
-| ------------- | ---------------------- |
-| `Overlay`     | `Tooltip` or `Popover` |
-| `Toggle`      | `SegmentedControl`     |
-| `Sidebar`     | `Panel`                |
+`docs.md` lists no props, defaults or tokens, and a contract's `description` is always the JSDoc.
 
 ## Contracts
 
@@ -136,27 +130,31 @@ pnpm exec playwright install chromium firefox webkit
 pnpm test:browser
 ```
 
-`pnpm check` runs:
-
-- generated token, component contract and gallery drift checks
-
-- npm build for ESM, CommonJS, and types
-- Vitest contract and interaction tests
-- npm smoke checks for export paths and forbidden artifacts
-- `npm pack --dry-run`
-
-Useful focused commands:
-
-```bash
-pnpm build
-pnpm test
-pnpm smoke
-pnpm pack:dry
-```
+`pnpm check` is the release gate: drift checks for the generated tokens, contracts and gallery, then
+`build`, `test`, `test:types`, `smoke` and `pack:dry`, each of which also runs on its own.
 
 Browser tests cover the component gallery, real keyboard and focus behavior, forms, nested portals, SSR hydration, theme contrast and layout in Chromium, Firefox and WebKit. CI checks React 18 and 19; these regression gates are not accessibility certification.
 
-See [the composition contract and API migration](docs.md) and [token authoring guide](design-system/README.md).
+## Changing the API
+
+JSDoc is the only home for a prop decision. Every own prop, compound-part prop, `labels` key and
+details field carries one:
+
+- one present-tense sentence about the observable effect, and a second only for what the type cannot say;
+- at most 200 characters, with no history, dates or links to reviews;
+- the same text in every branch of a union;
+- on the exported component, a single line, which becomes the contract's `description`;
+- `@deprecated` only on `compat` exports.
+
+`CONTRACT_OVERRIDES` in `assets/contracts/sync-face-json.ts` patches `type` and `options` only; a
+`description` there is a type error. Every removal or rename is a row in `scripts/migrations/<Name>.ts`,
+written by the change that breaks it, and `pnpm migration:sync` regenerates `MIGRATION.md` and
+`migrations.json` from those files.
+
+`pnpm check` enforces this: `contracts:check` regenerates every contract from the source and fails on
+descriptions that union branches disagree about, and the suite under `assets/__tests__/governance`
+holds the naming conventions, the invalid-prop reports, SSR and reachability. To check a consumer
+against the break log, run `pnpm migrate --check <paths…>`.
 
 ## Release
 
@@ -174,12 +172,6 @@ NPM_TOKEN
 ```
 
 The release workflow installs locked dependencies, applies the requested version, runs package and browser checks, and publishes the package publicly to npm.
-
-## Governance
-
-The primary public API is `index.ts`. Component status and migration metadata live in `component-registry.json`. Human guidance lives in `docs.md`; the concise taxonomy is in `docs/component-map.md`.
-
-Stable components require compatibility. Beta components may change before `1.0`. Deprecated aliases are migration surfaces only.
 
 ## License
 
