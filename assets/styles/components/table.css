@@ -155,7 +155,15 @@
   overflow: hidden;
   white-space: nowrap;
 }
-.uf-table__cellSlot[data-truncate] > * {
+/* Every box inside the cell, not only the outermost one: an element with a
+   layout of its own — Face UI's Text, a Badge, any flex or grid box — keeps
+   its whole shape, border included, and hands the cut down to the text it
+   holds, which is the only thing an ellipsis can replace. Clipped overflow is
+   also what lets each of those boxes shrink below its content: it drops the
+   automatic minimum size that would otherwise push it out of the cell. */
+.uf-table__cellSlot[data-truncate] * {
+  min-inline-size: 0;
+  max-inline-size: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
