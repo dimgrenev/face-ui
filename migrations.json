@@ -155,6 +155,19 @@
       "after": "`maxItems={null}` turns it off, and the codemod writes it for such literals; a number must be an integer of at least 3"
     },
     {
+      "kind": "move-to-labels",
+      "component": "Breadcrumb",
+      "from": "overflowLabel",
+      "key": "more",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Breadcrumb",
+      "before": "Malformed `items` or keys, and a `maxItems` that is not an integer of at least 3, threw during render",
+      "after": "The trail renders them normalized (bad items dropped, the first of a repeated key kept, `maxItems` clamped) and reports once in development"
+    },
+    {
       "kind": "remove-prop",
       "component": "Button",
       "prop": "selector",
@@ -660,6 +673,40 @@
       "codemod": "auto"
     },
     {
+      "kind": "move-to-labels",
+      "component": "Pagination",
+      "from": "surfaceTitle",
+      "key": "choosePage",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Pagination",
+      "prop": "labels",
+      "before": "`previousPage` and `nextPage` keys",
+      "after": "the shared `previous` and `next` keys",
+      "codemod": "manual",
+      "legacy": "\\b(previousPage|nextPage)\\b"
+    },
+    {
+      "kind": "behavior",
+      "component": "Pagination",
+      "before": "A `page`, `defaultPage`, `total`, `pageSize` or `siblingCount` out of range or not an integer threw during render",
+      "after": "Pagination renders it normalized (integers clamped, non-numbers such as `\"50\"` replaced by the default) and reports once in development"
+    },
+    {
+      "kind": "behavior",
+      "component": "Pagination",
+      "before": "`labels.page` without exactly one `{page}` threw during render",
+      "after": "Every `{page}` is replaced by the number; a template without one gets the number appended after a space"
+    },
+    {
+      "kind": "behavior",
+      "component": "Pagination",
+      "before": "The nav's `onClick` ran after the page changed",
+      "after": "`onClick` runs first, and its `preventDefault()` cancels the change"
+    },
+    {
       "kind": "remove-prop",
       "component": "Popover",
       "prop": "interactive",
@@ -1111,6 +1158,30 @@
       "component": "Slider",
       "before": "The label was a `Text` part (`[data-scope=slider][data-part=label]`, `.uf-slider__label`) with the membrane around it",
       "after": "The root is a field (`uf-field`) with `label`, `description`, `error`, `labelPosition` and a `required` marker; the label is `.uf-field__label` in the shared field typography, and each thumb carries the description, the error and `aria-invalid`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Steps",
+      "before": "Malformed `items` or keys, and a `step` or `defaultStep` that is not a nonnegative integer, threw during render",
+      "after": "Steps render them normalized (bad items dropped, the first of a repeated key kept, the index clamped) and report once in development"
+    },
+    {
+      "kind": "behavior",
+      "component": "Steps",
+      "before": "The root group was named \"Steps\" by default",
+      "after": "The root has no default name; name it with `aria-label` or `aria-labelledby`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Steps",
+      "before": "The root's `onClick` ran after the step changed",
+      "after": "`onClick` runs first, and its `preventDefault()` cancels the change"
+    },
+    {
+      "kind": "behavior",
+      "component": "Steps",
+      "before": "An uncontrolled step beyond an empty or shorter `items` list fell back for good",
+      "after": "It waits for the items to arrive; only removing the current step moves it, to the last one left"
     },
     {
       "kind": "remove-prop",

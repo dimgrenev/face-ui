@@ -125,6 +125,28 @@ test('expanding the full trail moves focus from the closing popup to the same vi
     page.getByRole('link', { name: 'Library', exact: true }),
   ).toBeFocused()
 })
+test('a focused popup crumb that moves inline while the trail still collapses keeps its location', { tag: ['@focus'] }, async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'Show path', exact: true }).click()
+  await page.getByRole('dialog').getByRole('link', { name: 'Chapter', exact: true }).focus()
+  await render(page, { maxItems: 5 })
+  await expect(page.getByRole('link', { name: 'Chapter', exact: true })).toBeFocused()
+})
+test('a focused popup crumb removed while the popup stays open hands focus to the overflow button', { tag: ['@focus'] }, async ({
+  page,
+}) => {
+  const trail = (labels: string[]) => ({
+    props: { items: labels.map((label) => ({ label, key: label, href: `#${label.toLowerCase()}` })) },
+  })
+  await render(page, trail(['Home', 'Library', 'Collection', 'Chapter', 'Section', 'Current']))
+  const trigger = page.getByRole('button', { name: 'Show path', exact: true })
+  await trigger.click()
+  await page.getByRole('dialog').getByRole('link', { name: 'Collection', exact: true }).focus()
+  await render(page, trail(['Home', 'Library', 'Chapter', 'Section', 'Current']))
+  await expect(page.getByRole('dialog').getByRole('link', { name: 'Library', exact: true })).toBeVisible()
+  await expect(trigger).toBeFocused()
+})
 for (const theme of ['light', 'dark'])
   for (const dir of ['ltr', 'rtl']) {
     test(`${theme}/${dir}: localized long paths wrap in a narrow container and the popup remains accessible`, { tag: ['@layout', '@a11y'] }, async ({
@@ -138,7 +160,7 @@ for (const theme of ['light', 'dark'])
         props: {
           dir,
           lang: 'ru',
-          overflowLabel: 'Все разделы',
+          labels: { more: 'Все разделы' },
           'aria-label': 'Путь документа',
           items: Array.from({ length: 12 }, (_, i) => ({
             key: i,

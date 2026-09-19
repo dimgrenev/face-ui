@@ -28,9 +28,6 @@
       "membrane": {
         "$ref": "props.membrane"
       },
-      "surfaceTitle": {
-        "$ref": "props.surfaceTitle"
-      },
       "labels": {
         "$ref": "props.labels"
       }
@@ -44,7 +41,9 @@
       "pageSize": 50,
       "siblingCount": 1,
       "membrane": true,
-      "surfaceTitle": "Choose audit page"
+      "labels": {
+        "choosePage": "Choose audit page"
+      }
     }
   },
   "controls": [
@@ -52,61 +51,55 @@
       "name": "page",
       "type": "number",
       "required": false,
-      "description": "Controlled positive integer page; displayed within the current total/pageSize bounds."
+      "description": "Controlled current page, from 1; a page past the last one shows the last page."
     },
     {
       "name": "defaultPage",
       "type": "number",
       "required": false,
-      "description": "Initial uncontrolled page (1-indexed); later changes are ignored.",
+      "description": "Uncontrolled page on mount, from 1; read once.",
       "defaultValue": 1
     },
     {
       "name": "total",
       "type": "number",
       "required": false,
-      "description": "Total item count: a nonnegative safe integer. Defaults to 0, displaying page 1.",
+      "description": "Number of items being paged, an integer from 0; no items still show page 1.",
       "defaultValue": 0
     },
     {
       "name": "pageSize",
       "type": "number",
       "required": false,
-      "description": "Items per page: a positive safe integer. Defaults to 10.",
+      "description": "Items per page, an integer from 1.",
       "defaultValue": 10
     },
     {
       "name": "siblingCount",
       "type": "number",
       "required": false,
-      "description": "Neighbor count, an integer from 0 to 20. Edge ranges fill the available slots. Defaults to 1.",
+      "description": "Page buttons on each side of the current page, an integer from 0 to 20; the bar keeps its length near either end.",
       "defaultValue": 1
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable page changes and picker opening; an already open picker can still be closed.",
+      "description": "Disables page changes and the picker button; an open picker can still be closed.",
       "defaultValue": false
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing around the outer navigation buttons; the dialog owns its own spacing.",
+      "description": "Membrane spacing around the navigation buttons; the picker dialog owns its own spacing.",
       "defaultValue": true
-    },
-    {
-      "name": "surfaceTitle",
-      "type": "string",
-      "required": false,
-      "description": "Page-picker dialog title at any viewport size. Defaults to labels.choosePage."
     },
     {
       "name": "labels",
       "type": "object",
       "required": false,
-      "description": "Internal control labels. The nav itself uses native aria-label or aria-labelledby."
+      "description": "Names and text of the component's own controls; the nav itself takes a native aria-label or aria-labelledby."
     }
   ],
   "meta": {

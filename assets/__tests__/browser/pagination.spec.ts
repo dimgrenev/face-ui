@@ -237,8 +237,8 @@ for (const theme of ['light', 'dark'])
         theme,
       )
       const labels = {
-        previousPage: 'Предыдущая страница журнала',
-        nextPage: 'Следующая страница журнала',
+        previous: 'Предыдущая страница журнала',
+        next: 'Следующая страница журнала',
         page: 'Страница {page}',
         choosePage: 'Выбрать страницу',
         pageNumber: 'Номер страницы',
@@ -256,7 +256,6 @@ for (const theme of ['light', 'dark'])
             defaultPage: 50,
             style: { maxWidth: 480 },
             'aria-label': 'Страницы журнала',
-            surfaceTitle: 'Переход по журналу',
           },
           { reset: true },
         )
@@ -277,7 +276,7 @@ for (const theme of ['light', 'dark'])
         await page
           .getByRole('button', { name: 'Выбрать страницу', exact: true })
           .click()
-        const dialog = page.getByRole('dialog', { name: 'Переход по журналу' })
+        const dialog = page.getByRole('dialog', { name: 'Выбрать страницу' })
         await expect(dialog).toBeVisible()
         await expect(dialog).toHaveAttribute('dir', dir)
         await expect(dialog.locator('bdi[dir="ltr"]')).toHaveText('1–100')

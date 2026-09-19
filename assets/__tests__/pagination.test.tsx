@@ -1,10 +1,10 @@
 import { act, createRef, useState } from 'react'
 import type { Root } from 'react-dom/client'
-import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi, describe } from 'vitest'
 import { Pagination, type PaginationProps } from '../../Pagination/Pagination'
 import { Modal } from '../../Modal/Modal'
 import { expectDevError, mount } from './harness'
+import { describeControlled } from './harness/controlled'
 
 let host: HTMLDivElement, root: Root
 beforeEach(() => {
@@ -111,38 +111,51 @@ it('capture preventDefault cancels a navigation action', async () => {
   expect(callback).not.toHaveBeenCalled()
 })
 
+const pageNumbers = () =>
+  [...host.querySelectorAll('.uf-pagination-page')].map((b) => b.textContent)
+
 it.each([
-  ['total', Infinity],
-  ['total', 1.5],
-  ['total', Number.MAX_VALUE],
-  ['pageSize', 0],
-  ['page', 0],
-  ['siblingCount', 21],
-])(
-  'invalid %s=%s cannot silently render a different numeric contract',
-  (prop, value) => {
-    expect(() =>
-      renderToStaticMarkup(<Pagination {...{ [prop]: value }} />),
-    ).toThrow(RangeError)
+  ['total', Infinity, 'Infinity; using 0', 1, ['1']],
+  ['total', '50', '"50"; using 0', 1, ['1']],
+  ['total', 1.5, '1.5; using 1', 1, ['1']],
+  ['total', -5, '-5; using 0', 1, ['1']],
+  ['total', Number.MAX_VALUE, `${Number.MAX_VALUE}; using ${Number.MAX_SAFE_INTEGER}`, 1, ['1', '2', '3', '4', '5', `${Math.ceil(Number.MAX_SAFE_INTEGER / 10)}`]],
+  ['pageSize', 0, '0; using 1', 1, ['1', '2', '3', '4', '5', '1000']],
+  ['pageSize', null, 'null; using 10', 1, ['1', '2', '3', '4', '5', '100']],
+  ['page', 0, '0; using 1', 1, ['1', '2', '3', '4', '5', '100']],
+  ['page', 2.9, '2.9; using 2', 2, ['1', '2', '3', '4', '5', '100']],
+  ['page', NaN, 'NaN; using 1', 1, ['1', '2', '3', '4', '5', '100']],
+  ['defaultPage', -3, '-3; using 1', 1, ['1', '2', '3', '4', '5', '100']],
+  ['siblingCount', 21, '21; using 20', 1, Array.from({ length: 43 }, (_, i) => `${i + 1}`).concat('100')],
+  ['siblingCount', -1, '-1; using 0', 1, ['1', '2', '3', '100']],
+] as const)(
+  'invalid %s=%s is normalized and reported; strings are not coerced',
+  async (prop, value, message, page, pages) => {
+    await expectDevError(
+      () => render({ [prop]: value }),
+      new RegExp(`^Face UI Pagination: invalid ${prop} ${message.replace(/[.+()]/g, '\\$&')}\\.$`),
+    )
+    expect(current()).toBe(page)
+    expect(pageNumbers()).toEqual(pages)
   },
 )
 
-it('numeric validation does not execute object coercion', () => {
+it('reading a number never runs object coercion', async () => {
   const valueOf = vi.fn(() => 100)
-  expect(() =>
-    renderToStaticMarkup(
-      <Pagination total={{ valueOf } as unknown as number} />,
-    ),
-  ).toThrow(RangeError)
+  await expectDevError(
+    () => render({ total: { valueOf } }),
+    /^Face UI Pagination: invalid total object; using 0\.$/,
+  )
   expect(valueOf).not.toHaveBeenCalled()
+  expect(pageNumbers()).toEqual(['1'])
 })
 
 it('internal labels and native navigation label can be localized independently', async () => {
   await render({
     'aria-label': 'Страницы журнала',
     labels: {
-      previousPage: 'Назад',
-      nextPage: 'Далее',
+      previous: 'Назад',
+      next: 'Далее',
       page: 'Страница {page}',
       choosePage: 'Выбрать страницу',
       pageNumber: 'Номер страницы',
@@ -200,7 +213,7 @@ it('an empty result has one bounded page and no available navigation action', as
   expect(callback).not.toHaveBeenCalled()
 })
 
-it('controlled page wins over an unused invalid initial default', async () => {
+it('controlled page wins over an unused invalid initial default, which is not reported', async () => {
   await render({ page: 3, defaultPage: -1 })
   expect(current()).toBe(3)
 })
@@ -350,7 +363,7 @@ it('disabled blocks dispatched page actions and re-enabling retains the page', a
   expect(current()).toBe(3)
 })
 
-it('native class, language, data and labelledby reach the same root and bubble after the proposal', async () => {
+it('native class, language, data and labelledby reach the same root, whose onClick runs before the change', async () => {
   const order: string[] = [],
     ref = createRef<HTMLElement>()
   await render({
@@ -367,13 +380,13 @@ it('native class, language, data and labelledby reach the same root and bubble a
   expect(ref.current?.dataset.audit).toBe('yes')
   expect(ref.current?.getAttribute('aria-labelledby')).toBe('heading')
   await click('Next page')
-  expect(order).toEqual(['change', 'bubble'])
+  expect(order).toEqual(['bubble', 'change'])
 })
 
 it('partial immutable dictionaries, whitespace fallback and extra fields do not leak to DOM', async () => {
   const labels = Object.freeze({
-    nextPage: '  Далее  ',
-    previousPage: ' ',
+    next: '  Далее  ',
+    previous: ' ',
     extra: 'unused',
   })
   await render({ labels })
@@ -384,8 +397,8 @@ it('partial immutable dictionaries, whitespace fallback and extra fields do not 
     'Previous page',
   )
   expect(host.querySelector('[labels], [extra]')).toBeNull()
-  expect(labels.nextPage).toBe('  Далее  ')
-  await render({ labels: Object.create({ nextPage: 'Inherited' }) })
+  expect(labels.next).toBe('  Далее  ')
+  await render({ labels: Object.create({ next: 'Inherited' }) })
   expect(host.querySelector('.uf-pagination-navNext')?.textContent).toBe(
     'Next page',
   )
@@ -405,7 +418,7 @@ it('page-name templates permit the number before or after localized text', async
 it.each([
   [null, /invalid labels null; using defaults/],
   [[], /invalid labels array; using defaults/],
-  [{ nextPage: 42 }, /invalid labels\.nextPage 42; using "Next page"/],
+  [{ next: 42 }, /invalid labels\.next 42; using "Next page"/],
 ])(
   'malformed label dictionary %j renders the defaults and is reported',
   async (labels, message) => {
@@ -418,28 +431,25 @@ it.each([
   },
 )
 
-it.each([{ page: 'Page' }, { page: '{page} {page}' }])(
-  'rejects page templates without exactly one {page}: %j',
-  (labels) => {
-    expect(() => renderToStaticMarkup(<Pagination labels={labels} />)).toThrow(
-      RangeError,
-    )
+it.each([
+  ['Page', 'Page 1'],
+  ['{page} / {page}', '1 / 1'],
+  ['№{page}', '№1'],
+])(
+  'labels.page %j names page 1 %j: every {page} is replaced, a template without one gets the number appended',
+  async (page, name) => {
+    await render({ total: 10, labels: { page } })
+    expect(
+      host.querySelector('.uf-pagination-page')?.getAttribute('aria-label'),
+    ).toBe(name)
   },
 )
 
-it('surfaceTitle names the picker independently and falls back to the localized trigger name', async () => {
-  await render({
-    surfaceTitle: 'Журнал — переход',
-    labels: { choosePage: 'Страница' },
-  })
-  expect(
-    document.querySelector('.uf-pagination-pagePicker .uf-modal-title')
-      ?.textContent,
-  ).toBe('Журнал — переход')
+it('labels.choosePage names the picker button and titles its dialog', async () => {
+  await render({ labels: { choosePage: 'Выбор страницы' } })
   expect(
     host.querySelector('.uf-pagination-more')?.getAttribute('aria-label'),
-  ).toBe('Страница')
-  await render({ surfaceTitle: ' ', labels: { choosePage: 'Выбор страницы' } })
+  ).toBe('Выбор страницы')
   expect(
     document.querySelector('.uf-pagination-pagePicker .uf-modal-title')
       ?.textContent,
@@ -614,4 +624,19 @@ it('an IME confirmation Enter does not submit the page picker', async () => {
   await enter(false)
   expect(current()).toBe(9)
   expect(change).toHaveBeenCalledExactlyOnceWith({ page: 9 })
+})
+
+describeControlled({
+  name: 'Pagination',
+  prop: 'page',
+  values: [2, 3],
+  render: (props) => <Pagination total={100} {...props} />,
+  change: (host, to) =>
+    host
+      .querySelector<HTMLButtonElement>(`.uf-pagination-page[data-page="${to}"]`)!
+      .click(),
+  read: (host) =>
+    Number(host.querySelector('.uf-pagination-page[aria-current="page"]')!.textContent),
+  normalizes: [99, 10],
+  handler: 'onClick',
 })

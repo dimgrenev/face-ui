@@ -9,7 +9,7 @@ export default [
       pageSize: 20,
       siblingCount: 2,
       membrane: true,
-      surfaceTitle: 'Choose results page',
+      labels: { choosePage: 'Choose results page' },
     },
   },
   {
@@ -20,7 +20,7 @@ export default [
       pageSize: 50,
       siblingCount: 1,
       membrane: true,
-      surfaceTitle: 'Choose audit page',
+      labels: { choosePage: 'Choose audit page' },
     },
   },
 ] satisfies ProductScenarioPair

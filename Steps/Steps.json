@@ -2,40 +2,40 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Steps",
-  "description": "Ordered wizard navigation with persistent content panels; form validation belongs to the consumer.",
+  "description": "Ordered wizard navigation: one button per step and a persistent panel for each step with content.",
   "props": {
     "items": {
       "type": "array",
       "required": false,
-      "description": "Ordered step definitions. An omitted or empty list renders no navigation."
+      "description": "Ordered steps; an omitted or empty list renders no navigation."
     },
     "step": {
       "type": "number",
       "required": false,
-      "description": "Controlled nonnegative integer index; displayed within the current item bounds."
+      "description": "Controlled index of the current step, from 0; an index past the last step shows the last one."
     },
     "defaultStep": {
       "type": "number",
       "required": false,
-      "description": "Initial uncontrolled index; later changes are ignored. Defaults to 0.",
+      "description": "Uncontrolled step index on mount, from 0; read once.",
       "default": 0
     },
     "linear": {
       "type": "boolean",
       "required": false,
-      "description": "Allow only the current, earlier or immediately next step. Does not validate forms.",
+      "description": "Allows only the current, an earlier or the immediately next step; does not validate forms.",
       "default": true
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable step navigation; the visible panel remains usable.",
+      "description": "Disables step navigation; the visible panel stays usable.",
       "default": false
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing around each step control. Defaults to true.",
+      "description": "Membrane spacing around each step button.",
       "default": true
     }
   },
@@ -130,7 +130,7 @@
     "linear": "Only current, earlier or next position. Form validation and approval belong to the controlled parent.",
     "disabled": "Disables navigation only; current content stays usable.",
     "panels": "Inactive panels remain mounted and hidden; their form fields still participate in form data.",
-    "items": "Use stable unique keys when inserting, removing or reordering stateful panels. Keys do not change index-based selection."
+    "items": "Use stable unique keys when inserting, removing or reordering stateful panels. Keys do not change index-based selection. An uncontrolled step beyond the list waits for its items; removing the current step moves it to the last one."
   },
   "keyboard": {
     "Tab": "Move between enabled step buttons and visible content controls.",
@@ -142,7 +142,7 @@
       "aria-current=\"step\" on the active button"
     ],
     "notes": [
-      "Name the root with aria-label or aria-labelledby; defaults to Steps.",
+      "Name the root with aria-label or aria-labelledby; it has no default name.",
       "An ordered list communicates step order. Number indicators are decorative.",
       "Existing panels are named by their button and referenced with aria-controls. Hidden panels are excluded from focus and the accessibility tree."
     ]

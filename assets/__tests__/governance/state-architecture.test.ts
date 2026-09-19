@@ -166,27 +166,19 @@ const oneImplementation = (component: string) =>
 
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
-  'D2 throw': [
-    'Breadcrumb', 'Calendar', 'Date', 'Pagination', 'Steps',
-  ],
+  'D2 throw': ['Calendar', 'Date'],
   'D3 machines': [
-    'Avatar', 'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Steps', 'Table',
-    'Toast', 'Toc', 'Tree', 'Upload',
+    'Avatar', 'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Table', 'Toast', 'Toc', 'Tree', 'Upload',
   ],
   'D3 isomorphic layout effect': [
     'Avatar', 'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
-    'Overlay', 'Pagination', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps',
+    'Overlay', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider',
     'Switcher', 'Table', 'Toc', 'Tooltip', 'Tree', 'Upload',
   ],
   'D3 direction': ['Calendar', 'Date'],
-  'D3 isConnected': ['Breadcrumb', 'Steps'],
-  'D3 machine-era hooks': [
-    'Calendar', 'Carousel', 'Command', 'Date', 'Modal', 'Navigation', 'Pagination', 'Panel',
-    'Steps', 'Toc', 'Tree',
-  ],
-  'D5 one implementation': [
-    'Breadcrumb', 'Calendar', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Panel', 'Steps', 'Tree', 'Upload',
-  ],
+  'D3 isConnected': [],
+  'D3 machine-era hooks': ['Calendar', 'Carousel', 'Command', 'Date', 'Modal', 'Navigation', 'Panel', 'Toc', 'Tree'],
+  'D5 one implementation': ['Calendar', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Panel', 'Tree', 'Upload'],
 } satisfies Record<string, readonly string[]>
 
 describeGate('state-architecture D2 throw', PENDING['D2 throw'], throws)

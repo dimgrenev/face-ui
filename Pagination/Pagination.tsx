@@ -1,57 +1,52 @@
-/**
- * Pagination — page navigation component.
- *
- * Renders prev/next buttons and numbered page buttons with ellipsis.
- * Range items with value -1 are rendered as ellipsis spans.
- *
- * `<Pagination page={1} total={100} pageSize={10} />`
- */
-
-import { forwardRef, useEffect, useState, type HTMLAttributes } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
+/** Pagination — page navigation with numbered buttons and a page-number picker. */
 import {
-  paginationMachine,
-  connectPagination,
-} from '../assets/machines/pagination.machine'
+  forwardRef,
+  useState,
+  type HTMLAttributes,
+  type MouseEvent,
+} from 'react'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
 import { Modal } from '../Modal/Modal'
-import { useIsCompactViewport } from '../assets/adapters/react/use-responsive-overlay-surface'
 import { Input } from '../Input/Input'
 import { Text } from '../Text/Text'
-import { resolveLabel, resolveLabels } from '../assets/runtime/labels'
+import { composeHandlers } from '../assets/adapters/react/merge-props'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useIsCompactViewport } from '../assets/adapters/react/use-responsive-overlay-surface'
+import {
+  formatLabel,
+  resolveLabels,
+  type CommonLabels,
+} from '../assets/runtime/labels'
+import { pageCount, pageRange } from '../assets/runtime/pagination'
+import { readNumber } from '../assets/runtime/props'
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-export interface PaginationLabels {
-  /** Visible text and accessible name of the previous-page button. */
-  previousPage: string
-  /** Visible text and accessible name of the next-page button. */
-  nextPage: string
-  /** Accessible page name, with exactly one {page} placeholder. */
+export interface PaginationLabels
+  extends Pick<CommonLabels, 'previous' | 'next' | 'close'> {
+  /** Accessible name of each numbered page button; `{page}` becomes its number. */
   page: string
-  /** Page-picker trigger name and default dialog title. */
+  /** Name of the page-picker button and title of its dialog. */
   choosePage: string
-  /** Label of the page-number input. */
+  /** Label of the picker's page-number input. */
   pageNumber: string
-  /** Submit action in the page picker. */
+  /** Submit button of the page picker. */
   goToPage: string
-  /** Accessible name of the page-picker close button. */
-  close: string
 }
 
 const defaultLabels: PaginationLabels = Object.freeze({
-  previousPage: 'Previous page',
-  nextPage: 'Next page',
+  previous: 'Previous page',
+  next: 'Next page',
   page: 'Page {page}',
   choosePage: 'Choose page',
   pageNumber: 'Page number',
   goToPage: 'Go to page',
   close: 'Close',
 })
+/** Landmark name until a native aria-label or aria-labelledby names the nav (K14). */
+const defaultRootLabels = Object.freeze({ nav: 'Pagination' })
+const POSITIVE = { integer: true, min: 1 } as const
+/** WebKit leaves buttons without an explicit tabIndex out of the Tab order. */
+const TABBABLE = { tabIndex: 0 } as const
 
 export interface PaginationProps extends Omit<
   HTMLAttributes<HTMLElement>,
@@ -63,147 +58,130 @@ export interface PaginationProps extends Omit<
   | 'contentEditable'
   | 'suppressContentEditableWarning'
 > {
-  /** Controlled positive integer page; displayed within the current total/pageSize bounds. */
+  /** Controlled current page, from 1; a page past the last one shows the last page. */
   page?: number
-  /** Initial uncontrolled page (1-indexed); later changes are ignored. */
+  /** Uncontrolled page on mount, from 1; read once. */
   defaultPage?: number
-  /** Total item count: a nonnegative safe integer. Defaults to 0, displaying page 1. */
+  /** Number of items being paged, an integer from 0; no items still show page 1. */
   total?: number
-  /** Items per page: a positive safe integer. Defaults to 10. */
+  /** Items per page, an integer from 1. */
   pageSize?: number
-  /** Neighbor count, an integer from 0 to 20. Edge ranges fill the available slots. Defaults to 1. */
+  /** Page buttons on each side of the current page, an integer from 0 to 20; the bar keeps its length near either end. */
   siblingCount?: number
-  /** Disable page changes and picker opening; an already open picker can still be closed. */
+  /** Disables page changes and the picker button; an open picker can still be closed. */
   disabled?: boolean
-  /** One proposal for a user change to a different visible page; external updates are quiet. */
+  /** Called once per user change to a different page; `page` updates from the parent never call it. */
   onPageChange?: (details: { page: number }) => void
-  /** Additional class name on the root element. */
+  /** Additional class name on the root nav. */
   className?: string
-  /** Membrane spacing around the outer navigation buttons; the dialog owns its own spacing. */
+  /** Membrane spacing around the navigation buttons; the picker dialog owns its own spacing. */
   membrane?: boolean
-  /** Page-picker dialog title at any viewport size. Defaults to labels.choosePage. */
-  surfaceTitle?: string
-  /** Internal control labels. The nav itself uses native aria-label or aria-labelledby. */
+  /** Names and text of the component's own controls; the nav itself takes a native aria-label or aria-labelledby. */
   labels?: Partial<PaginationLabels>
 }
 
-function readInteger(
-  value: unknown,
-  name: string,
-  min: number,
-  max = Number.MAX_SAFE_INTEGER,
-): number {
-  if (
-    typeof value !== 'number' ||
-    !Number.isSafeInteger(value) ||
-    value < min ||
-    value > max
-  )
-    throw new RangeError(
-      `Pagination ${name} must be an integer between ${min} and ${max}`,
-    )
-  return value
-}
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
+/** Page navigation with previous, next and numbered buttons, plus a dialog for jumping to any page. */
 export const Pagination = forwardRef<HTMLElement, PaginationProps>(
   function Pagination(props, ref) {
     const {
-      page: rawPage,
-      defaultPage: rawDefaultPage = 1,
-      total: rawTotal = 0,
-      pageSize: rawPageSize = 10,
-      siblingCount: rawSiblingCount = 1,
+      page,
+      defaultPage = 1,
+      total = 0,
+      pageSize = 10,
+      siblingCount = 1,
       disabled = false,
       onPageChange,
       className,
       membrane = true,
-      surfaceTitle,
       labels,
       hidden,
+      onClick,
       ...rest
     } = props
-
-    const controlledPage =
-      rawPage === undefined ? undefined : readInteger(rawPage, 'page', 1)
-    const [defaultPage] = useState(() =>
-      rawPage === undefined
-        ? readInteger(rawDefaultPage, 'defaultPage', 1)
-        : 1,
+    const pages = pageCount(
+      readNumber('Pagination', 'total', total, 0, { integer: true, min: 0 }),
+      readNumber('Pagination', 'pageSize', pageSize, 10, POSITIVE),
     )
-    const total = readInteger(rawTotal, 'total', 0)
-    const pageSize = readInteger(rawPageSize, 'pageSize', 1)
-    const siblingCount = readInteger(rawSiblingCount, 'siblingCount', 0, 20)
-    const page = useControllableMachineProp(controlledPage, defaultPage)
-    const resolvedLabels = resolveLabels(defaultLabels, labels, 'Pagination')
-    if ((resolvedLabels.page.match(/\{page\}/g) ?? []).length !== 1)
-      throw new RangeError(
-        'Pagination labels.page must contain exactly one {page} placeholder',
-      )
-    const pickerTitle = resolveLabel(
-      surfaceTitle,
-      resolvedLabels.choosePage,
-      'Pagination',
-      'surfaceTitle',
-    )
-
-    const { state, send } = useMachine(paginationMachine, {
-      page,
-      total,
-      pageSize,
-      siblingCount,
-      disabled,
-      onPageChange: onPageChange ?? null,
+    const siblings = readNumber('Pagination', 'siblingCount', siblingCount, 1, {
+      integer: true,
+      min: 0,
+      max: 20,
     })
+    const [stored, setPage] = useControllableState<number>({
+      value:
+        page === undefined
+          ? undefined
+          : readNumber('Pagination', 'page', page, 1, POSITIVE),
+      // Read only while uncontrolled: an unused default reports nothing.
+      defaultValue: () =>
+        page === undefined
+          ? readNumber('Pagination', 'defaultPage', defaultPage, 1, POSITIVE)
+          : 1,
+      onChange: (next) => onPageChange?.({ page: next }),
+      name: ['Pagination', 'page'],
+    })
+    // The stored page is the intent; fewer pages only change what is shown.
+    const current = Math.min(stored, pages)
+    const text = resolveLabels(defaultLabels, labels, 'Pagination')
+    const go = (target: number) => {
+      if (!disabled && target >= 1 && target <= pages && target !== current)
+        setPage(target)
+    }
+    const select = (event: MouseEvent<HTMLElement>) => {
+      const button = (event.target as Element).closest?.('button[data-page]')
+      if (button && !event.defaultPrevented && !button.matches(':disabled'))
+        go(Number(button.getAttribute('data-page')))
+    }
 
-    const api = connectPagination(state, send)
-    const pickerDisabled = disabled || api.totalPages <= 1
+    const pickerDisabled = disabled || pages <= 1
     const compact = useIsCompactViewport()
     const [pickerOpen, setPickerOpen] = useState(false)
-    useEffect(() => {
-      if (hidden) setPickerOpen(false)
-    }, [hidden])
+    // A hidden nav closes its portaled picker, which stays closed on reveal.
+    if (pickerOpen && hidden) setPickerOpen(false)
     const [pageInput, setPageInput] = useState('1')
-    const nextPage = Number(pageInput)
-    const validPage =
-      Number.isSafeInteger(nextPage) &&
-      nextPage >= 1 &&
-      nextPage <= api.totalPages
+    const typed = Number(pageInput)
+    const valid = Number.isSafeInteger(typed) && typed >= 1 && typed <= pages
     const jump = () => {
-      if (disabled || !validPage) return
-      send({ type: 'SET_PAGE', page: nextPage })
+      if (disabled || !valid) return
+      go(typed)
       setPickerOpen(false)
     }
 
     return (
       <nav
-        ref={ref}
-        {...api.getRootProps()}
+        aria-label={defaultRootLabels.nav}
         {...rest}
+        ref={ref}
         hidden={hidden}
+        data-scope="pagination"
+        data-part="root"
         className={cn('uf-pagination', className)}
+        onClick={composeHandlers(onClick, select)}
       >
         <Button
-          {...api.getPrevProps()}
-          aria-label={resolvedLabels.previousPage}
+          data-scope="pagination"
+          data-part="prev"
+          data-page={current - 1}
+          {...TABBABLE}
+          disabled={disabled || current <= 1}
+          aria-label={text.previous}
           fullWidth={false}
           membrane={membrane}
           variant="ghost"
           className="uf-pagination-nav uf-pagination-navPrev"
         >
-          {resolvedLabels.previousPage}
+          {text.previous}
         </Button>
 
         <span className="uf-pagination-pages">
-          {api.range.map((rangeItem, index) =>
-            rangeItem === -1 ? (
+          {pageRange(current, pages, siblings).map((item, index) =>
+            item === null ? (
               <Text
-                key={`ellipsis-${index}`}
+                key={`gap-${index}`}
                 as="span"
-                {...api.getEllipsisProps()}
+                data-scope="pagination"
+                data-part="ellipsis"
+                aria-hidden
                 membrane={false}
                 fullWidth={false}
                 className="uf-pagination-ellipsis"
@@ -212,18 +190,20 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
               </Text>
             ) : (
               <Button
-                key={rangeItem}
-                {...api.getPageProps(rangeItem)}
+                key={item}
+                data-scope="pagination"
+                data-part="item"
+                data-page={item}
+                {...TABBABLE}
+                aria-current={item === current ? 'page' : undefined}
+                aria-label={formatLabel(text.page, { page: item })}
+                disabled={disabled}
                 fullWidth={false}
                 membrane={membrane}
-                variant={api.page === rangeItem ? 'primary' : 'ghost'}
-                aria-label={resolvedLabels.page.replace(
-                  '{page}',
-                  String(rangeItem),
-                )}
+                variant={item === current ? 'primary' : 'ghost'}
                 className="uf-pagination-page"
               >
-                {String(rangeItem)}
+                {String(item)}
               </Button>
             ),
           )}
@@ -231,24 +211,28 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
 
         <span className="uf-pagination-trailing">
           <Button
-            {...api.getNextProps()}
-            aria-label={resolvedLabels.nextPage}
+            data-scope="pagination"
+            data-part="next"
+            data-page={current + 1}
+            {...TABBABLE}
+            disabled={disabled || current >= pages}
+            aria-label={text.next}
             fullWidth={false}
             membrane={membrane}
             variant="ghost"
             className="uf-pagination-nav uf-pagination-navNext"
           >
-            {resolvedLabels.nextPage}
+            {text.next}
           </Button>
           <Modal
-            open={pickerOpen && !hidden}
+            open={pickerOpen}
             onOpenChange={({ open }) => {
               if (open && pickerDisabled) return
               setPickerOpen(open)
-              if (open) setPageInput(String(api.page))
+              if (open) setPageInput(String(current))
             }}
-            title={pickerTitle}
-            closeLabel={resolvedLabels.close}
+            title={text.choosePage}
+            closeLabel={text.close}
             placement={compact ? 'bottom' : 'center'}
             width={280}
             className="uf-pagination-pagePicker"
@@ -257,28 +241,28 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
             trigger={
               <Button
                 disabled={pickerDisabled}
-                tabIndex={pickerDisabled ? -1 : 0}
+                {...TABBABLE}
                 icon="more"
                 iconOnly
                 fullWidth={false}
                 membrane={membrane}
                 variant="ghost"
                 className="uf-pagination-more"
-                aria-label={resolvedLabels.choosePage}
-                title={resolvedLabels.choosePage}
+                aria-label={text.choosePage}
+                title={text.choosePage}
               />
             }
           >
             <div>
               <Input
-                label={resolvedLabels.pageNumber}
+                label={text.pageNumber}
                 clearable={false}
-                description={<bdi dir="ltr">1–{api.totalPages}</bdi>}
+                description={<bdi dir="ltr">1–{pages}</bdi>}
                 disabled={disabled}
-                aria-invalid={!validPage || undefined}
+                aria-invalid={!valid || undefined}
                 type="number"
                 min={1}
-                max={api.totalPages}
+                max={pages}
                 step={1}
                 value={pageInput}
                 onValueChange={({ value }) => setPageInput(value)}
@@ -294,13 +278,13 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
                 }}
               />
               <Button
-                disabled={!validPage || disabled}
-                tabIndex={!validPage || disabled ? -1 : 0}
+                disabled={!valid || disabled}
+                {...TABBABLE}
                 onClick={(event) => {
                   if (!event.defaultPrevented) jump()
                 }}
               >
-                {resolvedLabels.goToPage}
+                {text.goToPage}
               </Button>
             </div>
           </Modal>

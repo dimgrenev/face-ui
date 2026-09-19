@@ -35,7 +35,7 @@ export type { AccordionProps } from './Accordion/Accordion'
 export { Bar, BarSection } from './Bar/Bar'
 export type { BarProps, BarSectionProps } from './Bar/Bar'
 export { Breadcrumb } from './Breadcrumb/Breadcrumb'
-export type { BreadcrumbProps, BreadcrumbItem } from './Breadcrumb/Breadcrumb'
+export type { BreadcrumbProps, BreadcrumbItem, BreadcrumbLabels } from './Breadcrumb/Breadcrumb'
 export { Card, cardAnatomy } from './Card/Card'
 export type {
   CardAlign,
