@@ -162,7 +162,7 @@ describe('data and feedback a11y characterization', () => {
     expect(progress?.getAttribute('aria-labelledby')).toBe(label?.id)
 
     await act(async () => {
-      root.render(<Progress indeterminate aria-label="Loading assets" />)
+      root.render(<Progress value={null} aria-label="Loading assets" />)
     })
 
     const labelledProgress = container.querySelector<HTMLElement>(

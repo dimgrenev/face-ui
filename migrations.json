@@ -688,6 +688,17 @@
       "codemod": "auto"
     },
     {
+      "kind": "remove-prop",
+      "component": "Progress",
+      "prop": "indeterminate",
+      "use": "`value={null}`",
+      "codemod": "auto",
+      "values": {
+        "true": "value={null}",
+        "false": ""
+      }
+    },
+    {
       "kind": "rename-prop",
       "component": "Radio",
       "from": "ariaLabel",

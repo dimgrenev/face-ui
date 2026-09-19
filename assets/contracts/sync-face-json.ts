@@ -601,7 +601,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
       {
         name: 'Indeterminate',
-        props: { indeterminate: true, label: 'Loading assets' },
+        props: { value: null, label: 'Loading assets' },
       },
     ],
   },

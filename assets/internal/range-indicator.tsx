@@ -75,7 +75,7 @@ const anatomy = {
  * value becomes min, both reported; a finite value outside clamps silently. */
 function resolveRange(
   component: string,
-  value: number,
+  value: unknown,
   min: number,
   max: number,
 ): RangeValueDetails {
@@ -98,10 +98,10 @@ function resolveRange(
 }
 interface InternalProps extends RangeIndicatorProps {
   kind: 'progress' | 'meter'
-  value: number
+  /** `null` is an unknown amount for progress; a meter reads it as invalid. */
+  value: number | null
   min: number
   max: number
-  indeterminate?: boolean
 }
 /** One presentation for two distinct semantics: task completion and measurement. */
 export const RangeIndicator = forwardRef<HTMLDivElement, InternalProps>(
@@ -111,7 +111,6 @@ export const RangeIndicator = forwardRef<HTMLDivElement, InternalProps>(
       value,
       min,
       max,
-      indeterminate = false,
       tone = 'neutral',
       shape = 'linear',
       showValue = false,
@@ -125,7 +124,8 @@ export const RangeIndicator = forwardRef<HTMLDivElement, InternalProps>(
       ...rest
     } = props
     const component = kind === 'progress' ? 'Progress' : 'Meter'
-    const details = resolveRange(component, value, min, max)
+    const indeterminate = kind === 'progress' && value === null
+    const details = resolveRange(component, indeterminate ? min : value, min, max)
     const percentText = `${details.value === details.max ? 100 : Math.min(99, Math.floor(details.percent + Number.EPSILON * 100))}%`
     const formattedValue = indeterminate
       ? undefined

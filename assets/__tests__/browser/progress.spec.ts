@@ -287,7 +287,7 @@ for (const direction of ['ltr', 'rtl'])
     await render(
       page,
       'progress',
-      { indeterminate: true, showValue: true },
+      { value: null, showValue: true },
       { direction },
     )
     const fill = page.locator('.uf-range-indicator__indicator'),
@@ -316,7 +316,7 @@ test('reduced motion keeps a static unknown segment visible in both shapes', { t
   for (const shape of ['linear', 'circle'] as const) {
     await render(page, 'progress', {
       shape,
-      indeterminate: true,
+      value: null,
       showValue: true,
     })
     await expect(page.locator('.uf-range-indicator__indicator')).toHaveCSS(
@@ -327,5 +327,25 @@ test('reduced motion keeps a static unknown segment visible in both shapes', { t
     await expect(page.getByRole('progressbar')).not.toHaveAttribute(
       'aria-valuetext',
     )
+  }
+})
+test('axe accepts an unknown amount: a named progressbar without aria-valuenow', { tag: ['@a11y'] }, async ({
+  page,
+}) => {
+  await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') })
+  for (const shape of ['linear', 'circle'] as const) {
+    await render(page, 'progress', { shape, value: null, showValue: true })
+    const node = page.getByRole('progressbar', { name: 'Transfer' })
+    await expect(node).not.toHaveAttribute('aria-valuenow')
+    await expect(node).toHaveAttribute('aria-valuemax', '100')
+    const violations = await page.evaluate(
+      async () =>
+        (
+          await (window as any).axe.run('#frame', {
+            runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] },
+          })
+        ).violations,
+    )
+    expect(violations).toEqual([])
   }
 })

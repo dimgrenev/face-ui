@@ -373,7 +373,7 @@ const PENDING = {
     'Avatar', 'Code', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Select', 'Table', 'Toast',
     'Toc', 'Tree',
   ],
-  'R-dup': ['Carousel', 'Code', 'Date', 'Markdown', 'Progress', 'Select', 'Toc'],
+  'R-dup': ['Carousel', 'Code', 'Date', 'Markdown', 'Select', 'Toc'],
   'R-label': ['Breadcrumb', 'Modal', 'Select', 'Toast'],
   'R-aria': ['Carousel', 'Media', 'Scroll', 'Table'],
   'R-logical': ['Modal', 'Table', 'Toast', 'Toc'],

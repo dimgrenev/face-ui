@@ -1,12 +1,14 @@
-import { StrictMode, Fragment } from 'react'
+import { StrictMode, Fragment, type ComponentType, type RefAttributes } from 'react'
 import { createRoot } from 'react-dom/client'
 import { flushSync } from 'react-dom'
-import { Progress, type ProgressProps } from '../../../../Progress/Progress'
+import { Progress } from '../../../../Progress/Progress'
 import { Meter, type MeterProps } from '../../../../Meter/Meter'
+/** Either indicator's props; a meter given `value: null` shows how it treats raw input. */
+type RangeProps = Omit<MeterProps, 'value'> & { value?: number | null }
 const root = createRoot(document.getElementById('root')!)
 const renderRange = (
   kind = 'progress',
-  props: ProgressProps & MeterProps = {},
+  props: RangeProps = {},
   options: {
     width?: number
     zoom?: number
@@ -24,7 +26,9 @@ const renderRange = (
     color: 'var(--uf-color-fg)',
     background: 'var(--uf-color-bg)',
   })
-  const Component = kind === 'meter' ? Meter : Progress
+  const Component = (kind === 'meter' ? Meter : Progress) as ComponentType<
+    RangeProps & RefAttributes<HTMLDivElement>
+  >
   flushSync(() =>
     root.render(
       <StrictMode>

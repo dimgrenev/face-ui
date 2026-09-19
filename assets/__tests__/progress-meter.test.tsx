@@ -239,27 +239,62 @@ for (const [name, Component, role] of [
     expect(indicator().getAttribute('aria-valuetext')).toBe('70%')
   })
 }
-it('Progress unknown state hides numeric text, skips formatting, and returns to the latest known value', async () => {
+it('Progress value null is an unknown amount: a progressbar without aria-valuenow or numeric text', async () => {
   const formatValue = vi.fn(({ value }) => String(value))
   await render(
     <Progress
-      value={65}
+      value={null}
+      max={10}
       showValue
       label="Import"
-      indeterminate
       formatValue={formatValue}
     />,
   )
-  const node = host.querySelector('[role="progressbar"]')!
+  const node = host.querySelector<HTMLElement>('[role="progressbar"]')!
   expect(node.hasAttribute('aria-valuenow')).toBe(false)
   expect(node.hasAttribute('aria-valuetext')).toBe(false)
+  expect(node.getAttribute('aria-valuemin')).toBe('0')
+  expect(node.getAttribute('aria-valuemax')).toBe('10')
+  expect(node.dataset.state).toBe('indeterminate')
   expect(host.textContent).toBe('Import')
   expect(formatValue).not.toHaveBeenCalled()
   await render(
-    <Progress value={70} showValue label="Import" formatValue={formatValue} />,
+    <Progress value={7} max={10} showValue label="Import" formatValue={formatValue} />,
   )
-  expect(node.getAttribute('aria-valuenow')).toBe('70')
-  expect(host.textContent).toBe('Import70')
+  expect(host.querySelector('[role="progressbar"]')).toBe(node)
+  expect(node.getAttribute('aria-valuenow')).toBe('7')
+  expect(node.getAttribute('aria-valuetext')).toBe('7')
+  expect(node.dataset.state).toBe('loading')
+  expect(host.textContent).toBe('Import7')
+  await render(<Progress value={null} aria-valuetext="Waiting for the server" />)
+  expect(node.hasAttribute('aria-valuenow')).toBe(false)
+  expect(node.getAttribute('aria-valuetext')).toBe('Waiting for the server')
+})
+it('Progress value 0 and an omitted value are known amounts, unlike null', async () => {
+  for (const props of [{ value: 0 }, {}]) {
+    await render(<Progress {...props} aria-label="Import" />)
+    const node = host.querySelector<HTMLElement>('[role="progressbar"]')!
+    expect(node.getAttribute('aria-valuenow')).toBe('0')
+    expect(node.dataset.state).toBe('loading')
+  }
+})
+it('Progress value null with an invalid max reports only the bounds', async () => {
+  await expectDevError(
+    () => render(<Progress value={null} max={0} aria-label="Import" />),
+    /^Face UI Progress: invalid max 0; using 0\.\.100\.$/,
+  )
+  const node = host.querySelector('[role="progressbar"]')!
+  expect(node.getAttribute('aria-valuemax')).toBe('100')
+  expect(node.hasAttribute('aria-valuenow')).toBe(false)
+})
+it('Meter has no unknown reading: value null renders the minimum and is reported', async () => {
+  await expectDevError(
+    () => render(<Meter value={null as never} min={10} max={20} aria-label="Reading" />),
+    /^Face UI Meter: invalid value null; using 10\.$/,
+  )
+  const meter = host.querySelector<HTMLElement>('[role="meter"]')!
+  expect(meter.getAttribute('aria-valuenow')).toBe('10')
+  expect(meter.dataset.state).toBe('empty')
 })
 it('Meter supports nonzero and negative ranges, including opposite finite extremes', async () => {
   for (const props of [
