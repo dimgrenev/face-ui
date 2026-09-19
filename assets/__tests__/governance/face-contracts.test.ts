@@ -23,13 +23,23 @@ describe('face-ui-react contracts', () => {
   it('keeps Upload contract props aligned to the public component API', () => {
     const [upload] = collectFaceJsonContracts('Upload')
     const expectedProps = [
+      'label',
+      'description',
+      'error',
+      'labelPosition',
+      'files',
+      'defaultFiles',
       'accept',
       'multiple',
       'maxSize',
       'maxFiles',
       'disabled',
-      'files',
-      'defaultFiles',
+      'name',
+      'form',
+      'required',
+      'autoFocus',
+      'aria-label',
+      'aria-labelledby',
       'labels',
     ]
 

@@ -138,7 +138,7 @@ async function scenarioReports(name: string): Promise<string[]> {
 
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
-  'hostile props': ['Table', 'Upload'],
+  'hostile props': ['Table'],
   'scenario reports': [],
 } satisfies Record<string, readonly string[]>
 
