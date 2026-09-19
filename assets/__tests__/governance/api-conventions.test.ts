@@ -378,7 +378,7 @@ const PENDING = {
   'R-aria': ['Carousel', 'Media', 'Scroll', 'Table'],
   'R-logical': ['Modal', 'Table', 'Toast', 'Toc'],
   'R-bool': [],
-  'R-field': ['Date', 'Rating', 'Select', 'Slider'],
+  'R-field': ['Date', 'Select', 'Slider'],
   'R-strings': [
     'Breadcrumb', 'Carousel', 'Code', 'Command', 'Date', 'Menu', 'Navigation', 'Panel', 'Scroll', 'Select', 'Toast',
   ],

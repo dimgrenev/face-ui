@@ -217,6 +217,9 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | --- | --- | --- |
 | `ariaLabel` | `aria-label` | auto |
 | Pressing the selected star again or Home cleared the value | Neither clears it; reset the value yourself. Show a fixed score with `readOnly`, not `disabled` | — |
+| The root was an inline box sized to its stars; `label` was `[data-scope="rating"][data-part="label"]` inside the membrane | The root is a block field (`uf-field`) with `label`, `description` and `error` as `[data-scope="field"]` parts; `membrane` spaces the stars only | — |
+| An invalid `max`, a non-finite `value`, `required` without `name` or a non-text `formatValue` result threw | Each renders normalized (`max` clamped to 1..10, score 0, `required` ignored, the default text) with one development report | — |
+| Shrinking `max`, turning off `allowHalf` or leaving `readOnly` stored the rounded or bounded score | The stored score stays; only the shown one is bounded or rounded, so the exact score returns with the scale | — |
 
 ### SegmentedControl
 

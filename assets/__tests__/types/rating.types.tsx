@@ -4,6 +4,9 @@ import { Rating as AuditedRating, type RatingValueDetails } from '../../../Ratin
 const ratingFormatter = ({ value, max }: RatingValueDetails) => `${value} из ${max}`
 ;<AuditedRating readOnly value={4.2} formatValue={ratingFormatter} aria-label="Average" />
 ;<AuditedRating name="score" required form="review" autoFocus membrane={false} />
+;<AuditedRating label="Score" description="Shared with the author" error="Choose a score" labelPosition="start" />
+// @ts-expect-error the label sits on top or at the inline start
+;<AuditedRating labelPosition="end" />
 // @ts-expect-error native naming replaces the duplicate alias
 ;<AuditedRating ariaLabel="Review" />
 // @ts-expect-error required native validation needs a form key

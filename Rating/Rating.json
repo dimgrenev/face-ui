@@ -2,12 +2,36 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Rating",
-  "description": "Short star scale for native score input or a precise readonly average",
+  "description": "A star scale field for choosing a score, or for showing an average read-only.",
   "props": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
+    },
     "value": {
       "type": "number",
       "required": false,
-      "description": "Controlled finite score, bounded to 0..max. Zero means unrated.",
+      "description": "Controlled score, shown within 0..max; 0 means unrated. Editable stars show it rounded to the nearest choice.",
       "min": 0,
       "max": 10,
       "step": 0.1
@@ -15,80 +39,75 @@
     "defaultValue": {
       "type": "number",
       "required": false,
-      "description": "Initial uncontrolled score, restored by form reset. Defaults to 0.",
-      "default": 0,
+      "description": "Uncontrolled initial score, restored by form reset. Defaults to 0.",
       "min": 0,
       "max": 10,
-      "step": 0.5
+      "step": 0.5,
+      "default": 0
     },
     "max": {
       "type": "number",
       "required": false,
-      "description": "Number of stars: an integer from 1 to 10. Defaults to 5.",
-      "default": 5,
+      "description": "Number of stars, an integer from 1 to 10. Defaults to 5.",
       "min": 1,
       "max": 10,
-      "step": 1
+      "step": 1,
+      "default": 5
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable editing and native form submission, retaining the displayed score.",
+      "description": "Blocks choosing, focus and form submission; the score stays visible.",
       "default": false
     },
     "readOnly": {
       "type": "boolean",
       "required": false,
-      "description": "Display a precise average as a measurement, without editing or required validation.",
+      "description": "Shows the score as a meter with its exact fraction: not editable or focusable, submitted with the form, never required.",
       "default": false
     },
     "allowHalf": {
       "type": "boolean",
       "required": false,
-      "description": "Allow half-star input steps. Readonly averages always retain exact fractions.",
+      "description": "Adds a half-star choice before each star; a read-only score keeps its exact fraction either way.",
       "default": false
-    },
-    "label": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Noninteractive visible name; empty content falls back to native naming attributes."
     },
     "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Name override, or a name when no visible label is provided."
+      "description": "Names the group when there is no visible `label`."
     },
     "aria-labelledby": {
       "type": "string",
       "required": false,
-      "description": "External naming elements; takes precedence over label and aria-label."
+      "description": "Ids of the elements that name the group; wins over `label` and `aria-label`."
     },
     "form": {
       "type": "string",
       "required": false,
-      "description": "Id of an external native form that owns this score."
+      "description": "Id of an external native form that owns the score."
     },
     "autoFocus": {
       "type": "boolean",
       "required": false,
-      "description": "Focus the selected or first editable choice on mount. Defaults to false.",
+      "description": "Focuses the selected choice, else the first one, on mount.",
       "default": false
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Shared membrane spacing around each choice and the label. Defaults to true.",
+      "description": "Shared outer spacing around each star; toggling it keeps the native inputs.",
       "default": true
     },
     "name": {
       "type": "string",
       "required": false,
-      "description": "Nonempty native form key; use a distinct name for each independent rating."
+      "description": "Nonempty native form key; use a distinct name for each independent rating in a form."
     },
     "required": {
       "type": "boolean",
       "required": false,
-      "description": "Require a score before submitting an editable rating. Defaults to false.",
+      "description": "Requires a score before an editable rating's form submits; ignored without a nonempty `name`.",
       "default": false
     }
   },
@@ -139,6 +158,16 @@
         "disabled": true,
         "label": "Locked rating"
       }
+    },
+    {
+      "name": "Invalid",
+      "props": {
+        "label": "How helpful was this answer?",
+        "description": "Your score is shared with the author.",
+        "error": "Choose a score.",
+        "name": "helpfulness",
+        "required": true
+      }
     }
   ],
   "behavior": {
@@ -176,7 +205,11 @@
     "required": [
       "accessible name"
     ],
-    "readOnlyRole": "meter"
+    "readOnlyRole": "meter",
+    "notes": [
+      "Name the group with label, aria-label or aria-labelledby; description and error describe the group and every radio.",
+      "readOnly renders a meter with the exact score: no radios or tab stop, the score submitted through a hidden input, never required or invalid."
+    ]
   },
   "composition": {
     "required": [
@@ -184,16 +217,10 @@
       "list",
       "indicator"
     ],
-    "recommended": [
-      "label"
-    ],
+    "recommended": [],
     "parts": {
       "root": {
         "slot": "root"
-      },
-      "label": {
-        "slot": "label",
-        "parent": "root"
       },
       "list": {
         "slot": "list",
@@ -215,7 +242,8 @@
       }
     },
     "notes": [
-      "Editable mode adds native input/item parts; readOnly retains the root, list and decorative indicators."
+      "Editable mode adds native input/item parts; readOnly retains the root, list and decorative indicators.",
+      "Field owns the label, description and error parts ([data-scope=\"field\"]) around the list."
     ]
   },
   "tokenMapping": {
