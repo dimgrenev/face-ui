@@ -565,6 +565,52 @@ describe('hover timing and combined intent', () => {
     expect(surface()).toBeNull()
     expect(change).not.toHaveBeenCalled()
   })
+  // A delay's proposal renders in a later task than its timer. act() flushes
+  // that render only when its scope ends, so input inside the scope lands in the gap.
+  const pointerRightAfter = (ms: number, type: 'pointerover' | 'pointerout') =>
+    act(async () => {
+      vi.advanceTimersByTime(ms)
+      const event = new MouseEvent(type, { bubbles: true, cancelable: true })
+      Object.defineProperty(event, 'pointerType', { value: 'mouse' })
+      trigger().dispatchEvent(event)
+    })
+  it('a pointer that leaves as the open delay fires leaves the surface closed', async () => {
+    await render(
+      <Tooltip content="Help" openDelay={50} closeDelay={0}>
+        <button>Trigger</button>
+      </Tooltip>,
+    )
+    await pointer(trigger(), 'pointerover')
+    await pointerRightAfter(50, 'pointerout')
+    await advance(1000)
+    expect(visible()).toBe(false)
+  })
+  it('a pointer that returns as the close delay fires leaves the surface open', async () => {
+    await render(
+      <Tooltip content="Help" openDelay={0} closeDelay={50}>
+        <button>Trigger</button>
+      </Tooltip>,
+    )
+    await pointer(trigger(), 'pointerover')
+    await pointer(trigger(), 'pointerout')
+    await pointerRightAfter(50, 'pointerover')
+    await advance(1000)
+    expect(visible()).toBe(true)
+  })
+  it('a pointer that leaves before a controlled parent commits the open asks to close', async () => {
+    const change = vi.fn()
+    const view = (open: boolean) => (
+      <Tooltip open={open} openDelay={50} closeDelay={0} content="Help" onOpenChange={change}>
+        <button>Trigger</button>
+      </Tooltip>
+    )
+    await render(view(false))
+    await pointer(trigger(), 'pointerover')
+    await advance(50)
+    await pointer(trigger(), 'pointerout')
+    await render(view(true))
+    expect(change.mock.calls).toEqual([[{ open: true }], [{ open: false }]])
+  })
 })
 
 it('releasing controlled mode retains the last externally selected visibility', async () => {

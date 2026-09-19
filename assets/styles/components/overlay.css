@@ -14,7 +14,7 @@
   min-height: var(--uf-control-height);
   font-size: var(--uf-control-font-size);
   line-height: var(--uf-control-line-height);
-  text-align: left;
+  text-align: start;
   white-space: normal;
   overflow-wrap: break-word;
   opacity: 0;
@@ -60,7 +60,4 @@
   --uf-text-color: var(--uf-tooltip-fg);
   color: var(--uf-tooltip-fg);
   font-size: var(--uf-control-font-size);
-}
-.uf-overlay-content[data-scope][data-state="open"][data-trigger="hover"] {
-  pointer-events: auto;
 }

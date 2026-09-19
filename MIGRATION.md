@@ -117,6 +117,12 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `weekStartsOn` defaulted to 1 (Monday) | The first weekday follows `locale`; set `weekStartsOn` to pin it | — |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the trigger `<button>`; `className` and `style` still style the whole field | — |
 
+### FloatingOverlay
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `trigger` | `openOn` | auto |
+
 ### Icon
 
 | Before | After | Codemod |

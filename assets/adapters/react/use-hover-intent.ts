@@ -100,6 +100,8 @@ function createIntent(
     proposed: undefined as { value: string | null } | undefined,
     pointer: null as Region | null,
     focused: false,
+    /** The trigger keyboard focus entered; focus a layer restored holds but did not enter. */
+    focusKey: null as string | null,
     bridge: null as (() => void) | null,
   }
   const triggers = new Map<string, HTMLElement>()
@@ -148,6 +150,21 @@ function createIntent(
         s.mode = 'closing'
         schedule()
       } else commit(null)
+    }
+  }
+  /**
+   * Replays input that arrived while the own proposal waited for its commit and
+   * was measured against the old value: whatever still holds the intent wins.
+   */
+  const settle = () => {
+    if (s.mode === 'opening' ? s.target === s.value : s.mode === 'closing' && s.value === null)
+      idle()
+    if (s.mode !== 'idle') return
+    if (s.value !== null) {
+      if (s.pointer === null && !s.focused) leave()
+    } else {
+      const key = typeof s.pointer === 'string' ? s.pointer : s.focusKey
+      if (key !== null) enter(key)
     }
   }
   const endBridge = () => {
@@ -246,12 +263,14 @@ function createIntent(
         if (ignored(event) || !s.focus) return
         s.focused = true
         // Focus returned by a closing layer is not the user arriving.
-        const entered = key()
-        if (entered !== null && !isRestoringFocus()) enter(entered)
+        const entered = isRestoringFocus() ? null : key()
+        s.focusKey = region === CONTENT ? null : entered
+        if (entered !== null) enter(entered)
       },
       onBlur(event) {
         if (ignored(event) || !s.focus || holds(event.relatedTarget)) return
         s.focused = false
+        s.focusKey = null
         if (s.pointer === null) leave()
       },
     }
@@ -280,22 +299,24 @@ function createIntent(
     sync(options: HoverIntentOptions) {
       const { value, openDelay, closeDelay } = options
       const disabled = !!options.disabled
-      const own = s.proposed && Object.is(s.proposed.value, value)
-      const external = !Object.is(value, s.value) && !own
+      const changed = !Object.is(value, s.value)
+      const own = changed && !!s.proposed && Object.is(s.proposed.value, value)
       const retimed = openDelay !== s.openDelay || closeDelay !== s.closeDelay
       Object.assign(s, { value, openDelay, closeDelay, disabled })
       s.focus = options.focus ?? true
       s.proposed = undefined
-      if (disabled) {
-        dispose()
-        s.pointer = null
-        s.focused = false
-      } else if (external) idle()
-      else if (retimed && s.mode !== 'idle') schedule()
-      if (value === null && s.pointer !== null && (s.bridge || s.pointer === CONTENT)) {
+      if (value === null && (s.bridge || s.pointer === CONTENT)) {
         // Closed while crossing or over content that is now hidden.
         endBridge()
         s.pointer = null
+      }
+      if (disabled) {
+        dispose()
+        Object.assign(s, { pointer: null, focused: false, focusKey: null })
+      } else if (changed && !own) idle()
+      else {
+        if (retimed && s.mode !== 'idle') schedule()
+        if (own) settle()
       }
     },
     dispose,

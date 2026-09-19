@@ -431,6 +431,13 @@
     },
     {
       "kind": "rename-prop",
+      "component": "FloatingOverlay",
+      "from": "trigger",
+      "to": "openOn",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
       "component": "Icon",
       "from": "label",
       "to": "aria-label",
