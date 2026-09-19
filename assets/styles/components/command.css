@@ -53,7 +53,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-align: left;
+  text-align: start;
 }
 .uf-command__triggerLabel--placeholder {
   color: var(--uf-color-fg-muted);
@@ -133,6 +133,10 @@
 .uf-command-itemMembrane {
   display: flex;
   width: 100%;
+  cursor: pointer;
+}
+.uf-command-itemMembrane[data-disabled] {
+  cursor: not-allowed;
 }
 [data-scope="command"] [data-part="item"] {
   width: 100%;
