@@ -42,8 +42,11 @@ function sourceTokens() {
   return { tokens, prefixes }
 }
 const { tokens, prefixes } = sourceTokens()
-/** Density containers consumers put on their own elements (public CSS API). */
-const CONSUMER_CLASSES = new Set(['uf-compact', 'uf-large'])
+/**
+ * Classes consumers put on their own elements (public CSS API): the density
+ * containers and the opt-in animation ancestor of `animations.css`.
+ */
+const CONSUMER_CLASSES = new Set(['uf-compact', 'uf-large', 'uf-animated'])
 const isUsed = (name: string) =>
   CONSUMER_CLASSES.has(name) || tokens.has(name) || prefixes.some((prefix) => name.startsWith(prefix))
 
@@ -89,10 +92,7 @@ describeGate('reachability: component CSS classes', PENDING.css, (component) =>
 /** Shared modules and shared-stylesheet classes not yet used; the lists only shrink. */
 const PENDING_SHARED = {
   modules: [],
-  classes: [
-    'animations.css: .uf-animated is never rendered',
-    'base.css: .is-active is never rendered',
-  ],
+  classes: [],
 } satisfies Record<string, readonly string[]>
 
 describe.skipIf(filtered)('reachability: shared code', () => {

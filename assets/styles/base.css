@@ -119,11 +119,9 @@ table[data-scope] {
 [data-scope] .uf-control[aria-current="true"],
 [data-scope] .uf-control[aria-selected="true"],
 [data-scope] .uf-control[data-active="true"],
-[data-scope] .uf-control.is-active,
 .uf-control[data-scope][aria-current="true"],
 .uf-control[data-scope][aria-selected="true"],
-.uf-control[data-scope][data-active="true"],
-.uf-control[data-scope].is-active {
+.uf-control[data-scope][data-active="true"] {
   font-weight: var(--uf-font-weight);
 }
 

@@ -7,11 +7,12 @@ interface ResponsiveSheetHeaderProps {
   title: ReactNode
   titleId?: string
   onClose: () => void
-  closeLabel?: string
+  /** Name of the close button; the owner passes its resolved `labels.close`. */
+  closeLabel: string
 }
 
 export function ResponsiveSheetHeader(props: ResponsiveSheetHeaderProps) {
-  const { title, titleId, onClose, closeLabel = 'Close' } = props
+  const { title, titleId, onClose, closeLabel } = props
 
   return (
     <Bar className="uf-responsive-sheetHeader">

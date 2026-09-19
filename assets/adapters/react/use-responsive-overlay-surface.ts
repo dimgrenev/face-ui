@@ -3,23 +3,10 @@ import { useEffect, useState } from 'react'
 export type ResponsiveOverlaySurface = 'auto' | 'popover' | 'sheet'
 export type ResolvedOverlaySurface = Exclude<ResponsiveOverlaySurface, 'auto'>
 
-export const DEFAULT_OVERLAY_SURFACE_BREAKPOINT = 900
+/** The one compact boundary (K20): below 900px wide, `auto` resolves to a sheet. */
+const COMPACT_QUERY = '(max-width: 899px)'
 
-function normalizeBreakpoint(breakpoint: number): number {
-  const numericBreakpoint = Number(breakpoint)
-  return Number.isFinite(numericBreakpoint) && numericBreakpoint > 0
-    ? numericBreakpoint
-    : DEFAULT_OVERLAY_SURFACE_BREAKPOINT
-}
-
-function getCompactMediaQuery(breakpoint: number): string {
-  return `(max-width: ${Math.max(0, normalizeBreakpoint(breakpoint) - 1)}px)`
-}
-
-function resolveSurface(
-  surface: ResponsiveOverlaySurface,
-  breakpoint: number,
-): ResolvedOverlaySurface {
+function resolveSurface(surface: ResponsiveOverlaySurface): ResolvedOverlaySurface {
   if (surface === 'popover' || surface === 'sheet') {
     return surface
   }
@@ -28,12 +15,11 @@ function resolveSurface(
     return 'popover'
   }
 
-  return window.matchMedia(getCompactMediaQuery(breakpoint)).matches ? 'sheet' : 'popover'
+  return window.matchMedia(COMPACT_QUERY).matches ? 'sheet' : 'popover'
 }
 
 export function useResponsiveOverlaySurface(
   surface: ResponsiveOverlaySurface = 'auto',
-  breakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
 ): ResolvedOverlaySurface {
   const [resolvedSurface, setResolvedSurface] = useState<ResolvedOverlaySurface>(() => (
     surface === 'popover' || surface === 'sheet' ? surface : 'popover'
@@ -50,11 +36,9 @@ export function useResponsiveOverlaySurface(
       return
     }
 
-    const normalizedBreakpoint = normalizeBreakpoint(breakpoint)
-    const query = getCompactMediaQuery(normalizedBreakpoint)
-    const mediaQuery = window.matchMedia(query)
+    const mediaQuery = window.matchMedia(COMPACT_QUERY)
     const updateSurface = () => {
-      setResolvedSurface(resolveSurface(surface, normalizedBreakpoint))
+      setResolvedSurface(resolveSurface(surface))
     }
 
     updateSurface()
@@ -73,13 +57,12 @@ export function useResponsiveOverlaySurface(
       window.removeEventListener('resize', updateSurface)
       mediaQuery.removeListener(updateSurface)
     }
-  }, [surface, breakpoint])
+  }, [surface])
 
   return resolvedSurface
 }
 
-export function useIsCompactViewport(
-  breakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
-): boolean {
-  return useResponsiveOverlaySurface('auto', breakpoint) === 'sheet'
+/** True below the 900px compact boundary. */
+export function useIsCompactViewport(): boolean {
+  return useResponsiveOverlaySurface('auto') === 'sheet'
 }

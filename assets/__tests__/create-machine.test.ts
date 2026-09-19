@@ -2,9 +2,6 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   createMachine,
   interpret,
-  and,
-  or,
-  not,
   areContextValuesEqual,
 } from '../create-machine'
 import type { MachineSchema } from '../types'
@@ -388,55 +385,6 @@ describe('effects', () => {
     svc.send('TOGGLE') // → off, cleanups effect
     expect(cleanupSpy).toHaveBeenCalledTimes(1)
     svc.stop()
-  })
-})
-
-describe('guard combinators', () => {
-  const isEnabled = (ctx: { disabled: boolean }) => !ctx.disabled
-  const hasValue = (ctx: { count: number }) => ctx.count > 0
-
-  it('and() combines guards', () => {
-    type Ctx = { disabled: boolean; count: number }
-    const combined = and<{
-      context: Ctx
-      state: string
-      event: { type: string }
-    }>(isEnabled as (ctx: Ctx) => boolean, hasValue as (ctx: Ctx) => boolean)
-    expect(combined({ disabled: false, count: 5 } as Ctx, { type: 'X' })).toBe(
-      true,
-    )
-    expect(combined({ disabled: true, count: 5 } as Ctx, { type: 'X' })).toBe(
-      false,
-    )
-    expect(combined({ disabled: false, count: 0 } as Ctx, { type: 'X' })).toBe(
-      false,
-    )
-  })
-
-  it('or() combines guards', () => {
-    type Ctx = { disabled: boolean; count: number }
-    const combined = or<{
-      context: Ctx
-      state: string
-      event: { type: string }
-    }>(isEnabled as (ctx: Ctx) => boolean, hasValue as (ctx: Ctx) => boolean)
-    expect(combined({ disabled: true, count: 5 } as Ctx, { type: 'X' })).toBe(
-      true,
-    )
-    expect(combined({ disabled: true, count: 0 } as Ctx, { type: 'X' })).toBe(
-      false,
-    )
-  })
-
-  it('not() inverts guard', () => {
-    type Ctx = { disabled: boolean }
-    const notDisabled = not<{
-      context: Ctx
-      state: string
-      event: { type: string }
-    }>((ctx: Ctx) => ctx.disabled)
-    expect(notDisabled({ disabled: false } as Ctx, { type: 'X' })).toBe(true)
-    expect(notDisabled({ disabled: true } as Ctx, { type: 'X' })).toBe(false)
   })
 })
 

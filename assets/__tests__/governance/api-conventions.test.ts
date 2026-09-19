@@ -376,9 +376,7 @@ const PENDING = {
   'R-logical': ['Table'],
   'R-bool': [],
   'R-field': [],
-  'R-strings': [
-    'Date', 'Menu', 'Select',
-  ],
+  'R-strings': [],
 } satisfies Record<string, readonly string[]>
 
 describeGate('api-conventions R-triple', PENDING['R-triple'], tripleViolations)

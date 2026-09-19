@@ -16,8 +16,11 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `useDismissOutside` from `assets/adapters/react/use-dismiss-outside` | `useLayer` from `assets/adapters/react/use-layer` | manual |
 | `UseDismissOutsideOptions` from `assets/adapters/react/use-dismiss-outside` | The options of `useLayer` from `assets/adapters/react/use-layer` | manual |
 | `useFocusTrap` from `assets/adapters/react/use-focus-trap` | `useLayer` from `assets/adapters/react/use-layer` | manual |
+| `useControllableOpenState` from `assets/adapters/react/use-controllable-open-state` | `useControllableState` from `assets/adapters/react/use-controllable-state` | manual |
+| `DEFAULT_OVERLAY_SURFACE_BREAKPOINT` from `assets/adapters/react/use-responsive-overlay-surface` | Removed with the `breakpoint` argument of `useResponsiveOverlaySurface` and `useIsCompactViewport`: every `auto` surface is a sheet below 900px wide | manual |
 | `installMembraneInteractions` from `assets/membrane-interactions` | Remove the call; each component owns its membrane | manual |
 | `FormControlProps` | `FieldProps` for label, description, error and labelPosition; each control declares disabled, required, name, membrane and className itself | manual |
+| `NavItemBase` | The item type of the component: `PanelItem`, `NavigationLink` or `TreeItem`, each keyed by `value` | manual |
 
 ### Accordion
 

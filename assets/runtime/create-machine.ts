@@ -27,28 +27,6 @@ import type {
 } from './types'
 
 // ---------------------------------------------------------------------------
-// Guard combinators
-// ---------------------------------------------------------------------------
-
-export function and<S extends MachineSchema>(
-  ...guards: ((ctx: S['context'], event: S['event']) => boolean)[]
-): (ctx: S['context'], event: S['event']) => boolean {
-  return (ctx, event) => guards.every((g) => g(ctx, event))
-}
-
-export function or<S extends MachineSchema>(
-  ...guards: ((ctx: S['context'], event: S['event']) => boolean)[]
-): (ctx: S['context'], event: S['event']) => boolean {
-  return (ctx, event) => guards.some((g) => g(ctx, event))
-}
-
-export function not<S extends MachineSchema>(
-  guard: (ctx: S['context'], event: S['event']) => boolean,
-): (ctx: S['context'], event: S['event']) => boolean {
-  return (ctx, event) => !guard(ctx, event)
-}
-
-// ---------------------------------------------------------------------------
 // createMachine — returns a config object (not a running service)
 // ---------------------------------------------------------------------------
 

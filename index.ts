@@ -88,7 +88,6 @@ export type { TreeProps, TreeItem, TreeRenderNodeDetails } from './Tree/Tree'
 
 // Shared utilities and types
 export type { FieldProps } from './assets/internal/field'
-export type { NavItemBase } from './assets/nav-item'
 export type { RangeValueDetails } from './assets/internal/range-indicator'
 export { cn } from './assets/utils'
 export { hasSlotContent } from './assets/slot-content'

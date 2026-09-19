@@ -33,6 +33,18 @@ export default [
   },
   {
     kind: 'export',
+    from: 'assets/adapters/react/use-controllable-open-state#useControllableOpenState',
+    to: '`useControllableState` from `assets/adapters/react/use-controllable-state`',
+    codemod: 'manual',
+  },
+  {
+    kind: 'export',
+    from: 'assets/adapters/react/use-responsive-overlay-surface#DEFAULT_OVERLAY_SURFACE_BREAKPOINT',
+    to: 'Removed with the `breakpoint` argument of `useResponsiveOverlaySurface` and `useIsCompactViewport`: every `auto` surface is a sheet below 900px wide',
+    codemod: 'manual',
+  },
+  {
+    kind: 'export',
     from: 'assets/membrane-interactions#installMembraneInteractions',
     to: 'Remove the call; each component owns its membrane',
     codemod: 'manual',
@@ -41,6 +53,12 @@ export default [
     kind: 'export',
     from: 'FormControlProps',
     to: '`FieldProps` for label, description, error and labelPosition; each control declares disabled, required, name, membrane and className itself',
+    codemod: 'manual',
+  },
+  {
+    kind: 'export',
+    from: 'NavItemBase',
+    to: 'The item type of the component: `PanelItem`, `NavigationLink` or `TreeItem`, each keyed by `value`',
     codemod: 'manual',
   },
 ] satisfies Migration[]

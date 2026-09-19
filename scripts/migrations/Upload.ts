@@ -35,7 +35,7 @@ export default [
     before: '`details.files` held `{ id, name, size, type, source, reason }` with reasons `type`, `size`, `count` and `multiple`',
     after: '`details.files` holds `{ file, reason }`, `file` being the browser File, with reasons `invalidType`, `tooLarge` and `tooMany` (a second file without `multiple` included)',
     codemod: 'manual',
-    legacy: String.raw`\b(source|reason)\b`,
+    legacy: String.raw`\bsource\b|['"](type|size|count|multiple)['"]`,
   },
   { kind: 'remove-prop', component: 'Upload', prop: 'files[].source', use: '`files[].file`', codemod: 'manual' },
   {
