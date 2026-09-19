@@ -464,6 +464,9 @@ test('submit sends the selection, required blocks an empty group, reset restores
     )
   await submit()
   expect(await submits()).toEqual([])
+  // Firefox's validation bubble for the focused first radio covers the second
+  // option and swallows clicks there until that radio blurs.
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
   await page.locator('[data-radio-fixture] label').nth(1).click()
   await submit()
   expect(await submits()).toEqual(['choice=b'])
