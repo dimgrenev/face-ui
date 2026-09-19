@@ -4,6 +4,30 @@
   "name": "Input",
   "description": "Native text field with labeling, validation, clear action and multiline sizing.",
   "props": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
+    },
     "placeholder": {
       "type": "string",
       "required": false,
@@ -65,32 +89,8 @@
     "defaultValue": {
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial value, also restored by form reset."
-    },
-    "label": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Visible label associated with the native control."
-    },
-    "description": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Help associated with the native control. Empty content adds no spacing or ARIA id."
-    },
-    "error": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Validation message; also marks the control invalid unless aria-invalid is explicit."
-    },
-    "labelOrientation": {
-      "type": "enum",
-      "required": false,
-      "description": "Label placement; has no effect without a label.",
-      "options": [
-        "vertical",
-        "horizontal"
-      ],
-      "default": "vertical"
+      "description": "Uncontrolled initial value, also restored by form reset.",
+      "default": ""
     },
     "icon": {
       "type": "ReactNode",
@@ -113,17 +113,22 @@
       "description": "Offer a clear action for a nonempty, editable field.",
       "default": true
     },
-    "clearLabel": {
-      "type": "string",
+    "labels": {
+      "type": "object",
       "required": false,
-      "description": "Accessible name of the clear action.",
-      "default": "Clear input"
+      "description": "Accessible names of the field's own controls."
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch the field to its container; false keeps the control's native width.",
+      "default": true
     },
     "membrane": {
       "type": "boolean",
       "required": false,
       "description": "Outer spacing around the native control, independent of label and help.",
-      "default": false
+      "default": true
     },
     "multiline": {
       "type": "boolean",
@@ -202,10 +207,10 @@
         "disabled": false,
         "readOnly": false,
         "error": "",
-        "labelOrientation": "vertical",
+        "labelPosition": "top",
         "iconPosition": "start",
         "required": false,
-        "membrane": false,
+        "membrane": true,
         "label": "Input",
         "placeholder": "Type…"
       }
@@ -278,12 +283,14 @@
       "props": {
         "label": "Имя",
         "defaultValue": "Анна",
-        "clearLabel": "Очистить"
+        "labels": {
+          "clear": "Очистить"
+        }
       }
     }
   ],
   "behavior": {
-    "controlledValue": "Parent value updates and form reset are silent. User edits, including clear, notify onChange and onValueChange once.",
+    "controlledValue": "Parent value updates and form reset are silent. A user edit, including clear, calls onChange first, then onValueChange once; preventDefault() in onChange cancels the edit.",
     "autoGrow": "Multiline fields grow and shrink with content, available width and fonts. rows is the minimum, or the fixed row count when autoGrow=false.",
     "ref": "Ordinary ref targets the native input or textarea; className/style target the outer field layout."
   },
@@ -301,7 +308,7 @@
   "aria": {
     "role": "textbox",
     "labeling": [
-      "Visible label is associated with the native control id.",
+      "The visible label is the shared Field label, associated with the native control through for and aria-labelledby.",
       "Native aria-label, role and aria-* attributes target the control."
     ],
     "describedBy": [
@@ -309,7 +316,7 @@
     ],
     "states": [
       "disabled and readOnly expose matching native and ARIA states.",
-      "Nonempty error marks the control invalid unless aria-invalid is explicit; the message uses role=alert.",
+      "Nonempty error marks the control invalid unless aria-invalid is explicit; the control describes the message, which is not a live region.",
       "The required marker is hidden from assistive technology; native required supplies its semantics."
     ]
   },
@@ -352,8 +359,7 @@
   },
   "tokenMapping": {
     "component": [
-      "--uf-input-icon-size",
-      "--uf-input-required-gap"
+      "--uf-input-icon-size"
     ],
     "semanticFallbacks": [
       "--uf-control-height",

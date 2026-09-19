@@ -39,7 +39,7 @@ for (const fallback of [false, true]) {
       multiline: true,
       rows: 3,
       defaultValue: 'Initial',
-      clearLabel: 'Очистить',
+      labels: { clear: 'Очистить' },
     }
     await render(page, props)
     const field = page.getByRole('textbox', { name: 'Field', exact: true })
@@ -94,7 +94,7 @@ for (const multiline of [false, true]) {
   }) => {
     await render(
       page,
-      { multiline, defaultValue: 'Initial', clearLabel: 'Очистить' },
+      { multiline, defaultValue: 'Initial', labels: { clear: 'Очистить' } },
       true,
     )
     const field = page.getByRole('textbox', { name: 'Field', exact: true })
@@ -102,11 +102,12 @@ for (const multiline of [false, true]) {
     await page.getByRole('button', { name: 'Очистить' }).click()
     await expect(field).toHaveValue('')
     await expect(field).toBeFocused()
+    // The native handler runs first, then the value notification.
     expect(await page.evaluate(() => (window as any).inputEvents)).toEqual([
-      { type: 'value', value: 'Updated' },
       { type: 'change', value: 'Updated' },
-      { type: 'value', value: '' },
+      { type: 'value', value: 'Updated' },
       { type: 'change', value: '' },
+      { type: 'value', value: '' },
     ])
     await field.fill('Sent')
     await page.getByRole('button', { name: 'Submit', exact: true }).click()
@@ -140,7 +141,7 @@ for (const multiline of [false, true]) {
     await expect(field).toHaveValue('Start')
   })
 }
-test('horizontal label, help and error share columns with and without membrane', { tag: ['@layout'] }, async ({
+test('a start label, help and error share columns with and without membrane', { tag: ['@layout'] }, async ({
   page,
 }) => {
   for (const membrane of [false, true])
@@ -149,21 +150,23 @@ test('horizontal label, help and error share columns with and without membrane',
         label: 'Account',
         description: 'Help',
         error: 'Error',
-        labelOrientation: 'horizontal',
+        labelPosition: 'start',
         membrane,
         dir,
       })
       const field = page.getByRole('textbox', { name: 'Account', exact: true })
       await expect(field).toHaveAccessibleDescription('Help Error')
       const label = (await page
-        .locator('[data-scope="input"] [data-part="label"]')
+        .locator('[data-scope="field"][data-part="label"]')
         .boundingBox())!
       const input = (await field.boundingBox())!,
-        help = (await page.locator('.uf-input__description').boundingBox())!,
-        error = (await page.locator('.uf-input__error').boundingBox())!
+        help = (await page.locator('.uf-field__description').boundingBox())!,
+        error = (await page.locator('.uf-field__error').boundingBox())!
       expect(Math.abs(label.y - input.y)).toBeLessThan(10)
-      expect(Math.abs(help.x - input.x)).toBeLessThan(10)
-      expect(Math.abs(error.x - input.x)).toBeLessThan(10)
+      const start = (box: { x: number; width: number }) =>
+        dir === 'ltr' ? box.x : box.x + box.width
+      expect(Math.abs(start(help) - start(input))).toBeLessThanOrEqual(2)
+      expect(Math.abs(start(error) - start(input))).toBeLessThanOrEqual(2)
       expect(help.y).toBeGreaterThanOrEqual(input.y + input.height - 1)
       expect(
         dir === 'ltr' ? input.x - label.x : label.x - input.x,
@@ -173,10 +176,6 @@ test('horizontal label, help and error share columns with and without membrane',
 test('native direction auto places the trailing icon and clear next to the text direction', { tag: ['@layout', '@css'] }, async ({
   page,
 }) => {
-  // Known product bug, fixed by W2-09 (owner of Input.tsx and input.css):
-  // bundlers lower :dir() to :lang(), which cannot see a direction resolved
-  // from the typed text. The marker turns this test red once Input is fixed.
-  test.fail(true, 'W2-09: Input dir="auto" relies on :dir(), lowered to :lang() in builds')
   await render(page, {
     dir: 'auto',
     icon: 'search',
@@ -197,6 +196,45 @@ test('native direction auto places the trailing icon and clear next to the text 
     expect(
       dir === 'ltr' ? clear.x - box.x : box.x + box.width - clear.x,
     ).toBeGreaterThan(box.width / 2)
+  }
+})
+for (const controlled of [false, true])
+  test(`typing inside the text keeps the caret (${controlled ? 'controlled' : 'uncontrolled'})`, { tag: ['@native', '@focus'] }, async ({
+    page,
+  }) => {
+    await render(page, { defaultValue: 'Hello world' }, controlled)
+    const field = page.getByRole('textbox', { name: 'Field', exact: true })
+    await field.focus()
+    await field.evaluate((node: HTMLInputElement) => node.setSelectionRange(5, 5))
+    await page.keyboard.type('XY')
+    await expect(field).toHaveValue('HelloXY world')
+    expect(
+      await field.evaluate((node: HTMLInputElement) => [node.selectionStart, node.selectionEnd]),
+    ).toEqual([7, 7])
+  })
+test('IME composition inside the text commits without losing the caret', { tag: ['@native'] }, async ({
+  page,
+  browserName,
+}) => {
+  test.skip(browserName !== 'chromium', 'composition is driven through the Chrome DevTools Protocol')
+  const cdp = await page.context().newCDPSession(page)
+  for (const controlled of [false, true]) {
+    await render(page, { defaultValue: 'ab' }, controlled, `ime-${controlled}`)
+    const field = page.getByRole('textbox', { name: 'Field', exact: true })
+    await field.focus()
+    await field.evaluate((node: HTMLInputElement) => node.setSelectionRange(1, 1))
+    await cdp.send('Input.imeSetComposition', { text: 'k', selectionStart: 1, selectionEnd: 1 })
+    await cdp.send('Input.imeSetComposition', { text: 'か', selectionStart: 1, selectionEnd: 1 })
+    await cdp.send('Input.insertText', { text: 'か' })
+    await expect(field).toHaveValue('aかb')
+    expect(
+      await field.evaluate((node: HTMLInputElement) => [node.selectionStart, node.selectionEnd]),
+    ).toEqual([2, 2])
+    expect(
+      await page.evaluate(() =>
+        (window as any).inputEvents.filter((event: any) => event.type === 'value').at(-1),
+      ),
+    ).toEqual({ type: 'value', value: 'aかb' })
   }
 })
 test('native types and constraints are forwarded to the control', { tag: ['@native'] }, async ({
@@ -343,17 +381,18 @@ test('field names, descriptions and validation pass automated accessibility chec
  }
 })
 
-test('help and validation text align with control text in both label orientations and directions',{ tag: ['@layout', '@css'] }, async({page})=>{
- for(const labelOrientation of ['vertical','horizontal'] as const) for(const dir of ['ltr','rtl']) {
-  await render(page,{label:'Account',description:'Help',error:'Error',labelOrientation,dir})
+test('help and validation text align with control text in both label positions and directions',{ tag: ['@layout', '@css'] }, async({page})=>{
+ for(const labelPosition of ['top','start'] as const) for(const dir of ['ltr','rtl']) for(const membrane of [false,true]) {
+  await render(page,{label:'Account',description:'Help',error:'Error',labelPosition,dir,membrane})
   const offsets=await page.locator('.uf-input').evaluate(root=>{
    const control=root.querySelector('input')!, box=control.getBoundingClientRect(),style=getComputedStyle(control),rtl=style.direction==='rtl'
    const edge=rtl?box.right-parseFloat(style.paddingRight):box.left+parseFloat(style.paddingLeft)
-   return ['.uf-input__description','.uf-input__error'].map(selector=>{
+   return ['.uf-field__description','.uf-field__error'].map(selector=>{
     const node=root.querySelector(selector)!,range=document.createRange();range.selectNodeContents(node)
     const text=range.getBoundingClientRect();return Math.abs((rtl?text.right:text.left)-edge)
    })
   })
-  for(const offset of offsets)expect(offset).toBeLessThanOrEqual(1)
+  // The membrane pads the control, not the help below it.
+  for(const offset of offsets)expect(offset).toBeLessThanOrEqual(membrane ? 1.5 : 0.5)
  }
 })

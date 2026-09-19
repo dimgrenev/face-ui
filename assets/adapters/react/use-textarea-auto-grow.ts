@@ -1,7 +1,5 @@
-import { useCallback, useEffect, useLayoutEffect, type RefObject } from 'react'
-
-const useCommitEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
+import { useCallback, type RefObject } from 'react'
+import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 /** Native intrinsic sizing where available; measure only for older browsers. */
 export function useTextareaAutoGrow(
@@ -22,8 +20,8 @@ export function useTextareaAutoGrow(
   }, [enabled, ref])
 
   // The committed value includes typing, controlled updates, clearing and reset.
-  useCommitEffect(measure)
-  useCommitEffect(() => {
+  useIsomorphicLayoutEffect(measure)
+  useIsomorphicLayoutEffect(() => {
     const field = ref.current
     if (!enabled || field?.tagName !== 'TEXTAREA') return
     const view = field.ownerDocument.defaultView

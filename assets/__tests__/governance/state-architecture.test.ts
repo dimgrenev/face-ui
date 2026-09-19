@@ -170,8 +170,8 @@ const PENDING = {
     'Accordion', 'Breadcrumb', 'Calendar', 'Date', 'Pagination', 'Rating', 'Slider', 'Steps',
   ],
   'D3 machines': [
-    'Accordion', 'Avatar', 'Carousel', 'Checkbox', 'Command', 'Input', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel',
-    'Select', 'Steps', 'Switcher', 'Table', 'Toast', 'Toc', 'Tree', 'Upload',
+    'Accordion', 'Avatar', 'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Select', 'Steps',
+    'Table', 'Toast', 'Toc', 'Tree', 'Upload',
   ],
   'D3 isomorphic layout effect': [
     'Accordion', 'Avatar', 'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
@@ -185,8 +185,8 @@ const PENDING = {
     'Steps', 'Toc', 'Tree',
   ],
   'D5 one implementation': [
-    'Accordion', 'Breadcrumb', 'Calendar', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Panel', 'Rating',
-    'Select', 'Slider', 'Steps', 'Tree', 'Upload',
+    'Accordion', 'Breadcrumb', 'Calendar', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Panel', 'Rating', 'Select',
+    'Slider', 'Steps', 'Tree', 'Upload',
   ],
 } satisfies Record<string, readonly string[]>
 

@@ -103,6 +103,8 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Before | After | Codemod |
 | --- | --- | --- |
 | `ref` pointed to the `<label>` | `ref` points to the native checkbox `<input>`; `className` and `style` still style the label | — |
+| `onCheckedChange` ran before the native `onChange` | `onChange` runs first, and its `preventDefault()` cancels the change | — |
+| `syncCheckedInput` from `assets/adapters/react/use-checked-input` | `useCheckedInput(options)`, which owns the checked state and writes the input | manual |
 
 ### Date
 
@@ -146,6 +148,14 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `stretchText` | Remove it; it had no effect | auto |
 | `iconPosition="left"`, `iconPosition="right"` | `iconPosition="start"`, `iconPosition="end"` | auto |
 | `InputTextLayout` | The boolean `multiline` prop | manual |
+| `clearLabel` | `labels.clear` | auto |
+| `labelOrientation` | `labelPosition` | auto |
+| `labelOrientation="vertical"`, `labelOrientation="horizontal"` | `labelPosition="top"`, `labelPosition="start"` | auto |
+| `InputLabelOrientation` from `Input/Input` | `FieldProps['labelPosition']` (`'top' \| 'start'`) | manual |
+| `membrane` defaulted to `false` | `membrane` defaults to `true`, like every control in a row; pass `membrane={false}` for the old spacing | — |
+| `onValueChange` ran before the native `onChange` | `onChange` runs first, and its `preventDefault()` cancels the edit | — |
+| The `error` message was a `role="alert"` live region | The control describes the message (`aria-describedby`); nothing is announced on render | — |
+| Label, help, error and required marker were `.uf-input__description`, `.uf-input__error`, `.uf-input__required` and `[data-scope="input"][data-part="label"]` | They are the shared Field parts `.uf-field__label`, `.uf-field__description`, `.uf-field__error` and `.uf-field__required` (`[data-scope="field"]`) | — |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the native input or textarea; `className` and `style` still style the outer layout | — |
 
 ### Menu
@@ -248,6 +258,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `SwitcherTextWrap` | The boolean `truncate` prop | manual |
 | A long label was cut to one line with an ellipsis | A long label wraps; set `truncate` to keep one line | — |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the native checkbox `<input>`; `className` and `style` still style the visible row | — |
+| `onCheckedChange` ran before the native `onChange` | `onChange` runs first, and its `preventDefault()` cancels the change | — |
 
 ### Table
 

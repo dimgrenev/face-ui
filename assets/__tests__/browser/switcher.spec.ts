@@ -429,3 +429,35 @@ for (const theme of ['light', 'dark'])
         .evaluate((n) => parseFloat(getComputedStyle(n).transitionDuration)),
     ).toBeLessThanOrEqual(0.001)
   })
+for (const controlled of [false, true] as const)
+  test(`a canceled or refused activation leaves the setting and the next one reports (${controlled ? 'controlled' : 'uncontrolled'})`, { tag: ['@native', '@pointer'] }, async ({
+    page,
+  }) => {
+    const input = page.getByRole('switch', { name: 'Setting' })
+    const reported = () =>
+      page.evaluate(() =>
+        (window as any).switcherEvents
+          .filter((event: any) => event.type === 'checked')
+          .map((event: any) => event.checked),
+      )
+    const attempts = [
+      ['click', controlled],
+      ['change', controlled],
+      [null, 'refuse'],
+    ] as const
+    for (const [cancel, mode] of attempts) {
+      await render(page, {}, mode, `${cancel}-${mode}`)
+      await page.evaluate((cancel) => ((window as any).switcherCancel.current = cancel), cancel)
+      const before = (await reported()).length
+      await input.focus()
+      await page.keyboard.press('Space')
+      await expect(input).not.toBeChecked()
+      await expect(input).toHaveAttribute('aria-checked', 'false')
+      expect((await reported()).slice(before)).toEqual(mode === 'refuse' ? [true] : [])
+      if (mode === 'refuse') continue
+      await page.evaluate(() => ((window as any).switcherCancel.current = null))
+      await page.keyboard.press('Space')
+      await expect(input).toBeChecked()
+      expect((await reported()).slice(before)).toEqual([true])
+    }
+  })

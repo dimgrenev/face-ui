@@ -2,24 +2,30 @@
 import {
   forwardRef,
   useRef,
-  useId,
-  useMemo,
+  useState,
   type ChangeEvent,
   type CSSProperties,
   type InputHTMLAttributes,
   type ReactNode,
 } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { inputMachine, connectInput } from '../assets/machines/input.machine'
 import { cn } from '../assets/utils'
 import { hasSlotContent } from '../assets/slot-content'
 import { CloseIcon } from '../assets/icons'
 import { Icon } from '../Icon/Icon'
 import { useFormReset } from '../assets/adapters/react/use-form-reset'
 import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
+import { composeHandlers } from '../assets/adapters/react/merge-props'
 import { useTextareaAutoGrow } from '../assets/adapters/react/use-textarea-auto-grow'
-import { Text } from '../Text/Text'
 import { Membrane } from '../assets/adapters/react/Membrane'
+import {
+  FieldLayout,
+  useField,
+  type FieldProps,
+} from '../assets/internal/field'
+import { resolveLabels, type CommonLabels } from '../assets/runtime/labels'
+import { readNumber } from '../assets/runtime/props'
 
 export type InputType =
   | 'text'
@@ -34,37 +40,43 @@ export type InputType =
   | 'datetime-local'
   | 'month'
   | 'week'
-export type InputLabelOrientation = 'vertical' | 'horizontal'
 type InputControl = HTMLInputElement | HTMLTextAreaElement
 
-interface InputSharedProps extends Omit<
-  InputHTMLAttributes<InputControl>,
-  | 'children'
-  | 'dangerouslySetInnerHTML'
-  | 'type'
-  | 'value'
-  | 'defaultValue'
-  | 'min'
-  | 'max'
-  | 'step'
-  | 'pattern'
-  | 'list'
-  | 'multiple'
-  | 'checked'
-  | 'defaultChecked'
-  | 'size'
-  | 'height'
-  | 'width'
-  | 'accept'
-  | 'capture'
-  | 'src'
-  | 'alt'
-  | 'formAction'
-  | 'formEncType'
-  | 'formMethod'
-  | 'formNoValidate'
-  | 'formTarget'
-> {
+/** Names of Input's own controls. */
+export type InputLabels = Pick<CommonLabels, 'clear'>
+const defaultLabels: InputLabels = Object.freeze({ clear: 'Clear input' })
+
+interface InputSharedProps
+  extends
+    FieldProps,
+    Omit<
+      InputHTMLAttributes<InputControl>,
+      | 'children'
+      | 'dangerouslySetInnerHTML'
+      | 'type'
+      | 'value'
+      | 'defaultValue'
+      | 'min'
+      | 'max'
+      | 'step'
+      | 'pattern'
+      | 'list'
+      | 'multiple'
+      | 'checked'
+      | 'defaultChecked'
+      | 'size'
+      | 'height'
+      | 'width'
+      | 'accept'
+      | 'capture'
+      | 'src'
+      | 'alt'
+      | 'formAction'
+      | 'formEncType'
+      | 'formMethod'
+      | 'formNoValidate'
+      | 'formTarget'
+    > {
   /** Hint while empty; use label or aria-label for the accessible name. */
   placeholder?: string
   /** Exclude the field from editing, focus navigation, and form submission. */
@@ -89,24 +101,18 @@ interface InputSharedProps extends Omit<
   value?: string
   /** Uncontrolled initial value, also restored by form reset. */
   defaultValue?: string
-  /** Visible label associated with the native control. */
-  label?: ReactNode
-  /** Help associated with the native control. Empty content adds no spacing or ARIA id. */
-  description?: ReactNode
-  /** Validation message; also marks the control invalid unless aria-invalid is explicit. */
-  error?: ReactNode
-  /** Label placement; has no effect without a label. */
-  labelOrientation?: InputLabelOrientation
   /** Decorative icon from the registry or a custom element. */
   icon?: ReactNode
   /** Icon at inline start or end, following the control's text direction. */
   iconPosition?: 'start' | 'end'
   /** Offer a clear action for a nonempty, editable field. */
   clearable?: boolean
-  /** Accessible name of the clear action. */
-  clearLabel?: string
+  /** Accessible names of the field's own controls. */
+  labels?: Partial<InputLabels>
   /** Value notification for user edits, including clear; parent updates and reset are silent. */
   onValueChange?: (details: { value: string }) => void
+  /** Stretch the field to its container; false keeps the control's native width. */
+  fullWidth?: boolean
   /** Outer spacing around the native control, independent of label and help. */
   membrane?: boolean
   /** Class on the outer field layout. Native attributes and events target the control. */
@@ -118,6 +124,7 @@ interface InputSharedProps extends Omit<
 export type InputProps = InputSharedProps &
   (
     | {
+        /** Use a native textarea, including newline entry and textarea form behavior. */
         multiline?: false
         /** Native single-line type. Multiline fields always use textarea text semantics. */
         type?: InputType
@@ -139,6 +146,7 @@ export type InputProps = InputSharedProps &
     | {
         /** Use a native textarea, including newline entry and textarea form behavior. */
         multiline: true
+        /** Native single-line type. Multiline fields always use textarea text semantics. */
         type?: 'text'
         min?: never
         max?: never
@@ -156,8 +164,8 @@ export type InputProps = InputSharedProps &
 export const Input = forwardRef<InputControl, InputProps>(
   function Input(props, ref) {
     const {
-      value,
-      defaultValue,
+      value: valueProp,
+      defaultValue = '',
       id,
       type = 'text',
       multiline = false,
@@ -169,16 +177,15 @@ export const Input = forwardRef<InputControl, InputProps>(
       label,
       description,
       error,
-      labelOrientation = 'vertical',
+      labelPosition,
       icon,
       iconPosition = 'start',
       clearable = true,
-      clearLabel = 'Clear input',
+      labels,
       onValueChange,
       onChange,
-      onFocus,
-      onBlur,
-      membrane = false,
+      fullWidth = true,
+      membrane = true,
       className,
       style,
       hidden,
@@ -190,102 +197,77 @@ export const Input = forwardRef<InputControl, InputProps>(
       pattern,
       list,
       multiple,
-      'aria-describedby': externalDescription,
-      'aria-invalid': externalInvalid,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
+      'aria-describedby': ariaDescribedBy,
+      'aria-invalid': ariaInvalid,
       ...nativeProps
     } = props
-    const isTextarea = multiline && type === 'text'
-    const visibleRows = Number.isFinite(rows)
-      ? Math.max(1, Math.trunc(rows))
-      : 1
-    const initialValue = useRef(value ?? defaultValue ?? '')
-    const machine = useMemo(
-      () => ({
-        ...inputMachine,
-        context: { ...inputMachine.context, value: initialValue.current },
-      }),
-      [],
-    )
-    const { state, send, syncContext } = useMachine(machine, {
-      value,
-      type,
-      disabled,
-      readOnly,
-      onValueChange,
+    const [value, setValue, replaceValue] = useControllableState({
+      value: valueProp,
+      defaultValue,
+      onChange: (next: string) => onValueChange?.({ value: next }),
+      name: ['Input', 'value'],
     })
-    const api = connectInput(state, send)
+    const field = useField({
+      id,
+      label,
+      description,
+      error,
+      labelPosition,
+      labelable: true,
+      required,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
+      'aria-describedby': ariaDescribedBy,
+      'aria-invalid': ariaInvalid,
+    })
+    const isTextarea = multiline && type === 'text'
     const inputRef = useRef<InputControl | null>(null)
     const controlRef = useComposedRefs(inputRef, ref)
-    const resetValue = useRef(defaultValue ?? '')
-    useFormReset(inputRef, () => {
-      const next = value ?? resetValue.current
-      syncContext({ value: next })
-      if (inputRef.current) inputRef.current.value = next
-    })
+    useFormReset(inputRef, () => replaceValue())
     useTextareaAutoGrow(inputRef, isTextarea && autoGrow)
+    // dir="auto" resolves from the typed text. The icon and clear button follow it through a
+    // dir attribute: builds lower :dir() to :lang(), which cannot see a direction from the value.
+    const [autoDirection, setAutoDirection] = useState<string>()
+    useIsomorphicLayoutEffect(() => {
+      const control = inputRef.current
+      setAutoDirection(
+        (dir === 'auto' && control && getComputedStyle(control).direction) ||
+          undefined,
+      )
+    }, [dir, value])
 
-    const generatedId = useId()
-    const inputId = id ?? generatedId
-    const hasLabel = hasSlotContent(label)
-    const hasDescription = hasSlotContent(description)
-    const hasError = hasSlotContent(error)
     const hasIcon = hasSlotContent(icon)
-    const descriptionId = hasDescription ? `${inputId}-description` : undefined
-    const errorId = hasError ? `${inputId}-error` : undefined
-    const describedBy =
-      [
-        ...new Set(
-          [externalDescription, descriptionId, errorId]
-            .filter(Boolean)
-            .join(' ')
-            .split(/\s+/)
-            .filter(Boolean),
-        ),
-      ].join(' ') || undefined
-    const invalid = externalInvalid ?? (hasError || undefined)
-    const isInvalid =
-      invalid != null && invalid !== false && invalid !== 'false'
-    const { type: _machineType, ...inputProps } = api.getInputProps()
+    const clearName = resolveLabels(defaultLabels, labels, 'Input').clear
+    const visibleRows = isTextarea
+      ? readNumber('Input', 'rows', rows, 1, { integer: true, min: 1 })
+      : 1
+    const canClear = clearable && !disabled && !readOnly && value !== ''
     const controlProps = {
+      'aria-disabled': disabled || undefined,
+      'aria-readonly': readOnly || undefined,
       ...nativeProps,
-      ...inputProps,
-      id: inputId,
+      ...field.controlProps,
+      'aria-invalid': ariaInvalid ?? (field.invalid || undefined),
+      'data-scope': 'input',
       hidden,
       dir,
       lang,
+      disabled,
+      readOnly,
       required,
-      'aria-describedby': describedBy,
-      'aria-invalid': invalid,
-      'aria-disabled':
-        nativeProps['aria-disabled'] ?? inputProps['aria-disabled'],
-      'aria-readonly':
-        nativeProps['aria-readonly'] ?? inputProps['aria-readonly'],
-      onChange(event: ChangeEvent<InputControl>) {
-        inputProps.onChange(event)
-        onChange?.(event)
-      },
-      onFocus(event: React.FocusEvent<InputControl>) {
-        inputProps.onFocus()
-        onFocus?.(event)
-      },
-      onBlur(event: React.FocusEvent<InputControl>) {
-        inputProps.onBlur()
-        onBlur?.(event)
-      },
+      value,
+      ref: controlRef,
+      onChange: composeHandlers(onChange, (event: ChangeEvent<InputControl>) =>
+        setValue(event.currentTarget.value),
+      ),
     }
 
     const clear = () => {
       const control = inputRef.current
-      if (
-        !control ||
-        control.disabled ||
-        control.readOnly ||
-        !clearable ||
-        !control.value
-      )
-        return
-      const view = control.ownerDocument.defaultView
-      if (!view) return
+      if (!control || !canClear) return
+      const view = control.ownerDocument.defaultView!
       // Use the native edit path so both React onChange and onValueChange receive
       // the control as their source, including when the parent owns the value.
       const prototype =
@@ -299,108 +281,81 @@ export const Input = forwardRef<InputControl, InputProps>(
       control.dispatchEvent(new view.Event('input', { bubbles: true }))
       control.focus()
     }
-    const clearProps = api.getClearProps()
 
     return (
       <div
-        {...api.getRootProps()}
-        data-label-orientation={hasLabel ? labelOrientation : undefined}
+        {...field.rootProps}
+        data-scope="input"
+        data-part="root"
+        data-disabled={disabled || undefined}
+        data-readonly={readOnly || undefined}
         data-icon-position={hasIcon ? iconPosition : undefined}
-        data-invalid={isInvalid || undefined}
-        className={cn('uf-input', className)}
+        data-full-width={fullWidth || undefined}
+        className={cn('uf-field', 'uf-input', className)}
         style={style}
         hidden={hidden}
         dir={dir}
         lang={lang}
         aria-hidden={nativeProps['aria-hidden']}
       >
-        {hasLabel && (
-          <Text
-            {...api.getLabelProps()}
-            as="label"
-            variant="label"
-            htmlFor={inputId}
-            membrane={false}
+        <FieldLayout field={field}>
+          <Membrane
+            enabled={membrane}
+            as="div"
+            fullWidth={fullWidth}
+            interactive
+            target="input, textarea"
           >
-            {label}
-            {required && (
-              <span className="uf-input__required" aria-hidden="true">
-                *
-              </span>
-            )}
-          </Text>
-        )}
-        <Membrane
-          enabled={membrane}
-          as="div"
-          fullWidth
-          interactive
-          target="input, textarea"
-        >
-          <span className="uf-input__control">
-            {hasIcon && (
-              <span
-                className="uf-input__icon"
-                data-position={iconPosition}
-                aria-hidden="true"
+            <span className="uf-input__control" dir={autoDirection}>
+              {hasIcon && (
+                <span
+                  className="uf-input__icon"
+                  data-position={iconPosition}
+                  aria-hidden="true"
+                >
+                  {typeof icon === 'string' ? <Icon name={icon} /> : icon}
+                </span>
+              )}
+              {isTextarea ? (
+                <textarea
+                  {...controlProps}
+                  data-part="textarea"
+                  data-auto-grow={autoGrow ? '' : undefined}
+                  rows={visibleRows}
+                  wrap="soft"
+                  style={
+                    { '--face-runtime-input-rows': visibleRows } as CSSProperties
+                  }
+                />
+              ) : (
+                <input
+                  {...controlProps}
+                  data-part="input"
+                  type={type}
+                  min={min}
+                  max={max}
+                  step={step}
+                  pattern={pattern}
+                  list={list}
+                  multiple={multiple}
+                />
+              )}
+              <button
+                type="button"
+                // Explicit, so WebKit's Tab order includes the button.
+                tabIndex={0}
+                data-scope="input"
+                data-part="clear"
+                className="uf-input__clear"
+                hidden={!canClear}
+                aria-label={clearName}
+                onClick={clear}
               >
-                {typeof icon === 'string' ? <Icon name={icon} /> : icon}
-              </span>
-            )}
-            {isTextarea ? (
-              <textarea
-                {...controlProps}
-                ref={controlRef}
-                data-part="textarea"
-                data-auto-grow={autoGrow ? '' : undefined}
-                rows={visibleRows}
-                wrap="soft"
-                style={
-                  { '--face-runtime-input-rows': visibleRows } as CSSProperties
-                }
-              />
-            ) : (
-              <input
-                {...controlProps}
-                ref={controlRef}
-                type={type}
-                min={min}
-                max={max}
-                step={step}
-                pattern={pattern}
-                list={list}
-                multiple={multiple}
-              />
-            )}
-            <button
-              {...clearProps}
-              type="button"
-              className="uf-input__clear"
-              hidden={!clearable || clearProps.hidden}
-              aria-label={clearLabel.trim() || 'Clear input'}
-              onClick={clear}
-            >
-              <CloseIcon />
-            </button>
-          </span>
-        </Membrane>
-        {hasDescription && (
-          <div
-            id={descriptionId}
-            className="uf-input__description uf-text-body"
-          >
-            {description}
-          </div>
-        )}
-        {hasError && (
-          <div
-            id={errorId}
-            className="uf-input__error uf-text-body"
-            role="alert"
-          >
-            {error}
-          </div>
-        )}
+                <CloseIcon />
+              </button>
+            </span>
+          </Membrane>
+        </FieldLayout>
       </div>
     )
   },

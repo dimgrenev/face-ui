@@ -291,3 +291,36 @@ test('wrapped RTL labels align actual text lines to the reading start', { tag: [
   expect(edges.length).toBeGreaterThan(1)
   expect(Math.max(...edges) - Math.min(...edges)).toBeLessThanOrEqual(1)
 })
+for (const controlled of [false, true] as const)
+  test(`a canceled or refused activation leaves the mixed state and the next one reports (${controlled ? 'controlled' : 'uncontrolled'})`, { tag: ['@native', '@pointer'] }, async ({
+    page,
+  }) => {
+    const input = page.getByRole('checkbox', { name: 'Choice' })
+    const label = page.locator('[data-checkbox-fixture] label')
+    const reported = () =>
+      page.evaluate(() =>
+        (window as any).checkboxEvents
+          .filter((event: any) => event.type === 'checked')
+          .map((event: any) => event.checked),
+      )
+    const attempts = [
+      ['click', controlled],
+      ['change', controlled],
+      [null, 'refuse'],
+    ] as const
+    for (const [cancel, mode] of attempts) {
+      await render(page, { defaultChecked: 'indeterminate' }, mode, `${cancel}-${mode}`)
+      await page.evaluate((cancel) => ((window as any).checkboxCancel.current = cancel), cancel)
+      const before = (await reported()).length
+      await label.click()
+      await expect(input).toBeChecked({ indeterminate: true })
+      await expect(input).toHaveAttribute('aria-checked', 'mixed')
+      // A refusing parent still hears the proposal; a canceled one never happens.
+      expect((await reported()).slice(before)).toEqual(mode === 'refuse' ? [true] : [])
+      if (mode === 'refuse') continue
+      await page.evaluate(() => ((window as any).checkboxCancel.current = null))
+      await label.click()
+      await expect(input).toBeChecked()
+      expect((await reported()).slice(before)).toEqual([true])
+    }
+  })

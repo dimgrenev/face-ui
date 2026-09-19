@@ -5,12 +5,14 @@ import { Checkbox, type CheckboxProps } from '../../../../Checkbox/Checkbox'
 import type { Flat } from '../helpers'
 const root = createRoot(document.getElementById('root')!),
   events: { type: string; checked: boolean | string }[] = []
+/** Which consumer handler cancels the next activations: set by the spec. */
+const cancel: { current: 'click' | 'change' | null } = { current: null }
 function Fixture({
   props,
   controlled,
 }: {
   props: Flat<CheckboxProps>
-  controlled: boolean | 'change'
+  controlled: boolean | 'change' | 'refuse'
 }) {
   const [checked, setChecked] = useState<boolean | 'indeterminate'>(
     (props.defaultChecked as boolean | 'indeterminate') ?? false,
@@ -27,12 +29,16 @@ function Fixture({
             {...(props as CheckboxProps)}
             {...(controlled ? { checked } : {})}
             {...{
+              onClick: (event: React.MouseEvent<HTMLInputElement>) => {
+                if (cancel.current === 'click') event.preventDefault()
+              },
               onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
                 events.push({
                   type: 'change',
                   checked: event.currentTarget.checked,
                 })
-                if (controlled === 'change')
+                if (cancel.current === 'change') event.preventDefault()
+                else if (controlled === 'change')
                   setChecked(event.currentTarget.checked)
               },
             }}
@@ -58,7 +64,7 @@ function Fixture({
 }
 function renderCheckbox(
   props: Flat<CheckboxProps> = {},
-  controlled: boolean | 'change' = false,
+  controlled: boolean | 'change' | 'refuse' = false,
   key = 'field',
 ) {
   flushSync(() =>
@@ -71,6 +77,7 @@ function renderCheckbox(
 }
 Object.assign(window, {
   checkboxEvents: events,
+  checkboxCancel: cancel,
   renderCheckbox,
 })
 export type Hooks = { renderCheckbox: typeof renderCheckbox }

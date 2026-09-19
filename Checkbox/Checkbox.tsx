@@ -1,24 +1,10 @@
 /** Checkbox — a native boolean choice or an indeterminate selection summary. */
-import {
-  forwardRef,
-  useMemo,
-  useRef,
-  type CSSProperties,
-  type ReactNode,
-} from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import {
-  checkboxMachine,
-  connectCheckbox,
-} from '../assets/machines/checkbox.machine'
+import { forwardRef, type CSSProperties, type ReactNode } from 'react'
 import { cn } from '../assets/utils'
-import { useFormReset } from '../assets/adapters/react/use-form-reset'
 import {
   useCheckedInput,
-  syncCheckedInput,
   type CheckedInputAttributes,
 } from '../assets/adapters/react/use-checked-input'
-import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
 import { hasSlotContent } from '../assets/slot-content'
 import { Text } from '../Text/Text'
 import { CheckOnIcon, CheckOffIcon, MinusIcon } from '../assets/icons'
@@ -61,28 +47,17 @@ export interface CheckboxProps extends CheckedInputAttributes {
   style?: CSSProperties
 }
 
-function initialCheckboxState(
-  checked: boolean | 'indeterminate',
-): 'unchecked' | 'checked' | 'indeterminate' {
-  return checked === 'indeterminate'
-    ? 'indeterminate'
-    : checked
-      ? 'checked'
-      : 'unchecked'
-}
-
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  function Checkbox(props, ref) {
-    const {
-      checked,
+  function Checkbox(
+    {
+      checked: checkedProp,
       defaultChecked = false,
-      disabled = false,
-      required = false,
-      name,
-      value = 'on',
-      label,
       onCheckedChange,
       onChange,
+      disabled = false,
+      required = false,
+      value = 'on',
+      label,
       className,
       style,
       hidden,
@@ -92,41 +67,31 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       membrane = true,
       fullWidth = false,
       ...nativeProps
-    } = props
-    const initial = useRef({
-      checked: checked ?? defaultChecked,
+    },
+    ref,
+  ) {
+    const { checked, inputProps } = useCheckedInput({
+      component: 'Checkbox',
+      checked: checkedProp,
       defaultChecked,
-    })
-    const machineConfig = useMemo(
-      () => ({
-        ...checkboxMachine,
-        initial: initialCheckboxState(initial.current.checked),
-        context: {
-          ...checkboxMachine.context,
-          checked: initial.current.checked,
-        },
-      }),
-      [],
-    )
-    const { state, send, syncContext } = useMachine(machineConfig, {
-      checked,
-      disabled,
-      required,
-      name: name ?? '',
       onCheckedChange,
+      onChange,
+      ref,
     })
-    const api = connectCheckbox(state, send)
-    const inputRef = useRef<HTMLInputElement>(null)
-    const composedRef = useComposedRefs(inputRef, ref)
-    useCheckedInput(inputRef, state.context.checked)
-    useFormReset(inputRef, () => {
-      const next =
-        checked !== undefined ? checked : initial.current.defaultChecked
-      syncContext({ checked: next })
-      syncCheckedInput(inputRef.current, next)
+    const state =
+      checked === 'indeterminate'
+        ? 'indeterminate'
+        : checked
+          ? 'checked'
+          : 'unchecked'
+    const part = (name: string) => ({
+      'data-scope': 'checkbox',
+      'data-part': name,
+      'data-state': state,
+      'data-disabled': disabled || undefined,
     })
     const hasLabel = hasSlotContent(label)
-    const inputProps = api.getInputProps()
+    const shared = { hidden, dir, lang, title }
     return (
       <Membrane
         enabled={membrane}
@@ -135,11 +100,8 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         target="input"
       >
         <label
-          {...api.getRootProps()}
-          hidden={hidden}
-          dir={dir}
-          lang={lang}
-          title={title}
+          {...part('root')}
+          {...shared}
           style={style}
           data-has-label={hasLabel ? '' : undefined}
           data-icon-left={hasLabel ? '' : undefined}
@@ -147,52 +109,32 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           data-full-width={fullWidth || undefined}
           className={cn('uf-checkbox', 'uf-option', 'uf-control', className)}
         >
-          <span {...api.getIndicatorProps()} aria-hidden="true">
-            {state.context.checked === 'indeterminate' ? (
+          <span {...part('indicator')} aria-hidden="true">
+            {checked === 'indeterminate' ? (
               <MinusIcon />
-            ) : state.context.checked === true ? (
+            ) : checked ? (
               <CheckOnIcon />
             ) : (
               <CheckOffIcon />
             )}
           </span>
           <input
+            // Explicit, so WebKit's Tab order includes the checkbox.
+            tabIndex={disabled ? -1 : 0}
+            aria-disabled={disabled || undefined}
+            aria-required={required || undefined}
             {...nativeProps}
+            {...part('input')}
+            {...shared}
             {...inputProps}
-            ref={composedRef}
-            // Commit both checked properties together while preserving native
-            // click rollback. React's controlled restoration precedes rollback.
-            checked={undefined}
-            defaultChecked={initial.current.checked === true}
-            name={name}
+            role="checkbox"
+            aria-checked={checked === 'indeterminate' ? 'mixed' : checked}
+            disabled={disabled}
+            required={required}
             value={value}
-            aria-disabled={
-              nativeProps['aria-disabled'] ?? inputProps['aria-disabled']
-            }
-            aria-required={
-              nativeProps['aria-required'] ?? inputProps['aria-required']
-            }
-            hidden={hidden}
-            dir={dir}
-            lang={lang}
-            title={title}
-            tabIndex={disabled ? -1 : (nativeProps.tabIndex ?? 0)}
-            onChange={(event) => {
-              if (event.nativeEvent.defaultPrevented) {
-                event.stopPropagation()
-                return
-              }
-              inputProps.onChange(event)
-              onChange?.(event)
-            }}
           />
           {hasLabel && (
-            <Text
-              {...api.getLabelProps()}
-              as="span"
-              inset="none"
-              membrane={false}
-            >
+            <Text {...part('label')} as="span" inset="none" membrane={false}>
               {label}
             </Text>
           )}
