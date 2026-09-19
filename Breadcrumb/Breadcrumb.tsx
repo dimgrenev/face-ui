@@ -3,6 +3,7 @@ import {
   forwardRef,
   useRef,
   useState,
+  type FocusEvent,
   type HTMLAttributes,
   type MouseEvent,
   type MouseEventHandler,
@@ -47,8 +48,8 @@ export interface BreadcrumbItem {
 
 export type BreadcrumbLabels = Pick<CommonLabels, 'more'>
 const defaultLabels: BreadcrumbLabels = Object.freeze({ more: 'Show path' })
-/** Landmark name until a native aria-label or aria-labelledby names the nav. */
-const LANDMARK = 'Breadcrumb'
+/** Landmark name until a native aria-label or aria-labelledby names the nav (K14). */
+const defaultRootLabels = Object.freeze({ nav: 'Breadcrumb' })
 
 export interface BreadcrumbProps extends Omit<
   HTMLAttributes<HTMLElement>,
@@ -118,28 +119,30 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
     const navRef = useRef<HTMLElement>(null)
     const composedRef = useComposedRefs(navRef, ref)
     const trigger = useRef<HTMLButtonElement>(null)
-    /** Key of the overflow crumb holding focus; the list is portaled outside the nav. */
-    const overflowFocus = useRef<string | null>(null)
-    const fallback = (preferred?: HTMLElement) =>
-      [
-        preferred,
-        trigger.current,
+    /** Item key of every crumb element rendered, inline or in the overflow list. */
+    const [keys] = useState(() => new WeakMap<Element, string>())
+    /** A lost crumb's location inline, else the overflow button, else the first focusable crumb. */
+    const recover = (lost: Element) => {
+      const inline = [
         ...(navRef.current?.querySelectorAll<HTMLElement>(
           '.uf-breadcrumb-label',
         ) ?? []),
-      ].find(focusable)
-    useFocusRecovery(navRef, () => fallback())
-    // A trail that stops collapsing unmounts the overflow list; focus there returns to the same crumb.
+      ]
+      const same = inline.find((node) => keys.get(node) === keys.get(lost))
+      return [same, trigger.current, ...inline].find(focusable)
+    }
+    useFocusRecovery(navRef, recover)
+    /** Overflow crumb holding focus: the list is portaled outside the nav that useFocusRecovery watches. */
+    const overflowFocus = useRef<HTMLElement | null>(null)
+    // It is lost when removed, moved inline or unmounted with the list as the trail stops collapsing.
     useIsomorphicLayoutEffect(() => {
-      const key = overflowFocus.current
-      if (open || key === null) return
+      const lost = overflowFocus.current
+      if (!lost || isAvailable(lost)) return
       overflowFocus.current = null
-      const nav = navRef.current
-      const doc = nav?.ownerDocument
-      if (!nav || !isAvailable(nav) || doc!.activeElement !== doc!.body) return
-      const index = entries.findIndex((entry) => entry.key === key)
-      const inline = nav.querySelectorAll<HTMLElement>('.uf-breadcrumb-label')
-      fallback(inline[index])?.focus({ preventScroll: true })
+      const active = lost.ownerDocument.activeElement
+      if (active !== lost.ownerDocument.body && active !== lost) return
+      if (navRef.current && isAvailable(navRef.current))
+        recover(lost)?.focus({ preventScroll: true })
     })
     const closeOverflow = () => {
       overflowFocus.current = null
@@ -169,11 +172,18 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
         'aria-current': current ? ('page' as const) : undefined,
         className: cn('uf-breadcrumb-label', interactive && 'uf-control'),
         tabIndex: interactive ? 0 : undefined,
-        onFocus: overflow
-          ? () => {
-              overflowFocus.current = key
-            }
-          : undefined,
+        ref: (node: HTMLElement | null) => {
+          if (node) keys.set(node, key)
+        },
+        ...(overflow && {
+          onFocus: (event: FocusEvent<HTMLElement>) => {
+            overflowFocus.current = event.currentTarget
+          },
+          onBlur: (event: FocusEvent<HTMLElement>) => {
+            // Focus moved on by the user is not a loss.
+            if (event.relatedTarget) overflowFocus.current = null
+          },
+        }),
       }
       const onClick = (
         event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
@@ -220,7 +230,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
       <nav
         ref={composedRef}
         {...breadcrumbAnatomy.getPartAttrs('root')}
-        aria-label={LANDMARK}
+        aria-label={defaultRootLabels.nav}
         {...rest}
         hidden={hidden}
         className={cn('uf-breadcrumb', className)}

@@ -88,8 +88,11 @@ export const Steps = forwardRef<HTMLDivElement, StepsProps>(
         step === undefined
           ? undefined
           : readNumber('Steps', 'step', step, 0, INDEX),
+      // Read only while uncontrolled: an unused default reports nothing.
       defaultValue: () =>
-        readNumber('Steps', 'defaultStep', defaultStep, 0, INDEX),
+        step === undefined
+          ? readNumber('Steps', 'defaultStep', defaultStep, 0, INDEX)
+          : 0,
       onChange: (next) => onStepChange?.({ step: next }),
       name: ['Steps', 'step'],
     })

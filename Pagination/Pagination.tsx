@@ -42,8 +42,8 @@ const defaultLabels: PaginationLabels = Object.freeze({
   goToPage: 'Go to page',
   close: 'Close',
 })
-/** Landmark name until a native aria-label or aria-labelledby names the nav. */
-const LANDMARK = 'Pagination'
+/** Landmark name until a native aria-label or aria-labelledby names the nav (K14). */
+const defaultRootLabels = Object.freeze({ nav: 'Pagination' })
 const POSITIVE = { integer: true, min: 1 } as const
 /** WebKit leaves buttons without an explicit tabIndex out of the Tab order. */
 const TABBABLE = { tabIndex: 0 } as const
@@ -112,8 +112,11 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
         page === undefined
           ? undefined
           : readNumber('Pagination', 'page', page, 1, POSITIVE),
+      // Read only while uncontrolled: an unused default reports nothing.
       defaultValue: () =>
-        readNumber('Pagination', 'defaultPage', defaultPage, 1, POSITIVE),
+        page === undefined
+          ? readNumber('Pagination', 'defaultPage', defaultPage, 1, POSITIVE)
+          : 1,
       onChange: (next) => onPageChange?.({ page: next }),
       name: ['Pagination', 'page'],
     })
@@ -146,7 +149,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
 
     return (
       <nav
-        aria-label={LANDMARK}
+        aria-label={defaultRootLabels.nav}
         {...rest}
         ref={ref}
         hidden={hidden}

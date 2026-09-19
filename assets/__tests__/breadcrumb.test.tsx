@@ -413,6 +413,50 @@ it('focus in the overflow list returns to the same crumb when the trail stops co
   expect(document.querySelector('[role="dialog"]')).toBeNull()
   expect(document.activeElement).toBe(host.querySelector('a[href="#B"]'))
 })
+const openOverflowAt = async (href: string) => {
+  await act(async () =>
+    host.querySelector<HTMLButtonElement>('button[aria-label="Show path"]')!.click(),
+  )
+  await act(async () =>
+    document.querySelector<HTMLElement>(`[role="dialog"] a[href="${href}"]`)!.focus(),
+  )
+}
+it('a focused overflow crumb removed while the list stays open hands focus to the overflow button', async () => {
+  await render({ items: trail })
+  await openOverflowAt('#B')
+  await render({ items: trail.filter(({ key }) => key !== 'B') })
+  expect(document.querySelector('[role="dialog"] a[href="#A"]')).not.toBeNull()
+  expect(document.activeElement).toBe(
+    host.querySelector('button[aria-label="Show path"]'),
+  )
+})
+it('a focused overflow crumb that moves inline while the trail still collapses keeps focus on its location', async () => {
+  await render({ items: trail, maxItems: 4 })
+  await openOverflowAt('#C')
+  await render({ items: trail, maxItems: 5 })
+  expect(document.activeElement).toBe(host.querySelector('a[href="#C"]'))
+})
+it('a focused crumb whose element is replaced keeps focus on the same location', async () => {
+  await render({ items: trail, maxItems: null })
+  await act(async () => host.querySelector<HTMLElement>('a[href="#C"]')!.focus())
+  await render({
+    items: trail.map((item) =>
+      item.key === 'C' ? { key: 'C', label: 'C', onClick() {} } : item,
+    ),
+    maxItems: null,
+  })
+  const active = document.activeElement as HTMLElement
+  expect([active.tagName, active.textContent]).toEqual(['BUTTON', 'C'])
+})
+it('focus moved out of the overflow list is not recovered when that crumb goes away', async () => {
+  await render({ items: trail })
+  await openOverflowAt('#B')
+  const outside = document.body.appendChild(document.createElement('button'))
+  await act(async () => outside.focus())
+  await act(async () => outside.remove())
+  await render({ items: trail.filter(({ key }) => key !== 'B') })
+  expect(document.activeElement).toBe(document.body)
+})
 it('closing the overflow list by an outside press leaves focus where the user put it', async () => {
   await render({ items: trail })
   await act(async () =>

@@ -213,11 +213,8 @@ it('an empty result has one bounded page and no available navigation action', as
   expect(callback).not.toHaveBeenCalled()
 })
 
-it('controlled page wins over an unused invalid initial default', async () => {
-  await expectDevError(
-    () => render({ page: 3, defaultPage: -1 }),
-    /^Face UI Pagination: invalid defaultPage -1; using 1\.$/,
-  )
+it('controlled page wins over an unused invalid initial default, which is not reported', async () => {
+  await render({ page: 3, defaultPage: -1 })
   expect(current()).toBe(3)
 })
 

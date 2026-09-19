@@ -245,6 +245,10 @@ it('controlled selection overrides defaultStep and can be released without reset
   await click(0)
   expect(current()).toBe('0')
 })
+it('an unused invalid defaultStep is not reported while controlled', async () => {
+  await render({ step: 1, defaultStep: -1 })
+  expect(current()).toBe('1')
+})
 it('linear guards are based on the current position, not alleged completion', async () => {
   await render({ defaultStep: 2 })
   await click(0)
