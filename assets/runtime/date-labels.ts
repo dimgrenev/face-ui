@@ -1,3 +1,5 @@
+import type { CommonLabels } from './labels'
+
 export interface CalendarLabels {
   /** Accessible name of the previous-month button. */
   previousMonth: string
@@ -5,9 +7,11 @@ export interface CalendarLabels {
   nextMonth: string
 }
 
-/** Internal controls only. Field labels, placeholders and dialog titles keep
- * their existing content APIs rather than duplicating them in this dictionary. */
-export interface DateLabels extends CalendarLabels {
+/** Internal controls only. The field label and placeholder stay props rather than
+ * duplicating them in this dictionary; `clear` and `close` are the common keys. */
+export interface DateLabels
+  extends CalendarLabels,
+    Pick<CommonLabels, 'clear' | 'close'> {
   /** Accessible name of the calendar group inside the picker. */
   calendar: string
   /** Day view switch. */
@@ -34,12 +38,8 @@ export interface DateLabels extends CalendarLabels {
   previousYearPage: string
   /** Next page of twelve years in the year view. */
   nextYearPage: string
-  /** Clear action, visible text and accessible name. */
-  clear: string
   /** Current day/time action, visible text and accessible name. */
   now: string
-  /** Accessible name of the sheet close button. */
-  close: string
 }
 
 export const defaultCalendarLabels: CalendarLabels = Object.freeze({

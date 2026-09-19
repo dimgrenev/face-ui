@@ -3,6 +3,7 @@ import type { Root } from 'react-dom/client'
 import { act } from 'react'
 import { Calendar } from '../../Calendar/Calendar'
 import { mount } from './harness'
+import { describeControlled } from './harness/controlled'
 
 describe('component smoke', () => {
   let container: HTMLDivElement
@@ -50,4 +51,41 @@ describe('component smoke', () => {
       | undefined
     expect(call?.value).toBe(selectableDay?.getAttribute('data-date'))
   })
+})
+
+const day = (host: HTMLElement, iso: string) =>
+  host.querySelector<HTMLElement>(`[data-date="${iso}"]`)!
+describeControlled<string | null>({
+  name: 'Calendar',
+  prop: 'value',
+  values: ['2026-09-12', '2026-09-20'],
+  render: (props) => <Calendar defaultViewDate="2026-09-01" {...props} />,
+  change: (host, to) => day(host, to!).click(),
+  read: (host) =>
+    host
+      .querySelector('[role="gridcell"][aria-selected="true"] [data-date]')
+      ?.getAttribute('data-date') ?? null,
+  // A range given to a single-day calendar is projected onto its start.
+  normalizes: [{ start: '2026-09-12', end: '2026-09-14' }, '2026-09-12'],
+  handler: 'onClickCapture',
+})
+describeControlled<string | null>({
+  name: 'Calendar',
+  prop: 'viewDate',
+  values: ['2026-09-01', '2026-10-01'],
+  render: (props) => <Calendar {...props} />,
+  change: (host, to) =>
+    host
+      .querySelector<HTMLElement>(
+        `[data-part="${to === '2026-10-01' ? 'nextButton' : 'prevButton'}"]`,
+      )!
+      .click(),
+  read: (host) =>
+    host
+      .querySelector('[data-date]:not([data-outside])')
+      ?.getAttribute('data-date')
+      ?.replace(/\d\d$/, '01') ?? null,
+  // Any day of a month shows that month.
+  normalizes: ['2026-09-17', '2026-09-01'],
+  handler: 'onClickCapture',
 })

@@ -7,6 +7,7 @@ import {
 } from '@internationalized/date'
 import { parseCivilDate, parseCivilDateTime } from './civil-date'
 import { createDateFormatter, createDateNumberFormatter } from './date-locale'
+import { invalidProp } from './props'
 
 export type DateMode = 'date' | 'datetime' | 'time' | 'week' | 'month' | 'year'
 export type DateSelection = 'single' | 'range'
@@ -237,9 +238,9 @@ export function formatTriggerValue(
   },
 ): string {
   const { mode, selection, locale, placeholder, format } = opts
-  const customFormat = typeof format === 'string' ? format.trim() : ''
+  let customFormat = typeof format === 'string' ? format.trim() : ''
   // Parse before looking at value: configuration errors must also surface on empty fields.
-  const tokens =
+  let tokens =
     customFormat.match(/''|'(?:[^']|'')*'|([A-Za-z])\1*|[^A-Za-z']+|'/g) ?? []
   const supported = new Set([
     'y',
@@ -261,12 +262,16 @@ export function formatTriggerValue(
     'EEE',
     'EEEE',
   ])
-  for (const token of tokens) {
-    if (token === "'") throw new RangeError('Unclosed quote in Date format')
-    if (/^[A-Za-z]/.test(token) && !supported.has(token))
-      throw new RangeError(
-        `Unsupported Date format token: ${token}. Quote literal text with apostrophes.`,
-      )
+  // An unclosed quote or an unknown letter would print misleading fields.
+  if (
+    tokens.some(
+      (token) =>
+        token === "'" || (/^[A-Za-z]/.test(token) && !supported.has(token)),
+    )
+  ) {
+    invalidProp('Date', 'format', format, 'using the locale format')
+    customFormat = ''
+    tokens = []
   }
   value = normalizeISOValue(value, opts.timezone)
   // The normalized fields already describe wall time in the requested zone.

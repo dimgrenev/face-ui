@@ -1,13 +1,13 @@
 import React, { act } from 'react'
 import type { Root } from 'react-dom/client'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Date as DateField } from '../../Date/Date'
 import { Calendar } from '../../Calendar/Calendar'
 import { formatTriggerValue } from '../date-utils'
 import { interpret } from '../create-machine'
 import { dateMachine } from '../machines/date.machine'
 import { calendarMachine } from '../machines/calendar.machine'
-import { allowConsoleError, mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 const format = (
   pattern: string,
@@ -63,9 +63,14 @@ describe('Date format has one Gregorian numeric meaning', () => {
     expect(format('MMMM yyyy', 'ru-RU')).toBe('сентябрь 2026')
   })
   it.each(['YYYY-MM-dd', 'ddd', "yyyy-MM-dd 'at"])(
-    'rejects an invalid pattern %s instead of printing misleading fields',
+    'reports an invalid pattern %s and uses the locale format instead of printing misleading fields',
     (pattern) => {
-      expect(() => format(pattern)).toThrow(RangeError)
+      expect(
+        expectDevError(
+          () => format(pattern),
+          /^Face UI Date: invalid format ".*"; using the locale format\.$/,
+        ),
+      ).toBe('Sep 12, 2026, 09:35')
     },
   )
 })
@@ -76,67 +81,54 @@ beforeEach(() => {
 })
 const render = (node: React.ReactNode) => act(async () => root.render(node))
 
-class Boundary extends React.Component<
-  { children: React.ReactNode },
-  { error: Error | null }
-> {
-  state = { error: null as Error | null }
-  static getDerivedStateFromError(error: Error) {
-    return { error }
-  }
-  render() {
-    return this.state.error ? (
-      <output data-error={this.state.error.name}>
-        {this.state.error.message}
-      </output>
-    ) : (
-      this.props.children
-    )
-  }
-}
-
 describe('locale configuration is explicit and independent of value', () => {
-  // React 18 reports caught render errors through window.error as well as console.
-  const caughtConfigurationError = (event: ErrorEvent) => {
-    if (event.error instanceof RangeError) event.preventDefault()
-  }
-  beforeEach(() => window.addEventListener('error', caughtConfigurationError))
-  afterEach(() => window.removeEventListener('error', caughtConfigurationError))
   it.each([
-    ['Date empty', <DateField locale="not_a_locale" />],
+    ['Date empty', <DateField locale="not_a_locale" />, /Date: invalid locale "not_a_locale"; using "en-US"/],
     [
       'Date selected',
       <DateField locale="not_a_locale" defaultValue="2026-09-12" />,
+      /Date: invalid locale "not_a_locale"; using "en-US"/,
     ],
-    ['Calendar', <Calendar locale="not_a_locale" />],
-    ['Date empty zone', <DateField timezone="Not/A_Zone" />],
-    ['Date empty pattern', <DateField format="YYYY-MM-dd" />],
+    ['Calendar', <Calendar locale="not_a_locale" />, /Calendar: invalid locale "not_a_locale"; using "en-US"/],
+    ['Date empty zone', <DateField timezone="Not/A_Zone" />, /Date: invalid timezone "Not\/A_Zone"; using "UTC"/],
+    ['Date empty pattern', <DateField format="YYYY-MM-dd" />, /Date: invalid format "YYYY-MM-dd"; using the locale format/],
     [
       'Date selected zone',
       <DateField timezone="Not/A_Zone" defaultValue="2026-09-12" />,
+      /Date: invalid timezone "Not\/A_Zone"; using "UTC"/,
     ],
-  ])('%s reports invalid configuration at render', async (_name, element) => {
-    allowConsoleError(/error boundary you provided, Boundary/)
-    await render(<Boundary>{element}</Boundary>)
-    expect(host.querySelector('output')?.dataset.error).toBe('RangeError')
+  ])('%s reports invalid configuration at render and falls back', async (_name, element, report) => {
+    await expectDevError(() => render(element), report)
+    expect(host.querySelector('[data-scope]')).not.toBeNull()
+  })
+  it('renders the selection in the fallback locale and zone', async () => {
+    await expectDevError(
+      () =>
+        render(
+          <DateField
+            locale="not_a_locale"
+            timezone="Not/A_Zone"
+            value={new Date('2026-09-12T23:30Z')}
+          />,
+        ),
+      /invalid (locale|timezone)/,
+    )
+    expect(host.querySelector('[role="combobox"]')?.textContent).toBe('Sep 12, 2026')
   })
   it.each([-1, 7, 1.5, Number.NaN])(
-    'rejects invalid weekStartsOn=%s on both owners',
+    'reports invalid weekStartsOn=%s on both owners and uses the locale week',
     async (weekStartsOn) => {
-      allowConsoleError(/error boundary you provided, Boundary/)
-      for (const [kind, Component] of [
-        ['Date', DateField],
-        ['Calendar', Calendar],
+      for (const [kind, element] of [
+        ['Date', <DateField defaultOpen weekStartsOn={weekStartsOn as 0} />],
+        ['Calendar', <Calendar weekStartsOn={weekStartsOn as 0} />],
       ] as const) {
-        await render(
-          <Boundary key={kind}>
-            <Component weekStartsOn={weekStartsOn as 0} />
-          </Boundary>,
+        await expectDevError(
+          () => render(element),
+          new RegExp(`^Face UI ${kind}: invalid weekStartsOn ${weekStartsOn}; using the locale's first weekday\\.$`),
         )
-        expect(host.querySelector('output')?.dataset.error).toBe('RangeError')
-        expect(host.querySelector('output')?.textContent).toMatch(
-          /weekStartsOn/,
-        )
+        expect(
+          document.querySelector('[role="columnheader"]')?.getAttribute('aria-label'),
+        ).toBe('Sunday')
       }
     },
   )

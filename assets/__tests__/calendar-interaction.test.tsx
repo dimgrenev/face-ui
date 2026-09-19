@@ -4,7 +4,7 @@ import { beforeEach, expect, it, vi } from 'vitest'
 import { Calendar, type CalendarProps } from '../../Calendar/Calendar'
 import { interpret } from '../create-machine'
 import { calendarMachine, connectCalendar } from '../machines/calendar.machine'
-import { mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 let host: HTMLDivElement, root: Root
 beforeEach(() => {
@@ -132,7 +132,10 @@ it.each(['disabled', 'readOnly'])(
     await render({ ...props, value: { start: '2026-09-12', end: null } })
     await render({ ...props, value: { start: '2026-09-14', end: null } })
     expect(change).not.toHaveBeenCalled()
-    await render({ ...props, [state]: false })
+    await expectDevError(
+      () => render({ ...props, [state]: false }),
+      /^Face UI Calendar: missing value; keeping the last controlled value\.$/,
+    )
     await click(day('2026-09-16'))
     expect(change).toHaveBeenCalledExactlyOnceWith({
       value: { start: '2026-09-14', end: '2026-09-16' },

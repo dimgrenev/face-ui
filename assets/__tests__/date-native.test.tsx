@@ -45,7 +45,7 @@ describe('Date native field and layer contract', () => {
   })
   it('exposes a stable native button ref across value and membrane changes', async () => {
     const ref = vi.fn()
-    await render({ ref })
+    await render({ ref, value: null })
     expect(ref.mock.calls[0][0]).toBe(trigger())
     ref.mockClear()
     await render({ ref, value: '2026-09-12', membrane: false })
@@ -184,18 +184,20 @@ describe('Date native field and layer contract', () => {
     },
   )
   it('does not create empty label/help/error slots and keeps zero content', async () => {
+    const part = (name: string) =>
+      host.querySelector(`[data-scope="field"][data-part="${name}"]`)
     for (const empty of [false, true, '', <Fragment />]) {
       await render({ label: empty, description: empty, error: empty })
-      expect(host.querySelector('.uf-date__label')).toBeNull()
-      expect(host.querySelector('.uf-date__description')).toBeNull()
-      expect(host.querySelector('.uf-date__error')).toBeNull()
+      expect(part('label')).toBeNull()
+      expect(part('description')).toBeNull()
+      expect(part('error')).toBeNull()
       expect(trigger().getAttribute('aria-labelledby')).toBeNull()
       expect(trigger().getAttribute('aria-invalid')).toBeNull()
     }
     await render({ label: 0, description: 0, error: 0 })
-    expect(host.querySelector('.uf-date__label')?.textContent).toBe('0')
-    expect(host.querySelector('.uf-date__description')?.textContent).toBe('0')
-    expect(host.querySelector('.uf-date__error')?.textContent).toBe('0')
+    expect(part('label')?.textContent).toBe('0')
+    expect(part('description')?.textContent).toBe('0')
+    expect(part('error')?.textContent).toBe('0')
     expect(trigger().getAttribute('aria-invalid')).toBe('true')
   })
   it('honors native accessible names and merges description links without duplicate ids', async () => {
@@ -223,18 +225,54 @@ describe('Date native field and layer contract', () => {
       host.querySelector('label [aria-hidden="true"]')?.textContent?.trim(),
     ).toBe('*')
   })
-  it('names a dialog from a rich title and localizes the sheet close control', async () => {
+  it('names the dialog like the field and localizes the sheet close control', async () => {
     await render({
       defaultOpen: true,
       surface: 'sheet',
-      surfaceTitle: <strong>Campaign period</strong>,
+      label: <strong>Campaign period</strong>,
       labels: { close: 'Закрыть календарь' },
     })
     const id = dialog()!.getAttribute('aria-labelledby')!
     expect(document.getElementById(id)?.textContent).toBe('Campaign period')
+    expect(document.querySelectorAll('strong')).toHaveLength(1)
     expect(
       dialog()!.querySelector('button[aria-label="Закрыть календарь"]'),
     ).not.toBeNull()
+    await render({ defaultOpen: true, surface: 'sheet', 'aria-label': 'Period' })
+    expect(dialog()!.getAttribute('aria-label')).toBe('Period')
+    expect(dialog()!.hasAttribute('aria-labelledby')).toBe(false)
+    expect(dialog()!.querySelector('.uf-responsive-sheetTitle')?.textContent).toBe('Period')
+  })
+  it('interactive validation shows the browser message as the field error and focuses the trigger', async () => {
+    const field = (error?: string) =>
+      act(async () =>
+        root.render(
+          <form>
+            <DateField id="due" name="due" label="Due" required error={error} />
+          </form>,
+        ),
+      )
+    await field()
+    const proxy = host.querySelector('select')!
+    await act(async () => proxy.focus())
+    await act(async () => {})
+    const error = host.querySelector('[data-scope="field"][data-part="error"]')!
+    expect(error.textContent).toBe(proxy.validationMessage)
+    expect(trigger().getAttribute('aria-invalid')).toBe('true')
+    expect(trigger().getAttribute('aria-describedby')).toBe('due-error')
+    expect(document.activeElement).toBe(trigger())
+    // The consumer's error takes the slot over the browser message.
+    await field('Pick a due day')
+    expect(host.querySelector('[data-part="error"]')?.textContent).toBe('Pick a due day')
+  })
+  it('has no English placeholder or name of its own', async () => {
+    await render({ defaultOpen: true, surface: 'sheet' })
+    expect(trigger().textContent).toBe('')
+    expect(trigger().hasAttribute('aria-label')).toBe(false)
+    expect(dialog()!.hasAttribute('aria-label')).toBe(false)
+    expect(dialog()!.querySelector('.uf-responsive-sheetTitle')?.textContent).toBe('')
+    await render({ defaultOpen: true, placeholder: 'Pick a launch day' })
+    expect(trigger().textContent).toBe('Pick a launch day')
   })
   it('focuses the selected calendar day on open and closes a repeated selection without value callback', async () => {
     const change = vi.fn(),

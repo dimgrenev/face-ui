@@ -2,10 +2,10 @@ import React, { act } from 'react'
 import type { Root } from 'react-dom/client'
 import { flushSync } from 'react-dom'
 import { runInNewContext } from 'node:vm'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Date as DateField, type DateProps } from '../../Date/Date'
 import { normalizeISOValue, parseDateLike } from '../date-utils'
-import { allowConsoleError, mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 let root: Root, host: HTMLDivElement
 beforeEach(() => {
@@ -95,7 +95,10 @@ describe('Date uses the same value model for display, interaction and forms', ()
     expect(formValue()).toBe('2026-09-11T16:30')
     await reset()
     expect(formValue()).toBe('2026-09-11T16:30')
-    await render({ ...props, value: undefined, timezone: 'UTC' })
+    await expectDevError(
+      () => render({ ...props, value: undefined, timezone: 'UTC' }),
+      /^Face UI Date: missing value; keeping the last controlled value\./,
+    )
     expect(formValue()).toBe('2026-09-11T16:30')
     expect(change).not.toHaveBeenCalled()
   })
@@ -270,10 +273,14 @@ describe('Date uses the same value model for display, interaction and forms', ()
       defaultValue: 'ignored invalid default',
       onValueChange: change,
     })
-    await render({
-      defaultValue: 'ignored late default',
-      onValueChange: change,
-    })
+    await expectDevError(
+      () =>
+        render({
+          defaultValue: 'ignored late default',
+          onValueChange: change,
+        }),
+      /^Face UI Date: missing value; keeping the last controlled value\./,
+    )
     expect(formValue()).toBe('2026-09-13')
     expect(change).not.toHaveBeenCalled()
   })
@@ -281,7 +288,10 @@ describe('Date uses the same value model for display, interaction and forms', ()
     const valid = () => host.querySelector('form')!.checkValidity()
     await render({ value: '2026-09-12', defaultValue: 'ignored' })
     await render({ value: '2026-09-13', defaultValue: 'ignored' })
-    await render({ defaultValue: 'ignored', required: true })
+    await expectDevError(
+      () => render({ defaultValue: 'ignored', required: true }),
+      /^Face UI Date: missing value; keeping the last controlled value\./,
+    )
     expect(formValue()).toBe('2026-09-13')
     expect(valid()).toBe(true)
     await reset()
@@ -325,64 +335,56 @@ describe('Date uses the same value model for display, interaction and forms', ()
   })
 })
 
-class Boundary extends React.Component<
-  { children: React.ReactNode },
-  { error: Error | null }
-> {
-  state = { error: null as Error | null }
-  static getDerivedStateFromError(error: Error) {
-    return { error }
-  }
-  render() {
-    return this.state.error ? (
-      <output data-error={this.state.error.name}>
-        {this.state.error.message}
-      </output>
-    ) : (
-      this.props.children
-    )
-  }
-}
-describe('Date rejects malformed configuration rather than dropping values or constraints', () => {
-  const caught = (event: ErrorEvent) => {
-    if (event.error instanceof RangeError) event.preventDefault()
-  }
-  beforeEach(() => window.addEventListener('error', caught))
-  afterEach(() => window.removeEventListener('error', caught))
+describe('Date normalizes malformed values and reports the owning prop', () => {
   it.each([
-    [{ value: '2026-02-30' }, 'value'],
-    [{ value: ' 2026-09-12 ' }, 'value'],
-    [{ value: new Date(NaN) }, 'value'],
-    [{ value: { start: '2026-09-12', end: null } }, 'value'],
-    [{ selection: 'range', value: '2026-09-12' }, 'value'],
-    [{ mode: 'week', value: '2026-09-12' }, 'value'],
-    [{ selection: 'range', value: { start: '2026-09-12' } }, 'value'],
+    [{ value: '2026-02-30' }, /invalid value "2026-02-30"; using no date/, ''],
+    [{ value: ' 2026-09-12 ' }, /invalid value " 2026-09-12 "; using no date/, ''],
+    [{ value: new Date(NaN) }, /invalid value object; using no date/, ''],
     [
       { selection: 'range', value: { start: '2026-09-12', end: 'bad' } },
-      'value.end',
+      /invalid value\.end "bad"; using no date/,
+      '2026-09-12 00:00 - ...',
     ],
-    [{ defaultValue: 'bad' }, 'defaultValue'],
-    [{ min: 'bad' }, 'min'],
-    [{ max: new Date(NaN) }, 'max'],
-    [{ disabledDates: ['2026-02-30'] }, 'disabledDates[0]'],
-    [{ disabledDates: '2026-09-12' }, 'disabledDates'],
-    [{ disabledDates: new Array(1) }, 'disabledDates[0]'],
-    [{ disabledTime: { hours: new Array(1) } }, 'disabledTime.hours'],
-    [{ disabledTime: { minutes: new Array(1) } }, 'disabledTime.minutes'],
-    [{ disabledTime: { hours: [24] } }, 'disabledTime.hours'],
-    [{ disabledTime: { minutes: [-1] } }, 'disabledTime.minutes'],
-    [{ disabledTime: { minutes: [0.5] } }, 'disabledTime.minutes'],
-  ])('rejects %j with the owning prop in its error', async (props, prop) => {
-    allowConsoleError(/error boundary you provided, Boundary/)
-    await act(async () =>
-      root.render(
-        <Boundary>
-          <DateField {...(props as DateProps)} />
-        </Boundary>,
-      ),
+    [{ defaultValue: 'bad' }, /invalid defaultValue "bad"; using no date/, ''],
+  ])('%j', async (props, report, shown) => {
+    await expectDevError(() => render(props), report)
+    expect(host.querySelector('[role="combobox"]')!.textContent).toBe(shown)
+  })
+  it.each([
+    [{ value: { start: '2026-09-12', end: null } }, '2026-09-12'],
+    [{ selection: 'range', value: '2026-09-12' }, ''],
+    [{ mode: 'week', value: '2026-09-12' }, ''],
+    [{ selection: 'range', value: { start: '2026-09-12' } }, ''],
+  ])('projects %j into the selection shape silently', async (props, submits) => {
+    await render(props)
+    expect(formValue()).toBe(submits)
+    expect(host.querySelector('[role="combobox"]')!.textContent).toMatch(/^2026-09-12 00:00/)
+  })
+  it.each([
+    [{ min: 'bad' }, /invalid min "bad"; using no date/, '2026-09-01'],
+    [{ max: new Date(NaN) }, /invalid max object; using no date/, '2026-09-30'],
+    [{ disabledDates: ['2026-02-30'] }, /invalid disabledDates\[0\] "2026-02-30"; dropping it/, '2026-09-15'],
+    [{ disabledDates: '2026-09-15' }, /invalid disabledDates "2026-09-15"; using no dates/, '2026-09-15'],
+    [{ disabledDates: new Array(1) }, /missing disabledDates\[0\]; dropping it/, '2026-09-15'],
+  ])('drops an unreadable constraint %j', async (props, report, day) => {
+    await expectDevError(
+      () => render({ ...props, defaultValue: '2026-09-12', defaultOpen: true }),
+      report,
     )
-    const output = host.querySelector('[data-error="RangeError"]')
-    expect(output, String(prop)).not.toBeNull()
-    expect(output!.textContent).toContain(prop)
+    expect(document.querySelector(`[data-date="${day}"]`)?.getAttribute('aria-disabled')).toBeNull()
+  })
+  it.each([
+    { hours: new Array(1) },
+    { minutes: new Array(1) },
+    { hours: [24] },
+    { minutes: [-1] },
+    { minutes: [0.5] },
+  ])('ignores disabledTime entries that match no clock (%j)', async (disabledTime) => {
+    await render({ mode: 'time', defaultValue: '2026-09-12T09:35', disabledTime, defaultOpen: true })
+    expect(
+      [...document.querySelectorAll<HTMLButtonElement>('.uf-date__grid button')].every(
+        (button) => !button.disabled,
+      ),
+    ).toBe(true)
   })
 })

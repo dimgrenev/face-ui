@@ -1,9 +1,9 @@
-import React, { act } from 'react'
+import { act } from 'react'
 import type { Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Calendar } from '../../Calendar/Calendar'
 import { normalizeISOValue } from '../date-utils'
-import { allowConsoleError, mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 let root: Root, host: HTMLDivElement
 beforeEach(() => {
@@ -31,7 +31,10 @@ describe('Calendar has one civil ISO value contract', () => {
     expect(host.querySelector('[data-part="title"]')?.textContent).toBe(
       'February 2025',
     )
-    await render({ value: '2026-09-12', defaultViewDate: 'ignored' })
+    await expectDevError(
+      () => render({ value: '2026-09-12', defaultViewDate: 'ignored' }),
+      /^Face UI Calendar: missing viewDate; keeping the last controlled value\.$/,
+    )
     expect(host.querySelector('[data-part="title"]')?.textContent).toBe(
       'February 2025',
     )
@@ -40,7 +43,10 @@ describe('Calendar has one civil ISO value contract', () => {
     const change = vi.fn()
     await render({ value: '2026-09-12', onValueChange: change })
     await render({ value: '2026-09-13', onValueChange: change })
-    await render({ defaultValue: 'discarded default', onValueChange: change })
+    await expectDevError(
+      () => render({ defaultValue: 'discarded default', onValueChange: change }),
+      /^Face UI Calendar: missing value; keeping the last controlled value\./,
+    )
     expect(selected()).toBe('2026-09-13')
     expect(change).not.toHaveBeenCalled()
     await click(day('2026-09-14'))
@@ -172,52 +178,52 @@ describe('Date rejects civil years and instants outside the picker domain', () =
   )
 })
 
-class Boundary extends React.Component<
-  { children: React.ReactNode },
-  { error: Error | null }
-> {
-  state = { error: null as Error | null }
-  static getDerivedStateFromError(error: Error) {
-    return { error }
-  }
-  render() {
-    return this.state.error ? (
-      <output data-error={this.state.error.name}>
-        {this.state.error.message}
-      </output>
-    ) : (
-      this.props.children
+describe('Calendar normalizes invalid values instead of rolling dates or dropping the calendar', () => {
+  const selectedDays = () =>
+    [...host.querySelectorAll('[role="gridcell"][aria-selected="true"] [data-date]')].map(
+      (node) => node.getAttribute('data-date'),
     )
-  }
-}
-describe('Calendar rejects invalid values instead of rolling dates or dropping constraints', () => {
-  const caught = (event: ErrorEvent) => {
-    if (event.error instanceof RangeError) event.preventDefault()
-  }
-  beforeEach(() => window.addEventListener('error', caught))
-  afterEach(() => window.removeEventListener('error', caught))
+  const unavailable = (iso: string) =>
+    day(iso).getAttribute('aria-disabled') === 'true'
   it.each([
-    { value: '2026-02-30' },
-    { value: new Date('2026-09-12T00:00Z') },
-    { defaultValue: '2026-09-12T00:00' },
-    { viewDate: 'not a date' },
-    { defaultViewDate: '0000-12-31' },
-    { min: '2026-02-30' },
-    { max: '10000-01-01' },
-    { disabledDates: ['2026-09-12', '2026-02-30'] },
-    { disabledDates: new Array(1) },
-    { value: { start: '2026-09-12', end: '2026-09-13' } },
-    { selection: 'range', value: '2026-09-12' },
-    { selection: 'range', value: { start: '2026-09-12', end: '2026-02-30' } },
-  ])('reports the invalid prop %j', async (props) => {
-    allowConsoleError(/error boundary you provided, Boundary/)
-    await act(async () =>
-      root.render(
-        <Boundary>
-          <Calendar {...(props as any)} />
-        </Boundary>,
-      ),
-    )
-    expect(host.querySelector('output')?.dataset.error).toBe('RangeError')
+    [{ value: '2026-02-30' }, /invalid value "2026-02-30"; using no date/],
+    [{ value: new Date('2026-09-12T00:00Z') }, /invalid value object; using no date/],
+    [{ defaultValue: '2026-09-12T00:00' }, /invalid defaultValue "2026-09-12T00:00"; using no date/],
+    [
+      { selection: 'range', value: { start: '2026-09-12', end: '2026-02-30' } },
+      /invalid value\.end "2026-02-30"; using no date/,
+    ],
+  ])('%j selects nothing it cannot read and reports it', async (props, report) => {
+    await expectDevError(() => render({ defaultViewDate: '2026-09-01', ...props }), report)
+    expect(selectedDays()).toEqual('selection' in props ? ['2026-09-12'] : [])
+  })
+  it.each([
+    [{ viewDate: 'not a date' }, /invalid viewDate "not a date"; using no date/],
+    [{ defaultViewDate: '0000-12-31' }, /invalid defaultViewDate "0000-12-31"; using no date/],
+  ])('%j shows the month of the selection instead', async (props, report) => {
+    await expectDevError(() => render({ defaultValue: '2026-09-12', ...props }), report)
+    expect(host.querySelector('[data-part="title"]')?.textContent).toBe('September 2026')
+  })
+  it.each([
+    [{ min: '2026-02-30' }, /invalid min "2026-02-30"; using no date/, '2026-09-01'],
+    [{ max: '10000-01-01' }, /invalid max "10000-01-01"; using no date/, '2026-09-30'],
+    [
+      { disabledDates: ['2026-09-13', '2026-02-30'] },
+      /invalid disabledDates\[1\] "2026-02-30"; dropping it/,
+      '2026-09-14',
+    ],
+    [{ disabledDates: new Array(1) }, /missing disabledDates\[0\]; dropping it/, '2026-09-14'],
+  ])('%j drops only the unreadable constraint', async (props, report, available) => {
+    await expectDevError(() => render({ defaultValue: '2026-09-12', ...props }), report)
+    expect(unavailable(available)).toBe(false)
+    if ('disabledDates' in props && Array.isArray(props.disabledDates) && props.disabledDates[0])
+      expect(unavailable('2026-09-13')).toBe(true)
+  })
+  it.each([
+    [{ value: { start: '2026-09-12', end: '2026-09-13' } }, ['2026-09-12']],
+    [{ selection: 'range', value: '2026-09-12' }, ['2026-09-12']],
+  ])('projects %j into the selection shape silently', async (props, days) => {
+    await render(props)
+    expect(selectedDays()).toEqual(days)
   })
 })

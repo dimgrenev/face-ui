@@ -1,11 +1,17 @@
-/** A civil-day selector. ISO dates are independent of the browser's timezone. */
 import { forwardRef, useState } from 'react'
-import { parseCivilDate as parseDate } from '../assets/runtime/civil-date'
 import {
   CalendarGrid,
   type CalendarRootAttributes,
 } from '../assets/internal/CalendarGrid'
-import { normalizeRange } from '../assets/date-utils'
+import {
+  readCivilDay,
+  readDateList,
+  readDateShape,
+} from '../assets/internal/date-value'
+import { projectDateValue, type DateValueISO } from '../assets/date-utils'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
+import { readWeekStartsOn } from '../assets/runtime/date-locale'
 import {
   getNextDateRange,
   isDateRangeDisabled,
@@ -61,58 +67,32 @@ export interface CalendarRangeValue {
 export type CalendarProps = CalendarSharedProps &
   (
     | {
+        /** Select one day, or a range from a start day to an end day. */
         selection?: 'single'
+        /** Exclude unavailable days from the whole range; false constrains only its endpoints. */
         excludeDisabledDates?: never
-        /** Selected civil day or range; dates use YYYY-MM-DD and null clears the controlled value. */
+        /** Selected day or range as YYYY-MM-DD; null clears the controlled value. */
         value?: string | null
-        /** Initial uncontrolled civil day or range; dates use YYYY-MM-DD. */
+        /** Initial uncontrolled day or range as YYYY-MM-DD. */
         defaultValue?: string | null
-        /** Called once for a user selection, with its civil ISO date. */
+        /** Called once per user selection, with the day or the range, including an incomplete one. */
         onValueChange?: (details: { value: string }) => void
       }
     | {
+        /** Select one day, or a range from a start day to an end day. */
         selection: 'range'
         /** Exclude unavailable days from the whole range; false constrains only its endpoints. */
         excludeDisabledDates?: boolean
-        /** Selected civil range; null clears the controlled value. */
+        /** Selected day or range as YYYY-MM-DD; null clears the controlled value. */
         value?: CalendarRangeValue | null
-        /** Initial uncontrolled civil range. */
+        /** Initial uncontrolled day or range as YYYY-MM-DD. */
         defaultValue?: CalendarRangeValue | null
-        /** Called once for a user selection, including an incomplete range. */
+        /** Called once per user selection, with the day or the range, including an incomplete one. */
         onValueChange?: (details: { value: CalendarRangeValue }) => void
       }
   )
 
-function readDate(value: unknown, prop: string): string {
-  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    try {
-      return parseDate(value).toString()
-    } catch {
-      /* Report the owning prop below. */
-    }
-  }
-  throw new RangeError(
-    `Calendar ${prop} must be a valid Gregorian YYYY-MM-DD string (years 0001–9999)`,
-  )
-}
-
-function readSelection(
-  value: unknown,
-  selection: 'single' | 'range',
-  prop: string,
-): CalendarRangeValue {
-  if (value == null) return { start: null, end: null }
-  if (selection === 'single') return { start: readDate(value, prop), end: null }
-  if (typeof value !== 'object' || !('start' in value) || !('end' in value))
-    throw new RangeError(
-      `Calendar ${prop} must have start and end civil dates, each YYYY-MM-DD or null`,
-    )
-  return normalizeRange(
-    value.start === null ? null : readDate(value.start, `${prop}.start`),
-    value.end === null ? null : readDate(value.end, `${prop}.end`),
-  )
-}
-
+/** A civil-day selector. ISO dates are independent of the browser's timezone. */
 export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
   function Calendar(props, ref) {
     const {
@@ -122,10 +102,10 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
       defaultViewDate,
       onViewDateChange,
       selection = 'single',
-      onValueChange: _onValueChange,
+      onValueChange,
       min,
       max,
-      disabledDates = [],
+      disabledDates,
       excludeDisabledDates = true,
       disabled = false,
       readOnly = false,
@@ -135,54 +115,47 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
       className,
       ...nativeProps
     } = props
-    const controlled =
-      value !== undefined ? readSelection(value, selection, 'value') : undefined
-    const [stored, setStored] = useState(
-      () =>
-        controlled ?? readSelection(defaultValue, selection, 'defaultValue'),
-    )
-    // Preserve the last controlled value when the caller releases ownership.
-    if (controlled && !areContextValuesEqual(controlled, stored))
-      setStored(controlled)
-    else if (selection === 'single' && stored.end !== null)
-      setStored({ start: stored.start ?? stored.end, end: null })
-    const current = controlled ?? stored
-    const selected =
-      selection === 'single'
-        ? { start: current.start ?? current.end, end: null }
-        : current
+    const project = (input: unknown, prop: string) =>
+      projectDateValue(readDateShape(input, prop, readCivilDay), 'date', selection)
+    const [current, setCurrent, replaceCurrent] = useControllableState({
+      value: value === undefined ? undefined : project(value, 'value'),
+      // A default is not read while the value is controlled, so it cannot be reported then.
+      defaultValue: () =>
+        value === undefined ? project(defaultValue, 'defaultValue') : null,
+      onChange: (next: DateValueISO) =>
+        (onValueChange as ((details: { value: DateValueISO }) => void) | undefined)?.({
+          value: next,
+        }),
+      equal: areContextValuesEqual,
+      name: ['Calendar', 'value'],
+    })
+    const selected = projectDateValue(current, 'date', selection)
+    // A range made single keeps only its start, so switching back does not resurrect the end.
+    useIsomorphicLayoutEffect(() => {
+      if (!areContextValuesEqual(selected, current)) replaceCurrent(selected)
+    }, [selection])
+    const range =
+      typeof selected === 'object' && selected !== null
+        ? selected
+        : { start: selected, end: null }
+    const month = (input: unknown, prop: string) =>
+      readCivilDay(input, prop)?.slice(0, 7).concat('-01') ?? undefined
     const [initialView] = useState(() =>
-      viewDate !== undefined || defaultViewDate === undefined
-        ? undefined
-        : readDate(defaultViewDate, 'defaultViewDate'),
+      viewDate === undefined ? month(defaultViewDate, 'defaultViewDate') : undefined,
     )
-    if (!Array.isArray(disabledDates))
-      throw new RangeError(
-        'Calendar disabledDates must be an array of YYYY-MM-DD strings',
-      )
     const constraints = {
-      min: min === undefined ? null : readDate(min, 'min'),
-      max: max === undefined ? null : readDate(max, 'max'),
-      disabledDates: Array.from(disabledDates, (date, index) =>
-        readDate(date, `disabledDates[${index}]`),
-      ),
+      min: readCivilDay(min, 'min'),
+      max: readCivilDay(max, 'max'),
+      disabledDates: readDateList(disabledDates, 'Calendar', 'disabledDates', readCivilDay),
       excludeDisabledDates,
     }
     return (
       <CalendarGrid
         {...nativeProps}
         ref={ref}
-        value={selection === 'range' ? selected : selected.start}
-        viewDate={
-          viewDate === undefined
-            ? undefined
-            : readDate(viewDate, 'viewDate').slice(0, 7) + '-01'
-        }
-        defaultViewDate={
-          initialView === undefined
-            ? undefined
-            : initialView.slice(0, 7) + '-01'
-        }
+        value={selected}
+        viewDate={month(viewDate, 'viewDate')}
+        defaultViewDate={initialView}
         min={constraints.min}
         max={constraints.max}
         disabledDates={constraints.disabledDates}
@@ -190,22 +163,18 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
         readOnly={readOnly}
         locale={locale}
         labels={resolveLabels(defaultCalendarLabels, labels, 'Calendar')}
-        weekStartsOn={weekStartsOn}
+        weekStartsOn={readWeekStartsOn('Calendar', weekStartsOn) ?? undefined}
         onViewDateChange={onViewDateChange}
         className={className}
-        onDateSelect={(date) => {
-          const next =
+        onDateSelect={(date) =>
+          setCurrent(
             selection === 'range'
-              ? getNextDateRange(selected, date, (range) =>
+              ? getNextDateRange(range, date, (range) =>
                   isDateRangeDisabled(range, constraints),
                 )
-              : { start: date, end: null }
-          if (areContextValuesEqual(selected, next)) return
-          if (value === undefined) setStored(next)
-          if (props.selection === 'range')
-            props.onValueChange?.({ value: next })
-          else props.onValueChange?.({ value: date })
-        }}
+              : date,
+          )
+        }
       />
     )
   },

@@ -2,8 +2,32 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Date",
-  "description": "Unified date/time picker with multi-view and range support",
+  "description": "A date, time, week, month or year field with a picker; values are civil ISO strings or Date instants.",
   "props": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
+    },
     "open": {
       "type": "boolean",
       "required": false,
@@ -24,7 +48,7 @@
     "labels": {
       "type": "object",
       "required": false,
-      "description": "Internal action and view labels; field label, placeholder and surfaceTitle keep their own content APIs."
+      "description": "Internal action and view labels; the field keeps label and placeholder as its own props."
     },
     "timezone": {
       "type": "string",
@@ -54,20 +78,17 @@
     "min": {
       "type": "any",
       "required": false,
-      "description": "Inclusive lower bound in timezone; a date-only bound includes its whole day.",
-      "default": null
+      "description": "Inclusive lower bound in timezone; a date-only bound includes its whole day."
     },
     "max": {
       "type": "any",
       "required": false,
-      "description": "Inclusive upper bound in timezone; a date-only bound includes its whole day.",
-      "default": null
+      "description": "Inclusive upper bound in timezone; a date-only bound includes its whole day."
     },
     "disabledDates": {
       "type": "array",
       "required": false,
-      "description": "Unavailable whole days; Date instants are converted into timezone before taking the day.",
-      "default": []
+      "description": "Unavailable whole days; Date instants are converted into timezone before taking the day."
     },
     "disabledTime": {
       "type": "object",
@@ -77,7 +98,7 @@
     "closeOnSelect": {
       "type": "boolean",
       "required": false,
-      "description": "Close panel after completing selection"
+      "description": "Close the picker once a selection is complete; defaults to true for a single date."
     },
     "showNow": {
       "type": "boolean",
@@ -85,47 +106,22 @@
       "description": "Show the shortcut to the current day or time in timezone.",
       "default": true
     },
-    "showClear": {
+    "clearable": {
       "type": "boolean",
       "required": false,
-      "description": "Show the clear action; it is disabled when the selection is empty.",
+      "description": "Offer the clear action; it is disabled while the selection is empty.",
       "default": true
     },
     "surface": {
       "type": "enum",
       "required": false,
-      "description": "surface prop",
+      "description": "Picker surface: a popover, a bottom sheet, or auto (a sheet below 900px wide).",
       "options": [
         "auto",
         "popover",
         "sheet"
       ],
       "default": "auto"
-    },
-    "surfaceBreakpoint": {
-      "type": "number",
-      "required": false,
-      "description": "surfaceBreakpoint prop"
-    },
-    "surfaceTitle": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "surfaceTitle prop"
-    },
-    "label": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Control label"
-    },
-    "description": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Helper text below control"
-    },
-    "error": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Error message below control"
     },
     "name": {
       "type": "string",
@@ -146,36 +142,36 @@
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable interactions",
+      "description": "Disable the trigger; the picker cannot open.",
       "default": false
     },
     "readOnly": {
       "type": "boolean",
       "required": false,
-      "description": "Read-only mode",
+      "description": "Show the value without letting the user change it; it is still submitted.",
       "default": false
     },
     "placeholder": {
       "type": "string",
       "required": false,
-      "description": "Trigger placeholder text"
+      "description": "Trigger text while nothing is selected."
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Enable membrane wrapper around trigger",
+      "description": "Wrap the trigger in the membrane spacing of controls in a row.",
       "default": true
     },
     "fullWidth": {
       "type": "boolean",
       "required": false,
-      "description": "Stretch control to container width",
+      "description": "Stretch the field to the width of its container.",
       "default": true
     },
     "mode": {
       "type": "enum",
       "required": false,
-      "description": "Picker mode: date, datetime, time, week, month or year",
+      "description": "Picker mode: date, datetime, time, week, month or year.",
       "options": [
         "date",
         "datetime",
@@ -189,7 +185,7 @@
     "openTo": {
       "type": "enum",
       "required": false,
-      "description": "Initial opened view",
+      "description": "First view shown when the picker opens.",
       "options": [
         "day",
         "hours",
@@ -254,7 +250,6 @@
         "min": null,
         "max": null,
         "showNow": true,
-        "showClear": true,
         "surface": "auto",
         "required": false,
         "disabled": false,

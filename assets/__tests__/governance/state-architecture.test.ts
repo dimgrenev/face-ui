@@ -166,7 +166,7 @@ const oneImplementation = (component: string) =>
 
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
-  'D2 throw': ['Calendar', 'Date'],
+  'D2 throw': [],
   'D3 machines': [
     'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Table', 'Toast', 'Toc', 'Tree', 'Upload',
   ],
@@ -175,10 +175,10 @@ const PENDING = {
     'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Switcher', 'Table', 'Toc', 'Tooltip', 'Tree',
     'Upload',
   ],
-  'D3 direction': ['Calendar', 'Date'],
+  'D3 direction': [],
   'D3 isConnected': [],
-  'D3 machine-era hooks': ['Calendar', 'Carousel', 'Command', 'Date', 'Modal', 'Navigation', 'Panel', 'Toc', 'Tree'],
-  'D5 one implementation': ['Calendar', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Panel', 'Tree', 'Upload'],
+  'D3 machine-era hooks': ['Carousel', 'Command', 'Modal', 'Navigation', 'Panel', 'Toc', 'Tree'],
+  'D5 one implementation': ['Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Tree', 'Upload'],
 } satisfies Record<string, readonly string[]>
 
 describeGate('state-architecture D2 throw', PENDING['D2 throw'], throws)

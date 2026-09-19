@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Calendar",
-  "description": "Standalone date picker grid",
+  "description": "A civil-day selector. ISO dates are independent of the browser's timezone.",
   "props": {
     "viewDate": {
       "type": "string",
@@ -27,8 +27,7 @@
     "disabledDates": {
       "type": "array",
       "required": false,
-      "description": "Unavailable civil dates as YYYY-MM-DD strings.",
-      "default": []
+      "description": "Unavailable civil dates as YYYY-MM-DD strings."
     },
     "disabled": {
       "type": "boolean",
@@ -85,7 +84,7 @@
     "selection": {
       "type": "enum",
       "required": false,
-      "description": "Selection model.",
+      "description": "Select one day, or a range from a start day to an end day.",
       "options": [
         "single",
         "range"
@@ -95,12 +94,12 @@
     "value": {
       "type": "object",
       "required": false,
-      "description": "Selected civil day or range; dates use YYYY-MM-DD and null clears the controlled value."
+      "description": "Selected day or range as YYYY-MM-DD; null clears the controlled value."
     },
     "defaultValue": {
       "type": "object",
       "required": false,
-      "description": "Initial uncontrolled civil day or range; dates use YYYY-MM-DD."
+      "description": "Initial uncontrolled day or range as YYYY-MM-DD."
     },
     "excludeDisabledDates": {
       "type": "boolean",

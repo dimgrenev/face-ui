@@ -75,3 +75,12 @@ export const dateRemovedCloseLabel = <DatePicker closeLabel="Close" />
 export const dateDictionary: CompleteDateLabels = { calendar:'Calendar',previousMonth:'Previous month',nextMonth:'Next month',previousYear:'Previous year',nextYear:'Next year',previousYearPage:'Previous 12 years',nextYearPage:'Next 12 years',day:'Day',month:'Month',year:'Year',hours:'Hour',minutes:'Minute',start:'Start',end:'End',rangeEndpoint:'Range endpoint',clear:'Clear',now:'Now',close:'Close' }
 export const calendarDictionary: CompleteCalendarLabels = dateDictionary
 export const calendarSharedDictionary = <Calendar labels={dateDictionary} />
+export const dateClearable = <DatePicker clearable={false} label="Deadline" labelPosition="start" />
+// @ts-expect-error use clearable
+export const dateRemovedShowClear = <DatePicker showClear={false} />
+// @ts-expect-error the picker takes the field name: label or aria-label
+export const dateRemovedSurfaceTitle = <DatePicker surfaceTitle="Deadline" />
+// @ts-expect-error surface="auto" has one 900px boundary
+export const dateRemovedSurfaceBreakpoint = <DatePicker surfaceBreakpoint={600} />
+// @ts-expect-error a field label sits on top or at the inline start
+export const dateLabelLeft = <DatePicker labelPosition="left" />
