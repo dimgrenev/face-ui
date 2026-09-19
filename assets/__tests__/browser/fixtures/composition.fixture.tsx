@@ -266,7 +266,7 @@ function Fixture() {
         />
         <Rating label="Quality" allowHalf defaultValue={2.5} />
       </section>
-      <Carousel ariaLabel="Multiple slides" slidesPerView={2}>
+      <Carousel aria-label="Multiple slides" slidesPerView={2}>
         <Button>Slide one</Button>
         <Button>Slide two</Button>
         <Button>Slide three</Button>

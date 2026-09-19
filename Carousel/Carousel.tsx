@@ -1,338 +1,486 @@
 /**
- * Carousel — multi-slide content display.
+ * Carousel — slides shown one position at a time.
  *
- * Uses core carousel machine + Face UI primitives:
- * - Button for nav and indicators
- * - Media for fallback slide content
+ * `<Carousel aria-label="Product tour"><Media src="/a.jpg" alt="Dashboard" /><Media src="/b.jpg" alt="Reports" /></Carousel>`
  */
 
 import {
   forwardRef,
-  version,
-  useEffect,
-  useState,
-  useRef,
-  Children,
   isValidElement,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
   type CSSProperties,
+  type HTMLAttributes,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
   type ReactNode,
 } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
-import {
-  carouselMachine,
-  connectCarousel,
-} from '../assets/machines/carousel.machine'
-import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
 import { Media } from '../Media/Media'
+import { Text } from '../Text/Text'
+import { inertProp } from '../assets/adapters/react/inert-prop'
+import { composeHandlers } from '../assets/adapters/react/merge-props'
+import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useFocusRecovery } from '../assets/adapters/react/use-focus-recovery'
+import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
+import { createAnatomy } from '../assets/anatomy'
+import { move, type Move } from '../assets/runtime/collection'
+import { keyToMove, readDirection } from '../assets/runtime/keyboard'
+import {
+  formatLabel,
+  resolveLabel,
+  resolveLabels,
+  type CommonLabels,
+} from '../assets/runtime/labels'
+import { readNumber } from '../assets/runtime/props'
+import {
+  hasSlotContent,
+  renderSlotContent,
+  type SlotContent,
+} from '../assets/slot-content'
+import { cn } from '../assets/utils'
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+export interface CarouselLabels
+  extends Pick<CommonLabels, 'previous' | 'next'> {
+  /** Name of the control that starts automatic rotation. */
+  play: string
+  /** Name of the control that pauses automatic rotation. */
+  pause: string
+  /** Name of each slide; `{index}` becomes its number from 1 and `{count}` the number of slides. */
+  slide: string
+  /** Name of each indicator; `{index}` becomes the number of the first slide it shows. */
+  goToSlide: string
+  /** Kind of region the carousel announces, its `aria-roledescription`. */
+  roleCarousel: string
+  /** Kind of group each slide announces, its `aria-roledescription`. */
+  roleSlide: string
+}
 
-export interface CarouselProps {
-  /** Slide elements. Each child becomes one slide. */
-  children?: ReactNode | ReactNode[]
-  /** Data-driven image slides. Composed children take precedence when both are provided. */
-  slides?: CarouselMediaSlide[]
-  /** Enable infinite looping. */
-  loop?: boolean
-  /** Enable automatic slide advancement. */
-  autoPlay?: boolean
-  /** Interval in ms between auto-play transitions. */
-  autoPlayInterval?: number
-  /** Slide orientation. */
-  orientation?: 'horizontal' | 'vertical'
-  /** Number of slides visible at once. */
-  slidesPerView?: number
-  /** Controlled current slide index. */
+export interface CarouselProps
+  extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    | 'children'
+    | 'dangerouslySetInnerHTML'
+    | 'defaultValue'
+    | 'defaultChecked'
+    | 'role'
+    | 'aria-roledescription'
+    | 'autoFocus'
+    | 'contentEditable'
+    | 'suppressContentEditableWarning'
+  > {
+  /** The slides in order, one per top-level child: elements, text, or JSON `Media` descriptors. */
+  children?: SlotContent
+  /** Position shown (controlled): the index of the first visible slide, from 0; past the last position shows the last. */
   index?: number
-  /** Uncontrolled initial slide index. */
+  /** Position shown on mount (uncontrolled), from 0; later changes are ignored. */
   defaultIndex?: number
-  /** Callback when the active slide changes. */
-  onIndexChange?: (details: { index: number }) => void
-  /** Accessible name for the carousel region. */
-  ariaLabel?: string
-  className?: string
+  /** Called once per position change a control, key, swipe or autoplay proposes; never for `index` updates. */
+  onIndexChange?: (details: {
+    /** The proposed position, from 0. */
+    index: number
+  }) => void
+  /** Slides visible side by side, a whole number from 1; each takes that share of the width. Default: 1. */
+  slidesPerView?: number
+  /** Previous and next, by control, key or swipe, wrap around at the ends instead of stopping there. */
+  loop?: boolean
+  /** Advances one position per interval, after the last back to the first; any press or focus inside stops it, hover pauses it. */
+  autoPlay?: boolean
+  /** Milliseconds each position shows before autoplay advances, from 100. Default: 3000. */
+  autoPlayInterval?: number
+  /** Names of the carousel's controls and slides, and the kinds they announce. */
+  labels?: Partial<CarouselLabels>
+  /** Names the carousel region; without it and `aria-labelledby` the name is "Carousel". */
+  'aria-label'?: string
 }
 
-export interface CarouselMediaSlide {
-  src: string
-  alt?: string
+const { getPartAttrs: part } = createAnatomy('carousel').parts(
+  'root',
+  'viewport',
+  'slide',
+  'indicator',
+)
+
+const defaultLabels: CarouselLabels = Object.freeze({
+  previous: 'Previous slide',
+  next: 'Next slide',
+  play: 'Start rotation',
+  pause: 'Pause rotation',
+  slide: 'Slide {index} of {count}',
+  goToSlide: 'Go to slide {index}',
+  roleCarousel: 'carousel',
+  roleSlide: 'slide',
+})
+/** A carousel region needs a name until a native aria-label or aria-labelledby gives one (K14). */
+const defaultRootLabels = Object.freeze({ region: 'Carousel' })
+
+const INDEX = { integer: true, min: 0 } as const
+const PER_VIEW = { integer: true, min: 1 } as const
+/** Faster rotation is unreadable; the maximum is the longest delay a timer can wait. */
+const INTERVAL = { min: 100, max: 2_147_483_647 } as const
+/** Pixels a swipe must travel to change the position. */
+const SWIPE = 50
+/** Custom property the track follows while a pointer drags it. */
+const DRAG = '--face-runtime-carousel-drag'
+
+const REDUCED_MOTION = '(prefers-reduced-motion: reduce)'
+const motionQuery = () =>
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia(REDUCED_MOTION)
+    : null
+const subscribeMotion = (onChange: () => void) => {
+  const query = motionQuery()
+  query?.addEventListener?.('change', onChange)
+  return () => query?.removeEventListener?.('change', onChange)
+}
+const prefersReducedMotion = () => motionQuery()?.matches ?? false
+/** Until the client reads the preference, nothing rotates. */
+const serverPrefersReducedMotion = () => true
+
+const SLIDE_COMPONENTS = { Media }
+const renderText = (value: string | number) => <Text as="div">{value}</Text>
+
+/** One slide per top-level child: nested arrays flatten, empty children drop, JSON descriptors and text render as components. */
+function slidesOf(children: SlotContent) {
+  const slides: Array<{ key: string; node: ReactNode }> = []
+  const visit = (node: unknown) => {
+    if (Array.isArray(node)) node.forEach(visit)
+    else if (hasSlotContent(node))
+      slides.push({
+        key:
+          isValidElement(node) && node.key != null
+            ? `key:${node.key}`
+            : `at:${slides.length}`,
+        node: renderSlotContent(node, SLIDE_COMPONENTS, renderText),
+      })
+  }
+  visit(children)
+  return slides
 }
 
-type CarouselSlideInput = ReactNode | CarouselMediaSlide
-
-function isCarouselMediaSlide(
-  slide: CarouselSlideInput,
-): slide is CarouselMediaSlide {
-  if (slide == null || typeof slide !== 'object' || isValidElement(slide))
-    return false
-  return (
-    'src' in slide &&
-    typeof (slide as unknown as { src?: unknown }).src === 'string'
-  )
-}
-
-function preserveButtonScope<T extends { 'data-scope'?: string }>(
-  props: T,
-): Omit<T, 'data-scope'> {
-  const { 'data-scope': _scope, ...rest } = props
-  return rest
-}
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
+/** Slides shown one position at a time, with previous and next controls, indicators and optional autoplay. */
 export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
   function Carousel(props, ref) {
     const {
       children,
-      slides: mediaSlides = [],
-      loop = false,
-      autoPlay = false,
-      autoPlayInterval = 3000,
-      orientation = 'horizontal',
-      slidesPerView = 1,
       index,
       defaultIndex = 0,
       onIndexChange,
-      ariaLabel = 'Carousel',
+      slidesPerView = 1,
+      loop = false,
+      autoPlay = false,
+      autoPlayInterval = 3000,
+      labels,
+      'aria-label': ariaLabel,
       className,
+      style,
+      onClick,
+      onKeyDown,
+      onFocus,
+      onPointerDown,
+      onPointerEnter,
+      onPointerLeave,
+      ...rest
     } = props
-
-    const providedSlides = Children.toArray(children)
-    const slides: CarouselSlideInput[] =
-      providedSlides.length > 0
-        ? (providedSlides as CarouselSlideInput[])
-        : Array.isArray(mediaSlides)
-          ? mediaSlides
-          : []
-    const total = slides.length
-    const clampedSlidesPerView = Number.isFinite(slidesPerView)
-      ? Math.max(1, Math.min(total || 1, Math.floor(slidesPerView)))
-      : 1
-    const machineIndex = useControllableMachineProp(
-      typeof index === 'number' ? index : undefined,
-      typeof defaultIndex === 'number' ? defaultIndex : 0,
+    const text = resolveLabels(defaultLabels, labels, 'Carousel')
+    const slides = slidesOf(children)
+    const count = slides.length
+    const perView = readNumber(
+      'Carousel',
+      'slidesPerView',
+      slidesPerView,
+      1,
+      PER_VIEW,
+    )
+    const positions = Math.max(1, count - perView + 1)
+    const last = positions - 1
+    const keys = Array.from({ length: positions }, (_, position) =>
+      String(position),
     )
 
-    const [paused, setPaused] = useState(false)
-    const [hovered, setHovered] = useState(false)
-    const [reducedMotion, setReducedMotion] = useState(true)
-    const pointerId = useRef<number | null>(null)
-    useEffect(() => {
-      const query = window.matchMedia?.('(prefers-reduced-motion: reduce)')
-      const update = () => setReducedMotion(query?.matches ?? false)
-      update()
-      query?.addEventListener?.('change', update)
-      return () => query?.removeEventListener?.('change', update)
-    }, [])
-    const playing = autoPlay && !paused && !hovered && !reducedMotion
-    const { state, send } = useMachine(carouselMachine, {
-      index: machineIndex,
-      total,
-      loop,
-      autoPlay: playing,
-      autoPlayInterval,
-      orientation,
-      slidesPerView: clampedSlidesPerView,
-      onIndexChange: onIndexChange ?? null,
-    })
-    const safeIndex = Math.max(
-      0,
-      Math.min(
-        total - clampedSlidesPerView,
-        Number.isFinite(state.context.index)
-          ? Math.trunc(state.context.index)
+    const [stored, setIndex] = useControllableState<number>({
+      value:
+        index === undefined
+          ? undefined
+          : readNumber('Carousel', 'index', index, 0, INDEX),
+      // Read only while uncontrolled: an unused default reports nothing.
+      defaultValue: () =>
+        index === undefined
+          ? readNumber('Carousel', 'defaultIndex', defaultIndex, 0, INDEX)
           : 0,
-      ),
+      onChange: (next) => onIndexChange?.({ index: next }),
+      name: ['Carousel', 'index'],
+    })
+    const shown = Math.min(stored, last)
+    const go = (to: Move) => {
+      const next = move(keys, String(shown), to, loop)
+      if (next !== null) setIndex(Number(next))
+    }
+
+    // Rotation: 'auto' follows the reduced-motion preference until the user starts or stops it.
+    const [rotation, setRotation] = useState<'auto' | 'on' | 'off'>('auto')
+    const [hovered, setHovered] = useState(false)
+    const reducedMotion = useSyncExternalStore(
+      subscribeMotion,
+      prefersReducedMotion,
+      serverPrefersReducedMotion,
     )
-    const api = connectCarousel(
-      { ...state, context: { ...state.context, index: safeIndex } },
-      send,
+    const hasControls = positions > 1
+    const rotationOn =
+      rotation === 'on' || (rotation === 'auto' && !reducedMotion)
+    const rotating = autoPlay && hasControls && rotationOn && !hovered
+    const interval = readNumber(
+      'Carousel',
+      'autoPlayInterval',
+      autoPlayInterval,
+      3000,
+      INTERVAL,
     )
     useEffect(() => {
-      if (state.value === 'dragging') return
-      send({ type: 'PAUSE' })
-      if (playing && api.hasNext) send({ type: 'PLAY' })
-    }, [
-      playing,
-      autoPlayInterval,
-      api.hasNext,
-      state.value === 'dragging',
-      send,
-    ])
-
-    const axis = orientation === 'vertical' ? 'Y' : 'X'
-    const stepPercent = 100 / clampedSlidesPerView
-    const trackTransform = `translate${axis}(-${api.index * stepPercent}%)`
-    const rootStyle = {
-      '--face-runtime-carousel-slides-per-view': String(clampedSlidesPerView),
-    } as CSSProperties
-
-    const renderSlide = (slide: CarouselSlideInput, slideIndex: number) => {
-      if (isValidElement(slide)) return slide
-      if (isCarouselMediaSlide(slide)) {
-        const mediaSlide = slide
-        return (
-          <Media
-            src={mediaSlide.src}
-            alt={mediaSlide.alt ?? `Slide ${slideIndex + 1}`}
-            objectFit="cover"
-            width="100%"
-            membrane
-            className="uf-carousel-slideMedia"
-          />
-        )
-      }
-      return (
-        <Media
-          src={String(slide)}
-          alt={`Slide ${slideIndex + 1}`}
-          objectFit="cover"
-          width="100%"
-          membrane
-          className="uf-carousel-slideMedia"
-        />
+      if (!rotating) return
+      const timer = setTimeout(
+        () => setIndex(shown < last ? shown + 1 : 0),
+        interval,
       )
+      return () => clearTimeout(timer)
+    }, [rotating, shown, last, interval, setIndex])
+
+    const rootRef = useRef<HTMLDivElement>(null)
+    const composedRef = useComposedRefs(rootRef, ref)
+    const controlsRef = useRef<HTMLDivElement>(null)
+    const indicatorsRef = useRef<HTMLDivElement>(null)
+    const rotationRef = useRef<HTMLButtonElement>(null)
+    const prevRef = useRef<HTMLButtonElement>(null)
+    const nextRef = useRef<HTMLButtonElement>(null)
+    // A previous or next button disabled at an end hands focus to the other one; anything else
+    // lost (a slide's content hidden by a controlled change) goes to the current indicator.
+    useFocusRecovery(rootRef, (lost) =>
+      lost === prevRef.current
+        ? nextRef.current
+        : lost === nextRef.current
+          ? prevRef.current
+          : indicatorsRef.current?.querySelector<HTMLElement>('[aria-current]'),
+    )
+    const roving = useRovingFocus({
+      keys,
+      active: String(shown),
+      orientation: 'horizontal',
+      loop,
+      activateOnMove: true,
+    })
+
+    /** Any press or focus inside, except on the rotation control itself, stops rotation. */
+    const interact = (target: EventTarget) => {
+      if (autoPlay && !rotationRef.current?.contains(target as Node))
+        setRotation('off')
     }
+    const activate = (event: MouseEvent<HTMLDivElement>) => {
+      const control = (event.target as Element).closest?.('button')
+      if (!control || !controlsRef.current?.contains(control)) return
+      const kind = control.getAttribute('data-part')
+      if (kind === 'prev') go('prev')
+      else if (kind === 'next') go('next')
+      else if (kind === 'indicator-item')
+        setIndex(Number(control.getAttribute('data-index')))
+      else if (kind === 'rotation') setRotation(rotationOn ? 'off' : 'on')
+    }
+    // Keys on the carousel's own controls move it; slide content keeps its keys. The indicators
+    // move focus themselves (roving) and mark the event handled.
+    const navigate = (event: KeyboardEvent<HTMLDivElement>) => {
+      if (
+        event.defaultPrevented ||
+        !controlsRef.current?.contains(event.target as Node)
+      )
+        return
+      const to = keyToMove(
+        event,
+        'horizontal',
+        readDirection(event.currentTarget),
+      )
+      if (!to) return
+      event.preventDefault()
+      go(to)
+    }
+
+    const trackRef = useRef<HTMLDivElement>(null)
+    const drag = useRef<{ pointer: number; x: number } | null>(null)
+    const follow = (offset: number | null) => {
+      const track = trackRef.current
+      if (!track) return
+      track.toggleAttribute('data-dragging', offset !== null)
+      if (offset === null) track.style.removeProperty(DRAG)
+      else track.style.setProperty(DRAG, `${offset}px`)
+    }
+    const release = () => {
+      drag.current = null
+      follow(null)
+    }
+    const dragStart = (event: PointerEvent<HTMLDivElement>) => {
+      if (
+        event.button !== 0 ||
+        drag.current ||
+        !hasControls ||
+        (event.target as Element).closest(
+          'a, button, input, select, textarea, label, [contenteditable]',
+        )
+      )
+        return
+      drag.current = { pointer: event.pointerId, x: event.clientX }
+      event.currentTarget.setPointerCapture?.(event.pointerId)
+    }
+    const dragMove = (event: PointerEvent<HTMLDivElement>) => {
+      if (drag.current?.pointer === event.pointerId)
+        follow(event.clientX - drag.current.x)
+    }
+    const dragEnd = (event: PointerEvent<HTMLDivElement>) => {
+      if (drag.current?.pointer !== event.pointerId) return
+      const offset = event.clientX - drag.current.x
+      release()
+      if (Math.abs(offset) < SWIPE) return
+      // Dragging the track left brings in what lies to the right, as ArrowRight would.
+      const to = keyToMove(
+        { key: offset < 0 ? 'ArrowRight' : 'ArrowLeft' },
+        'horizontal',
+        readDirection(event.currentTarget),
+      )
+      if (to) go(to)
+    }
+
+    const name = resolveLabel(
+      ariaLabel,
+      defaultRootLabels.region,
+      'Carousel',
+      'aria-label',
+    )
+    const rootStyle = {
+      ...style,
+      '--face-runtime-carousel-slides-per-view': perView,
+      '--face-runtime-carousel-index': shown,
+    } as CSSProperties
 
     return (
       <div
-        ref={ref}
-        {...api.getRootProps()}
-        onFocusCapture={(event) => {
-          if (!(event.target as HTMLElement).closest('[data-carousel-play]'))
-            setPaused(true)
-        }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onKeyDown={(event) => {
-          if (
-            (event.target as HTMLElement).closest(
-              'input, textarea, select, [contenteditable="true"]',
-            )
-          )
-            return
-          if (
-            ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(
-              event.key,
-            )
-          )
-            event.preventDefault()
-          api.getRootProps().onKeyDown?.(event)
-        }}
-        aria-label={ariaLabel}
-        style={rootStyle}
+        {...rest}
+        {...part('root')}
+        ref={composedRef}
+        role="region"
+        aria-roledescription={text.roleCarousel}
+        aria-label={name}
         className={cn('uf-carousel', className)}
+        style={rootStyle}
+        onClick={composeHandlers(onClick, activate)}
+        onKeyDown={composeHandlers(onKeyDown, navigate)}
+        onFocus={composeHandlers(onFocus, (event) => interact(event.target))}
+        onPointerDown={composeHandlers(onPointerDown, (event) =>
+          interact(event.target),
+        )}
+        onPointerEnter={composeHandlers(onPointerEnter, () => setHovered(true))}
+        onPointerLeave={composeHandlers(onPointerLeave, () =>
+          setHovered(false),
+        )}
       >
         <div
-          {...api.getViewportProps()}
-          style={{
-            ...api.getViewportProps().style,
-            touchAction: orientation === 'vertical' ? 'pan-x' : 'pan-y',
-          }}
+          {...part('viewport')}
+          aria-live={rotating ? 'off' : 'polite'}
           onDragStart={(event) => event.preventDefault()}
-          onPointerDown={(event) => {
-            if (
-              event.button !== 0 ||
-              pointerId.current !== null ||
-              (event.target as HTMLElement).closest(
-                'button, a, input, select, textarea, [contenteditable="true"]',
-              )
-            )
-              return
-            pointerId.current = event.pointerId
-            event.currentTarget.setPointerCapture?.(event.pointerId)
-            api.getViewportProps().onPointerDown?.(event)
-          }}
-          onPointerMove={(event) => {
-            if (pointerId.current === event.pointerId)
-              api.getViewportProps().onPointerMove?.(event)
-          }}
-          onPointerUp={(event) => {
-            if (pointerId.current !== event.pointerId) return
-            pointerId.current = null
-            api.getViewportProps().onPointerUp?.()
-            event.currentTarget.releasePointerCapture?.(event.pointerId)
-          }}
-          onPointerCancel={() => {
-            pointerId.current = null
-            send({ type: 'PAUSE' })
-          }}
+          onPointerDown={dragStart}
+          onPointerMove={dragMove}
+          onPointerUp={dragEnd}
+          onPointerCancel={release}
+          onLostPointerCapture={release}
         >
-          <div
-            className="uf-carousel-track"
-            style={{ transform: trackTransform }}
-          >
-            {slides.map((slide, i) => {
-              const { inert, ...slideProps } = api.getSlideProps(i)
-              // React 18 forwards unknown attributes as strings; React 19 owns
-              // the native boolean inert attribute. Keep headless props HTML-like.
-              const inertProps: Record<string, unknown> =
-                inert === undefined
-                  ? {}
-                  : { inert: Number.parseInt(version, 10) >= 19 ? true : '' }
+          <div ref={trackRef} className="uf-carousel-track">
+            {slides.map(({ key, node }, position) => {
+              const visible = position >= shown && position < shown + perView
               return (
-                <div key={i} {...slideProps} {...inertProps}>
-                  {renderSlide(slide, i)}
+                <div
+                  key={key}
+                  {...part('slide')}
+                  {...inertProp(!visible)}
+                  role="group"
+                  aria-roledescription={text.roleSlide}
+                  aria-label={formatLabel(text.slide, {
+                    index: position + 1,
+                    count,
+                  })}
+                  data-index={position}
+                  data-current={visible ? '' : undefined}
+                >
+                  {node}
                 </div>
               )
             })}
           </div>
         </div>
-        <div className="uf-carousel-controls">
-          {autoPlay && (
-            <Button
-              data-carousel-play
-              fullWidth={false}
-              onClick={() => {
-                if (paused || reducedMotion) {
-                  setPaused(false)
-                  setReducedMotion(false)
-                } else setPaused(true)
-              }}
-            >
-              {paused || reducedMotion ? 'Start rotation' : 'Pause rotation'}
-            </Button>
-          )}
-          <div className="uf-carousel-navSlot uf-carousel-navSlot--prev">
-            <Button
-              {...preserveButtonScope(api.getPrevProps())}
-              icon="arrow-left"
-              iconOnly
-              fullWidth={false}
-              className="uf-carousel-nav uf-carousel-navPrev"
-            />
-          </div>
-          <div {...api.getIndicatorProps()} className="uf-carousel-indicators">
-            {Array.from(
-              { length: Math.max(0, total - clampedSlidesPerView + 1) },
-              (_, i) => (
+        {hasControls && (
+          // An explicit tabIndex keeps the buttons in WebKit's Tab order, as the indicators are.
+          <div ref={controlsRef} className="uf-carousel-controls">
+            <div className="uf-carousel-navSlot uf-carousel-navSlot--prev">
+              {autoPlay && (
                 <Button
-                  key={i}
-                  {...preserveButtonScope(api.getIndicatorItemProps(i))}
-                  icon={api.index === i ? 'radio-on' : 'radio-off'}
+                  ref={rotationRef}
+                  data-part="rotation"
+                  tabIndex={0}
+                  icon={rotationOn ? 'pause' : 'play'}
                   iconOnly
-                  fullWidth={false}
+                  className="uf-carousel-nav"
+                >
+                  {rotationOn ? text.pause : text.play}
+                </Button>
+              )}
+              <Button
+                ref={prevRef}
+                data-part="prev"
+                tabIndex={0}
+                icon="arrow-left"
+                iconOnly
+                disabled={!loop && shown === 0}
+                className="uf-carousel-nav uf-carousel-navPrev"
+              >
+                {text.previous}
+              </Button>
+            </div>
+            <div
+              ref={indicatorsRef}
+              {...part('indicator')}
+              {...roving.root}
+              className="uf-carousel-indicators"
+            >
+              {keys.map((key, position) => (
+                <Button
+                  key={key}
+                  {...roving.item(key)}
+                  data-part="indicator-item"
+                  data-index={position}
+                  data-state={position === shown ? 'active' : 'inactive'}
+                  aria-current={position === shown || undefined}
+                  icon={position === shown ? 'radio-on' : 'radio-off'}
+                  iconOnly
                   className="uf-carousel-indicatorButton"
-                />
-              ),
-            )}
+                >
+                  {formatLabel(text.goToSlide, { index: position + 1 })}
+                </Button>
+              ))}
+            </div>
+            <div className="uf-carousel-navSlot uf-carousel-navSlot--next">
+              <Button
+                ref={nextRef}
+                data-part="next"
+                tabIndex={0}
+                icon="arrow-right"
+                iconOnly
+                disabled={!loop && shown === last}
+                className="uf-carousel-nav uf-carousel-navNext"
+              >
+                {text.next}
+              </Button>
+            </div>
           </div>
-          <div className="uf-carousel-navSlot uf-carousel-navSlot--next">
-            <Button
-              {...preserveButtonScope(api.getNextProps())}
-              icon="arrow-right"
-              iconOnly
-              fullWidth={false}
-              className="uf-carousel-nav uf-carousel-navNext"
-            />
-          </div>
-        </div>
+        )}
       </div>
     )
   },

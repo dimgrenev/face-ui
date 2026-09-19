@@ -168,12 +168,12 @@ const oneImplementation = (component: string) =>
 const PENDING = {
   'D2 throw': [],
   'D3 machines': [
-    'Carousel', 'Table', 'Upload',
+    'Table', 'Upload',
   ],
   'D3 isomorphic layout effect': [],
   'D3 direction': [],
   'D3 isConnected': [],
-  'D3 machine-era hooks': ['Carousel'],
+  'D3 machine-era hooks': [],
   'D5 one implementation': ['Upload'],
 } satisfies Record<string, readonly string[]>
 

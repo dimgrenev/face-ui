@@ -10,8 +10,14 @@
       "children": {
         "$ref": "props.children"
       },
-      "slides": {
-        "$ref": "props.slides"
+      "index": {
+        "$ref": "props.index"
+      },
+      "defaultIndex": {
+        "$ref": "props.defaultIndex"
+      },
+      "slidesPerView": {
+        "$ref": "props.slidesPerView"
       },
       "loop": {
         "$ref": "props.loop"
@@ -22,39 +28,38 @@
       "autoPlayInterval": {
         "$ref": "props.autoPlayInterval"
       },
-      "orientation": {
-        "$ref": "props.orientation"
+      "labels": {
+        "$ref": "props.labels"
       },
-      "slidesPerView": {
-        "$ref": "props.slidesPerView"
-      },
-      "index": {
-        "$ref": "props.index"
-      },
-      "defaultIndex": {
-        "$ref": "props.defaultIndex"
-      },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "aria-label": {
+        "$ref": "props.aria-label"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "ariaLabel": "Customer stories",
-      "loop": false,
-      "autoPlay": false,
+      "aria-label": "Customer stories",
       "defaultIndex": 1,
-      "slidesPerView": 1,
-      "slides": [
+      "slidesPerView": 2,
+      "children": [
         {
-          "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
-          "alt": "Customer team in a bright office"
+          "__componentName__": "Media",
+          "src": "/assets/media/examples/office-core/lobby-day.webp",
+          "alt": "Design team in the studio",
+          "height": 320
         },
         {
+          "__componentName__": "Media",
+          "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
+          "alt": "Customer team in a bright office",
+          "height": 320
+        },
+        {
+          "__componentName__": "Media",
           "src": "/assets/media/examples/office-core/skyline-window-day.webp",
-          "alt": "Enterprise team reviewing results"
+          "alt": "Enterprise team reviewing results",
+          "height": 320
         }
       ]
     }
@@ -64,73 +69,60 @@
       "name": "children",
       "type": "array",
       "required": false,
-      "description": "Slide elements. Each child becomes one slide."
+      "description": "The slides in order, one per top-level child: elements, text, or JSON `Media` descriptors."
     },
     {
-      "name": "slides",
-      "type": "array",
+      "name": "index",
+      "type": "number",
       "required": false,
-      "description": "Data-driven image slides. Composed children take precedence when both are provided.",
-      "defaultValue": []
+      "description": "Position shown (controlled): the index of the first visible slide, from 0; past the last position shows the last."
+    },
+    {
+      "name": "defaultIndex",
+      "type": "number",
+      "required": false,
+      "description": "Position shown on mount (uncontrolled), from 0; later changes are ignored.",
+      "defaultValue": 0
+    },
+    {
+      "name": "slidesPerView",
+      "type": "number",
+      "required": false,
+      "description": "Slides visible side by side, a whole number from 1; each takes that share of the width. Default: 1.",
+      "defaultValue": 1
     },
     {
       "name": "loop",
       "type": "boolean",
       "required": false,
-      "description": "Enable infinite looping.",
+      "description": "Previous and next, by control, key or swipe, wrap around at the ends instead of stopping there.",
       "defaultValue": false
     },
     {
       "name": "autoPlay",
       "type": "boolean",
       "required": false,
-      "description": "Enable automatic slide advancement.",
+      "description": "Advances one position per interval, after the last back to the first; any press or focus inside stops it, hover pauses it.",
       "defaultValue": false
     },
     {
       "name": "autoPlayInterval",
       "type": "number",
       "required": false,
-      "description": "Interval in ms between auto-play transitions.",
+      "description": "Milliseconds each position shows before autoplay advances, from 100. Default: 3000.",
       "defaultValue": 3000
     },
     {
-      "name": "orientation",
-      "type": "select",
+      "name": "labels",
+      "type": "object",
       "required": false,
-      "description": "Slide orientation.",
-      "options": [
-        "horizontal",
-        "vertical"
-      ],
-      "defaultValue": "horizontal"
+      "description": "Names of the carousel's controls and slides, and the kinds they announce."
     },
     {
-      "name": "slidesPerView",
-      "type": "number",
-      "required": false,
-      "description": "Number of slides visible at once.",
-      "defaultValue": 1
-    },
-    {
-      "name": "index",
-      "type": "number",
-      "required": false,
-      "description": "Controlled current slide index."
-    },
-    {
-      "name": "defaultIndex",
-      "type": "number",
-      "required": false,
-      "description": "Uncontrolled initial slide index.",
-      "defaultValue": 0
-    },
-    {
-      "name": "ariaLabel",
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Accessible name for the carousel region.",
-      "defaultValue": "Carousel"
+      "description": "Names the carousel region; without it and `aria-labelledby` the name is \"Carousel\"."
     }
   ],
   "meta": {

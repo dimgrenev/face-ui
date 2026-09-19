@@ -13,7 +13,7 @@
   align-self: stretch;
   overflow: hidden;
 }
-[data-scope="carousel"] [data-part="viewport"] {
+[data-scope="carousel"][data-part="viewport"] {
   display: block;
   overflow: hidden;
   border-radius: 0;
@@ -26,39 +26,39 @@
   width: 100%;
   min-width: 0;
 }
+/* The track and the arrows follow the nearest dir boundary: custom properties rather than
+   :dir(), which minifiers may lower to :lang(). */
+:where([dir="ltr"]) {
+  --uf-carousel-inline-sign: 1;
+}
+:where([dir="rtl"]) {
+  --uf-carousel-inline-sign: -1;
+}
+/* The position comes from the root and the drag offset from the pointer, in pixels. */
 .uf-carousel-track {
   display: flex;
   width: 100%;
   min-width: 0;
+  transform: translateX(
+    calc(
+      var(--face-runtime-carousel-index, 0) * -100% * var(--uf-carousel-inline-sign, 1) /
+        var(--face-runtime-carousel-slides-per-view, 1) + var(--face-runtime-carousel-drag, 0px)
+    )
+  );
   transition: transform var(--uf-motion-duration-medium) var(--uf-motion-ease-standard);
   will-change: transform;
 }
-[data-scope="carousel"] [data-part="slide"],
-[data-scope="carousel"] [data-part="item"] {
+.uf-carousel-track[data-dragging] {
+  transition: none;
+  user-select: none;
+  cursor: grabbing;
+}
+[data-scope="carousel"][data-part="slide"] {
   flex: 0 0 calc(100% / var(--face-runtime-carousel-slides-per-view, 1));
   min-width: 0;
   max-width: calc(100% / var(--face-runtime-carousel-slides-per-view, 1));
   overflow: hidden;
   box-sizing: border-box;
-}
-.uf-carousel-slideTitle {
-  font-weight: var(--uf-font-weight-bold);
-}
-.uf-carousel-slideMedia[data-scope="media"] {
-  width: 100%;
-  min-height: calc(var(--uf-control-height) * 5);
-  aspect-ratio: 16 / 9;
-  display: flex;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-.uf-carousel [data-part="slide"] > .uf-mediaMembrane {
-  width: 100%;
-}
-.uf-carousel-slideMedia[data-scope="media"] [data-part="element"] {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .uf-carousel-controls {
@@ -103,6 +103,10 @@
   --uf-icon-only-size: var(--uf-control-height);
   position: static;
   transform: none;
+}
+.uf-carousel-navPrev [data-part="icon"],
+.uf-carousel-navNext [data-part="icon"] {
+  transform: scaleX(var(--uf-carousel-inline-sign, 1));
 }
 
 .uf-button[data-scope] [data-part="icon"] {

@@ -112,6 +112,23 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `Card.Description align="left"`, `Card.Description align="right"` | `align="start"`, `align="end"` | auto |
 | `content` without `title`, `description` or `footer` was wrapped in the content part | Children without `title`, `description` or `footer` render directly in the card; wrap them in `Card.Content` to keep the part | — |
 
+### Carousel
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `slides` | One child per slide: `<Media src alt />` for each former `{ src, alt }` (in JSON, `{ "__componentName__": "Media", "src": …, "alt": … }`) | manual |
+| `CarouselMediaSlide` from `Carousel/Carousel` | `MediaImageProps` of the `Media` children | manual |
+| `useControllableMachineProp` from `assets/adapters/react/use-controllable-machine-prop` | `useControllableState` from `assets/adapters/react/use-controllable-state` | manual |
+| `ariaLabel` | `aria-label` | auto |
+| `orientation` | Remove it; a carousel moves horizontally. Content that scrolls vertically belongs in `Scroll` | auto |
+| A text or number child became an image whose URL was that text | A text child is a text slide; images are `Media` children | — |
+| Control names, slide names, the rotation button text and the announced kinds were fixed English strings | `labels` renames them: `previous`, `next`, `play`, `pause`, `slide` (`{index}`, `{count}`), `goToSlide` (`{index}`), `roleCarousel`, `roleSlide` | — |
+| The root took only `className`; every indicator was a tab stop marked `aria-pressed`; one slide still showed two disabled arrows and a dot | The root takes native attributes; the indicators are one tab stop whose arrows move and activate, the current one marked `aria-current`; a single position shows no controls | — |
+| Without `loop`, autoplay stopped at the last slide while its button still read "Pause rotation"; focus paused it, a click did not | Autoplay returns to the first slide after the last; any press or focus inside stops it until the rotation control starts it, hover pauses it; the rotation control is an icon button named `labels.play`/`labels.pause` | — |
+| In right-to-left text the track slid the wrong way and showed nothing; arrows and swipes did not mirror | The track, the arrow icons, ArrowLeft/ArrowRight and swipes follow text direction; the track follows the pointer while dragged | — |
+| `slidesPerView` above the number of slides stretched the slides to fill the width | Each slide keeps its `1 / slidesPerView` share; a fractional or zero `slidesPerView` is reported and becomes a whole number from 1 | — |
+| The root and viewport carried `data-state` (`idle`, `dragging`, `auto-playing`); slides carried `aria-hidden` and `data-state` | Slides outside the view are `inert` (also on React 19) and marked by the absence of `data-current`; the root carries no state attribute | — |
+
 ### Checkbox
 
 | Before | After | Codemod |
@@ -216,6 +233,21 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | The `error` message was a `role="alert"` live region | The control describes the message (`aria-describedby`); nothing is announced on render | — |
 | Label, help, error and required marker were `.uf-input__description`, `.uf-input__error`, `.uf-input__required` and `[data-scope="input"][data-part="label"]` | They are the shared Field parts `.uf-field__label`, `.uf-field__description`, `.uf-field__error` and `.uf-field__required` (`[data-scope="field"]`) | — |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the native input or textarea; `className` and `style` still style the outer layout | — |
+
+### Media
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `ariaLabel` | `aria-label` | auto |
+| `ref`, `id`, `role`, `tabIndex` and `aria-label` went to the wrapping box, `title` to both the box and the element; other native attributes were dropped | `ref` and every native attribute go to the `<img>`, `<video>` or `<audio>` element; only `className` and `style` stay on the box | — |
+| `alt` defaulted to `""`, so an image without it was silently decorative; any type accepted every prop | `type` selects the props: an image requires `alt` (`""` marks it decorative) and takes `variant`; video and audio take player attributes and `<track>` children | — |
+| `variant="rounded"` | `variant="default"` | auto |
+| `onLoad()` and `onError()` received no event; on video and audio `onLoad` ran on `loadeddata` | `onLoad(event)` and `onError(event)` are the element's native events; video and audio report loading through the native `onLoadedData(event)` | — |
+| An image in a box with a height stretched to fill it unless `objectFit` was set; a video kept its own width | Images default to `objectFit="cover"`; video and audio fill the box width and video keeps `contain` | — |
+| A failed load replaced the element with the fallback and set `data-error` on the box; an empty `src` requested the page | The box carries `data-state` (`loading`, `loaded`, `error`); a missing or empty `src` counts as failed; the fallback shows beside the element, which is hidden | — |
+| `MediaLoading` from `Media/Media` | `ImgHTMLAttributes<HTMLImageElement>['loading']` | manual |
+| `MediaDecoding` from `Media/Media` | `ImgHTMLAttributes<HTMLImageElement>['decoding']` | manual |
+| `mediaAnatomy` from `Media/Media` | The `[data-scope="media"][data-part="root" \| "element" \| "fallback"]` attributes | manual |
 
 ### Menu
 

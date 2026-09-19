@@ -2,69 +2,57 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Carousel",
-  "description": "Multi-slide content display with navigation and indicators",
+  "description": "Slides shown one position at a time, with previous and next controls, indicators and optional autoplay.",
   "props": {
     "children": {
       "type": "array",
       "required": false,
-      "description": "Slide elements. Each child becomes one slide."
+      "description": "The slides in order, one per top-level child: elements, text, or JSON `Media` descriptors."
     },
-    "slides": {
-      "type": "array",
+    "index": {
+      "type": "number",
       "required": false,
-      "description": "Data-driven image slides. Composed children take precedence when both are provided.",
-      "default": []
+      "description": "Position shown (controlled): the index of the first visible slide, from 0; past the last position shows the last."
+    },
+    "defaultIndex": {
+      "type": "number",
+      "required": false,
+      "description": "Position shown on mount (uncontrolled), from 0; later changes are ignored.",
+      "default": 0
+    },
+    "slidesPerView": {
+      "type": "number",
+      "required": false,
+      "description": "Slides visible side by side, a whole number from 1; each takes that share of the width. Default: 1.",
+      "default": 1
     },
     "loop": {
       "type": "boolean",
       "required": false,
-      "description": "Enable infinite looping.",
+      "description": "Previous and next, by control, key or swipe, wrap around at the ends instead of stopping there.",
       "default": false
     },
     "autoPlay": {
       "type": "boolean",
       "required": false,
-      "description": "Enable automatic slide advancement.",
+      "description": "Advances one position per interval, after the last back to the first; any press or focus inside stops it, hover pauses it.",
       "default": false
     },
     "autoPlayInterval": {
       "type": "number",
       "required": false,
-      "description": "Interval in ms between auto-play transitions.",
+      "description": "Milliseconds each position shows before autoplay advances, from 100. Default: 3000.",
       "default": 3000
     },
-    "orientation": {
-      "type": "enum",
+    "labels": {
+      "type": "object",
       "required": false,
-      "description": "Slide orientation.",
-      "options": [
-        "horizontal",
-        "vertical"
-      ],
-      "default": "horizontal"
+      "description": "Names of the carousel's controls and slides, and the kinds they announce."
     },
-    "slidesPerView": {
-      "type": "number",
-      "required": false,
-      "description": "Number of slides visible at once.",
-      "default": 1
-    },
-    "index": {
-      "type": "number",
-      "required": false,
-      "description": "Controlled current slide index."
-    },
-    "defaultIndex": {
-      "type": "number",
-      "required": false,
-      "description": "Uncontrolled initial slide index.",
-      "default": 0
-    },
-    "ariaLabel": {
+    "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Accessible name for the carousel region.",
-      "default": "Carousel"
+      "description": "Names the carousel region; without it and `aria-labelledby` the name is \"Carousel\"."
     }
   },
   "states": [
@@ -74,22 +62,27 @@
         "loop": false,
         "autoPlay": false,
         "autoPlayInterval": 3000,
-        "orientation": "horizontal",
         "slidesPerView": 1,
         "defaultIndex": 0,
-        "ariaLabel": "Office gallery",
-        "slides": [
+        "aria-label": "Office gallery",
+        "children": [
           {
+            "__componentName__": "Media",
             "src": "/assets/media/examples/office-core/lobby-day.webp",
-            "alt": "Bright office lobby with glass-block wall, seating, and plants"
+            "alt": "Bright office lobby with glass-block wall, seating, and plants",
+            "height": 240
           },
           {
+            "__componentName__": "Media",
             "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
-            "alt": "Office lobby with glass-block wall, seating, and a person by the window"
+            "alt": "Office lobby with glass-block wall, seating, and a person by the window",
+            "height": 240
           },
           {
+            "__componentName__": "Media",
             "src": "/assets/media/examples/office-core/skyline-window-day.webp",
-            "alt": "Two people looking out from a high-rise office window"
+            "alt": "Two people looking out from a high-rise office window",
+            "height": 240
           }
         ]
       }
@@ -108,9 +101,9 @@
       }
     },
     {
-      "name": "Vertical",
+      "name": "Two Per View",
       "props": {
-        "orientation": "vertical"
+        "slidesPerView": 2
       }
     }
   ],
@@ -121,25 +114,19 @@
   "keyboard": {
     "ArrowRight": {
       "action": "nextSlide",
-      "condition": "horizontal"
+      "condition": "focus on a carousel control; previousSlide in right-to-left text"
     },
     "ArrowLeft": {
       "action": "previousSlide",
-      "condition": "horizontal"
-    },
-    "ArrowDown": {
-      "action": "nextSlide",
-      "condition": "vertical"
-    },
-    "ArrowUp": {
-      "action": "previousSlide",
-      "condition": "vertical"
+      "condition": "focus on a carousel control; nextSlide in right-to-left text"
     },
     "Home": {
-      "action": "firstSlide"
+      "action": "firstSlide",
+      "condition": "focus on a carousel control"
     },
     "End": {
-      "action": "lastSlide"
+      "action": "lastSlide",
+      "condition": "focus on a carousel control"
     }
   },
   "aria": {
@@ -147,6 +134,11 @@
     "required": [
       "aria-roledescription",
       "aria-label"
+    ],
+    "notes": [
+      "The region announces labels.roleCarousel and is named \"Carousel\" until aria-label or aria-labelledby names it.",
+      "Each slide is a group announcing labels.roleSlide, named labels.slide; slides outside the view are inert.",
+      "The slides are a polite live region except while rotating; indicators mark the current position with aria-current."
     ]
   },
   "composition": {
@@ -156,9 +148,9 @@
       "slide"
     ],
     "recommended": [
-      "prevButton",
-      "nextButton",
-      "indicators"
+      "prev",
+      "next",
+      "indicator"
     ],
     "parts": {
       "root": {
@@ -173,16 +165,20 @@
         "parent": "viewport",
         "multiple": true
       },
-      "prevButton": {
-        "slot": "prevButton",
+      "rotation": {
+        "slot": "rotation",
         "parent": "root"
       },
-      "nextButton": {
-        "slot": "nextButton",
+      "prev": {
+        "slot": "prev",
         "parent": "root"
       },
-      "indicators": {
-        "slot": "indicators",
+      "indicator": {
+        "slot": "indicator",
+        "parent": "root"
+      },
+      "next": {
+        "slot": "next",
         "parent": "root"
       }
     }
@@ -191,21 +187,19 @@
     "component": [
       "--uf-carousel-viewport-pad",
       "--uf-carousel-controls-inset",
-      "--face-runtime-carousel-slides-per-view"
+      "--face-runtime-carousel-slides-per-view",
+      "--face-runtime-carousel-index",
+      "--face-runtime-carousel-drag"
     ],
     "semanticFallbacks": [
-      "--uf-membrane",
       "--uf-control-height",
-      "--uf-radius-full",
-      "--uf-font-weight-bold",
-      "--uf-color-accent",
       "--uf-motion-duration-medium",
       "--uf-motion-ease-standard"
     ],
     "notes": [
-      "Carousel uses Media for fallback slide content and Button icon-only controls with Icon assets for navigation and indicators.",
-      "slidesPerView and track transform are runtime layout state surfaced through component custom properties/styles.",
-      "Track transition uses shared Face UI motion tokens."
+      "Slides are the children; Button icon-only controls move between positions, and a rotation control appears with autoPlay.",
+      "slidesPerView, the position and the drag offset are runtime custom properties; the track's sign follows text direction.",
+      "Track transition uses shared Face UI motion tokens, which reduced motion shortens."
     ]
   },
   "platform": {},
@@ -217,11 +211,13 @@
     ],
     "whenNotToUse": [
       "Single image (use Media)",
-      "Content tabs (use Tabs)"
+      "Content tabs (use Tabs)",
+      "Vertical lists (use Scroll)"
     ],
     "alternatives": [
       "Tabs",
-      "Media"
+      "Media",
+      "Scroll"
     ],
     "context": "both"
   }

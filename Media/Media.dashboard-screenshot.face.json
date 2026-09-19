@@ -7,38 +7,8 @@
   "root": {
     "type": "Media",
     "props": {
-      "type": {
-        "$ref": "props.type"
-      },
       "src": {
         "$ref": "props.src"
-      },
-      "alt": {
-        "$ref": "props.alt"
-      },
-      "variant": {
-        "$ref": "props.variant"
-      },
-      "loading": {
-        "$ref": "props.loading"
-      },
-      "decoding": {
-        "$ref": "props.decoding"
-      },
-      "poster": {
-        "$ref": "props.poster"
-      },
-      "controls": {
-        "$ref": "props.controls"
-      },
-      "autoPlay": {
-        "$ref": "props.autoPlay"
-      },
-      "loop": {
-        "$ref": "props.loop"
-      },
-      "muted": {
-        "$ref": "props.muted"
       },
       "width": {
         "$ref": "props.width"
@@ -46,20 +16,26 @@
       "height": {
         "$ref": "props.height"
       },
-      "objectFit": {
-        "$ref": "props.objectFit"
-      },
       "fallback": {
         "$ref": "props.fallback"
       },
       "membrane": {
         "$ref": "props.membrane"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "type": {
+        "$ref": "props.type"
       },
-      "title": {
-        "$ref": "props.title"
+      "alt": {
+        "$ref": "props.alt"
+      },
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "objectFit": {
+        "$ref": "props.objectFit"
+      },
+      "children": {
+        "$ref": "props.children"
       }
     },
     "children": []
@@ -69,21 +45,48 @@
       "type": "image",
       "src": "/assets/media/examples/office-core/lobby-day.webp",
       "alt": "Analytics dashboard overview",
-      "variant": "rounded",
-      "loading": "eager",
-      "decoding": "async",
-      "objectFit": "cover",
-      "width": "100%",
+      "objectFit": "contain",
       "height": 320,
-      "membrane": true
+      "fallback": "Screenshot unavailable"
     }
   },
   "controls": [
     {
+      "name": "src",
+      "type": "string",
+      "required": true,
+      "description": "URL of the source; a missing or empty one counts as a failed load."
+    },
+    {
+      "name": "width",
+      "type": "any",
+      "required": false,
+      "description": "Width of the box, pixels or a CSS length; wins over `style.width`. Default: the full available width."
+    },
+    {
+      "name": "height",
+      "type": "any",
+      "required": false,
+      "description": "Height of the box, pixels or a CSS length, which the media then fills; wins over `style.height`. Default: the media's own ratio."
+    },
+    {
+      "name": "fallback",
+      "type": "any",
+      "required": false,
+      "description": "Content shown in place of the media while its source is missing or failed to load."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around the box, for media aligned with a row of controls.",
+      "defaultValue": false
+    },
+    {
       "name": "type",
       "type": "select",
       "required": false,
-      "description": "Media type. Defaults to \"image\".",
+      "description": "Element that renders the source: `image` (default), `video` or `audio`; the other props follow it.",
       "options": [
         "image",
         "video",
@@ -92,99 +95,28 @@
       "defaultValue": "image"
     },
     {
-      "name": "src",
-      "type": "string",
-      "required": true,
-      "description": "Source URL."
-    },
-    {
       "name": "alt",
       "type": "string",
       "required": false,
-      "description": "Alt text (for images).",
-      "defaultValue": ""
+      "description": "Text that stands for the image to people who cannot see it; `\"\"` marks the image decorative."
     },
     {
       "name": "variant",
       "type": "select",
       "required": false,
-      "description": "Image presentation variant.",
+      "description": "Frame of the image: the system radius (default), a circle cut from its center, or a bordered thumbnail.",
       "options": [
         "default",
-        "rounded",
         "circle",
         "thumbnail"
       ],
       "defaultValue": "default"
     },
     {
-      "name": "loading",
-      "type": "select",
-      "required": false,
-      "description": "Browser loading strategy for images.",
-      "options": [
-        "eager",
-        "lazy"
-      ]
-    },
-    {
-      "name": "decoding",
-      "type": "select",
-      "required": false,
-      "description": "Browser decoding strategy for images.",
-      "options": [
-        "async",
-        "sync",
-        "auto"
-      ]
-    },
-    {
-      "name": "poster",
-      "type": "string",
-      "required": false,
-      "description": "Poster image (for video)."
-    },
-    {
-      "name": "controls",
-      "type": "boolean",
-      "required": false,
-      "description": "Show native controls (for video/audio)."
-    },
-    {
-      "name": "autoPlay",
-      "type": "boolean",
-      "required": false,
-      "description": "Auto-play media."
-    },
-    {
-      "name": "loop",
-      "type": "boolean",
-      "required": false,
-      "description": "Loop playback."
-    },
-    {
-      "name": "muted",
-      "type": "boolean",
-      "required": false,
-      "description": "Start muted."
-    },
-    {
-      "name": "width",
-      "type": "any",
-      "required": false,
-      "description": "Explicit width."
-    },
-    {
-      "name": "height",
-      "type": "any",
-      "required": false,
-      "description": "Explicit height."
-    },
-    {
       "name": "objectFit",
       "type": "select",
       "required": false,
-      "description": "CSS object-fit for images/video.",
+      "description": "How the media fills a box whose height is set: `cover` crops, `contain` letterboxes. Default: cover for images, contain for video.",
       "options": [
         "cover",
         "contain",
@@ -193,29 +125,10 @@
       ]
     },
     {
-      "name": "fallback",
+      "name": "children",
       "type": "any",
       "required": false,
-      "description": "Fallback content shown on error."
-    },
-    {
-      "name": "membrane",
-      "type": "boolean",
-      "required": false,
-      "description": "Membrane spacing around media.",
-      "defaultValue": false
-    },
-    {
-      "name": "ariaLabel",
-      "type": "string",
-      "required": false,
-      "description": "Accessible label for the wrapper role. Sets aria-label."
-    },
-    {
-      "name": "title",
-      "type": "string",
-      "required": false,
-      "description": "title prop"
+      "description": "Native `<track>` captions and `<source>` alternatives inside the player."
     }
   ],
   "meta": {
