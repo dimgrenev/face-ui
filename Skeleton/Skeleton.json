@@ -2,68 +2,65 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Skeleton",
-  "description": "Loading placeholder with animation",
+  "description": "A pulsing placeholder in the shape of loading content, hidden from assistive technology; mark the region being loaded with aria-busy.",
   "props": {
+    "shape": {
+      "type": "enum",
+      "required": false,
+      "description": "What it stands in for: `text` a line of text, painted where a one-line Text puts its glyphs; `rect` a block as wide as its column and one control tall; `circle` an avatar one control across.",
+      "options": [
+        "rect",
+        "circle",
+        "text"
+      ],
+      "default": "text"
+    },
     "width": {
       "type": "any",
       "required": false,
-      "description": "Explicit width"
+      "description": "Width it paints, in pixels or any CSS length, in place of the shape's default (a text line or rect fills its column, so give one in a container sized by its content); a circle given only a width is as tall."
     },
     "height": {
       "type": "any",
       "required": false,
-      "description": "Explicit height"
-    },
-    "variant": {
-      "type": "enum",
-      "required": false,
-      "description": "Shape variant",
-      "options": [
-        "text",
-        "circle",
-        "rect"
-      ],
-      "default": "text"
+      "description": "Height it paints, in pixels or any CSS length, in place of the shape's default; a circle given only a height is as wide."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "variant": "circle",
-        "width": "var(--uf-control-height)",
-        "height": "var(--uf-control-height)"
+        "shape": "text"
+      }
+    },
+    {
+      "name": "Short Line",
+      "props": {
+        "shape": "text",
+        "width": "60%"
+      }
+    },
+    {
+      "name": "Block",
+      "props": {
+        "shape": "rect",
+        "height": 160
       }
     },
     {
       "name": "Circle",
       "props": {
-        "variant": "circle",
-        "width": "var(--uf-control-height)",
-        "height": "var(--uf-control-height)"
-      }
-    },
-    {
-      "name": "Rectangle",
-      "props": {
-        "variant": "rect",
-        "width": "200px",
-        "height": "120px"
-      }
-    },
-    {
-      "name": "Custom Size",
-      "props": {
-        "width": "300px",
-        "height": "20px"
+        "shape": "circle"
       }
     }
   ],
   "behavior": {},
   "keyboard": {},
   "aria": {
-    "role": "none — root sets aria-hidden=\"true\" and is excluded from the accessibility tree",
-    "notes": "Skeleton is a decorative loading placeholder. It sets no role and requires no aria-label; announce loading state via an aria-live region in the surrounding content instead."
+    "role": "none — the root sets aria-hidden=\"true\", which a passed aria-hidden cannot change, so no skeleton reaches the accessibility tree",
+    "notes": [
+      "Mark the region being loaded with aria-busy=\"true\" and remove it when the content arrives; announce a long load in a live region of your own."
+    ]
   },
   "composition": {
     "required": [
@@ -80,27 +77,35 @@
     "semanticFallbacks": [
       "--uf-color-hover-bg",
       "--uf-radius",
-      "--uf-radius-full",
+      "--uf-radius-sm",
       "--uf-control-height",
+      "--uf-membrane",
+      "--uf-text-min-height",
+      "--uf-text-pad-x",
+      "--uf-text-body-size",
       "--uf-motion-duration-skeleton",
       "--uf-motion-iteration-indefinite",
       "--uf-motion-ease-in-out"
     ],
     "notes": [
-      "Width and height are product layout inputs passed through style for placeholder fitting.",
-      "Pulse keyframes stay component-local while animation duration and easing consume shared Face UI motion tokens."
+      "Without a size each shape takes the box of the content it stands in for: text a one-line Text with its membrane across its column, from Text's own tokens; rect one control tall across its column; circle one control across, like Avatar.",
+      "A text line paints a bar where the glyphs will be: inset like them and as tall as the text, with the space of a one-line Text around it; it is never wider than its column.",
+      "width and height are the size it paints, below one control as well as above; a width or height in style wins over them. A circle stays round from the one side it is given, a percentage of its column included, and a flex row that stretches its items does not stretch it.",
+      "A text line or rect adds no width of its own: in a container sized by its content, such as an inline label or a popover, give it a width.",
+      "The pulse runs for --uf-motion-duration-skeleton and repeats until the skeleton is replaced; under reduced motion it does not run.",
+      "In forced colors the placeholder is painted in GrayText."
     ]
   },
   "platform": {},
   "usage": {
     "whenToUse": [
-      "Loading placeholder for content",
-      "Shimmer effect while fetching",
-      "Layout preview before data loads"
+      "A one-line text still loading, such as a name, a title or a label: the default shape lines up with the Text that replaces it (width for a shorter line)",
+      "An image, chart, card or paragraph still loading (shape rect with its height; a stack of text lines is taller than a wrapped paragraph)",
+      "An avatar still loading (shape circle)"
     ],
     "whenNotToUse": [
       "Known progress percentage (use Progress)",
-      "Simple spinner"
+      "An action the user started (use Button loading)"
     ],
     "alternatives": [
       "Progress"

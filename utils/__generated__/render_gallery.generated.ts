@@ -85,7 +85,7 @@ export const FELD_GALLERY_ENTRIES: FeldGalleryEntry[] = [
   { name: "SegmentedControl", Component: SegmentedControl, sampleProps: {"items":[{"value":"grid","label":"Grid"},{"value":"list","label":"List"},{"value":"board","label":"Board"}],"defaultValue":"grid","aria-label":"View"} },
   { name: "Select", Component: Select, sampleProps: {"placeholder":"Choose option","disabled":false,"stretchText":false,"surface":"auto","membrane":true,"items":[{"value":"1","label":"Option 1"},{"value":"2","label":"Option 2"}],"label":"Select"} },
   { name: "Separator", Component: Separator, sampleProps: {"orientation":"horizontal","decorative":true,"membrane":true} },
-  { name: "Skeleton", Component: Skeleton, sampleProps: {"variant":"circle","width":"var(--uf-control-height)","height":"var(--uf-control-height)"} },
+  { name: "Skeleton", Component: Skeleton, sampleProps: {"shape":"text"} },
   { name: "Slider", Component: Slider, sampleProps: {"label":"Value","defaultValue":[50]} },
   { name: "Steps", Component: Steps, sampleProps: {"defaultStep":0,"linear":true,"disabled":false,"items":[{"label":"Account","content":"Create your workspace and owner account."},{"label":"Profile","content":"Add brand settings, themes, and team details."},{"label":"Review","content":"Review the setup before publishing."}]} },
   { name: "Switcher", Component: Switcher, sampleProps: {"disabled":false,"required":false,"value":"on","membrane":true,"label":"Dark mode","defaultChecked":false,"fullWidth":true} },

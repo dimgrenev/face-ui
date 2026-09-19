@@ -1,21 +1,44 @@
 /* =================================================================
  * SKELETON
  * ================================================================= */
+/* width and height are the size a skeleton paints. A rect is as wide as its column and one control
+   tall; a circle is one control across and stays round from whichever side it is given. A text line or
+   rect adds no width of its own, so in a container sized by its content it needs a width. */
 .uf-skeleton[data-scope] {
-  background: var(--uf-color-hover-bg);
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: var(--uf-control-height);
   border-radius: var(--uf-radius);
-  width: var(--uf-control-height);
-  min-width: var(--uf-control-height);
-  height: var(--uf-control-height);
-  min-height: var(--uf-control-height);
+  background: var(--uf-color-hover-bg);
+  animation: uf-skeleton-pulse var(--uf-motion-duration-skeleton) var(--uf-motion-ease-in-out) var(--uf-motion-iteration-indefinite);
 }
-.uf-skeleton[data-scope][data-variant="text"] {
-  width: calc(var(--uf-control-height) * 4);
-  height: var(--uf-control-height);
-  min-height: var(--uf-control-height);
+.uf-skeleton[data-scope][data-shape="circle"] {
+  flex-shrink: 0;
+  inline-size: var(--uf-control-height);
+  /* Its height comes from its width through the ratio; unlike auto, a flex row's stretch cannot change it. */
+  block-size: min-content;
+  aspect-ratio: 1;
+  border-radius: 50%;
 }
-.uf-skeleton[data-scope][data-variant="circle"] {
-  border-radius: var(--uf-radius-full);
+/* The default, text, and any value that is not a shape: a bar as tall as the text and inset like its
+   glyphs, never wider than its column, with a one-line Text's space around it (from Text's own
+   tokens), so it sits where the glyphs will. */
+.uf-skeleton[data-scope]:not([data-shape="rect"], [data-shape="circle"]) {
+  --uf-skeleton-inset: calc(var(--uf-membrane) + var(--uf-text-pad-x, var(--uf-control-pad-text)));
+  display: flex;
+  box-sizing: content-box;
+  inline-size: calc(100% - 2 * var(--uf-skeleton-inset));
+  max-inline-size: calc(100% - 2 * var(--uf-skeleton-inset));
+  block-size: var(--uf-text-body-size, var(--uf-control-font-size));
+  padding: calc((var(--uf-text-min-height, var(--uf-control-height)) + 2 * var(--uf-membrane) - var(--uf-text-body-size, var(--uf-control-font-size))) / 2) var(--uf-skeleton-inset);
+  border-radius: var(--uf-radius-sm);
+  background: none;
+}
+.uf-skeleton[data-scope]:not([data-shape="rect"], [data-shape="circle"])::before {
+  content: "";
+  flex: 1;
+  border-radius: inherit;
+  background: var(--uf-color-hover-bg);
 }
 
 @keyframes uf-skeleton-pulse {
@@ -27,6 +50,12 @@
     opacity: 0.5;
   }
 }
-.uf-skeleton[data-scope] {
-  animation: uf-skeleton-pulse var(--uf-motion-duration-skeleton) var(--uf-motion-ease-in-out) var(--uf-motion-iteration-indefinite);
+
+/* Forced colors repaint backgrounds with Canvas, which would erase the placeholder. */
+@media (forced-colors: active) {
+  .uf-skeleton[data-scope],
+  .uf-skeleton[data-scope]:not([data-shape="rect"], [data-shape="circle"])::before {
+    forced-color-adjust: none;
+    background: GrayText;
+  }
 }
