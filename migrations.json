@@ -1325,6 +1325,13 @@
       "codemod": "auto"
     },
     {
+      "kind": "rename-prop",
+      "component": "Table",
+      "from": "showRowNumbers",
+      "to": "rowNumbers",
+      "codemod": "auto"
+    },
+    {
       "kind": "remove-prop",
       "component": "Table",
       "prop": "sortColumn",
@@ -1345,7 +1352,7 @@
       "before": "`{ column, direction }`",
       "after": "`{ sort }`, with `sort` as `{ column, direction }` or `null`",
       "codemod": "manual",
-      "legacy": "\\{\\s*(column|direction)\\b"
+      "legacy": "^\\s*(?:async\\s+)?(?:function\\b\\s*[\\w$]*\\s*)?\\(\\s*\\{\\s*(?:column|direction)\\b"
     },
     {
       "kind": "retype-prop",
@@ -1354,7 +1361,7 @@
       "before": "`(row, index)`",
       "after": "`({ row, index, event })`; `index` is the position shown",
       "codemod": "manual",
-      "legacy": "^\\s*(\\(\\s*[A-Za-z_$][\\w$]*\\s*[,)]|[A-Za-z_$][\\w$]*\\s*=>)"
+      "legacy": "^\\s*(?:async\\s+)?(?:function\\b\\s*[\\w$]*\\s*)?\\(\\s*[A-Za-z_$][\\w$]*\\s*(?::[^,()<]*)?,"
     },
     {
       "kind": "remove-prop",
@@ -1384,7 +1391,7 @@
       "before": "`(columnId, width)` on every pointer move, for the column and its neighbour",
       "after": "`({ column, width })` once per finished resize of that column",
       "codemod": "manual",
-      "legacy": "^\\s*(\\(\\s*[A-Za-z_$][\\w$]*\\s*[,)]|[A-Za-z_$][\\w$]*\\s*=>)"
+      "legacy": "^\\s*(?:async\\s+)?(?:function\\b\\s*[\\w$]*\\s*)?\\(\\s*[A-Za-z_$][\\w$]*\\s*(?::[^,()<]*)?,"
     },
     {
       "kind": "retype-prop",
@@ -1393,16 +1400,16 @@
       "before": "`align: \"left\" | \"center\" | \"right\"`",
       "after": "`align: \"start\" | \"center\" | \"end\"`, following text direction",
       "codemod": "manual",
-      "legacy": "align:\\s*['\"](left|right)['\"]"
+      "legacy": "\\balign['\"]?\\s*:\\s*['\"](?:left|right)['\"]"
     },
     {
       "kind": "retype-prop",
       "component": "Table",
       "prop": "columns",
       "before": "`render(value, row, { rowIndex, column })`",
-      "after": "`render({ value, row, rowIndex, column })`. A one-argument `render: (value) =>` still compiles and shows `[object Object]`, so every such render is reported, and so are columns passed as a variable or a call: check each render in them by hand",
+      "after": "`render({ value, row, rowIndex, column })`. A render with two or more parameters is reported where the columns are written in the JSX; one written for the value alone, such as `render: (value) => String(value)`, still compiles and shows `[object Object]`, so search for `render:` and check each one by hand, in columns passed as a variable too",
       "codemod": "manual",
-      "legacy": "^[^\\[]*$|\\brender\\s*(?::\\s*(?:async\\s+)?(?:function\\b\\s*[\\w$]*\\s*)?)?(?:\\(\\s*(?![{)])|[A-Za-z_$][\\w$.]*\\s*(?:=>|[,}\\n]))"
+      "legacy": "\\brender\\s*(?::\\s*(?:async\\s+)?(?:function\\b\\s*[\\w$]*\\s*)?)?\\(\\s*[A-Za-z_$][\\w$]*\\s*(?::[^,()<]*)?,"
     },
     {
       "kind": "export",

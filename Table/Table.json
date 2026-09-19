@@ -56,10 +56,10 @@
       "description": "Adds a leading checkbox column: one checkbox per row and a select-all checkbox in the header.",
       "default": false
     },
-    "showRowNumbers": {
+    "rowNumbers": {
       "type": "boolean",
       "required": false,
-      "description": "Adds a leading column numbering the rows 1, 2, 3 in the order shown.",
+      "description": "Adds a leading column, headed by `labels.rowNumber`, that numbers the rows 1, 2, 3 in the order shown.",
       "default": false
     },
     "stickyHeader": {
@@ -83,7 +83,7 @@
     "resizable": {
       "type": "boolean",
       "required": false,
-      "description": "Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys; the first resize fixes every column at its width, so only the resized one changes and the table grows or shrinks.",
+      "description": "Adds a handle to each header cell that resizes its column by pointer or arrow keys; a resize fixes every column, so the table grows or shrinks. Turning it off restores the columns.",
       "default": false
     },
     "activeRow": {
@@ -117,7 +117,7 @@
     {
       "name": "Default",
       "props": {
-        "showRowNumbers": true,
+        "rowNumbers": true,
         "showDividers": true,
         "columns": [
           {

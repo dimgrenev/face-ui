@@ -1,18 +1,21 @@
 import type { Migration } from './types'
 
 const sort = 'One `sort={{ column, direction }}` (controlled) or `defaultSort` (uncontrolled); `null` is unsorted'
-// Handlers written for the positional arguments `(row, index)` or `(columnId, width)`.
-const positional = String.raw`^\s*(\(\s*[A-Za-z_$][\w$]*\s*[,)]|[A-Za-z_$][\w$]*\s*=>)`
-// Columns the codemod cannot read (a variable, a call) or a `render` that does not destructure its
-// one argument: `render: (value: unknown) =>`, `render: (v) =>`, `render: v =>`, `render(value) {`,
-// `render: function (value)` or `render: renderCell`. `render: ({ value }) =>` and `render: () =>` pass.
-const legacyRender = String.raw`^[^\[]*$|\brender\s*(?::\s*(?:async\s+)?(?:function\b\s*[\w$]*\s*)?)?(?:\(\s*(?![{)])|[A-Za-z_$][\w$.]*\s*(?:=>|[,}\n]))`
+// The legacy patterns match only code that cannot be the new form, so migrated code is never
+// reported. A function whose first parameter is followed by a second was written for positional
+// arguments, `(row, index)`, `(columnId, width)` or `render(value, row)`; one parameter, a function
+// passed by name and columns passed as a variable are left to the type checker and the reader.
+const second = String.raw`\(\s*[A-Za-z_$][\w$]*\s*(?::[^,()<]*)?,`
+const fn = String.raw`(?:async\s+)?(?:function\b\s*[\w$]*\s*)?`
+const positional = String.raw`^\s*${fn}${second}`
+const legacyRender = String.raw`\brender\s*(?::\s*${fn})?${second}`
 const noHover = 'No replacement: put pointer handlers on the content `render` returns'
 
 export default [
   { kind: 'rename-prop', component: 'Table', from: 'ariaLabel', to: 'aria-label', codemod: 'auto' },
   { kind: 'rename-prop', component: 'Table', from: 'activeRowId', to: 'activeRow', codemod: 'auto' },
   { kind: 'rename-prop', component: 'Table', from: 'rowStyle', to: 'variant', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Table', from: 'showRowNumbers', to: 'rowNumbers', codemod: 'auto' },
   { kind: 'remove-prop', component: 'Table', prop: 'sortColumn', use: sort, codemod: 'manual' },
   { kind: 'remove-prop', component: 'Table', prop: 'sortDirection', use: sort, codemod: 'manual' },
   {
@@ -22,7 +25,8 @@ export default [
     before: '`{ column, direction }`',
     after: '`{ sort }`, with `sort` as `{ column, direction }` or `null`',
     codemod: 'manual',
-    legacy: String.raw`\{\s*(column|direction)\b`,
+    // The one parameter destructures `column` or `direction` of the old details.
+    legacy: String.raw`^\s*${fn}\(\s*\{\s*(?:column|direction)\b`,
   },
   {
     kind: 'retype-prop',
@@ -58,7 +62,8 @@ export default [
     before: '`align: "left" | "center" | "right"`',
     after: '`align: "start" | "center" | "end"`, following text direction',
     codemod: 'manual',
-    legacy: String.raw`align:\s*['"](left|right)['"]`,
+    // A key in code or in JSON (`"align": "left"`).
+    legacy: String.raw`\balign['"]?\s*:\s*['"](?:left|right)['"]`,
   },
   {
     kind: 'retype-prop',
@@ -66,7 +71,7 @@ export default [
     prop: 'columns',
     before: '`render(value, row, { rowIndex, column })`',
     after:
-      '`render({ value, row, rowIndex, column })`. A one-argument `render: (value) =>` still compiles and shows `[object Object]`, so every such render is reported, and so are columns passed as a variable or a call: check each render in them by hand',
+      '`render({ value, row, rowIndex, column })`. A render with two or more parameters is reported where the columns are written in the JSX; one written for the value alone, such as `render: (value) => String(value)`, still compiles and shows `[object Object]`, so search for `render:` and check each one by hand, in columns passed as a variable too',
     codemod: 'manual',
     legacy: legacyRender,
   },

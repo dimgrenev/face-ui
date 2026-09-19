@@ -69,9 +69,27 @@
 :where(.uf-table[data-scope] tbody tr[data-active]) > :first-child {
   position: relative;
 }
+/* Forced colors drop the tints, which are box shadows: a row under the
+   pointer, selected or current is drawn between two lines instead (Highlight
+   when selected, thicker when current), over the cells so no row moves. */
 @media (forced-colors: active) {
-  .uf-table[data-scope] tbody tr[data-selected] > * {
-    border-block: var(--uf-table-divider-width) solid Highlight;
+  :where(.uf-table[data-scope]) > tbody > tr > * {
+    position: relative;
+  }
+  :where(.uf-table[data-scope]) > tbody > tr:where([data-interactive]):hover > *::after,
+  :where(.uf-table[data-scope][data-variant="tile"]) > tbody > tr:hover > *::after,
+  .uf-table[data-scope] tbody tr:is([data-selected], [data-active]) > *::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-block: var(--uf-table-divider-width) solid CanvasText;
+    pointer-events: none;
+  }
+  .uf-table[data-scope] tbody tr[data-selected] > *::after {
+    border-block-color: Highlight;
+  }
+  .uf-table[data-scope] tbody tr[data-active] > *::after {
+    border-block-width: calc(var(--uf-table-divider-width) * 3);
   }
 }
 

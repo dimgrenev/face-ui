@@ -16,7 +16,7 @@ const invoiceColumns: TableColumn<Invoice>[] = [
 ]
 export const tableDictionary: Readonly<TableLabels> = { selectAll: 'Выбрать все', selectRow: 'Выбрать {name}', resizeColumn: 'Ширина столбца {name}', columnWidth: '{width} пикселей', rowNumber: '№' }
 const byTotal: TableSort = { column: 'total', direction: 'desc' }
-export const tableNative = <AuditedTable ref={createTableRef<HTMLTableElement>()} columns={invoiceColumns} rows={[{ id: 'a', total: 1 }]} rowKey={(row) => row.id} sort={byTotal} defaultSort={null} onSortChange={({ sort }) => sort?.direction} selectedRows={['a']} defaultSelectedRows={[]} onSelectedRowsChange={({ selectedRows }) => selectedRows.push('b')} selectable showRowNumbers stickyHeader showDividers={false} stickyLastColumn resizable onColumnResize={({ column, width }) => `${column}${width.toFixed()}`} onRowClick={({ row, index, event }) => event.preventDefault() ?? row ?? index} activeRow="a" membrane variant="tile" labels={tableDictionary} aria-label="Invoices" aria-labelledby="heading" id="invoices" className="invoices" style={{ maxWidth: 600 }} dir="rtl" data-table="yes" />
+export const tableNative = <AuditedTable ref={createTableRef<HTMLTableElement>()} columns={invoiceColumns} rows={[{ id: 'a', total: 1 }]} rowKey={(row) => row.id} sort={byTotal} defaultSort={null} onSortChange={({ sort }) => sort?.direction} selectedRows={['a']} defaultSelectedRows={[]} onSelectedRowsChange={({ selectedRows }) => selectedRows.push('b')} selectable rowNumbers stickyHeader showDividers={false} stickyLastColumn resizable onColumnResize={({ column, width }) => `${column}${width.toFixed()}`} onRowClick={({ row, index, event }) => event.preventDefault() ?? row ?? index} activeRow="a" membrane variant="tile" labels={tableDictionary} aria-label="Invoices" aria-labelledby="heading" id="invoices" className="invoices" style={{ maxWidth: 600 }} dir="rtl" data-table="yes" />
 // @ts-expect-error The table builds its rows and cells from columns and rows.
 export const tableInvalidChildren = <AuditedTable>rows</AuditedTable>
 // @ts-expect-error The native aria-label names the table.
@@ -51,3 +51,7 @@ export const tableRemovedRowMouseEnter = <AuditedTable onRowMouseEnter={() => un
 export const tableRemovedRowMouseLeave = <AuditedTable onRowMouseLeave={() => undefined} />
 // @ts-expect-error A row key is text: numbers are not converted.
 export const tableInvalidRowKey = <AuditedTable rows={[{ n: 1 }]} rowKey={(row) => row.n as number} />
+// @ts-expect-error rowNumbers adds the number column; show* is for purely visual props.
+export const tableRemovedShowRowNumbers = <AuditedTable showRowNumbers />
+// @ts-expect-error A one-parameter row handler receives the details, not the row.
+export const tableInvalidRowClick = <AuditedTable onRowClick={(row: Invoice) => row.total} />

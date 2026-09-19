@@ -44,7 +44,7 @@ export interface TableColumn<T = any> {
   accessor?: string | ((row: T) => unknown)
   /** The header becomes a button that sorts by this column: ascending, then descending, then the order of `rows`. */
   sortable?: boolean
-  /** Width of the column, in px or a CSS length such as `25%` or `var(--w)`; its content wraps inside, or is cut with `truncate`, and never widens it. Extra room in a full-width table goes to the columns without a width, if any. A user's resize replaces it. A keyword such as `auto` or a negative width is reported and left out. */
+  /** Width in px or a CSS length such as `25%`; content wraps or is cut inside, and a full-width table spreads spare room over the columns. A keyword or negative width is reported and ignored. */
   width?: number | string
   /** Least width in px: a column without `width` never narrows below it, and a resize stops at it (48 px when unset). */
   minWidth?: number
@@ -143,15 +143,15 @@ export interface TableProps<T = any>
   onSelectedRowsChange?: (details: { selectedRows: string[] }) => void
   /** Adds a leading checkbox column: one checkbox per row and a select-all checkbox in the header. */
   selectable?: boolean
-  /** Adds a leading column numbering the rows 1, 2, 3 in the order shown. */
-  showRowNumbers?: boolean
+  /** Adds a leading column, headed by `labels.rowNumber`, that numbers the rows 1, 2, 3 in the order shown. */
+  rowNumbers?: boolean
   /** Keeps the header row at the top of the nearest scrolling container. */
   stickyHeader?: boolean
   /** Draws a line under the header and under every row. */
   showDividers?: boolean
   /** Keeps the last column at the inline end of the nearest scrolling container while rows scroll sideways. */
   stickyLastColumn?: boolean
-  /** Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys; the first resize fixes every column at its width, so only the resized one changes and the table grows or shrinks. */
+  /** Adds a handle to each header cell that resizes its column by pointer or arrow keys; a resize fixes every column, so the table grows or shrinks. Turning it off restores the columns. */
   resizable?: boolean
   /** Called when the user finishes resizing a column: on pointer release, or per key press. */
   onColumnResize?: (details: { column: string; width: number }) => void
@@ -168,13 +168,19 @@ export interface TableProps<T = any>
 }
 
 const none: readonly never[] = []
+const noWidths: Readonly<Record<string, number>> = Object.freeze({})
 /** Resizing never makes a column narrower than this unless `minWidth` says so. */
 const MIN_WIDTH = 48
 /** Pixels per arrow key on a resize handle; Page Up and Page Down move ten steps. */
 const STEP = 10
-/** Clicks on these inside a row, and on the selection cell, do not activate the row. */
-const CONTROL =
-  'a[href], button, input, select, textarea, label, summary, [contenteditable]:not([contenteditable="false"]), [tabindex], [data-select]'
+/** Clicks on these inside a row, native controls and ARIA widgets alike, and on the selection cell do not activate the row. */
+const CONTROL = [
+  'a[href], button, input, select, textarea, label, summary, [tabindex], [data-select]',
+  '[contenteditable]:not([contenteditable="false"])',
+  ...'button link checkbox radio switch tab option menuitem menuitemcheckbox menuitemradio textbox searchbox combobox slider spinbutton'
+    .split(' ')
+    .map((role) => `[role="${role}"]`),
+].join()
 /** A CSS length or function: `120px`, `.5em`, `25%`, `0`, `calc(…)`, `var(--w)`; not a keyword or a negative value. */
 const LENGTH = /^\s*(?:(?:\d+\.?\d*|\.\d+)(?:[a-z]+|%)|0|[a-z-]+\(.+\))\s*$/i
 
@@ -367,7 +373,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
     defaultSelectedRows,
     onSelectedRowsChange,
     selectable = false,
-    showRowNumbers = false,
+    rowNumbers = false,
     stickyHeader = false,
     showDividers = true,
     stickyLastColumn = false,
@@ -472,7 +478,9 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
 
   // Resizing: the widths a resize fixed. The first one fixes every column at its rendered width,
   // so only the resized column changes and the table takes the sum.
-  const [widths, setWidths] = useState<Readonly<Record<string, number>>>({})
+  const [widths, setWidths] = useState(noWidths)
+  // Turning resizing off returns every column to its own width.
+  if (!resizable && widths !== noWidths) setWidths(noWidths)
   const headRow = useRef<HTMLTableRowElement>(null)
   const resize = (column: string, width: number, done: boolean) => {
     const rendered: Record<string, number> = {}
@@ -501,7 +509,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
       data-sticky-header={stickyHeader || undefined}
       data-sticky-last-column={stickyLastColumn || undefined}
       data-show-dividers={showDividers || undefined}
-      data-resized={Object.keys(widths).length > 0 || undefined}
+      data-resized={widths !== noWidths || undefined}
       className={cn('uf-table', className)}
     >
       <thead data-scope="table" data-part="header" role="rowgroup">
@@ -519,7 +527,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
               </div>
             </th>
           )}
-          {showRowNumbers && (
+          {rowNumbers && (
             <th {...cell('headerCell')} data-row-number="">
               <div className="uf-table__cellSlot">
                 {content(text.rowNumber, 'labels.rowNumber', { variant: 'muted' })}
@@ -646,7 +654,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
                   </div>
                 </td>
               )}
-              {showRowNumbers && (
+              {rowNumbers && (
                 <td {...cell('cell')} data-row-number="">
                   <div className="uf-table__cellSlot">
                     {content(index + 1, 'row number', { variant: 'muted' })}

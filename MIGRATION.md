@@ -335,6 +335,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `ariaLabel` | `aria-label` | auto |
 | `activeRowId` | `activeRow` | auto |
 | `rowStyle` | `variant` | auto |
+| `showRowNumbers` | `rowNumbers` | auto |
 | `sortColumn` | One `sort={{ column, direction }}` (controlled) or `defaultSort` (uncontrolled); `null` is unsorted | manual |
 | `sortDirection` | One `sort={{ column, direction }}` (controlled) or `defaultSort` (uncontrolled); `null` is unsorted | manual |
 | `onSortChange`: `{ column, direction }` | `{ sort }`, with `sort` as `{ column, direction }` or `null` | manual |
@@ -344,7 +345,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `columns[].maxWidth` | Browsers ignore a maximum width on table cells; give the column a `width`, which its content can no longer widen | manual |
 | `onColumnResize`: `(columnId, width)` on every pointer move, for the column and its neighbour | `({ column, width })` once per finished resize of that column | manual |
 | `columns`: `align: "left" \| "center" \| "right"` | `align: "start" \| "center" \| "end"`, following text direction | manual |
-| `columns`: `render(value, row, { rowIndex, column })` | `render({ value, row, rowIndex, column })`. A one-argument `render: (value) =>` still compiles and shows `[object Object]`, so every such render is reported, and so are columns passed as a variable or a call: check each render in them by hand | manual |
+| `columns`: `render(value, row, { rowIndex, column })` | `render({ value, row, rowIndex, column })`. A render with two or more parameters is reported where the columns are written in the JSX; one written for the value alone, such as `render: (value) => String(value)`, still compiles and shows `[object Object]`, so search for `render:` and check each one by hand, in columns passed as a variable too | manual |
 | `TableAlign` from `Table/Table` | `TableColumn['align']` | manual |
 | `membrane` styled rows as tiles | `variant="tile"` styles rows; `membrane` adds outer spacing only | — |
 | The header stuck to the top of the scrolling container by default | `stickyHeader` is off by default; pass it where the table scrolls inside its own container | — |

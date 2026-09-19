@@ -190,10 +190,14 @@ describe('selection', () => {
     ])
   })
 
-  it('select-all is unchecked when a selected key has no row, and disabled without rows', async () => {
+  it('select-all counts only the keys that have a row, and is disabled without rows', async () => {
+    const all = () => host.querySelector<HTMLInputElement>('thead input[type="checkbox"]')!
+    await render({ selectable: true, selectedRows: ['gone'] })
+    expect(all().getAttribute('aria-checked')).toBe('false')
     await render({ selectable: true, selectedRows: ['a', 'b', 'gone'] })
-    const all = host.querySelector<HTMLInputElement>('thead input[type="checkbox"]')!
-    expect(all.getAttribute('aria-checked')).toBe('mixed')
+    expect(all().getAttribute('aria-checked')).toBe('mixed')
+    await render({ selectable: true, selectedRows: ['a', 'b', 'c', 'gone'] })
+    expect(all().getAttribute('aria-checked')).toBe('true')
     await render({ selectable: true, selectedRows: [], rows: [] })
     expect(host.querySelector<HTMLInputElement>('thead input[type="checkbox"]')!.disabled).toBe(true)
   })
@@ -215,7 +219,7 @@ describe('selection', () => {
 })
 
 describe('row events', () => {
-  it('onRowClick reports the row, its shown index and the event; clicks on controls in the row, a summary or editable text included, do not', async () => {
+  it('onRowClick reports the row, its shown index and the event; clicks on controls in the row, ARIA widgets, a summary or editable text included, do not', async () => {
     const rowClick = vi.fn()
     await render({
       selectable: true,
@@ -236,6 +240,20 @@ describe('row events', () => {
             </details>
           ),
         },
+        {
+          id: 'widgets',
+          header: 'Widgets',
+          render: () => (
+            <>
+              <div role="button">Act</div>
+              <span role="link">Go</span>
+              <span role="switch" aria-checked="false">
+                <i>On</i>
+              </span>
+              <span role="note">Plain</span>
+            </>
+          ),
+        },
       ],
     })
     await click(checkboxOf(host, 'b'))
@@ -243,7 +261,13 @@ describe('row events', () => {
     await click(host.querySelector('tr[data-row-id="b"] button'))
     await click(host.querySelector('tr[data-row-id="b"] summary'))
     await click(host.querySelector('tr[data-row-id="b"] [contenteditable]'))
+    for (const role of ['button', 'link']) await click(host.querySelector(`tr[data-row-id="b"] [role="${role}"]`))
+    await click(host.querySelector('tr[data-row-id="b"] [role="switch"] i'))
     expect(rowClick).not.toHaveBeenCalled()
+    // Text with a role that is not a widget still activates the row.
+    await click(host.querySelector('tr[data-row-id="b"] [role="note"]'))
+    expect(rowClick).toHaveBeenCalledOnce()
+    rowClick.mockClear()
     await click(host.querySelector('tr[data-row-id="b"] td[data-column="status"]'))
     expect(rowClick).toHaveBeenCalledOnce()
     const [{ row, index, event }] = rowClick.mock.calls[0]
@@ -442,8 +466,8 @@ describe('rows and rowKey', () => {
 })
 
 describe('layout props', () => {
-  it('showRowNumbers numbers the rows in the order shown under the rowNumber label', async () => {
-    await render({ showRowNumbers: true, defaultSort: { column: 'name', direction: 'desc' }, labels: { rowNumber: '№' } })
+  it('rowNumbers adds a column numbering the rows in the order shown, headed by the rowNumber label', async () => {
+    await render({ rowNumbers: true, defaultSort: { column: 'name', direction: 'desc' }, labels: { rowNumber: '№' } })
     const numbers = rowsOf(host).map((row) => row.querySelector('[data-row-number]')!.textContent)
     expect(numbers).toEqual(['1', '2', '3'])
     expect(host.querySelector('th[data-row-number]')!.textContent).toBe('№')
@@ -629,6 +653,23 @@ describe('resizing', () => {
     await key(handle('tiny'), 'Home')
     expect(header('tiny').style.width).toBe('')
     expect(resized.mock.calls.map(([details]) => details.column)).toEqual(['name', 'status'])
+  })
+
+  it('turning resizable off returns the columns to their own widths, and on again starts from them', async () => {
+    const own: TableColumn[] = [{ id: 'name', width: 160 }, { id: 'status' }]
+    await render({ resizable: true, columns: own })
+    await key(handle('name'), 'ArrowRight')
+    expect([header('name').style.cssText, header('status').style.cssText]).toEqual([
+      'width: 130px; min-width: 130px;',
+      'width: 120px; min-width: 120px;',
+    ])
+    expect(host.querySelector('table')!.hasAttribute('data-resized')).toBe(true)
+    await render({ resizable: false, columns: own })
+    expect([header('name').style.cssText, header('status').style.cssText]).toEqual(['width: 160px; min-width: 160px;', ''])
+    expect(host.querySelector('table')!.hasAttribute('data-resized')).toBe(false)
+    await render({ resizable: true, columns: own })
+    expect(header('name').style.cssText).toBe('width: 160px; min-width: 160px;')
+    expect(host.querySelector('table')!.hasAttribute('data-resized')).toBe(false)
   })
 })
 

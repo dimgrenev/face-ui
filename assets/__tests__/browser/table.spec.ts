@@ -37,7 +37,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 for (const stickyHeader of [true, false])
-  test(`stickyHeader=${stickyHeader} keeps the header at the top of the scrolling container at 360px`, { tag: ['@layout'] }, async ({
+  test(`stickyHeader=${stickyHeader} ${stickyHeader ? 'keeps the header at the top of' : 'lets the header scroll away with'} the scrolling container at 360px`, { tag: ['@layout'] }, async ({
     page,
   }) => {
     await render(page, { stickyHeader }, { wide: true, box: { width: 328, height: 240 }, fresh: true })
@@ -52,7 +52,7 @@ for (const stickyHeader of [true, false])
 
 for (const direction of ['ltr', 'rtl'])
   for (const stickyLastColumn of [true, false])
-    test(`stickyLastColumn=${stickyLastColumn} keeps the last column at the inline end at 360px (${direction})`, { tag: ['@layout'] }, async ({
+    test(`stickyLastColumn=${stickyLastColumn} ${stickyLastColumn ? 'keeps the last column at the inline end' : 'lets the last column scroll with the rows'} at 360px (${direction})`, { tag: ['@layout'] }, async ({
       page,
     }) => {
       await render(
@@ -176,7 +176,7 @@ for (const direction of ['ltr', 'rtl'])
     expect(Math.abs(start)).toBeLessThanOrEqual(1)
   })
 
-test('in a wide table a column keeps its width and the columns without one take the room', { tag: ['@layout'] }, async ({
+test('in a wide table a column keeps its width and the columns without one take the room; when every column has one, they share it', { tag: ['@layout'] }, async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1000, height: 640 })
@@ -191,6 +191,17 @@ test('in a wide table a column keeps its width and the columns without one take 
   const table = await widthOf(page, 'table')
   expect(Math.abs((await widthOf(page, 'th[data-column="n"]')) - 60)).toBeLessThanOrEqual(1)
   expect(Math.abs((await widthOf(page, 'th[data-column="note"]')) - (table - 60))).toBeLessThanOrEqual(1)
+  await render(page, {
+    columns: [
+      { id: 'a', header: 'A', width: 150 },
+      { id: 'b', header: 'B', width: 200 },
+    ],
+    rows: [{ id: 'r', a: 'x', b: 'y' }],
+  }, { fresh: true })
+  const [a, b] = [await widthOf(page, 'th[data-column="a"]'), await widthOf(page, 'th[data-column="b"]')]
+  expect(Math.abs(a + b - (await widthOf(page, 'table')))).toBeLessThanOrEqual(1)
+  expect(a).toBeGreaterThan(150)
+  expect(b).toBeGreaterThan(a)
 })
 
 test('dividers, tile rows and the tints of selected, current and hovered rows', { tag: ['@css', '@pointer'] }, async ({ page }) => {
@@ -233,6 +244,49 @@ test('dividers, tile rows and the tints of selected, current and hovered rows', 
   // A tile row shows its surface under the pointer even when it does nothing.
   await page.hover(first)
   expect((await style(first)).tint).toBe(selected.tint)
+})
+
+test('forced colors draw the rows under the pointer, selected and current as lines, in both variants, without moving the rows', { tag: ['@forced-colors', '@css', '@pointer'] }, async ({
+  page,
+}) => {
+  await page.emulateMedia({ forcedColors: 'active' })
+  expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
+  /** The lines drawn over the first cell of a row, and the row's height. */
+  const lines = (row: string) =>
+    page.locator(`tr[data-row-id="${row}"]`).evaluate((node) => {
+      const line = getComputedStyle(node.querySelector('td[data-column="name"]')!, '::after')
+      const probe = document.body.appendChild(document.createElement('i'))
+      probe.style.color = 'Highlight'
+      const highlight = getComputedStyle(probe).color
+      probe.remove()
+      return {
+        drawn: line.content !== 'none' && line.borderTopStyle === 'solid' && line.borderBottomStyle === 'solid',
+        width: parseFloat(line.borderTopWidth),
+        highlight: line.borderTopColor === highlight,
+        height: node.getBoundingClientRect().height,
+      }
+    })
+  const rows = {
+    ...people,
+    rows: [...people.rows, { id: 'c', name: 'Gamma', status: 'Active', score: 33 }],
+    selectable: true,
+    defaultSelectedRows: ['b'],
+    activeRow: 'a',
+  }
+  for (const variant of ['plain', 'tile'] as const) {
+    await render(page, { ...rows, variant }, { fresh: true, rowClick: variant === 'plain' })
+    await page.mouse.move(0, 0)
+    const selected = await lines('b')
+    const current = await lines('a')
+    const rest = await lines('c')
+    expect(selected).toMatchObject({ drawn: true, highlight: true })
+    expect(current).toMatchObject({ drawn: true, highlight: false })
+    expect(current.width).toBeGreaterThan(selected.width)
+    expect(rest.drawn).toBe(false)
+    await page.hover('tr[data-row-id="c"] td[data-column="status"]')
+    const hovered = await lines('c')
+    expect(hovered).toMatchObject({ drawn: true, highlight: false, width: selected.width, height: rest.height })
+  }
 })
 
 for (const direction of ['ltr', 'rtl'])
@@ -350,7 +404,7 @@ test('a full table passes axe and names its table, column headers, checkboxes an
 }) => {
   await render(
     page,
-    { ...people, selectable: true, resizable: true, showRowNumbers: true, defaultSort: { column: 'name', direction: 'asc' } },
+    { ...people, selectable: true, resizable: true, rowNumbers: true, defaultSort: { column: 'name', direction: 'asc' } },
     { fresh: true },
   )
   expect(await axe(page)).toEqual([])

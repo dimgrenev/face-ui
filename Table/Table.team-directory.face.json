@@ -37,8 +37,8 @@
       "selectable": {
         "$ref": "props.selectable"
       },
-      "showRowNumbers": {
-        "$ref": "props.showRowNumbers"
+      "rowNumbers": {
+        "$ref": "props.rowNumbers"
       },
       "stickyHeader": {
         "$ref": "props.stickyHeader"
@@ -183,10 +183,10 @@
       "defaultValue": false
     },
     {
-      "name": "showRowNumbers",
+      "name": "rowNumbers",
       "type": "boolean",
       "required": false,
-      "description": "Adds a leading column numbering the rows 1, 2, 3 in the order shown.",
+      "description": "Adds a leading column, headed by `labels.rowNumber`, that numbers the rows 1, 2, 3 in the order shown.",
       "defaultValue": false
     },
     {
@@ -214,7 +214,7 @@
       "name": "resizable",
       "type": "boolean",
       "required": false,
-      "description": "Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys; the first resize fixes every column at its width, so only the resized one changes and the table grows or shrinks.",
+      "description": "Adds a handle to each header cell that resizes its column by pointer or arrow keys; a resize fixes every column, so the table grows or shrinks. Turning it off restores the columns.",
       "defaultValue": false
     },
     {

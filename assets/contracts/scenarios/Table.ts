@@ -27,7 +27,7 @@ export default [
     props: {
       'aria-label': 'Invoice ledger',
       defaultSort: { column: 'date', direction: 'desc' },
-      showRowNumbers: true,
+      rowNumbers: true,
       stickyHeader: true,
       stickyLastColumn: true,
       resizable: true,
