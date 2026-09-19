@@ -2,7 +2,7 @@ import { test, expect, type Page } from './test'
 import { hooks, open } from './helpers'
 import type { Hooks } from './fixtures/media.fixture'
 
-const { renderMedia: render } = hooks<Hooks>()
+const { renderMedia: render, renderPlayer } = hooks<Hooks>()
 const events = (page: Page) => page.evaluate(() => (window as any).mediaEvents as string[])
 const root = (page: Page) => page.locator('[data-scope="media"][data-part="root"]')
 const image = (page: Page) => page.locator('img[data-part="element"]')
@@ -57,4 +57,14 @@ test('a real image reports load; a broken one reports error and shows the fallba
   await expect(page.getByText('Unavailable')).toBeVisible()
   await expect(image(page)).toBeHidden()
   expect(await events(page)).toEqual(['error'])
+})
+
+test('a player is loaded once its metadata arrives or fetching waits for playback; a broken one shows the fallback', { tag: ['@native'] }, async ({ page }) => {
+  await renderPlayer(page)
+  await expect(root(page)).toHaveAttribute('data-state', 'loaded')
+  await renderPlayer(page, { preload: 'none' })
+  await expect(root(page)).toHaveAttribute('data-state', 'loaded')
+  await renderPlayer(page, { broken: true, fallback: 'No audio' })
+  await expect(root(page)).toHaveAttribute('data-state', 'error')
+  await expect(page.getByText('No audio')).toBeVisible()
 })

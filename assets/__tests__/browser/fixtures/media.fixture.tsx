@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { flushSync } from 'react-dom'
-import { Media, type MediaImageProps } from '../../../../Media/Media'
+import { Media, type MediaAudioProps, type MediaImageProps } from '../../../../Media/Media'
 
 const root = createRoot(document.getElementById('root')!)
 Object.assign(document.body.style, { margin: '16px', background: 'var(--uf-color-bg)' })
@@ -41,6 +41,48 @@ const renderMedia = (
     ),
   )
 }
-Object.assign(window, { renderMedia, mediaEvents: events })
-export type Hooks = { renderMedia: typeof renderMedia }
+/** A tenth of a second of silence as 8 kHz, 8-bit mono WAV, which every engine plays. */
+const silence = (() => {
+  const samples = 800
+  const bytes = new Uint8Array(44 + samples).fill(128)
+  const view = new DataView(bytes.buffer)
+  const text = (at: number, value: string) =>
+    [...value].forEach((char, index) => view.setUint8(at + index, char.charCodeAt(0)))
+  text(0, 'RIFF')
+  view.setUint32(4, 36 + samples, true)
+  text(8, 'WAVEfmt ')
+  view.setUint32(16, 16, true)
+  view.setUint16(20, 1, true)
+  view.setUint16(22, 1, true)
+  view.setUint32(24, 8000, true)
+  view.setUint32(28, 8000, true)
+  view.setUint16(32, 1, true)
+  view.setUint16(34, 8, true)
+  text(36, 'data')
+  view.setUint32(40, samples, true)
+  return URL.createObjectURL(new Blob([bytes], { type: 'audio/wav' }))
+})()
+
+/** One audio player with native controls; `broken` is a source no engine can decode. */
+const renderPlayer = (
+  props: Pick<MediaAudioProps, 'preload'> & { broken?: boolean; fallback?: string } = {},
+) => {
+  const { broken, ...rest } = props
+  flushSync(() =>
+    root.render(
+      <StrictMode>
+        <Media
+          key={generation++}
+          type="audio"
+          src={broken ? 'data:audio/wav;base64,AAAA' : silence}
+          controls
+          aria-label="Silence"
+          {...rest}
+        />
+      </StrictMode>,
+    ),
+  )
+}
+Object.assign(window, { renderMedia, renderPlayer, mediaEvents: events })
+export type Hooks = { renderMedia: typeof renderMedia; renderPlayer: typeof renderPlayer }
 renderMedia()

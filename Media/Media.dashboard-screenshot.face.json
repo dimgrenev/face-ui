@@ -34,8 +34,35 @@
       "objectFit": {
         "$ref": "props.objectFit"
       },
+      "loading": {
+        "$ref": "props.loading"
+      },
+      "decoding": {
+        "$ref": "props.decoding"
+      },
+      "controls": {
+        "$ref": "props.controls"
+      },
+      "autoPlay": {
+        "$ref": "props.autoPlay"
+      },
+      "loop": {
+        "$ref": "props.loop"
+      },
+      "muted": {
+        "$ref": "props.muted"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
       "children": {
         "$ref": "props.children"
+      },
+      "poster": {
+        "$ref": "props.poster"
+      },
+      "playsInline": {
+        "$ref": "props.playsInline"
       }
     },
     "children": []
@@ -125,10 +152,74 @@
       ]
     },
     {
+      "name": "loading",
+      "type": "select",
+      "required": false,
+      "description": "`lazy` waits to fetch the image until it nears the viewport; `eager` (default) fetches it at once.",
+      "options": [
+        "eager",
+        "lazy"
+      ]
+    },
+    {
+      "name": "decoding",
+      "type": "select",
+      "required": false,
+      "description": "`async` (default) decodes the image off the main thread; `sync` shows it in the same frame as the content around it.",
+      "options": [
+        "async",
+        "sync",
+        "auto"
+      ],
+      "defaultValue": "async"
+    },
+    {
+      "name": "controls",
+      "type": "boolean",
+      "required": false,
+      "description": "Shows the browser's playback controls; without them only `autoPlay` or script can play the media."
+    },
+    {
+      "name": "autoPlay",
+      "type": "boolean",
+      "required": false,
+      "description": "Starts playback as soon as it can; most browsers block it unless the media is `muted`."
+    },
+    {
+      "name": "loop",
+      "type": "boolean",
+      "required": false,
+      "description": "Starts playback over from the beginning when it reaches the end."
+    },
+    {
+      "name": "muted",
+      "type": "boolean",
+      "required": false,
+      "description": "Starts with the sound off."
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Names the player for assistive technology."
+    },
+    {
       "name": "children",
       "type": "any",
       "required": false,
-      "description": "Native `<track>` captions and `<source>` alternatives inside the player."
+      "description": "Native `<track>` elements for captions, subtitles, descriptions or chapters."
+    },
+    {
+      "name": "poster",
+      "type": "string",
+      "required": false,
+      "description": "URL of the image shown until playback starts."
+    },
+    {
+      "name": "playsInline",
+      "type": "boolean",
+      "required": false,
+      "description": "Plays inside the page on iPhone instead of switching to fullscreen, as a background video needs."
     }
   ],
   "meta": {

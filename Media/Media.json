@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Media",
-  "description": "An image, video or audio source in a box sized by `width` and `height`, with `fallback` content when it fails. Native attributes and `ref` go to the `<img>`, `<video>` or `<audio>` element; images decode asynchronously unless `decoding` says otherwise.",
+  "description": "An image, video or audio source in a box sized by `width` and `height`, with `fallback` content when it fails. Native attributes and `ref` go to the `<img>`, `<video>` or `<audio>` element. The box's `data-state` is `loading`, then `loaded` or `error`; a player counts as loaded once its metadata arrives or the browser holds off fetching until playback (`preload=\"none\"`).",
   "props": {
     "src": {
       "type": "string",
@@ -68,10 +68,65 @@
         "none"
       ]
     },
+    "loading": {
+      "type": "enum",
+      "required": false,
+      "description": "`lazy` waits to fetch the image until it nears the viewport; `eager` (default) fetches it at once.",
+      "options": [
+        "eager",
+        "lazy"
+      ]
+    },
+    "decoding": {
+      "type": "enum",
+      "required": false,
+      "description": "`async` (default) decodes the image off the main thread; `sync` shows it in the same frame as the content around it.",
+      "options": [
+        "async",
+        "sync",
+        "auto"
+      ],
+      "default": "async"
+    },
+    "controls": {
+      "type": "boolean",
+      "required": false,
+      "description": "Shows the browser's playback controls; without them only `autoPlay` or script can play the media."
+    },
+    "autoPlay": {
+      "type": "boolean",
+      "required": false,
+      "description": "Starts playback as soon as it can; most browsers block it unless the media is `muted`."
+    },
+    "loop": {
+      "type": "boolean",
+      "required": false,
+      "description": "Starts playback over from the beginning when it reaches the end."
+    },
+    "muted": {
+      "type": "boolean",
+      "required": false,
+      "description": "Starts with the sound off."
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Names the player for assistive technology."
+    },
     "children": {
       "type": "ReactNode",
       "required": false,
-      "description": "Native `<track>` captions and `<source>` alternatives inside the player."
+      "description": "Native `<track>` elements for captions, subtitles, descriptions or chapters."
+    },
+    "poster": {
+      "type": "string",
+      "required": false,
+      "description": "URL of the image shown until playback starts."
+    },
+    "playsInline": {
+      "type": "boolean",
+      "required": false,
+      "description": "Plays inside the page on iPhone instead of switching to fullscreen, as a background video needs."
     }
   },
   "states": [

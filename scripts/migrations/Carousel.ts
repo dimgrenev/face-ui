@@ -28,7 +28,7 @@ export default [
     kind: 'behavior',
     component: 'Carousel',
     before: 'A text or number child became an image whose URL was that text',
-    after: 'A text child is a text slide; images are `Media` children',
+    after: 'A text child is a text slide; images are `Media` children, and any other JSON descriptor is reported and left out',
   },
   {
     kind: 'behavior',
@@ -46,13 +46,13 @@ export default [
     kind: 'behavior',
     component: 'Carousel',
     before: 'Without `loop`, autoplay stopped at the last slide while its button still read "Pause rotation"; focus paused it, a click did not',
-    after: 'Autoplay returns to the first slide after the last; any press or focus inside stops it until the rotation control starts it, hover pauses it; the rotation control is an icon button named `labels.play`/`labels.pause`',
+    after: 'Autoplay returns to the first slide after the last; a move by the user, keyboard focus inside (on the rotation control too) or a press outside the rotation control stops it until the rotation control starts it, hover pauses it; the rotation control is an icon button named `labels.play`/`labels.pause`',
   },
   {
     kind: 'behavior',
     component: 'Carousel',
     before: 'In right-to-left text the track slid the wrong way and showed nothing; arrows and swipes did not mirror',
-    after: 'The track, the arrow icons, ArrowLeft/ArrowRight and swipes follow text direction; the track follows the pointer while dragged',
+    after: 'The track, ArrowLeft/ArrowRight and swipes follow the computed text direction, however it is set; the arrow icons follow the nearest `dir` attribute; the track follows the pointer while dragged',
   },
   {
     kind: 'behavior',

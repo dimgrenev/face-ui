@@ -93,6 +93,24 @@ describe('Carousel children', () => {
     expect(images[0]?.closest('[data-scope="media"][data-part="root"]')).not.toBeNull()
   })
 
+  it('a JSON child that is not a Media descriptor is reported and left out, leaving no empty slide', async () => {
+    await expectDevError(
+      () =>
+        render(
+          <Carousel>
+            {[
+              { __componentName__: 'Card', title: 'Story' },
+              { __componentName__: 'Media', src: '/a.jpg', alt: 'Lobby' },
+            ]}
+          </Carousel>,
+        ),
+      /^Face UI Carousel: invalid children "Card"; JSON slides are Media descriptors; the slide is left out\.$/,
+    )
+    expect(slides(view.host)).toHaveLength(1)
+    expect(slides(view.host)[0]!.querySelector('img')?.getAttribute('alt')).toBe('Lobby')
+    expect(view.host.querySelector('button')).toBeNull()
+  })
+
   it('without slides the region renders empty and without controls', async () => {
     await render(<Carousel />)
     expect(view.host.querySelector('[role="region"]')).not.toBeNull()
@@ -287,6 +305,15 @@ describe('Carousel focus', () => {
     expect(document.activeElement).toBe(control(view.host, 'prev'))
   })
 
+  it('focus in a slide that a controlled change hides moves to the current indicator', async () => {
+    await render(three({ index: 0 }))
+    const inside = slides(view.host)[0]!.querySelector('button')!
+    await focus(inside)
+    await render(three({ index: 1 }))
+    expect(slides(view.host)[0]!.hasAttribute('inert')).toBe(true)
+    expect(document.activeElement).toBe(indicators(view.host)[1])
+  })
+
   it('previous disabled at the start hands focus to next', async () => {
     await render(three({ defaultIndex: 1 }))
     const prev = control(view.host, 'prev')!
@@ -379,16 +406,61 @@ describe('Carousel autoplay', () => {
     expect(shown(view.host)).toBe(2)
   })
 
-  it('the rotation control pauses rotation; focusing it alone does not', async () => {
+  it('a press on the rotation control only toggles rotation, though it focuses the control', async () => {
     await render(three({ autoPlay: true, autoPlayInterval: 1000 }))
     const rotation = control(view.host, 'rotation')!
-    await focus(rotation)
+    /** A mouse press as Chromium delivers it: the button takes focus between down and click. */
+    const pressFocusing = async () => {
+      await act(async () => {
+        rotation.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+        rotation.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+        rotation.focus()
+      })
+      await act(async () => {
+        rotation.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+      })
+    }
+    await pressFocusing()
+    expect(document.activeElement).toBe(rotation)
+    expect(nameOf(rotation)).toBe('Start rotation')
+    await wait(5000)
+    expect(shown(view.host)).toBe(0)
+    await act(async () => rotation.blur())
+    await pressFocusing()
+    expect(nameOf(rotation)).toBe('Pause rotation')
     await wait(1000)
     expect(shown(view.host)).toBe(1)
-    await click(rotation)
+  })
+
+  it('keyboard focus on the rotation control stops rotation, which activating it starts again', async () => {
+    await render(three({ autoPlay: true, autoPlayInterval: 1000 }))
+    const rotation = control(view.host, 'rotation')!
+    // Tab pressed, then focus arrives: :focus-visible matches, as after keyboard navigation.
+    await press(document.body, 'Tab')
+    await focus(rotation)
+    expect(nameOf(rotation)).toBe('Start rotation')
+    await wait(5000)
+    expect(shown(view.host)).toBe(0)
+    await act(async () => rotation.click())
+    expect(nameOf(rotation)).toBe('Pause rotation')
+    await wait(1000)
+    expect(shown(view.host)).toBe(1)
+  })
+
+  it('any move the user asks for stops rotation: keys on the rotation control, an indicator', async () => {
+    await render(three({ autoPlay: true, autoPlayInterval: 1000 }))
+    const rotation = control(view.host, 'rotation')!
+    await press(rotation, 'ArrowRight')
+    expect(shown(view.host)).toBe(1)
     expect(nameOf(rotation)).toBe('Start rotation')
     await wait(5000)
     expect(shown(view.host)).toBe(1)
+    await act(async () => rotation.click())
+    await act(async () => indicators(view.host)[0]!.click())
+    expect(shown(view.host)).toBe(0)
+    expect(nameOf(rotation)).toBe('Start rotation')
+    await wait(5000)
+    expect(shown(view.host)).toBe(0)
   })
 
   it('under reduced motion rotation waits for the rotation control', async () => {

@@ -26,26 +26,20 @@
   width: 100%;
   min-width: 0;
 }
-/* The track and the arrows follow the nearest dir boundary: custom properties rather than
-   :dir(), which minifiers may lower to :lang(). */
-:where([dir="ltr"]) {
-  --uf-carousel-inline-sign: 1;
-}
-:where([dir="rtl"]) {
-  --uf-carousel-inline-sign: -1;
-}
-/* The position comes from the root and the drag offset from the pointer, in pixels. */
+/* The position is a logical offset, so the track follows the computed direction as the arrow
+   keys and swipes do, however it is set; the drag offset follows the pointer, in pixels. */
 .uf-carousel-track {
+  position: relative;
+  inset-inline-start: calc(
+    var(--face-runtime-carousel-index, 0) * -100% / var(--face-runtime-carousel-slides-per-view, 1)
+  );
   display: flex;
   width: 100%;
   min-width: 0;
-  transform: translateX(
-    calc(
-      var(--face-runtime-carousel-index, 0) * -100% * var(--uf-carousel-inline-sign, 1) /
-        var(--face-runtime-carousel-slides-per-view, 1) + var(--face-runtime-carousel-drag, 0px)
-    )
-  );
-  transition: transform var(--uf-motion-duration-medium) var(--uf-motion-ease-standard);
+  transform: translateX(var(--face-runtime-carousel-drag, 0px));
+  transition:
+    inset-inline-start var(--uf-motion-duration-medium) var(--uf-motion-ease-standard),
+    transform var(--uf-motion-duration-medium) var(--uf-motion-ease-standard);
   will-change: transform;
 }
 .uf-carousel-track[data-dragging] {
@@ -103,6 +97,14 @@
   --uf-icon-only-size: var(--uf-control-height);
   position: static;
   transform: none;
+}
+/* The arrows follow the nearest dir boundary, as other Button icons do: a custom property rather
+   than :dir(), which the CSS build lowers to :lang(). */
+:where([dir="ltr"]) {
+  --uf-carousel-inline-sign: 1;
+}
+:where([dir="rtl"]) {
+  --uf-carousel-inline-sign: -1;
 }
 .uf-carousel-navPrev [data-part="icon"],
 .uf-carousel-navNext [data-part="icon"] {

@@ -62,3 +62,7 @@ export const audioFit = <Media type="audio" src="/a.mp3" objectFit="cover" />
 export const rounded = <Media src="/a.jpg" alt="" variant="rounded" />
 // @ts-expect-error An image takes no children (checked once type is written out).
 export const imageChildren = <Media type="image" src="/a.jpg" alt="">caption</Media>
+// @ts-expect-error A poster is a video's picture; audio has none.
+export const audioPoster = <Media type="audio" src="/a.mp3" poster="/a.jpg" />
+// @ts-expect-error loading takes the native eager or lazy.
+export const imageLoading = <Media src="/a.jpg" alt="" loading="soon" />

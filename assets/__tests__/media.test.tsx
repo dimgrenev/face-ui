@@ -1,7 +1,7 @@
 import { act, createRef, type ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Media, type MediaProps } from '../../Media/Media'
-import { libraryCss, mount, type View } from './harness'
+import { expectDevError, libraryCss, mount, type View } from './harness'
 
 let view: View
 beforeEach(() => {
@@ -117,12 +117,55 @@ describe('Media events', () => {
     expect(element().hidden).toBe(false)
   })
 
-  it('video and audio report loading through onLoadedData', async () => {
+  it('a player is loaded once its metadata arrives; onLoadedMetadata receives the native event', async () => {
+    const onLoadedMetadata = vi.fn((event: { type: string }) => event.type)
+    await render(<Media type="video" src="/a.mp4" onLoadedMetadata={onLoadedMetadata} />)
+    expect(root().getAttribute('data-state')).toBe('loading')
+    await fire(element(), 'loadedmetadata')
+    expect(onLoadedMetadata.mock.results[0]!.value).toBe('loadedmetadata')
+    expect(root().getAttribute('data-state')).toBe('loaded')
+  })
+
+  it('a player whose browser holds off fetching until playback is not left loading', async () => {
+    await render(<Media type="audio" src="/a.mp3" controls preload="none" />)
+    expect(root().getAttribute('data-state')).toBe('loading')
+    await fire(element(), 'suspend')
+    expect(root().getAttribute('data-state')).toBe('loaded')
+    // Playback of a broken source still shows the failure.
+    await fire(element(), 'error')
+    expect(root().getAttribute('data-state')).toBe('error')
+  })
+
+  it('a player that settled before React attached reports its state at once', async () => {
+    const proto = HTMLMediaElement.prototype
+    const original = {
+      readyState: Object.getOwnPropertyDescriptor(proto, 'readyState'),
+      error: Object.getOwnPropertyDescriptor(proto, 'error'),
+    }
+    const stub = (name: keyof typeof original, value: unknown) =>
+      Object.defineProperty(proto, name, { configurable: true, get: () => value })
+    try {
+      stub('readyState', proto.HAVE_ENOUGH_DATA)
+      await render(<Media type="video" src="/cached.mp4" />)
+      expect(root().getAttribute('data-state')).toBe('loaded')
+      stub('readyState', proto.HAVE_NOTHING)
+      stub('error', { code: 4 })
+      await render(<Media type="video" src="/broken.mp4" fallback="No video" />)
+      expect(root().getAttribute('data-state')).toBe('error')
+      expect(fallback()?.textContent).toBe('No video')
+    } finally {
+      for (const [name, descriptor] of Object.entries(original)) {
+        if (descriptor) Object.defineProperty(proto, name, descriptor)
+        else delete (proto as unknown as Record<string, unknown>)[name]
+      }
+    }
+  })
+
+  it('onLoadedData and the other native media events reach the player', async () => {
     const onLoadedData = vi.fn((event: { type: string }) => event.type)
     await render(<Media type="video" src="/a.mp4" onLoadedData={onLoadedData} />)
     await fire(element(), 'loadeddata')
     expect(onLoadedData.mock.results[0]!.value).toBe('loadeddata')
-    expect(root().getAttribute('data-state')).toBe('loaded')
   })
 })
 
@@ -132,6 +175,19 @@ describe('Media alt', () => {
     expect(element().getAttribute('alt')).toBe('Team at the offsite')
     await render(<Media src="/a.jpg" alt="" />)
     expect(element().getAttribute('alt')).toBe('')
+  })
+
+  it('an image without alt, as JSON can send, is reported and still renders', async () => {
+    const json = { src: '/a.jpg' } as unknown as MediaProps
+    await expectDevError(
+      () => render(<Media {...json} />),
+      /^Face UI Media: missing alt; the image has no text alternative \(alt="" marks a decorative one\)\.$/,
+    )
+    expect(element().tagName).toBe('IMG')
+    expect(element().hasAttribute('alt')).toBe(false)
+    // Players are named by aria-label and need no alt; any other console.error fails the test.
+    await render(<Media type="video" src="/a.mp4" />)
+    expect(element().tagName).toBe('VIDEO')
   })
 })
 
@@ -196,6 +252,23 @@ describe('Media box', () => {
     expect(element().getAttribute('aria-describedby')).toBe('caption')
   })
 
+  it('player attributes reach the player: controls, poster, autoPlay, loop, muted, playsInline', async () => {
+    await render(<Media type="video" src="/a.mp4" poster="/a.jpg" controls autoPlay loop muted playsInline />)
+    const video = element() as HTMLVideoElement
+    expect(video.getAttribute('poster')).toBe('/a.jpg')
+    expect(video.hasAttribute('controls')).toBe(true)
+    expect(video.hasAttribute('autoplay')).toBe(true)
+    expect(video.hasAttribute('loop')).toBe(true)
+    expect(video.muted).toBe(true)
+    expect(video.hasAttribute('playsinline')).toBe(true)
+    await render(<Media type="audio" src="/a.mp3" controls loop />)
+    expect(element().tagName).toBe('AUDIO')
+    expect(element().hasAttribute('controls')).toBe(true)
+    expect(element().hasAttribute('loop')).toBe(true)
+    await render(<Media type="video" src="/a.mp4" />)
+    expect(element().hasAttribute('controls')).toBe(false)
+  })
+
   it('aria-label names a video player', async () => {
     await render(<Media type="video" src="/tour.mp4" controls aria-label="Product tour" />)
     expect(element().getAttribute('aria-label')).toBe('Product tour')
@@ -209,7 +282,7 @@ describe('Media box', () => {
     expect(element().getAttribute('decoding')).toBe('sync')
   })
 
-  it('video and audio children render inside the player', async () => {
+  it('video and audio children render inside the player as tracks', async () => {
     await render(
       <Media type="video" src="/tour.mp4">
         <track kind="captions" src="/tour.vtt" srcLang="en" />

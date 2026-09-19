@@ -35,7 +35,7 @@
     "autoPlay": {
       "type": "boolean",
       "required": false,
-      "description": "Advances one position per interval, after the last back to the first; any press or focus inside stops it, hover pauses it.",
+      "description": "Advances one position per interval, after the last back to the first; a move by the user, keyboard focus inside or a press outside the rotation control stops it, hover pauses it.",
       "default": false
     },
     "autoPlayInterval": {

@@ -7,6 +7,7 @@
 
 import {
   forwardRef,
+  useMemo,
   type AudioHTMLAttributes,
   type CSSProperties,
   type ImgHTMLAttributes,
@@ -20,7 +21,11 @@ import { cn } from '../assets/utils'
 import { Membrane } from '../assets/adapters/react/Membrane'
 import { composeHandlers } from '../assets/adapters/react/merge-props'
 import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
-import { useImageStatus } from '../assets/adapters/react/use-image-status'
+import {
+  useImageStatus,
+  type ImageStatusProps,
+} from '../assets/adapters/react/use-image-status'
+import { invalidProp } from '../assets/runtime/props'
 import { hasSlotContent } from '../assets/slot-content'
 
 const { getPartAttrs: part } = createAnatomy('media').parts(
@@ -62,7 +67,7 @@ interface MediaBoxProps {
 
 export interface MediaImageProps
   extends MediaBoxProps,
-    Omit<ImgHTMLAttributes<HTMLImageElement>, Owned | 'alt'> {
+    Omit<ImgHTMLAttributes<HTMLImageElement>, Owned | 'alt' | 'loading' | 'decoding'> {
   /** Element that renders the source: `image` (default), `video` or `audio`; the other props follow it. */
   type?: 'image'
   /** Text that stands for the image to people who cannot see it; `""` marks the image decorative. */
@@ -71,26 +76,46 @@ export interface MediaImageProps
   variant?: MediaVariant
   /** How the media fills a box whose height is set: `cover` crops, `contain` letterboxes. Default: cover for images, contain for video. */
   objectFit?: MediaFit
+  /** `lazy` waits to fetch the image until it nears the viewport; `eager` (default) fetches it at once. */
+  loading?: 'eager' | 'lazy'
+  /** `async` (default) decodes the image off the main thread; `sync` shows it in the same frame as the content around it. */
+  decoding?: 'async' | 'sync' | 'auto'
+}
+
+/** What video and audio players share. */
+interface MediaPlayerProps extends MediaBoxProps {
+  /** Shows the browser's playback controls; without them only `autoPlay` or script can play the media. */
+  controls?: boolean
+  /** Starts playback as soon as it can; most browsers block it unless the media is `muted`. */
+  autoPlay?: boolean
+  /** Starts playback over from the beginning when it reaches the end. */
+  loop?: boolean
+  /** Starts with the sound off. */
+  muted?: boolean
+  /** Names the player for assistive technology. */
+  'aria-label'?: string
+  /** Native `<track>` elements for captions, subtitles, descriptions or chapters. */
+  children?: ReactNode
 }
 
 export interface MediaVideoProps
-  extends MediaBoxProps,
-    Omit<VideoHTMLAttributes<HTMLVideoElement>, Owned | 'onLoad'> {
+  extends MediaPlayerProps,
+    Omit<VideoHTMLAttributes<HTMLVideoElement>, Owned | 'onLoad' | keyof MediaPlayerProps | 'poster' | 'playsInline'> {
   /** Element that renders the source: `image` (default), `video` or `audio`; the other props follow it. */
   type: 'video'
   /** How the media fills a box whose height is set: `cover` crops, `contain` letterboxes. Default: cover for images, contain for video. */
   objectFit?: MediaFit
-  /** Native `<track>` captions and `<source>` alternatives inside the player. */
-  children?: ReactNode
+  /** URL of the image shown until playback starts. */
+  poster?: string
+  /** Plays inside the page on iPhone instead of switching to fullscreen, as a background video needs. */
+  playsInline?: boolean
 }
 
 export interface MediaAudioProps
-  extends MediaBoxProps,
-    Omit<AudioHTMLAttributes<HTMLAudioElement>, Owned | 'onLoad'> {
+  extends MediaPlayerProps,
+    Omit<AudioHTMLAttributes<HTMLAudioElement>, Owned | 'onLoad' | keyof MediaPlayerProps> {
   /** Element that renders the source: `image` (default), `video` or `audio`; the other props follow it. */
   type: 'audio'
-  /** Native `<track>` captions and `<source>` alternatives inside the player. */
-  children?: ReactNode
 }
 
 export type MediaProps = MediaImageProps | MediaVideoProps | MediaAudioProps
@@ -101,17 +126,36 @@ interface AnyMediaProps extends MediaBoxProps {
   alt?: string
   variant?: MediaVariant
   objectFit?: MediaFit
+  decoding?: MediaImageProps['decoding']
   children?: ReactNode
   hidden?: boolean
   onLoad?: ReactEventHandler<HTMLElement>
-  onLoadedData?: ReactEventHandler<HTMLElement>
+  onLoadedMetadata?: ReactEventHandler<HTMLElement>
+  onSuspend?: ReactEventHandler<HTMLElement>
   onError?: ReactEventHandler<HTMLElement>
 }
 
 /**
+ * Settles a player that finished before React attached (server markup, a cached source): an
+ * error, or metadata in hand or fetching held off, reads as the matching event would.
+ */
+const readPlayer =
+  (load: ImageStatusProps) => (node: HTMLElement | null) => {
+    if (!node || !('readyState' in node)) return
+    const player = node as HTMLMediaElement
+    if (player.error) load.onError()
+    else if (
+      player.readyState >= player.HAVE_METADATA ||
+      player.networkState === player.NETWORK_IDLE
+    )
+      load.onLoad()
+  }
+
+/**
  * An image, video or audio source in a box sized by `width` and `height`, with `fallback` content
- * when it fails. Native attributes and `ref` go to the `<img>`, `<video>` or `<audio>` element;
- * images decode asynchronously unless `decoding` says otherwise.
+ * when it fails. Native attributes and `ref` go to the `<img>`, `<video>` or `<audio>` element.
+ * The box's `data-state` is `loading`, then `loaded` or `error`; a player counts as loaded once its
+ * metadata arrives or the browser holds off fetching until playback (`preload="none"`).
  */
 export const Media = forwardRef<
   HTMLImageElement | HTMLVideoElement | HTMLAudioElement,
@@ -129,18 +173,31 @@ export const Media = forwardRef<
     alt,
     variant = 'default',
     objectFit,
+    decoding = 'async',
     children,
     hidden,
     onLoad,
-    onLoadedData,
+    onLoadedMetadata,
+    onSuspend,
     onError,
     ...native
   } = props
   const kind: MediaType = type === 'video' || type === 'audio' ? type : 'image'
+  if (kind === 'image' && typeof alt !== 'string')
+    invalidProp(
+      'Media',
+      'alt',
+      alt,
+      'the image has no text alternative (alt="" marks a decorative one)',
+    )
   const source = typeof src === 'string' ? src.trim() : ''
   const [status, load] = useImageStatus(source)
+  const settled = useMemo(
+    () => (kind === 'image' ? load.ref : readPlayer(load)),
+    [kind, load],
+  )
   const elementRef = useComposedRefs<HTMLElement>(
-    load.ref,
+    settled,
     ref as Ref<HTMLElement>,
   )
   const showFallback = status === 'error' && hasSlotContent(fallback)
@@ -158,10 +215,10 @@ export const Media = forwardRef<
   const media =
     kind === 'image' ? (
       <img
-        decoding="async"
         {...element}
         key={source}
         alt={alt}
+        decoding={decoding}
         className="uf-image"
         onLoad={composeHandlers(onLoad, load.onLoad)}
       />
@@ -169,7 +226,8 @@ export const Media = forwardRef<
       <Player
         {...element}
         key={source}
-        onLoadedData={composeHandlers(onLoadedData, load.onLoad)}
+        onLoadedMetadata={composeHandlers(onLoadedMetadata, load.onLoad)}
+        onSuspend={composeHandlers(onSuspend, load.onLoad)}
       >
         {children}
       </Player>

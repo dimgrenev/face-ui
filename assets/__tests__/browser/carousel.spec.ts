@@ -100,6 +100,46 @@ test('in right-to-left text the track, the controls, the arrow keys and the icon
   expect(mirrored).toBe(-1)
 })
 
+test('with only CSS direction set, the track follows the arrow keys the same way', { tag: ['@layout', '@focus'] }, async ({ page }) => {
+  await render(page, {}, { cssDirection: 'rtl' })
+  await fills(page, 'One')
+  await control(page, 'Next slide').focus()
+  await page.keyboard.press('ArrowLeft')
+  await fills(page, 'Two')
+  await control(page, 'Next slide').click()
+  await fills(page, 'Three')
+  expect(await events(page)).toEqual([1, 2])
+})
+
+test('focus in a slide that a controlled change hides moves to the current indicator', { tag: ['@focus'] }, async ({ page }) => {
+  await render(page, { index: 0 })
+  await page.locator('a[href="#One"]').focus()
+  await render(page, { index: 1 }, { update: true })
+  await expect(control(page, 'Go to slide 2')).toBeFocused()
+  await fills(page, 'Two')
+})
+
+test('a click on the rotation control only toggles rotation; keyboard focus on it stops rotation', { tag: ['@focus'] }, async ({ page }) => {
+  await page.clock.install()
+  await open(page, 'carousel')
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await render(page, { autoPlay: true, autoPlayInterval: 1000 }, { plain: true })
+  // Chromium focuses a clicked button; the click still only toggles.
+  await control(page, 'Pause rotation').click()
+  await expect(control(page, 'Start rotation')).toBeVisible()
+  await control(page, 'Start rotation').click()
+  await expect(control(page, 'Pause rotation')).toBeVisible()
+  await page.mouse.move(0, 0)
+  await page.clock.runFor(1000)
+  await expect.poll(() => events(page)).toEqual([1])
+  // Without focusable slide content, Tab lands on the rotation control first.
+  await page.locator('#before').focus()
+  await page.keyboard.press('Tab')
+  await expect(control(page, 'Start rotation')).toBeFocused()
+  await page.clock.runFor(3000)
+  expect(await events(page)).toEqual([1])
+})
+
 test('a swipe follows the pointer and moves one slide toward the drag', { tag: ['@pointer'] }, async ({ page }) => {
   for (const direction of ['ltr', 'rtl'] as const) {
     await render(page, {}, { direction })
