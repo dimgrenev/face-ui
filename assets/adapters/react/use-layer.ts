@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import {
   getFocusableElements,
   isAvailable,
@@ -7,6 +7,7 @@ import {
   restoreFocus,
   type Layer,
 } from '../../runtime/layers'
+import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 interface LayerOptions {
   /** Registers the layer while true; turning it off is a close. */
@@ -28,13 +29,11 @@ interface LayerOptions {
   /** A press outside this layer and every layer above it. */
   onOutside?: (event: Event) => void
 }
-const useCommitEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /** Registers a dismissable layer in the document stack and owns its focus on open and close. */
 export function useLayer(options: LayerOptions) {
   const latest = useRef(options)
-  useCommitEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     latest.current = options
   })
   const { enabled, modal, contentRef } = options
@@ -80,7 +79,8 @@ export function useLayer(options: LayerOptions) {
     doc.addEventListener('focusin', track)
     return () => {
       doc.removeEventListener('focusin', track)
-      const restore = latest.current.restoreFocus && owned && (modal || !outside)
+      const restore =
+        latest.current.restoreFocus && owned && (modal || !outside)
       unregister()
       const trigger = latest.current.triggerRef?.current
       const previous = opener && !content.contains(opener) ? opener : null

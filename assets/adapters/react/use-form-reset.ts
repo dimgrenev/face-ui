@@ -1,7 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react'
-
-const useCommitEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
+import { useEffect, useRef, type RefObject } from 'react'
+import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 /** Reset after the browser's default action; a prevented reset changes nothing. */
 export function useFormReset(
@@ -11,7 +9,7 @@ export function useFormReset(
   reset: () => void,
 ) {
   const latest = useRef(reset)
-  useCommitEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     latest.current = reset
   })
   useEffect(() => {

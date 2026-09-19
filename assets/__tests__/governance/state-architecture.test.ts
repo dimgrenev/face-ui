@@ -170,11 +170,7 @@ const PENDING = {
   'D3 machines': [
     'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Table', 'Toast', 'Toc', 'Tree', 'Upload',
   ],
-  'D3 isomorphic layout effect': [
-    'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Overlay', 'Panel',
-    'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Switcher', 'Table', 'Toc', 'Tooltip', 'Tree',
-    'Upload',
-  ],
+  'D3 isomorphic layout effect': [],
   'D3 direction': [],
   'D3 isConnected': [],
   'D3 machine-era hooks': ['Carousel', 'Command', 'Modal', 'Navigation', 'Panel', 'Toc', 'Tree'],

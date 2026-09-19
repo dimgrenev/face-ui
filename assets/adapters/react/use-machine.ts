@@ -5,12 +5,7 @@
  * Second argument is flat Partial<TSchema['context']> — no wrapping.
  */
 
-import {
-  useSyncExternalStore,
-  useRef,
-  useEffect,
-  useLayoutEffect,
-} from 'react'
+import { useSyncExternalStore, useRef } from 'react'
 import { interpret, areContextValuesEqual } from '../../create-machine'
 import type {
   MachineSchema,
@@ -18,6 +13,7 @@ import type {
   MachineSnapshot,
   SendFn,
 } from '../../types'
+import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 export type UseMachineOptions<S extends MachineSchema> = Partial<S['context']>
 
@@ -27,9 +23,6 @@ export interface UseMachineReturn<S extends MachineSchema> {
   /** Restore external state without emitting user-change callbacks. */
   syncContext: (patch: Partial<S['context']>) => void
 }
-
-const useIsomorphicLayoutEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export function useMachine<S extends MachineSchema>(
   config: MachineConfig<S>,
