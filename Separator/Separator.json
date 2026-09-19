@@ -2,12 +2,12 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Separator",
-  "description": "Visual divider for separating content",
+  "description": "A thin line between sections or between controls in a row, hidden from assistive technology unless `decorative` is false.",
   "props": {
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Separator direction",
+      "description": "Draws a horizontal line across the available width, or a vertical line down the height of its row and at least one control tall.",
       "options": [
         "horizontal",
         "vertical"
@@ -17,13 +17,13 @@
     "decorative": {
       "type": "boolean",
       "required": false,
-      "description": "Whether the separator is purely decorative",
+      "description": "Hides the line from assistive technology; `false` exposes it as a separator with its orientation, for a break between sections or a resize handle.",
       "default": true
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing",
+      "description": "Insets the line by the control spacing on every side, so its ends line up with the visible edges of neighbouring controls.",
       "default": true
     }
   },
@@ -56,8 +56,10 @@
   "behavior": {},
   "keyboard": {},
   "aria": {
-    "role": "none by default; separator when decorative is false",
-    "orientation": "aria-orientation is set only for semantic separators."
+    "role": "none while decorative; separator with aria-orientation from orientation when decorative is false. A role or aria-orientation passed as an attribute is ignored.",
+    "notes": [
+      "A window splitter is a separator that is not decorative with tabIndex, aria-valuenow, aria-valuemin, aria-valuemax, aria-controls and a name; they and its key handlers are native attributes of the line."
+    ]
   },
   "composition": {
     "required": [
@@ -74,23 +76,29 @@
       "--uf-separator-line-width"
     ],
     "semanticFallbacks": [
-      "--uf-control-pad-text",
-      "--uf-color-border"
+      "--uf-color-border",
+      "--uf-membrane",
+      "--uf-control-height"
     ],
     "notes": [
-      "Separator line width is a thin border token and must not scale with membrane spacing.",
-      "Membrane spacing keeps horizontal separators aligned with control/text insets."
+      "The line is --uf-separator-line-width thick and does not scale with membrane spacing.",
+      "Membrane insets the line by --uf-membrane on every side, so its ends meet the visible edges of neighbouring controls.",
+      "A vertical line stretches with its row and is at least --uf-control-height tall; a horizontal one in a row fills the space its siblings leave.",
+      "In forced colors the line is drawn in CanvasText."
     ]
   },
   "platform": {},
   "usage": {
     "whenToUse": [
-      "Visual divider between content sections",
-      "Menu item group divider"
+      "Rule between a card or panel heading and its fields",
+      "Divider between groups of controls in a toolbar",
+      "Break between content sections, with decorative={false}",
+      "Resize handle between panes, with decorative={false} and the window-splitter attributes"
     ],
     "whenNotToUse": [
       "Spacing only (use CSS gap)",
-      "Decorative borders (use CSS border)"
+      "Decorative borders (use CSS border)",
+      "Groups in a Menu (use a { type: 'separator' } item)"
     ],
     "alternatives": [],
     "context": "both"

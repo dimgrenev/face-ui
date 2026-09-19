@@ -322,6 +322,16 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | A failed `required` check showed only the browser bubble | The browser message also fills the field error slot and marks the trigger `aria-invalid` until a value is chosen; `error` wins over it | — |
 | Home and End did nothing on a closed list | Home and End open the list at the first or last enabled item | — |
 
+### Separator
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `role` | `decorative={false}` for `role="separator"`; `decorative` for `role="none"`. A role passed anyway is ignored | auto |
+| `aria-orientation` | Set `orientation` to the direction the line is drawn in; a separator that is not decorative announces it. A passed `aria-orientation` is ignored | manual |
+| `children` | Place the text beside the separator; a separator is only a line | manual |
+| Outside a flex or grid row a vertical separator was 0 tall without membrane, and its line 2px shorter than a control with membrane | The line is at least `--uf-control-height` tall and stretches with its row; membrane only adds its spacing around it | — |
+| The line’s min and max width and height were pinned, so a className or style could not widen or lengthen it (a resize handle stayed 1px wide) | Only the thickness is set; a className or style sizes the line directly, and a widened line is painted in the separator color unless that rule also sets its background | — |
+
 ### Slider
 
 | Before | After | Codemod |

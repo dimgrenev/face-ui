@@ -1,62 +1,45 @@
 /* =================================================================
  * SEPARATOR
+ * The line is --uf-separator-line-width thick. Its membrane box only adds
+ * --uf-membrane on every side. No max-size clamps: a className or style on
+ * the line can widen or lengthen it, as a resize handle does.
  * ================================================================= */
 .uf-separator[data-scope] {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
   border: none;
   background: var(--uf-color-border);
-  display: block;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
+}
+/* Full width in a column or block; in a row, the space its siblings leave. */
+.uf-separator[data-scope][data-orientation="horizontal"] {
+  block-size: var(--uf-separator-line-width);
+  min-block-size: var(--uf-separator-line-width);
   inline-size: 100%;
   min-inline-size: 0;
-  max-inline-size: 100%;
-  flex: 1 1 auto;
-  box-sizing: border-box;
-  padding: 0;
+  flex: 0 1 auto;
+  align-self: center;
+}
+/* The row's height, and at least one control tall anywhere else. */
+.uf-separator[data-scope][data-orientation="vertical"] {
+  inline-size: var(--uf-separator-line-width);
+  min-block-size: var(--uf-control-height);
+  flex: none;
+  align-self: stretch;
 }
 .uf-separator-membrane {
-  display: flex;
-  width: 100%;
-  min-width: 0;
-  flex: 0 0 auto;
+  min-inline-size: 0;
+  flex: 0 1 auto;
   align-self: stretch;
 }
 .uf-separator-membrane--vertical {
-  align-self: stretch;
   flex: none;
-  min-height: var(--uf-control-height);
-}
-.uf-separator[data-scope][data-orientation="horizontal"] {
-  display: block;
-  height: var(--uf-separator-line-width);
-  min-height: var(--uf-separator-line-width);
-  max-height: var(--uf-separator-line-width);
-  flex: 1 1 auto;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  inline-size: 100%;
-  min-inline-size: 0;
-  max-inline-size: 100%;
-  margin: 0;
-  align-self: center;
-  border-top: none;
-  background: var(--uf-color-border);
-}
-.uf-separator-membrane > .uf-separator[data-scope][data-orientation="horizontal"] {
-  flex: 1 1 auto;
-  width: 100%;
-  inline-size: 100%;
-}
-.uf-separator[data-scope][data-orientation="vertical"] {
-  width: var(--uf-separator-line-width);
-  min-width: var(--uf-separator-line-width);
-  max-width: var(--uf-separator-line-width);
-  inline-size: var(--uf-separator-line-width);
-  min-inline-size: var(--uf-separator-line-width);
-  max-inline-size: var(--uf-separator-line-width);
   align-self: stretch;
-  border-left: none;
-  background: var(--uf-color-border);
+}
+/* Forced colors repaint backgrounds with Canvas, which would erase the line. */
+@media (forced-colors: active) {
+  .uf-separator[data-scope] {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
 }
