@@ -197,8 +197,8 @@
     "stateModel": "sort/defaultSort/onSortChange and selectedRows/defaultSelectedRows/onSelectedRowsChange; both work uncontrolled. Selected keys without a row are kept and not shown.",
     "sorting": "A sortable header cycles ascending, descending, then the order of rows. Values compare by number, date or text with numeric runs; empty values go last.",
     "rowActivation": "With onRowClick rows form one tab stop; clicks on controls inside a row and on the selection cell do not activate it.",
-    "resizing": "The first resize fixes every column at its rendered width, so a resize changes only its own column and the table grows or shrinks. A resize stops at minWidth (48 px without one); onColumnResize reports the rendered width when the drag ends or per key press.",
-    "layout": "A column without width sizes to its content and wraps its text; a column with width keeps it, its content wrapping inside (truncate cuts one line). In a full-width table the extra room goes to the columns without width.",
+    "resizing": "The first resize fixes every column at its rendered width, so a resize changes only its own column and the table grows or shrinks. A column header is named by its label, not by its resize handle. A resize stops at minWidth (48 px without one); onColumnResize reports the rendered width when the drag ends or per key press.",
+    "layout": "A column without width sizes to its content and wraps its text; content that cannot wrap (an email, a URL) widens the table, so give it truncate or width, or let the container scroll. A column with width keeps it, its content wrapping inside. truncate keeps text and elements on one line with an ellipsis. In a full-width table the extra room goes to the columns without width. A width that is not a length of 0 or more is reported and left out.",
     "cellValues": "Text and numbers show as text; a boolean or a date needs render, else the cell is empty and reported."
   },
   "keyboard": {

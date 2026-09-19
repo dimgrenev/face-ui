@@ -215,7 +215,7 @@ describe('selection', () => {
 })
 
 describe('row events', () => {
-  it('onRowClick reports the row, its shown index and the event; clicks on controls in the row do not', async () => {
+  it('onRowClick reports the row, its shown index and the event; clicks on controls in the row, a summary or editable text included, do not', async () => {
     const rowClick = vi.fn()
     await render({
       selectable: true,
@@ -224,11 +224,25 @@ describe('row events', () => {
       columns: [
         ...columns,
         { id: 'action', header: 'Action', render: () => <Button>Open</Button> },
+        {
+          id: 'more',
+          header: 'More',
+          render: () => (
+            <details>
+              <summary>More</summary>
+              <span contentEditable suppressContentEditableWarning>
+                Note
+              </span>
+            </details>
+          ),
+        },
       ],
     })
     await click(checkboxOf(host, 'b'))
     await click(host.querySelector('tr[data-row-id="b"] [data-select]'))
     await click(host.querySelector('tr[data-row-id="b"] button'))
+    await click(host.querySelector('tr[data-row-id="b"] summary'))
+    await click(host.querySelector('tr[data-row-id="b"] [contenteditable]'))
     expect(rowClick).not.toHaveBeenCalled()
     await click(host.querySelector('tr[data-row-id="b"] td[data-column="status"]'))
     expect(rowClick).toHaveBeenCalledOnce()
@@ -332,6 +346,36 @@ describe('columns', () => {
     expect(sized('name')).toEqual([true, true, true, true])
     expect(sized('score')).toEqual([false, false, false, false])
     expect(libraryCss()).toMatch(/\.uf-table__cellSlot\[data-sized\] \{\s*contain: inline-size;/)
+  })
+
+  it('a width that is not a length of 0 or more is reported and left out, so its cells are not contained and the column sizes to its content', async () => {
+    allowConsoleError(
+      /^Face UI Table: invalid columns\.score width -5; sizing the column to its content\.$/,
+      /^Face UI Table: invalid columns\.score minWidth -1; using 0\.$/,
+    )
+    await expectDevError(
+      () =>
+        render({
+          columns: [
+            { id: 'name', width: 'auto' },
+            { id: 'status', width: 'var(--status-width)' },
+            { id: 'score', width: -5, minWidth: -1 },
+            { id: 'note', width: '' },
+            { id: 'total', width: 'calc(100% - 2rem)' },
+          ],
+        }),
+      /^Face UI Table: invalid columns\.name width "auto"; sizing the column to its content\.$/,
+    )
+    expect(['name', 'status', 'score', 'note', 'total'].map((column) => header(column).style.cssText)).toEqual([
+      '',
+      'width: var(--status-width); min-width: var(--status-width);',
+      'min-width: 0;',
+      '',
+      'width: calc(100% - 2rem); min-width: calc(100% - 2rem);',
+    ])
+    const sized = (column: string) =>
+      host.querySelector(`td[data-column="${column}"] .uf-table__cellSlot`)!.hasAttribute('data-sized')
+    expect(['name', 'status', 'score', 'note', 'total'].map(sized)).toEqual([false, true, false, false, true])
   })
 
   it('a column without a unique string id is dropped with a report', async () => {
@@ -474,8 +518,43 @@ describe('resizing', () => {
     expect(separator.getAttribute('aria-valuemin')).toBe('48')
   })
 
+  it('a column header is named by its label alone, not by the resize handle inside it', async () => {
+    await render({ resizable: true, columns: [{ id: 'name', header: 'Name', sortable: true }, { id: 'badge', header: <em>Badge</em> }] })
+    for (const [column, name] of [['name', 'Name'], ['badge', 'Badge']]) {
+      const label = document.getElementById(header(column).getAttribute('aria-labelledby')!)!
+      expect(header(column).contains(label)).toBe(true)
+      expect(label.contains(handle(column))).toBe(false)
+      expect(label.textContent).toBe(name)
+    }
+  })
+
+  it('a resize of the table updates each handle value without rendering the rows again', async () => {
+    const observers: Array<() => void> = []
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(callback: () => void) {
+          observers.push(callback)
+        }
+        observe() {}
+        disconnect() {}
+      },
+    )
+    const renderCell = vi.fn(({ value }: { value: unknown }) => String(value))
+    await render({ resizable: true, columns: [{ id: 'name', header: 'Name', render: renderCell }] })
+    const calls = renderCell.mock.calls.length
+    width = 200
+    await act(async () => observers.forEach((notify) => notify()))
+    expect(handle('name').getAttribute('aria-valuenow')).toBe('200')
+    expect(handle('name').getAttribute('aria-valuetext')).toBe('200 pixels')
+    expect(renderCell).toHaveBeenCalledTimes(calls)
+    vi.unstubAllGlobals()
+  })
+
   it('server HTML has no resize handles: they appear once the widths are measured, each with its value', async () => {
-    expect(renderToString(<Table columns={columns} rows={people} resizable />)).not.toContain('separator')
+    const html = renderToString(<Table columns={columns} rows={people} resizable />)
+    expect(html).not.toContain('separator')
+    expect(html).not.toContain('aria-valuenow')
     await render({ resizable: true })
     expect([...host.querySelectorAll('[role="separator"]')].map((node) => node.getAttribute('aria-valuenow'))).toEqual([
       '120',

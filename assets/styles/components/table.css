@@ -127,12 +127,19 @@
   contain: inline-size;
   overflow-wrap: anywhere;
 }
-/* One line cut with an ellipsis. The track lets the column shrink below the
-   text while its full width still counts when the table has room. */
+/* One line cut with an ellipsis, for text and for elements such as a link.
+   Each piece of content takes a track that can shrink below it while its
+   full width still counts when the table has room. */
 .uf-table__cellSlot[data-truncate] {
   display: grid;
-  grid-template-columns: minmax(0, max-content);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, max-content);
   overflow: hidden;
+  white-space: nowrap;
+}
+.uf-table__cellSlot[data-truncate] > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .uf-table__cellSlot > svg {
   flex-shrink: 0;

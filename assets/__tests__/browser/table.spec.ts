@@ -117,6 +117,65 @@ test('at 360px a width holds and wraps its content, minWidth holds, truncate cut
   expect(await lines(page, 'td[data-column="note"] .uf-text__content')).toBeGreaterThan(1)
 })
 
+test('truncate keeps element content on one line too, cut with an ellipsis, at 360px', { tag: ['@layout'] }, async ({
+  page,
+}) => {
+  const long = 'A very long link text that cannot fit on a phone screen at all'
+  await render(page, {
+    columns: [
+      { id: 'name', header: 'Name', truncate: true },
+      { id: 'note', header: 'Note' },
+    ],
+    rows: [{ id: 'a', name: long, note: 'Short note' }],
+  }, { fresh: true, links: ['name'] })
+  expect(await widthOf(page, 'table')).toBeLessThanOrEqual(328)
+  const link = 'td[data-column="name"] a'
+  expect(await lines(page, link)).toBe(1)
+  const cut = await page
+    .locator(link)
+    .evaluate((node) => node.scrollWidth > node.clientWidth && getComputedStyle(node).textOverflow)
+  expect(cut).toBe('ellipsis')
+})
+
+for (const direction of ['ltr', 'rtl'])
+  test(`align end and center place the header and the cells at the inline end and in the middle (${direction})`, { tag: ['@layout'] }, async ({
+    page,
+  }) => {
+    await render(page, {
+      columns: [
+        { id: 'name', header: 'Name' },
+        { id: 'score', header: 'Score', align: 'end', sortable: true, width: 120 },
+        { id: 'status', header: 'Status', align: 'center', width: 120 },
+      ],
+      rows: people.rows,
+    }, { direction, fresh: true })
+    /** Space between the content of `selector` and the start and end of its cell's content box. */
+    const gaps = (selector: string) =>
+      page.locator(selector).evaluate((node, rtl) => {
+        const slot = node.closest('.uf-table__cellSlot')!
+        const box = slot.getBoundingClientRect()
+        const style = getComputedStyle(slot)
+        const range = document.createRange()
+        range.selectNodeContents(node)
+        const content = range.getBoundingClientRect()
+        const left = content.left - box.left - parseFloat(style.paddingLeft)
+        const right = box.right - parseFloat(style.paddingRight) - content.right
+        return rtl ? { start: right, end: left } : { start: left, end: right }
+      }, direction === 'rtl')
+    for (const selector of ['th[data-column="score"] button', 'tbody tr:first-child td[data-column="score"] .uf-text__content']) {
+      const { start, end } = await gaps(selector)
+      expect(Math.abs(end)).toBeLessThanOrEqual(1)
+      expect(start).toBeGreaterThan(40)
+    }
+    for (const selector of ['th[data-column="status"] .uf-text__content', 'tbody tr:first-child td[data-column="status"] .uf-text__content']) {
+      const { start, end } = await gaps(selector)
+      expect(Math.abs(start - end)).toBeLessThanOrEqual(1)
+      expect(start).toBeGreaterThan(20)
+    }
+    const { start } = await gaps('tbody tr:first-child td[data-column="name"] .uf-text__content')
+    expect(Math.abs(start)).toBeLessThanOrEqual(1)
+  })
+
 test('in a wide table a column keeps its width and the columns without one take the room', { tag: ['@layout'] }, async ({
   page,
 }) => {
@@ -285,8 +344,9 @@ test('with onRowClick the rows are one tab stop with a focus ring; arrows move a
   expect(await page.evaluate(() => document.activeElement!.id)).toBe('after')
 })
 
-test('a full table passes axe and names its table, checkboxes and resize handles', { tag: ['@a11y'] }, async ({
+test('a full table passes axe and names its table, column headers, checkboxes and resize handles', { tag: ['@a11y'] }, async ({
   page,
+  browserName,
 }) => {
   await render(
     page,
@@ -297,6 +357,17 @@ test('a full table passes axe and names its table, checkboxes and resize handles
   await expect(page.getByRole('table', { name: 'People' })).toBeVisible()
   await expect(page.getByRole('checkbox', { name: 'Select Alpha' })).toBeVisible()
   await expect(page.getByRole('checkbox', { name: 'Select all rows' })).toBeVisible()
+  // A header is named by its label alone, not by the resize handle inside it.
+  for (const name of ['Name', 'Status', 'Score'])
+    await expect(page.getByRole('columnheader', { name, exact: true })).toBeVisible()
+  if (browserName === 'chromium') {
+    const cdp = await page.context().newCDPSession(page)
+    const { nodes } = await cdp.send('Accessibility.getFullAXTree')
+    const headers = nodes
+      .filter((node: any) => node.role?.value === 'columnheader')
+      .map((node: any) => node.name?.value)
+    expect(headers).toEqual(['Select all rows', '#', 'Name', 'Status', 'Score'])
+  }
   const separator = page.getByRole('separator', { name: 'Resize Name' })
   const width = String(Math.round((await page.locator('th[data-column="name"]').boundingBox())!.width))
   await expect(separator).toHaveAttribute('aria-valuenow', width)

@@ -27,6 +27,8 @@ type Options = {
   box?: { width: number; height?: number }
   wide?: boolean
   rowClick?: boolean
+  /** Ids of the columns whose `render` shows the value as a link. */
+  links?: string[]
 }
 
 function renderTable(props: Omit<TableProps, 'ref'> = {}, options: Options = {}) {
@@ -46,6 +48,11 @@ function renderTable(props: Omit<TableProps, 'ref'> = {}, options: Options = {})
       aria-label="People"
       {...(options.wide ? { columns: wideColumns, rows: wideRows } : {})}
       {...props}
+      columns={(props.columns ?? (options.wide ? wideColumns : undefined))?.map((column) =>
+        options.links?.includes(column.id)
+          ? { ...column, render: ({ value }) => <a href="#">{String(value)}</a> }
+          : column,
+      )}
       onSortChange={(details) => events.push(details)}
       onSelectedRowsChange={(details) => events.push(details)}
       onColumnResize={(details) => events.push(details)}

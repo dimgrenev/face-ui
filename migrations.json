@@ -1426,7 +1426,7 @@
       "kind": "behavior",
       "component": "Table",
       "before": "Fixed layout: every cell stayed on one line with an ellipsis, `minWidth` had no effect, and resizing a column resized its neighbour",
-      "after": "A column without `width` sizes to its content and its text wraps; a column with `width` keeps it and wraps its content inside. Add `truncate` for one line with an ellipsis. `minWidth` holds. The first resize fixes every column at its width, so a resize changes only its own column and the table grows or shrinks"
+      "after": "A column without `width` sizes to its content and its text wraps; a column with `width` keeps it and wraps its content inside. Add `truncate` for one line with an ellipsis. `minWidth` holds. The first resize fixes every column at its width, so a resize changes only its own column and the table grows or shrinks. Content that cannot wrap, such as an email or a URL, no longer gets squeezed: in a column without `width` or `truncate` it makes the table as wide as it needs, wider than a narrow screen and the page with it. Give such columns `truncate` or a `width`, or put the table in a container with `overflow-x: auto`"
     },
     {
       "kind": "behavior",
