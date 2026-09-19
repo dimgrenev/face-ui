@@ -232,7 +232,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
               if (open) setPageInput(String(current))
             }}
             title={text.choosePage}
-            closeLabel={text.close}
+            labels={{ close: text.close }}
             placement={compact ? 'bottom' : 'center'}
             width={280}
             className="uf-pagination-pagePicker"

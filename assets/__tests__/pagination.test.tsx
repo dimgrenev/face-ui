@@ -2,7 +2,6 @@ import { act, createRef, useState } from 'react'
 import type { Root } from 'react-dom/client'
 import { beforeEach, expect, it, vi, describe } from 'vitest'
 import { Pagination, type PaginationProps } from '../../Pagination/Pagination'
-import { Modal } from '../../Modal/Modal'
 import { expectDevError, mount } from './harness'
 import { describeControlled } from './harness/controlled'
 
@@ -170,34 +169,6 @@ it('internal labels and native navigation label can be localized independently',
     'Далее',
   )
 })
-
-it.each([false, true])(
-  'Modal respects capture cancellation for open=%s',
-  async (open) => {
-    const change = vi.fn()
-    await act(async () =>
-      root.render(
-        <div onClickCapture={(e) => e.preventDefault()}>
-          <Modal
-            open={open}
-            title="Pages"
-            trigger={<button>Open pages</button>}
-            onOpenChange={change}
-          >
-            Body
-          </Modal>
-        </div>,
-      ),
-    )
-    await act(async () => {
-      const button = open
-        ? document.querySelector<HTMLButtonElement>('.uf-modal-closeButton')
-        : host.querySelector<HTMLButtonElement>('button')
-      button!.click()
-    })
-    expect(change).not.toHaveBeenCalled()
-  },
-)
 
 it('an empty result has one bounded page and no available navigation action', async () => {
   const callback = vi.fn()
@@ -450,48 +421,13 @@ it('labels.choosePage names the picker button and titles its dialog', async () =
   expect(
     host.querySelector('.uf-pagination-more')?.getAttribute('aria-label'),
   ).toBe('Выбор страницы')
+  await act(async () => host.querySelector<HTMLButtonElement>('.uf-pagination-more')!.click())
   expect(
     document.querySelector('.uf-pagination-pagePicker .uf-modal-title')
       ?.textContent,
   ).toBe('Выбор страницы')
 })
 
-it.each([undefined, 'Закрыть', ' '])(
-  'Modal closeLabel=%s names its actual close control',
-  async (closeLabel) => {
-    const change = vi.fn()
-    await act(async () =>
-      root.render(
-        <Modal open title="Pages" closeLabel={closeLabel} onOpenChange={change}>
-          Body
-        </Modal>,
-      ),
-    )
-    const close = document.querySelector<HTMLButtonElement>(
-      '.uf-modal-closeButton',
-    )!
-    const expected = closeLabel?.trim() || 'Close modal'
-    expect(close.getAttribute('aria-label')).toBe(expected)
-    expect(close.title).toBe(expected)
-    await act(async () => close.click())
-    expect(change).toHaveBeenCalledExactlyOnceWith({ open: false })
-  },
-)
-
-it('Modal keeps its default close name for a non-string close label and reports it', async () => {
-  await expectDevError(
-    () =>
-      act(async () =>
-        root.render(<Modal open title="Pages" closeLabel={false as never} />),
-      ),
-    /^Face UI Modal: invalid closeLabel false; using "Close modal"\.$/,
-  )
-  expect(
-    document
-      .querySelector('.uf-modal-closeButton')
-      ?.getAttribute('aria-label'),
-  ).toBe('Close modal')
-})
 
 describe('component smoke', () => {
   let container: HTMLDivElement
@@ -512,6 +448,9 @@ describe('component smoke', () => {
     const currentPage = container.querySelector(
       '.uf-pagination-page[aria-current="page"]',
     ) as HTMLElement | null
+    await act(async () =>
+      container.querySelector<HTMLButtonElement>('.uf-pagination-more')!.click(),
+    )
     const pagePicker = document.querySelector('.uf-pagination-pagePicker')
     const pagePickerInput = pagePicker?.querySelector(
       'input[type="number"]',
@@ -526,6 +465,9 @@ describe('component smoke', () => {
     expect(pagePicker).not.toBeNull()
     expect(pagePickerInput).not.toBeNull()
     expect(pagePickerInput?.max).toBe('10')
+    await act(async () =>
+      document.querySelector<HTMLButtonElement>('[data-scope="modal"][data-part="close"]')!.click(),
+    )
 
     await act(async () => {
       nextButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))

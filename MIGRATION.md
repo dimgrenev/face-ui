@@ -188,7 +188,18 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 
 | Before | After | Codemod |
 | --- | --- | --- |
-| `scrollLock` defaulted to `false` | `scrollLock` defaults to `portal`: a portaled modal locks page scroll unless `scrollLock={false}` | — |
+| `closeLabel` | `labels.close` | auto |
+| `closeOnOverlayClick` | `closeOnBackdropClick` | auto |
+| `placement="left"`, `placement="right"` | `placement="start"`, `placement="end"` | auto |
+| `autoFocusOnOpen` | Nothing: opening always moves focus inside, to focus a child already took, else `[data-autofocus]`, else the first control; `portal={false}` previews never take focus | auto |
+| `actions` | `footer` with Button elements, e.g. `footer={<><Button variant="outline" onClick={cancel}>Cancel</Button><Button variant="accent" onClick={save}>Save</Button></>}`; the last button is no longer made accent for you | manual |
+| `ModalAction` | Button props in `footer` | manual |
+| The close button was named "Close modal" | It is named "Close"; `labels.close` renames it | — |
+| A closed Modal kept its body mounted and hidden, so a child with `autoFocus` never received focus when it opened | The surface mounts when the dialog opens and unmounts after it fades out; child state resets on every opening | — |
+| An open `portal={false}` Modal still held focus and took Escape and outside presses, like a portaled one | An in-place Modal is a static preview: the page, Escape and focus are left alone and `scrollLock` does nothing | — |
+| `edge="flush"` squared and unbordered a centered dialog | `edge` applies to edge placements only; a centered dialog stays inset | — |
+| `placement="left"`/`"right"` sat on the right/left in right-to-left documents | `start`/`end` follow the dialog direction (`dir`, else the document), and the surface slides in from that side | — |
+| A dialog without a title had no accessible name and no warning | An open dialog without `title`, `aria-label` or `aria-labelledby` is reported once in development | — |
 
 ### Overlay
 

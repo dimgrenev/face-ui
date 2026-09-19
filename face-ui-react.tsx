@@ -257,11 +257,7 @@ export default function faceUiReact(props: FeldGalleryProps) {
           const baseSampleProps = ((entry as any)?.sampleProps && typeof (entry as any).sampleProps === 'object')
             ? (entry as any).sampleProps
             : {};
-          const sampleProps = (
-            normalizedName === 'modal' || normalizedName === 'drawer'
-          )
-            ? { ...baseSampleProps, autoFocusOnOpen: false }
-            : baseSampleProps;
+          const sampleProps = baseSampleProps;
           return (
             <div key={card?.id || rawName} className="uf-gallery-item">
               <Text as="div" className="uf-gallery-itemTitle" fullWidth truncate membrane>

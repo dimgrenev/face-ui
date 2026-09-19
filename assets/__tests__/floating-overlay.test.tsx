@@ -883,7 +883,9 @@ it('§5 #5: Tooltip, Popover, Menu, Select and Modal inside <p> hydrate without 
   // Surfaces mount after hydration, in the portal only.
   expect(server.querySelector('[role="tooltip"], [role="dialog"], [role="menu"]')).toBeNull()
   expect(document.querySelectorAll('.uf-overlay-content')).toHaveLength(2)
-  expect(document.querySelectorAll('[role="menu"], .uf-modal')).toHaveLength(2)
+  expect(document.querySelectorAll('[role="menu"]')).toHaveLength(1)
+  // A closed Modal mounts no surface at all.
+  expect(document.querySelector('.uf-modal')).toBeNull()
 })
 
 const shownIn = () => {

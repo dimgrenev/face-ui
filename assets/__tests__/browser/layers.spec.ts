@@ -30,7 +30,7 @@ test.describe('shared modal focus boundary', { tag: ['@focus', '@react'] }, () =
         .focus()
       await renderLayers(page, { open: true, state })
       await expect(
-        modal(page).getByRole('button', { name: 'Close modal', exact: true }),
+        modal(page).getByRole('button', { name: 'Close', exact: true }),
       ).toBeFocused()
     })
   }
@@ -67,27 +67,6 @@ test.describe('shared modal focus boundary', { tag: ['@focus', '@react'] }, () =
     })
     await expect(heading).toBeFocused()
   })
-  test('does not activate autofocus=false on updates, but recovers after the user enters', async ({
-    page,
-  }) => {
-    await renderLayers(page, { open: false, autoFocus: false })
-    await page.locator('#outside').focus()
-    await renderLayers(page, { open: true, autoFocus: false })
-    await renderLayers(page, { open: true, autoFocus: false, state: 'removed' })
-    expect(
-      await modal(page).evaluate((node) =>
-        node.contains(document.activeElement),
-      ),
-    ).toBe(false)
-    await renderLayers(page, { open: true, autoFocus: false })
-    await modal(page)
-      .getByRole('button', { name: 'Target', exact: true })
-      .focus()
-    await renderLayers(page, { open: true, autoFocus: false, state: 'removed' })
-    await expect(
-      modal(page).getByRole('button', { name: 'Close modal', exact: true }),
-    ).toBeFocused()
-  })
   test('recovers in the top modal and preserves its normal close and parent return', async ({
     page,
   }) => {
@@ -101,7 +80,7 @@ test.describe('shared modal focus boundary', { tag: ['@focus', '@react'] }, () =
       .focus()
     await renderLayers(page, { childState: 'removed' })
     await expect(
-      child.getByRole('button', { name: 'Close modal', exact: true }),
+      child.getByRole('button', { name: 'Close', exact: true }),
     ).toBeFocused()
     await page.keyboard.press('Escape')
     await expect(child).toHaveCount(0)
@@ -148,14 +127,14 @@ test.describe('shared modal focus boundary', { tag: ['@focus', '@react'] }, () =
   test('remembers a child that focused itself before the layer registered', async ({
     page,
   }) => {
-    const props = { open: true, autoFocus: false, childAutoFocus: true }
+    const props = { open: true, childAutoFocus: true }
     await renderLayers(page, props)
     await expect(
       modal(page).getByRole('button', { name: 'Target', exact: true }),
     ).toBeFocused()
     await renderLayers(page, { ...props, state: 'removed' })
     await expect(
-      modal(page).getByRole('button', { name: 'Close modal', exact: true }),
+      modal(page).getByRole('button', { name: 'Close', exact: true }),
     ).toBeFocused()
   })
   test('respects an explicit replacement focus and a deliberate blur of a surviving control', async ({

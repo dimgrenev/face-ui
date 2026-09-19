@@ -425,31 +425,11 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
     ],
   },
   Modal: {
-    omitProps: ['disabled', 'label'],
     patchProps: {
-      placement: {
-        type: 'enum',
+      footer: {
+        type: 'ReactNode',
         required: false,
-        default: 'center',
-        options: ['center', 'left', 'right', 'top', 'bottom'],
-      },
-      edge: {
-        type: 'enum',
-        required: false,
-        default: 'inset',
-        options: ['inset', 'flush'],
-      },
-      width: {
-        type: 'number',
-        required: false,
-      },
-      height: {
-        type: 'number',
-        required: false,
-      },
-      actions: {
-        type: 'array',
-        required: false,
+        controlType: 'object',
       },
     },
     patchStates: () => [
@@ -458,31 +438,28 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
         props: {
           open: true,
           portal: false,
-          autoFocusOnOpen: false,
           placement: 'center',
-          edge: 'inset',
           title: 'Modal',
           description: 'Focused work surface',
           children: 'Review the workspace details before creating it.',
-          actions: [
-            { label: 'Cancel', variant: 'outline' },
-            { label: 'Create', variant: 'accent' },
+          footer: [
+            { __componentName__: 'Button', variant: 'outline', children: 'Cancel' },
+            { __componentName__: 'Button', variant: 'accent', children: 'Create' },
           ],
         },
       },
       {
-        name: 'Right edge workspace',
+        name: 'End edge workspace',
         props: {
           open: true,
           portal: false,
-          autoFocusOnOpen: false,
-          placement: 'right',
+          placement: 'end',
           edge: 'flush',
           width: 420,
           title: 'Customer details',
           description: 'Account health and recent activity',
           children: 'Plan: Enterprise. Last active 12 minutes ago.',
-          actions: [{ label: 'Edit customer', variant: 'accent' }],
+          footer: { __componentName__: 'Button', variant: 'accent', children: 'Edit customer' },
         },
       },
     ],

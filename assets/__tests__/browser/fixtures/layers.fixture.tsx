@@ -48,7 +48,6 @@ type ActionState =
   | 'style'
 type Options = {
   open?: boolean
-  autoFocus?: boolean
   empty?: boolean
   state?: ActionState
   childAutoFocus?: boolean
@@ -62,7 +61,6 @@ function Fixture(props: Options) {
       <button id="outside">Outside</button>
       <Modal
         open={props.open}
-        autoFocusOnOpen={props.autoFocus !== false}
         scrollLock
         title="Parent"
         closable={!props.empty}

@@ -751,13 +751,13 @@ describe('taxonomy and governance', () => {
           <Modal open portal={false} title="Bottom" placement="bottom">
             Content
           </Modal>
-          <Modal open portal={false} title="Left" placement="left" edge="flush">
+          <Modal open portal={false} title="Start" placement="start" edge="flush">
             Content
           </Modal>
           <Modal open portal={false} title="Top" placement="top">
             Content
           </Modal>
-          <Modal open portal={false} title="Right" placement="right">
+          <Modal open portal={false} title="End" placement="end">
             Content
           </Modal>
         </div>,
@@ -779,7 +779,7 @@ describe('taxonomy and governance', () => {
     expect(
       positioners[0]?.classList.contains('uf-modal-positioner--edge-inset'),
     ).toBe(true)
-    expect(modals[1]?.getAttribute('data-variant')).toBe('left')
+    expect(modals[1]?.getAttribute('data-variant')).toBe('start')
     expect(modals[1]?.getAttribute('data-edge')).toBe('flush')
     expect(modals[1]?.classList.contains('uf-modal--edge-flush')).toBe(true)
     expect(
@@ -787,7 +787,7 @@ describe('taxonomy and governance', () => {
     ).toBe(true)
     expect(modals[2]?.getAttribute('data-variant')).toBe('top')
     expect(modals[2]?.classList.contains('uf-modal--edge-inset')).toBe(true)
-    expect(modals[3]?.getAttribute('data-variant')).toBe('right')
+    expect(modals[3]?.getAttribute('data-variant')).toBe('end')
     expect(modals[3]?.classList.contains('uf-modal--edge-inset')).toBe(true)
     expect(modals[0]?.getAttribute('data-border')).toBe('true')
     expect(modals[1]?.getAttribute('data-border')).toBe('false')
@@ -798,13 +798,11 @@ describe('taxonomy and governance', () => {
     expect(modals[2]?.getAttribute('data-radius')).toBe('lg')
     expect(modals[3]?.getAttribute('data-radius')).toBe('lg')
     expect(componentsCss).toContain(
-      '.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="top"]',
+      '.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset:not([data-variant="center"])',
     )
+    expect(componentsCss).toContain('.uf-modal[data-scope].uf-modal--edge-flush {')
     expect(componentsCss).toContain(
-      '.uf-modal[data-scope].uf-modal--edge-flush:is([data-variant="top"], [data-variant="bottom"])',
-    )
-    expect(componentsCss).toContain(
-      '.uf-modal[data-scope].uf-modal--edge-inset:is([data-variant="top"], [data-variant="bottom"])',
+      '.uf-modal[data-scope].uf-modal--edge-inset:not([data-variant="center"])',
     )
   })
 
