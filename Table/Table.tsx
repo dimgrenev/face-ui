@@ -50,7 +50,7 @@ export interface TableColumn<T = any> {
   minWidth?: number
   /** Inline alignment of the header and the cells, following text direction; `end` suits numbers. */
   align?: 'start' | 'center' | 'end'
-  /** Keeps the cells on one line, whether `render` returns text or elements such as a link, cut with an ellipsis, so the column can narrow to its header; a text cell shows its full text as a tooltip. */
+  /** Keeps the cells on one line, cut with an ellipsis, so the column can narrow to its header. Any content is kept whole: an element with a layout of its own, a link or a Badge, shrinks with the cell and the text inside it carries the ellipsis. A text cell shows its full text as a tooltip. Every box in the cell clips what leaves it, so ink a control paints outside itself — a focus ring, a dot — is cut; put controls in a column without `truncate`. */
   truncate?: boolean
   /** Cell content built from the value; without it a text or number value shows as text, and any other value (a date, a boolean) needs `render`. */
   render?: (details: TableCellDetails<T>) => ReactNode

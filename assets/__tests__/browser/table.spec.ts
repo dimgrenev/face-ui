@@ -117,25 +117,119 @@ test('at 360px a width holds and wraps its content, minWidth holds, truncate cut
   expect(await lines(page, 'td[data-column="note"] .uf-text__content')).toBeGreaterThan(1)
 })
 
-test('truncate keeps element content on one line too, cut with an ellipsis, at 360px', { tag: ['@layout'] }, async ({
-  page,
-}) => {
-  const long = 'A very long link text that cannot fit on a phone screen at all'
-  await render(page, {
-    columns: [
-      { id: 'name', header: 'Name', truncate: true },
-      { id: 'note', header: 'Note' },
-    ],
-    rows: [{ id: 'a', name: long, note: 'Short note' }],
-  }, { fresh: true, links: ['name'] })
-  expect(await widthOf(page, 'table')).toBeLessThanOrEqual(328)
-  const link = 'td[data-column="name"] a'
-  expect(await lines(page, link)).toBe(1)
-  const cut = await page
-    .locator(link)
-    .evaluate((node) => node.scrollWidth > node.clientWidth && getComputedStyle(node).textOverflow)
-  expect(cut).toBe('ellipsis')
-})
+/**
+ * What a cell does with content too wide for it: how many lines its text takes,
+ * where that text begins, which boxes are cut with nothing to show for it, and
+ * which boxes stick out of the cell. A name is reported for each box, so a
+ * failure says what was cut.
+ */
+const cutting = (page: Page, column: string) =>
+  page.locator(`td[data-column="${column}"]`).evaluate((cell) => {
+    const name = (node: Element) =>
+      `${node.localName}${node.classList[0] ? `.${node.classList[0]}` : ''}`
+    const slot = cell.querySelector('.uf-table__cellSlot')!
+    const pad = getComputedStyle(slot)
+    const box = slot.getBoundingClientRect()
+    const inside = {
+      left: box.left + parseFloat(pad.paddingLeft) - 1,
+      right: box.right - parseFloat(pad.paddingRight) + 1,
+    }
+    // The slot clips the cell's content; its descendants are the content.
+    const cut = [slot, ...slot.querySelectorAll('*')].filter(
+      (node) => node.scrollWidth > node.clientWidth + 1,
+    )
+    /** Whether this box replaces what it cuts with an ellipsis, as painted. */
+    const ellipses = (node: Element) => {
+      const style = getComputedStyle(node)
+      return (
+        style.textOverflow === 'ellipsis' &&
+        // `text-overflow` applies to block containers only.
+        ['block', 'inline-block', 'flow-root', 'list-item', 'table-cell'].includes(style.display)
+      )
+    }
+    const boxes = [...slot.querySelectorAll('*')].filter(
+      // A box of its own: a transparent wrapper (display: contents) has none.
+      (node) => getComputedStyle(node).display !== 'contents',
+    )
+    // The deepest element holding the text is the one whose line count matters:
+    // the boxes around it have their own height.
+    const holder = boxes.findLast((node) =>
+      [...node.childNodes].some((child) => child.nodeType === 3 && child.textContent!.trim()),
+    )
+    const rects = holder ? (() => {
+      const range = document.createRange()
+      range.selectNodeContents(holder)
+      return [...range.getClientRects()]
+    })() : []
+    const first = boxes[0]?.getBoundingClientRect()
+    return {
+      lines: new Set(rects.map((rect) => Math.round(rect.top))).size,
+      // Where the content begins, from the inline start of the cell's content
+      // box: the cut belongs at the inline end, in both directions.
+      start: first
+        ? Math.round(
+            getComputedStyle(cell).direction === 'rtl'
+              ? inside.right - 1 - first.right
+              : first.left - inside.left - 1,
+          )
+        : null,
+      // Overflow cut off with nothing to show for it: `text-overflow` replaces
+      // what a block container cuts, and nothing else, so a flex or grid box
+      // that cuts its own content cuts it bluntly whatever it asks for.
+      bluntlyCut: cut.filter((node) => !ellipses(node)).map(name),
+      // A box reaching past the cell: the part outside it is cut, border included.
+      outside: boxes
+        .filter((node) => {
+          const rect = node.getBoundingClientRect()
+          return rect.width > 0 && (rect.left < inside.left || rect.right > inside.right)
+        })
+        .map(name),
+    }
+  })
+
+/**
+ * Whether the cell paints an ellipsis: the cell as it is, against the same cell
+ * with nothing allowed to replace what it cuts. `text-overflow` changes no
+ * layout, so the two differ only where the ellipsis is drawn.
+ */
+const paintsEllipsis = async (page: Page, column: string) => {
+  const slot = page.locator(`td[data-column="${column}"] .uf-table__cellSlot`)
+  const shown = await slot.screenshot()
+  await page.evaluate(() => {
+    const style = document.createElement('style')
+    style.id = 'no-ellipsis'
+    style.textContent = '.uf-table__cellSlot, .uf-table__cellSlot * { text-overflow: clip !important }'
+    document.head.append(style)
+  })
+  const clipped = await slot.screenshot()
+  await page.evaluate(() => document.getElementById('no-ellipsis')!.remove())
+  return !shown.equals(clipped)
+}
+
+const longValue = 'A very long value that cannot fit on a phone screen at all'
+/** Plain text, then the same text inside each kind of element a cell may hold. */
+const shownAs = [undefined, 'text', 'badge', 'link', 'textAccessor'] as const
+for (const direction of ['ltr', 'rtl'])
+  for (const shows of shownAs)
+    test(`truncate cuts ${shows ?? 'plain text'} on one line with an ellipsis, whole, at 360px (${direction})`, { tag: ['@layout'] }, async ({
+      page,
+    }) => {
+      await render(page, {
+        columns: [
+          { id: 'value', header: 'Value', truncate: true },
+          { id: 'note', header: 'Note' },
+        ],
+        rows: [{ id: 'a', value: longValue, note: 'Short note' }],
+      }, { fresh: true, direction, shows: shows ? { value: shows } : undefined })
+      expect(await widthOf(page, 'table')).toBeLessThanOrEqual(328)
+      expect(await cutting(page, 'value')).toEqual({
+        lines: 1,
+        start: 0,
+        bluntlyCut: [],
+        outside: [],
+      })
+      expect(await paintsEllipsis(page, 'value')).toBe(true)
+    })
 
 for (const direction of ['ltr', 'rtl'])
   test(`align end and center place the header and the cells at the inline end and in the middle (${direction})`, { tag: ['@layout'] }, async ({
