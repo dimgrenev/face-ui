@@ -18,7 +18,7 @@ if (name === 'Calendar' && new URLSearchParams(location.search).has('range'))
 if (name === 'Modal') Object.assign(props, { open: true })
 if (name === 'Command') Object.assign(props, { open: true })
 if (name === 'Markdown')
-  props.content =
+  props.children =
     '# Markdown\n\n- [x] Complete\n\n[Documentation](https://example.com)'
 if (name === 'Radio' || name === 'Select') props['aria-label'] = name
 if (name === 'Input') props.label = 'Input'

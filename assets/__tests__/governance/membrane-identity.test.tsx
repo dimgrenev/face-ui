@@ -122,7 +122,7 @@ const cases: [string, (membrane: boolean) => React.ReactNode, string][] = [
   ],
   [
     'Markdown',
-    (membrane) => <Markdown membrane={membrane} content="[Help](#help)" />,
+    (membrane) => <Markdown membrane={membrane}>[Help](#help)</Markdown>,
     'a',
   ],
   [

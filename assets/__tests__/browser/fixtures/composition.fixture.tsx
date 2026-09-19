@@ -271,11 +271,9 @@ function Fixture() {
         <Button>Slide two</Button>
         <Button>Slide three</Button>
       </Carousel>
-      <Markdown
-        content={
-          '# Markdown heading\n\n- [x] Complete\n\n[Link](https://example.com)'
-        }
-      />
+      <Markdown>
+        {'# Markdown heading\n\n- [x] Complete\n\n[Link](https://example.com)'}
+      </Markdown>
       <Modal trigger="Open parent" title="Parent">
         <Input label="Inside parent" />
         <Popover

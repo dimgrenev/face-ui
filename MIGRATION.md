@@ -217,6 +217,21 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Label, help, error and required marker were `.uf-input__description`, `.uf-input__error`, `.uf-input__required` and `[data-scope="input"][data-part="label"]` | They are the shared Field parts `.uf-field__label`, `.uf-field__description`, `.uf-field__error` and `.uf-field__required` (`[data-scope="field"]`) | — |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the native input or textarea; `className` and `style` still style the outer layout | — |
 
+### Markdown
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `content` | children | auto |
+| `allowRawHtml` | `html` | auto |
+| `safeMode` | Remove it: sanitization is always on, and `html` alone decides whether raw HTML renders (`safeMode={false}` without `allowRawHtml` changed nothing) | auto |
+| `fullWidth` | Remove it: Markdown always fills its container; `fullWidth={false}` narrowed it only inside a membrane | auto |
+| Markdown had the 1px outer spacing box of `membrane` by default | Block content has none by default, like Table and Media; pass `membrane` to keep it | — |
+| Without `allowRawHtml`, a raw HTML block vanished with its text and inline tags were dropped; with it, `safeMode` chose between Markdown tags only and a wider set | Without `html`, raw HTML shows as the text it was typed as; with `html` it renders through one allowlist of text and block tags (details, kbd, sup, div, …), never scripts, styles, forms, frames, ids or classes | — |
+| `linkTarget` applied to every link not starting with `/` or `#` (a relative `docs/x` opened in a new tab, `//host` in place), and `linkRel` only to links opening in a new tab | `linkTarget` and `linkRel` apply to links to other sites: http(s) and protocol-relative URLs. `linkRel` (default `noopener noreferrer`) applies whatever the target; a link that opens in place has no `target` | — |
+| A task checkbox was named "Completed task" or "Incomplete task" | A task checkbox and its text share a `<label>`, so the checkbox is named by its task and announces its own checked state | — |
+| The HTML sat in an inner `[data-part="content"]` element, and the root carried `data-full-width` | The root holds the HTML itself; there is no content part and no `data-full-width` | — |
+| Table cells were always left-aligned, overriding GFM column alignment; lists and quotes were indented from the left and task lists lost their indent | Columns follow their alignment and unaligned cells start at the inline start; lists, quotes and task checkboxes follow the text direction, a task checkbox takes its bullet’s place, and code blocks read left to right | — |
+
 ### Menu
 
 | Before | After | Codemod |

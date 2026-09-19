@@ -115,7 +115,7 @@ const cases = {
     />
   ),
   Markdown: (membrane: boolean) => (
-    <Markdown membrane={membrane} content="[Help](#help)" />
+    <Markdown membrane={membrane}>[Help](#help)</Markdown>
   ),
   Table: (membrane: boolean) => (
     <Table
