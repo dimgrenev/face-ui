@@ -384,39 +384,28 @@ describe('face-ui-react gallery smoke', () => {
     expect(listSegment?.getAttribute('data-state')).toBe('on')
 
     const treeCard = getGalleryCard(container, 'Tree')
-    const treeBranch = treeCard.querySelector(
-      '[data-tree-node-id="src"]',
-    ) as HTMLButtonElement | null
-    expect(
-      treeCard
-        .querySelector('[data-part="branchContent"][data-value="src"]')
-        ?.hasAttribute('hidden'),
-    ).toBe(false)
+    const treeBranch = treeCard.querySelector<HTMLButtonElement>(
+      '[role="treeitem"][data-value="src"]',
+    )
+    expect(treeBranch?.getAttribute('aria-expanded')).toBe('true')
     await act(async () => {
       treeBranch?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
-    expect(
-      treeCard
-        .querySelector('[data-part="branchContent"][data-value="src"]')
-        ?.hasAttribute('hidden'),
-    ).toBe(true)
+    expect(treeBranch?.getAttribute('aria-expanded')).toBe('false')
+    expect(treeCard.querySelector('[role="treeitem"][data-value="index"]')).toBeNull()
 
     await act(async () => {
       treeBranch?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
-    expect(
-      treeCard
-        .querySelector('[data-part="branchContent"][data-value="src"]')
-        ?.hasAttribute('hidden'),
-    ).toBe(false)
+    expect(treeBranch?.getAttribute('aria-expanded')).toBe('true')
 
-    const treeChild = treeCard.querySelector(
-      '[data-tree-node-id="index"]',
-    ) as HTMLButtonElement | null
+    const treeChild = treeCard.querySelector<HTMLButtonElement>(
+      '[role="treeitem"][data-value="index"]',
+    )
     await act(async () => {
       treeChild?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
-    expect(treeChild?.getAttribute('data-selected')).toBe('')
+    expect(treeChild?.getAttribute('aria-selected')).toBe('true')
   })
 
   it('renders the Panel gallery state through the production items API without stealing focus', async () => {

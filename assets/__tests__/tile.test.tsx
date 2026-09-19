@@ -3,7 +3,6 @@ import type { Root } from 'react-dom/client'
 import { beforeEach, expect, it, vi, describe } from 'vitest'
 import { Tile } from '../../Tile/Tile'
 import { Button } from '../../Button/Button'
-import { Tree } from '../../Tree/Tree'
 import { Text } from '../../Text/Text'
 import { expectDevError, libraryCss, mount } from './harness'
 let host: HTMLDivElement
@@ -197,37 +196,6 @@ it('interactive=false suppresses inferred activation and custom roles stay expli
   expect(tile().getAttribute('aria-current')).toBeNull()
 })
 
-it('Tree exposes expansion only on branches for both Tile and Button rows', async () => {
-  await act(async () =>
-    root.render(
-      <Tree
-        defaultExpandedIds={['branch']}
-        items={[
-          {
-            id: 'branch',
-            label: 'Folder',
-            kind: 'tile',
-            children: [
-              { id: 'tile-leaf', kind: 'tile', label: 'Tile leaf' },
-              { id: 'button-leaf', kind: 'button', label: 'Button leaf' },
-            ],
-          },
-        ]}
-      />,
-    ),
-  )
-  expect(
-    host
-      .querySelector('[data-tree-node-id="branch"]')
-      ?.getAttribute('aria-expanded'),
-  ).toBe('true')
-  for (const id of ['tile-leaf', 'button-leaf'])
-    expect(
-      host
-        .querySelector(`[data-tree-node-id="${id}"]`)
-        ?.hasAttribute('aria-expanded'),
-    ).toBe(false)
-})
 it('id identifies the actual primary control for keyboard focus and ARIA references', async () => {
   await render({
     id: 'tab-control',

@@ -455,3 +455,32 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Without `type`, Toggle pressed independent options | Toggle is `SegmentedControl`: without `multiple` it selects one choice, so add `multiple` where `type` was omitted | — |
 | `value`: an array in both modes | A string or `null` without `multiple`, as is `onValueChange`'s `details.value`; an array with it | manual |
 | `defaultValue`: an array in both modes | A string or `null` without `multiple`; an array with it | manual |
+
+### Tree
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `selectedId` | `value` | auto |
+| `defaultSelectedId` | `defaultValue` | auto |
+| `onSelectedChange` | `onValueChange` | auto |
+| `onValueChange`: `details.selectedId` | `details.value` | manual |
+| `expandedIds` | `expanded` | auto |
+| `defaultExpandedIds` | `defaultExpanded` | auto |
+| `onExpandedChange`: `details.expandedIds` | `details.expanded` | manual |
+| `renderNode`: `details` held `node`, `depth`, `hasChildren`, `expanded`, `selected`, `focused` and `activePath`, and the result replaced the whole row | `details` holds `item`, `expanded` and `selected`; the result replaces the icon, label and meta after the arrow | manual |
+| `items[].id` | `items[].value` | manual |
+| `items[].children` | `items[].items` | manual |
+| `items[].rightText` | `items[].meta` | manual |
+| `items[].kind` | Remove it; every row has one look, chosen for the whole tree by `variant`. `kind: "custom"` content goes in `label` | manual |
+| `items[].content` | `items[].label`, which takes rich content | manual |
+| `items[].render` | `renderNode` on the Tree | manual |
+| `items[].actions` | A tree item cannot hold controls; offer row actions from a `Menu openOn="context"` around the Tree and read the row from `data-value` | manual |
+| `TreeNode` | `TreeItem` | auto |
+| Rows were Face UI Buttons or Tiles marked `data-tree-node-id`, and collapsed children stayed in the document, hidden | Rows are `[data-scope="tree"][data-part="item"]` buttons marked `data-value`; nested rows sit in `[data-part="group"]`, which exists only while its item is expanded | — |
+| A click on a branch selected and toggled it, while Enter and Space only selected it; nothing expanded a branch without selecting it | A click, Enter and Space all select the item and toggle a branch; a click on the arrow, Right and Left toggle without selecting | — |
+| Right on a leaf added it to `expandedIds`; Right and Left never moved to a child or parent; typeahead and `*` did nothing; a disabled item trapped the arrows | The APG tree keyboard: Right expands then enters, Left collapses then leaves (swapped in RTL), typeahead, `*` expands the siblings; disabled items are skipped | — |
+| A disabled item was focusable, silently ignored clicks and looked enabled | A disabled item and everything nested in it are disabled buttons: dimmed, skipped by the keyboard, never selected or expanded | — |
+| The root was always named "Tree navigation" and took no native attributes, only `className` | The root is named "Tree" until `aria-label` or `aria-labelledby` names it, and takes native attributes and `ref` | — |
+| The selected item and all its ancestors had the hover background; a controlled selection could not be cleared | Only the selected item is marked (active background, bold); `value={null}` selects nothing | — |
+| A branch showed a down or up chevron at the end of its row | A branch shows an arrow at the start that points to the inline end and turns down when expanded | — |
+| With the selected item inside a collapsed branch, Tab could not enter the tree | Tab enters at the selected item, or at the collapsed item that holds it | — |

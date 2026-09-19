@@ -1902,6 +1902,171 @@
       "before": "an array in both modes",
       "after": "A string or `null` without `multiple`; an array with it",
       "codemod": "manual"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tree",
+      "from": "selectedId",
+      "to": "value",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tree",
+      "from": "defaultSelectedId",
+      "to": "defaultValue",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tree",
+      "from": "onSelectedChange",
+      "to": "onValueChange",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Tree",
+      "prop": "onValueChange",
+      "before": "`details.selectedId`",
+      "after": "`details.value`",
+      "codemod": "manual",
+      "legacy": "\\bselectedId\\b"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tree",
+      "from": "expandedIds",
+      "to": "expanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tree",
+      "from": "defaultExpandedIds",
+      "to": "defaultExpanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Tree",
+      "prop": "onExpandedChange",
+      "before": "`details.expandedIds`",
+      "after": "`details.expanded`",
+      "codemod": "manual",
+      "legacy": "\\bexpandedIds\\b"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Tree",
+      "prop": "renderNode",
+      "before": "`details` held `node`, `depth`, `hasChildren`, `expanded`, `selected`, `focused` and `activePath`, and the result replaced the whole row",
+      "after": "`details` holds `item`, `expanded` and `selected`; the result replaces the icon, label and meta after the arrow",
+      "codemod": "manual",
+      "legacy": "\\b(depth|hasChildren|activePath)\\b"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].id",
+      "use": "`items[].value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].children",
+      "use": "`items[].items`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].rightText",
+      "use": "`items[].meta`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].kind",
+      "use": "Remove it; every row has one look, chosen for the whole tree by `variant`. `kind: \"custom\"` content goes in `label`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].content",
+      "use": "`items[].label`, which takes rich content",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].render",
+      "use": "`renderNode` on the Tree",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].actions",
+      "use": "A tree item cannot hold controls; offer row actions from a `Menu openOn=\"context\"` around the Tree and read the row from `data-value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "TreeNode",
+      "to": "TreeItem",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "Rows were Face UI Buttons or Tiles marked `data-tree-node-id`, and collapsed children stayed in the document, hidden",
+      "after": "Rows are `[data-scope=\"tree\"][data-part=\"item\"]` buttons marked `data-value`; nested rows sit in `[data-part=\"group\"]`, which exists only while its item is expanded"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "A click on a branch selected and toggled it, while Enter and Space only selected it; nothing expanded a branch without selecting it",
+      "after": "A click, Enter and Space all select the item and toggle a branch; a click on the arrow, Right and Left toggle without selecting"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "Right on a leaf added it to `expandedIds`; Right and Left never moved to a child or parent; typeahead and `*` did nothing; a disabled item trapped the arrows",
+      "after": "The APG tree keyboard: Right expands then enters, Left collapses then leaves (swapped in RTL), typeahead, `*` expands the siblings; disabled items are skipped"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "A disabled item was focusable, silently ignored clicks and looked enabled",
+      "after": "A disabled item and everything nested in it are disabled buttons: dimmed, skipped by the keyboard, never selected or expanded"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "The root was always named \"Tree navigation\" and took no native attributes, only `className`",
+      "after": "The root is named \"Tree\" until `aria-label` or `aria-labelledby` names it, and takes native attributes and `ref`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "The selected item and all its ancestors had the hover background; a controlled selection could not be cleared",
+      "after": "Only the selected item is marked (active background, bold); `value={null}` selects nothing"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "A branch showed a down or up chevron at the end of its row",
+      "after": "A branch shows an arrow at the start that points to the inline end and turns down when expanded"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "With the selected item inside a collapsed branch, Tab could not enter the tree",
+      "after": "Tab enters at the selected item, or at the collapsed item that holds it"
     }
   ]
 }

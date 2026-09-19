@@ -314,7 +314,7 @@ describe('taxonomy and governance', () => {
       '.uf-breadcrumb-label[data-scope]',
       '.uf-sidebar-item',
       '[data-scope="navigation"] [data-part="trigger"],\n[data-scope="navigation"] [data-part="link"]',
-      '.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]),\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]),\n.uf-tree[data-scope] .uf-tree-custom-node',
+      '.uf-tree-item[data-scope]',
     ]
 
     for (const selector of controlSelectors) {
@@ -500,7 +500,7 @@ describe('taxonomy and governance', () => {
       '.uf-breadcrumb-label.uf-control:hover',
       '.uf-sidebar-item:hover',
       '[data-scope="navigation"] [data-part="trigger"]:hover,\n[data-scope="navigation"] [data-part="link"]:hover',
-      '.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]):hover,\n.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]):hover,\n.uf-tree[data-scope] .uf-tree-custom-node:hover',
+      '.uf-tree-item[data-scope]:hover',
     ]
     const hoverBackgroundPattern =
       /background:\s*var\(--uf-(?:color-hover-bg|button-hover-bg|tile-hover-bg)\);/

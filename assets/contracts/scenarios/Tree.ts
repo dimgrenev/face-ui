@@ -4,67 +4,60 @@ export default [
   {
     name: 'Product / Repository Explorer',
     props: {
-      defaultExpandedIds: ['src', 'components'],
-      defaultSelectedId: 'agent',
+      'aria-label': 'Repository files',
+      variant: 'lines',
+      defaultExpanded: ['src', 'components'],
+      defaultValue: 'agent',
       items: [
         {
-          id: 'src',
+          value: 'src',
           label: 'src',
           icon: 'folder',
-          children: [
+          items: [
             {
-              id: 'components',
+              value: 'components',
               label: 'components',
               icon: 'folder',
-              kind: 'tile',
-              children: [
-                { id: 'agent', label: 'AgentPanel.tsx', icon: 'file' },
-                { id: 'chat', label: 'ChatComposer.tsx', icon: 'file' },
+              items: [
+                { value: 'agent', label: 'AgentPanel.tsx', icon: 'file', meta: 'M' },
+                { value: 'chat', label: 'ChatComposer.tsx', icon: 'file' },
               ],
             },
-            { id: 'app', label: 'App.tsx', icon: 'file' },
+            { value: 'app', label: 'App.tsx', icon: 'file' },
           ],
         },
-        { id: 'readme', label: 'README.md', icon: 'file' },
+        { value: 'readme', label: 'README.md', icon: 'file' },
       ],
     },
   },
   {
     name: 'Product / Knowledge Base',
     props: {
-      defaultExpandedIds: ['company', 'engineering'],
-      defaultSelectedId: 'runbooks',
+      'aria-label': 'Knowledge base',
+      defaultExpanded: ['company', 'engineering'],
+      defaultValue: 'runbooks',
       items: [
         {
-          id: 'company',
+          value: 'company',
           label: 'Company wiki',
           icon: 'folder',
-          kind: 'tile',
-          children: [
+          items: [
             {
-              id: 'policies',
+              value: 'policies',
               label: 'Policies',
               icon: 'folder',
-              children: [
-                {
-                  id: 'security-policy',
-                  label: 'Security policy',
-                  icon: 'file',
-                },
+              items: [
+                { value: 'security-policy', label: 'Security policy', icon: 'file' },
               ],
             },
             {
-              id: 'engineering',
+              value: 'engineering',
               label: 'Engineering',
               icon: 'folder',
-              children: [
-                {
-                  id: 'runbooks',
-                  label: 'Runbooks',
-                  icon: 'file',
-                  rightText: '8',
-                },
-                { id: 'architecture', label: 'Architecture', icon: 'file' },
+              items: [
+                { value: 'runbooks', label: 'Runbooks', icon: 'file', meta: '8' },
+                { value: 'architecture', label: 'Architecture', icon: 'file' },
+                { value: 'archive', label: 'Archive', icon: 'folder', disabled: true, items: [{ value: 'old', label: '2019' }] },
               ],
             },
           ],
