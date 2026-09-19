@@ -3,22 +3,45 @@
   "schema-version": 1,
   "name": "SegmentedControl",
   "props": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
+    },
     "items": {
       "type": "array",
       "required": false,
-      "description": "Choices in visual, keyboard and form order; missing items render an empty group.",
-      "default": []
+      "description": "Choices in visual, keyboard and form order; an item with a missing or repeated `value` is skipped."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable every control and exclude the group from FormData.",
+      "description": "Disables every choice and leaves the value out of FormData.",
       "default": false
     },
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Visual axis; single radio mode supports both arrow pairs.",
+      "description": "Lays the choices out in a row or a column; without `multiple`, all four arrow keys move between choices.",
       "options": [
         "horizontal",
         "vertical"
@@ -28,50 +51,56 @@
     "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Accessible group name when there is no visible heading."
+      "description": "Names the group when there is no visible label."
     },
     "aria-labelledby": {
       "type": "string",
       "required": false,
-      "description": "Visible heading IDs that name this group."
+      "description": "Ids of visible elements that name the group; they take precedence over `label`."
     },
     "name": {
       "type": "string",
       "required": false,
-      "description": "Native FormData key; multiple selections produce repeated entries."
+      "description": "FormData key; a multiple value submits one entry per choice."
     },
     "form": {
       "type": "string",
       "required": false,
-      "description": "ID of an external form that owns the selection."
+      "description": "Id of the form that submits and resets the value, when it is not an ancestor."
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Blocks form submission until a choice is selected and marks the group required; a group with no enabled choice never blocks.",
+      "default": false
     },
     "autoFocus": {
       "type": "boolean",
       "required": false,
-      "description": "Focus the selected enabled choice, or the first enabled choice, on mount.",
+      "description": "Focuses the selected enabled choice, or the first enabled one, on mount.",
       "default": false
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Shared outer spacing around each item; toggling preserves DOM and focus.",
+      "description": "Shared outer spacing around each choice; toggling it keeps DOM and focus.",
       "default": true
     },
     "multiple": {
       "type": "boolean",
       "required": false,
-      "description": "False selects one item without clearing on reselect; true toggles independent options.",
+      "description": "Lets the user press any number of choices, and makes the value a `string[]` instead of `string | null`.",
       "default": false
     },
     "value": {
       "type": "any",
       "required": false,
-      "description": "Controlled selection: string/null for single, readonly string[] for multiple. Unknown keys are omitted."
+      "description": "Selected key, or keys with `multiple`; keys missing from `items` select nothing until they appear."
     },
     "defaultValue": {
       "type": "any",
       "required": false,
-      "description": "Initial selection, restored on form reset: string/null for single, readonly string[] for multiple."
+      "description": "Selection on mount, restored by form reset; same shape as `value`."
     }
   },
   "states": [
@@ -135,7 +164,7 @@
       }
     }
   ],
-  "description": "Compact single-choice radio strip or a group of independently pressed options",
+  "description": "Compact choice strip: one radio choice, or independently pressed options with `multiple`.",
   "behavior": {
     "rovingFocus": true
   },
@@ -167,22 +196,29 @@
   },
   "aria": {
     "role": "radiogroup",
-    "required": [
-      "aria-label"
+    "notes": [
+      "Name the group with label, aria-label or aria-labelledby; description and error describe every choice.",
+      "Without multiple the root is a radiogroup of radio buttons (aria-checked); required sets aria-required on it and the visible marker is hidden from assistive technology.",
+      "With multiple the root is a group of toggle buttons (aria-pressed)."
     ]
   },
   "composition": {
     "required": [
       "root",
+      "list",
       "item"
     ],
     "parts": {
       "root": {
         "slot": "root"
       },
+      "list": {
+        "slot": "list",
+        "parent": "root"
+      },
       "item": {
         "slot": "item",
-        "parent": "root",
+        "parent": "list",
         "multiple": true
       }
     }
@@ -205,6 +241,7 @@
     ],
     "notes": [
       "One implementation owns SegmentedControl and compatibility Toggle.",
+      "The root is a field (label, strip, description, error); the strip list draws the border and keeps its natural width.",
       "Shared Membrane owns item spacing; orientation changes layout and multiple changes selection semantics.",
       "Selection uses fill and a stable border, without changing text metrics."
     ]
@@ -219,7 +256,6 @@
     "whenNotToUse": [
       "Many or dynamically searched options (use Select)",
       "Navigating content panels (use Tabs)",
-      "Validated required form choices (use Radio or Select)",
       "Binary on/off (use Switcher)"
     ],
     "alternatives": [

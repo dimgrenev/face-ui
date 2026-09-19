@@ -92,7 +92,6 @@ const PENDING_SHARED = {
   classes: [
     'animations.css: .uf-animated is never rendered',
     'base.css: .is-active is never rendered',
-    'components/field.css: .uf-field is never rendered',
   ],
 } satisfies Record<string, readonly string[]>
 

@@ -4,10 +4,9 @@ export default [
   {
     name: 'Product / Editor Mode',
     props: {
-      type: 'single',
       'aria-label': 'Editor mode',
       orientation: 'horizontal',
-      defaultValue: ['visual'],
+      defaultValue: 'visual',
       membrane: true,
       items: [
         { value: 'visual', label: 'Visual' },
@@ -18,7 +17,7 @@ export default [
   {
     name: 'Product / Visible Layers',
     props: {
-      type: 'multiple',
+      multiple: true,
       'aria-label': 'Visible layers',
       orientation: 'horizontal',
       defaultValue: ['grid', 'guides'],

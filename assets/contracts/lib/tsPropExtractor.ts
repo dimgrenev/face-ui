@@ -102,6 +102,9 @@ export function extractComponentDescription(
     const specifier = statement.exportClause.elements.find(
       (element) => element.name.text === componentName,
     )
+    // An alias documented at its export (a compat name) keeps its own description.
+    const own = specifier && readDoc(specifier)
+    if (own) return own
     const target =
       specifier && bundle.resolveImport?.(statement.moduleSpecifier.text)
     if (target)

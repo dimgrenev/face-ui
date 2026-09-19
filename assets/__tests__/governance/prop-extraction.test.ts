@@ -432,4 +432,16 @@ describe('JSDoc as the single description source', () => {
     })
     expect(extractComponentDescription(bundle('Icon.tsx'))).toBe('Renders built-in icons.')
   })
+  it('describes an alias documented at its export specifier by that JSDoc', () => {
+    const files: Record<string, string> = {
+      'Toggle.tsx': `export {\n  /**\n   * Deprecated alias.\n   * @deprecated Use Strip.\n   */\n  Strip as Toggle,\n} from './impl'`,
+      './impl': `/** Choice strip. */\nexport const Strip = () => null`,
+    }
+    const bundle = (name: string): Parameters<typeof extract>[0] => ({
+      fileName: name,
+      code: files[name],
+      resolveImport: (specifier) => (files[specifier] ? bundle(specifier) : undefined),
+    })
+    expect(extractComponentDescription(bundle('Toggle.tsx'))).toBe('Deprecated alias.')
+  })
 })

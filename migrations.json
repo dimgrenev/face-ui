@@ -644,6 +644,30 @@
       "after": "Single selection is a string or `null`; only `multiple` uses an array"
     },
     {
+      "kind": "behavior",
+      "component": "SegmentedControl",
+      "before": "An item without a string `value`, a repeated `value`, or a malformed `items`/`value` threw a TypeError",
+      "after": "The item or key is skipped and a development report names it"
+    },
+    {
+      "kind": "behavior",
+      "component": "SegmentedControl",
+      "before": "A selected choice missing from `items` was discarded, so it stayed unselected when the item returned",
+      "after": "The value is kept and the choice shows as selected again once its item is back; `onValueChange` is not called"
+    },
+    {
+      "kind": "behavior",
+      "component": "SegmentedControl",
+      "before": "The root was the bordered strip of choices",
+      "after": "The root is a field (`uf-field`) with `label`, `description` and `error`; the border is on the `.uf-toggle-list` strip, which keeps its natural width, so a width set on the root no longer stretches it: also give `.uf-toggle-list` `inline-size: 100%`"
+    },
+    {
+      "kind": "behavior",
+      "component": "SegmentedControl",
+      "before": "Removing or disabling the focused choice moved focus to the selected or first choice",
+      "after": "Focus moves to the choice now at its place, else the one before it"
+    },
+    {
       "kind": "rename-prop",
       "component": "Select",
       "from": "ariaLabel",
@@ -1062,6 +1086,39 @@
       "kind": "export",
       "from": "assets/machines/toggle.machine#ToggleSchema",
       "to": "Use `SegmentedControl`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Toggle",
+      "prop": "type",
+      "use": "`multiple` instead of `\"multiple\"`; omit `\"single\"`",
+      "codemod": "auto",
+      "values": {
+        "multiple": "multiple",
+        "single": ""
+      }
+    },
+    {
+      "kind": "behavior",
+      "component": "Toggle",
+      "before": "Without `type`, Toggle pressed independent options",
+      "after": "Toggle is `SegmentedControl`: without `multiple` it selects one choice, so add `multiple` where `type` was omitted"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Toggle",
+      "prop": "value",
+      "before": "an array in both modes",
+      "after": "A string or `null` without `multiple`, as is `onValueChange`'s `details.value`; an array with it",
+      "codemod": "manual"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Toggle",
+      "prop": "defaultValue",
+      "before": "an array in both modes",
+      "after": "A string or `null` without `multiple`; an array with it",
       "codemod": "manual"
     }
   ]

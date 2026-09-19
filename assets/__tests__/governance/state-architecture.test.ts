@@ -167,7 +167,7 @@ const oneImplementation = (component: string) =>
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
   'D2 throw': [
-    'Accordion', 'Breadcrumb', 'Calendar', 'Date', 'Pagination', 'Rating', 'SegmentedControl', 'Slider', 'Steps', 'Toggle',
+    'Accordion', 'Breadcrumb', 'Calendar', 'Date', 'Pagination', 'Rating', 'Slider', 'Steps',
   ],
   'D3 machines': [
     'Accordion', 'Avatar', 'Carousel', 'Checkbox', 'Command', 'Input', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel',
@@ -178,15 +178,15 @@ const PENDING = {
     'Overlay', 'Pagination', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps',
     'Switcher', 'Table', 'Toc', 'Tooltip', 'Tree', 'Upload',
   ],
-  'D3 direction': ['Calendar', 'Date', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider'],
-  'D3 isConnected': ['Breadcrumb', 'Rating', 'SegmentedControl', 'Slider', 'Steps'],
+  'D3 direction': ['Calendar', 'Date', 'Radio', 'Rating', 'Select', 'Slider'],
+  'D3 isConnected': ['Breadcrumb', 'Rating', 'Slider', 'Steps'],
   'D3 machine-era hooks': [
     'Accordion', 'Calendar', 'Carousel', 'Command', 'Date', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Radio', 'Select',
     'Steps', 'Toc', 'Tree',
   ],
   'D5 one implementation': [
     'Accordion', 'Breadcrumb', 'Calendar', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Panel', 'Rating',
-    'SegmentedControl', 'Select', 'Slider', 'Steps', 'Tree', 'Upload',
+    'Select', 'Slider', 'Steps', 'Tree', 'Upload',
   ],
 } satisfies Record<string, readonly string[]>
 
