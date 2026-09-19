@@ -31,7 +31,7 @@
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Draws a horizontal line across the available width, or a vertical line down the height of its row and at least one control tall.",
+      "description": "Draws a horizontal line across the available width, or a vertical line down the height of its row.",
       "options": [
         "horizontal",
         "vertical"
@@ -49,7 +49,7 @@
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Insets the line by the control spacing on every side, so its ends line up with the visible edges of neighbouring controls.",
+      "description": "Insets the line by the control spacing so its ends meet the visible edges of neighbouring controls; a vertical line also keeps at least one control's height.",
       "defaultValue": true
     }
   ],

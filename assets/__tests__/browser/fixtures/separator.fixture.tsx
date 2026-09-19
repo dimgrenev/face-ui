@@ -7,7 +7,8 @@ import { Bar, Button, Card, Input, Separator, Text, type SeparatorProps } from '
  * Where separators are authored. `card` is the engine's settings and
  * list-detail patterns (a heading, a separator, then fields); `toolbar` is a
  * divider between buttons in a Bar; `row` and `flow` are plain flex and
- * block containers that set no geometry of their own.
+ * block containers that set no geometry of their own; `label` is a section
+ * title with its rule.
  */
 const layouts = {
   card: (subject: ReactNode) => (
@@ -32,6 +33,19 @@ const layouts = {
     </div>
   ),
   flow: (subject: ReactNode) => <div data-testid="frame">{subject}</div>,
+  /** A section title followed by its rule, the label free to wrap or kept on one line. */
+  label: (subject: ReactNode) => (
+    <div data-testid="frame" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <Text>Payment details and billing</Text>
+      {subject}
+    </div>
+  ),
+  nowrapLabel: (subject: ReactNode) => (
+    <div data-testid="frame" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <Text style={{ whiteSpace: 'nowrap' }}>Payment details and billing</Text>
+      {subject}
+    </div>
+  ),
 }
 export type Layout = keyof typeof layouts
 

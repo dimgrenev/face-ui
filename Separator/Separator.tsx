@@ -22,11 +22,11 @@ export interface SeparatorProps
     | 'role'
     | 'aria-orientation'
   > {
-  /** Draws a horizontal line across the available width, or a vertical line down the height of its row and at least one control tall. */
+  /** Draws a horizontal line across the available width, or a vertical line down the height of its row. */
   orientation?: 'horizontal' | 'vertical'
   /** Hides the line from assistive technology; `false` exposes it as a separator with its orientation, for a break between sections or a resize handle. */
   decorative?: boolean
-  /** Insets the line by the control spacing on every side, so its ends line up with the visible edges of neighbouring controls. */
+  /** Insets the line by the control spacing so its ends meet the visible edges of neighbouring controls; a vertical line also keeps at least one control's height. */
   membrane?: boolean
 }
 

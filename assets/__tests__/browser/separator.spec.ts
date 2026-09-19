@@ -88,7 +88,7 @@ test('in a toolbar a vertical line is as tall as the buttons, and without membra
 })
 
 for (const membrane of [true, false])
-  test(`in a row a horizontal line fills the space its siblings leave${membrane ? '' : ' without membrane'}`, { tag: ['@layout'] }, async ({
+  test(`in a row a horizontal line takes the space one-word siblings leave${membrane ? '' : ' without membrane'}`, { tag: ['@layout'] }, async ({
     page,
   }) => {
     const inset = membrane ? await token(page, '--uf-membrane') : 0
@@ -100,29 +100,84 @@ for (const membrane of [true, false])
     expect((line.top + line.bottom) / 2).toBeCloseTo((frame.top + frame.bottom) / 2, 0)
   })
 
-test('outside a row a vertical line is one control tall, with or without membrane', { tag: ['@layout'] }, async ({
+test('beside a multi-word label a horizontal line shrinks with it without overflowing, and takes the rest of a label kept on one line', { tag: ['@layout'] }, async ({
   page,
 }) => {
-  const control = await token(page, '--uf-control-height')
+  const inset = await token(page, '--uf-membrane')
+  /** The number of lines the label's words are laid out on. */
+  const lines = () =>
+    page.locator('.uf-text').evaluate((node) => {
+      const tops = new Set<number>()
+      const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT)
+      while (walker.nextNode()) {
+        const range = document.createRange()
+        range.selectNodeContents(walker.currentNode)
+        for (const rect of range.getClientRects()) tops.add(Math.round(rect.top))
+      }
+      return tops.size
+    })
   for (const membrane of [true, false]) {
-    await render(page, { orientation: 'vertical', membrane }, 'flow')
-    expect((await measure(page)).line.height).toBe(control)
+    await render(page, { membrane }, 'label')
+    const shared = await measure(page)
+    expect(shared.overflow).toBe(0)
+    expect(shared.line.width).toBeGreaterThan(0)
+    expect(shared.line.left).toBeGreaterThanOrEqual(shared.text!.right)
+    // Both shrink: the label down to its narrowest width, so it wraps.
+    expect(await lines()).toBeGreaterThan(1)
+
+    await render(page, { membrane }, 'nowrapLabel')
+    const kept = await measure(page)
+    expect(kept.overflow).toBe(0)
+    expect(await lines()).toBe(1)
+    expect(kept.line.right).toBeCloseTo(kept.frame.right - (membrane ? inset : 0), 1)
+    expect(kept.line.left).toBeGreaterThan(kept.text!.right)
   }
 })
 
-test('a className sizes the line itself, as a wider resize handle does', { tag: ['@layout'] }, async ({
+test('outside a row a vertical line is one control tall with membrane, and without it only as tall as its own height', { tag: ['@layout'] }, async ({
+  page,
+}) => {
+  const control = await token(page, '--uf-control-height')
+  await render(page, { orientation: 'vertical' }, 'flow')
+  expect((await measure(page)).line.height).toBe(control)
+  await render(page, { orientation: 'vertical', membrane: false }, 'flow')
+  expect((await measure(page)).line.height).toBe(0)
+  await render(page, { orientation: 'vertical', membrane: false, style: { height: 20 } }, 'flow')
+  expect((await measure(page)).line.height).toBe(20)
+})
+
+test('a style or className sizes the line itself, shorter as well as longer', { tag: ['@layout'] }, async ({
   page,
 }) => {
   await page.addStyleTag({
     content: `
-      .handle.uf-separator[data-scope][data-orientation="vertical"] { width: 8px; }
-      .handle.uf-separator[data-scope][data-orientation="horizontal"] { height: 4px; }`,
+      .short { height: 16px; }
+      .handle.uf-separator[data-scope][data-orientation="vertical"] { width: 8px; }`,
   })
   for (const membrane of [true, false]) {
+    for (const props of [{ style: { height: 16 } }, { className: 'short' }]) {
+      await render(page, { orientation: 'vertical', membrane, ...props }, 'toolbar')
+      expect((await measure(page)).line.height).toBe(16)
+      await render(page, { orientation: 'vertical', membrane, ...props }, 'flow')
+      expect((await measure(page)).line.height).toBe(16)
+    }
+    await render(page, { orientation: 'vertical', membrane, style: { height: 64 } }, 'toolbar')
+    expect((await measure(page)).line.height).toBe(64)
     await render(page, { orientation: 'vertical', membrane, className: 'handle' }, 'row')
     expect((await measure(page)).line.width).toBe(8)
-    await render(page, { membrane, className: 'handle' }, 'card')
-    expect((await measure(page)).line.height).toBe(4)
+    await render(page, { membrane, style: { width: 120, height: 4 } }, 'card')
+    expect((await measure(page)).line).toMatchObject({ width: 120, height: 4 })
+  }
+})
+
+test('a shorter vertical line aligned to the center sits centered on the buttons beside it', { tag: ['@layout'] }, async ({
+  page,
+}) => {
+  for (const membrane of [true, false]) {
+    await render(page, { orientation: 'vertical', membrane, style: { height: 16, alignSelf: 'center' } }, 'toolbar')
+    const { line, control } = await measure(page)
+    expect(line.height).toBe(16)
+    expect((line.top + line.bottom) / 2).toBeCloseTo((control!.top + control!.bottom) / 2, 1)
   }
 })
 

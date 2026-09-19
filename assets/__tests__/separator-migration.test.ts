@@ -8,7 +8,7 @@ import rows from '../../scripts/migrations/Separator'
 let directory = ''
 afterEach(() => fs.rmSync(directory, { recursive: true, force: true }))
 
-it('Separator role becomes decorative, and aria-orientation, children and conflicting roles are left for a person', async () => {
+it('Separator role becomes decorative, value attributes are dropped, and aria-orientation, content and conflicting roles are left for a person', async () => {
   directory = fs.mkdtempSync(path.join(os.tmpdir(), 'face-separator-'))
   const tsx = path.join(directory, 'Usage.tsx')
   const json = path.join(directory, 'descriptors.json')
@@ -23,6 +23,8 @@ export const view = <>
   <Separator role={role} />
   <Separator aria-orientation="vertical" />
   <Separator>or</Separator>
+  <Separator dangerouslySetInnerHTML={{ __html: 'or' }} />
+  <Separator defaultValue="or" defaultChecked />
 </>
 `,
   )
@@ -31,6 +33,7 @@ export const view = <>
     JSON.stringify([
       { __componentName__: 'Separator', role: 'separator' },
       { __componentName__: 'Separator', role: 'none', orientation: 'vertical' },
+      { __componentName__: 'Separator', defaultValue: 'or' },
     ]),
   )
   const { findings } = await migrate({ paths: [directory], mode: 'write', migrations: rows })
@@ -42,10 +45,13 @@ export const view = <>
   <Separator role={role} />
   <Separator aria-orientation="vertical" />
   <Separator>or</Separator>
+  <Separator dangerouslySetInnerHTML={{ __html: 'or' }} />
+  <Separator />
 `)
   expect(JSON.parse(fs.readFileSync(json, 'utf8'))).toEqual([
     { __componentName__: 'Separator', decorative: false },
     { __componentName__: 'Separator', orientation: 'vertical', decorative: true },
+    { __componentName__: 'Separator' },
   ])
   expect(
     findings
@@ -56,5 +62,6 @@ export const view = <>
     ['7', 'role', 'the value is computed'],
     ['8', 'aria-orientation', undefined],
     ['9', 'children', undefined],
+    ['10', 'dangerouslySetInnerHTML', undefined],
   ])
 })

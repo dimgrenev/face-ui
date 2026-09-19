@@ -7,7 +7,7 @@
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Draws a horizontal line across the available width, or a vertical line down the height of its row and at least one control tall.",
+      "description": "Draws a horizontal line across the available width, or a vertical line down the height of its row.",
       "options": [
         "horizontal",
         "vertical"
@@ -23,7 +23,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Insets the line by the control spacing on every side, so its ends line up with the visible edges of neighbouring controls.",
+      "description": "Insets the line by the control spacing so its ends meet the visible edges of neighbouring controls; a vertical line also keeps at least one control's height.",
       "default": true
     }
   },
@@ -82,8 +82,9 @@
     ],
     "notes": [
       "The line is --uf-separator-line-width thick and does not scale with membrane spacing.",
-      "Membrane insets the line by --uf-membrane on every side, so its ends meet the visible edges of neighbouring controls.",
-      "A vertical line stretches with its row and is at least --uf-control-height tall; a horizontal one in a row fills the space its siblings leave.",
+      "Membrane insets the line by --uf-membrane on every side, so its ends meet the visible edges of neighbouring controls, and keeps a vertical line at least --uf-control-height tall.",
+      "A vertical line takes the height of its row; without membrane it has no height of its own elsewhere. A height set on the line wins, and align-self: center centers a shorter one.",
+      "In a row a horizontal line never overflows but shrinks along with its siblings, so a multi-word label beside it wraps unless it is kept on one line.",
       "In forced colors the line is drawn in CanvasText."
     ]
   },

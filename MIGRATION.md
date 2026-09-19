@@ -329,8 +329,13 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `role` | `decorative={false}` for `role="separator"`; `decorative` for `role="none"`. A role passed anyway is ignored | auto |
 | `aria-orientation` | Set `orientation` to the direction the line is drawn in; a separator that is not decorative announces it. A passed `aria-orientation` is ignored | manual |
 | `children` | Place the text beside the separator; a separator is only a line | manual |
-| Outside a flex or grid row a vertical separator was 0 tall without membrane, and its line 2px shorter than a control with membrane | The line is at least `--uf-control-height` tall and stretches with its row; membrane only adds its spacing around it | — |
-| The line’s min and max width and height were pinned, so a className or style could not widen or lengthen it (a resize handle stayed 1px wide) | Only the thickness is set; a className or style sizes the line directly, and a widened line is painted in the separator color unless that rule also sets its background | — |
+| `dangerouslySetInnerHTML` | Place the markup beside the separator; a separator is only a line | manual |
+| `defaultValue` | Nothing: a separator holds no value, and the attribute never did anything | auto |
+| `defaultChecked` | Nothing: a separator holds no value, and the attribute never did anything | auto |
+| Outside a flex or grid row, a vertical separator with membrane drew its line 2px shorter than a control | The line is one control tall there. Without membrane it still takes its height only from its row or its own style | — |
+| The line’s thickness was pinned by min and max sizes, so no className or style could widen it (a resize handle stayed 1px wide) | A style on the line, or a className rule that outranks the library’s, widens it. A widened resize handle is painted in the separator color unless that rule also sets its background | — |
+| With membrane, a horizontal separator in a row kept its container’s full width and overflowed the row | It never overflows: it shrinks along with its siblings, so a multi-word label beside it wraps unless it is kept on one line | — |
+| In forced colors the line was repainted in the canvas color and disappeared | It is drawn in CanvasText | — |
 
 ### Slider
 
