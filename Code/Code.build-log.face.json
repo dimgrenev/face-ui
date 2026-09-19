@@ -7,8 +7,8 @@
   "root": {
     "type": "Code",
     "props": {
-      "code": {
-        "$ref": "props.code"
+      "children": {
+        "$ref": "props.children"
       },
       "language": {
         "$ref": "props.language"
@@ -22,14 +22,20 @@
       "showLineNumbers": {
         "$ref": "props.showLineNumbers"
       },
-      "highlight": {
-        "$ref": "props.highlight"
+      "highlightedLines": {
+        "$ref": "props.highlightedLines"
+      },
+      "collapsed": {
+        "$ref": "props.collapsed"
       },
       "defaultCollapsed": {
         "$ref": "props.defaultCollapsed"
       },
-      "collapsedHeight": {
-        "$ref": "props.collapsedHeight"
+      "collapsedLines": {
+        "$ref": "props.collapsedLines"
+      },
+      "labels": {
+        "$ref": "props.labels"
       }
     },
     "children": []
@@ -38,64 +44,74 @@
     "props": {
       "title": "production-build.log",
       "language": "text",
-      "showLineNumbers": false,
       "defaultCollapsed": true,
-      "collapsedHeight": 120,
-      "code": "Installing dependencies...\nCompiling application...\nRunning tests...\nCreating optimized bundle...\nUploading source maps...\nDeployment completed."
+      "collapsedLines": 3,
+      "children": "Installing dependencies...\nCompiling application...\nRunning tests...\nCreating optimized bundle...\nUploading source maps...\nDeployment completed."
     }
   },
   "controls": [
     {
-      "name": "code",
+      "name": "children",
       "type": "string",
       "required": false,
-      "description": "Source code string."
+      "description": "Source text, shown line by line and copied verbatim; a final line break ends the last line instead of adding an empty one."
     },
     {
       "name": "language",
       "type": "string",
       "required": false,
-      "description": "Language hint (used as a data attribute for syntax highlighter integration)."
+      "description": "Language of the source, set as the `language-*` class of `<code>` for highlighters; Code itself does not color the text."
     },
     {
       "name": "tokenizedLines",
       "type": "array",
       "required": false,
-      "description": "Pre-tokenized lines from a syntax highlighter (e.g. Shiki). When provided, renders colored tokens instead of plain text. Each entry is an array of tokens for that line."
+      "description": "Syntax colors from a highlighter, one token array per line of `children`; a line whose tokens are missing or spell other text (a highlighter still catching up) renders plain."
     },
     {
       "name": "title",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Title shown in the header bar."
+      "description": "Header text such as a file name; without it a one-line source keeps its copy button beside it instead of a header."
     },
     {
       "name": "showLineNumbers",
       "type": "boolean",
       "required": false,
-      "description": "Whether to display line numbers.",
+      "description": "Number each line in a gutter that is never selected, copied or read aloud.",
       "defaultValue": false
     },
     {
-      "name": "highlight",
+      "name": "highlightedLines",
       "type": "array",
       "required": false,
-      "description": "Line numbers to visually highlight (1-based).",
-      "defaultValue": []
+      "description": "Numbers of the lines to mark, whole and from 1; each renders as a highlighted `<mark>`."
+    },
+    {
+      "name": "collapsed",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled collapse: a source longer than `collapsedLines` shows only its first lines and cannot scroll, yet every line stays readable to assistive technology (so the toggle is named by `labels.expand`/`labels.collapse`, without `aria-expanded`); a shorter source shows in full."
     },
     {
       "name": "defaultCollapsed",
       "type": "boolean",
       "required": false,
-      "description": "Start collapsed (auto-disables if content is short).",
+      "description": "Uncontrolled `collapsed` on mount; read once.",
       "defaultValue": false
     },
     {
-      "name": "collapsedHeight",
+      "name": "collapsedLines",
       "type": "number",
       "required": false,
-      "description": "Maximum height when collapsed (px).",
-      "defaultValue": 160
+      "description": "Lines a collapsed source shows, an integer from 1; a source with no more lines cannot collapse.",
+      "defaultValue": 8
+    },
+    {
+      "name": "labels",
+      "type": "object",
+      "required": false,
+      "description": "Names of the copy and collapse buttons and the copy confirmation."
     }
   ],
   "meta": {

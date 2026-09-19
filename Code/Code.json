@@ -2,87 +2,94 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Code",
-  "description": "Source code display with optional line numbers and highlighting",
+  "description": "A block of source code with an optional title, line numbers, marked lines, syntax colors, copy and collapse.",
   "props": {
-    "code": {
+    "children": {
       "type": "string",
       "required": false,
-      "description": "Source code string."
+      "description": "Source text, shown line by line and copied verbatim; a final line break ends the last line instead of adding an empty one."
     },
     "language": {
       "type": "string",
       "required": false,
-      "description": "Language hint (used as a data attribute for syntax highlighter integration)."
+      "description": "Language of the source, set as the `language-*` class of `<code>` for highlighters; Code itself does not color the text."
     },
     "tokenizedLines": {
       "type": "array",
       "required": false,
-      "description": "Pre-tokenized lines from a syntax highlighter (e.g. Shiki). When provided, renders colored tokens instead of plain text. Each entry is an array of tokens for that line."
+      "description": "Syntax colors from a highlighter, one token array per line of `children`; a line whose tokens are missing or spell other text (a highlighter still catching up) renders plain."
     },
     "title": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Title shown in the header bar."
+      "description": "Header text such as a file name; without it a one-line source keeps its copy button beside it instead of a header."
     },
     "showLineNumbers": {
       "type": "boolean",
       "required": false,
-      "description": "Whether to display line numbers.",
+      "description": "Number each line in a gutter that is never selected, copied or read aloud.",
       "default": false
     },
-    "highlight": {
+    "highlightedLines": {
       "type": "array",
       "required": false,
-      "description": "Line numbers to visually highlight (1-based).",
-      "default": []
+      "description": "Numbers of the lines to mark, whole and from 1; each renders as a highlighted `<mark>`."
+    },
+    "collapsed": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled collapse: a source longer than `collapsedLines` shows only its first lines and cannot scroll, yet every line stays readable to assistive technology (so the toggle is named by `labels.expand`/`labels.collapse`, without `aria-expanded`); a shorter source shows in full."
     },
     "defaultCollapsed": {
       "type": "boolean",
       "required": false,
-      "description": "Start collapsed (auto-disables if content is short).",
+      "description": "Uncontrolled `collapsed` on mount; read once.",
       "default": false
     },
-    "collapsedHeight": {
+    "collapsedLines": {
       "type": "number",
       "required": false,
-      "description": "Maximum height when collapsed (px).",
-      "default": 160
+      "description": "Lines a collapsed source shows, an integer from 1; a source with no more lines cannot collapse.",
+      "default": 8
+    },
+    "labels": {
+      "type": "object",
+      "required": false,
+      "description": "Names of the copy and collapse buttons and the copy confirmation."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "showLineNumbers": false,
-        "defaultCollapsed": true,
-        "collapsedHeight": 160,
-        "code": "/* CSS file example */\n\n:root {\n  --uf-color-hover: var(--uf-color-black-8);\n}\n\n.button {\n  height: 32px;\n  padding: 0 8px;\n  border-radius: 6px;\n}\n\n/* long tail to test collapse */\n/* line 1 */\\n/* line 2 */\\n/* line 3 */\\n/* line 4 */\\n/* line 5 */\\n/* line 6 */\\n/* line 7 */\\n/* line 8 */\\n/* line 9 */\\n/* line 10 */\\n/* line 11 */\\n/* line 12 */\\n/* line 13 */\\n/* line 14 */\\n/* line 15 */\\n/* line 16 */\\n/* line 17 */\\n/* line 18 */\\n/* line 19 */\\n/* line 20 */",
+        "title": "Files / Playground",
         "language": "css",
-        "title": "Files / Playground"
+        "defaultCollapsed": true,
+        "children": "/* CSS file example */\n\n:root {\n  --uf-color-hover: var(--uf-color-black-8);\n}\n\n.button {\n  height: 32px;\n  padding: 0 8px;\n  border-radius: 6px;\n}\n\n.button:hover {\n  background: var(--uf-color-hover);\n}\n\n.button:focus-visible {\n  outline: 2px solid currentColor;\n}"
       }
     },
     {
       "name": "With Language",
       "props": {
-        "code": "function hello() {\n  return 'world';\n}",
-        "language": "tsx"
+        "language": "tsx",
+        "children": "function hello() {\n  return 'world';\n}"
       }
     },
     {
       "name": "Line Numbers",
       "props": {
-        "code": "const a = 1;\nconst b = 2;\nconst c = a + b;",
-        "showLineNumbers": true
+        "showLineNumbers": true,
+        "children": "const a = 1;\nconst b = 2;\nconst c = a + b;"
       }
     },
     {
       "name": "Highlighted",
       "props": {
-        "code": "line 1\nline 2\nline 3",
         "showLineNumbers": true,
-        "highlight": [
+        "highlightedLines": [
           2
-        ]
+        ],
+        "children": "line 1\nline 2\nline 3"
       }
     },
     {
@@ -90,8 +97,9 @@
       "props": {
         "title": "long-snippet.ts",
         "defaultCollapsed": true,
+        "collapsedLines": 4,
         "showLineNumbers": true,
-        "code": "const v1 = 1;\nconst v2 = 2;\nconst v3 = 3;\nconst v4 = 4;\nconst v5 = 5;\nconst v6 = 6;\nconst v7 = 7;\nconst v8 = 8;\nconst v9 = 9;\nconsole.log(v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9);"
+        "children": "const v1 = 1;\nconst v2 = 2;\nconst v3 = 3;\nconst v4 = 4;\nconst v5 = 5;\nconst v6 = 6;\nconst v7 = 7;\nconst v8 = 8;\nconst v9 = 9;\nconsole.log(v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9);"
       }
     }
   ],
@@ -131,7 +139,8 @@
       "--uf-code-scroll-max-height",
       "--uf-code-fade-height",
       "--uf-code-fade-h",
-      "--uf-code-line-number-width"
+      "--uf-code-line-number-width",
+      "--uf-code-pad"
     ],
     "semanticFallbacks": [
       "--uf-control-height",
@@ -143,7 +152,8 @@
     "notes": [
       "Code is an approved mono-content exception and intentionally uses mono typography tokens.",
       "Title and action labels route through Text/Button; tokenizedLines may carry syntax-highlighter colors as source-code data.",
-      "Code backgrounds still reference primitive black alpha variables and collapsedHeight uses a numeric compatibility prop; migrate only with visual regression coverage."
+      "A collapsed source is exactly collapsedLines line boxes tall (1lh each plus --uf-code-pad above and below), capped by --uf-code-scroll-max-height.",
+      "--uf-code-collapsed-lines is written inline on the pre from the collapsedLines prop; it is not a theme token."
     ]
   },
   "platform": {},

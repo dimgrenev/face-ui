@@ -55,7 +55,7 @@ export type {
 export { Carousel } from './Carousel/Carousel'
 export type { CarouselProps } from './Carousel/Carousel'
 export { Code } from './Code/Code'
-export type { CodeProps } from './Code/Code'
+export type { CodeLabels, CodeProps, CodeToken } from './Code/Code'
 export { Input } from './Input/Input'
 export type { InputLabels, InputProps } from './Input/Input'
 export { Markdown } from './Markdown/Markdown'
