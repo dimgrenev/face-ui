@@ -22,7 +22,7 @@ export function HydrationFixture() {
       <Avatar name="क्षमा शर्मा" />
       <Input label="Server name" defaultValue="Анна" description="Public name" required />
       <Input label="Server notes" multiline rows={3} defaultValue={"First line\nSecond line"} />
-      <Radio aria-label="Server choice" name="server-choice" required defaultValue="" options={[{value:'',label:'Standard'},{value:'pro',label:'Professional'}]} />
+      <Radio aria-label="Server choice" name="server-choice" required defaultValue="" items={[{value:'',label:'Standard'},{value:'pro',label:'Professional'}]} />
       <Button>Save</Button>
       <Checkbox label="Terms" defaultChecked />
       <Checkbox label="Partial selection" checked="indeterminate" />

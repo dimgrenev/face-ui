@@ -67,7 +67,7 @@ const cases: [string, (membrane: boolean) => React.ReactNode, string][] = [
   [
     'Radio',
     (membrane) => (
-      <Radio membrane={membrane} options={[{ value: 'a', label: 'A' }]} />
+      <Radio membrane={membrane} items={[{ value: 'a', label: 'A' }]} />
     ),
     'input',
   ],

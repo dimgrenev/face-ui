@@ -15,7 +15,8 @@ function Fixture({
   controlled,
 }: {
   props: Flat<RadioProps>
-  controlled: boolean | 'change'
+  /** `true` accepts onValueChange, `'change'` accepts native change, `'refuse'` keeps the value. */
+  controlled: boolean | 'change' | 'refuse'
 }) {
   const [value, setValue] = useState<string | null>(
     (props.defaultValue as string) ?? null,
@@ -25,10 +26,17 @@ function Fixture({
       <button id="before" tabIndex={0}>
         Before
       </button>
-      <form id="form">
+      <form
+        id="form"
+        onSubmit={(event) => {
+          event.preventDefault()
+          const data = [...new FormData(event.currentTarget).entries()]
+          events.push({ type: 'submit', value: new URLSearchParams(data as string[][]).toString() })
+        }}
+      >
         <div data-radio-fixture>
           <Radio
-            options={defaults}
+            items={defaults}
             {...(props as RadioProps)}
             {...(controlled ? { value } : {})}
             onChange={(event) => {
@@ -64,7 +72,7 @@ function Fixture({
 }
 function renderRadio(
   props: Flat<RadioProps> = {},
-  controlled: boolean | 'change' = false,
+  controlled: boolean | 'change' | 'refuse' = false,
   key = 'field',
 ) {
   flushSync(() =>

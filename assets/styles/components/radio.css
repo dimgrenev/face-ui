@@ -1,29 +1,30 @@
 /* =================================================================
- * RADIO
+ * RADIO — a field (field.css lays out the root); the list holds the items.
  * ================================================================= */
 .uf-radio[data-scope="radio"] {
   --uf-radio-indicator-size: var(--uf-control-line-height);
+}
+.uf-radio__list {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  min-inline-size: 0;
 }
-.uf-radio[data-scope="radio"][hidden] {
-  display: none;
-}
-.uf-radio > .uf-membrane {
+.uf-radio__list > .uf-membrane {
   min-width: 0;
   max-width: 100%;
 }
-.uf-radio[data-scope="radio"][data-orientation="horizontal"] {
+.uf-radio__list[data-orientation="horizontal"] {
   flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0;
 }
-.uf-radio[data-scope="radio"][data-orientation="horizontal"] .uf-radio-option,
-.uf-radio[data-scope="radio"][data-orientation="horizontal"] [data-part="item"] {
+.uf-radio__list[data-orientation="horizontal"] .uf-radio-option {
   width: auto;
   flex: 0 0 auto;
+}
+/* Without membranes the first item has no outer spacing for the start label to center on. */
+.uf-radio.uf-field[data-label-position="start"]:has(> .uf-radio__list > [data-membrane-disabled]) > .uf-field__label {
+  padding-block: calc((var(--uf-control-height) - var(--uf-text-label-line-height)) / 2);
 }
 /* Radio option — rendered as <label> with className="uf-radio-option" AND data-part="item" */
 .uf-radio-option,
