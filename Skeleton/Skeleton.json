@@ -7,7 +7,7 @@
     "shape": {
       "type": "enum",
       "required": false,
-      "description": "What it stands in for: `text` a line of Text across its column, `rect` a block as wide as its column and one control tall, `circle` an avatar one control across.",
+      "description": "What it stands in for: `text` a line of text, painted where a one-line Text puts its glyphs; `rect` a block as wide as its column and one control tall; `circle` an avatar one control across.",
       "options": [
         "rect",
         "circle",
@@ -18,12 +18,12 @@
     "width": {
       "type": "any",
       "required": false,
-      "description": "Width of the box it takes, in pixels or any CSS length, in place of the shape's default; a circle given only a width is as tall."
+      "description": "Width it paints, in pixels or any CSS length, in place of the shape's default; a circle given only a width is as tall."
     },
     "height": {
       "type": "any",
       "required": false,
-      "description": "Height of the box it takes, in pixels or any CSS length, in place of the shape's default; a circle given only a height is as wide."
+      "description": "Height it paints, in pixels or any CSS length, in place of the shape's default; a circle given only a height is as wide."
     }
   },
   "states": [
@@ -88,9 +88,9 @@
       "--uf-motion-ease-in-out"
     ],
     "notes": [
-      "Every shape takes the box of the content it stands in for: text a one-line Text with its membrane across its column, from Text's own tokens; rect one control tall across its column; circle one control across, like Avatar.",
-      "A text line paints a bar where the glyphs will be: inset like them, as tall as the font and never taller than its box.",
-      "width and height size the box exactly, below one control as well as above; a width or height in style wins over them.",
+      "Without a size each shape takes the box of the content it stands in for: text a one-line Text with its membrane across its column, from Text's own tokens; rect one control tall across its column; circle one control across, like Avatar.",
+      "A text line paints a bar where the glyphs will be: inset like them and as tall as the text, with the space of a one-line Text around it; it is never wider than its column.",
+      "width and height are the size it paints, below one control as well as above; a width or height in style wins over them. A circle stays round from the one side it is given, a percentage of its column included.",
       "The pulse runs for --uf-motion-duration-skeleton and repeats until the skeleton is replaced; under reduced motion it does not run.",
       "In forced colors the placeholder is painted in GrayText."
     ]
@@ -98,8 +98,8 @@
   "platform": {},
   "usage": {
     "whenToUse": [
-      "Lines of text still loading, one skeleton per line (width on the last one)",
-      "An image, chart or card still loading (shape rect with its height)",
+      "A one-line text still loading, such as a name, a title or a label: the default shape lines up with the Text that replaces it (width for a shorter line)",
+      "An image, chart, card or paragraph still loading (shape rect with its height; a stack of text lines is taller than a wrapped paragraph)",
       "An avatar still loading (shape circle)"
     ],
     "whenNotToUse": [

@@ -1,41 +1,42 @@
 /* =================================================================
  * SKELETON
  * ================================================================= */
-/* Every shape takes the box its content will take, so nothing moves when the content arrives.
-   The default, text, takes the box of a one-line Text with its membrane, from Text's own tokens,
-   and paints a bar where the glyphs will be: inset like them, as tall as the font, never taller
-   than the box. */
+/* width and height are the size a skeleton paints. A rect is as wide as its column and one control
+   tall; a circle is one control across and stays round from whichever side it is given. */
 .uf-skeleton[data-scope] {
-  display: flex;
-  align-items: center;
   box-sizing: border-box;
   inline-size: 100%;
-  block-size: calc(var(--uf-text-min-height, var(--uf-control-height)) + 2 * var(--uf-membrane));
-  padding-inline: calc(var(--uf-membrane) + var(--uf-text-pad-x, var(--uf-control-pad-text)));
-  border-radius: var(--uf-radius-sm);
-  animation: uf-skeleton-pulse var(--uf-motion-duration-skeleton) var(--uf-motion-ease-in-out) var(--uf-motion-iteration-indefinite);
-}
-.uf-skeleton[data-scope]::before {
-  content: "";
-  flex: 1;
-  block-size: min(100%, var(--uf-text-body-size, var(--uf-control-font-size)));
-  border-radius: inherit;
-  background: var(--uf-color-hover-bg);
-}
-/* A block or an avatar is painted whole. */
-.uf-skeleton[data-scope]:is([data-shape="rect"], [data-shape="circle"]) {
   block-size: var(--uf-control-height);
-  padding: 0;
   border-radius: var(--uf-radius);
   background: var(--uf-color-hover-bg);
-}
-.uf-skeleton[data-scope]:is([data-shape="rect"], [data-shape="circle"])::before {
-  content: none;
+  animation: uf-skeleton-pulse var(--uf-motion-duration-skeleton) var(--uf-motion-ease-in-out) var(--uf-motion-iteration-indefinite);
 }
 .uf-skeleton[data-scope][data-shape="circle"] {
-  inline-size: var(--uf-control-height);
   flex-shrink: 0;
+  inline-size: var(--uf-control-height);
+  block-size: auto;
+  aspect-ratio: 1;
   border-radius: 50%;
+}
+/* The default, text, and any value that is not a shape: a bar as tall as the text and inset like its
+   glyphs, never wider than its column, with a one-line Text's space around it (from Text's own
+   tokens), so it sits where the glyphs will. */
+.uf-skeleton[data-scope]:not([data-shape="rect"], [data-shape="circle"]) {
+  --uf-skeleton-inset: calc(var(--uf-membrane) + var(--uf-text-pad-x, var(--uf-control-pad-text)));
+  display: flex;
+  box-sizing: content-box;
+  inline-size: calc(100% - 2 * var(--uf-skeleton-inset));
+  max-inline-size: calc(100% - 2 * var(--uf-skeleton-inset));
+  block-size: var(--uf-text-body-size, var(--uf-control-font-size));
+  padding: calc((var(--uf-text-min-height, var(--uf-control-height)) + 2 * var(--uf-membrane) - var(--uf-text-body-size, var(--uf-control-font-size))) / 2) var(--uf-skeleton-inset);
+  border-radius: var(--uf-radius-sm);
+  background: none;
+}
+.uf-skeleton[data-scope]:not([data-shape="rect"], [data-shape="circle"])::before {
+  content: "";
+  flex: 1;
+  border-radius: inherit;
+  background: var(--uf-color-hover-bg);
 }
 
 @keyframes uf-skeleton-pulse {
@@ -50,11 +51,9 @@
 
 /* Forced colors repaint backgrounds with Canvas, which would erase the placeholder. */
 @media (forced-colors: active) {
-  .uf-skeleton[data-scope] {
+  .uf-skeleton[data-scope],
+  .uf-skeleton[data-scope]:not([data-shape="rect"], [data-shape="circle"])::before {
     forced-color-adjust: none;
-  }
-  .uf-skeleton[data-scope]:is([data-shape="rect"], [data-shape="circle"]),
-  .uf-skeleton[data-scope]::before {
     background: GrayText;
   }
 }

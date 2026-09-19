@@ -22,7 +22,7 @@ const measure = (page: Page) =>
     const own = box(subject)!
     const style = getComputedStyle(subject)
     const before = getComputedStyle(subject, '::before')
-    const painted = before.content !== 'none'
+    const painted = !['none', 'normal'].includes(before.content)
     const barHeight = painted ? parseFloat(before.height) : own.height
     const left = own.left + (painted ? parseFloat(style.paddingLeft) : 0)
     const right = own.right - (painted ? parseFloat(style.paddingRight) : 0)
@@ -122,10 +122,12 @@ for (const layout of ['flow', 'card'] as const)
     }
   })
 
-test('width and height size the box exactly, below one control as well as above', { tag: ['@layout'] }, async ({
+test('width and height are the size it paints, below one control as well as above', { tag: ['@layout'] }, async ({
   page,
 }) => {
-  const { membrane, inset, font } = await tokens(page)
+  const { control, membrane, text, inset, font } = await tokens(page)
+  // 16 by 12 is below one control, which the stylesheet once raised it to.
+  expect(control).toBeGreaterThan(16)
   for (const shape of ['rect', 'circle'] as const) {
     await render(page, { shape, width: 16, height: 12 }, 'column')
     expect((await measure(page)).skeleton).toMatchObject({ width: 16, height: 12 })
@@ -135,32 +137,58 @@ test('width and height size the box exactly, below one control as well as above'
   await render(page, { shape: 'rect', width: 240, height: 160 }, 'column')
   expect((await measure(page)).bar).toMatchObject({ width: 240, height: 160 })
 
-  // A text line keeps its bar inside the box it is given, never taller than the text.
-  await render(page, { width: 120, height: 12 }, 'column')
-  const short = await measure(page)
-  expect(short.skeleton).toMatchObject({ width: 120, height: 12 })
-  expect(short.bar).toMatchObject({ width: 120 - 2 * (membrane + inset), height: 12 })
-  await render(page, { width: '60%', height: 48 }, 'column')
-  const tall = await measure(page)
-  expect(tall.skeleton).toMatchObject({ width: 216, height: 48 })
-  expect(tall.bar.height).toBe(font)
+  // A text line paints a bar of that size, however small, with a one-line Text's space around it.
+  const space = { inline: 2 * (membrane + inset), block: text + 2 * membrane - font }
+  for (const [width, height] of [[12, 8], [120, 12], [96, 24]] as const) {
+    await render(page, { width, height }, 'column')
+    const line = await measure(page)
+    expect(line.bar).toMatchObject({ width, height })
+    expect(line.skeleton).toMatchObject({ width: width + space.inline, height: height + space.block })
+  }
+  await render(page, { width: '60%', height: '3rem' }, 'column')
+  expect((await measure(page)).bar).toMatchObject({ width: 216, height: 48 })
+  // As wide as it can be is its column, never past it.
+  for (const width of ['100%', 1000]) {
+    await render(page, { width }, 'column')
+    const line = await measure(page)
+    expect(line.skeleton.width).toBe(line.frame.width)
+    expect(line.bar.width).toBe(line.frame.width - space.inline)
+  }
 })
 
-test('a circle given one side is that size both ways, and given both keeps both', { tag: ['@layout'] }, async ({
-  page,
-}) => {
-  await render(page, { shape: 'circle', width: 48 }, 'column')
-  expect((await measure(page)).skeleton).toMatchObject({ width: 48, height: 48 })
-  await render(page, { shape: 'circle', height: 20 }, 'column')
-  expect((await measure(page)).skeleton).toMatchObject({ width: 20, height: 20 })
-  await render(page, { shape: 'circle', width: 64, height: 40 }, 'column')
-  expect((await measure(page)).skeleton).toMatchObject({ width: 64, height: 40 })
-})
+for (const layout of ['column', 'avatar', 'card'] as const)
+  test(`a circle stays round from the one side it is given, a percentage too, and given both keeps both (${layout})`, { tag: ['@layout'] }, async ({
+    page,
+  }) => {
+    const cases = [
+      [{ width: 48 }, 48],
+      [{ height: 20 }, 20],
+      [{ width: '3rem' }, 48],
+      [{ height: '1.5rem' }, 24],
+      [{ style: { width: 60 } }, 60],
+      [{ style: { height: 20 } }, 20],
+      [{ width: '', height: 20 }, 20],
+    ] as const
+    for (const [props, side] of cases) {
+      await render(page, { shape: 'circle', ...props }, layout)
+      expect((await measure(page)).skeleton, JSON.stringify(props)).toMatchObject({ width: side, height: side })
+    }
+    // A percentage is of the column's width, whichever side it is given for.
+    for (const props of [{ width: '50%' }, { height: '50%' }]) {
+      await render(page, { shape: 'circle', ...props }, layout)
+      const { skeleton, frame } = await measure(page)
+      expect(skeleton.width, JSON.stringify(props)).toBeGreaterThan(0)
+      expect(skeleton.height, JSON.stringify(props)).toBe(skeleton.width)
+      if (layout === 'column') expect(skeleton.width).toBe(frame.width / 2)
+    }
+    await render(page, { shape: 'circle', width: 64, height: 40 }, layout)
+    expect((await measure(page)).skeleton).toMatchObject({ width: 64, height: 40 })
+  })
 
-test('a style width or height wins over the props and sizes the box', { tag: ['@layout'] }, async ({ page }) => {
+test('a style width or height wins over the props and is the size it paints', { tag: ['@layout'] }, async ({ page }) => {
   for (const shape of ['text', 'rect', 'circle'] as const) {
     await render(page, { shape, width: 100, height: 40, style: { width: 30, height: 10 } }, 'column')
-    expect((await measure(page)).skeleton).toMatchObject({ width: 30, height: 10 })
+    expect((await measure(page)).bar).toMatchObject({ width: 30, height: 10 })
   }
 })
 
@@ -211,7 +239,7 @@ test('in forced colors every shape is painted in GrayText instead of vanishing i
       const probe = document.body.appendChild(document.createElement('span'))
       probe.style.color = 'GrayText'
       probe.style.backgroundColor = 'Canvas'
-      const painted = getComputedStyle(node, '::before').content !== 'none'
+      const painted = !['none', 'normal'].includes(getComputedStyle(node, '::before').content)
       const result = {
         paint: getComputedStyle(node, painted ? '::before' : null).backgroundColor,
         gray: getComputedStyle(probe).color,

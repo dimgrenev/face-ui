@@ -42,15 +42,21 @@ describe('Skeleton prop contract', () => {
     expect(size()).toEqual({ width: '240px', height: '' })
   })
 
-  it('a circle given only a width or only a height takes it for both sides, and given both keeps both', async () => {
-    await render({ shape: 'circle', width: 48 })
-    expect(size()).toEqual({ width: '48px', height: '48px' })
+  it('a circle given only a height, as a prop or in style, takes it as its width and leaves its height to the stylesheet to keep round', async () => {
     await render({ shape: 'circle', height: '2rem' })
-    expect(size()).toEqual({ width: '2rem', height: '2rem' })
+    expect(size()).toEqual({ width: '2rem', height: '' })
+    await render({ shape: 'circle', width: '', style: { height: 20 } })
+    expect(size()).toEqual({ width: '20px', height: '20px' })
+    await render({ shape: 'circle', width: '50%' })
+    expect(size()).toEqual({ width: '50%', height: '' })
+    await render({ shape: 'circle', height: 20, style: { width: 30 } })
+    expect(size()).toEqual({ width: '30px', height: '20px' })
     await render({ shape: 'circle', width: 64, height: 40 })
     expect(size()).toEqual({ width: '64px', height: '40px' })
-    await render({ shape: 'text', width: 48 })
-    expect(size()).toEqual({ width: '48px', height: '' })
+    await render({ shape: 'circle', height: '' })
+    expect(size()).toEqual({ width: '', height: '' })
+    await render({ shape: 'text', height: 12 })
+    expect(size()).toEqual({ width: '', height: '12px' })
   })
 
   it('a width or height in style wins over the props', async () => {

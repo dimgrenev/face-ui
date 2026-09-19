@@ -40,14 +40,20 @@ export default [
   {
     kind: 'behavior',
     component: 'Skeleton',
+    before: 'The root carried the shape as `data-variant`',
+    after: 'It carries it as `data-shape`, after the prop',
+  },
+  {
+    kind: 'behavior',
+    component: 'Skeleton',
     before: 'A width or height below one control height was raised to it, so `height={12}` still drew 32px',
-    after: 'width and height size the box exactly, smaller as well as larger',
+    after: 'width and height are the size it paints, smaller as well as larger',
   },
   {
     kind: 'behavior',
     component: 'Skeleton',
     before: 'The default text shape was a filled box four controls wide and one control tall',
-    after: 'It takes the box of a one-line Text with its membrane across its column, and paints a bar as tall as the text where the glyphs will be. Set `width` for a shorter line',
+    after: 'It paints a bar as tall as the text across its column, with the space of a one-line Text around it, so it sits where the glyphs will; width and height size the bar',
   },
   {
     kind: 'behavior',
@@ -59,7 +65,7 @@ export default [
     kind: 'behavior',
     component: 'Skeleton',
     before: 'A circle given only a width or only a height was one control across the other way',
-    after: 'It takes the side it is given for both',
+    after: 'It stays round from the one side it is given, a percentage of its column included',
   },
   {
     kind: 'behavior',

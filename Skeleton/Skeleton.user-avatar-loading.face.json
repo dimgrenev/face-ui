@@ -30,7 +30,7 @@
       "name": "shape",
       "type": "select",
       "required": false,
-      "description": "What it stands in for: `text` a line of Text across its column, `rect` a block as wide as its column and one control tall, `circle` an avatar one control across.",
+      "description": "What it stands in for: `text` a line of text, painted where a one-line Text puts its glyphs; `rect` a block as wide as its column and one control tall; `circle` an avatar one control across.",
       "options": [
         "rect",
         "circle",
@@ -42,13 +42,13 @@
       "name": "width",
       "type": "any",
       "required": false,
-      "description": "Width of the box it takes, in pixels or any CSS length, in place of the shape's default; a circle given only a width is as tall."
+      "description": "Width it paints, in pixels or any CSS length, in place of the shape's default; a circle given only a width is as tall."
     },
     {
       "name": "height",
       "type": "any",
       "required": false,
-      "description": "Height of the box it takes, in pixels or any CSS length, in place of the shape's default; a circle given only a height is as wide."
+      "description": "Height it paints, in pixels or any CSS length, in place of the shape's default; a circle given only a height is as wide."
     }
   ],
   "meta": {
