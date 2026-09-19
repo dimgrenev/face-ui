@@ -53,13 +53,13 @@ export default [
     kind: 'behavior',
     component: 'Skeleton',
     before: 'The default text shape was a filled box four controls wide and one control tall',
-    after: 'It paints a bar as tall as the text across its column, with the space of a one-line Text around it, so it sits where the glyphs will; width and height size the bar',
+    after: 'It paints a bar as tall as the text across its column, with the space of a one-line Text around it, so it sits where the glyphs will; width and height size the bar. In a container sized by its content, such as an inline label or a popover, it adds no width of its own, so give it a width there',
   },
   {
     kind: 'behavior',
     component: 'Skeleton',
     before: 'The rect shape was a square one control across',
-    after: 'It is as wide as its column and one control tall; set `height` for an image or a card',
+    after: 'It is as wide as its column and one control tall; set `height` for an image or a card, and a width in a container sized by its content',
   },
   {
     kind: 'behavior',

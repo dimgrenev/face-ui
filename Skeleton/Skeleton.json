@@ -18,7 +18,7 @@
     "width": {
       "type": "any",
       "required": false,
-      "description": "Width it paints, in pixels or any CSS length, in place of the shape's default; a circle given only a width is as tall."
+      "description": "Width it paints, in pixels or any CSS length, in place of the shape's default (a text line or rect fills its column, so give one in a container sized by its content); a circle given only a width is as tall."
     },
     "height": {
       "type": "any",
@@ -90,7 +90,8 @@
     "notes": [
       "Without a size each shape takes the box of the content it stands in for: text a one-line Text with its membrane across its column, from Text's own tokens; rect one control tall across its column; circle one control across, like Avatar.",
       "A text line paints a bar where the glyphs will be: inset like them and as tall as the text, with the space of a one-line Text around it; it is never wider than its column.",
-      "width and height are the size it paints, below one control as well as above; a width or height in style wins over them. A circle stays round from the one side it is given, a percentage of its column included.",
+      "width and height are the size it paints, below one control as well as above; a width or height in style wins over them. A circle stays round from the one side it is given, a percentage of its column included, and a flex row that stretches its items does not stretch it.",
+      "A text line or rect adds no width of its own: in a container sized by its content, such as an inline label or a popover, give it a width.",
       "The pulse runs for --uf-motion-duration-skeleton and repeats until the skeleton is replaced; under reduced motion it does not run.",
       "In forced colors the placeholder is painted in GrayText."
     ]

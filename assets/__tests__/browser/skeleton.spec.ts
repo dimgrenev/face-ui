@@ -97,8 +97,10 @@ for (const density of ['default', 'compact', 'large'] as Density[])
     expect(block.skeleton).toMatchObject({ width: block.frame.width, height: control })
     expect(block.bar).toEqual(block.skeleton)
 
-    await render(page, { shape: 'circle' }, 'avatar', density)
+    // In a profile row whose name and email are taller, with the default (stretch) alignment.
+    await render(page, { shape: 'circle' }, 'profile', density)
     const avatar = await measure(page)
+    expect(avatar.frame.height).toBeGreaterThan(control)
     expect(avatar.skeleton).toMatchObject({ width: control, height: control })
     expect(avatar.skeleton.height).toBe(avatar.loaded!.height)
     expect(avatar.skeleton.width).toBe(avatar.loaded!.width)
@@ -156,10 +158,13 @@ test('width and height are the size it paints, below one control as well as abov
   }
 })
 
-for (const layout of ['column', 'avatar', 'card'] as const)
+for (const layout of ['column', 'profile', 'card'] as const)
   test(`a circle stays round from the one side it is given, a percentage too, and given both keeps both (${layout})`, { tag: ['@layout'] }, async ({
     page,
   }) => {
+    // The profile row stretches its items to the name and email beside them, which are taller than every fixed side here.
+    await render(page, { shape: 'circle' }, layout)
+    if (layout === 'profile') expect((await measure(page)).frame.height).toBeGreaterThan(64)
     const cases = [
       [{ width: 48 }, 48],
       [{ height: 20 }, 20],
@@ -184,6 +189,23 @@ for (const layout of ['column', 'avatar', 'card'] as const)
     await render(page, { shape: 'circle', width: 64, height: 40 }, layout)
     expect((await measure(page)).skeleton).toMatchObject({ width: 64, height: 40 })
   })
+
+test('in a container sized by its content a text line or rect adds no width of its own and paints the width it is given', { tag: ['@layout'] }, async ({
+  page,
+}) => {
+  const { control } = await tokens(page)
+  for (const shape of ['text', 'rect'] as const) {
+    await render(page, { shape }, 'label')
+    expect((await measure(page)).bar.width).toBe(0)
+    await render(page, { shape, width: 120 }, 'label')
+    const { bar, skeleton, frame } = await measure(page)
+    expect(bar.width).toBe(120)
+    expect(frame.width).toBe(skeleton.width)
+  }
+  // A circle has a size of its own.
+  await render(page, { shape: 'circle' }, 'label')
+  expect((await measure(page)).skeleton).toMatchObject({ width: control, height: control })
+})
 
 test('a style width or height wins over the props and is the size it paints', { tag: ['@layout'] }, async ({ page }) => {
   for (const shape of ['text', 'rect', 'circle'] as const) {

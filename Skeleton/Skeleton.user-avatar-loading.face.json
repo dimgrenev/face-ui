@@ -42,7 +42,7 @@
       "name": "width",
       "type": "any",
       "required": false,
-      "description": "Width it paints, in pixels or any CSS length, in place of the shape's default; a circle given only a width is as tall."
+      "description": "Width it paints, in pixels or any CSS length, in place of the shape's default (a text line or rect fills its column, so give one in a container sized by its content); a circle given only a width is as tall."
     },
     {
       "name": "height",

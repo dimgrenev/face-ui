@@ -6,8 +6,10 @@ import { Avatar, Card, Skeleton, Text, type SkeletonProps } from '../../../../in
 /**
  * Where skeletons stand in for content. `column` is a plain block column;
  * `flow` and `card` put the subject under a Text line that has already loaded,
- * in block flow and in a Card; `avatar` puts it beside a loaded Avatar; `row`
- * is a list row with an avatar placeholder before the subject; `busy` is a
+ * in block flow and in a Card; `profile` puts it beside a loaded Avatar in a
+ * profile row with the default (stretch) alignment and a name and email that
+ * are taller than both; `row` is a list row with an avatar placeholder before
+ * the subject; `label` is an inline label sized by its content; `busy` is a
  * card region marked busy while it loads.
  */
 const layouts = {
@@ -24,10 +26,14 @@ const layouts = {
       {subject}
     </Card>
   ),
-  avatar: (subject: ReactNode) => (
-    <div data-testid="frame" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+  profile: (subject: ReactNode) => (
+    <div data-testid="frame" style={{ display: 'flex', gap: 8 }}>
       <Avatar name="Ada Lovelace" data-testid="loaded" />
       {subject}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Text>Ada Lovelace</Text>
+        <Text>ada@example.com</Text>
+      </div>
     </div>
   ),
   row: (subject: ReactNode) => (
@@ -35,6 +41,11 @@ const layouts = {
       <Skeleton shape="circle" data-testid="avatar" />
       {subject}
     </div>
+  ),
+  label: (subject: ReactNode) => (
+    <span data-testid="frame" style={{ display: 'inline-flex' }}>
+      {subject}
+    </span>
   ),
   busy: (subject: ReactNode) => (
     <Card data-testid="frame" aria-busy="true">
