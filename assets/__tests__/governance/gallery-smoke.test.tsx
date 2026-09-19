@@ -363,12 +363,11 @@ describe('face-ui-react gallery smoke', () => {
     expect(tabBPanel?.hidden).toBe(false)
 
     const tocCard = getGalleryCard(container, 'Toc')
-    const setupItem =
-      Array.from(tocCard.querySelectorAll<HTMLButtonElement>('button')).find(
-        (button) => button.textContent?.includes('Setup'),
-      ) ?? null
+    const setupItem = tocCard.querySelector<HTMLAnchorElement>('a[href="#setup"]')
     await act(async () => {
-      setupItem?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      setupItem?.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true }),
+      )
     })
     expect(setupItem?.getAttribute('aria-current')).toBe('location')
     expect(tocCard.textContent).toContain('Themes')

@@ -2,145 +2,217 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Toc",
-  "description": "Table of contents navigation with active-item tracking",
+  "description": "A table of contents: native links to the sections of this document, nested by level, with the current one marked.",
   "props": {
     "items": {
       "type": "array",
       "required": false,
-      "description": "Section items to render."
+      "description": "Entries in document order; an empty list renders nothing."
     },
-    "activeId": {
+    "value": {
       "type": "string",
       "required": false,
-      "description": "Currently active section id (controlled)."
+      "description": "Controlled current entry, marked `aria-current=\"location\"`; `null` or a value missing from `items` marks none."
     },
-    "defaultActiveId": {
+    "defaultValue": {
       "type": "string",
       "required": false,
-      "description": "Initial active section id (uncontrolled). Falls back to first item."
+      "description": "Uncontrolled current entry on mount, read once; by default no entry is current.",
+      "default": null
     },
-    "withLine": {
-      "type": "boolean",
-      "required": false,
-      "description": "Show the active indicator line + baseline rail.",
-      "default": true
-    },
-    "lineSide": {
+    "line": {
       "type": "enum",
       "required": false,
-      "description": "Side of the indicator/rail.",
+      "description": "Rail with a marker at the current entry, at the inline start or end of the list; `none` removes both.",
       "options": [
-        "left",
-        "right"
+        "start",
+        "end",
+        "none"
       ],
-      "default": "left"
+      "default": "start"
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "withLine": true,
-        "lineSide": "left",
+        "line": "start",
         "items": [
           {
-            "id": "intro",
+            "value": "intro",
             "label": "Introduction",
             "level": 1
           },
           {
-            "id": "setup",
+            "value": "setup",
             "label": "Setup",
             "level": 1
           },
           {
-            "id": "tokens",
+            "value": "tokens",
             "label": "Design tokens",
             "level": 2
           },
           {
-            "id": "themes",
+            "value": "themes",
             "label": "Themes",
             "level": 3
           },
           {
-            "id": "usage",
+            "value": "usage",
             "label": "Usage",
             "level": 1
           }
         ],
-        "defaultActiveId": "tokens"
+        "defaultValue": "tokens"
       }
     },
     {
-      "name": "With Active",
+      "name": "Line At End",
       "props": {
+        "line": "end",
         "items": [
           {
-            "id": "intro",
+            "value": "intro",
             "label": "Introduction",
             "level": 1
           },
           {
-            "id": "setup",
+            "value": "setup",
             "label": "Setup",
             "level": 1
           },
           {
-            "id": "tokens",
+            "value": "tokens",
             "label": "Design tokens",
             "level": 2
           },
           {
-            "id": "themes",
+            "value": "themes",
             "label": "Themes",
             "level": 3
           },
           {
-            "id": "usage",
+            "value": "usage",
             "label": "Usage",
             "level": 1
           }
         ],
-        "activeId": "intro"
+        "defaultValue": "setup"
+      }
+    },
+    {
+      "name": "Without Line",
+      "props": {
+        "line": "none",
+        "items": [
+          {
+            "value": "intro",
+            "label": "Introduction",
+            "level": 1
+          },
+          {
+            "value": "setup",
+            "label": "Setup",
+            "level": 1
+          },
+          {
+            "value": "tokens",
+            "label": "Design tokens",
+            "level": 2
+          },
+          {
+            "value": "themes",
+            "label": "Themes",
+            "level": 3
+          },
+          {
+            "value": "usage",
+            "label": "Usage",
+            "level": 1
+          }
+        ],
+        "defaultValue": "intro"
+      }
+    },
+    {
+      "name": "Controlled",
+      "props": {
+        "items": [
+          {
+            "value": "intro",
+            "label": "Introduction",
+            "level": 1
+          },
+          {
+            "value": "setup",
+            "label": "Setup",
+            "level": 1
+          },
+          {
+            "value": "tokens",
+            "label": "Design tokens",
+            "level": 2
+          },
+          {
+            "value": "themes",
+            "label": "Themes",
+            "level": 3
+          },
+          {
+            "value": "usage",
+            "label": "Usage",
+            "level": 1
+          }
+        ],
+        "value": "usage"
       }
     }
   ],
-  "behavior": {},
+  "behavior": {
+    "navigation": "Entries are native links to #value. A plain click or Enter makes the entry current, calls onSelect and lets the browser scroll to the section and update the hash; onSelect's preventDefault keeps the page still. A modified click opens the link elsewhere and changes nothing.",
+    "current": "value marks the current entry; the consumer may drive it from scrolling. A value missing from items marks none, and an uncontrolled one waits for items that arrive later.",
+    "outline": "level nests an entry in a sublist under the previous entry of a smaller level; indentation follows the nesting.",
+    "line": "line puts a rail and a marker at the inline start or end of the list; the marker follows the current entry and its wrapped height.",
+    "empty": "An empty list renders no navigation landmark."
+  },
   "keyboard": {
-    "ArrowDown": {
-      "action": "focusNext"
+    "Tab": {
+      "action": "focusNextEntry"
     },
-    "ArrowUp": {
-      "action": "focusPrevious"
+    "Enter": {
+      "action": "followFocusedEntry"
     }
   },
   "aria": {
     "role": "navigation",
-    "required": [
-      "aria-label"
-    ]
+    "label": "Native aria-label/aria-labelledby name the nav; default Table of contents.",
+    "current": "The current entry's link has aria-current=location.",
+    "structure": "Entries are links in nested lists that mirror the outline."
   },
   "composition": {
     "required": [
       "root",
-      "item"
-    ],
-    "recommended": [
-      "indicator"
+      "list",
+      "item",
+      "link"
     ],
     "parts": {
       "root": {
         "slot": "root"
       },
+      "list": {
+        "slot": "list",
+        "parent": "root"
+      },
       "item": {
         "slot": "item",
-        "parent": "root",
+        "parent": "list",
         "multiple": true
       },
-      "indicator": {
-        "slot": "indicator",
-        "parent": "root"
+      "link": {
+        "slot": "link",
+        "parent": "item"
       }
     }
   },
@@ -154,7 +226,13 @@
     "semanticFallbacks": [
       "--uf-spacing-2",
       "--uf-membrane",
-      "--uf-font-weight-bold",
+      "--uf-control-height",
+      "--uf-control-pad-y",
+      "--uf-control-pad-text",
+      "--uf-control-font-size",
+      "--uf-control-line-height",
+      "--uf-option-indent",
+      "--uf-radius",
       "--uf-color-fg",
       "--uf-color-hover-bg",
       "--uf-color-border",
@@ -162,8 +240,8 @@
       "--uf-motion-ease-standard"
     ],
     "notes": [
-      "Toc items render through Button; active indicator geometry is local to the table-of-contents pattern.",
-      "Indicator transform and height transitions use shared Face UI motion tokens."
+      "Entries are links with the full-width option rhythm and Membrane; nesting indents the text by --uf-option-indent per level.",
+      "The rail and the marker are the top list's ::before and ::after; the marker moves with shared motion tokens."
     ]
   },
   "platform": {},
