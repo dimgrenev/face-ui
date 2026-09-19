@@ -3,7 +3,7 @@ import { Breadcrumb as AuditedBreadcrumb } from '../../../index'
 import type { BreadcrumbItem as AuditedCrumbItem } from '../../../Breadcrumb/Breadcrumb'
 
 export const breadcrumbReadonlyItems: readonly AuditedCrumbItem[] = Object.freeze([{key:'root',label:'Root',href:'#root',onClick:e=>e.preventDefault()},{key:2,label:'Current'}])
-export const breadcrumbNative = <AuditedBreadcrumb items={breadcrumbReadonlyItems} maxItems={null} membrane={false} separator={null} overflowLabel="Показать путь" ref={createPaginationRef<HTMLElement>()} id="path" lang="ru" dir="rtl" hidden={false} className="path" style={{width:320}} aria-label="Путь" onClickCapture={e=>e.preventDefault()} />
+export const breadcrumbNative = <AuditedBreadcrumb items={breadcrumbReadonlyItems} maxItems={null} membrane={false} separator={null} labels={{more:'Показать путь'}} ref={createPaginationRef<HTMLElement>()} id="path" lang="ru" dir="rtl" hidden={false} className="path" style={{width:320}} aria-label="Путь" onClickCapture={e=>e.preventDefault()} />
 // @ts-expect-error Breadcrumb follows native navigation without a sandbox opt-in.
 export const breadcrumbRemovedAllowNavigation = <AuditedBreadcrumb allowNavigation />
 // @ts-expect-error maxItems names the bound including the overflow position.
@@ -19,6 +19,8 @@ export const breadcrumbInvalidDefaultValue = <AuditedBreadcrumb defaultValue="pa
 // @ts-expect-error Navigation cannot honor autofocus.
 export const breadcrumbInvalidAutoFocus = <AuditedBreadcrumb autoFocus />
 // @ts-expect-error The overflow name is text, not content markup.
-export const breadcrumbInvalidOverflowLabel = <AuditedBreadcrumb overflowLabel={<span>Path</span>} />
+export const breadcrumbInvalidOverflowLabel = <AuditedBreadcrumb labels={{more:<span>Path</span>}} />
+// @ts-expect-error The overflow name lives in labels.more.
+export const breadcrumbRemovedOverflowLabel = <AuditedBreadcrumb overflowLabel="Path" />
 // @ts-expect-error The ref belongs to the HTML nav.
 export const breadcrumbInvalidRef = <AuditedBreadcrumb ref={createPaginationRef<SVGSVGElement>()} />

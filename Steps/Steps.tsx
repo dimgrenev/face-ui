@@ -1,29 +1,30 @@
 /** Steps — ordered wizard navigation with persistent content panels. */
 import {
   forwardRef,
-  useEffect,
   useId,
-  useLayoutEffect,
   useRef,
-  useState,
   type HTMLAttributes,
+  type MouseEvent,
   type ReactNode,
 } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
-import { stepsMachine, connectSteps } from '../assets/machines/steps.machine'
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
 import { Membrane } from '../assets/adapters/react/Membrane'
-import { hasSlotContent } from '../assets/slot-content'
+import { composeHandlers } from '../assets/adapters/react/merge-props'
 import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useFocusRecovery } from '../assets/adapters/react/use-focus-recovery'
+import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
+import { readCollection } from '../assets/runtime/collection'
+import { readNumber } from '../assets/runtime/props'
+import { hasSlotContent } from '../assets/slot-content'
 
 export interface StepItem {
-  /** Nonempty, noninteractive content naming the step. */
+  /** Noninteractive content naming the step inside its button. */
   label: ReactNode
-  /** Panel content. Inactive panels stay mounted but hidden, preserving local state. */
+  /** Panel content; inactive panels stay mounted but hidden, keeping their local state. */
   content?: ReactNode
-  /** Stable unique identity for dynamic items; defaults to the original array index. */
+  /** Stable identity that keeps the step's DOM and panel state across reorders; defaults to its position. */
   key?: string | number
 }
 export interface StepsProps extends Omit<
@@ -38,195 +39,191 @@ export interface StepsProps extends Omit<
   | 'role'
   | 'aria-disabled'
 > {
-  /** Ordered step definitions. An omitted or empty list renders no navigation. */
+  /** Ordered steps; an omitted or empty list renders no navigation. */
   items?: readonly StepItem[]
-  /** Controlled nonnegative integer index; displayed within the current item bounds. */
+  /** Controlled index of the current step, from 0; an index past the last step shows the last one. */
   step?: number
-  /** Initial uncontrolled index; later changes are ignored. Defaults to 0. */
+  /** Uncontrolled step index on mount, from 0; read once. */
   defaultStep?: number
-  /** Allow only the current, earlier or immediately next step. Does not validate forms. */
+  /** Allows only the current, an earlier or the immediately next step; does not validate forms. */
   linear?: boolean
-  /** Disable step navigation; the visible panel remains usable. */
+  /** Disables step navigation; the visible panel stays usable. */
   disabled?: boolean
-  /** One proposal for a user change to a different step; external updates are quiet. */
+  /** Called once per user selection of a different step; `step` updates from the parent never call it. */
   onStepChange?: (details: { step: number }) => void
-  /** Membrane spacing around each step control. Defaults to true. */
+  /** Membrane spacing around each step button. */
   membrane?: boolean
   /** Additional class name on the root group. */
   className?: string
 }
-function readItems(value: StepsProps['items']): readonly StepItem[] {
-  if (value === undefined) return []
-  if (!Array.isArray(value)) throw new TypeError('Steps items must be an array')
-  const keys = new Set<string>()
-  for (const item of value) {
-    if (
-      !item ||
-      typeof item !== 'object' ||
-      !hasSlotContent(item.label) ||
-      (typeof item.label === 'string' && !item.label.trim())
-    )
-      throw new TypeError('Steps item labels must contain content')
-    if (item.key !== undefined) {
-      if (
-        typeof item.key !== 'string' &&
-        (typeof item.key !== 'number' || !Number.isFinite(item.key))
-      )
-        throw new TypeError('Steps item key must be a string or finite number')
-      const key = String(item.key)
-      if (keys.has(key)) throw new TypeError('Steps item keys must be unique')
-      keys.add(key)
-    }
-  }
-  return value
-}
-function readStep(value: number, name: string): number {
-  if (!Number.isSafeInteger(value) || value < 0)
-    throw new RangeError(`Steps ${name} must be a nonnegative safe integer`)
-  return value
-}
-const useCommitEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
-const itemKey = (item: StepItem, index: number) =>
-  item.key === undefined ? `index:${index}` : `key:${item.key}`
 
+const INDEX = { integer: true, min: 0 } as const
+/** Keys are strings; a finite number stands for its decimal text. */
+const keyOf = ({ key }: StepItem) =>
+  typeof key === 'number' && Number.isFinite(key) ? String(key) : key
+
+/** Ordered wizard navigation: one button per step and a persistent panel for each step with content. */
 export const Steps = forwardRef<HTMLDivElement, StepsProps>(
   function Steps(props, ref) {
     const {
-      items: rawItems,
-      step: rawStep,
-      defaultStep: rawDefaultStep = 0,
+      items,
+      step,
+      defaultStep = 0,
       linear = true,
       disabled = false,
       onStepChange,
       membrane = true,
       className,
-      hidden,
+      onClick,
       ...rest
     } = props
-    const items = readItems(rawItems)
-    const step = rawStep === undefined ? undefined : readStep(rawStep, 'step')
-    const [defaultStep] = useState(() =>
-      step === undefined ? readStep(rawDefaultStep, 'defaultStep') : 0,
-    )
-    const machineStep = useControllableMachineProp(step, defaultStep)
-    const { state, send, syncContext } = useMachine(stepsMachine, {
-      step: machineStep,
-      total: items.length,
-      linear,
-      disabled,
-      onStepChange: onStepChange ?? null,
+    const { entries } = readCollection<StepItem>(items, {
+      component: 'Steps',
+      positional: true,
+      key: keyOf,
     })
-    const api = connectSteps(state, send)
-    const id = useId()
-    const rootRef = useRef<HTMLDivElement | null>(null)
+    const count = entries.length
+    const [stored, setStep, replaceStep] = useControllableState<number>({
+      value:
+        step === undefined
+          ? undefined
+          : readNumber('Steps', 'step', step, 0, INDEX),
+      defaultValue: () =>
+        readNumber('Steps', 'defaultStep', defaultStep, 0, INDEX),
+      onChange: (next) => onStepChange?.({ step: next }),
+      name: ['Steps', 'step'],
+    })
+    const current = Math.min(stored, Math.max(count - 1, 0))
+    // Only a removal moves an uncontrolled step, to the last one left; an index the items do not
+    // reach yet (async or momentarily empty items) keeps waiting for them.
+    const previous = useRef(count)
+    const removed = count > 0 && Math.min(stored, previous.current - 1) >= count
+    useIsomorphicLayoutEffect(() => {
+      if (removed) replaceStep(count - 1)
+      previous.current = count
+    })
+
+    const reachable = (index: number) =>
+      !disabled && (!linear || index <= current + 1)
+    const select = (event: MouseEvent<HTMLDivElement>) => {
+      const trigger = (event.target as Element).closest?.(
+        '[data-scope="steps"][data-part="trigger"]',
+      )
+      if (
+        !trigger ||
+        event.defaultPrevented ||
+        trigger.closest('[data-scope="steps"][data-part="root"]') !==
+          event.currentTarget
+      )
+        return
+      const index = Number(trigger.getAttribute('data-index'))
+      if (index !== current && reachable(index)) setStep(index)
+    }
+
+    const rootRef = useRef<HTMLDivElement>(null)
     const composedRef = useComposedRefs(rootRef, ref)
-    const focused = useRef<HTMLElement | null>(null)
-    useCommitEffect(() => {
-      if (step === undefined && state.context.step !== api.step)
-        syncContext({ step: api.step })
-    }, [step, api.step, state.context.step, syncContext])
-    useCommitEffect(() => {
-      // useMachine commits a changed collection before paint; wait for that view
-      // before choosing a focus target after a removal.
-      if (state.context.total !== items.length) return
-      const previous = focused.current
-      const root = rootRef.current
-      if (hidden || !root || root.closest('[hidden], [inert]')) {
-        focused.current = null
-        return
-      }
-      if (
-        !previous ||
-        (previous.isConnected &&
-          !previous.closest('[hidden]') &&
-          !(previous instanceof HTMLButtonElement && previous.disabled))
-      )
-        return
-      const active = root.ownerDocument.activeElement
-      if (
-        active !== root.ownerDocument.body &&
-        active !== previous &&
-        !previous.contains(active)
-      )
-        return
-      focused.current = null
-      const target =
+    // Focus lost with a removed, hidden or disabled element goes to the current step's button,
+    // else the visible panel, else the root.
+    useFocusRecovery(rootRef, () => {
+      const root = rootRef.current!
+      return (
         root.querySelector<HTMLElement>(
           '[aria-current="step"]:not(:disabled)',
         ) ??
         root.querySelector<HTMLElement>(
-          '[data-part="content"]:not([hidden])',
+          ':scope > [data-part="content"]:not([hidden])',
         ) ??
         root
-      target.focus({ preventScroll: true })
+      )
     })
+    const id = useId()
+    const stateOf = (index: number) =>
+      index === current ? 'active' : index < current ? 'previous' : 'upcoming'
     return (
       <div
-        {...api.getRootProps()}
         {...rest}
-        hidden={hidden}
         ref={composedRef}
+        data-scope="steps"
+        data-part="root"
+        role="group"
         tabIndex={rest.tabIndex ?? -1}
-        onFocusCapture={(event) => {
-          focused.current = event.target as HTMLElement
-          rest.onFocusCapture?.(event)
-        }}
-        onBlurCapture={(event) => {
-          if (
-            event.relatedTarget &&
-            !event.currentTarget.contains(event.relatedTarget as Node)
-          )
-            focused.current = null
-          rest.onBlurCapture?.(event)
-        }}
         className={cn('uf-steps', className)}
+        onClick={composeHandlers(onClick, select)}
       >
-        {items.length > 0 && (
-          <ol {...api.getListProps()} className="uf-steps-list">
-            {items.map((item, index) => (
-              <li
-                key={itemKey(item, index)}
-                {...api.getItemProps(index)}
-                className="uf-steps-item"
-              >
-                <Membrane enabled={membrane} interactive>
-                  <button
-                    {...api.getTriggerProps(index)}
-                    id={`${id}-trigger-${index}`}
-                    aria-controls={
-                      hasSlotContent(item.content)
-                        ? `${id}-content-${index}`
-                        : undefined
-                    }
-                    className="uf-steps-trigger uf-option uf-control"
-                  >
-                    <span
-                      {...api.getIndicatorProps(index)}
-                      className="uf-steps-indicator"
+        {count > 0 && (
+          <ol
+            data-scope="steps"
+            data-part="list"
+            role="list"
+            className="uf-steps-list"
+          >
+            {entries.map(({ key, item }, index) => {
+              const off = !reachable(index)
+              return (
+                <li
+                  key={key}
+                  data-scope="steps"
+                  data-part="item"
+                  data-state={stateOf(index)}
+                  data-index={index}
+                  className="uf-steps-item"
+                >
+                  <Membrane enabled={membrane} interactive>
+                    <button
+                      type="button"
+                      // WebKit leaves buttons without an explicit tabIndex out of the Tab order.
+                      tabIndex={0}
+                      id={`${id}-trigger-${index}`}
+                      data-scope="steps"
+                      data-part="trigger"
+                      data-state={stateOf(index)}
+                      data-index={index}
+                      data-disabled={off ? '' : undefined}
+                      disabled={off}
+                      aria-current={index === current ? 'step' : undefined}
+                      aria-controls={
+                        hasSlotContent(item.content)
+                          ? `${id}-content-${index}`
+                          : undefined
+                      }
+                      className="uf-steps-trigger uf-option uf-control"
                     >
-                      {index + 1}
-                    </span>
-                    <Text
-                      as="span"
-                      inset="none"
-                      membrane={false}
-                      className="uf-steps-label"
-                    >
-                      {item.label}
-                    </Text>
-                  </button>
-                </Membrane>
-              </li>
-            ))}
+                      <span
+                        data-scope="steps"
+                        data-part="indicator"
+                        data-index={index}
+                        aria-hidden
+                        className="uf-steps-indicator"
+                      >
+                        {index + 1}
+                      </span>
+                      <Text
+                        as="span"
+                        inset="none"
+                        membrane={false}
+                        className="uf-steps-label"
+                      >
+                        {item.label}
+                      </Text>
+                    </button>
+                  </Membrane>
+                </li>
+              )
+            })}
           </ol>
         )}
-        {items.map((item, index) =>
+        {entries.map(({ key, item }, index) =>
           hasSlotContent(item.content) ? (
             <div
-              key={itemKey(item, index)}
-              {...api.getContentProps(index)}
+              key={key}
               id={`${id}-content-${index}`}
+              data-scope="steps"
+              data-part="content"
+              data-state={stateOf(index)}
+              data-index={index}
+              role="group"
+              tabIndex={-1}
+              hidden={index !== current}
               aria-labelledby={`${id}-trigger-${index}`}
             >
               {typeof item.content === 'string' ||

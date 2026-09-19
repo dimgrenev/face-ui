@@ -3,7 +3,8 @@ import type { Root } from 'react-dom/client'
 import { beforeEach, afterEach, expect, it, vi, describe } from 'vitest'
 import { Steps, type StepsProps } from '../../Steps/Steps'
 import { installMatchMedia, type MatchMediaRestore } from './harness/match-media'
-import { mount } from './harness'
+import { expectDevError, mount } from './harness'
+import { describeControlled } from './harness/controlled'
 let host: HTMLDivElement, root: Root
 const items = [
   { label: 'Account', content: 'Account content' },
@@ -123,10 +124,6 @@ it('frozen items are not modified while changing steps', async () => {
   expect(frozen).toEqual(items)
 })
 
-import { renderToString } from 'react-dom/server'
-import { interpret } from '../create-machine'
-import { connectSteps, stepsMachine } from '../machines/steps.machine'
-
 it('native class, style, events and ref use the same semantic root', async () => {
   const ref = createRef<HTMLDivElement>(),
     focus = vi.fn(),
@@ -240,7 +237,11 @@ it('removing the callback leaves navigation functional', async () => {
 it('controlled selection overrides defaultStep and can be released without resetting', async () => {
   await render({ step: 1, defaultStep: 2 })
   expect(current()).toBe('1')
-  await render({ defaultStep: 2 })
+  await expectDevError(
+    () => render({ defaultStep: 2 }),
+    /^Face UI Steps: missing step; keeping the last controlled value\.$/,
+  )
+  expect(current()).toBe('1')
   await click(0)
   expect(current()).toBe('0')
 })
@@ -293,18 +294,20 @@ it('controlled out-of-bounds selection is derived and respects later growth', as
   expect(current()).toBe('2')
   expect(change).not.toHaveBeenCalled()
 })
-it('empty-to-filled and filled-to-empty lists remain usable without callbacks', async () => {
+it('an uncontrolled step waits for items that are empty or still loading, without callbacks', async () => {
   const change = vi.fn()
   await render({ items: [], defaultStep: 2, onStepChange: change })
   expect(current()).toBeUndefined()
   expect(host.querySelector('ol')).toBeNull()
-  await render({ onStepChange: change })
+  await render({ items: items.slice(0, 1), onStepChange: change })
   expect(current()).toBe('0')
+  await render({ onStepChange: change })
+  expect(current()).toBe('2')
   await click(1)
   change.mockClear()
   await render({ items: [], onStepChange: change })
   await render({ onStepChange: change })
-  expect(current()).toBe('0')
+  expect(current()).toBe('1')
   expect(change).not.toHaveBeenCalled()
 })
 it('omitted items render a stable empty root', async () => {
@@ -402,76 +405,62 @@ it('hidden does not focus another control or reset the selection', async () => {
   expect(current()).toBe('1')
 })
 for (const name of ['step', 'defaultStep'] as const) {
-  for (const value of [
-    -1,
-    0.5,
-    NaN,
-    Infinity,
-    Number.MAX_SAFE_INTEGER + 1,
-    null,
-    '1',
-  ]) {
-    it(`${name} rejects invalid index ${String(value)}`, () => {
-      expect(() =>
-        renderToString(<Steps items={items} {...({ [name]: value } as any)} />),
-      ).toThrow(/Steps .*nonnegative safe integer/)
+  for (const [value, shown, message] of [
+    [-1, '0', '-1; using 0'],
+    [0.5, '0', '0.5; using 0'],
+    [1.9, '1', '1.9; using 1'],
+    [NaN, '0', 'NaN; using 0'],
+    [Infinity, '0', 'Infinity; using 0'],
+    [Number.MAX_SAFE_INTEGER + 1, '2', `${Number.MAX_SAFE_INTEGER + 1}; using ${Number.MAX_SAFE_INTEGER}`],
+    [null, '0', 'null; using 0'],
+    ['1', '0', '"1"; using 0'],
+  ] as const) {
+    it(`${name}=${String(value)} is normalized and reported`, async () => {
+      await expectDevError(
+        () => render({ [name]: value } as StepsProps),
+        new RegExp(`^Face UI Steps: invalid ${name} ${message.replace(/[.+]/g, '\\$&')}\\.$`),
+      )
+      expect(current()).toBe(shown)
     })
   }
 }
-for (const [name, value] of Object.entries({
-  notArray: {},
-  null: null,
-  sparse: new Array(2),
-  missingLabel: [{}],
-  emptyLabel: [{ label: '' }],
-  blankLabel: [{ label: '  ' }],
-  falseLabel: [{ label: false }],
-  duplicateKey: [
-    { label: 'A', key: 1 },
-    { label: 'B', key: '1' },
-  ],
-  invalidKey: [{ label: 'A', key: NaN }],
-})) {
-  it(`items rejects ${name}`, () => {
-    expect(() => renderToString(<Steps items={value as any} />)).toThrow(
-      /Steps /,
-    )
+for (const [name, value, labels, message] of [
+  ['not an array', {}, [], /invalid items object; using \[\]/],
+  ['null', null, [], /invalid items null; using \[\]/],
+  ['sparse', new Array(2), [], /missing items\[\d\]; dropping the item/],
+  ['a null item', [null, { label: 'B' }], ['B'], /invalid items\[0\] null; dropping the item/],
+  ['a repeated key', [{ label: 'A', key: 1 }, { label: 'B', key: '1' }], ['A'], /invalid items\[1\] key "1"; dropping the duplicate/],
+  ['a non-finite key', [{ label: 'A', key: NaN }, { label: 'B' }], ['A', 'B'], /invalid items\[0\] key NaN; using "#0"/],
+] as const) {
+  it(`items with ${name} render normalized and are reported`, async () => {
+    await expectDevError(() => render({ items: value as never }), new RegExp(`^Face UI Steps: ${message.source}\\.$`))
+    expect([...host.querySelectorAll('.uf-steps-label')].map((node) => node.textContent)).toEqual(labels)
+    expect(host.querySelector('.uf-steps')).not.toBeNull()
   })
 }
+it('items with empty, blank or missing labels render without a report', async () => {
+  await render({ items: [{}, { label: '' }, { label: '  ' }, { label: false }] as never })
+  expect(host.querySelectorAll('[data-part="trigger"]')).toHaveLength(4)
+})
 it('keyed and fallback indices occupy distinct identity namespaces', async () => {
   await render({ items: [{ label: 0, key: 1 }, { label: 'B' }] })
   expect(host.querySelectorAll('button')).toHaveLength(2)
 })
-it('machine navigation boundaries and public capability flags agree', () => {
-  const change = vi.fn(),
-    service = interpret(stepsMachine, {
-      total: 3,
-      linear: false,
-      onStepChange: change,
-    })
-  service.start()
-  const api = () => connectSteps(service.getSnapshot(), service.send)
-  for (const index of [NaN, Infinity, 0.5, -1, 3])
-    service.send({ type: 'SET_STEP', step: index })
-  expect(api().step).toBe(0)
-  expect(change).not.toHaveBeenCalled()
-  service.send('NEXT')
-  expect(api().step).toBe(1)
-  service.syncContext({ disabled: true })
-  expect(api().canGoNext).toBe(false)
-  expect(api().canGoPrev).toBe(false)
-  service.send('NEXT')
-  service.send('PREV')
-  expect(api().step).toBe(1)
-  service.syncContext({ disabled: false, total: 1 })
-  expect(api().step).toBe(0)
-  expect(api().isFirst).toBe(true)
-  expect(api().isLast).toBe(true)
-  service.syncContext({ total: 0 })
-  expect(api().isFirst).toBe(false)
-  expect(api().isLast).toBe(false)
-  expect(api().canGoNext).toBe(false)
-  service.stop()
+it('a trigger of a nested Steps in a panel selects only in its own instance', async () => {
+  const outer = vi.fn(),
+    inner = vi.fn()
+  await render({
+    onStepChange: outer,
+    items: [
+      { label: 'Outer', content: <Steps items={items} onStepChange={inner} /> },
+      { label: 'Next' },
+    ],
+  })
+  await act(async () => {
+    host.querySelectorAll<HTMLButtonElement>('.uf-steps .uf-steps [data-part="trigger"]')[1].click()
+  })
+  expect(inner.mock.calls).toEqual([[{ step: 1 }]])
+  expect(outer).not.toHaveBeenCalled()
 })
 
 describe('component smoke', () => {
@@ -579,7 +568,7 @@ describe('responsive overlay surfaces', () => {
       ),
     )
 
-    expect(rootNode?.getAttribute('aria-label')).toBe('Steps')
+    expect(rootNode?.hasAttribute('aria-label')).toBe(false)
     expect(triggers).toHaveLength(3)
     expect(contents).toHaveLength(3)
     expect(triggers[0]?.type).toBe('button')
@@ -603,4 +592,19 @@ describe('responsive overlay surfaces', () => {
     expect(contents[1]?.hidden).toBe(false)
     expect(contents[2]?.hidden).toBe(true)
   })
+})
+
+describeControlled({
+  name: 'Steps',
+  prop: 'step',
+  values: [0, 1],
+  render: (props) => <Steps items={items} {...props} />,
+  change: (host, to) =>
+    host
+      .querySelector<HTMLButtonElement>(`[data-part="trigger"][data-index="${to}"]`)!
+      .click(),
+  read: (host) =>
+    Number(host.querySelector('[aria-current="step"]')!.getAttribute('data-index')),
+  normalizes: [5, 2],
+  handler: 'onClick',
 })

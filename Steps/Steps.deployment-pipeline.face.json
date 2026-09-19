@@ -57,40 +57,40 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Ordered step definitions. An omitted or empty list renders no navigation."
+      "description": "Ordered steps; an omitted or empty list renders no navigation."
     },
     {
       "name": "step",
       "type": "number",
       "required": false,
-      "description": "Controlled nonnegative integer index; displayed within the current item bounds."
+      "description": "Controlled index of the current step, from 0; an index past the last step shows the last one."
     },
     {
       "name": "defaultStep",
       "type": "number",
       "required": false,
-      "description": "Initial uncontrolled index; later changes are ignored. Defaults to 0.",
+      "description": "Uncontrolled step index on mount, from 0; read once.",
       "defaultValue": 0
     },
     {
       "name": "linear",
       "type": "boolean",
       "required": false,
-      "description": "Allow only the current, earlier or immediately next step. Does not validate forms.",
+      "description": "Allows only the current, an earlier or the immediately next step; does not validate forms.",
       "defaultValue": true
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable step navigation; the visible panel remains usable.",
+      "description": "Disables step navigation; the visible panel stays usable.",
       "defaultValue": false
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing around each step control. Defaults to true.",
+      "description": "Membrane spacing around each step button.",
       "defaultValue": true
     }
   ],

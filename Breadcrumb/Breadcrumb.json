@@ -2,12 +2,12 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Breadcrumb",
-  "description": "Navigation trail showing current location in a hierarchy",
+  "description": "A navigation trail whose middle collapses into an overflow list once it exceeds `maxItems`.",
   "props": {
     "items": {
       "type": "array",
       "required": false,
-      "description": "Ordered locations from root to current; the last item is current."
+      "description": "Ordered locations from root to current; the last item is the current page."
     },
     "separator": {
       "type": "ReactNode",
@@ -24,13 +24,13 @@
     "maxItems": {
       "type": "number",
       "required": false,
-      "description": "Maximum visible positions, including overflow: integer >=3; null shows all. Defaults to 4.",
+      "description": "Visible positions including the overflow button, an integer from 3; null shows every item.",
       "default": 4
     },
-    "overflowLabel": {
-      "type": "string",
+    "labels": {
+      "type": "object",
       "required": false,
-      "description": "Accessible name of the overflow button and its list dialog. Empty text uses the default."
+      "description": "Names of the component's own controls: `more` names the overflow button and its dialog."
     }
   },
   "states": [
@@ -177,7 +177,7 @@
   },
   "aria": {
     "role": "navigation",
-    "label": "Native aria-label/aria-labelledby name the nav; default Breadcrumb. overflowLabel names the overflow button and dialog.",
+    "label": "Native aria-label/aria-labelledby name the nav; default Breadcrumb. labels.more names the overflow button and dialog.",
     "current": "The last location has aria-current=page; a destination is optional.",
     "separator": "Separators are decorative and hidden from assistive technology."
   },

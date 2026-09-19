@@ -59,6 +59,8 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `collapseAfter` | `maxItems` | auto |
 | `allowNavigation` | Links always navigate; cancel the click in your own handler to stay on the page | manual |
 | `collapseAfter` below 3, or not finite, turned collapsing off | `maxItems={null}` turns it off, and the codemod writes it for such literals; a number must be an integer of at least 3 | — |
+| `overflowLabel` | `labels.more` | auto |
+| Malformed `items` or keys, and a `maxItems` that is not an integer of at least 3, threw during render | The trail renders them normalized (bad items dropped, the first of a repeated key kept, `maxItems` clamped) and reports once in development | — |
 
 ### Button
 
@@ -185,6 +187,16 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | --- | --- | --- |
 | `trigger` | `openOn` | auto |
 
+### Pagination
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `surfaceTitle` | `labels.choosePage` | auto |
+| `labels`: `previousPage` and `nextPage` keys | the shared `previous` and `next` keys | manual |
+| A `page`, `defaultPage`, `total`, `pageSize` or `siblingCount` out of range or not an integer threw during render | Pagination renders it normalized (integers clamped, non-numbers such as `"50"` replaced by the default) and reports once in development | — |
+| `labels.page` without exactly one `{page}` threw during render | Every `{page}` is replaced by the number; a template without one gets the number appended after a space | — |
+| The nav's `onClick` ran after the page changed | `onClick` runs first, and its `preventDefault()` cancels the change | — |
+
 ### Popover
 
 | Before | After | Codemod |
@@ -256,6 +268,15 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `SliderAdvanced` from `Slider/SliderAdvanced` | `Slider` with `showValue` and `crop` | manual |
 | `SliderAdvancedProps` from `Slider/SliderAdvanced` | `SliderProps` | manual |
 | `SliderCropRange` from `Slider/SliderAdvanced` | `SliderCropRange` from `Slider/Slider` | auto |
+
+### Steps
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| Malformed `items` or keys, and a `step` or `defaultStep` that is not a nonnegative integer, threw during render | Steps render them normalized (bad items dropped, the first of a repeated key kept, the index clamped) and report once in development | — |
+| The root group was named "Steps" by default | The root has no default name; name it with `aria-label` or `aria-labelledby` | — |
+| The root's `onClick` ran after the step changed | `onClick` runs first, and its `preventDefault()` cancels the change | — |
+| An uncontrolled step beyond an empty or shorter `items` list fell back for good | It waits for the items to arrive; only removing the current step moves it, to the last one left | — |
 
 ### Switcher
 

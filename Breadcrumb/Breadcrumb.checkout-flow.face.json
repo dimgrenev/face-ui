@@ -19,8 +19,8 @@
       "maxItems": {
         "$ref": "props.maxItems"
       },
-      "overflowLabel": {
-        "$ref": "props.overflowLabel"
+      "labels": {
+        "$ref": "props.labels"
       }
     },
     "children": []
@@ -54,7 +54,7 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Ordered locations from root to current; the last item is current."
+      "description": "Ordered locations from root to current; the last item is the current page."
     },
     {
       "name": "separator",
@@ -74,14 +74,14 @@
       "name": "maxItems",
       "type": "number",
       "required": false,
-      "description": "Maximum visible positions, including overflow: integer >=3; null shows all. Defaults to 4.",
+      "description": "Visible positions including the overflow button, an integer from 3; null shows every item.",
       "defaultValue": 4
     },
     {
-      "name": "overflowLabel",
-      "type": "string",
+      "name": "labels",
+      "type": "object",
       "required": false,
-      "description": "Accessible name of the overflow button and its list dialog. Empty text uses the default."
+      "description": "Names of the component's own controls: `more` names the overflow button and its dialog."
     }
   ],
   "meta": {

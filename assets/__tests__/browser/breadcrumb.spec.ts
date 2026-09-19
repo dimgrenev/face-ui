@@ -138,7 +138,7 @@ for (const theme of ['light', 'dark'])
         props: {
           dir,
           lang: 'ru',
-          overflowLabel: 'Все разделы',
+          labels: { more: 'Все разделы' },
           'aria-label': 'Путь документа',
           items: Array.from({ length: 12 }, (_, i) => ({
             key: i,

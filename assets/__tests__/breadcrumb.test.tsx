@@ -1,5 +1,4 @@
 import { act, createRef } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
 import type { Root } from 'react-dom/client'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { Breadcrumb, type BreadcrumbProps } from '../../Breadcrumb/Breadcrumb'
@@ -188,12 +187,22 @@ it('maxItems can show only root/current or the entire trail and updates live', a
   await render({ items: trail, maxItems: 6 })
   expect(host.querySelector('button')).toBeNull()
 })
-it.each([0, 1, 2, 3.5, NaN, Infinity, Number.MAX_VALUE, '4'])(
-  'rejects invalid maxItems=%s',
-  (maxItems) => {
-    expect(() =>
-      renderToStaticMarkup(<Breadcrumb {...({ maxItems } as any)} />),
-    ).toThrow(RangeError)
+it.each([
+  [0, '0; using 3', ['Root', '[overflow]', 'Current']],
+  [2, '2; using 3', ['Root', '[overflow]', 'Current']],
+  [3.5, '3.5; using 3', ['Root', '[overflow]', 'Current']],
+  [NaN, 'NaN; using 4', ['Root', '[overflow]', 'D', 'Current']],
+  [Infinity, 'Infinity; using 4', ['Root', '[overflow]', 'D', 'Current']],
+  ['4', '"4"; using 4', ['Root', '[overflow]', 'D', 'Current']],
+  [Number.MAX_VALUE, `${Number.MAX_VALUE}; using ${Number.MAX_SAFE_INTEGER}`, ['Root', 'A', 'B', 'C', 'D', 'Current']],
+] as const)(
+  'invalid maxItems=%s is normalized and reported',
+  async (maxItems, message, shown) => {
+    await expectDevError(
+      () => render({ items: trail, maxItems }),
+      new RegExp(`^Face UI Breadcrumb: invalid maxItems ${message.replace(/[.+]/g, '\\$&')}\\.$`),
+    )
+    expect(visible()).toEqual(shown)
   },
 )
 it('item keys preserve DOM identity through reorder in the same list', async () => {
@@ -207,25 +216,26 @@ it('item keys preserve DOM identity through reorder in the same list', async () 
   expect(host.querySelector('a[href="#B"]')).toBe(original)
   expect(original?.getAttribute('key')).toBeNull()
 })
+const labels = () =>
+  Array.from(host.querySelectorAll('.uf-breadcrumb-label'), (node) => node.textContent)
 it.each([
-  null,
-  {},
-  [null],
-  [{ label: '' }],
-  [{ label: '   ' }],
-  [{ label: false }],
-  [{ label: 'A', href: 2 }],
-  [{ label: 'A', onClick: true }],
-  [{ label: 'A', key: {} }],
-  [{ label: 'A', key: Infinity }],
-  [
-    { label: 'A', key: 1 },
-    { label: 'B', key: '1' },
-  ],
-])('rejects malformed item definitions %j', (items) => {
-  expect(() =>
-    renderToStaticMarkup(<Breadcrumb items={items as any} />),
-  ).toThrow(TypeError)
+  ['not an array', {}, [], /invalid items object; using \[\]/],
+  ['null', null, [], /invalid items null; using \[\]/],
+  ['a null item', [null, { label: 'B' }], ['B'], /invalid items\[0\] null; dropping the item/],
+  ['an object key', [{ label: 'A', key: {} }, { label: 'B' }], ['A', 'B'], /invalid items\[0\] key object; using "#0"/],
+  ['an infinite key', [{ label: 'A', key: Infinity }], ['A'], /invalid items\[0\] key Infinity; using "#0"/],
+  ['a repeated key', [{ label: 'A', key: 1 }, { label: 'B', key: '1' }], ['A'], /invalid items\[1\] key "1"; dropping the duplicate/],
+] as const)('items with %s render normalized and are reported', async (_, items, shown, message) => {
+  await expectDevError(
+    () => render({ items }),
+    new RegExp(`^Face UI Breadcrumb: ${message.source}\\.$`),
+  )
+  expect(labels()).toEqual(shown)
+  expect(host.querySelector('nav') !== null).toBe(shown.length > 0)
+})
+it('empty labels render as given, without a report', async () => {
+  await render({ items: [{ label: '' }, { label: '   ' }, { label: false }] })
+  expect(labels()).toEqual(['', '   ', ''])
 })
 it('input metadata cannot impersonate the internal overflow slot', async () => {
   await render({ items: [{ label: 'Current', __overflow: true }] })
@@ -254,10 +264,10 @@ it('native class/style/lang/data attributes stay on the same nav', async () => {
   expect(ref.current?.lang).toBe('ru')
   expect(ref.current?.dataset.owned).toBe('yes')
 })
-it('overflowLabel names the real trigger and dialog', async () => {
+it('labels.more names the real trigger and dialog', async () => {
   await render({
     items: trail,
-    overflowLabel: 'Все разделы',
+    labels: { more: 'Все разделы' },
     'aria-label': 'Путь',
   })
   const button = host.querySelector<HTMLButtonElement>('button')!
@@ -268,14 +278,14 @@ it('overflowLabel names the real trigger and dialog', async () => {
   ).toBe('Все разделы')
   expect(host.querySelector('nav')?.getAttribute('aria-label')).toBe('Путь')
 })
-it('blank overflowLabel falls back silently; a non-string one falls back and is reported', async () => {
-  await render({ items: trail, overflowLabel: '  ' })
+it('blank labels.more falls back silently; a non-string one falls back and is reported', async () => {
+  await render({ items: trail, labels: { more: '  ' } })
   expect(host.querySelector('button')?.getAttribute('aria-label')).toBe(
     'Show path',
   )
   await expectDevError(
-    () => render({ items: trail, overflowLabel: 5 }),
-    /^Face UI Breadcrumb: invalid overflowLabel 5; using "Show path"\.$/,
+    () => render({ items: trail, labels: { more: 5 } }),
+    /^Face UI Breadcrumb: invalid labels\.more 5; using "Show path"\.$/,
   )
   expect(host.querySelector('button')?.getAttribute('aria-label')).toBe(
     'Show path',
@@ -371,4 +381,52 @@ it('the gallery owns navigation cancellation for inline and portaled links', asy
     popupLink.dispatchEvent(popupEvent)
   })
   expect(popupEvent.defaultPrevented).toBe(true)
+})
+
+it('a focused crumb that collapses into the overflow hands focus to the overflow button', async () => {
+  await render({ items: trail, maxItems: null })
+  await act(async () => host.querySelector<HTMLElement>('a[href="#B"]')!.focus())
+  await render({ items: trail, maxItems: 3 })
+  expect(document.activeElement).toBe(
+    host.querySelector('button[aria-label="Show path"]'),
+  )
+})
+it('a removed focused crumb hands focus to the first remaining link; a retained one keeps it', async () => {
+  await render({ items: trail, maxItems: null })
+  const root = host.querySelector<HTMLElement>('a[href="#Root"]')!
+  await act(async () => root.focus())
+  await render({ items: trail.slice(0, 5), maxItems: null })
+  expect(document.activeElement).toBe(root)
+  await act(async () => host.querySelector<HTMLElement>('a[href="#C"]')!.focus())
+  await render({ items: [trail[0], trail[1], trail[5]], maxItems: null })
+  expect(document.activeElement).toBe(root)
+})
+it('focus in the overflow list returns to the same crumb when the trail stops collapsing', async () => {
+  await render({ items: trail })
+  await act(async () =>
+    host.querySelector<HTMLButtonElement>('button[aria-label="Show path"]')!.click(),
+  )
+  await act(async () =>
+    document.querySelector<HTMLElement>('[role="dialog"] a[href="#B"]')!.focus(),
+  )
+  await render({ items: trail, maxItems: null })
+  expect(document.querySelector('[role="dialog"]')).toBeNull()
+  expect(document.activeElement).toBe(host.querySelector('a[href="#B"]'))
+})
+it('closing the overflow list by an outside press leaves focus where the user put it', async () => {
+  await render({ items: trail })
+  await act(async () =>
+    host.querySelector<HTMLButtonElement>('button[aria-label="Show path"]')!.click(),
+  )
+  await act(async () =>
+    document.querySelector<HTMLElement>('[role="dialog"] a[href="#B"]')!.focus(),
+  )
+  await act(async () => {
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    ;(document.activeElement as HTMLElement | null)?.blur()
+  })
+  expect(document.querySelector('[role="dialog"]:not([hidden])')).toBeNull()
+  await render({ items: trail, maxItems: null })
+  expect(document.activeElement).toBe(document.body)
 })
