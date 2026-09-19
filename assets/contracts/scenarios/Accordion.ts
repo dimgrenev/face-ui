@@ -6,7 +6,7 @@ export default [
     props: {
       multiple: true,
       collapsible: true,
-      defaultExpandedIds: ['profile', 'security'],
+      defaultExpanded: ['profile', 'security'],
       items: [
         {
           value: 'profile',
@@ -35,7 +35,7 @@ export default [
     props: {
       multiple: false,
       collapsible: true,
-      defaultExpandedIds: ['reasoning'],
+      defaultExpanded: ['reasoning'],
       items: [
         {
           value: 'reasoning',

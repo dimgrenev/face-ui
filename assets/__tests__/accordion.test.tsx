@@ -4,9 +4,60 @@ import type { Root } from 'react-dom/client'
 import { beforeEach, expect, it, vi, describe } from 'vitest'
 import { Accordion, type AccordionProps, type AccordionItem } from '../../Accordion/Accordion'
 import { Button } from '../../Button/Button'
-import { libraryCss, mount } from './harness'
-import { interpret } from '../create-machine'
-import { accordionMachine } from '../machines/accordion.machine'
+import { expectDevError, libraryCss, mount } from './harness'
+import { describeControlled } from './harness/controlled'
+import { describeRoving } from './harness/roving'
+
+const triggerOf = (host: HTMLElement, value: string) =>
+  host.querySelector<HTMLButtonElement>(
+    `button[data-part="trigger"][data-value="${value}"]`,
+  )!
+const openValues = (host: HTMLElement) =>
+  [
+    ...host.querySelectorAll<HTMLElement>(
+      'button[data-part="trigger"][aria-expanded="true"]',
+    ),
+  ].map((node) => node.dataset.value!)
+const sections = ['a', 'b', 'c'].map((value) => ({
+  value,
+  label: value.toUpperCase(),
+  content: value,
+}))
+
+describeControlled<string[]>({
+  name: 'Accordion',
+  prop: 'expanded',
+  values: [['a'], ['a', 'b']],
+  render: (props) => <Accordion items={sections} {...props} />,
+  change: (host) => triggerOf(host, 'b').click(),
+  read: openValues,
+  normalizes: [['missing', 'a'], ['a']],
+  handler: 'onClickCapture',
+})
+
+// K3: in single mode the value and every payload hold at most one section.
+describeControlled<string[]>({
+  name: 'Accordion',
+  prop: 'expanded',
+  values: [['a'], ['b']],
+  render: (props) => <Accordion items={sections} multiple={false} {...props} />,
+  change: (host, [to]) => triggerOf(host, to).click(),
+  read: openValues,
+  normalizes: [['missing', 'b', 'a'], ['b']],
+  handler: 'onClickCapture',
+})
+
+describeRoving({
+  name: 'Accordion',
+  orientation: 'vertical',
+  tabStops: 'all',
+  render: ({ items }) => (
+    <Accordion items={items.map((item) => ({ ...item, content: item.label }))} />
+  ),
+  items: (host) => [
+    ...host.querySelectorAll<HTMLElement>('button[data-part="trigger"]'),
+  ],
+})
 
 let host: HTMLDivElement, root: Root
 const items = ['a', 'b', 'a\u0001b'].map((value) => ({
@@ -40,36 +91,31 @@ it('renders an empty accordion without invented items or callbacks', async () =>
 it('controlled empty wins over a nonempty default and rejected clicks stay closed', async () => {
   const change = vi.fn()
   await render({
-    expandedIds: [],
-    defaultExpandedIds: ['a'],
+    expanded: [],
+    defaultExpanded: ['a'],
     onExpandedChange: change,
   })
   expect(expanded()).toEqual([])
   await click(0)
   expect(expanded()).toEqual([])
-  expect(change).toHaveBeenCalledExactlyOnceWith({ expandedIds: ['a'] })
+  expect(change).toHaveBeenCalledExactlyOnceWith({ expanded: ['a'] })
 })
 
 it('controlled arrays do not collide when string values contain separators', async () => {
-  await render({ expandedIds: ['a', 'b'] })
-  await render({ expandedIds: ['a\u0001b'] })
+  await render({ expanded: ['a', 'b'] })
+  await render({ expanded: ['a\u0001b'] })
   expect(expanded()).toEqual(['a\u0001b'])
 })
 
-it('multiple=false actually permits only one expanded section', async () => {
-  await render({ defaultExpandedIds: ['a', 'b'], multiple: false })
-  expect(expanded()).toHaveLength(1)
-})
-
 it('removing an expanded item cannot let the final remaining panel collapse', async () => {
-  await render({ defaultExpandedIds: ['a', 'b'], collapsible: false })
+  await render({ defaultExpanded: ['a', 'b'], collapsible: false })
   await render({ items: [items[1]], collapsible: false })
   await click(0)
   expect(expanded()).toEqual(['b'])
 })
 
 it('non-collapsible last open trigger exposes its disabled action but remains focusable', async () => {
-  await render({ defaultExpandedIds: ['a'], collapsible: false })
+  await render({ defaultExpanded: ['a'], collapsible: false })
   expect(triggers()[0].getAttribute('aria-disabled')).toBe('true')
   expect(triggers()[0].disabled).toBe(false)
 })
@@ -95,22 +141,12 @@ it('native identity, direction, style and hidden belong to the root ref', async 
   expect(ref.current?.hidden).toBe(true)
 })
 
-it('capture cancellation prevents expansion', async () => {
-  const change = vi.fn(),
-    capture = vi.fn((event: Event) => event.preventDefault())
-  await render({ onClickCapture: capture, onExpandedChange: change })
-  await click(0)
-  expect(capture).toHaveBeenCalledOnce()
-  expect(expanded()).toEqual([])
-  expect(change).not.toHaveBeenCalled()
-})
-
 it('keyed content preserves input state after content reordering', async () => {
   const a = <input key="a" aria-label="A" defaultValue="a" />
   const b = <input key="b" aria-label="B" defaultValue="b" />
   await render({
     items: [{ ...items[0], content: [a, b] }],
-    defaultExpandedIds: ['a'],
+    defaultExpanded: ['a'],
   })
   const node = host.querySelector<HTMLInputElement>('[aria-label="A"]')!
   node.value = 'edited'
@@ -126,33 +162,29 @@ it('whitespace in a valid item string does not create invalid ARIA ID tokens', a
   expect(triggers()[0].getAttribute('aria-controls')).not.toMatch(/\s/)
 })
 
-it('default changes do not overwrite uncontrolled expansion or emit callbacks', async () => {
-  const change = vi.fn()
-  await render({ defaultExpandedIds: ['a'], onExpandedChange: change })
-  await render({ defaultExpandedIds: ['b'], onExpandedChange: change })
-  expect(expanded()).toEqual(['a'])
-  expect(change).not.toHaveBeenCalled()
-})
-
 it('deduplicates visible expansion and ignores absent items when deciding whether collapse is allowed', async () => {
   const change = vi.fn()
-  await render({
-    defaultExpandedIds: ['missing', 'a', 'a'],
-    collapsible: false,
-    onExpandedChange: change,
-  })
+  await expectDevError(
+    () =>
+      render({
+        defaultExpanded: ['missing', 'a', 'a'],
+        collapsible: false,
+        onExpandedChange: change,
+      }),
+    /^Face UI Accordion: invalid defaultExpanded\[2\] "a"; dropping the duplicate\.$/,
+  )
   await click(0)
   expect(expanded()).toEqual(['a'])
   expect(change).not.toHaveBeenCalled()
   await click(1)
   expect(expanded()).toEqual(['a', 'b'])
-  expect(change).toHaveBeenCalledExactlyOnceWith({ expandedIds: ['a', 'b'] })
+  expect(change).toHaveBeenCalledExactlyOnceWith({ expanded: ['a', 'b'] })
 })
 
 it('async items, reorder, and mode changes project the same stored intent quietly', async () => {
   const change = vi.fn(),
     ids = Object.freeze(['b', 'a'])
-  await render({ items: [], defaultExpandedIds: ids, onExpandedChange: change })
+  await render({ items: [], defaultExpanded: ids, onExpandedChange: change })
   await render({ items, multiple: false, onExpandedChange: change })
   expect(expanded()).toEqual(['b'])
   await render({
@@ -164,21 +196,10 @@ it('async items, reorder, and mode changes project the same stored intent quietl
   expect(change).not.toHaveBeenCalled()
 })
 
-it('controlled ownership may be acquired and released without reviving the default', async () => {
-  const change = vi.fn()
-  await render({ defaultExpandedIds: ['a'], onExpandedChange: change })
-  await render({ expandedIds: ['b'], onExpandedChange: change })
-  expect(expanded()).toEqual(['b'])
-  await render({ onExpandedChange: change })
-  await click(0)
-  expect(expanded()).toEqual(['a', 'b'])
-  expect(change).toHaveBeenCalledExactlyOnceWith({ expandedIds: ['b', 'a'] })
-})
-
 it('the latest callback can accept controlled proposals and cannot mutate stored state', async () => {
   const old = vi.fn(),
-    current = vi.fn((details: { expandedIds: string[] }) =>
-      details.expandedIds.push('b'),
+    current = vi.fn((details: { expanded: string[] }) =>
+      details.expanded.push('b'),
     )
   await render({ onExpandedChange: old })
   await render({ onExpandedChange: current })
@@ -192,7 +213,7 @@ it('explicitly disabled triggers cannot change even when already expanded', asyn
   const change = vi.fn()
   await render({
     items: [{ ...items[0], disabled: true }, items[1]],
-    defaultExpandedIds: ['a'],
+    defaultExpanded: ['a'],
     onExpandedChange: change,
   })
   await click(0)
@@ -207,19 +228,19 @@ it('explicitly disabled triggers cannot change even when already expanded', asyn
 it('collapsible=false permits an explicitly empty value and external updates', async () => {
   const change = vi.fn()
   await render({
-    expandedIds: [],
+    expanded: [],
     collapsible: false,
     onExpandedChange: change,
   })
   expect(expanded()).toEqual([])
   await render({
-    expandedIds: ['b'],
+    expanded: ['b'],
     collapsible: false,
     onExpandedChange: change,
   })
   expect(triggers()[1].getAttribute('aria-disabled')).toBe('true')
   await render({
-    expandedIds: ['b'],
+    expanded: ['b'],
     collapsible: true,
     onExpandedChange: change,
   })
@@ -245,7 +266,7 @@ it.each(
 
 it('heading levels and optional regions update without remounting triggers or contents', async () => {
   await render({
-    defaultExpandedIds: ['a'],
+    defaultExpanded: ['a'],
     items: [{ ...items[0], region: true }],
   })
   const trigger = triggers()[0],
@@ -267,7 +288,7 @@ it('heading levels and optional regions update without remounting triggers or co
 
 it('collapse, icon changes and item reorder retain mounted panel input state', async () => {
   const a = { ...items[0], content: <input defaultValue="initial" /> }
-  await render({ defaultExpandedIds: ['a'], items: [a, items[1]] })
+  await render({ defaultExpanded: ['a'], items: [a, items[1]] })
   const input = host.querySelector('input')!
   input.value = 'edited'
   await click(0)
@@ -359,33 +380,50 @@ it('capture can cancel arrows while native modifier shortcuts remain untouched',
   expect(document.activeElement).toBe(triggers()[0])
 })
 
+const all = items.map((item) => item.value)
 it.each([
-  { items: {} },
-  { items: [null] },
-  { items: [{ ...items[0], value: 1 }] },
-  { items: [items[0], items[0]] },
-  { items: [{ ...items[0], label: '' }] },
-  { expandedIds: null },
-  { expandedIds: ['a', 1] },
-  { defaultExpandedIds: 'a' },
-  { headingLevel: 0 },
-  { headingLevel: 7 },
-  { headingLevel: 2.5 },
-  { items: [{ ...items[0], label: '   ' }] },
-  { expandedIds: new Array(2) },
-])('rejects malformed API data with a component-owned error (%j)', (props) => {
-  expect(() =>
-    renderToStaticMarkup(
-      <Accordion {...(props as unknown as AccordionProps)} />,
-    ),
-  ).toThrow(/Accordion/)
+  [{ items: {} }, 'invalid items object; using \\[\\]', [], []],
+  [{ items: [null, items[1]] }, 'invalid items\\[0\\] null; dropping the item', ['b'], []],
+  [{ items: [{ ...items[0], value: 1 }] }, 'invalid items\\[0\\] key 1; dropping the item', [], []],
+  [
+    { items: [items[0], { ...items[0], label: 'Second' }] },
+    'invalid items\\[1\\] key "a"; dropping the duplicate',
+    ['a'],
+    [],
+  ],
+  [{ expanded: null }, 'invalid expanded null; using \\[\\]', all, []],
+  [{ expanded: ['a', 1] }, 'invalid expanded\\[1\\] 1; dropping it', all, ['a']],
+  [{ defaultExpanded: 'a' }, 'invalid defaultExpanded "a"; using \\[\\]', all, []],
+])('malformed data renders normalized and reports it (%j)', async (props, report, shown, open) => {
+  await expectDevError(() => render(props), new RegExp(`^Face UI Accordion: ${report}\\.$`))
+  expect(triggers().map((node) => node.dataset.value)).toEqual(shown)
+  expect(expanded()).toEqual(open)
+})
+
+it.each([
+  [0, 1],
+  [7, 6],
+  [2.5, 2],
+])('headingLevel %s renders as aria-level %s with a report', async (headingLevel, level) => {
+  await expectDevError(
+    () => render({ headingLevel }),
+    new RegExp(`^Face UI Accordion: invalid headingLevel ${headingLevel}; using ${level}\\.$`),
+  )
+  for (const trigger of triggers())
+    expect(trigger.parentElement!.getAttribute('aria-level')).toBe(String(level))
+})
+
+it('an empty label renders an unnamed section without a report', async () => {
+  await render({ items: [{ ...items[0], label: '' }, { ...items[1], label: '   ' }] })
+  expect(triggers()).toHaveLength(2)
+  expect(triggers()[0].querySelector('.uf-accordion-label')!.textContent).toBe('')
 })
 
 it('SSR observes controlled empty, single expansion and heading/region semantics', () => {
   const html = renderToStaticMarkup(
     <Accordion
       items={items}
-      expandedIds={['b', 'a']}
+      expanded={['b', 'a']}
       multiple={false}
       headingLevel={4}
     />,
@@ -395,7 +433,7 @@ it('SSR observes controlled empty, single expansion and heading/region semantics
   expect(html).not.toContain('role="region"')
   expect(
     renderToStaticMarkup(
-      <Accordion items={items} expandedIds={[]} defaultExpandedIds={['a']} />,
+      <Accordion items={items} expanded={[]} defaultExpanded={['a']} />,
     ),
   ).not.toContain('aria-expanded="true"')
 })
@@ -458,7 +496,7 @@ it.each(['empty', 'disabled'])(
       await render()
       await act(async () => triggers()[0].focus())
       await render(mode === 'empty' ? { items: [] } : { disabled: true })
-      outside.focus()
+      await act(async () => outside.focus())
       await render()
       expect(document.activeElement).toBe(outside)
     } finally {
@@ -473,7 +511,7 @@ it.each(['root', 'item'])(
     const action = vi.fn()
     await render({
       disabled: level === 'root',
-      defaultExpandedIds: ['a'],
+      defaultExpanded: ['a'],
       items: [
         {
           ...items[0],
@@ -540,7 +578,7 @@ describe('component smoke', () => {
     await act(async () => {
       root.render(
         <Accordion
-          defaultExpandedIds={['getting-started']}
+          defaultExpanded={['getting-started']}
           items={[
             {
               value: 'getting-started',
@@ -678,7 +716,7 @@ describe('Accordion and Navigation disclosure a11y baseline', () => {
   it('wires Accordion button triggers to controlled regions and disabled items', async () => {
     await act(async () => {
       root.render(
-        <Accordion items={accordionItems} defaultExpandedIds={['overview']} />,
+        <Accordion items={accordionItems} defaultExpanded={['overview']} />,
       )
     })
 
@@ -689,8 +727,7 @@ describe('Accordion and Navigation disclosure a11y baseline', () => {
     const detailsContent = getAccordionContent('details')
     const billingContent = getAccordionContent('billing')
 
-    expect(overviewTrigger.getAttribute('role')).toBe('button')
-    expect(overviewTrigger.id).toMatch(/^accordion:.+:trigger:overview$/)
+    expect(overviewTrigger.id).not.toMatch(/\s/)
     expect(overviewTrigger.getAttribute('aria-expanded')).toBe('true')
     expect(overviewTrigger.getAttribute('aria-controls')).toBe(
       overviewContent.id,
@@ -717,7 +754,7 @@ describe('Accordion and Navigation disclosure a11y baseline', () => {
       root.render(
         <Accordion
           items={accordionItems}
-          defaultExpandedIds={['overview']}
+          defaultExpanded={['overview']}
           collapsible={false}
         />,
       )
@@ -754,7 +791,7 @@ describe('Accordion and Navigation disclosure a11y baseline', () => {
         <Accordion
           key="collapsible"
           items={accordionItems}
-          defaultExpandedIds={['overview']}
+          defaultExpanded={['overview']}
           collapsible
         />,
       )
@@ -777,7 +814,7 @@ describe('Accordion and Navigation disclosure a11y baseline', () => {
       root.render(
         <Accordion
           items={accordionItems}
-          defaultExpandedIds={['overview']}
+          defaultExpanded={['overview']}
           multiple={false}
         />,
       )
@@ -797,21 +834,5 @@ describe('Accordion and Navigation disclosure a11y baseline', () => {
       'true',
     )
     expect(getAccordionContent('billing').hidden).toBe(false)
-  })
-})
-
-describe('content and upload integrity', () => {
-  it('expands registered accordion sections and updates the active keyboard item', () => {
-    const service = interpret(accordionMachine, {
-      enabledValues: ['a', 'c'],
-    }).start()
-    service.send('EXPAND_ALL')
-    expect(service.getSnapshot().context.expandedIds).toEqual(['a', 'c'])
-    service.send({ type: 'FOCUS', value: 'a' })
-    service.send('FOCUS_NEXT')
-    expect(service.getSnapshot().context.focusedValue).toBe('c')
-    service.send('FOCUS_FIRST')
-    expect(service.getSnapshot().context.focusedValue).toBe('a')
-    service.stop()
   })
 })

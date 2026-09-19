@@ -24,7 +24,16 @@ test('keyboard, Tab, disabled skip, cancellation, focus ring and membrane use on
   expect(
     await first(page).evaluate((node) => getComputedStyle(node).outlineStyle),
   ).not.toBe('none')
+  // APG accordion: every enabled trigger is a Tab stop; arrows wrap past the disabled one.
+  await page.keyboard.press('Tab')
+  await expect(last(page)).toBeFocused()
+  await page.keyboard.press('Shift+Tab')
+  await expect(first(page)).toBeFocused()
   await page.keyboard.press('ArrowDown')
+  await expect(last(page)).toBeFocused()
+  await page.keyboard.press('ArrowDown')
+  await expect(first(page)).toBeFocused()
+  await page.keyboard.press('End')
   await expect(last(page)).toBeFocused()
   await page.keyboard.press('Home')
   await expect(first(page)).toBeFocused()
@@ -33,15 +42,15 @@ test('keyboard, Tab, disabled skip, cancellation, focus ring and membrane use on
   await page.keyboard.press('Home')
   await page.keyboard.press('Space')
   await expect(first(page)).toHaveAttribute('aria-expanded', 'true')
-  expect(await events(page)).toEqual([{ expandedIds: ['first'] }])
+  expect(await events(page)).toEqual([{ expanded: ['first'] }])
   await page.keyboard.press('Tab')
   await expect(page.getByRole('textbox', { name: 'Panel input' })).toBeFocused()
   await page.keyboard.press('Tab')
   await expect(last(page)).toBeFocused()
   await page.keyboard.press('Enter')
   expect(await events(page)).toEqual([
-    { expandedIds: ['first'] },
-    { expandedIds: ['first', 'last'] },
+    { expanded: ['first'] },
+    { expanded: ['first', 'last'] },
   ])
   await render(page, {}, { cancelClick: true, cancelKey: true })
   await first(page).focus()
@@ -90,7 +99,7 @@ test('keyed panel content retains focus, node identity and form input across reo
 }) => {
   await render(
     page,
-    { defaultExpandedIds: ['first'] },
+    { defaultExpanded: ['first'] },
     { scenario: 'keys', reset: true },
   )
   const input = page.getByRole('textbox', { name: 'First input' })
@@ -125,7 +134,7 @@ test('nested foreign controls keep their own geometry and content semantics', { 
 }) => {
   await render(
     page,
-    { defaultExpandedIds: ['first'] },
+    { defaultExpanded: ['first'] },
     { scenario: 'foreign', reset: true },
   )
   const controls = [
@@ -161,7 +170,7 @@ for (const level of ['root', 'item'])
   }) => {
     await render(
       page,
-      { disabled: level === 'root', defaultExpandedIds: ['first'] },
+      { disabled: level === 'root', defaultExpanded: ['first'] },
       { scenario: 'action', disableFirst: level === 'item', reset: true },
     )
     const button = page.getByRole('button', {
@@ -191,7 +200,7 @@ for (const theme of ['light', 'dark'])
       )
       await render(
         page,
-        { dir, defaultExpandedIds: ['first'], icon: 'folder' },
+        { dir, defaultExpanded: ['first'], icon: 'folder' },
         { scenario: 'nested', reset: true },
       )
       const child = page.getByRole('button', {
@@ -247,7 +256,7 @@ for (const theme of ['light', 'dark'])
       ).toBe(true)
       await render(
         page,
-        { dir, disabled: true, defaultExpandedIds: ['first'] },
+        { dir, disabled: true, defaultExpanded: ['first'] },
         { reset: true },
       )
       await expect(first(page)).toBeDisabled()
@@ -280,7 +289,7 @@ for (const theme of ['light', 'dark'])
         await page.setViewportSize({ width, height: 850 })
         await render(
           page,
-          { dir, defaultExpandedIds: ['first'] },
+          { dir, defaultExpanded: ['first'] },
           { reset: true },
         )
         await page.addScriptTag({ content: axe.source })

@@ -17,6 +17,7 @@ const UNCONTROLLED_PROP_PAIRS = [
   ['collapsed', 'defaultCollapsed'],
   ['selectedId', 'defaultSelectedId'],
   ['expandedIds', 'defaultExpandedIds'],
+  ['expanded', 'defaultExpanded'],
   ['page', 'defaultPage'],
   ['step', 'defaultStep'],
   ['sizes', 'defaultSizes'],
