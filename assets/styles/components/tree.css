@@ -1,89 +1,87 @@
 /* =================================================================
- * TREE (TreeView)
+ * TREE
  * ================================================================= */
 .uf-tree[data-scope] {
-  --uf-tree-branch-indicator-size: var(--uf-spacing-4);
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0;
-  width: 100%;
-  max-height: none;
-  overflow: visible;
-  overscroll-behavior: auto;
+  inline-size: 100%;
+  min-inline-size: 0;
 }
-.uf-tree[data-scope] [data-part="branch"],
-.uf-tree[data-scope] .uf-tree-branch {
+.uf-tree-group[data-scope] {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0;
-  width: 100%;
-  min-width: 0;
+  min-inline-size: 0;
 }
-.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]),
-.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]),
-.uf-tree[data-scope] .uf-tree-custom-node {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+/* Each level indents by one option step, so a child's arrow sits under its parent's icon. */
+.uf-tree-item[data-scope] {
   min-height: var(--uf-control-height);
-  height: auto;
-  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
-  gap: var(--uf-control-gap);
-  cursor: pointer;
-  color: var(--uf-color-fg);
-  font-size: var(--uf-font-size-sm);
-  border-radius: var(--uf-radius);
-  border: none;
-  background: var(--uf-color-black-0);
-  font: inherit;
-  width: 100%;
-  min-width: 0;
-  text-align: left;
+  justify-content: flex-start;
+  padding-inline-start: calc(var(--uf-control-pad-icon) + var(--uf-tree-depth, 0) * var(--uf-option-indent));
+  padding-inline-end: var(--uf-control-pad-text);
+  text-align: start;
 }
-.uf-tree[data-scope] .uf-tree-custom-node {
-  padding-inline-start: calc(var(--uf-control-pad-start) + (var(--face-runtime-option-level, 0) * var(--uf-option-indent)));
-}
-.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"]):hover,
-.uf-tree[data-scope] [data-part="branchTrigger"]:not([data-scope="button"]):hover,
-.uf-tree[data-scope] .uf-tree-custom-node:hover {
+.uf-tree-item[data-scope]:hover {
   background: var(--uf-color-hover-bg);
 }
-.uf-tree[data-scope] [data-part="item"]:not([data-scope="button"])[aria-selected="true"],
-.uf-tree[data-scope] .uf-tree-custom-node[aria-selected="true"] {
-  background: var(--uf-color-hover-bg);
+/* Only the selected item is marked: a step stronger than hover, and bold, so hover never looks like it. */
+.uf-tree-item[data-scope][aria-selected="true"] {
+  background: var(--uf-color-active-bg);
+  font-weight: var(--uf-font-weight-bold);
 }
-.uf-tree[data-scope] [data-part="branchIndicator"] {
-  width: var(--uf-tree-branch-indicator-size);
-  height: var(--uf-tree-branch-indicator-size);
-  display: flex;
+/* Inherit from the nearest HTML direction boundary; CSS minifiers may lower :dir() to :lang(). */
+:where([dir="ltr"]) {
+  --uf-tree-closed-angle: 0deg;
+}
+:where([dir="rtl"]) {
+  --uf-tree-closed-angle: 180deg;
+}
+/* Leaves keep the empty slot so labels align at every level; the 20px arrow box overflows it evenly. */
+.uf-tree-indicator {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  flex: none;
+  inline-size: var(--uf-tree-branch-indicator-size);
+  min-inline-size: 0;
+  transform: rotate(var(--uf-tree-closed-angle, 0deg));
+  transition: transform var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
 }
-.uf-tree[data-scope] [data-part="branchContent"] {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0;
-  width: 100%;
+.uf-tree-item[aria-expanded="true"] > .uf-tree-indicator {
+  transform: rotate(90deg);
+}
+.uf-tree-icon {
+  display: inline-flex;
+  flex: none;
+}
+.uf-tree-label {
+  flex: 1 1 auto;
   min-width: 0;
-  padding-left: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.uf-tree[data-scope] .uf-tree-item-button,
-.uf-tree[data-scope] .uf-tree-branch-button,
-.uf-tree[data-scope] .uf-tree-custom-node {
-  width: 100%;
+.uf-tree-meta {
+  flex: none;
+  color: var(--uf-color-fg-muted);
 }
-.uf-tree[data-scope] .uf-tree-item-button[aria-selected="true"],
-.uf-tree[data-scope] .uf-tree-branch-button[aria-selected="true"],
-.uf-tree[data-scope] .uf-tree-custom-node[aria-selected="true"],
-.uf-tree[data-scope] .uf-tree-item-button[data-active-path],
-.uf-tree[data-scope] .uf-tree-branch-button[data-active-path],
-.uf-tree[data-scope] .uf-tree-custom-node[data-active-path] {
-  background: var(--uf-color-hover-bg);
+/* The guide runs under the arrow of the item whose nested items it spans. */
+.uf-tree[data-variant="lines"] .uf-tree-group {
+  position: relative;
 }
-.uf-tree[data-scope] [data-part="branchContent"][hidden] {
-  display: none;
+.uf-tree[data-variant="lines"] .uf-tree-group::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--uf-membrane) + var(--uf-control-pad-icon) + var(--uf-tree-depth, 0) * var(--uf-option-indent) + var(--uf-tree-branch-indicator-size) / 2);
+  border-inline-start: var(--uf-membrane) solid var(--uf-color-border);
+  pointer-events: none;
+}
+@media (forced-colors: active) {
+  .uf-tree-item[data-scope][aria-selected="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
 }

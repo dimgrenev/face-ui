@@ -84,7 +84,7 @@ export type {
   ToasterProps,
 } from './Toast/Toast'
 export { Tree } from './Tree/Tree'
-export type { TreeProps, TreeNode } from './Tree/Tree'
+export type { TreeProps, TreeItem, TreeRenderNodeDetails } from './Tree/Tree'
 
 // Shared utilities and types
 export type { FieldProps } from './assets/internal/field'

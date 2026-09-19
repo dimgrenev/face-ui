@@ -833,64 +833,66 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       {
         name: 'Default',
         props: {
+          'aria-label': 'Files',
           items: [
             {
-              id: 'src',
+              value: 'src',
               label: 'src',
               icon: 'folder',
-              children: [
+              items: [
                 {
-                  id: 'components',
+                  value: 'components',
                   label: 'components',
                   icon: 'folder',
-                  children: [
-                    { id: 'button', label: 'Button.tsx', icon: 'file' },
-                    { id: 'tile', label: 'Tile.tsx', icon: 'file', kind: 'tile' },
+                  items: [
+                    { value: 'button', label: 'Button.tsx', icon: 'file' },
+                    { value: 'tile', label: 'Tile.tsx', icon: 'file' },
                   ],
                 },
                 {
-                  id: 'assets',
+                  value: 'assets',
                   label: 'assets',
                   icon: 'folder',
-                  children: [
+                  items: [
                     {
-                      id: 'icons',
+                      value: 'icons',
                       label: 'icons',
                       icon: 'folder',
-                      children: [
-                        { id: 'search-icon', label: 'search.svg', icon: 'file' },
-                        { id: 'folder-icon', label: 'folder.svg', icon: 'file' },
+                      items: [
+                        { value: 'search-icon', label: 'search.svg', icon: 'file' },
+                        { value: 'folder-icon', label: 'folder.svg', icon: 'file' },
                       ],
                     },
                   ],
                 },
-                { id: 'index', label: 'index.ts', icon: 'file' },
+                { value: 'index', label: 'index.ts', icon: 'file' },
               ],
             },
-            { id: 'readme', label: 'README.md', icon: 'file' },
+            { value: 'readme', label: 'README.md', icon: 'file' },
           ],
-          defaultExpandedIds: ['src', 'components', 'assets', 'icons'],
-          defaultSelectedId: 'button',
+          defaultExpanded: ['src', 'components', 'assets', 'icons'],
+          defaultValue: 'button',
         },
       },
       {
-        name: 'Mixed Rows',
+        name: 'Guide Lines',
         props: {
+          'aria-label': 'Workspace',
+          variant: 'lines',
           items: [
             {
-              id: 'workspace',
+              value: 'workspace',
               label: 'Workspace',
               icon: 'folder',
-              kind: 'tile',
-              children: [
-                { id: 'overview', label: 'Overview', icon: 'file', kind: 'tile' },
-                { id: 'settings', label: 'Settings', icon: 'settings', rightText: '3' },
-                { id: 'tokens', label: 'Tokens', icon: 'theme' },
+              items: [
+                { value: 'overview', label: 'Overview', icon: 'file' },
+                { value: 'settings', label: 'Settings', icon: 'settings', meta: '3' },
+                { value: 'tokens', label: 'Tokens', icon: 'theme', disabled: true },
               ],
             },
           ],
-          defaultExpandedIds: ['workspace'],
-          defaultSelectedId: 'overview',
+          defaultExpanded: ['workspace'],
+          defaultValue: 'overview',
         },
       },
     ],
