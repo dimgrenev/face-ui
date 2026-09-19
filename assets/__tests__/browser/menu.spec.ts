@@ -62,12 +62,17 @@ test('a context menu opens at the pointer and flips above it near the bottom edg
   let surface = await surfaceBox(page)
   expect(Math.abs(surface.x - (canvas.x + 120))).toBeLessThanOrEqual(1)
   expect(Math.abs(surface.y - (canvas.y + 60))).toBeLessThanOrEqual(1)
-  // Another right-click moves the open menu to the new point and keeps the keyboard in it.
+  // Another right-click closes the menu with its press and opens it at the new point, keyboard in it.
   await page.mouse.click(canvas.x + 200, canvas.y + 20, { button: 'right' })
   await expect
     .poll(async () => Math.abs((await box(page, '.uf-menu-content')).x - canvas.x - 200) <= 1)
     .toBe(true)
   await expect(menu(page)).toBeFocused()
+  expect(await events(page)).toEqual([
+    { type: 'open', open: true },
+    { type: 'open', open: false },
+    { type: 'open', open: true },
+  ])
   await page.keyboard.press('ArrowDown')
   await expect(item(page, 'Copy')).toBeFocused()
   await page.keyboard.press('Escape')
@@ -79,6 +84,34 @@ test('a context menu opens at the pointer and flips above it near the bottom edg
   await expect(page.locator('.uf-menu-content')).toHaveAttribute('data-side', 'top')
   surface = await surfaceBox(page)
   expect(Math.abs(surface.y + surface.height - y)).toBeLessThanOrEqual(1)
+})
+
+test('a context menu without room right of the pointer opens left of it instead of covering it', { tag: ['@layout', '@pointer'] }, async ({
+  page,
+}) => {
+  await render(page, { openOn: 'context' }, { right: true })
+  const canvas = await box(page, '#canvas')
+  const x = canvas.x + canvas.width - 10
+  await page.mouse.click(x, canvas.y + 60, { button: 'right' })
+  const surface = await surfaceBox(page)
+  expect(Math.abs(surface.x + surface.width - x)).toBeLessThanOrEqual(1)
+  expect(Math.abs(surface.y - (canvas.y + 60))).toBeLessThanOrEqual(1)
+})
+
+test('a press in the context area outside the menu closes it, as any outside press does', { tag: ['@pointer'] }, async ({
+  page,
+}) => {
+  await render(page, { openOn: 'context' })
+  const canvas = await box(page, '#canvas')
+  await page.mouse.click(canvas.x + 120, canvas.y + 60, { button: 'right' })
+  await expect(menu(page)).toBeVisible()
+  // Left of the menu, inside the area.
+  await page.mouse.click(canvas.x + 20, canvas.y + 200)
+  await expect(menu(page)).toHaveCount(0)
+  expect(await events(page)).toEqual([
+    { type: 'open', open: true },
+    { type: 'open', open: false },
+  ])
 })
 
 test('a link item follows its href; with a modifier key the browser opens it elsewhere and the page stays', { tag: ['@native'] }, async ({
@@ -150,6 +183,9 @@ test('a pointer open focuses the menu without highlighting; hover highlights and
   await page.locator('#trigger').click()
   await expect(menu(page)).toBeFocused()
   await expect(menu(page).locator('[data-highlighted]')).toHaveCount(0)
+  // Letters typed on the list and then on the items form one search.
+  await page.keyboard.type('pre')
+  await expect(item(page, 'Preview')).toBeFocused()
   await item(page, 'Print').hover()
   await expect(item(page, 'Print')).toHaveAttribute('data-highlighted')
   await page.keyboard.press('ArrowDown')
@@ -168,6 +204,39 @@ test('an outside press closes the menu through the layer stack and the pressed c
   await expect(page.locator('#before')).toBeFocused()
   expect((await events(page)).at(-1)).toEqual({ type: 'open', open: false })
 })
+
+test('a pointer open shows no focus ring around the menu list, in a popover or a sheet', { tag: ['@css', '@focus'] }, async ({
+  page,
+}) => {
+  for (const surface of ['popover', 'sheet'] as const) {
+    await render(page, { surface })
+    await page.locator('#trigger').click()
+    await expect(menu(page)).toBeFocused()
+    await expect(menu(page)).toHaveCSS('outline-style', 'none')
+    await page.keyboard.press('Escape')
+    await expect(menu(page)).toHaveCount(0)
+  }
+})
+
+for (const theme of ['light', 'dark']) {
+  test(`a destructive item's label takes the destructive color a host palette supplies in ${theme}`, { tag: ['@css'] }, async ({
+    page,
+  }) => {
+    // The authored monochrome palette aliases destructive to the foreground in light mode.
+    await page.evaluate((theme) => {
+      document.documentElement.dataset.theme = theme
+      document.documentElement.style.setProperty('--uf-color-destructive', 'rgb(184, 32, 48)')
+    }, theme)
+    await render(page)
+    await page.locator('#trigger').click()
+    const label = (name: string) =>
+      item(page, name)
+        .locator('.uf-menu-itemLabel')
+        .evaluate((node) => getComputedStyle(node).color)
+    expect(await label('Delete')).toBe('rgb(184, 32, 48)')
+    expect(await label('Print')).not.toBe('rgb(184, 32, 48)')
+  })
+}
 
 test('the open menu, its groups and checkbox items pass axe', { tag: ['@a11y'] }, async ({ page }) => {
   await render(page, { 'aria-label': 'Canvas actions' })

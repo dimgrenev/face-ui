@@ -1,4 +1,4 @@
-import { act, createRef, type ReactElement } from 'react'
+import { act, createRef, useState, type ReactElement } from 'react'
 import type { Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Menu, type MenuItemEntry, type MenuProps } from '../../Menu/Menu'
@@ -109,16 +109,42 @@ describe('Menu openOn', () => {
     expect(menu()!.hasAttribute('aria-labelledby')).toBe(false)
   })
 
-  it('openOn context: a second context menu while open keeps it open and takes focus back from the area', async () => {
+  it('openOn context: a press in the area outside the menu closes it, and focus returns where it was on open', async () => {
     const onOpenChange = vi.fn()
     await show(
       <Menu items={items} openOn="context" surface="popover" onOpenChange={onOpenChange}>
-        <div>Canvas</div>
+        <div tabIndex={0}>Canvas</div>
+      </Menu>,
+    )
+    // Pressing the area focuses it before its context menu fires.
+    await act(async () => trigger().focus())
+    await contextMenu(trigger(), 10, 10)
+    expect(document.activeElement).toBe(menu())
+    await pointer(trigger(), 'pointerdown')
+    expect(menu()).toBeNull()
+    // The press focuses the area, and its context menu opens the menu again; Escape returns focus to the area.
+    await act(async () => trigger().focus())
+    await contextMenu(trigger(), 40, 40)
+    expect(document.activeElement).toBe(menu())
+    await press('Escape')
+    expect(menu()).toBeNull()
+    expect(document.activeElement).toBe(trigger())
+    expect(onOpenChange.mock.calls).toEqual([
+      [{ open: true }],
+      [{ open: false }],
+      [{ open: true }],
+      [{ open: false }],
+    ])
+  })
+
+  it('openOn context: a context menu with no press before it (a touch long-press) moves the open menu and takes focus back', async () => {
+    const onOpenChange = vi.fn()
+    await show(
+      <Menu items={items} openOn="context" surface="popover" onOpenChange={onOpenChange}>
+        <div tabIndex={0}>Canvas</div>
       </Menu>,
     )
     await contextMenu(trigger(), 10, 10)
-    expect(document.activeElement).toBe(menu())
-    // Pressing the area focuses it before its context menu fires.
     await act(async () => trigger().focus())
     await contextMenu(trigger(), 40, 40)
     expect(document.activeElement).toBe(menu())
@@ -138,7 +164,7 @@ describe('Menu placement', () => {
         return rect(TRIGGER.left, TRIGGER.top, TRIGGER.width, TRIGGER.height)
       if (node.matches('.uf-menu-content')) return rect(0, 0, CONTENT.width, CONTENT.height)
       if (node.style.position === 'fixed')
-        return rect(parseFloat(node.style.left), parseFloat(node.style.top), 0, 0)
+        return rect(parseFloat(node.style.left), parseFloat(node.style.top), parseFloat(node.style.width) || 0, 0)
       return rect(0, 0, 0, 0)
     })
   })
@@ -193,6 +219,27 @@ describe('Menu placement', () => {
     // A second context menu moves the open menu to the new point.
     await contextMenu(trigger(), 320, 240)
     expect(placed()).toEqual([320, 240, 'bottom'])
+  })
+
+  it('a context menu opens from the pointer in the reading direction, and on the other side when only that one has room', async () => {
+    const width = window.innerWidth
+    await render({ openOn: 'context' })
+    await contextMenu(trigger(), width - 24, 200)
+    expect(placed()).toEqual([width - 24 - 160, 200, 'bottom'])
+    await press('Escape')
+    // In right-to-left text a context menu opens leftward, and back rightward at the left edge.
+    await show(
+      <div dir="rtl">
+        <Menu items={items} openOn="context" surface="popover">
+          <button type="button">Canvas</button>
+        </Menu>
+      </div>,
+    )
+    await contextMenu(trigger(), 300, 200)
+    expect(placed()).toEqual([300 - 160, 200, 'bottom'])
+    await press('Escape')
+    await contextMenu(trigger(), 24, 200)
+    expect(placed()).toEqual([24, 200, 'bottom'])
   })
 
   it('sideOffset that is not a finite number falls back to 4 with a report', async () => {
@@ -391,11 +438,20 @@ describe('Menu items', () => {
     expect(libraryCss()).toMatch(/\.uf-menu-item\[aria-checked="false"\] \.uf-menu-itemCheck \{\s*visibility: hidden;/)
   })
 
+  it('item.checked: activating a checkbox item reports its value and closes the menu, as every item does', async () => {
+    const onSelect = vi.fn()
+    await render({ defaultOpen: true, onSelect, items: [{ value: 'grid', label: 'Grid', checked: false }] })
+    await click(item('grid'))
+    expect(onSelect.mock.calls.map(([details]) => details.value)).toEqual(['grid'])
+    expect(menu()).toBeNull()
+  })
+
   it('item.tone: destructive colors the item as a destructive action', async () => {
     await render({ defaultOpen: true })
     expect(item('delete').getAttribute('data-tone')).toBe('destructive')
     expect(item('copy').hasAttribute('data-tone')).toBe(false)
-    expect(libraryCss()).toMatch(/\.uf-menu-item\[data-tone="destructive"\] \{\s*color: var\(--uf-color-destructive\);/)
+    // The label is a Text, which takes its color from --uf-text-color; the browser spec checks the computed color.
+    expect(libraryCss()).toMatch(/\.uf-menu-item\[data-tone="destructive"\] \{\s*--uf-text-color: var\(--uf-color-destructive\);\s*color: var\(--uf-color-destructive\);/)
   })
 })
 
@@ -594,6 +650,54 @@ describe('Menu keyboard and focus', () => {
       expect([name, focused()]).toEqual([name, expected])
       await click(trigger())
     }
+  })
+
+  it('after a pointer open, the letters typed on the list and then on the items form one search, forgotten on close', async () => {
+    await render({
+      items: [
+        { value: 'print', label: 'Print' },
+        { value: 'preview', label: 'Preview' },
+        { value: 'rulers', label: 'Rulers' },
+      ],
+    })
+    await click(trigger())
+    expect(document.activeElement).toBe(menu())
+    for (const letter of 'pre') await press(letter)
+    expect(focused()).toBe('preview')
+    await press('Escape')
+    await click(trigger())
+    await press('p')
+    await press('Escape')
+    // Reopened at once: "r" starts a new search instead of continuing "p".
+    await click(trigger())
+    await press('r')
+    expect(focused()).toBe('rulers')
+  })
+
+  it('a key opens at an edge item only when its own request opens the menu; an open by the parent focuses the list', async () => {
+    await render({ open: false, onOpenChange: () => {} })
+    // The parent refuses the keyboard request, then opens the menu itself.
+    await key(trigger(), 'Enter')
+    expect(menu()).toBeNull()
+    await render({ open: true, onOpenChange: () => {} })
+    expect(document.activeElement).toBe(menu())
+    let setOpen: (open: boolean) => void = () => {}
+    function Parent() {
+      const [open, set] = useState(false)
+      setOpen = set
+      return (
+        <Menu items={items} surface="popover" open={open} onOpenChange={(details) => set(details.open)}>
+          <button type="button">Actions</button>
+        </Menu>
+      )
+    }
+    await show(<Parent key="parent" />)
+    await key(trigger(), 'End')
+    expect(focused()).toBe('archive')
+    // Closed and reopened by the parent, not by a key.
+    await act(async () => setOpen(false))
+    await act(async () => setOpen(true))
+    expect(document.activeElement).toBe(menu())
   })
 
   it('arrows, Home and End move between enabled items and wrap at the ends', async () => {

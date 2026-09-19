@@ -84,6 +84,10 @@
   opacity: 1;
   transform: translateY(0) scale(1);
 }
+/* The list takes focus only as a starting point for keys after a pointer open; items show the ring. */
+.uf-menu-content .uf-menu-list[data-scope][data-part]:focus {
+  outline: none;
+}
 .uf-menu-item {
   width: 100%;
   justify-content: flex-start;
@@ -95,6 +99,7 @@
   background: var(--uf-color-hover-bg);
 }
 .uf-menu-item[data-tone="destructive"] {
+  --uf-text-color: var(--uf-color-destructive);
   color: var(--uf-color-destructive);
 }
 .uf-menu-itemIcon,

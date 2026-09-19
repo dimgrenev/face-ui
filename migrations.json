@@ -783,8 +783,26 @@
     {
       "kind": "behavior",
       "component": "Menu",
+      "before": "`.uf-menu` and `.uf-menu-content` carried `data-trigger=\"click|context\"`",
+      "after": "They carry `data-open-on=\"click|context\"`, after the prop"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "Typeahead read the text inside an item label that was an element",
+      "after": "Typeahead reads `textValue`, else a text `label`; give an element label a `textValue` to keep it searchable"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
       "before": "A context menu opened below its trigger",
       "after": "It opens at the pointer; `side`, `align` and `sideOffset` place click menus only"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "A press inside the context area kept an open context menu open, and closing it moved focus to the area or its first focusable element",
+      "after": "Any press outside the menu closes it, and a right-click reopens it at the new point; focus returns to where it was when the menu opened"
     },
     {
       "kind": "behavior",

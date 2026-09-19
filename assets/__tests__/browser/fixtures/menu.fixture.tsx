@@ -28,6 +28,8 @@ type Props = Omit<MenuProps, 'children' | 'onSelect' | 'onOpenChange' | 'items'>
 interface Layout {
   /** Puts the trigger at the bottom edge of the viewport. */
   bottom?: boolean
+  /** Puts the context area at the right edge of the viewport. */
+  right?: boolean
 }
 
 function renderMenu(props: Props = {}, layout: Layout = {}) {
@@ -57,7 +59,15 @@ function renderMenu(props: Props = {}, layout: Layout = {}) {
             onOpenChange={(details) => events.push({ type: 'open', ...details })}
           >
             {context ? (
-              <div id="canvas" style={{ width: 360, height: 240, background: '#eee' }}>
+              <div
+                id="canvas"
+                style={{
+                  width: 360,
+                  height: 240,
+                  background: '#eee',
+                  ...(layout.right ? { position: 'fixed', top: 16, right: 0 } : {}),
+                }}
+              >
                 Canvas
               </div>
             ) : (

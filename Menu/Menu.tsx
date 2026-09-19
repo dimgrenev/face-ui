@@ -43,6 +43,7 @@ import {
   typeahead,
   type Entry,
   type Move,
+  type Typeahead,
 } from '../assets/runtime/collection'
 import {
   keyToMove,
@@ -105,7 +106,7 @@ export interface MenuProps
   children?: ReactNode
   /** Items, separators and labelled groups in menu order; an item repeating an earlier value is dropped. */
   items?: readonly MenuItemEntry[]
-  /** Called when the user activates an enabled item, before the menu closes; `event.preventDefault()` cancels a link item's navigation. */
+  /** Called when the user activates an enabled item, then the menu closes; `event` is the click, whose `preventDefault()` cancels only a link item's navigation. */
   onSelect?: (details: { value: string; event: MouseEvent<HTMLElement> }) => void
   /** Opens on a click of the trigger, or on its context menu at the pointer. Default click. */
   openOn?: 'click' | 'context'
@@ -150,6 +151,8 @@ const { getPartAttrs: part } = createAnatomy('menu').parts(
   'group-label',
 )
 const defaultLabels: MenuLabels = Object.freeze({ close: 'Close' })
+/** The floating surface keeps this far from the viewport edges. */
+const VIEWPORT_INSET = 8
 
 const kindOf = (item: unknown) => {
   const { type } = item as { type?: unknown }
@@ -236,6 +239,8 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
     }, [available, shown, replaceOpen])
     const [point, setPoint] = useState<{ x: number; y: number } | null>(null)
     const [highlighted, setHighlighted] = useState<string | null>(null)
+    // Where focus goes on open: a key opens at an edge item, anything else on the list.
+    const [entry, setEntry] = useState<'first' | 'last' | null>(null)
     const [wasOpen, setWasOpen] = useState(isOpen)
     if (wasOpen !== isOpen) {
       setWasOpen(isOpen)
@@ -244,11 +249,11 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
         setHighlighted(null)
       }
     }
-    // Where focus goes on open: keyboard opens at an edge item, anything else on the list.
-    const entryEdge = useRef<'first' | 'last' | null>(null)
+    // A closed menu forgets the edge, so a request the parent refused cannot steer a later open.
+    if (entry !== null && !isOpen) setEntry(null)
     const request = (next: boolean, edge: 'first' | 'last' | null = null) => {
       if (!available) return
-      entryEdge.current = edge
+      setEntry(next ? edge : null)
       setOpen(next)
     }
     const close = () => request(false)
@@ -277,6 +282,24 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
     useIsomorphicLayoutEffect(() => {
       if (shows) setDirection(readDirection(triggerRef.current))
     })
+    // A context menu opens from the pointer in the reading direction. When only one side of the
+    // pointer has room, its anchor spans the menu's width on that side, which places it there in
+    // either direction.
+    const [span, setSpan] = useState({ start: 0, width: 0 })
+    useIsomorphicLayoutEffect(() => {
+      const node = contentRef.current
+      const view = node?.ownerDocument.defaultView
+      let next = { start: 0, width: 0 }
+      if (context && point && node && view) {
+        const width = node.getBoundingClientRect().width
+        const right = point.x + width + VIEWPORT_INSET <= view.innerWidth
+        const left = point.x - width - VIEWPORT_INSET >= 0
+        if (right !== left) next = { start: right ? 0 : -width, width }
+      }
+      setSpan((previous) =>
+        previous.start === next.start && previous.width === next.width ? previous : next,
+      )
+    }, [context, point, shows])
     const position = useFloatingPosition({
       open: shows && !isSheet,
       triggerRef: context && point ? pointRef : triggerRef,
@@ -287,16 +310,18 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
         ? 0
         : readNumber('Menu', 'sideOffset', sideOffset, 4),
       dir: dir ?? direction,
+      viewportInset: VIEWPORT_INSET,
     })
     useBodyScrollLock(shows && isSheet)
     useLayer({
       enabled: shows,
       contentRef,
-      triggerRef,
+      // A press in a context area outside the menu is outside it; focus returns where it was on open.
+      triggerRef: context ? undefined : triggerRef,
       modal: isSheet,
       autoFocus: true,
       initialFocus: () => {
-        const key = entryEdge.current ? edgeKey(entryEdge.current) : undefined
+        const key = entry ? edgeKey(entry) : undefined
         const node =
           key === undefined
             ? null
@@ -308,13 +333,17 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
       onOutside: close,
     })
 
-    // Keyboard focus between items: arrows, Home/End and typeahead.
+    // Keyboard focus between items: arrows and Home/End.
     const roving = useRovingFocus({
       keys,
       disabled: (key) => collection.get(key)?.disabled !== false,
       orientation: 'vertical',
-      typeahead: (key) => collection.get(key)?.text ?? '',
     })
+    // Typeahead belongs to the whole list, so the letters typed before focus reaches an item still count.
+    const query = useRef<Typeahead | null>(null)
+    useIsomorphicLayoutEffect(() => {
+      query.current = null
+    }, [shows])
     const onListKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
       roving.root.onKeyDown(event)
       if (event.defaultPrevented) return
@@ -324,6 +353,28 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
         if (!isSheet) flushSync(close)
         return
       }
+      if (
+        Array.from(event.key).length === 1 &&
+        !event.altKey &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.nativeEvent.isComposing
+      ) {
+        const [state, found] = typeahead(
+          query.current,
+          event.key,
+          event.timeStamp,
+          entries,
+          roving.keyOf(target),
+        )
+        query.current = state
+        // Space outside a query stays the item's own activation.
+        if (state.query) {
+          event.preventDefault()
+          if (found !== null) roving.focus(found)
+          return
+        }
+      }
       if (target !== event.currentTarget) {
         // Buttons activate on Space natively, links do not.
         if (event.key === ' ' && target.localName === 'a') {
@@ -332,21 +383,12 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
         }
         return
       }
-      // Focus on the list itself (opened by pointer): arrows and letters enter the items.
+      // Focus on the list itself (opened by pointer): arrows enter the items at an edge.
       const to = keyToMove(event, 'vertical', 'ltr')
-      let found: string | null | undefined
-      if (to) found = edgeKey(edgeOf(to))
-      else if (
-        Array.from(event.key).length === 1 &&
-        event.key.trim() &&
-        !event.altKey &&
-        !event.ctrlKey &&
-        !event.metaKey
-      )
-        found = typeahead(null, event.key, event.timeStamp, entries, null)[1]
-      else return
+      if (!to) return
       event.preventDefault()
-      if (found != null) roving.focus(found)
+      const key = edgeKey(edgeOf(to))
+      if (key !== undefined) roving.focus(key)
     }
 
     // Trigger.
@@ -356,7 +398,7 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
             if (!available) return
             event.preventDefault()
             setPoint({ x: event.clientX, y: event.clientY })
-            // Reopening at a new point takes focus back from the pressed context area.
+            // A mouse press closed an open menu already; a touch long-press moves it and takes focus back.
             if (isOpen) listRef.current?.focus({ preventScroll: true })
             else request(true)
           },
@@ -583,7 +625,12 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
                     <span
                       ref={pointRef}
                       aria-hidden="true"
-                      style={{ position: 'fixed', left: point.x, top: point.y }}
+                      style={{
+                        position: 'fixed',
+                        left: point.x + span.start,
+                        top: point.y,
+                        width: span.width,
+                      }}
                     />
                   )}
                   {content}

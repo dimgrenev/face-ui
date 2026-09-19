@@ -193,7 +193,10 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `surfaceTitle` only titled the sheet; the menu had no accessible name | `aria-label` names the menu and titles the sheet; without it a click menu is named by its trigger | — |
 | `ref` pointed to the `.uf-menu-content` surface, which stayed in the document while closed | `ref` and native attributes go on the `[role="menu"]` list, which exists only while open; `className` and `style` stay on `.uf-menu-content` | — |
 | Items were Face UI Buttons (`.uf-button`, `[data-scope="button"]`) | Items are `[data-scope="menu"][data-part="item"].uf-menu-item` buttons, or links with `href`; the label is `.uf-menu-itemLabel` | — |
+| `.uf-menu` and `.uf-menu-content` carried `data-trigger="click\|context"` | They carry `data-open-on="click\|context"`, after the prop | — |
+| Typeahead read the text inside an item label that was an element | Typeahead reads `textValue`, else a text `label`; give an element label a `textValue` to keep it searchable | — |
 | A context menu opened below its trigger | It opens at the pointer; `side`, `align` and `sideOffset` place click menus only | — |
+| A press inside the context area kept an open context menu open, and closing it moved focus to the area or its first focusable element | Any press outside the menu closes it, and a right-click reopens it at the new point; focus returns to where it was when the menu opened | — |
 | Opening by click kept focus on the trigger; Tab left the menu open; disabling an open menu left it open | A click focuses the menu list and a key opens at the first or last item; Tab closes it from the trigger; `disabled` closes it | — |
 
 ### Modal
