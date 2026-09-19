@@ -7,14 +7,20 @@
   "root": {
     "type": "Menu",
     "props": {
-      "trigger": {
-        "$ref": "props.trigger"
+      "children": {
+        "$ref": "props.children"
       },
       "items": {
         "$ref": "props.items"
       },
-      "children": {
-        "$ref": "props.children"
+      "openOn": {
+        "$ref": "props.openOn"
+      },
+      "open": {
+        "$ref": "props.open"
+      },
+      "defaultOpen": {
+        "$ref": "props.defaultOpen"
       },
       "disabled": {
         "$ref": "props.disabled"
@@ -22,8 +28,8 @@
       "surface": {
         "$ref": "props.surface"
       },
-      "surfaceBreakpoint": {
-        "$ref": "props.surfaceBreakpoint"
+      "side": {
+        "$ref": "props.side"
       },
       "align": {
         "$ref": "props.align"
@@ -31,45 +37,66 @@
       "sideOffset": {
         "$ref": "props.sideOffset"
       },
-      "surfaceTitle": {
-        "$ref": "props.surfaceTitle"
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "labels": {
+        "$ref": "props.labels"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "trigger": "click",
       "children": "Account",
       "surface": "popover",
       "align": "end",
       "sideOffset": 4,
-      "surfaceTitle": "Account actions",
+      "aria-label": "Account actions",
       "items": [
         {
           "value": "profile",
-          "label": "Profile settings"
+          "label": "Profile settings",
+          "icon": "user"
         },
         {
           "value": "billing",
           "label": "Billing"
         },
         {
+          "value": "help",
+          "label": "Help center",
+          "href": "#help"
+        },
+        {
           "type": "separator"
         },
         {
           "value": "logout",
-          "label": "Sign out"
+          "label": "Sign out",
+          "tone": "destructive"
         }
       ]
     }
   },
   "controls": [
     {
-      "name": "trigger",
+      "name": "children",
+      "type": "any",
+      "required": false,
+      "description": "The trigger: one element that takes the trigger props and ref, or text shown as a Button; without it nothing renders."
+    },
+    {
+      "name": "items",
+      "type": "array",
+      "required": false,
+      "description": "Items, separators and labelled groups in menu order; an item repeating an earlier value is dropped."
+    },
+    {
+      "name": "openOn",
       "type": "select",
       "required": false,
-      "description": "How the menu is triggered.",
+      "description": "Opens on a click of the trigger, or on its context menu at the pointer. Default click.",
       "options": [
         "click",
         "context"
@@ -77,29 +104,30 @@
       "defaultValue": "click"
     },
     {
-      "name": "items",
-      "type": "array",
+      "name": "open",
+      "type": "boolean",
       "required": false,
-      "description": "Menu item definitions."
+      "description": "Controlled visibility; a disabled Menu, or one without a trigger, stays closed."
     },
     {
-      "name": "children",
-      "type": "any",
+      "name": "defaultOpen",
+      "type": "boolean",
       "required": false,
-      "description": "Trigger element (the anchor)."
+      "description": "Visibility on mount when `open` is not set; read once.",
+      "defaultValue": false
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire menu.",
+      "description": "Disables the trigger and closes an open menu.",
       "defaultValue": false
     },
     {
       "name": "surface",
       "type": "select",
       "required": false,
-      "description": "Preferred content surface. Auto switches to bottom sheet on compact viewports.",
+      "description": "Where the menu opens: auto is a popover, or a bottom sheet below 900px.",
       "options": [
         "auto",
         "popover",
@@ -108,16 +136,23 @@
       "defaultValue": "auto"
     },
     {
-      "name": "surfaceBreakpoint",
-      "type": "number",
+      "name": "side",
+      "type": "select",
       "required": false,
-      "description": "Breakpoint where auto surfaces switch from popover to sheet."
+      "description": "Preferred side of the trigger for a click menu's popover; flips when the opposite side has more room. Default bottom.",
+      "options": [
+        "bottom",
+        "left",
+        "right",
+        "top"
+      ],
+      "defaultValue": "bottom"
     },
     {
       "name": "align",
       "type": "select",
       "required": false,
-      "description": "Popover alignment relative to the trigger.",
+      "description": "Alignment of a click menu's popover on the cross axis, following the trigger's direction. Default end.",
       "options": [
         "center",
         "end",
@@ -129,14 +164,19 @@
       "name": "sideOffset",
       "type": "number",
       "required": false,
-      "description": "Popover distance from the trigger in pixels.",
-      "defaultValue": 4
+      "description": "Gap in pixels between the trigger and a click menu's popover; negative values overlap them. Default 4."
     },
     {
-      "name": "surfaceTitle",
-      "type": "any",
+      "name": "aria-label",
+      "type": "string",
       "required": false,
-      "description": "Optional title used for the mobile sheet header."
+      "description": "Names the menu and titles the sheet; without it a click menu is named by its trigger."
+    },
+    {
+      "name": "labels",
+      "type": "object",
+      "required": false,
+      "description": "Strings Menu renders itself: `close` names the sheet's close button."
     }
   ],
   "meta": {

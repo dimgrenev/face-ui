@@ -52,11 +52,6 @@
     opacity var(--uf-duration-enter) var(--uf-ease-enter),
     visibility 0s linear 0s;
 }
-.uf-menu-content[data-scope][data-state="closed"] {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
 .uf-menu-contentMembrane {
   display: flex;
   width: 100%;
@@ -89,23 +84,41 @@
   opacity: 1;
   transform: translateY(0) scale(1);
 }
+/* The list takes focus only as a starting point for keys after a pointer open; items show the ring. */
+.uf-menu-content .uf-menu-list[data-scope][data-part]:focus {
+  outline: none;
+}
 .uf-menu-item {
   width: 100%;
   justify-content: flex-start;
+  text-align: start;
+  text-decoration: none;
 }
 .uf-menu-item:hover,
 .uf-menu-item[data-highlighted] {
   background: var(--uf-color-hover-bg);
 }
+.uf-menu-item[data-tone="destructive"] {
+  --uf-text-color: var(--uf-color-destructive);
+  color: var(--uf-color-destructive);
+}
+.uf-menu-itemIcon,
+.uf-menu-itemCheck {
+  display: inline-flex;
+  flex: none;
+}
+.uf-menu-itemLabel {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.uf-menu-item[aria-checked="false"] .uf-menu-itemCheck {
+  visibility: hidden;
+}
 .uf-menu-separator {
   height: var(--uf-menu-separator-h);
   background: var(--uf-color-border);
   margin: 0;
-}
-.uf-menu-item [data-part="text"] {
-  white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
 }
 .uf-menu-group-label {
   --uf-text-size-font-size: var(--uf-font-size-xs);
@@ -114,4 +127,17 @@
   font-size: var(--uf-font-size-xs);
   color: var(--uf-color-fg-muted);
   font-weight: var(--uf-font-weight-bold);
+}
+/* The surface mounts open, so its entrance starts from the closed look. */
+@starting-style {
+  .uf-menu-content[data-scope][data-state="open"] {
+    opacity: 0;
+  }
+  .uf-menu-content[data-scope][data-state="open"] .uf-menu-contentPanel {
+    opacity: 0;
+    transform: translateY(var(--uf-overlay-enter-y)) scale(var(--uf-overlay-enter-scale));
+  }
+  .uf-menu-content[data-scope][data-surface="sheet"][data-state="open"] .uf-menu-contentPanel {
+    transform: translateY(var(--uf-menu-sheet-enter-y));
+  }
 }

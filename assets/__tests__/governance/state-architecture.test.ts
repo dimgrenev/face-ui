@@ -168,13 +168,13 @@ const oneImplementation = (component: string) =>
 const PENDING = {
   'D2 throw': [],
   'D3 machines': [
-    'Carousel', 'Command', 'Menu', 'Navigation', 'Panel', 'Table', 'Toast', 'Toc', 'Tree', 'Upload',
+    'Carousel', 'Command', 'Navigation', 'Panel', 'Table', 'Toast', 'Toc', 'Tree', 'Upload',
   ],
   'D3 isomorphic layout effect': [],
   'D3 direction': [],
   'D3 isConnected': [],
   'D3 machine-era hooks': ['Carousel', 'Command', 'Navigation', 'Panel', 'Toc', 'Tree'],
-  'D5 one implementation': ['Command', 'Menu', 'Navigation', 'Panel', 'Tree', 'Upload'],
+  'D5 one implementation': ['Command', 'Navigation', 'Panel', 'Tree', 'Upload'],
 } satisfies Record<string, readonly string[]>
 
 describeGate('state-architecture D2 throw', PENDING['D2 throw'], throws)
