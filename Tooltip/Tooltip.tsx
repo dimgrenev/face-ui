@@ -1,9 +1,9 @@
 import { forwardRef } from 'react'
-import {
-  useFloatingOverlay,
-  type FloatingSurfaceProps,
-  type HoverTimingProps,
+import type {
+  FloatingSurfaceProps,
+  HoverTimingProps,
 } from '../assets/adapters/react/FloatingOverlay'
+import { useFloatingOverlay } from '../assets/internal/floating-overlay'
 
 export interface TooltipProps extends FloatingSurfaceProps, HoverTimingProps {}
 

@@ -122,6 +122,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Before | After | Codemod |
 | --- | --- | --- |
 | `trigger` | `openOn` | auto |
+| Its hover hook, `useHoverIntent({ enabled, open, triggerRef, contentRef, send })` from `assets/adapters/react/use-hover-intent`, sent pointer and focus events to a machine | `useHoverIntent({ value, onValueChange, openDelay, closeDelay })` proposes the open key; spread `trigger(key)` on each trigger and `content` on the surface | — |
 
 ### Icon
 

@@ -1,8 +1,6 @@
 import { forwardRef } from 'react'
-import {
-  useFloatingOverlay,
-  type FloatingSurfaceProps,
-} from '../assets/adapters/react/FloatingOverlay'
+import type { FloatingSurfaceProps } from '../assets/adapters/react/FloatingOverlay'
+import { useFloatingOverlay } from '../assets/internal/floating-overlay'
 
 export interface PopoverProps extends FloatingSurfaceProps {}
 

@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useReducer,
   useState,
   type FocusEvent,
   type PointerEvent,
@@ -12,7 +13,10 @@ import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 export interface HoverIntentOptions {
   /** The open key, or `null` when nothing is open. */
   value: string | null
-  /** Proposes the key to open or `null` to close; route it to useControllableState. */
+  /**
+   * Proposes the key to open or `null` to close; route it to useControllableState.
+   * Accept it in the same batch: a later commit of that value counts as the parent's own change.
+   */
   onValueChange: (next: string | null) => void
   /** Milliseconds from entering a trigger to proposing its key. */
   openDelay: number
@@ -96,7 +100,10 @@ function createIntent(
     /** The key a pending opening proposes. */
     target: null as string | null,
     timer: undefined as ReturnType<typeof setTimeout> | undefined,
-    /** The last proposal, so its commit is not taken for an external change. */
+    /**
+     * The last proposal until the next commit: that commit carries it (own) or
+     * refuses it, so a later parent change to the same value stays external.
+     */
     proposed: undefined as { value: string | null } | undefined,
     pointer: null as Region | null,
     focused: false,
@@ -333,8 +340,16 @@ function createIntent(
  * cross the gap to the content without a close delay.
  */
 export function useHoverIntent(options: HoverIntentOptions): HoverIntent {
-  const propose = useEventCallback(options.onValueChange)
-  const [intent] = useState(() => createIntent(propose, options))
+  const onValueChange = useEventCallback(options.onValueChange)
+  // A proposal re-renders the hook in its own batch, so the very next commit
+  // either carries it or shows that the parent refused it.
+  const [, rerender] = useReducer((n: number) => n + 1, 0)
+  const [intent] = useState(() =>
+    createIntent((next) => {
+      onValueChange(next)
+      rerender()
+    }, options),
+  )
   useIsomorphicLayoutEffect(() => intent.sync(options))
   useEffect(() => intent.dispose, [intent])
   return intent.api

@@ -95,6 +95,14 @@ for (const [name, Component] of [
       await render(null)
       expect(ref.current).toBeNull()
     })
+    it('keeps its own data-scope, data-part and data-state over consumer attributes (K16)', async () => {
+      await render(
+        <Component content="Content" data-scope="x" data-part="x" data-state="open">
+          <button>Trigger</button>
+        </Component>,
+      )
+      expect(surface()?.dataset).toMatchObject({ scope: 'overlay', part: 'content', state: 'closed' })
+    })
     it.each(
       [null, undefined, false, '', '   ', [], <Fragment />].map(
         (content, index) => [index, content] as const,
@@ -599,6 +607,36 @@ describe('hover timing and combined intent', () => {
   })
   it('a pointer that leaves before a controlled parent commits the open asks to close', async () => {
     const change = vi.fn()
+    function App() {
+      const [open, setOpen] = useState(false)
+      return (
+        <Tooltip
+          open={open}
+          openDelay={50}
+          closeDelay={0}
+          content="Help"
+          onOpenChange={(details) => {
+            change(details)
+            setOpen(details.open)
+          }}
+        >
+          <button>Trigger</button>
+        </Tooltip>
+      )
+    }
+    await render(<App />)
+    await pointer(trigger(), 'pointerover')
+    await pointerRightAfter(50, 'pointerout')
+    expect(change.mock.calls).toEqual([[{ open: true }], [{ open: false }]])
+    expect(visible()).toBe(false)
+  })
+})
+
+/** §1.3 #4: once a refused proposal is gone, the parent's own change of `open` never calls onOpenChange. */
+describe('a refused hover proposal expires', () => {
+  beforeEach(() => vi.useFakeTimers())
+  it('the parent later opening the surface itself does not ask to close it', async () => {
+    const change = vi.fn()
     const view = (open: boolean) => (
       <Tooltip open={open} openDelay={50} closeDelay={0} content="Help" onOpenChange={change}>
         <button>Trigger</button>
@@ -608,8 +646,64 @@ describe('hover timing and combined intent', () => {
     await pointer(trigger(), 'pointerover')
     await advance(50)
     await pointer(trigger(), 'pointerout')
+    await advance(1000)
+    expect(change.mock.calls).toEqual([[{ open: true }]])
+    change.mockClear()
     await render(view(true))
-    expect(change.mock.calls).toEqual([[{ open: true }], [{ open: false }]])
+    await advance(1000)
+    expect(change).not.toHaveBeenCalled()
+    expect(visible()).toBe(true)
+  })
+  it('the parent later closing the surface under the pointer does not ask to open it', async () => {
+    const change = vi.fn()
+    const view = (open: boolean) => (
+      <Tooltip open={open} openDelay={0} closeDelay={50} content="Help" onOpenChange={change}>
+        <button>Trigger</button>
+      </Tooltip>
+    )
+    await render(view(true))
+    await pointer(trigger(), 'pointerover')
+    await pointer(trigger(), 'pointerout')
+    await advance(50)
+    await pointer(trigger(), 'pointerover')
+    expect(change.mock.calls).toEqual([[{ open: false }]])
+    change.mockClear()
+    await render(view(false))
+    await advance(1000)
+    expect(change).not.toHaveBeenCalled()
+    expect(visible()).toBe(false)
+  })
+  it('a hint the app opens stays open after an earlier refused hover', async () => {
+    let show: (open: boolean) => void = () => {}
+    function App() {
+      const [hint, setHint] = useState(false)
+      show = setHint
+      return (
+        <Tooltip
+          open={hint}
+          openDelay={50}
+          closeDelay={0}
+          content="Help"
+          onOpenChange={({ open }) => {
+            if (!open) setHint(false)
+          }}
+        >
+          <button>Trigger</button>
+        </Tooltip>
+      )
+    }
+    await render(
+      <StrictMode>
+        <App />
+      </StrictMode>,
+    )
+    await pointer(trigger(), 'pointerover')
+    await advance(50)
+    await pointer(trigger(), 'pointerout')
+    await advance(1000)
+    await act(async () => show(true))
+    await advance(1000)
+    expect(visible()).toBe(true)
   })
 })
 
@@ -842,7 +936,7 @@ describe('open is stored in exactly one place', () => {
       expect(
         modulesOf(name).filter((path) => /machines\/|use-machine|create-machine/.test(path)),
       ).toEqual([])
-    const source = readFileSync(join(repo, 'assets/adapters/react/FloatingOverlay.tsx'), 'utf8')
+    const source = readFileSync(join(repo, 'assets/internal/floating-overlay.tsx'), 'utf8')
     expect(source.match(/useControllableState[<(]/g)).toHaveLength(1)
     expect(source).not.toMatch(/\buse(State|Reducer|SyncExternalStore)\b/)
   })

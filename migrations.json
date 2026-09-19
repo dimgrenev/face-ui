@@ -437,6 +437,12 @@
       "codemod": "auto"
     },
     {
+      "kind": "behavior",
+      "component": "FloatingOverlay",
+      "before": "Its hover hook, `useHoverIntent({ enabled, open, triggerRef, contentRef, send })` from `assets/adapters/react/use-hover-intent`, sent pointer and focus events to a machine",
+      "after": "`useHoverIntent({ value, onValueChange, openDelay, closeDelay })` proposes the open key; spread `trigger(key)` on each trigger and `content` on the surface"
+    },
+    {
       "kind": "rename-prop",
       "component": "Icon",
       "from": "label",
