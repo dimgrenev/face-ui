@@ -34,4 +34,10 @@ export default [
     before: '`weekStartsOn` defaulted to 0 (Sunday)',
     after: 'The first weekday follows `locale`; set `weekStartsOn` to pin it',
   },
+  {
+    kind: 'behavior',
+    component: 'Calendar',
+    before: 'An unreadable `value`, `defaultValue`, `viewDate`, `defaultViewDate`, `min`, `max`, `disabledDates`, `locale` or `weekStartsOn` threw during render',
+    after: 'The calendar renders without it and reports it once in development; a day given for a range, or a range for a day, is projected silently',
+  },
 ] satisfies Migration[]

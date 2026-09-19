@@ -3,12 +3,14 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
   type HTMLAttributes,
 } from 'react'
 import { mergeProps } from '../adapters/react/merge-props'
 import { useMachine } from '../adapters/react/use-machine'
-import { useControllableMachineProp } from '../adapters/react/use-controllable-machine-prop'
+import { useControllableState } from '../adapters/react/use-controllable-state'
 import { useComposedRefs } from '../adapters/react/use-composed-refs'
+import { withOwnedContext } from './date-value'
 import { calendarMachine, connectCalendar } from '../machines/calendar.machine'
 import { type DateRangeISO, getTodayISO } from '../date-utils'
 import { cn } from '../utils'
@@ -20,8 +22,8 @@ import { Icon } from '../../Icon/Icon'
 import { Button } from '../../Button/Button'
 import { Text } from '../../Text/Text'
 import {
-  createDateFormatter,
   createDateNumberFormatter,
+  resolveDateLocale,
 } from '../runtime/date-locale'
 
 export type CalendarRootAttributes = Omit<
@@ -92,8 +94,8 @@ export const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
     },
     ref,
   ) {
-    const locale = useMemo(
-      () => createDateFormatter(requestedLocale).resolvedOptions().locale,
+    const { locale } = useMemo(
+      () => resolveDateLocale('Calendar', requestedLocale),
       [requestedLocale],
     )
     const numbers = useMemo(() => createDateNumberFormatter(locale), [locale])
@@ -102,20 +104,26 @@ export const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
     const selectedDate =
       typeof value === 'string' ? value : (range?.start ?? range?.end ?? null)
     const today = getTodayISO(timezone)
-    const initialMonth = (selectedDate ?? today).slice(0, 7) + '-01'
-    const viewDate = useControllableMachineProp(
-      controlledView,
-      defaultViewDate ?? initialMonth,
-    )
-    const focusedDate = useControllableMachineProp(
-      undefined,
-      selectedDate ??
-        (viewDate?.slice(0, 7) === today.slice(0, 7) ? today : viewDate),
-    )
-    const { state, send } = useMachine(calendarMachine, {
-      value: selectedDate,
-      viewDate,
-      focusedDate,
+    const [viewDate, setViewDate] = useControllableState({
+      value: controlledView,
+      defaultValue: () =>
+        defaultViewDate ?? (selectedDate ?? today).slice(0, 7) + '-01',
+      onChange: (viewDate: string) => onViewDateChange?.({ viewDate }),
+      name: ['Calendar', 'viewDate'],
+    })
+    // The first focused day is machine state; React owns the selection and the viewed month.
+    const [machine] = useState(() => ({
+      ...calendarMachine,
+      context: {
+        ...calendarMachine.context,
+        focusedDate:
+          selectedDate ??
+          (viewDate.slice(0, 7) === today.slice(0, 7) ? today : viewDate),
+      },
+    }))
+    const owned = { value: selectedDate, viewDate }
+    const { state, send } = useMachine(machine, {
+      ...owned,
       min,
       max,
       disabledDates,
@@ -125,9 +133,9 @@ export const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
       labels,
       timezone: timezone ?? null,
       weekStartsOn: weekStartsOn ?? null,
-      onViewDateChange,
+      onViewDateChange: (details) => setViewDate(details.viewDate),
     })
-    const api = connectCalendar(state, send)
+    const api = connectCalendar(withOwnedContext(machine, state, owned), send)
     const days = api.days.map((day) => ({
       ...day,
       isDisabled: day.isDisabled || Boolean(isDateUnavailable?.(day.date)),
@@ -140,7 +148,7 @@ export const CalendarGrid = forwardRef<HTMLDivElement, CalendarGridProps>(
         rootRef.current
           ?.querySelector<HTMLElement>(`[data-date="${api.focusedDate}"]`)
           ?.focus({ preventScroll: true })
-    }, [api.focusedDate, state.context.viewDate, disabled])
+    }, [api.focusedDate, viewDate, disabled])
     const selectDate = (
       date: string,
       event?: { defaultPrevented: boolean },

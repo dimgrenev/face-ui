@@ -14,7 +14,7 @@ export default [
       placeholder: 'Choose date and time',
       surface: 'popover',
       showNow: true,
-      showClear: true,
+      clearable: true,
       membrane: true,
       fullWidth: true,
     },
@@ -43,7 +43,7 @@ export default [
         },
       ],
       showNow: false,
-      showClear: true,
+      clearable: true,
     },
   },
 ] satisfies ProductScenarioPair

@@ -103,8 +103,7 @@
       "name": "disabledDates",
       "type": "array",
       "required": false,
-      "description": "Unavailable civil dates as YYYY-MM-DD strings.",
-      "defaultValue": []
+      "description": "Unavailable civil dates as YYYY-MM-DD strings."
     },
     {
       "name": "disabled",
@@ -170,7 +169,7 @@
       "name": "selection",
       "type": "select",
       "required": false,
-      "description": "Selection model.",
+      "description": "Select one day, or a range from a start day to an end day.",
       "options": [
         "single",
         "range"
@@ -181,13 +180,13 @@
       "name": "value",
       "type": "object",
       "required": false,
-      "description": "Selected civil day or range; dates use YYYY-MM-DD and null clears the controlled value."
+      "description": "Selected day or range as YYYY-MM-DD; null clears the controlled value."
     },
     {
       "name": "defaultValue",
       "type": "object",
       "required": false,
-      "description": "Initial uncontrolled civil day or range; dates use YYYY-MM-DD."
+      "description": "Initial uncontrolled day or range as YYYY-MM-DD."
     },
     {
       "name": "excludeDisabledDates",

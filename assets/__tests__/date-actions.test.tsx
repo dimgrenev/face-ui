@@ -1,8 +1,8 @@
-import React, { act } from 'react'
+import { act } from 'react'
 import type { Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Date as DateField, type DateProps } from '../../Date/Date'
-import { allowConsoleError, mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 let root: Root, host: HTMLDivElement
 beforeEach(() => {
@@ -108,18 +108,18 @@ it('localizes built-in actions and makes clearing an empty value unavailable', a
   ])
   expect(button('Очистить')!.disabled).toBe(true)
 })
-it('showClear/showNow independently control shortcuts while explicit presets stay usable', async () => {
+it('clearable/showNow independently control shortcuts while explicit presets stay usable', async () => {
   const props = {
     presets: [{ id: 'release', label: 'Release', value: '2026-09-12' }],
   }
-  await render({ ...props, showClear: false, showNow: true })
+  await render({ ...props, clearable: false, showNow: true })
   expect(button('Clear')).toBeUndefined()
   expect(button('Now')).toBeDefined()
   expect(button('Release')).toBeDefined()
-  await render({ ...props, showClear: true, showNow: false })
+  await render({ ...props, clearable: true, showNow: false })
   expect(button('Clear')).toBeDefined()
   expect(button('Now')).toBeUndefined()
-  await render({ ...props, showClear: false, showNow: false })
+  await render({ ...props, clearable: false, showNow: false })
   expect(button('Clear')).toBeUndefined()
   expect(button('Now')).toBeUndefined()
   expect(button('Release')).toBeDefined()
@@ -166,98 +166,49 @@ it('converts a native Date preset into the owning timezone with the field precis
   )
 })
 
-class Boundary extends React.Component<
-  { children: React.ReactNode },
-  { error: Error | null }
-> {
-  state = { error: null as Error | null }
-  static getDerivedStateFromError(error: Error) {
-    return { error }
-  }
-  render() {
-    return this.state.error ? (
-      <output data-error={this.state.error.name}>
-        {this.state.error.message}
-      </output>
-    ) : (
-      this.props.children
-    )
-  }
-}
-describe('invalid preset configuration names the owning action', () => {
-  const caught = (event: ErrorEvent) => {
-    if (event.error instanceof RangeError) event.preventDefault()
-  }
-  beforeEach(() => window.addEventListener('error', caught))
-  afterEach(() => window.removeEventListener('error', caught))
+describe('an invalid preset is dropped and reported with its index', () => {
+  const release = { id: 'release', label: 'Release', value: '2026-09-12' }
   it.each([
-    [{ presets: new Array(1) }, 'presets[0]'],
-    [{ presets: [{ label: 'Release', value: '2026-09-12' }] }, 'presets[0].id'],
+    [{ presets: new Array(1) }, /missing presets\[0\]; dropping the preset/],
+    [{ presets: [{ label: 'Release', value: '2026-09-12' }] }, /invalid presets\[0\] object; dropping/],
+    [{ presets: [{ ...release, label: ' ' }] }, /invalid presets\[0\] object; dropping/],
+    [{ presets: [{ ...release, value: null }] }, /invalid presets\[0\] object; dropping/],
+    [{ presets: [{ ...release, value: '2026-02-30' }] }, /invalid presets\[0\](\.value "2026-02-30"| object)/],
     [
-      { presets: [{ id: 'release', label: ' ', value: '2026-09-12' }] },
-      'presets[0].label',
+      { selection: 'range', presets: [{ ...release, value: { start: null, end: null } }] },
+      /invalid presets\[0\] object; dropping the preset/,
     ],
-    [
-      { presets: [{ id: 'release', label: 'Release', value: null }] },
-      'presets[0].value',
-    ],
-    [
-      { presets: [{ id: 'release', label: 'Release', value: '2026-02-30' }] },
-      'presets[0].value',
-    ],
-    [
-      {
-        presets: [
-          {
-            id: 'release',
-            label: 'Release',
-            value: { start: '2026-09-12', end: null },
-          },
-        ],
-      },
-      'presets[0].value',
-    ],
-    [
-      {
-        selection: 'range',
-        presets: [{ id: 'release', label: 'Release', value: '2026-09-12' }],
-      },
-      'presets[0].value',
-    ],
-    [
-      {
-        selection: 'range',
-        presets: [
-          {
-            id: 'release',
-            label: 'Release',
-            value: { start: null, end: null },
-          },
-        ],
-      },
-      'presets[0].value',
-    ],
-    [
-      {
-        presets: [
-          { id: 'release', label: 'A', value: '2026-09-12' },
-          { id: 'release', label: 'B', value: '2026-09-13' },
-        ],
-      },
-      'presets[1].id',
-    ],
-  ])('rejects %j', async (props, prop) => {
-    allowConsoleError(/error boundary you provided, Boundary/)
-    await act(async () =>
-      root.render(
-        <Boundary>
-          <DateField {...(props as DateProps)} />
-        </Boundary>,
-      ),
+    [{ presets: 'release' }, /invalid presets "release"; showing no presets/],
+  ])('%j', async (props, report) => {
+    await expectDevError(() => render(props), report)
+    expect(button('Release')).toBeUndefined()
+  })
+  it('keeps the first of two presets with one id', async () => {
+    await expectDevError(
+      () =>
+        render({
+          presets: [
+            { ...release, label: 'A' },
+            { ...release, label: 'B', value: '2026-09-13' },
+          ],
+        }),
+      /invalid presets\[1\] object; dropping the preset/,
     )
-    const error = host.querySelector('[data-error="RangeError"]')
-    expect(error).not.toBeNull()
-    expect(error!.textContent).toContain(prop)
+    expect(button('A')).toBeDefined()
+    expect(button('B')).toBeUndefined()
+  })
+  it.each([
+    [{}, { start: '2026-09-12', end: null }, '2026-09-12'],
+    [{ selection: 'range' }, '2026-09-12', ''],
+  ])('projects a preset shaped for the other selection silently (%j)', async (props, value, submits) => {
+    await render({ ...props, closeOnSelect: false, presets: [{ ...release, value }] })
+    await click(button('Release')!)
+    expect(submitted()).toBe(submits)
+    expect(
+      [...document.querySelectorAll('[role="gridcell"][aria-selected="true"] [data-date]')].map(
+        (node) => node.getAttribute('data-date'),
+      ),
+    ).toEqual(['2026-09-12'])
   })
 })
 

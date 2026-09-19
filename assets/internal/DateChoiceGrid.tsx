@@ -1,7 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '../../Button/Button'
 import { Membrane } from '../adapters/react/Membrane'
+import { useIsomorphicLayoutEffect } from '../adapters/react/use-isomorphic-layout-effect'
 import { dateAnatomy } from '../machines/date.machine'
+import { keyToMove, readDirection } from '../runtime/keyboard'
 
 interface DateChoice {
   value: number
@@ -17,9 +19,6 @@ interface DateChoiceGridProps {
   onSelect: (value: number) => void
   onPageChange?: (direction: -1 | 1) => void
 }
-const useCommitEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
-
 /** One keyboard model for month, year, hour and minute choices. Focus is separate
  * from selection, and survives a page change at the same visual position. */
 export function DateChoiceGrid({
@@ -42,7 +41,7 @@ export function DateChoiceGrid({
       ? clampedIndex
       : items.findIndex((item) => !item.disabled)
   const activeValue = items[activeIndex]?.value
-  useCommitEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (hasFocus.current)
       (buttons.current[activeIndex] ?? root.current)?.focus({
         preventScroll: true,
@@ -86,21 +85,19 @@ export function DateChoiceGrid({
           event.target as HTMLButtonElement,
         )
         if (current < 0) return
-        const direction =
-          getComputedStyle(event.currentTarget).direction ||
-          event.currentTarget.closest('[dir]')?.getAttribute('dir')
-        const rtl = direction === 'rtl'
         let next = current,
           step = 0,
           first = 0,
           last = items.length - 1
         switch (event.key) {
           case 'ArrowLeft':
-            step = rtl ? 1 : -1
-            next += step
-            break
           case 'ArrowRight':
-            step = rtl ? -1 : 1
+            // The next choice lies at the inline end: on the left in RTL.
+            step =
+              keyToMove(event, 'horizontal', readDirection(event.currentTarget)) ===
+              'next'
+                ? 1
+                : -1
             next += step
             break
           case 'ArrowUp':

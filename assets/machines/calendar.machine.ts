@@ -18,6 +18,7 @@ import {
   getDayOfWeek as civilWeekday,
 } from '@internationalized/date'
 import { parseCivilDate as parseDate } from '../runtime/civil-date'
+import { keyToMove, readDirection } from '../runtime/keyboard'
 import {
   createDateFormatter,
   createDateNumberFormatter,
@@ -548,15 +549,15 @@ export function connectCalendar(
           ]
           if (handledKeys.includes(event.key)) {
             event.preventDefault()
-            const rtl =
-              event.currentTarget &&
-              getComputedStyle(event.currentTarget).direction === 'rtl'
-            const key =
-              rtl && event.key === 'ArrowLeft'
+            // The next day lies at the inline end: on the left in RTL.
+            const move = /^Arrow(Left|Right)$/.test(event.key)
+              ? keyToMove(event, 'horizontal', readDirection(event.currentTarget))
+              : null
+            const key = move
+              ? move === 'next'
                 ? 'ArrowRight'
-                : rtl && event.key === 'ArrowRight'
-                  ? 'ArrowLeft'
-                  : event.key
+                : 'ArrowLeft'
+              : event.key
             send({ type: 'KEY_DOWN', key, shiftKey: event.shiftKey })
           }
         },

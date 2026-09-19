@@ -10,19 +10,10 @@
   --uf-date-panel-pad: var(--uf-membrane);
   --uf-date-sheet-enter-y: 1.125rem;
   position: relative; /* the form proxy covers the root */
-  display: flex;
-  flex-direction: column;
   width: 100%;
 }
 .uf-date[data-scope="date"]:not([data-full-width]) {
   width: auto;
-}
-.uf-date__triggerWrap {
-  position: relative;
-  width: 100%;
-}
-.uf-date__label {
-  margin: 0;
 }
 .uf-date__trigger {
   display: flex;
@@ -178,11 +169,4 @@
 }
 .uf-date__grid--time {
   grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-.uf-date__description,
-.uf-date__error {
-  margin: 0;
-}
-.uf-date__error {
-  color: var(--uf-color-destructive, var(--uf-color-error));
 }

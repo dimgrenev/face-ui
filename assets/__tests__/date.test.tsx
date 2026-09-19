@@ -4,6 +4,8 @@ import { act } from 'react'
 import { Date as DateField } from '../../Date/Date'
 import { libraryCss, mount } from './harness'
 import { installMatchMedia, type MatchMediaRestore } from './harness/match-media'
+import { describeControlled } from './harness/controlled'
+import { describeField } from './harness/field'
 
 describe('Date component', () => {
   let container: HTMLDivElement
@@ -123,7 +125,7 @@ describe('responsive overlay surfaces', () => {
 
   it('Date switches auto surfaces to a bottom sheet on compact viewports', async () => {
     await act(async () => {
-      root.render(<DateField />)
+      root.render(<DateField label="Start date" />)
     })
 
     const trigger = container.querySelector(
@@ -145,7 +147,9 @@ describe('responsive overlay surfaces', () => {
     expect(content?.hidden).toBe(false)
     expect(calendar).not.toBeNull()
     expect(document.body.style.overflow).toBe('hidden')
-    expect(content?.textContent).toContain('Choose date')
+    expect(
+      content?.querySelector('.uf-responsive-sheetTitle')?.textContent,
+    ).toBe('Start date')
 
     const componentStyles = libraryCss()
     expect(componentStyles).toMatch(
@@ -160,7 +164,7 @@ describe('responsive overlay surfaces', () => {
     restoreMatchMedia?.setMatches(false)
 
     await act(async () => {
-      root.render(<DateField />)
+      root.render(<DateField label="Start date" />)
     })
 
     const trigger = container.querySelector(
@@ -179,7 +183,7 @@ describe('responsive overlay surfaces', () => {
     expect(content?.hidden).toBe(false)
     expect(document.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
     expect(document.body.style.overflow).toBe('')
-    expect(container.textContent).not.toContain('Choose date')
+    expect(content?.querySelector('.uf-responsive-sheetTitle')).toBeNull()
   })
 
   it('Date reevaluates auto surfaces after crossing the responsive breakpoint', async () => {
@@ -242,7 +246,7 @@ describe('responsive overlay surfaces', () => {
       '[data-scope="date"][data-part="root"]',
     ) as HTMLElement | null
     const label = container.querySelector(
-      '.uf-date__label',
+      '[data-scope="field"][data-part="label"]',
     ) as HTMLLabelElement | null
     const trigger = container.querySelector(
       '[data-scope="date"][data-part="trigger"]',
@@ -279,10 +283,8 @@ describe('responsive overlay surfaces', () => {
       trigger?.getAttribute('aria-controls') ?? '',
     ) as HTMLElement | null
     expect(content?.getAttribute('role')).toBe('dialog')
-    expect(
-      document.getElementById(content?.getAttribute('aria-labelledby') ?? '')
-        ?.textContent,
-    ).toBe('Start date')
+    // The dialog shares the field's name; the required marker is aria-hidden.
+    expect(content?.getAttribute('aria-labelledby')).toBe(label?.id)
     expect(content?.hidden).toBe(false)
 
     const closeEvent = new KeyboardEvent('keydown', {
@@ -302,3 +304,34 @@ describe('responsive overlay surfaces', () => {
     expect(trigger?.hasAttribute('aria-controls')).toBe(false)
   })
 })
+
+// The picker stays open for the value contract; closeOnSelect would add open changes.
+const day = (iso: string) =>
+  document.querySelector<HTMLElement>(`[data-date="${iso}"]`)!
+describeControlled<string | null>({
+  name: 'Date',
+  prop: 'value',
+  values: ['2026-09-12', '2026-09-20'],
+  render: (props) => (
+    <DateField open format="yyyy-MM-dd" name="deadline" {...props} />
+  ),
+  change: (_host, to) => day(to!).click(),
+  read: (host) =>
+    host.querySelector('[role="combobox"]')?.textContent || null,
+  // A datetime is projected onto the date the mode shows.
+  normalizes: ['2026-09-12T09:35', '2026-09-12'],
+  formReset: true,
+})
+describeControlled({
+  name: 'Date',
+  prop: 'open',
+  values: [false, true],
+  render: (props) => <DateField aria-label="Deadline" {...props} />,
+  change: (host) => host.querySelector<HTMLElement>('[role="combobox"]')!.click(),
+  read: (host) =>
+    host.querySelector('[data-scope="date"][data-part="root"]')?.getAttribute(
+      'data-state',
+    ) === 'open',
+  handler: 'onClick',
+})
+describeField('Date', (props) => <DateField {...props} />)

@@ -87,6 +87,7 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `disabledDates`: `Date[]` | `YYYY-MM-DD` strings | manual |
 | `onValueChange`: `details.value` was a `Date` or a range of them | `details.value` is a `YYYY-MM-DD` string or a range of them | manual |
 | `weekStartsOn` defaulted to 0 (Sunday) | The first weekday follows `locale`; set `weekStartsOn` to pin it | — |
+| An unreadable `value`, `defaultValue`, `viewDate`, `defaultViewDate`, `min`, `max`, `disabledDates`, `locale` or `weekStartsOn` threw during render | The calendar renders without it and reports it once in development; a day given for a range, or a range for a day, is projected silently | — |
 
 ### Card
 
@@ -127,6 +128,12 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `presets`: `{ label, value }` items | Each item also needs an `id`, unique within the picker | manual |
 | `weekStartsOn` defaulted to 1 (Monday) | The first weekday follows `locale`; set `weekStartsOn` to pin it | — |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the trigger `<button>`; `className` and `style` still style the whole field | — |
+| `showClear` | `clearable` | auto |
+| `surfaceTitle` | The picker takes the field name: `label`, `aria-label` or `aria-labelledby` | manual |
+| `surfaceBreakpoint` | `surface="auto"` switches to a sheet below 900px; pass `surface="sheet"` or `"popover"` to pin one | auto |
+| The trigger showed "Pick date" or "Pick time", and an unlabelled field was named "Choose date" or "Choose time" | There is no English default: pass `placeholder`, and `label` or `aria-label` | — |
+| Label, help and error were `.uf-date__label`, `.uf-date__description` and `.uf-date__error` inside `.uf-date__triggerWrap` | They are the shared Field parts `.uf-field__label`, `.uf-field__description`, `.uf-field__error` and `.uf-field__required` (`[data-scope="field"]`); `labelPosition` places the label | — |
+| An unreadable `value`, `defaultValue`, `min`, `max`, `disabledDates`, `presets`, `format`, `locale`, `timezone` or `weekStartsOn`, or an out-of-range `disabledTime`, threw during render | The picker renders without it (a preset is dropped, a format or locale falls back) and reports it once in development; a point given for a range, or a range for a point, is projected silently | — |
 
 ### FloatingOverlay
 

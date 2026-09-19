@@ -7,6 +7,18 @@
   "root": {
     "type": "Date",
     "props": {
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "error": {
+        "$ref": "props.error"
+      },
+      "labelPosition": {
+        "$ref": "props.labelPosition"
+      },
       "open": {
         "$ref": "props.open"
       },
@@ -46,26 +58,11 @@
       "showNow": {
         "$ref": "props.showNow"
       },
-      "showClear": {
-        "$ref": "props.showClear"
+      "clearable": {
+        "$ref": "props.clearable"
       },
       "surface": {
         "$ref": "props.surface"
-      },
-      "surfaceBreakpoint": {
-        "$ref": "props.surfaceBreakpoint"
-      },
-      "surfaceTitle": {
-        "$ref": "props.surfaceTitle"
-      },
-      "label": {
-        "$ref": "props.label"
-      },
-      "description": {
-        "$ref": "props.description"
-      },
-      "error": {
-        "$ref": "props.error"
       },
       "name": {
         "$ref": "props.name"
@@ -130,12 +127,40 @@
       "placeholder": "Choose date and time",
       "surface": "popover",
       "showNow": true,
-      "showClear": true,
+      "clearable": true,
       "membrane": true,
       "fullWidth": true
     }
   },
   "controls": [
+    {
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    {
+      "name": "description",
+      "type": "any",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    {
+      "name": "error",
+      "type": "any",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    {
+      "name": "labelPosition",
+      "type": "select",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
+    },
     {
       "name": "open",
       "type": "boolean",
@@ -160,7 +185,7 @@
       "name": "labels",
       "type": "object",
       "required": false,
-      "description": "Internal action and view labels; field label, placeholder and surfaceTitle keep their own content APIs."
+      "description": "Internal action and view labels; the field keeps label and placeholder as its own props."
     },
     {
       "name": "timezone",
@@ -194,22 +219,19 @@
       "name": "min",
       "type": "any",
       "required": false,
-      "description": "Inclusive lower bound in timezone; a date-only bound includes its whole day.",
-      "defaultValue": null
+      "description": "Inclusive lower bound in timezone; a date-only bound includes its whole day."
     },
     {
       "name": "max",
       "type": "any",
       "required": false,
-      "description": "Inclusive upper bound in timezone; a date-only bound includes its whole day.",
-      "defaultValue": null
+      "description": "Inclusive upper bound in timezone; a date-only bound includes its whole day."
     },
     {
       "name": "disabledDates",
       "type": "array",
       "required": false,
-      "description": "Unavailable whole days; Date instants are converted into timezone before taking the day.",
-      "defaultValue": []
+      "description": "Unavailable whole days; Date instants are converted into timezone before taking the day."
     },
     {
       "name": "disabledTime",
@@ -221,7 +243,7 @@
       "name": "closeOnSelect",
       "type": "boolean",
       "required": false,
-      "description": "Close panel after completing selection"
+      "description": "Close the picker once a selection is complete; defaults to true for a single date."
     },
     {
       "name": "showNow",
@@ -231,53 +253,23 @@
       "defaultValue": true
     },
     {
-      "name": "showClear",
+      "name": "clearable",
       "type": "boolean",
       "required": false,
-      "description": "Show the clear action; it is disabled when the selection is empty.",
+      "description": "Offer the clear action; it is disabled while the selection is empty.",
       "defaultValue": true
     },
     {
       "name": "surface",
       "type": "select",
       "required": false,
-      "description": "surface prop",
+      "description": "Picker surface: a popover, a bottom sheet, or auto (a sheet below 900px wide).",
       "options": [
         "auto",
         "popover",
         "sheet"
       ],
       "defaultValue": "auto"
-    },
-    {
-      "name": "surfaceBreakpoint",
-      "type": "number",
-      "required": false,
-      "description": "surfaceBreakpoint prop"
-    },
-    {
-      "name": "surfaceTitle",
-      "type": "any",
-      "required": false,
-      "description": "surfaceTitle prop"
-    },
-    {
-      "name": "label",
-      "type": "any",
-      "required": false,
-      "description": "Control label"
-    },
-    {
-      "name": "description",
-      "type": "any",
-      "required": false,
-      "description": "Helper text below control"
-    },
-    {
-      "name": "error",
-      "type": "any",
-      "required": false,
-      "description": "Error message below control"
     },
     {
       "name": "name",
@@ -302,41 +294,41 @@
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable interactions",
+      "description": "Disable the trigger; the picker cannot open.",
       "defaultValue": false
     },
     {
       "name": "readOnly",
       "type": "boolean",
       "required": false,
-      "description": "Read-only mode",
+      "description": "Show the value without letting the user change it; it is still submitted.",
       "defaultValue": false
     },
     {
       "name": "placeholder",
       "type": "string",
       "required": false,
-      "description": "Trigger placeholder text"
+      "description": "Trigger text while nothing is selected."
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Enable membrane wrapper around trigger",
+      "description": "Wrap the trigger in the membrane spacing of controls in a row.",
       "defaultValue": true
     },
     {
       "name": "fullWidth",
       "type": "boolean",
       "required": false,
-      "description": "Stretch control to container width",
+      "description": "Stretch the field to the width of its container.",
       "defaultValue": true
     },
     {
       "name": "mode",
       "type": "select",
       "required": false,
-      "description": "Picker mode: date, datetime, time, week, month or year",
+      "description": "Picker mode: date, datetime, time, week, month or year.",
       "options": [
         "date",
         "datetime",
@@ -351,7 +343,7 @@
       "name": "openTo",
       "type": "select",
       "required": false,
-      "description": "Initial opened view",
+      "description": "First view shown when the picker opens.",
       "options": [
         "day",
         "hours",
