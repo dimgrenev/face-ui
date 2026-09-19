@@ -256,6 +256,19 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `SliderAdvanced` from `Slider/SliderAdvanced` | `Slider` with `showValue` and `crop` | manual |
 | `SliderAdvancedProps` from `Slider/SliderAdvanced` | `SliderProps` | manual |
 | `SliderCropRange` from `Slider/SliderAdvanced` | `SliderCropRange` from `Slider/Slider` | auto |
+| `onCropChange` | `onCropRangeChange` | auto |
+| `onCropCommit` | `onCropRangeCommit` | auto |
+| `onCropRangeChange`: The crop range itself, `{ min, max }` | `{ cropRange }`, with `cropRange` as `{ start, end }` | manual |
+| `onCropRangeCommit`: The crop range itself, `{ min, max }` | `{ cropRange }`, with `cropRange` as `{ start, end }` | manual |
+| `cropRange`: `{ min, max }` | `{ start, end }`; `min` and `max` name the ends of the scale | manual |
+| `defaultCropRange`: `{ min, max }` | `{ start, end }`; `min` and `max` name the ends of the scale | manual |
+| `onValueChange`: `details.value` was always an array | `details.value` has the shape of `value`/`defaultValue`: a number for a number, an array for an array | manual |
+| `onValueCommit`: `details.value` was always an array | `details.value` has the shape of `value`/`defaultValue`: a number for a number, an array for an array | manual |
+| An empty or non-finite `value`, a `labels.thumbs` of the wrong length, a blank control name, a non-object crop range or a non-text `formatValue` result threw during render | The slider renders: non-finite entries are dropped (none left reads as `min`), missing or blank names and text fall back to the defaults, and malformed data is reported once in development | — |
+| Narrowing `max`, `min` or the crop rewrote the uncontrolled value (and the default crop) to the clamped one, so widening again did not bring it back | The value is kept and shown clamped; widening the scale or the crop shows it again, and the default crop follows the scale until the user edits it | — |
+| `onValueCommit`/`onCropRangeCommit` fired only when the parent had accepted the last proposal of the gesture | They fire when a gesture ends showing a different value than at its start, whatever the parent accepted along the way | — |
+| ArrowRight decreased a vertical slider in right-to-left text | ArrowRight and ArrowUp always increase a vertical slider; only a horizontal right-to-left track swaps Left and Right | — |
+| The label was a `Text` part (`[data-scope=slider][data-part=label]`, `.uf-slider__label`) with the membrane around it | The root is a field (`uf-field`) with `label`, `description`, `error`, `labelPosition` and a `required` marker; the label is `.uf-field__label` in the shared field typography, and each thumb carries the description, the error and `aria-invalid` | — |
 
 ### Switcher
 

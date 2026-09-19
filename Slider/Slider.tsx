@@ -1,10 +1,7 @@
-/** One numeric editor: presentation never owns state or interaction. */
 import {
   forwardRef,
   useCallback,
-  useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -12,229 +9,324 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type PointerEvent,
-  type ReactNode,
+  type RefAttributes,
 } from 'react'
 import { cn } from '../assets/utils'
 import { createAnatomy } from '../assets/anatomy'
-import { createRange } from '../assets/runtime/range'
 import { hasSlotContent } from '../assets/slot-content'
+import { createRange } from '../assets/runtime/range'
 import { resolveLabel } from '../assets/runtime/labels'
+import { invalidProp, readNumber } from '../assets/runtime/props'
+import { readDirection, stepIntent } from '../assets/runtime/keyboard'
+import { isAvailable } from '../assets/runtime/layers'
 import { Membrane } from '../assets/adapters/react/Membrane'
+import { composeHandlers } from '../assets/adapters/react/merge-props'
 import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useFocusRecovery } from '../assets/adapters/react/use-focus-recovery'
 import { useFormReset } from '../assets/adapters/react/use-form-reset'
-import { Text } from '../Text/Text'
+import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
+import {
+  FieldLayout,
+  idList,
+  useField,
+  type FieldProps,
+} from '../assets/internal/field'
 
+/** A slider value: one number for one thumb, or an array with one number per thumb. */
+export type SliderValue = number | readonly number[]
+/** What the callbacks report for a value of type `V`: a number stays a number, an array becomes `number[]`. */
+export type SliderValueOf<V extends SliderValue> = V extends number
+  ? number
+  : number[]
+
+/** Crop boundaries on the slider's scale. */
 export interface SliderCropRange {
-  min: number
-  max: number
+  /** Lower boundary; both boundaries are snapped to the step grid and sorted. */
+  start: number
+  /** Upper boundary; both boundaries are snapped to the step grid and sorted. */
+  end: number
 }
+/** Accessible names of individual controls; each replaces the name the control takes from the group. */
 export interface SliderLabels {
-  /** Complete accessible names, in ascending thumb order. */
+  /** Complete names of the primary thumbs in ascending order; a missing or blank entry keeps the group-derived name. */
   thumbs?: readonly string[]
-  /** Complete accessible names for crop boundaries. Defaults include the group name. */
+  /** Complete name of the crop start boundary; blank keeps the group-derived name. */
   cropStart?: string
+  /** Complete name of the crop end boundary; blank keeps the group-derived name. */
   cropEnd?: string
 }
-export interface SliderValueDetails {
-  value: number[]
+/** Payload of onValueChange and onValueCommit. */
+export interface SliderValueDetails<
+  V extends number | number[] = number | number[],
+> {
+  /** The value in the shape of `value`: a number, or a fresh array in ascending order. */
+  value: V
 }
+/** Payload of onCropRangeChange and onCropRangeCommit. */
+export interface SliderCropRangeDetails {
+  /** The crop boundaries, as a fresh object. */
+  cropRange: SliderCropRange
+}
+/** Input of formatValue. */
 export interface SliderFormatDetails {
+  /** The number to format. */
   value: number
-  /** Index within primary values or the two crop endpoints. */
+  /** Index within the primary values or the two crop boundaries. */
   index: number
+  /** Whether the number is a primary value or a crop boundary. */
   kind: 'value' | 'crop'
 }
-export interface SliderProps extends Omit<
-  HTMLAttributes<HTMLDivElement>,
-  | 'children'
-  | 'dangerouslySetInnerHTML'
-  | 'defaultValue'
-  | 'defaultChecked'
-  | 'contentEditable'
-  | 'suppressContentEditableWarning'
-  | 'role'
-  | 'aria-disabled'
-  | 'aria-readonly'
-  | 'aria-required'
-  | 'aria-valuemin'
-  | 'aria-valuemax'
-  | 'aria-valuenow'
-  | 'aria-valuetext'
-  | 'aria-orientation'
-> {
-  /** Controlled finite number or nonempty array. Values are snapped and sorted. */
-  value?: number | readonly number[]
-  /** Initial uncontrolled value(s), restored on reset. Defaults to min. */
-  defaultValue?: number | readonly number[]
-  /** Finite lower bound and step origin. Defaults to 0. */
+
+interface SliderBaseProps
+  extends
+    FieldProps,
+    Omit<
+      HTMLAttributes<HTMLDivElement>,
+      | 'children'
+      | 'dangerouslySetInnerHTML'
+      | 'defaultValue'
+      | 'defaultChecked'
+      | 'contentEditable'
+      | 'suppressContentEditableWarning'
+      | 'role'
+      | 'aria-disabled'
+      | 'aria-readonly'
+      | 'aria-required'
+      | 'aria-valuemin'
+      | 'aria-valuemax'
+      | 'aria-valuenow'
+      | 'aria-valuetext'
+      | 'aria-orientation'
+    > {
+  /** Lower end of the scale and origin of the step grid; crossed or non-finite bounds use 0..100. Defaults to 0. */
   min?: number
-  /** Finite upper bound, at least min. Defaults to 100. */
+  /** Upper end of the scale; crossed or non-finite bounds use 0..100. Defaults to 100. */
   max?: number
-  /** Positive finite increment. End selects the last step at or below max. Defaults to 1. */
+  /** Distance between selectable values; End selects the last step at or below max. Defaults to 1. */
   step?: number
-  /** Disable editing and submission, including crop. Defaults to false. */
+  /** Blocks editing, crop included, and leaves every control out of FormData. */
   disabled?: boolean
-  /** Horizontal follows text direction; vertical increases upward. Defaults to horizontal. */
+  /** Horizontal follows the text direction; vertical increases upward. Defaults to horizontal. */
   orientation?: 'horizontal' | 'vertical'
-  /** Visible noninteractive name, including rich text. */
-  label?: ReactNode
-  /** Name when there is no visible label, or override for it. */
+  /** Names the group and its thumbs when there is no visible label. */
   'aria-label'?: string
-  /** External naming elements; takes precedence over label and aria-label. */
+  /** Ids of elements that name the group and its thumbs; they take precedence over label and aria-label. */
   'aria-labelledby'?: string
-  /** Specific or localized names for individual controls. */
+  /** Complete accessible names for individual thumbs and crop boundaries. */
   labels?: SliderLabels
-  /** Display the value inside each primary handle. Defaults to false. */
+  /** Shows each primary value inside its thumb. */
   showValue?: boolean
-  /** Nonempty visible value and accessible value text, including units. */
+  /** Text of each shown value and its aria-valuetext, units included; blank or non-text output shows the number. */
   formatValue?: (details: SliderFormatDetails) => string
-  /** One proposal per user change. External updates, clamping and reset are silent. */
-  onValueChange?: (details: SliderValueDetails) => void
-  /** Accepted edit on pointerup, navigation keyup/blur or assistive input. Cancellation is silent. */
-  onValueCommit?: (details: SliderValueDetails) => void
-  /** Enable two editable crop boundaries independently of value presentation. Defaults to false. */
+  /** Adds two crop boundaries on a second rail, edited independently of the value. */
   crop?: boolean
-  /** Controlled crop boundaries, sorted and snapped to the same step grid. */
+  /** Controlled crop boundaries; undefined leaves them uncontrolled. */
   cropRange?: SliderCropRange
-  /** Initial uncontrolled crop, restored on reset. Defaults to the full range. */
+  /** Crop boundaries on mount, restored by form reset. Defaults to the whole scale. */
   defaultCropRange?: SliderCropRange
-  /** Constrain primary values to the accepted crop. Defaults to true. */
+  /** Keeps the shown value inside the crop boundaries. Defaults to true. */
   clampToCrop?: boolean
-  /** User proposal for crop only; normalization of primary values is silent. */
-  onCropChange?: (range: SliderCropRange) => void
-  /** Accepted crop edit when the user finishes an interaction. */
-  onCropCommit?: (range: SliderCropRange) => void
-  /** Native form key, repeated for ordered primary values. */
+  /** Called once per user change of the crop boundaries; prop updates, clamping and reset are silent. */
+  onCropRangeChange?: (details: SliderCropRangeDetails) => void
+  /** Called once when an edit of the crop boundaries ends with a change; a refused or cancelled edit is silent. */
+  onCropRangeCommit?: (details: SliderCropRangeDetails) => void
+  /** FormData key of the value, repeated once per thumb in ascending order. */
   name?: string
-  /** Native form key, repeated for crop start/end when crop is enabled. */
+  /** FormData key of the crop boundaries, repeated for start and end while crop is on. */
   cropName?: string
-  /** External form id for all controls. */
+  /** Id of the form that submits and resets the controls, when it is not an ancestor. */
   form?: string
-  /** Focus the first primary thumb on mount. Defaults to false. */
+  /** Shows the required marker on the label; a range always has a value, so it never blocks submission. */
+  required?: boolean
+  /** Focuses the first thumb on mount. */
   autoFocus?: boolean
-  /** Shared spacing around handles and label. Defaults to true. */
+  /** Shared outer spacing around each thumb; toggling it keeps the DOM and focus. Defaults to true. */
   membrane?: boolean
-  /** Additional class name on the semantic root. */
-  className?: string
 }
-const { getPartAttrs: attrs } = createAnatomy('slider').parts(
+interface SliderValueProps<V extends SliderValue> {
+  /** Controlled value: a number, or one number per thumb; callbacks answer in the same shape. Shown snapped, clamped and sorted. */
+  value?: V
+  /** Value on mount, restored by form reset; a number or an array, as for value. Defaults to min. */
+  defaultValue?: V
+  /** Called once per user change, in the shape of the value; prop updates, clamping and reset are silent. */
+  onValueChange?: (details: SliderValueDetails<SliderValueOf<V>>) => void
+  /** Called once when a pointer, keyboard or assistive edit ends with a changed value; a refused or cancelled edit is silent. */
+  onValueCommit?: (details: SliderValueDetails<SliderValueOf<V>>) => void
+}
+/** Slider props; `V` is the shape of `value`, which the callbacks follow. */
+export type SliderProps<V extends SliderValue = SliderValue> =
+  SliderValueProps<V> & SliderBaseProps
+
+const { getPartAttrs: part } = createAnatomy('slider').parts(
   'root',
-  'label',
   'track',
   'range',
   'thumb',
   'input',
   'crop',
 )
-const useCommitEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect
-const equal = (a: readonly number[], b: readonly number[]) =>
-  a.length === b.length && a.every((n, i) => n === b[i])
-function numbers(value: number | readonly number[]) {
-  const entries = typeof value === 'number' ? [value] : value
-  if (
-    !Array.isArray(entries) ||
-    !entries.length ||
-    entries.some((n) => typeof n !== 'number' || !Number.isFinite(n))
-  )
-    throw new RangeError(
-      'Slider value must be a finite number or a nonempty array of finite numbers',
-    )
-  return entries
-}
+type Kind = SliderFormatDetails['kind']
 interface Gesture {
-  kind: 'value' | 'crop'
+  kind: Kind
   index: number
   source: 'pointer' | 'key' | 'native'
-  start: number[]
-  proposed: number[]
-  accepted: number[]
+  /** What the edited controls showed when the gesture began. */
+  start: readonly number[]
 }
-export const Slider = forwardRef<HTMLDivElement, SliderProps>(
+const same = (a: readonly number[], b: readonly number[]) =>
+  a.length === b.length && a.every((n, i) => n === b[i])
+// Object.is: a NaN boundary equals itself, or a controlled NaN would re-render forever.
+const sameRange = (a?: SliderCropRange, b?: SliderCropRange) =>
+  Object.is(a?.start, b?.start) && Object.is(a?.end, b?.end)
+
+/** One finite number per thumb: other entries are dropped and reported; none left reads as `[fallback]`. */
+function readValues(raw: unknown, prop: string, fallback: number): number[] {
+  if (!Array.isArray(raw)) return [readNumber('Slider', prop, raw, fallback)]
+  const finite = raw.filter(
+    (n): n is number => typeof n === 'number' && Number.isFinite(n),
+  )
+  if (finite.length && finite.length === raw.length) return finite
+  if (!finite.length) finite.push(fallback)
+  invalidProp('Slider', prop, raw, `using [${finite.join(', ')}]`)
+  return finite
+}
+
+const SliderRender = forwardRef<HTMLDivElement, SliderProps>(
   function Slider(props, ref) {
     const {
       value,
       defaultValue,
+      onValueChange,
+      onValueCommit,
       min = 0,
       max = 100,
       step = 1,
       disabled = false,
       orientation = 'horizontal',
-      label,
       labels,
       showValue = false,
       formatValue,
-      onValueChange,
-      onValueCommit,
       crop = false,
       cropRange,
       defaultCropRange,
       clampToCrop = true,
-      onCropChange,
-      onCropCommit,
+      onCropRangeChange,
+      onCropRangeCommit,
       name,
       cropName,
       form,
+      required,
       autoFocus = false,
       membrane = true,
-      className,
+      id,
+      label,
+      description,
+      error,
+      labelPosition,
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledby,
-      ...rest
+      'aria-describedby': ariaDescribedby,
+      'aria-invalid': ariaInvalid,
+      className,
+      style,
+      onKeyDown,
+      onKeyUp,
+      onBlur,
+      onPointerDown,
+      ...nativeProps
     } = props
+    const vertical = orientation === 'vertical'
     const grid = useMemo(() => createRange(min, max, step), [min, max, step])
-    if (orientation !== 'horizontal' && orientation !== 'vertical')
-      throw new TypeError('Slider orientation must be horizontal or vertical')
-    if (formatValue !== undefined && typeof formatValue !== 'function')
-      throw new TypeError('Slider formatValue must be a function')
-    const normalizeCrop = (range: SliderCropRange) => {
-      if (!range || typeof range !== 'object')
-        throw new TypeError('Slider crop range must contain finite min and max')
-      return [grid.snap(range.min), grid.snap(range.max)].sort((a, b) => a - b)
-    }
-    const [initial] = useState(() => ({
-      value: [...numbers(defaultValue === undefined ? grid.min : defaultValue)],
-      crop:
-        defaultCropRange === undefined
-          ? { min: grid.min, max: grid.max }
-          : { ...defaultCropRange },
-    }))
-    const [internal, setInternal] = useState(initial.value)
-    const [internalCrop, setInternalCrop] = useState(initial.crop)
-    const selection = normalizeCrop(
-      cropRange === undefined ? internalCrop : cropRange,
+    // The stored value is the intent; what the controls show is its projection onto the current
+    // scale and crop, computed here and never written back, so widening the scale restores it.
+    const [intent, setIntent, replaceIntent] = useControllableState<SliderValue>(
+      {
+        value,
+        // A copy: the default is read once, so later mutation of the caller's array changes nothing.
+        defaultValue: () =>
+          Array.isArray(defaultValue)
+            ? [...defaultValue]
+            : defaultValue === undefined
+              ? grid.min
+              : defaultValue,
+        onChange: (next) =>
+          onValueChange?.({ value: next as SliderValueOf<SliderValue> }),
+        name: ['Slider', 'value'],
+      },
     )
-    const lower = crop && clampToCrop ? selection[0] : grid.min
-    const upper = crop && clampToCrop ? selection[1] : grid.max
-    const normalize = (next: number | readonly number[]) =>
-      numbers(next)
+    const [cropIntent, setCropIntent, replaceCropIntent] =
+      useControllableState<SliderCropRange | undefined>({
+        value: cropRange,
+        defaultValue: () =>
+          defaultCropRange && {
+            start: defaultCropRange.start,
+            end: defaultCropRange.end,
+          },
+        onChange: (next) =>
+          next && onCropRangeChange?.({ cropRange: { ...next } }),
+        equal: sameRange,
+        name: ['Slider', 'cropRange'],
+      })
+    const cropProp = cropRange === undefined ? 'defaultCropRange' : 'cropRange'
+    const cropOf = (range: SliderCropRange | undefined) =>
+      [
+        readNumber('Slider', `${cropProp}.start`, range?.start, grid.min),
+        readNumber('Slider', `${cropProp}.end`, range?.end, grid.max),
+      ]
+        .map((n) => grid.snap(n))
+        .sort((a, b) => a - b)
+    const selection = cropOf(cropIntent)
+    const [lower, upper] =
+      crop && clampToCrop ? selection : [grid.min, grid.max]
+    const valueProp = value === undefined ? 'defaultValue' : 'value'
+    const valuesOf = (raw: unknown) =>
+      readValues(raw, valueProp, grid.min)
         .map((n) => Math.max(lower, Math.min(upper, grid.snap(n))))
         .sort((a, b) => a - b)
-    const values = normalize(value === undefined ? internal : value)
-    const id = useId()
-    const hasLabel = hasSlotContent(label, { trimText: true })
-    const labelId = hasLabel ? `${id}-label` : undefined
-    const explicitLabel =
-      resolveLabel(ariaLabel, '', 'Slider', 'aria-label') || undefined
-    const labelledby =
-      resolveLabel(ariaLabelledby, '', 'Slider', 'aria-labelledby') ||
-      (!explicitLabel ? labelId : undefined)
-    if (
-      labels?.thumbs &&
-      (labels.thumbs.length !== values.length ||
-        labels.thumbs.some((n) => typeof n !== 'string' || !n.trim()))
-    )
-      throw new TypeError(
-        'Slider labels.thumbs must contain one nonempty name per thumb',
-      )
+    const values = valuesOf(intent)
+
+    /** One user proposal for one control; `to` maps what it shows to the candidate. */
+    const propose = (kind: Kind, index: number, to: (shown: number) => number) => {
+      if (disabled) return
+      const clamp = (n: number, low: number, high: number) =>
+        Math.max(low, Math.min(high, grid.snap(n)))
+      // Updaters read the latest proposal, so several in one task build on each other.
+      if (kind === 'crop')
+        setCropIntent((range) => {
+          const shown = cropOf(range)
+          const next = [...shown]
+          next[index] = index
+            ? clamp(to(shown[1]), shown[0], grid.max)
+            : clamp(to(shown[0]), grid.min, shown[1])
+          return same(next, shown) ? range : { start: next[0], end: next[1] }
+        })
+      else
+        setIntent((current) => {
+          const shown = valuesOf(current)
+          const next = [...shown]
+          next[index] = clamp(
+            to(shown[index]),
+            shown[index - 1] ?? lower,
+            shown[index + 1] ?? upper,
+          )
+          if (same(next, shown)) return current
+          return Array.isArray(current) ? next : next[0]
+        })
+    }
+    const many = Array.isArray(intent)
+    // Document listeners and timers outlive their render; they read the last committed one.
+    const latest = useRef({ values, selection, many, propose, props })
+    useIsomorphicLayoutEffect(() => {
+      latest.current = { values, selection, many, propose, props }
+    })
+
     const rootRef = useRef<HTMLDivElement>(null)
     const composedRef = useComposedRefs(rootRef, ref)
     const formRef = useRef<HTMLInputElement>(null)
     const trackRef = useRef<HTMLDivElement>(null)
-    const focused = useRef<HTMLInputElement | null>(null)
     const gesture = useRef<Gesture | null>(null)
     const cleanup = useRef<(() => void) | null>(null)
-    const latest = useRef({ values, selection, props })
     const controls = () =>
       Array.from(
         rootRef.current?.querySelectorAll<HTMLInputElement>(
@@ -246,234 +338,111 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       cleanup.current = null
       gesture.current = null
     }
+    /** Ends the gesture; it commits only when what the edited controls show has changed. */
     const finish = () => {
       const edit = gesture.current
       cancel()
       if (!edit) return
-      const current = latest.current
-      const accepted =
-        edit.kind === 'value' ? current.values : current.selection
-      if (!equal(accepted, edit.accepted) || equal(edit.start, accepted)) return
+      const { values, selection, many, props } = latest.current
+      const end = edit.kind === 'value' ? values : selection
+      if (same(end, edit.start)) return
       if (edit.kind === 'value')
-        current.props.onValueCommit?.({ value: [...accepted] })
-      else current.props.onCropCommit?.({ min: accepted[0], max: accepted[1] })
+        props.onValueCommit?.({ value: many ? [...end] : end[0] })
+      else
+        props.onCropRangeCommit?.({
+          cropRange: { start: end[0], end: end[1] },
+        })
     }
-    useCommitEffect(() => {
-      latest.current = { values, selection, props }
-      if (!equal(internal, values)) setInternal(values)
+    const begin = (kind: Kind, index: number, source: Gesture['source']) => {
+      const active = gesture.current
       if (
-        internalCrop.min !== selection[0] ||
-        internalCrop.max !== selection[1]
+        active?.kind === kind &&
+        active.index === index &&
+        active.source === source
       )
-        setInternalCrop({ min: selection[0], max: selection[1] })
-      const edit = gesture.current
-      const accepted = edit?.kind === 'value' ? values : selection
-      if (edit && equal(accepted, edit.proposed)) edit.accepted = [...accepted]
-    })
-    useCommitEffect(
-      () => cancel,
-      [
-        disabled,
-        orientation,
-        min,
-        max,
-        step,
-        crop,
-        clampToCrop,
-        values.length,
-        form,
-      ],
-    )
+        return
+      finish()
+      const { values, selection } = latest.current
+      gesture.current = {
+        kind,
+        index,
+        source,
+        start: kind === 'value' ? values : selection,
+      }
+    }
+    // A gesture does not survive a change of what it edits.
+    const edited = [disabled, vertical, min, max, step, crop, clampToCrop, form]
+    useIsomorphicLayoutEffect(() => cancel, [...edited, values.length])
     useFormReset(formRef, () => {
       cancel()
-      const nextCrop = normalizeCrop(
-        cropRange === undefined ? initial.crop : cropRange,
-      )
-      const resetLow = crop && clampToCrop ? nextCrop[0] : grid.min
-      const resetHigh = crop && clampToCrop ? nextCrop[1] : grid.max
-      const next = numbers(value === undefined ? initial.value : value)
-        .map((n) => Math.max(resetLow, Math.min(resetHigh, grid.snap(n))))
-        .sort((a, b) => a - b)
-      if (value === undefined) setInternal(next)
-      if (cropRange === undefined)
-        setInternalCrop({ min: nextCrop[0], max: nextCrop[1] })
-      controls().forEach((input) => {
-        input.value = String(
-          (input.dataset.kind === 'value' ? next : nextCrop)[
-            Number(input.dataset.index)
-          ],
-        )
-      })
+      replaceIntent()
+      replaceCropIntent()
     })
-    const mounted = useRef(false)
-    useCommitEffect(() => {
-      const root = rootRef.current
-      if (!root) return
-      const target = () =>
-        controls().find((input) => !input.matches(':disabled'))
-      if (!mounted.current) {
-        mounted.current = true
-        if (autoFocus && !root.closest('[hidden], [inert]')) target()?.focus()
-      } else if (
-        focused.current &&
-        !focused.current.isConnected &&
-        root.ownerDocument.activeElement === root.ownerDocument.body &&
-        !root.closest('[hidden], [inert]')
-      ) {
-        focused.current = null
-        target()?.focus({ preventScroll: true })
-      }
-    })
+    useFocusRecovery(rootRef, () => controls().find(isAvailable))
+
     const [size, setSize] = useState({ inline: 0, block: 0 })
     const measure = useCallback(() => {
       const root = rootRef.current
       if (!root) return
-      const boxes = Array.from(
-        root.querySelectorAll<HTMLElement>(
-          '[data-part="thumb"] .uf-slider__control',
-        ),
-      ).map((node) => {
-        const box = node.parentElement?.hasAttribute('data-membrane-disabled')
-          ? node
-          : node.parentElement!
-        // CSS layout sizes exclude transforms and viewport-coordinate rounding.
-        const style = root.ownerDocument.defaultView!.getComputedStyle(box)
-        return {
-          width: Number.parseFloat(style.width) || 0,
-          height: Number.parseFloat(style.height) || 0,
-        }
-      })
-      const inline = Math.max(0, ...boxes.map((box) => box.width))
-      const block = Math.max(0, ...boxes.map((box) => box.height))
+      let inline = 0,
+        block = 0
+      root
+        .querySelectorAll<HTMLElement>('[data-part="thumb"] .uf-slider__control')
+        .forEach((node) => {
+          const box = node.parentElement?.hasAttribute('data-membrane-disabled')
+            ? node
+            : node.parentElement!
+          // CSS layout sizes exclude transforms and viewport-coordinate rounding.
+          const style = root.ownerDocument.defaultView!.getComputedStyle(box)
+          inline = Math.max(inline, Number.parseFloat(style.width) || 0)
+          block = Math.max(block, Number.parseFloat(style.height) || 0)
+        })
       if (size.inline !== inline || size.block !== block)
         setSize({ inline, block })
     }, [size])
     // Value text can change width before ResizeObserver delivers its next frame.
-    useCommitEffect(measure)
-    useCommitEffect(() => {
+    useIsomorphicLayoutEffect(measure)
+    useIsomorphicLayoutEffect(() => {
       const root = rootRef.current
-      if (!root) return
-      const Observer = root.ownerDocument.defaultView?.ResizeObserver
-      if (!Observer) return
+      const Observer = root?.ownerDocument.defaultView?.ResizeObserver
+      if (!root || !Observer) return
       const observer = new Observer(measure)
       root
         .querySelectorAll('[data-part="thumb"] .uf-slider__control')
         .forEach((node) => observer.observe(node))
       return () => observer.disconnect()
     }, [measure, showValue, membrane, values.length])
-    const begin = (
-      kind: Gesture['kind'],
-      index: number,
-      source: Gesture['source'],
-    ) => {
-      if (
-        gesture.current?.kind === kind &&
-        gesture.current.index === index &&
-        gesture.current.source === source
-      )
-        return
-      finish()
-      const start = [
-        ...(kind === 'value'
-          ? latest.current.values
-          : latest.current.selection),
-      ]
-      gesture.current = {
-        kind,
-        index,
-        source,
-        start,
-        proposed: start,
-        accepted: start,
-      }
-    }
-    const propose = (
-      kind: Gesture['kind'],
-      index: number,
-      candidate: number,
-    ) => {
-      if (latest.current.props.disabled) return
-      const current =
-        kind === 'value' ? latest.current.values : latest.current.selection
-      const acceptedCrop = latest.current.selection
-      const constrain =
-        latest.current.props.crop && latest.current.props.clampToCrop !== false
-      const minimum = constrain ? acceptedCrop[0] : grid.min
-      const maximum = constrain ? acceptedCrop[1] : grid.max
-      const low =
-        kind === 'value'
-          ? (current[index - 1] ?? minimum)
-          : index === 0
-            ? grid.min
-            : current[0]
-      const high =
-        kind === 'value'
-          ? (current[index + 1] ?? maximum)
-          : index === 0
-            ? current[1]
-            : grid.max
-      const next = [...current]
-      next[index] = Math.max(low, Math.min(high, grid.snap(candidate)))
-      if (equal(next, current)) return
-      if (gesture.current) gesture.current.proposed = next
-      if (kind === 'value') {
-        if (latest.current.props.value === undefined) setInternal(next)
-        latest.current.props.onValueChange?.({ value: [...next] })
-      } else {
-        const range = { min: next[0], max: next[1] }
-        if (latest.current.props.cropRange === undefined) setInternalCrop(range)
-        latest.current.props.onCropChange?.({ ...range })
-      }
-    }
+
     const navigate = (event: KeyboardEvent<HTMLDivElement>) => {
-      rest.onKeyDown?.(event)
+      const input = event.target as HTMLInputElement
       if (
         event.defaultPrevented ||
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey
+        !controls().includes(input) ||
+        input.matches(':disabled')
       )
         return
-      const input = event.target as HTMLInputElement
-      if (!controls().includes(input) || input.matches(':disabled')) return
-      const rtl =
-        input.ownerDocument.defaultView?.getComputedStyle(rootRef.current!)
-          .direction === 'rtl'
-      const delta =
-        event.key === 'ArrowUp'
-          ? 1
-          : event.key === 'ArrowDown'
-            ? -1
-            : event.key === 'ArrowRight'
-              ? rtl
-                ? -1
-                : 1
-              : event.key === 'ArrowLeft'
-                ? rtl
-                  ? 1
-                  : -1
-                : event.key === 'PageUp'
-                  ? 10
-                  : event.key === 'PageDown'
-                    ? -10
-                    : 0
-      if (!delta && event.key !== 'Home' && event.key !== 'End') return
+      const move = stepIntent(
+        event,
+        vertical ? 'vertical' : 'horizontal',
+        readDirection(rootRef.current),
+      )
+      if (!move) return
       event.preventDefault()
-      const kind = input.dataset.kind as Gesture['kind'],
+      const kind = input.dataset.kind as Kind,
         index = Number(input.dataset.index)
       begin(kind, index, 'key')
-      propose(
+      latest.current.propose(
         kind,
         index,
-        event.key === 'Home'
-          ? Number(input.min)
-          : event.key === 'End'
-            ? Number(input.max)
-            : grid.move(Number(input.value), delta),
+        'step' in move
+          ? (shown) => grid.move(shown, move.step)
+          : () => (move.to === 'min' ? -Infinity : Infinity),
       )
     }
     const pointerDown = (event: PointerEvent<HTMLDivElement>) => {
-      rest.onPointerDown?.(event)
+      const target = event.target as Element
+      const track = trackRef.current,
+        root = rootRef.current
       if (
         event.defaultPrevented ||
         event.button !== 0 ||
@@ -481,92 +450,71 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         event.altKey ||
         event.ctrlKey ||
         event.metaKey ||
-        gesture.current?.source === 'pointer'
-      )
-        return
-      const track = trackRef.current,
-        root = rootRef.current
-      if (
+        gesture.current?.source === 'pointer' ||
         !track ||
         !root ||
-        !(event.target as Element).closest('[data-slider-body]')
+        !target.closest('[data-slider-body]')
       )
         return
-      const available = controls().filter(
-        (input) => !input.matches(':disabled'),
-      )
-      if (!available.length) return
-      const rtl =
-        root.ownerDocument.defaultView?.getComputedStyle(root).direction ===
-        'rtl'
-      const rect = track.getBoundingClientRect()
-      const vertical = orientation === 'vertical'
-      const length = vertical ? rect.height : rect.width
-      if (length <= 0) return
-      const coordinate = (x: number, y: number) =>
-        vertical ? rect.bottom - y : rtl ? rect.right - x : x - rect.left
-      const point = coordinate(event.clientX, event.clientY)
-      const hit = (event.target as Element)
-        .closest('[data-slider-handle]')
-        ?.querySelector<HTMLInputElement>('input')
-      const trackKind = (event.target as Element).closest(
-        '[data-slider-crop-track]',
-      )
+      // A press on either rail edits the nearest control of that rail.
+      const kind: Kind = target.closest('[data-slider-crop-track]')
         ? 'crop'
         : 'value'
-      const candidates = available.filter(
-        (input) => input.dataset.kind === trackKind,
+      const candidates = controls().filter(
+        (input) => input.dataset.kind === kind && !input.matches(':disabled'),
       )
       if (!candidates.length) return
+      const dir = readDirection(root)
+      /** Pointer position along the current track, from its start, and the track's length. */
+      const along = (x: number, y: number) => {
+        const rect = track.getBoundingClientRect()
+        return [
+          vertical
+            ? rect.bottom - y
+            : dir === 'ltr'
+              ? x - rect.left
+              : rect.right - x,
+          vertical ? rect.height : rect.width,
+        ] as const
+      }
+      const [point, length] = along(event.clientX, event.clientY)
+      if (length <= 0) return
+      const at = (input: HTMLInputElement) =>
+        grid.ratio(Number(input.value)) * length
+      const hit = target
+        .closest('[data-slider-handle]')
+        ?.querySelector('input')
       const input =
-        hit && available.includes(hit)
+        hit && candidates.includes(hit)
           ? hit
           : candidates.reduce((nearest, next) => {
-              const distance = Math.abs(
-                point - grid.ratio(Number(next.value)) * length,
-              )
-              const previous = Math.abs(
-                point - grid.ratio(Number(nearest.value)) * length,
-              )
+              const distance = Math.abs(point - at(next))
+              const previous = Math.abs(point - at(nearest))
+              // Ties go to the thumb the pointer is past, so coincident thumbs can separate.
               return distance < previous ||
-                (distance === previous &&
-                  point > grid.ratio(Number(next.value)) * length)
+                (distance === previous && point > at(next))
                 ? next
                 : nearest
-            }, candidates[0])
-      if (!input) return
+            })
       event.preventDefault()
-      const kind = input.dataset.kind as Gesture['kind'],
-        index = Number(input.dataset.index)
+      const index = Number(input.dataset.index)
       begin(kind, index, 'pointer')
       input.focus({ preventScroll: true })
       if (event.isTrusted) input.setPointerCapture?.(event.pointerId)
-      const offset = hit ? point - grid.ratio(Number(input.value)) * length : 0
+      // Grabbing a thumb off-center keeps that offset instead of jumping.
+      const offset = hit ? point - at(input) : 0
       const pointerId = event.pointerId
       const captured = input.hasPointerCapture?.(pointerId) === true
       const update = (x: number, y: number) => {
+        const [position, current] = along(x, y)
         if (
           input.matches(':disabled') ||
-          (captured && !input.hasPointerCapture(pointerId))
-        ) {
-          cancel()
-          return
-        }
-        const currentRect = track.getBoundingClientRect()
-        const currentLength = vertical ? currentRect.height : currentRect.width
-        if (currentLength <= 0) {
-          cancel()
-          return
-        }
-        const position = vertical
-          ? currentRect.bottom - y
-          : rtl
-            ? currentRect.right - x
-            : x - currentRect.left
-        propose(
-          kind,
-          index,
-          grid.fromRatio((position - offset) / currentLength),
+          (captured && !input.hasPointerCapture(pointerId)) ||
+          current <= 0
+        )
+          return cancel()
+        latest.current.propose(kind, index, () =>
+          grid.fromRatio((position - offset) / current),
         )
       }
       const move = (next: globalThis.PointerEvent) => {
@@ -575,10 +523,9 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         update(next.clientX, next.clientY)
       }
       const up = (next: globalThis.PointerEvent) => {
-        if (next.pointerId === pointerId) {
-          if (captured && !input.hasPointerCapture(pointerId)) cancel()
-          else finish()
-        }
+        if (next.pointerId !== pointerId) return
+        if (captured && !input.hasPointerCapture(pointerId)) cancel()
+        else finish()
       }
       const abort = (next: globalThis.PointerEvent) => {
         if (next.pointerId === pointerId) cancel()
@@ -600,60 +547,68 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       }
       update(event.clientX, event.clientY)
     }
-    const describe = (n: number, index: number, kind: Gesture['kind']) => {
-      const text = formatValue
-        ? formatValue({ value: n, index, kind })
-        : String(n)
-      if (typeof text !== 'string' || !text.trim())
-        throw new TypeError('Slider formatValue must return nonempty text')
-      return text
-    }
-    const renderHandle = (n: number, index: number, kind: Gesture['kind']) => {
+
+    const generatedId = useId()
+    const fieldId = id || generatedId
+    // The thumbs repeat the label's content, without its required marker, through this id.
+    const nameId = `${fieldId}-name`
+    const field = useField({
+      id: fieldId,
+      label: hasSlotContent(label, { trimText: true }) ? (
+        <span id={nameId}>{label}</span>
+      ) : (
+        label
+      ),
+      description,
+      error,
+      labelPosition,
+      required,
+      labelable: false,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledby,
+      'aria-describedby': ariaDescribedby,
+      'aria-invalid': ariaInvalid,
+    })
+    // Each control is named after the group, plus its own part when there are several.
+    const groupRefs =
+      field.labelledBy === field.labelId ? nameId : field.labelledBy
+    const groupLabel = field.controlProps['aria-label']
+
+    const renderHandle = (n: number, index: number, kind: Kind) => {
       const isCrop = kind === 'crop'
+      const own = isCrop ? (index ? 'cropEnd' : 'cropStart') : undefined
+      const custom = resolveLabel(
+        own ? labels?.[own] : labels?.thumbs?.[index],
+        '',
+        'Slider',
+        `labels.${own ?? 'thumbs'}`,
+      )
       const suffix = isCrop
-        ? index === 0
-          ? 'Crop start'
-          : 'Crop end'
-        : values.length > 1
-          ? String(index + 1)
-          : ''
-      const custom = isCrop
-        ? index === 0
-          ? labels?.cropStart
-          : labels?.cropEnd
-        : labels?.thumbs?.[index]
-      const customName =
-        custom === undefined
-          ? undefined
-          : resolveLabel(custom, '', 'Slider', 'control label')
-      if (custom !== undefined && !customName)
-        throw new TypeError('Slider control labels must be nonempty')
-      const suffixId = `${id}-${kind}-${index}-name`
-      const low = isCrop
-        ? index === 0
-          ? grid.min
-          : selection[0]
-        : (values[index - 1] ?? lower)
-      const high = isCrop
-        ? index === 0
-          ? selection[1]
-          : grid.max
-        : (values[index + 1] ?? upper)
-      const text = describe(n, index, kind)
+        ? ['Crop start', 'Crop end'][index]
+        : values.length > 1 ? String(index + 1) : ''
+      const suffixId = `${fieldId}-${kind}-${index}-name`
+      // Each control's native bounds are its neighbours, so the thumbs never cross.
+      const [low, high] = isCrop
+        ? index ? [selection[0], grid.max] : [grid.min, selection[1]]
+        : [values[index - 1] ?? lower, values[index + 1] ?? upper]
+      const formatted = formatValue?.({ value: n, index, kind })
+      const text =
+        resolveLabel(formatted, '', 'Slider', 'formatValue') || String(n)
+      const first = !isCrop && index === 0
       return (
         <span
           key={`${kind}-${index}`}
-          {...attrs(isCrop ? 'crop' : 'thumb')}
+          {...part(isCrop ? 'crop' : 'thumb')}
           data-slider-handle=""
-          data-crop={isCrop ? (index === 0 ? 'min' : 'max') : undefined}
+          data-crop={isCrop ? (index ? 'max' : 'min') : undefined}
           className="uf-slider__handle"
           style={{ '--uf-slider-position': grid.ratio(n) } as CSSProperties}
         >
           <Membrane enabled={membrane} interactive target="input">
             <span className="uf-slider__control">
               <input
-                {...attrs('input')}
-                ref={!isCrop && index === 0 ? formRef : undefined}
+                {...part('input')}
+                ref={first ? formRef : undefined}
                 type="range"
                 tabIndex={0}
                 data-kind={kind}
@@ -665,39 +620,32 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 step={grid.step}
                 value={n}
                 disabled={disabled}
+                autoFocus={first && autoFocus}
+                data-autofocus={first && autoFocus ? '' : undefined}
                 title={showValue && !isCrop ? text : undefined}
-                aria-orientation={orientation}
+                aria-orientation={vertical ? 'vertical' : 'horizontal'}
                 aria-label={
-                  customName ||
-                  (!labelledby
-                    ? [explicitLabel, suffix].filter(Boolean).join(' ') ||
-                      undefined
-                    : undefined)
+                  custom ||
+                  (groupRefs
+                    ? undefined
+                    : [groupLabel, suffix].filter(Boolean).join(' ') ||
+                      undefined)
                 }
                 aria-labelledby={
-                  !customName && labelledby
-                    ? [labelledby, suffix ? suffixId : undefined]
-                        .filter(Boolean)
-                        .join(' ')
-                    : undefined
+                  custom || !groupRefs
+                    ? undefined
+                    : idList(groupRefs, suffix && suffixId)
                 }
-                aria-describedby={rest['aria-describedby']}
-                aria-invalid={rest['aria-invalid']}
-                aria-errormessage={rest['aria-errormessage']}
+                aria-describedby={field.describedBy}
+                aria-invalid={field.invalid || undefined}
                 aria-valuetext={formatValue ? text : undefined}
-                onFocus={(event) => {
-                  focused.current = event.currentTarget
-                }}
                 onChange={(event) => {
-                  if (
-                    event.defaultPrevented ||
-                    event.nativeEvent.defaultPrevented ||
-                    event.currentTarget.matches(':disabled')
-                  )
-                    return
+                  const input = event.currentTarget
+                  if (input.matches(':disabled')) return
+                  // Assistive technology and other native edits are one-step gestures.
                   const native = !gesture.current
                   if (native) begin(kind, index, 'native')
-                  propose(kind, index, Number(event.currentTarget.value))
+                  latest.current.propose(kind, index, () => Number(input.value))
                   if (native) setTimeout(finish, 0)
                 }}
               />
@@ -712,9 +660,9 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                       : 'uf-slider__dot',
                 )}
               >
-                {isCrop ? null : showValue ? (
+                {!isCrop && showValue && (
                   <bdi className="uf-slider__valueText">{text}</bdi>
-                ) : null}
+                )}
               </span>
             </span>
           </Membrane>
@@ -730,17 +678,17 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const end = grid.ratio(values[values.length - 1])
     return (
       <div
-        {...rest}
-        {...attrs('root')}
+        {...nativeProps}
+        {...field.controlProps}
+        {...field.rootProps}
+        {...part('root')}
         ref={composedRef}
         role="group"
-        className={cn('uf-slider', className)}
-        data-orientation={orientation}
+        className={cn('uf-field uf-slider', className)}
+        data-orientation={vertical ? 'vertical' : 'horizontal'}
         data-disabled={disabled ? '' : undefined}
         data-crop={crop ? '' : undefined}
         data-show-value={showValue ? '' : undefined}
-        aria-label={labelledby ? undefined : explicitLabel}
-        aria-labelledby={labelledby}
         aria-disabled={disabled || undefined}
         style={
           {
@@ -753,64 +701,65 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             ...(!membrane && {
               '--uf-slider-crop-size': 'var(--uf-slider-target)',
             }),
-            ...rest.style,
+            ...style,
           } as CSSProperties
         }
-        onKeyDown={navigate}
+        onKeyDown={composeHandlers(onKeyDown, navigate)}
         onKeyUp={(event) => {
-          rest.onKeyUp?.(event)
+          onKeyUp?.(event)
+          // Releasing the key ends a keyboard edit; a cancelled release discards its commit.
           if (
             gesture.current?.source === 'key' &&
-            /^(Arrow|Page|Home$|End$)/.test(event.key)
+            stepIntent(event, 'horizontal', 'ltr')
           )
             event.defaultPrevented ? cancel() : finish()
         }}
-        onBlur={(event) => {
-          rest.onBlur?.(event)
+        onBlur={composeHandlers(onBlur, () => {
           if (gesture.current?.source === 'key') finish()
-        }}
-        onPointerDown={pointerDown}
+        })}
+        onPointerDown={composeHandlers(onPointerDown, pointerDown)}
       >
-        {hasLabel && (
-          <Text
-            {...attrs('label')}
-            id={labelId}
-            membrane={membrane}
-            className="uf-slider__label"
-          >
-            {label}
-          </Text>
-        )}
-        <div className="uf-slider__body" data-slider-body="">
-          <div {...attrs('track')} ref={trackRef} className="uf-slider__track">
-            <span
-              {...attrs('range')}
-              className="uf-slider__range"
-              style={
-                {
-                  '--uf-slider-start': start,
-                  '--uf-slider-end': end,
-                } as CSSProperties
-              }
-            />
-            {values.map((n, i) => renderHandle(n, i, 'value'))}
-            {crop && (
-              <div className="uf-slider__crop-track" data-slider-crop-track="">
-                <span
-                  className="uf-slider__selection"
-                  style={
-                    {
-                      '--uf-slider-start': grid.ratio(selection[0]),
-                      '--uf-slider-end': grid.ratio(selection[1]),
-                    } as CSSProperties
-                  }
-                />
-                {selection.map((n, i) => renderHandle(n, i, 'crop'))}
-              </div>
-            )}
+        <FieldLayout field={field}>
+          <div className="uf-slider__body" data-slider-body="">
+            <div {...part('track')} ref={trackRef} className="uf-slider__track">
+              <span
+                {...part('range')}
+                className="uf-slider__range"
+                style={
+                  {
+                    '--uf-slider-start': start,
+                    '--uf-slider-end': end,
+                  } as CSSProperties
+                }
+              />
+              {values.map((n, i) => renderHandle(n, i, 'value'))}
+              {crop && (
+                <div
+                  className="uf-slider__crop-track"
+                  data-slider-crop-track=""
+                >
+                  <span
+                    className="uf-slider__selection"
+                    style={
+                      {
+                        '--uf-slider-start': grid.ratio(selection[0]),
+                        '--uf-slider-end': grid.ratio(selection[1]),
+                      } as CSSProperties
+                    }
+                  />
+                  {selection.map((n, i) => renderHandle(n, i, 'crop'))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </FieldLayout>
       </div>
     )
   },
 )
+
+/** Numeric input with ordered thumbs and an optional independently editable crop interval. */
+export const Slider = SliderRender as (<V extends SliderValue = number>(
+  props: SliderProps<V> & RefAttributes<HTMLDivElement>,
+) => ReturnType<typeof SliderRender>) &
+  typeof SliderRender

@@ -102,17 +102,17 @@ const renderSlider = (
                         { ...options, fresh: false },
                       )
                   }}
-                  onCropChange={(next) => {
-                    cropEvents.push({ ...next })
-                    if (options.mutateCrop) next.min = 90
+                  onCropRangeChange={({ cropRange }) => {
+                    cropEvents.push({ ...cropRange })
+                    if (options.mutateCrop) cropRange.start = 90
                     if (options.accept)
                       renderSlider(
-                        { ...props, cropRange: next },
+                        { ...props, cropRange },
                         { ...options, fresh: false },
                       )
                   }}
                   onValueCommit={(next) => commits.push(next.value)}
-                  onCropCommit={(next) => cropCommits.push(next)}
+                  onCropRangeCommit={(next) => cropCommits.push(next.cropRange)}
                 />
               </fieldset>
             </div>

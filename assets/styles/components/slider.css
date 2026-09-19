@@ -1,7 +1,8 @@
 /* =================================================================
  * SLIDER
  * ================================================================= */
-/* Track coordinates are shared by every handle; only the visible glyph changes. */
+/* Track coordinates are shared by every handle; only the visible glyph changes.
+   Layout of label, body, description and error belongs to .uf-field. */
 .uf-slider[data-scope="slider"] {
   --uf-slider-target: max(24px, var(--uf-control-height));
   --uf-slider-thumb-inline: calc(var(--uf-slider-target) + var(--uf-membrane) * 2);
@@ -10,15 +11,11 @@
   --uf-slider-crop-space: 0px;
   --uf-slider-crop-extent: 0px;
   container-type: inline-size;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
   min-width: 0;
   min-height: var(--uf-control-height);
   width: 100%;
 }
 .uf-slider[data-crop] { --uf-slider-crop-space: var(--uf-slider-crop-size); --uf-slider-crop-extent: var(--uf-slider-crop-size); }
-.uf-slider__label { min-width: 0; overflow-wrap: anywhere; text-align: start; }
 .uf-slider__body {
   position: relative;
   width: 100%;

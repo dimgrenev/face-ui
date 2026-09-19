@@ -688,7 +688,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       { name: 'Default', props: { label: 'Value', defaultValue: [50] } },
       { name: 'Range', props: { defaultValue: [20, 80], label: 'Price range', labels: { thumbs: ['Minimum price', 'Maximum price'] } } },
       { name: 'Value', props: { showValue: true, label: 'Zoom', defaultValue: 42 } },
-      { name: 'Crop', props: { showValue: true, label: 'Crop', defaultValue: 40, crop: true, defaultCropRange: { min: 20, max: 80 } } },
+      { name: 'Crop', props: { showValue: true, label: 'Crop', defaultValue: 40, crop: true, defaultCropRange: { start: 20, end: 80 } } },
       { name: 'Disabled', props: { label: 'Unavailable value', defaultValue: 30, disabled: true } },
     ],
   },
