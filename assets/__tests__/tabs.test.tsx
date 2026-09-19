@@ -4,7 +4,9 @@ import { beforeEach, it, expect, vi, describe } from 'vitest'
 import { renderToString } from 'react-dom/server'
 import { Tabs } from '../../Tabs/Tabs'
 import { Button } from '../../Button/Button'
-import { allowConsoleError, hydrate, mount } from './harness'
+import { expectDevError, hydrate, mount } from './harness'
+import { describeControlled } from './harness/controlled'
+import { describeRoving } from './harness/roving'
 let host: HTMLDivElement, root: Root
 const items = [
   { value: '', label: 'Empty', content: 'Empty panel' },
@@ -141,14 +143,24 @@ it('controlled updates are silent and release retains the accepted value', async
   const cb = vi.fn()
   await render({ value: 'a', onValueChange: cb })
   await render({ value: 'b', onValueChange: cb })
-  await render({ onValueChange: cb })
+  await expectDevError(
+    () => render({ onValueChange: cb }),
+    /^Face UI Tabs: missing value; keeping the last controlled value\.$/,
+  )
   expect(selected()).toEqual(['b'])
   expect(cb).not.toHaveBeenCalled()
 })
-it('unknown controlled key selects no phantom panel and returns when represented', async () => {
-  await render({ value: 'later' })
-  expect(selected()).toEqual([])
-  expect(tabs()[0].tabIndex).toBe(0)
+it('unknown controlled key shows the first enabled tab and returns when represented', async () => {
+  const cb = vi.fn()
+  await render({
+    value: 'later',
+    onValueChange: cb,
+    items: items.map((i, index) => ({ ...i, disabled: index === 0 })),
+  })
+  expect(selected()).toEqual(['a'])
+  expect(panels().filter((node) => !node.hidden)).toEqual([panels()[1]])
+  expect(tabs()[1].tabIndex).toBe(0)
+  expect(cb).not.toHaveBeenCalled()
   await render({
     value: 'later',
     items: [...items, { value: 'later', label: 'Later' }],
@@ -161,6 +173,40 @@ it('default changes do not replace a user choice', async () => {
   await render({ defaultValue: '' })
   expect(selected()).toEqual(['b'])
 })
+describe('selection invariant', () => {
+  const a = { value: 'a', label: 'A', content: 'A panel' }
+  const b = { value: 'b', label: 'B', content: 'B panel' }
+  const c = { value: 'c', label: 'C', content: 'C panel' }
+  it('a default key that items do not contain yet waits for them', async () => {
+    const cb = vi.fn()
+    await render({ items: [], defaultValue: 'b', onValueChange: cb })
+    expect(tabs()).toEqual([])
+    await render({ items: [a], defaultValue: 'b', onValueChange: cb })
+    expect(selected()).toEqual(['a'])
+    await render({ items: [a, b, c], defaultValue: 'b', onValueChange: cb })
+    expect(selected()).toEqual(['b'])
+    expect(panels().filter((node) => !node.hidden)).toEqual([panels()[1]])
+    expect(cb).not.toHaveBeenCalled()
+  })
+  it('a user choice survives momentarily empty items', async () => {
+    const cb = vi.fn()
+    await render({ items: [a, b, c], defaultValue: 'b', onValueChange: cb })
+    await click(2)
+    await render({ items: [], onValueChange: cb })
+    expect(tabs()).toEqual([])
+    await render({ items: [a, b, c], onValueChange: cb })
+    expect(selected()).toEqual(['c'])
+    expect(cb.mock.calls).toEqual([[{ value: 'c' }]])
+  })
+  it('selecting the shown tab while the default waits makes it the choice', async () => {
+    const cb = vi.fn()
+    await render({ items: [a], defaultValue: 'b', onValueChange: cb })
+    await click(0)
+    await render({ items: [a, b, c], onValueChange: cb })
+    expect(selected()).toEqual(['a'])
+    expect(cb.mock.calls).toEqual([[{ value: 'a' }]])
+  })
+})
 it('removing uncontrolled selection chooses its nearest enabled successor silently', async () => {
   const cb = vi.fn()
   await render({ defaultValue: 'a', onValueChange: cb })
@@ -172,6 +218,16 @@ it('removing uncontrolled selection chooses its nearest enabled successor silent
   expect(cb).not.toHaveBeenCalled()
   await render({ onValueChange: cb })
   expect(selected()).toEqual(['b'])
+  // No successor: the enabled tab before it.
+  await render({
+    items: [...items, { value: 'z', label: 'Z' }],
+    defaultValue: 'a',
+  })
+  await click(3)
+  await render({
+    items: items.map((i) => ({ ...i, disabled: i.value === 'b' })),
+  })
+  expect(selected()).toEqual(['a'])
 })
 it('disabling a selected item keeps its panel and makes an enabled tab the entry stop', async () => {
   await render({ defaultValue: 'a' })
@@ -221,13 +277,8 @@ it('empty fragments do not create action or icon slots and zero remains visible'
   await render({
     actions: <></>,
     items: [
-      {
-        value: '0',
-        label: 0,
-        leadingIcon: false,
-        trailingIcon: <></>,
-        content: 0,
-      },
+      { value: '0', label: 0, icon: <></>, content: 0 },
+      { value: '1', label: 1, icon: ' ' },
     ],
   })
   expect(host.querySelector('fieldset')).toBeNull()
@@ -235,20 +286,14 @@ it('empty fragments do not create action or icon slots and zero remains visible'
   expect(tabs()[0].textContent).toBe('0')
   expect(panels()[0].textContent).toBe('0')
 })
-it('both icon slots update without replacing the tab or its accessible label', async () => {
+it('the icon slot precedes the label and updates without replacing the tab', async () => {
   await render({
-    items: [
-      {
-        value: 'a',
-        label: 'File',
-        leadingIcon: <svg data-icon="file" />,
-        trailingIcon: <svg data-icon="status" />,
-      },
-    ],
+    items: [{ value: 'a', label: 'File', icon: <svg data-icon="file" /> }],
   })
   const button = tabs()[0]
-  expect(button.querySelectorAll('.uf-tabs-tabIcon')).toHaveLength(2)
-  await render({ items: [{ value: 'a', label: 'File', leadingIcon: null }] })
+  expect(button.firstElementChild?.className).toBe('uf-tabs-tabIcon')
+  expect(button.querySelector('svg')?.dataset.icon).toBe('file')
+  await render({ items: [{ value: 'a', label: 'File', icon: null }] })
   expect(tabs()[0]).toBe(button)
   expect(button.querySelectorAll('.uf-tabs-tabIcon')).toHaveLength(0)
 })
@@ -393,10 +438,18 @@ it('autoFocus is mount-only and does not report a value change', async () => {
   const cb = vi.fn()
   await render({ autoFocus: true, defaultValue: 'a', onValueChange: cb })
   expect(document.activeElement).toBe(tabs()[1])
-  await act(async () => tabs()[2].focus())
+  expect(cb).not.toHaveBeenCalled()
+  await key(1, 'ArrowRight')
   await render({ autoFocus: true, onValueChange: cb })
   expect(document.activeElement).toBe(tabs()[2])
   expect(cb.mock.calls).toEqual([[{ value: 'b' }]])
+})
+it('only arrow keys activate automatically: focusing a tab does not select it', async () => {
+  const cb = vi.fn()
+  await render({ defaultValue: 'a', onValueChange: cb })
+  await focus(2)
+  expect(selected()).toEqual(['a'])
+  expect(cb).not.toHaveBeenCalled()
 })
 it('nested tabs do not activate their parent tabs', async () => {
   const cb = vi.fn()
@@ -465,35 +518,58 @@ it.skipIf(!version.startsWith('19.'))(
     expect(cleanup).toHaveBeenCalledTimes(1)
   },
 )
-for (const [name, props] of [
-  ['duplicate keys', { items: [items[1], items[1]] }],
-  ['bad value', { value: [] }],
-  ['bad item key', { items: [{ value: 1, label: 'Bad' }] }],
-  [
-    'missing external ID',
-    { renderPanels: false, items: [{ value: 'a', label: 'A' }] },
-  ],
-  [
-    'ignored external content',
-    {
-      renderPanels: false,
-      items: [{ value: 'a', label: 'A', panelId: 'p', content: null }],
-    },
-  ],
-  [
-    'duplicate internal IDs',
-    {
-      items: [
-        { ...items[1], id: 'same' },
-        { ...items[2], panelId: 'same' },
-      ],
-    },
-  ],
-] as const)
-  it(`rejects ${name} instead of silently coercing`, async () => {
-    allowConsoleError(/The above error occurred in the <ForwardRef\(Tabs\)> component/)
-    await expect(render(props)).rejects.toThrow(TypeError)
+describe('invalid items never throw', () => {
+  it('drops duplicate and non-string keys, first wins, with a report', async () => {
+    await expectDevError(
+      () => render({ items: [items[1], { ...items[2], value: 'a' }] }),
+      /^Face UI Tabs: invalid items\[1\] key "a"; dropping the duplicate\.$/,
+    )
+    expect(tabs().map((n) => n.textContent)).toEqual(['Alpha'])
+    await expectDevError(
+      () => render({ items: [{ value: 1, label: 'Bad' }, items[2]] }),
+      /^Face UI Tabs: invalid items\[0\] key 1; dropping the item\.$/,
+    )
+    expect(tabs().map((n) => n.dataset.value)).toEqual(['b'])
+    await expectDevError(
+      () => render({ items: 'x' }),
+      /^Face UI Tabs: invalid items "x"; using \[\]\.$/,
+    )
+    expect(tabs()).toEqual([])
   })
+  it('a non-string value is an unknown key: the first enabled tab shows', async () => {
+    await render({ value: [] })
+    expect(selected()).toEqual([''])
+  })
+  it('external items without panelId render without aria-controls and report', async () => {
+    await expectDevError(
+      () =>
+        render({
+          renderPanels: false,
+          items: [
+            { value: 'a', label: 'A' },
+            { value: 'b', label: 'B', panelId: 'p', content: 'Ignored' },
+          ],
+        }),
+      /^Face UI Tabs: missing items\[\]\.panelId; rendering tab "a" without aria-controls\.$/,
+    )
+    expect(tabs()[0].hasAttribute('aria-controls')).toBe(false)
+    expect(tabs()[1].getAttribute('aria-controls')).toBe('p')
+    expect(panels()).toEqual([])
+    expect(host.textContent).not.toContain('Ignored')
+  })
+  it('empty ids fall back to generated ones and repeated ids render as given', async () => {
+    await render({
+      items: [
+        { ...items[1], id: '', panelId: '' },
+        { ...items[2], id: 'same', panelId: 'same' },
+      ],
+    })
+    expect(tabs()[0].id).toMatch(/^tabs-.+-tab-61$/)
+    expect(panels()[0].id).toMatch(/^tabs-.+-panel-61$/)
+    expect(tabs()[1].id).toBe('same')
+    expect(panels()[1].id).toBe('same')
+  })
+})
 
 it('hydrates stable tab/panel IDs and persistent panels in StrictMode', async () => {
   await act(async () => root.unmount())
@@ -515,7 +591,8 @@ it('hydrates stable tab/panel IDs and persistent panels in StrictMode', async ()
   await click(2)
   expect(selected()).toEqual(['b'])
 })
-it('native disabled fieldset prevents selection and autofocus without custom event state', async () => {
+// Autofocus inside a disabled fieldset is a browser matter (jsdom focuses such buttons): tabs.spec.ts.
+it('native disabled fieldset prevents selection without custom event state', async () => {
   const change = vi.fn()
   await act(async () =>
     root.render(
@@ -525,7 +602,6 @@ it('native disabled fieldset prevents selection and autofocus without custom eve
     ),
   )
   expect(tabs().every((node) => node.matches(':disabled'))).toBe(true)
-  expect(tabs()).not.toContain(document.activeElement)
   await click(1)
   await key(0, 'ArrowRight')
   expect(change).not.toHaveBeenCalled()
@@ -578,3 +654,39 @@ describe('component smoke', () => {
     expect(panelB?.hidden).toBe(true)
   })
 })
+
+describeControlled({
+  name: 'Tabs',
+  prop: 'value',
+  values: ['a', 'b'],
+  render: (props) => <Tabs items={items} {...props} />,
+  change: (host, to) =>
+    host.querySelector<HTMLElement>(`[role="tab"][data-value="${to}"]`)!.click(),
+  read: (host) =>
+    host.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')!
+      .dataset.value!,
+  normalizes: ['missing', ''],
+  handler: 'onClick',
+})
+for (const activationMode of ['automatic', 'manual'] as const)
+  for (const orientation of ['horizontal', 'vertical'] as const)
+    describeRoving({
+      name: `Tabs ${activationMode} ${orientation}`,
+      render: (props) => (
+        <Tabs
+          {...props}
+          orientation={orientation}
+          activationMode={activationMode}
+        />
+      ),
+      items: (host) => Array.from(host.querySelectorAll('[role="tab"]')),
+      orientation,
+      selects: true,
+      activateOnMove:
+        activationMode === 'automatic'
+          ? (host) =>
+              host.querySelector<HTMLElement>(
+                '[role="tab"][aria-selected="true"]',
+              )?.dataset.value ?? null
+          : undefined,
+    })

@@ -167,8 +167,7 @@ const oneImplementation = (component: string) =>
 /** Components that still violate each rule; only the wave-closing WP edits these, and they only shrink. */
 const PENDING = {
   'D2 throw': [
-    'Accordion', 'Breadcrumb', 'Calendar', 'Date', 'Pagination', 'Rating', 'SegmentedControl', 'Slider', 'Steps', 'Tabs',
-    'Toggle',
+    'Accordion', 'Breadcrumb', 'Calendar', 'Date', 'Pagination', 'Rating', 'SegmentedControl', 'Slider', 'Steps', 'Toggle',
   ],
   'D3 machines': [
     'Accordion', 'Avatar', 'Carousel', 'Checkbox', 'Command', 'Input', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel',
@@ -177,17 +176,17 @@ const PENDING = {
   'D3 isomorphic layout effect': [
     'Accordion', 'Avatar', 'Calendar', 'Carousel', 'Checkbox', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation',
     'Overlay', 'Pagination', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps',
-    'Switcher', 'Table', 'Tabs', 'Toc', 'Tooltip', 'Tree', 'Upload',
+    'Switcher', 'Table', 'Toc', 'Tooltip', 'Tree', 'Upload',
   ],
-  'D3 direction': ['Calendar', 'Date', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Tabs'],
-  'D3 isConnected': ['Breadcrumb', 'Rating', 'SegmentedControl', 'Slider', 'Steps', 'Tabs'],
+  'D3 direction': ['Calendar', 'Date', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider'],
+  'D3 isConnected': ['Breadcrumb', 'Rating', 'SegmentedControl', 'Slider', 'Steps'],
   'D3 machine-era hooks': [
     'Accordion', 'Calendar', 'Carousel', 'Command', 'Date', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Radio', 'Select',
     'Steps', 'Toc', 'Tree',
   ],
   'D5 one implementation': [
     'Accordion', 'Breadcrumb', 'Calendar', 'Command', 'Date', 'Input', 'Menu', 'Modal', 'Navigation', 'Panel', 'Rating',
-    'SegmentedControl', 'Select', 'Slider', 'Steps', 'Tabs', 'Tree', 'Upload',
+    'SegmentedControl', 'Select', 'Slider', 'Steps', 'Tree', 'Upload',
   ],
 } satisfies Record<string, readonly string[]>
 

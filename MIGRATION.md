@@ -252,6 +252,12 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | --- | --- | --- |
 | `withLine` | `variant="underline"` | auto |
 | `items[].actionIcon` | Put controls in `actions`; the other `action*` fields and `onAction` go with it | manual |
+| `items[].leadingIcon` | `items[].icon` | manual |
+| `items[].trailingIcon` | Put a status mark in `label`, or a control in `actions` | manual |
+| A `value` missing from `items` selected no tab and showed no panel | The first enabled tab shows until the key appears; nothing is reported to `onValueChange` | — |
+| A `defaultValue` missing from the first `items` was replaced by the first enabled tab for good | It waits until `items` contain it; only removing the selected tab moves the selection, to its neighbour | — |
+| In automatic mode any focus on a tab selected it | Arrow keys, Home and End select; focus from a script or the Tab key does not | — |
+| Invalid or duplicate item keys, external items without `panelId` or with `content`, and empty or repeated ids threw a TypeError | Tabs renders: bad items are dropped (first key wins) and reported, a tab without `panelId` in external mode gets no `aria-controls` and is reported, external `content` is ignored | — |
 | `tabsMachine` from `assets/machines/tabs.machine` | Use `Tabs`; the state machine is internal | manual |
 | `tabsAnatomy` from `assets/machines/tabs.machine` | Use `Tabs`; the state machine is internal | manual |
 | `connectTabs` from `assets/machines/tabs.machine` | Use `Tabs`; the state machine is internal | manual |
