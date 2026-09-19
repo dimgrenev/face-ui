@@ -162,7 +162,6 @@ const PENDING_UNION_DOC_CONFLICTS: Record<string, string[]> = {
   Input: ['multiline', 'type'],
   Rating: ['name', 'required'],
   SegmentedControl: ['multiple', 'value', 'defaultValue', 'onValueChange'],
-  Select: ['multiple', 'value', 'defaultValue'],
 }
 
 // Defaults for the shared range presentation live in its internal component,

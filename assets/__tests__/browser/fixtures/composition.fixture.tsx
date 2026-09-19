@@ -68,7 +68,7 @@ function Fixture() {
             <Select
               aria-label="Choose option"
               membrane={membrane}
-              options={options}
+              items={options}
             />
             <Switcher membrane={membrane} label="Switcher" />
             <Button fullWidth membrane={membrane}>Full width</Button>
@@ -107,7 +107,7 @@ function Fixture() {
           label="Form choice"
           name="choice"
           required
-          options={options}
+          items={options}
           defaultValue="a"
         />
         <DatePicker
@@ -282,7 +282,7 @@ function Fixture() {
         >
           <Button>Open popover</Button>
         </Popover>
-        <Select aria-label="Nested select" options={options} />
+        <Select aria-label="Nested select" items={options} />
         <Modal trigger="Open child" title="Child">
           <Button>Inside child</Button>
         </Modal>

@@ -81,6 +81,7 @@ test('the single-value native proxy does not make a required multiple select inv
     form: 'external',
     required: true,
     defaultValue: [],
+    placeholder: 'Choose plans',
   })
   const valid = () =>
     page
@@ -100,16 +101,17 @@ test('the single-value native proxy does not make a required multiple select inv
   await page
     .locator('#external')
     .evaluate((form: HTMLFormElement) => form.reset())
-  await expect(page.getByRole('combobox')).toContainText('Select option')
+  await expect(page.getByRole('combobox')).toContainText('Choose plans')
+  await expect(page.getByRole('combobox')).toHaveAttribute('data-placeholder')
   expect(await valid()).toBe(false)
 })
 test('sheet content has a named modal dialog and a separate, keyboard-operable listbox', { tag: ['@layout', '@focus'] }, async ({
   page,
 }) => {
   await page.setViewportSize({ width: 375, height: 720 })
-  await render(page, { surface: 'auto', surfaceTitle: 'Choose a plan' })
+  await render(page, { surface: 'auto' })
   await page.getByRole('combobox').click()
-  const dialog = page.getByRole('dialog', { name: 'Choose a plan' }),
+  const dialog = page.getByRole('dialog', { name: 'Plan', exact: true }),
     list = page.getByRole('listbox')
   await expect(dialog).toBeVisible()
   await expect(list).toBeFocused()
@@ -208,7 +210,7 @@ test('contentMinWidth changes measured popover width and remains inside a narrow
   }
 })
 
-test('width, label orientation, display value and class hooks have independent visual effects', { tag: ['@layout', '@css'] }, async ({
+test('width, label position, display value and class hooks have independent visual effects', { tag: ['@layout', '@css'] }, async ({
   page,
 }) => {
   await render(page, {
@@ -225,17 +227,21 @@ test('width, label orientation, display value and class hooks have independent v
   const compact = (await field.boundingBox())!.width
   await expect(field).toHaveClass('custom-trigger')
   await expect(root).toHaveCSS('margin-top', '12px')
+  // Beside the control, the label needs two columns of --uf-field-start-min.
+  await page.evaluate(() => {
+    document.querySelector('section')!.style.width = '480px'
+  })
   await render(page, {
     surface: 'popover',
     fullWidth: true,
     defaultValue: 'b',
-    labelOrientation: 'horizontal',
+    labelPosition: 'start',
     contentClassName: 'custom-content',
     displayValue: 'Custom display',
   })
   await expect(field).toContainText('Custom display')
   let label = await page
-    .locator('[data-scope="select"] [data-part="label"]')
+    .locator('[data-scope="field"][data-part="label"]')
     .boundingBox()
   let box = (await field.boundingBox())!
   expect(box.x).toBeGreaterThan(label!.x + 20)
@@ -244,13 +250,13 @@ test('width, label orientation, display value and class hooks have independent v
     surface: 'popover',
     fullWidth: true,
     defaultValue: 'b',
-    labelOrientation: 'vertical',
+    labelPosition: 'top',
     contentClassName: 'custom-content',
     valueClassName: 'custom-value',
   })
   box = (await field.boundingBox())!
   label = await page
-    .locator('[data-scope="select"] [data-part="label"]')
+    .locator('[data-scope="field"][data-part="label"]')
     .boundingBox()
   expect(box.width).toBeGreaterThan(compact + 60)
   expect(box.y).toBeGreaterThan(label!.y + 15)
@@ -262,11 +268,11 @@ test('width, label orientation, display value and class hooks have independent v
 test('side hover and click keep the selected row aligned with the trigger', { tag: ['@layout', '@pointer'] }, async ({
   page,
 }) => {
-  const options = Array.from({ length: 14 }, (_, i) => ({
+  const items = Array.from({ length: 14 }, (_, i) => ({
     value: String(i),
     label: `Option ${i}`,
   }))
-  await render(page, { surface: 'side', options, defaultValue: '8' })
+  await render(page, { surface: 'side', items, defaultValue: '8' })
   const field = page.getByRole('combobox')
   await field.hover()
   await expect(page.getByRole('listbox')).toBeVisible()
@@ -307,7 +313,7 @@ test('a low side trigger keeps the selected row visible on a wide viewport', { t
     surface: 'side',
     style: { marginTop: 180 },
     defaultValue: '8',
-    options: Array.from({ length: 16 }, (_, i) => ({
+    items: Array.from({ length: 16 }, (_, i) => ({
       value: String(i),
       label: `Option ${i}`,
     })),
@@ -340,7 +346,7 @@ test('a narrow side popup leaves its trigger exposed after mouse hover', { tag: 
         surface: 'side',
         style: { marginTop },
         defaultValue: '8',
-        options: Array.from({ length: 16 }, (_, i) => ({
+        items: Array.from({ length: 16 }, (_, i) => ({
           value: String(i),
           label: `Option ${i}`,
         })),
@@ -431,7 +437,7 @@ test('long lists scroll the active option into view without moving document focu
 }) => {
   await render(page, {
     surface: 'popover',
-    options: Array.from({ length: 60 }, (_, i) => ({
+    items: Array.from({ length: 60 }, (_, i) => ({
       value: String(i),
       label: `Choice ${i}`,
     })),
@@ -483,19 +489,20 @@ test('controlled refusal restores form data and reset cancellation preserves a u
   await expect(page.getByRole('combobox')).toContainText('Alpha')
 })
 
-test('surface breakpoint, sheet title and close label work across a live viewport change', { tag: ['@layout'] }, async ({
+test('the 900px boundary, the sheet title and labels.close work across a live viewport change', { tag: ['@layout'] }, async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 800, height: 720 })
+  await page.setViewportSize({ width: 900, height: 720 })
   await render(page, {
     surface: 'auto',
-    surfaceBreakpoint: 700,
-    surfaceTitle: 'Команда',
-    closeLabel: 'Закрыть',
+    label: '',
+    'aria-label': 'Команда',
+    labels: { close: 'Закрыть' },
   })
   await page.getByRole('combobox').click()
   await expect(page.getByRole('dialog')).toHaveCount(0)
-  await page.setViewportSize({ width: 650, height: 720 })
+  await expect(page.getByRole('listbox')).toBeVisible()
+  await page.setViewportSize({ width: 899, height: 720 })
   const dialog = page.getByRole('dialog', { name: 'Команда' })
   await expect(dialog).toBeVisible()
   await expect(page.getByRole('listbox')).toBeFocused()
@@ -519,7 +526,7 @@ test('production CSS preserves logical layout, focus, popup width and long label
         stretchText: true,
         defaultValue: 'long',
         contentMinWidth: 380,
-        options: [
+        items: [
           {
             value: 'long',
             label:
@@ -577,6 +584,70 @@ test('forced colors retain focus, highlight and the selected marker', { tag: ['@
   expect(colors.fg).not.toBe(colors.bg)
 })
 
+test('forced colors keep the highlighted option legible: HighlightText on Highlight, without a Canvas plate', { tag: ['@forced-colors', '@css'] }, async ({
+  page,
+}) => {
+  await page.emulateMedia({ forcedColors: 'active' })
+  await render(page, { surface: 'popover', defaultValue: 'b', membrane: false })
+  await page.getByRole('combobox').focus()
+  await page.keyboard.press('Enter')
+  const option = page.getByRole('option', { name: 'Beta', exact: true })
+  await expect(option).toHaveAttribute('data-highlighted')
+  await expect(option).toHaveCSS('forced-color-adjust', 'none')
+  const label = option.locator('.uf-select-optionLabel')
+  const ink = await label.evaluate(
+    (node) => getComputedStyle(node.querySelector('*') ?? node).color,
+  )
+  const png = (await label.screenshot({ animations: 'disabled' })).toString('base64')
+  // What the eye gets: the label's dominant (backdrop) color, and how many pixels contrast with it.
+  const seen = await page.evaluate(
+    async ({ png, ink }) => {
+      const luminance = ([r, g, b]: number[]) => {
+        const [R, G, B] = [r, g, b].map((c) => {
+          const v = c / 255
+          return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+        })
+        return 0.2126 * R + 0.7152 * G + 0.0722 * B
+      }
+      const contrast = (a: number[], b: number[]) => {
+        const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+        return (hi + 0.05) / (lo + 0.05)
+      }
+      const image = new Image()
+      image.src = `data:image/png;base64,${png}`
+      await image.decode()
+      const canvas = Object.assign(document.createElement('canvas'), {
+        width: image.width,
+        height: image.height,
+      })
+      const context = canvas.getContext('2d')!
+      context.drawImage(image, 0, 0)
+      const { data } = context.getImageData(0, 0, image.width, image.height)
+      const counts = new Map<string, number>()
+      for (let at = 0; at < data.length; at += 4) {
+        const key = `${data[at]},${data[at + 1]},${data[at + 2]}`
+        counts.set(key, (counts.get(key) ?? 0) + 1)
+      }
+      const backdrop = [...counts]
+        .sort((a, b) => b[1] - a[1])[0][0]
+        .split(',')
+        .map(Number)
+      let strokes = 0
+      for (let at = 0; at < data.length; at += 4)
+        if (contrast([data[at], data[at + 1], data[at + 2]], backdrop) > 2) strokes++
+      return {
+        backdrop,
+        text: contrast(ink.match(/\d+/g)!.slice(0, 3).map(Number), backdrop),
+        strokes,
+      }
+    },
+    { png, ink },
+  )
+  // HighlightText on a Canvas plate measures 1; the system pair itself is above 2
+  // (Firefox on macOS pairs white with a light blue).
+  expect(seen.text, `text ${ink} on ${seen.backdrop}`).toBeGreaterThan(2)
+  expect(seen.strokes).toBeGreaterThan(20)
+})
 test('touch taps open the sheet and commit a choice without hover activation', { tag: ['@pointer', '@layout'] }, async ({
   browser,
 }) => {
@@ -607,7 +678,7 @@ test('touch taps open the sheet and commit a choice without hover activation', {
 test('required validation can focus a select while its options are unavailable', { tag: ['@native', '@focus'] }, async ({
   page,
 }) => {
-  await render(page, { options: [], required: true, name: 'plan' })
+  await render(page, { items: [], required: true, name: 'plan' })
   const field = page.getByRole('combobox')
   await page.getByRole('button', { name: 'Submit', exact: true }).click()
   await expect(field).toBeFocused()
@@ -619,7 +690,7 @@ test('required validation can focus a select while its options are unavailable',
   await field.press('Enter')
   await expect(page.getByRole('listbox')).toHaveCount(0)
   await render(page, {
-    options: [{ value: 'ready', label: 'Ready' }],
+    items: [{ value: 'ready', label: 'Ready' }],
     required: true,
     name: 'plan',
   })
@@ -683,11 +754,30 @@ test.describe('§5 #4/#10: interactive validation reports a required select', ()
     await page.getByRole('button', { name: 'Submit', exact: true }).click()
     await expect.poll(() => submits(page)).toBe(1)
   })
-  test('the proxy covers the select, so the browser anchors its bubble there', { tag: ['@layout'] }, async ({ page }) => {
-    const [proxy, root] = await Promise.all([
+  test('the proxy covers the trigger, so the browser anchors its bubble there, not below the label', { tag: ['@layout'] }, async ({ page }) => {
+    const [proxy, control] = await Promise.all([
       page.locator('#form select').boundingBox(),
-      page.locator('.uf-select').boundingBox(),
+      page.locator('.uf-select-wrapper').boundingBox(),
     ])
-    expect(proxy).toEqual(root)
+    expect(proxy).toEqual(control)
+  })
+  test('the field shows the browser message and marks the trigger invalid until a value is chosen', { tag: ['@native'] }, async ({ page }) => {
+    const field = page.getByRole('combobox')
+    await page.getByRole('button', { name: 'Submit', exact: true }).click()
+    await expect(field).toBeFocused()
+    const message = await page
+      .locator('#form select')
+      .evaluate((node: HTMLSelectElement) => node.validationMessage)
+    expect(message).not.toBe('')
+    const error = page.locator('[data-scope="field"][data-part="error"]')
+    await expect(error).toHaveText(message)
+    await expect(field).toHaveAttribute('aria-invalid', 'true')
+    await expect(field).toHaveAccessibleDescription(message)
+    await field.click()
+    await page.getByRole('option', { name: 'Beta', exact: true }).click()
+    await page.getByRole('button', { name: 'Submit', exact: true }).click()
+    await expect(page.locator('#note')).toBeFocused()
+    await expect(error).toHaveCount(0)
+    await expect(field).not.toHaveAttribute('aria-invalid')
   })
 })

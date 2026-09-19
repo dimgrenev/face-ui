@@ -370,15 +370,15 @@ function stringViolations(component: string): string[] {
 const PENDING = {
   'R-triple': ['Code', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Slider', 'Table', 'Toc', 'Tree'],
   'R-names': [
-    'Avatar', 'Code', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Select', 'Table', 'Toast',
+    'Avatar', 'Code', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Table', 'Toast',
     'Toc', 'Tree',
   ],
-  'R-dup': ['Carousel', 'Code', 'Date', 'Markdown', 'Progress', 'Select', 'Toc'],
-  'R-label': ['Breadcrumb', 'Modal', 'Select', 'Toast'],
+  'R-dup': ['Carousel', 'Code', 'Date', 'Markdown', 'Progress', 'Toc'],
+  'R-label': ['Breadcrumb', 'Modal', 'Toast'],
   'R-aria': ['Carousel', 'Media', 'Scroll', 'Table'],
   'R-logical': ['Modal', 'Table', 'Toast', 'Toc'],
   'R-bool': [],
-  'R-field': ['Date', 'Rating', 'Select', 'Slider'],
+  'R-field': ['Date', 'Rating', 'Slider'],
   'R-strings': [
     'Breadcrumb', 'Carousel', 'Code', 'Command', 'Date', 'Menu', 'Navigation', 'Panel', 'Scroll', 'Select', 'Toast',
   ],

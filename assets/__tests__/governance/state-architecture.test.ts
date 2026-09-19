@@ -170,7 +170,7 @@ const PENDING = {
     'Breadcrumb', 'Calendar', 'Date', 'Pagination', 'Rating', 'Slider', 'Steps',
   ],
   'D3 machines': [
-    'Avatar', 'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Select', 'Steps', 'Table',
+    'Avatar', 'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Steps', 'Table',
     'Toast', 'Toc', 'Tree', 'Upload',
   ],
   'D3 isomorphic layout effect': [
@@ -178,14 +178,14 @@ const PENDING = {
     'Overlay', 'Pagination', 'Panel', 'Popover', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider', 'Steps',
     'Switcher', 'Table', 'Toc', 'Tooltip', 'Tree', 'Upload',
   ],
-  'D3 direction': ['Calendar', 'Date', 'Rating', 'Select', 'Slider'],
+  'D3 direction': ['Calendar', 'Date', 'Rating', 'Slider'],
   'D3 isConnected': ['Breadcrumb', 'Rating', 'Slider', 'Steps'],
   'D3 machine-era hooks': [
-    'Calendar', 'Carousel', 'Command', 'Date', 'Modal', 'Navigation', 'Pagination', 'Panel', 'Select',
+    'Calendar', 'Carousel', 'Command', 'Date', 'Modal', 'Navigation', 'Pagination', 'Panel',
     'Steps', 'Toc', 'Tree',
   ],
   'D5 one implementation': [
-    'Breadcrumb', 'Calendar', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Panel', 'Rating', 'Select', 'Slider',
+    'Breadcrumb', 'Calendar', 'Command', 'Date', 'Menu', 'Modal', 'Navigation', 'Panel', 'Rating', 'Slider',
     'Steps', 'Tree', 'Upload',
   ],
 } satisfies Record<string, readonly string[]>

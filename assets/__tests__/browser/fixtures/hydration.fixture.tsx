@@ -29,7 +29,7 @@ export function HydrationFixture() {
       <Switcher label="Notifications" defaultChecked />
       <Select
         label="Plan"
-        options={[{ value: 'a', label: 'Standard' }]}
+        items={[{ value: 'a', label: 'Standard' }]}
         defaultValue="a"
       />
       <Tooltip content="Help">

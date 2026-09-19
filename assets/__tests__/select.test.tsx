@@ -3,43 +3,137 @@ import type { Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Select } from '../../Select/Select'
 import { Icon } from '../../Icon/Icon'
-import { libraryCss, mount } from './harness'
+import { allowConsoleError, expectDevError, libraryCss, mount } from './harness'
+import { describeControlled } from './harness/controlled'
+import { describeField } from './harness/field'
 import { installMatchMedia, type MatchMediaRestore } from './harness/match-media'
-import { interpret } from '../create-machine'
-import { selectMachine } from '../machines/select.machine'
 
-const options = [
+const items = [
   { value: 'a', label: 'Alpha' },
   { value: '', label: 'Empty value' },
   { value: 'b', label: 'Beta' },
   { value: 'c', label: 'Charlie', disabled: true },
 ]
+const abc = [
+  { value: 'a', label: 'Alpha' },
+  { value: 'b', label: 'Beta' },
+  { value: 'c', label: 'Gamma' },
+]
 let root: Root, host: HTMLDivElement
 const trigger = () =>
   host.querySelector<HTMLButtonElement>('[role="combobox"]')!
 const list = () => document.querySelector<HTMLElement>('[role="listbox"]')
+const option = (value: string) =>
+  list()!.querySelector<HTMLElement>(`[data-value="${value}"]`)!
 const highlighted = () =>
   list()
     ?.querySelector<HTMLElement>('[data-highlighted]')
     ?.getAttribute('data-value')
 const render = (props: Record<string, unknown> = {}) =>
   act(async () =>
-    root.render(<Select options={options} surface="popover" {...props} />),
+    root.render(
+      <Select items={items} surface="popover" aria-label="Plan" {...props} />,
+    ),
   )
-const key = (node: Element, key: string) =>
+const key = (node: Element, key: string, init: KeyboardEventInit = {}) =>
   act(async () => {
     node.dispatchEvent(
-      new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }),
+      new KeyboardEvent('keydown', {
+        key,
+        bubbles: true,
+        cancelable: true,
+        ...init,
+      }),
     )
+  })
+const pointer = (node: Element, type: 'pointerover' | 'pointerout') =>
+  act(async () => {
+    const event = new MouseEvent(type, { bubbles: true, cancelable: true })
+    Object.defineProperty(event, 'pointerType', { value: 'mouse' })
+    node.dispatchEvent(event)
   })
 beforeEach(() => {
   ;({ host, root } = mount())
 })
 
+// The list stays open (a controlled `open` without a handler), so one click is one change.
+const listOf = (host: HTMLElement) =>
+  document.getElementById(
+    host.querySelector('[role="combobox"]')!.getAttribute('aria-controls')!,
+  )!
+const shownKeys = (host: HTMLElement) => {
+  const text = host.querySelector('[data-part="value"]')!.textContent ?? ''
+  return text
+    ? text.split(', ').map((label) => abc.find((item) => item.label === label)!.value)
+    : []
+}
+describeControlled<string | null>({
+  name: 'Select',
+  prop: 'value',
+  values: ['a', 'b'],
+  render: (props) => (
+    <Select items={abc} aria-label="Plan" surface="popover" open {...props} />
+  ),
+  change: (host, to) =>
+    listOf(host).querySelector<HTMLElement>(`[data-value="${to}"]`)!.click(),
+  read: (host) => shownKeys(host)[0] ?? null,
+  normalizes: ['missing', null],
+  formReset: true,
+})
+describeControlled<string[]>({
+  name: 'Select',
+  prop: 'value',
+  values: [['a'], ['a', 'b']],
+  render: (props) => (
+    <Select
+      multiple
+      items={abc}
+      aria-label="Teams"
+      surface="popover"
+      open
+      {...props}
+    />
+  ),
+  // Toggling Beta switches between the two values.
+  change: (host) =>
+    listOf(host).querySelector<HTMLElement>('[data-value="b"]')!.click(),
+  read: shownKeys,
+  normalizes: [
+    ['b', 'missing', 'a'],
+    ['b', 'a'],
+  ],
+  formReset: true,
+})
+describeControlled<boolean>({
+  name: 'Select',
+  prop: 'open',
+  values: [false, true],
+  render: (props) => (
+    <Select items={abc} aria-label="Plan" surface="popover" {...props} />
+  ),
+  change: (host) =>
+    host.querySelector<HTMLElement>('[role="combobox"]')!.click(),
+  read: (host) =>
+    host
+      .querySelector('[role="combobox"]')!
+      .getAttribute('aria-expanded') === 'true',
+  handler: 'onClick',
+})
+describe('Select as a field', () => {
+  // The contract also renders a field with no name at all, which Select reports.
+  beforeEach(() => allowConsoleError(/^Face UI Select: missing label; /))
+  describeField('Select', (props) => (
+    <Select items={abc} surface="popover" {...props} />
+  ))
+  describeField('Select multiple', (props) => (
+    <Select multiple items={abc} surface="popover" {...props} />
+  ))
+})
+
 describe('Select prop contract', () => {
   it('exposes a stable native trigger ref', async () => {
     const ref = vi.fn()
-    await render({ ref })
+    await render({ ref, value: 'a' })
     expect(ref.mock.calls[0][0]).toBe(trigger())
     ref.mockClear()
     await render({ ref, value: 'b', membrane: false })
@@ -61,7 +155,7 @@ describe('Select prop contract', () => {
       await act(async () =>
         root.render(
           <StrictMode>
-            <Select options={options} ref={ref as any} />
+            <Select items={items} aria-label="Plan" ref={ref as any} />
           </StrictMode>,
         ),
       )
@@ -69,7 +163,7 @@ describe('Select prop contract', () => {
       await act(async () =>
         root.render(
           <StrictMode>
-            <Select options={options} ref={createRef() as any} />
+            <Select items={items} aria-label="Plan" ref={createRef() as any} />
           </StrictMode>,
         ),
       )
@@ -95,6 +189,7 @@ describe('Select prop contract', () => {
     expect(trigger().tabIndex).toBe(-1)
     const visual = host.querySelector<HTMLElement>('.uf-select')!
     expect(visual.classList.contains('custom')).toBe(true)
+    expect(visual.classList.contains('uf-field')).toBe(true)
     expect(visual.style.width).toBe('260px')
     expect(visual.dir).toBe('rtl')
     expect(visual.lang).toBe('ar')
@@ -121,6 +216,22 @@ describe('Select prop contract', () => {
     await render({ label: 0 })
     expect(host.querySelector('[data-part="label"]')?.textContent).toBe('0')
   })
+  it('reports a combobox left without a name', async () => {
+    await expectDevError(
+      () => render({ 'aria-label': undefined }),
+      /^Face UI Select: missing label; the combobox has no accessible name/,
+    )
+    expect(trigger().hasAttribute('aria-label')).toBe(false)
+  })
+  it('has no English placeholder: an empty selection leaves the value slot empty', async () => {
+    await render()
+    expect(trigger().hasAttribute('data-placeholder')).toBe(true)
+    expect(host.querySelector('[data-part="value"]')!.textContent).toBe('')
+    await render({ placeholder: 'Pick a plan' })
+    expect(host.querySelector('[data-part="value"]')!.textContent).toBe(
+      'Pick a plan',
+    )
+  })
   it('distinguishes an empty string selection and a zero display override from a placeholder', async () => {
     await render({ value: '' })
     expect(trigger().textContent).toContain('Empty value')
@@ -140,7 +251,7 @@ describe('Select prop contract', () => {
   })
   it('handles a key once when it originates inside the listbox', async () => {
     await render({
-      options: ['a', 'b', 'c', 'd'].map((value) => ({ value, label: value })),
+      items: ['a', 'b', 'c', 'd'].map((value) => ({ value, label: value })),
     })
     await act(async () => trigger().click())
     await key(list()!.querySelector('[role="option"]')!, 'ArrowDown')
@@ -151,7 +262,10 @@ describe('Select prop contract', () => {
     await render({ defaultValue: 'a', onValueChange })
     await render({ defaultValue: 'b', onValueChange })
     expect(trigger().textContent).toContain('Alpha')
-    await render({ value: 'b', onValueChange })
+    await expectDevError(
+      () => render({ value: 'b', onValueChange }),
+      /^Face UI Select: invalid value "b"; switching from uncontrolled to controlled/,
+    )
     expect(trigger().textContent).toContain('Beta')
     expect(onValueChange).not.toHaveBeenCalled()
   })
@@ -159,19 +273,17 @@ describe('Select prop contract', () => {
     const onValueChange = vi.fn()
     await render({ value: 'a', onValueChange })
     await act(async () => trigger().click())
-    await act(async () =>
-      list()!.querySelector<HTMLElement>('[data-value="b"]')!.click(),
-    )
+    await act(async () => option('b').click())
     expect(onValueChange).toHaveBeenCalledExactlyOnceWith({ value: 'b' })
     expect(trigger().textContent).toContain('Alpha')
   })
   it('removes a highlighted option without leaving a stale active descendant', async () => {
     await render({ defaultValue: 'a' })
     await act(async () => trigger().click())
-    await render({ options: [{ value: 'b', label: 'Beta' }] })
+    await render({ items: [{ value: 'b', label: 'Beta' }] })
     expect(highlighted()).toBe('b')
     expect(trigger().getAttribute('aria-activedescendant')).toBe(
-      list()!.querySelector('[data-value="b"]')!.id,
+      option('b').id,
     )
   })
   it('lets the parent own opening and closing without echoing external updates', async () => {
@@ -192,6 +304,28 @@ describe('Select prop contract', () => {
     expect(list()).toBeNull()
     expect(onOpenChange).not.toHaveBeenCalled()
   })
+  it('closes when focus leaves the trigger and leaves focus where it went', async () => {
+    const onOpenChange = vi.fn()
+    await act(async () =>
+      root.render(
+        <>
+          <Select items={items} surface="popover" aria-label="Plan" onOpenChange={onOpenChange} />
+          <button id="elsewhere">Elsewhere</button>
+        </>,
+      ),
+    )
+    await act(async () => trigger().click())
+    expect(document.activeElement).toBe(trigger())
+    const elsewhere = document.getElementById('elsewhere')!
+    await act(async () => elsewhere.focus())
+    expect(list()).toBeNull()
+    expect(onOpenChange).toHaveBeenLastCalledWith({ open: false })
+    expect(document.activeElement).toBe(elsewhere)
+    // Escape and a choice return focus to the trigger.
+    await act(async () => trigger().click())
+    await act(async () => option('b').click())
+    expect(document.activeElement).toBe(trigger())
+  })
   it('uses defaultOpen only on mount and closes unavailable lists quietly', async () => {
     const onOpenChange = vi.fn()
     await render({ defaultOpen: true, onOpenChange })
@@ -207,54 +341,58 @@ describe('Select prop contract', () => {
     expect(list()).toBeNull()
     expect(onOpenChange).not.toHaveBeenCalled()
     expect(trigger().disabled).toBe(true)
+    // It stays closed when the items become available again.
+    await render({ onOpenChange })
+    expect(list()).toBeNull()
+    expect(onOpenChange).not.toHaveBeenCalled()
   })
   it('uses multiple as the mode even before any values are selected', async () => {
     const onValueChange = vi.fn()
     await render({ multiple: true, onValueChange })
     await act(async () => trigger().click())
-    await act(async () =>
-      list()!.querySelector<HTMLElement>('[data-value=""]')!.click(),
-    )
+    await act(async () => option('').click())
     expect(onValueChange).toHaveBeenLastCalledWith({ value: [''] })
     expect(list()?.getAttribute('aria-multiselectable')).toBe('true')
     expect(highlighted()).not.toBeUndefined()
-    await act(async () =>
-      list()!.querySelector<HTMLElement>('[data-value=""]')!.click(),
-    )
+    await act(async () => option('').click())
     expect(onValueChange).toHaveBeenLastCalledWith({ value: [] })
     expect(trigger().hasAttribute('data-placeholder')).toBe(true)
   })
-  it('preserves a selection when the uncontrolled mode changes and keeps unknown values until options arrive', async () => {
+  it('projects a selection onto the other mode without reporting it', async () => {
     const onValueChange = vi.fn()
     await render({ defaultValue: 'a', onValueChange })
     await render({ multiple: true, onValueChange })
     await act(async () => trigger().click())
     expect(list()?.getAttribute('aria-multiselectable')).toBe('true')
-    expect(
-      list()?.querySelector('[data-value="a"]')?.getAttribute('aria-selected'),
-    ).toBe('true')
-    await act(async () =>
-      list()!.querySelector<HTMLElement>('[data-value="b"]')!.click(),
-    )
+    expect(option('a').getAttribute('aria-selected')).toBe('true')
+    await act(async () => option('b').click())
     expect(onValueChange).toHaveBeenLastCalledWith({ value: ['a', 'b'] })
     onValueChange.mockClear()
     await render({ multiple: false, onValueChange })
     expect(trigger().textContent).toContain('Alpha')
     expect(onValueChange).not.toHaveBeenCalled()
-    await render({ value: 'pending', options: [] })
-    expect(trigger().textContent).toBe('pending')
+  })
+  it('shows a value missing from items as unselected until the items arrive', async () => {
+    const onValueChange = vi.fn()
+    await render({ value: 'pending', items: [], name: 'plan', onValueChange })
+    expect(trigger().hasAttribute('data-placeholder')).toBe(true)
+    expect(host.querySelector('select')!.value).toBe('')
     await render({
       value: 'pending',
-      options: [{ value: 'pending', label: 'Loaded' }],
+      items: [{ value: 'pending', label: 'Loaded' }],
+      name: 'plan',
+      onValueChange,
     })
     expect(trigger().textContent).toBe('Loaded')
+    expect(host.querySelector('select')!.value).toBe('pending')
+    expect(onValueChange).not.toHaveBeenCalled()
   })
   it('uses textValue for rich options and ignores modifiers and composition', async () => {
     function Rich() {
       return <span>Visible label</span>
     }
     await render({
-      options: [
+      items: [
         { value: 'a', label: 'Alpha' },
         { value: 'rich', label: <Rich />, textValue: 'Beta' },
       ],
@@ -265,43 +403,56 @@ describe('Select prop contract', () => {
       { altKey: true },
       { isComposing: true },
     ]) {
-      await act(async () =>
-        trigger().dispatchEvent(
-          new KeyboardEvent('keydown', {
-            key: 'b',
-            bubbles: true,
-            cancelable: true,
-            ...extra,
-          }),
-        ),
-      )
+      await key(trigger(), 'b', extra)
       expect(list()).toBeNull()
     }
     await key(trigger(), 'b')
     expect(highlighted()).toBe('rich')
-    expect(
-      list()?.querySelector('[data-value="rich"]')?.getAttribute('aria-label'),
-    ).toBe('Beta')
+    expect(option('rich').getAttribute('aria-label')).toBe('Beta')
   })
-  it('keeps an unavailable option set focusable for form validation without disabling its saved value', async () => {
+  it('searches the visible text of rich labels, without aria-hidden content', async () => {
     await render({
-      options: [],
+      items: [
+        { value: 'a', label: 'Alpha' },
+        {
+          value: 'bold',
+          label: (
+            <>
+              <span aria-hidden="true">Zzz</span>
+              <strong>Bold</strong>
+            </>
+          ),
+        },
+      ],
+    })
+    await key(trigger(), 'b')
+    expect(highlighted()).toBe('bold')
+    await key(trigger(), 'Escape')
+    await key(trigger(), 'z')
+    expect(highlighted()).toBe('a')
+  })
+  it('keeps an unavailable option set focusable for form validation without disabling its proxy', async () => {
+    const onOpenChange = vi.fn()
+    await render({
+      items: [],
       value: 'pending',
       name: 'plan',
       required: true,
+      onOpenChange,
     })
     expect(trigger().disabled).toBe(false)
     expect(trigger().tabIndex).toBe(0)
     expect(trigger().getAttribute('aria-disabled')).toBe('true')
     await act(async () => trigger().click())
+    await key(trigger(), 'Enter')
     expect(list()).toBeNull()
+    expect(onOpenChange).not.toHaveBeenCalled()
     expect(host.querySelector('select')!.disabled).toBe(false)
-    expect(host.querySelector('select')!.value).toBe('pending')
-    await render({ options: [], value: null, required: true })
+    await render({ items: [], value: null, required: true })
     // Interactive validation focuses the proxy; the trigger takes that focus.
     await act(async () => host.querySelector('select')!.focus())
     expect(document.activeElement).toBe(trigger())
-    await render({ options: [], value: null, required: true, disabled: true })
+    await render({ items: [], value: null, required: true, disabled: true })
     expect(trigger().disabled).toBe(true)
     expect(host.querySelector('select')!.disabled).toBe(true)
   })
@@ -310,8 +461,8 @@ describe('Select prop contract', () => {
     await act(async () =>
       root.render(
         <form>
-          <Select name="plan" required aria-label="Plan" options={options} />
-          <Select name="region" required aria-label="Region" options={options} />
+          <Select name="plan" required aria-label="Plan" items={items} />
+          <Select name="region" required aria-label="Region" items={items} />
         </form>,
       ),
     )
@@ -320,18 +471,266 @@ describe('Select prop contract', () => {
     expect(document.activeElement?.getAttribute('aria-label')).toBe('Plan')
   })
 
+  it('shows the browser validation message through the field until a value is chosen', async () => {
+    await render({ label: 'Plan', 'aria-label': undefined, name: 'plan', required: true })
+    const proxy = host.querySelector('select')!
+    const message = proxy.validationMessage
+    expect(message).not.toBe('')
+    await act(async () => proxy.focus())
+    const error = host.querySelector('[data-scope="field"][data-part="error"]')!
+    expect(error.textContent).toBe(message)
+    expect(trigger().getAttribute('aria-invalid')).toBe('true')
+    expect(trigger().getAttribute('aria-describedby')).toBe(error.id)
+    // The consumer's own error wins over the browser's.
+    await render({ label: 'Plan', 'aria-label': undefined, name: 'plan', required: true, error: 'Pick a plan' })
+    expect(host.querySelector('[data-part="error"]')!.textContent).toBe('Pick a plan')
+    await render({ label: 'Plan', 'aria-label': undefined, name: 'plan', required: true })
+    await act(async () => trigger().click())
+    await act(async () => option('b').click())
+    expect(host.querySelector('[data-part="error"]')).toBeNull()
+    expect(trigger().hasAttribute('aria-invalid')).toBe(false)
+  })
+
   it('renders a duplicate key once and never activates a disabled option', async () => {
     const onValueChange = vi.fn()
-    await render({
-      options: [...options, { value: 'a', label: 'Duplicate' }],
-      onValueChange,
-    })
+    await expectDevError(
+      () =>
+        render({
+          items: [...items, { value: 'a', label: 'Duplicate' }],
+          onValueChange,
+        }),
+      /^Face UI Select: invalid items\[4\] key "a"; dropping the duplicate/,
+    )
     await act(async () => trigger().click())
     expect(list()?.querySelectorAll('[data-value="a"]')).toHaveLength(1)
-    await act(async () =>
-      list()!.querySelector<HTMLElement>('[data-value="c"]')!.click(),
-    )
+    await act(async () => option('c').click())
     expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  it('drops groups and separators from its flat list with a report', async () => {
+    await expectDevError(
+      () =>
+        render({
+          items: [
+            { type: 'group', label: 'Group', items: [{ value: 'x', label: 'X' }] },
+            { type: 'separator' },
+            ...abc,
+          ],
+        }),
+      /^Face UI Select: invalid item type "(group|separator)"; dropping the item/,
+    )
+    await act(async () => trigger().click())
+    expect(
+      Array.from(list()!.querySelectorAll('[role="option"]'), (node) =>
+        node.getAttribute('data-value'),
+      ),
+    ).toEqual(['a', 'b', 'c'])
+  })
+
+  it('renders hostile sizes and labels without throwing', async () => {
+    await expectDevError(
+      () =>
+        render({
+          contentMinWidth: [{}],
+          placeholder: 0,
+          labels: [],
+          value: 0,
+          defaultOpen: true,
+          surface: 'sheet',
+        }),
+      /^Face UI Select: invalid (placeholder|labels|value)/,
+    )
+    expect(list()).not.toBeNull()
+    expect(host.querySelector('[data-part="value"]')!.textContent).toBe('')
+  })
+})
+
+describe('Select keyboard and highlight', () => {
+  it('highlights enabled options in order, wraps, and opens from each end', async () => {
+    await render({
+      items: [
+        { value: 'alpha', label: 'Alpha' },
+        { value: 'beta', label: 'Beta', disabled: true },
+        { value: 'gamma', label: 'Gamma' },
+        { value: 'delta', label: 'Delta' },
+      ],
+    })
+    await key(trigger(), 'ArrowUp')
+    expect(highlighted()).toBe('delta')
+    await key(trigger(), 'ArrowDown')
+    expect(highlighted()).toBe('alpha')
+    await key(trigger(), 'ArrowDown')
+    expect(highlighted()).toBe('gamma')
+    await key(trigger(), 'ArrowUp')
+    expect(highlighted()).toBe('alpha')
+    await key(trigger(), 'Escape')
+    expect(list()).toBeNull()
+    await key(trigger(), 'End')
+    expect(highlighted()).toBe('delta')
+    await key(trigger(), 'Home')
+    expect(highlighted()).toBe('alpha')
+  })
+  it('forgets the highlight on close: the next opening starts at the selection', async () => {
+    await render({ defaultValue: 'b' })
+    await key(trigger(), 'ArrowDown')
+    expect(highlighted()).toBe('b')
+    await key(trigger(), 'ArrowUp')
+    expect(highlighted()).toBe('')
+    await key(trigger(), 'Escape')
+    await act(async () => trigger().click())
+    expect(highlighted()).toBe('b')
+  })
+  it('Enter and Space choose the highlighted item; a single choice closes, multiple stays open', async () => {
+    const onValueChange = vi.fn()
+    await render({ onValueChange })
+    await key(trigger(), 'Enter')
+    await key(trigger(), 'ArrowDown')
+    await key(trigger(), 'Enter')
+    expect(onValueChange).toHaveBeenLastCalledWith({ value: '' })
+    expect(list()).toBeNull()
+    await act(async () =>
+      root.render(
+        <Select
+          key="multiple"
+          multiple
+          items={items}
+          surface="popover"
+          aria-label="Plan"
+          onValueChange={onValueChange}
+        />,
+      ),
+    )
+    await key(trigger(), ' ')
+    await key(trigger(), ' ')
+    expect(onValueChange).toHaveBeenLastCalledWith({ value: ['a'] })
+    await key(trigger(), 'End')
+    await key(trigger(), 'Enter')
+    expect(onValueChange).toHaveBeenLastCalledWith({ value: ['a', 'b'] })
+    expect(list()).not.toBeNull()
+  })
+  it('points aria-activedescendant at the highlighted option from the focused trigger', async () => {
+    await render({ defaultValue: 'a' })
+    expect(trigger().hasAttribute('aria-activedescendant')).toBe(false)
+    await key(trigger(), 'ArrowDown')
+    expect(trigger().getAttribute('aria-activedescendant')).toBe(option('a').id)
+    expect(trigger().getAttribute('aria-controls')).toBe(list()!.id)
+    expect(list()!.hasAttribute('aria-activedescendant')).toBe(false)
+    await key(trigger(), 'ArrowDown')
+    expect(trigger().getAttribute('aria-activedescendant')).toBe(option('').id)
+    await act(async () => {
+      const event = new MouseEvent('pointermove', { bubbles: true })
+      Object.defineProperty(event, 'pointerType', { value: 'mouse' })
+      option('b').dispatchEvent(event)
+    })
+    expect(trigger().getAttribute('aria-activedescendant')).toBe(option('b').id)
+    // Option ids are distinct and DOM-safe for any key, the empty one included.
+    const ids = Array.from(list()!.querySelectorAll('[role="option"]'), (node) => node.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(ids.every((id) => /^[^\s]+$/.test(id))).toBe(true)
+  })
+})
+
+describe('Select typeahead', () => {
+  const cities = [
+    { value: 'ams', label: 'Amsterdam' },
+    { value: 'ber', label: 'Berlin' },
+    { value: 'bog', label: 'Bogota', disabled: true },
+    { value: 'bru', label: 'Brussels' },
+    { value: 'nd', label: 'New Delhi' },
+    { value: 'ny', label: 'New York' },
+  ]
+  let now = 1000
+  beforeEach(() => {
+    now = 1000
+    vi.spyOn(Date, 'now').mockImplementation(() => now)
+  })
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+  const type = async (text: string, gap = 100) => {
+    for (const char of text) {
+      now += gap
+      await key(trigger(), char)
+    }
+  }
+  it('opens a closed list at the first match, cycles a repeated letter and skips disabled items', async () => {
+    await render({ items: cities })
+    await type('b')
+    expect(list()).not.toBeNull()
+    expect(highlighted()).toBe('ber')
+    await type('b')
+    expect(highlighted()).toBe('bru')
+    await type('b')
+    expect(highlighted()).toBe('ber')
+  })
+  it('matches a longer prefix and restarts after 700 ms', async () => {
+    await render({ items: cities })
+    await type('bru')
+    expect(highlighted()).toBe('bru')
+    now += 800
+    await type('a')
+    expect(highlighted()).toBe('ams')
+  })
+  it('takes Space as text during a search and as activation after it', async () => {
+    const onValueChange = vi.fn()
+    await render({ items: cities, onValueChange })
+    await type('new')
+    expect(highlighted()).toBe('nd')
+    await type(' y')
+    expect(highlighted()).toBe('ny')
+    expect(list()).not.toBeNull()
+    expect(onValueChange).not.toHaveBeenCalled()
+    now += 800
+    await key(trigger(), ' ')
+    expect(onValueChange).toHaveBeenCalledExactlyOnceWith({ value: 'ny' })
+    expect(list()).toBeNull()
+  })
+  it('a closed list forgets the search, so Space right after a choice opens it again', async () => {
+    const onValueChange = vi.fn()
+    await render({ items: cities, onValueChange })
+    await type('ber')
+    await key(trigger(), 'Enter')
+    expect(list()).toBeNull()
+    await type(' ')
+    expect(list()).not.toBeNull()
+    expect(highlighted()).toBe('ber')
+  })
+})
+
+describe('Select side surface', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+  it('opens on hover and closes after the pointer leaves, unless the keyboard holds it', async () => {
+    const onOpenChange = vi.fn()
+    await render({ surface: 'side', onOpenChange })
+    await pointer(trigger(), 'pointerover')
+    expect(list()).not.toBeNull()
+    expect(onOpenChange).toHaveBeenLastCalledWith({ open: true })
+    await pointer(trigger(), 'pointerout')
+    await act(async () => vi.advanceTimersByTime(100))
+    expect(list()).not.toBeNull()
+    await act(async () => vi.advanceTimersByTime(60))
+    expect(list()).toBeNull()
+    expect(onOpenChange).toHaveBeenLastCalledWith({ open: false })
+    // Opened by click, the trigger holds focus: leaving with the pointer keeps the list.
+    await act(async () => trigger().click())
+    expect(document.activeElement).toBe(trigger())
+    await pointer(trigger(), 'pointerover')
+    await pointer(trigger(), 'pointerout')
+    await act(async () => vi.advanceTimersByTime(500))
+    expect(list()).not.toBeNull()
+    // A click on an open side list keeps it open.
+    await act(async () => trigger().click())
+    expect(list()).not.toBeNull()
+  })
+  it('ignores hover outside the side surface', async () => {
+    await render({ surface: 'popover' })
+    await pointer(trigger(), 'pointerover')
+    expect(list()).toBeNull()
   })
 })
 
@@ -351,7 +750,8 @@ describe('component smoke', () => {
         <Select
           value="alpha"
           surface="sheet"
-          options={[
+          aria-label="Letter"
+          items={[
             { value: 'alpha', label: 'Alpha' },
             { value: 'beta', label: 'Beta' },
           ]}
@@ -402,7 +802,8 @@ describe('component smoke', () => {
         <Select
           value="beta"
           surface="sheet"
-          options={[
+          aria-label="Letter"
+          items={[
             { value: 'alpha', label: 'Alpha' },
             { value: 'beta', label: 'Beta' },
           ]}
@@ -425,7 +826,7 @@ describe('component smoke', () => {
           aria-label="Change type"
           displayValue={<Icon name="type" />}
           contentMinWidth="10rem"
-          options={[
+          items={[
             { value: 'string', label: 'String' },
             { value: 'boolean', label: 'Boolean' },
           ]}
@@ -444,9 +845,7 @@ describe('component smoke', () => {
     expect(trigger?.hasAttribute('data-icon-only')).toBe(true)
     expect(trigger?.querySelector('[data-part="indicator"]')).toBeNull()
     expect(
-      trigger?.querySelector(
-        '.uf-select__value svg[data-icon="type"]',
-      ),
+      trigger?.querySelector('.uf-select__value svg[data-icon="type"]'),
     ).not.toBeNull()
 
     await act(async () => {
@@ -492,11 +891,13 @@ describe('responsive overlay surfaces', () => {
     document.body.style.touchAction = ''
   })
 
-  it('Select switches auto surfaces to a bottom sheet on compact viewports', async () => {
+  it('Select switches auto surfaces to a bottom sheet titled by its name', async () => {
     await act(async () => {
       root.render(
         <Select
-          options={[
+          aria-label="Plan"
+          labels={{ close: 'Fermer' }}
+          items={[
             { value: 'a', label: 'Alpha' },
             { value: 'b', label: 'Beta' },
           ]}
@@ -521,19 +922,23 @@ describe('responsive overlay surfaces', () => {
       '.uf-responsive-overlay-backdrop',
     ) as HTMLElement | null
     expect(content?.getAttribute('data-surface')).toBe('sheet')
+    expect(content?.getAttribute('role')).toBe('dialog')
+    expect(
+      document.getElementById(content!.getAttribute('aria-labelledby')!)
+        ?.textContent,
+    ).toBe('Plan')
+    expect(
+      content?.querySelector('button[aria-label="Fermer"]'),
+    ).not.toBeNull()
     expect(content?.hidden).toBe(false)
     expect(backdrop?.getAttribute('data-state')).toBe('open')
     expect(document.body.style.overflow).toBe('hidden')
-    expect(container.textContent).toContain('Select option')
 
     await act(async () => {
       backdrop?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    const closedContent = container.querySelector(
-      '[data-part="content"]',
-    ) as HTMLElement | null
-    expect(closedContent?.hidden ?? true).toBe(true)
+    expect(container.querySelector('[data-part="content"]')).toBeNull()
   })
 
   it('Select binds its visible label, trigger, listbox and options', async () => {
@@ -541,7 +946,7 @@ describe('responsive overlay surfaces', () => {
       root.render(
         <Select
           label="Font style"
-          options={[
+          items={[
             { value: 'regular', label: 'Regular' },
             { value: 'bold', label: 'Bold' },
           ]}
@@ -564,8 +969,9 @@ describe('responsive overlay surfaces', () => {
     expect(trigger?.getAttribute('aria-labelledby')).toBe(label?.id)
     expect(trigger?.hasAttribute('aria-controls')).toBe(false)
 
+    // A click on the label opens the list, as on the trigger.
     await act(async () => {
-      trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      label?.click()
     })
 
     const listbox = container.querySelector(
@@ -581,6 +987,13 @@ describe('responsive overlay surfaces', () => {
     ).toBe(true)
     expect(listbox?.contains(document.activeElement)).toBe(true)
     expect(listbox?.getAttribute('aria-labelledby')).toBe(label?.id)
+    expect(
+      document.getElementById(
+        container
+          .querySelector('[role="dialog"]')!
+          .getAttribute('aria-labelledby')!,
+      )?.textContent,
+    ).toBe('Font style')
     expect(options).toHaveLength(2)
     expect(options.every((option) => Boolean(option.id))).toBe(true)
   })
@@ -590,7 +1003,7 @@ describe('responsive overlay surfaces', () => {
       root.render(
         <Select
           label="Weight"
-          options={[
+          items={[
             { value: 'thin', label: 'Thin', disabled: true },
             { value: 'regular', label: 'Regular' },
             { value: 'bold', label: 'Bold' },
@@ -607,11 +1020,7 @@ describe('responsive overlay surfaces', () => {
     expect(trigger).not.toBeNull()
     expect(trigger?.hasAttribute('aria-activedescendant')).toBe(false)
 
-    await act(async () => {
-      trigger?.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
-      )
-    })
+    await key(trigger!, 'ArrowDown')
 
     let highlighted = container.querySelector<HTMLElement>(
       '[role="option"][data-highlighted]',
@@ -623,11 +1032,7 @@ describe('responsive overlay surfaces', () => {
         ?.getAttribute('aria-activedescendant'),
     ).toBe(highlighted?.id)
 
-    await act(async () => {
-      trigger?.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
-      )
-    })
+    await key(trigger!, 'ArrowDown')
 
     highlighted = container.querySelector<HTMLElement>(
       '[role="option"][data-highlighted]',
@@ -639,31 +1044,19 @@ describe('responsive overlay surfaces', () => {
         ?.getAttribute('aria-activedescendant'),
     ).toBe(highlighted?.id)
 
-    await act(async () => {
-      trigger?.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'Home', bubbles: true }),
-      )
-    })
+    await key(trigger!, 'Home')
     expect(
       container.querySelector<HTMLElement>('[role="option"][data-highlighted]')
         ?.textContent,
     ).toContain('Regular')
 
-    await act(async () => {
-      trigger?.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'End', bubbles: true }),
-      )
-    })
+    await key(trigger!, 'End')
     expect(
       container.querySelector<HTMLElement>('[role="option"][data-highlighted]')
         ?.textContent,
     ).toContain('Bold')
 
-    await act(async () => {
-      trigger?.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-      )
-    })
+    await key(trigger!, 'Escape')
 
     expect(container.querySelector('[role="listbox"]')).toBeNull()
     expect(trigger?.hasAttribute('aria-activedescendant')).toBe(false)
@@ -677,8 +1070,9 @@ describe('responsive overlay surfaces', () => {
       root.render(
         <Select
           multiple
+          aria-label="Weights"
           defaultValue={[]}
-          options={[
+          items={[
             { value: 'regular', label: 'Regular' },
             { value: 'bold', label: 'Bold' },
           ]}
@@ -718,7 +1112,8 @@ describe('responsive overlay surfaces', () => {
       root.render(
         <Select
           surface="popover"
-          options={[
+          aria-label="Letter"
+          items={[
             { value: 'a', label: 'Alpha' },
             { value: 'b', label: 'Beta' },
           ]}
@@ -751,7 +1146,8 @@ describe('responsive overlay surfaces', () => {
         <>
           <Select
             surface="popover"
-            options={[
+            aria-label="Letter"
+            items={[
               { value: 'a', label: 'Alpha' },
               { value: 'b', label: 'Beta' },
             ]}
@@ -786,66 +1182,5 @@ describe('responsive overlay surfaces', () => {
     })
 
     expect(document.getElementById(contentId)).toBeNull()
-  })
-})
-
-describe('keyboard machine fidelity', () => {
-  it('select highlights enabled options in order and clears highlight on escape', () => {
-    const svc = interpret(selectMachine, {
-      optionOrder: ['alpha', 'beta', 'gamma', 'delta'],
-      disabledValues: ['beta'],
-    }).start()
-
-    svc.send({ type: 'OPEN_FIRST' })
-    expect(svc.getSnapshot().context.highlightedValue).toBe('alpha')
-
-    svc.send({ type: 'HIGHLIGHT_NEXT' })
-    expect(svc.getSnapshot().context.highlightedValue).toBe('gamma')
-
-    svc.send({ type: 'HIGHLIGHT_PREV' })
-    expect(svc.getSnapshot().context.highlightedValue).toBe('alpha')
-
-    svc.send({ type: 'HIGHLIGHT_LAST' })
-    expect(svc.getSnapshot().context.highlightedValue).toBe('delta')
-
-    svc.send({ type: 'HIGHLIGHT_FIRST' })
-    expect(svc.getSnapshot().context.highlightedValue).toBe('alpha')
-
-    svc.send({ type: 'ESCAPE' })
-    expect(svc.getSnapshot().value).toBe('closed')
-    expect(svc.getSnapshot().context.highlightedValue).toBeNull()
-    svc.stop()
-  })
-
-  it('select chooses highlighted values without closing multiselect', () => {
-    const single = interpret(selectMachine, {
-      optionOrder: ['alpha', 'beta', 'gamma'],
-      disabledValues: ['beta'],
-    }).start()
-
-    single.send({ type: 'OPEN_FIRST' })
-    single.send({ type: 'HIGHLIGHT_NEXT' })
-    single.send({ type: 'SELECT_HIGHLIGHTED' })
-    expect(single.getSnapshot().value).toBe('closed')
-    expect(single.getSnapshot().context.value).toBe('gamma')
-    single.stop()
-
-    const multi = interpret(selectMachine, {
-      multiple: true,
-      value: [],
-      optionOrder: ['alpha', 'beta', 'gamma'],
-      disabledValues: ['beta'],
-    }).start()
-
-    multi.send({ type: 'OPEN_FIRST' })
-    multi.send({ type: 'HIGHLIGHT_NEXT' })
-    multi.send({ type: 'SELECT_HIGHLIGHTED' })
-    expect(multi.getSnapshot().value).toBe('open')
-    expect(multi.getSnapshot().context.value).toEqual(['gamma'])
-
-    multi.send({ type: 'SELECT_HIGHLIGHTED' })
-    expect(multi.getSnapshot().value).toBe('open')
-    expect(multi.getSnapshot().context.value).toEqual([])
-    multi.stop()
   })
 })

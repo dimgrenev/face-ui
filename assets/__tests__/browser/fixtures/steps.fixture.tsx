@@ -12,7 +12,7 @@ const foreign = (suffix: string) => (
     <Button onClick={() => events.push('panel-action')}>Action {suffix}</Button>
     <Select
       label={`Project ${suffix}`}
-      options={[
+      items={[
         { value: 'a', label: 'Alpha' },
         { value: 'b', label: 'Beta' },
       ]}

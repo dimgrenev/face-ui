@@ -59,8 +59,8 @@ describe('§5 #4/#10: FormValue validation', () => {
     await render(
       <form id="form">
         <input id="email" name="email" />
-        <Select name="plan" required aria-label="Plan" options={options} />
-        <Select name="region" required aria-label="Region" options={options} />
+        <Select name="plan" required aria-label="Plan" items={options} />
+        <Select name="region" required aria-label="Region" items={options} />
       </form>,
     )
     byId('email').focus()

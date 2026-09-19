@@ -92,7 +92,7 @@ const cases = {
     <Select
       membrane={membrane}
       label="Plan"
-      options={[{ value: 'a', label: 'A' }]}
+      items={[{ value: 'a', label: 'A' }]}
     />
   ),
   Date: (membrane: boolean) => <DateControl membrane={membrane} />,

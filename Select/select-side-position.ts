@@ -105,10 +105,11 @@ export function computeSelectSidePosition(params: {
   const anchorRight = boundaryRect ? boundaryRect.left : triggerRect.left
   const rightSpace = viewportRight - anchorLeft
   const leftSpace = anchorRight - viewportLeft
-  const openLeft =
-    direction === 'rtl'
-      ? leftSpace >= panelWidth + gap || leftSpace >= rightSpace
-      : rightSpace < panelWidth + gap && leftSpace > rightSpace
+  // The panel prefers the inline end: right in LTR, left in RTL.
+  const endIsLeft = { ltr: false, rtl: true }[direction]
+  const openLeft = endIsLeft
+    ? leftSpace >= panelWidth + gap || leftSpace >= rightSpace
+    : rightSpace < panelWidth + gap && leftSpace > rightSpace
   // When neither side fits, keep the trigger exposed for hover followed by click.
   if (Math.max(leftSpace, rightSpace) < panelWidth + gap) {
     const below = Math.max(0, verticalMax - triggerRect.bottom - gap)
@@ -131,9 +132,7 @@ export function computeSelectSidePosition(params: {
       top: Math.round(clamp(top, verticalMin, verticalMax - height)),
       left: Math.round(
         clamp(
-          direction === 'rtl'
-            ? triggerRect.right - panelWidth
-            : triggerRect.left,
+          endIsLeft ? triggerRect.right - panelWidth : triggerRect.left,
           viewportLeft,
           viewportRight - panelWidth,
         ),

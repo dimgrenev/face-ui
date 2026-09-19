@@ -1,39 +1,14 @@
 /* =================================================================
  * SELECT
  * ================================================================= */
+/* The root is a Field (.uf-field): it keeps only its size. */
 .uf-select[data-scope="select"] {
-  position: relative; /* the form proxy covers the root */
   min-width: 0;
   width: max-content;
   max-width: 100%;
 }
 .uf-select[data-scope="select"][data-full-width] {
   width: 100%;
-}
-.uf-select[data-scope="select"]:not([data-label-orientation="horizontal"]) {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.uf-select[data-scope="select"][data-label-orientation="horizontal"] {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  column-gap: var(--uf-control-gap);
-}
-.uf-select[data-scope="select"] [data-part="label"] {
-  font-size: var(--uf-font-size-sm);
-  font-weight: var(--uf-font-weight-bold);
-  color: var(--uf-color-fg);
-  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
-}
-.uf-select[data-scope="select"][data-label-orientation="horizontal"] [data-part="label"] {
-  font-size: var(--uf-control-font-size);
-  font-weight: var(--uf-font-weight);
-  min-height: var(--uf-control-height);
-  height: auto;
-  display: flex;
-  align-items: center;
 }
 .uf-responsive-overlay-backdrop {
   --uf-responsive-overlay-zero-blur: 0;
@@ -136,10 +111,7 @@
 .uf-responsive-panel[data-placement="left"][data-state="open"] {
   transform: translateX(0);
 }
-.uf-select[data-scope="select"] > .uf-membrane:first-child {
-  display: flex;
-  width: 100%;
-}
+/* Positioned: the form proxy covers the trigger, where the browser anchors its report. */
 .uf-select-wrapper {
   position: relative;
   display: flex;
@@ -383,7 +355,6 @@
   background: var(--uf-color-hover-bg);
 }
 
-.uf-select[data-scope="select"][hidden] { display: none; }
 .uf-select__content [data-part="listbox"]:focus { outline: none; }
 .uf-select__content [data-part="listbox"]:focus-visible {
   outline: var(--uf-membrane) solid var(--uf-color-border);
@@ -399,9 +370,14 @@
     outline: 2px solid Highlight;
     outline-offset: -2px;
   }
-  .uf-select__content [data-part="option"][data-highlighted] {
+  /* The option rule's own specificity, so its hover background gives way; unadjusted,
+     or forced colors put a Canvas text plate behind HighlightText. */
+  :is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"][data-highlighted] {
+    forced-color-adjust: none;
     background: Highlight;
     color: HighlightText;
   }
-  .uf-select__content [data-part="option"][data-highlighted] * { color: HighlightText; }
+  :is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"][data-highlighted] * {
+    color: HighlightText;
+  }
 }

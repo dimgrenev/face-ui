@@ -53,7 +53,7 @@ const renderAccordion = (props: AccordionProps = {}, options: Options = {}) => {
         <Select
           label="Project"
           defaultValue="a"
-          options={[
+          items={[
             { value: 'a', label: 'Alpha' },
             { value: 'b', label: 'Beta' },
           ]}
@@ -114,7 +114,7 @@ const renderAccordion = (props: AccordionProps = {}, options: Options = {}) => {
             <Select
               label="Reference"
               defaultValue="a"
-              options={[
+              items={[
                 { value: 'a', label: 'Alpha' },
                 { value: 'b', label: 'Beta' },
               ]}
