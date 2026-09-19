@@ -7,49 +7,48 @@
   "root": {
     "type": "Skeleton",
     "props": {
+      "shape": {
+        "$ref": "props.shape"
+      },
       "width": {
         "$ref": "props.width"
       },
       "height": {
         "$ref": "props.height"
-      },
-      "variant": {
-        "$ref": "props.variant"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "variant": "circle",
-      "width": 40,
-      "height": 40
+      "shape": "circle",
+      "width": 40
     }
   },
   "controls": [
     {
+      "name": "shape",
+      "type": "select",
+      "required": false,
+      "description": "What it stands in for: `text` a line of Text across its column, `rect` a block as wide as its column and one control tall, `circle` an avatar one control across.",
+      "options": [
+        "rect",
+        "circle",
+        "text"
+      ],
+      "defaultValue": "text"
+    },
+    {
       "name": "width",
       "type": "any",
       "required": false,
-      "description": "Explicit width"
+      "description": "Width of the box it takes, in pixels or any CSS length, in place of the shape's default; a circle given only a width is as tall."
     },
     {
       "name": "height",
       "type": "any",
       "required": false,
-      "description": "Explicit height"
-    },
-    {
-      "name": "variant",
-      "type": "select",
-      "required": false,
-      "description": "Shape variant",
-      "options": [
-        "text",
-        "circle",
-        "rect"
-      ],
-      "defaultValue": "text"
+      "description": "Height of the box it takes, in pixels or any CSS length, in place of the shape's default; a circle given only a height is as wide."
     }
   ],
   "meta": {

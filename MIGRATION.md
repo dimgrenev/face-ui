@@ -405,6 +405,22 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | With membrane, a horizontal separator in a row kept its container’s full width and overflowed the row | It never overflows: it shrinks along with its siblings, so a multi-word label beside it wraps unless it is kept on one line | — |
 | In forced colors the line was repainted in the canvas color and disappeared | It is drawn in CanvasText | — |
 
+### Skeleton
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `variant` | `shape` | auto |
+| `aria-hidden` | Nothing: a skeleton is always hidden from assistive technology. Mark the region being loaded with `aria-busy` | auto |
+| `children` | Place the content after loading instead of the skeleton; a placeholder has no content | manual |
+| `dangerouslySetInnerHTML` | Place the markup after loading instead of the skeleton; a placeholder has no content | manual |
+| `defaultValue` | Nothing: a placeholder holds no value, and the attribute never did anything | auto |
+| `defaultChecked` | Nothing: a placeholder holds no value, and the attribute never did anything | auto |
+| A width or height below one control height was raised to it, so `height={12}` still drew 32px | width and height size the box exactly, smaller as well as larger | — |
+| The default text shape was a filled box four controls wide and one control tall | It takes the box of a one-line Text with its membrane across its column, and paints a bar as tall as the text where the glyphs will be. Set `width` for a shorter line | — |
+| The rect shape was a square one control across | It is as wide as its column and one control tall; set `height` for an image or a card | — |
+| A circle given only a width or only a height was one control across the other way | It takes the side it is given for both | — |
+| In forced colors the placeholder was repainted in the canvas color and disappeared | It is painted in GrayText | — |
+
 ### Slider
 
 | Before | After | Codemod |

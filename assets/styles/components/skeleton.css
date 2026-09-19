@@ -1,21 +1,41 @@
 /* =================================================================
  * SKELETON
  * ================================================================= */
+/* Every shape takes the box its content will take, so nothing moves when the content arrives.
+   The default, text, takes the box of a one-line Text with its membrane, from Text's own tokens,
+   and paints a bar where the glyphs will be: inset like them, as tall as the font, never taller
+   than the box. */
 .uf-skeleton[data-scope] {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: calc(var(--uf-text-min-height, var(--uf-control-height)) + 2 * var(--uf-membrane));
+  padding-inline: calc(var(--uf-membrane) + var(--uf-text-pad-x, var(--uf-control-pad-text)));
+  border-radius: var(--uf-radius-sm);
+  animation: uf-skeleton-pulse var(--uf-motion-duration-skeleton) var(--uf-motion-ease-in-out) var(--uf-motion-iteration-indefinite);
+}
+.uf-skeleton[data-scope]::before {
+  content: "";
+  flex: 1;
+  block-size: min(100%, var(--uf-text-body-size, var(--uf-control-font-size)));
+  border-radius: inherit;
   background: var(--uf-color-hover-bg);
+}
+/* A block or an avatar is painted whole. */
+.uf-skeleton[data-scope]:is([data-shape="rect"], [data-shape="circle"]) {
+  block-size: var(--uf-control-height);
+  padding: 0;
   border-radius: var(--uf-radius);
-  width: var(--uf-control-height);
-  min-width: var(--uf-control-height);
-  height: var(--uf-control-height);
-  min-height: var(--uf-control-height);
+  background: var(--uf-color-hover-bg);
 }
-.uf-skeleton[data-scope][data-variant="text"] {
-  width: calc(var(--uf-control-height) * 4);
-  height: var(--uf-control-height);
-  min-height: var(--uf-control-height);
+.uf-skeleton[data-scope]:is([data-shape="rect"], [data-shape="circle"])::before {
+  content: none;
 }
-.uf-skeleton[data-scope][data-variant="circle"] {
-  border-radius: var(--uf-radius-full);
+.uf-skeleton[data-scope][data-shape="circle"] {
+  inline-size: var(--uf-control-height);
+  flex-shrink: 0;
+  border-radius: 50%;
 }
 
 @keyframes uf-skeleton-pulse {
@@ -27,6 +47,14 @@
     opacity: 0.5;
   }
 }
-.uf-skeleton[data-scope] {
-  animation: uf-skeleton-pulse var(--uf-motion-duration-skeleton) var(--uf-motion-ease-in-out) var(--uf-motion-iteration-indefinite);
+
+/* Forced colors repaint backgrounds with Canvas, which would erase the placeholder. */
+@media (forced-colors: active) {
+  .uf-skeleton[data-scope] {
+    forced-color-adjust: none;
+  }
+  .uf-skeleton[data-scope]:is([data-shape="rect"], [data-shape="circle"]),
+  .uf-skeleton[data-scope]::before {
+    background: GrayText;
+  }
 }
