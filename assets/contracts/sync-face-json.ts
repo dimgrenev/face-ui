@@ -780,7 +780,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           title: 'Workspace updated',
           description: 'Your changes are available to collaborators.',
           tone: 'neutral',
-          dismissible: true,
         },
       },
       {
@@ -789,7 +788,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           title: 'Deployment completed',
           description: 'Production is healthy and serving the new release.',
           tone: 'positive',
-          dismissible: true,
         },
       },
       {
@@ -798,7 +796,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           title: 'Usage is near the limit',
           description: 'This workspace has used 82% of its monthly quota.',
           tone: 'warning',
-          dismissible: true,
         },
       },
       {
@@ -807,7 +804,6 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           title: 'Deployment failed',
           description: 'Review the build log before retrying.',
           tone: 'destructive',
-          dismissible: true,
         },
       },
     ],

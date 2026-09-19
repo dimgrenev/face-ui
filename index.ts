@@ -75,10 +75,12 @@ export type { TextProps, TextVariant } from './Text/Text'
 export { Toast, Toaster, useToast, createToastContext } from './Toast/Toast'
 export type {
   ToastAction,
+  ToastLabels,
   ToastOptions,
   ToastPlacement,
   ToastProps,
   ToastTone,
+  ToasterOptions,
   ToasterProps,
 } from './Toast/Toast'
 export { Tree } from './Tree/Tree'
