@@ -366,6 +366,21 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | A failed `required` check showed only the browser bubble | The browser message also fills the field error slot and marks the trigger `aria-invalid` until a value is chosen; `error` wins over it | — |
 | Home and End did nothing on a closed list | Home and End open the list at the first or last enabled item | — |
 
+### Separator
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `role` | `decorative={false}` for `role="separator"`; `decorative` for `role="none"`. A role passed anyway is ignored | auto |
+| `aria-orientation` | Set `orientation` to the direction the line is drawn in; a separator that is not decorative announces it. A passed `aria-orientation` is ignored | manual |
+| `children` | Place the text beside the separator; a separator is only a line | manual |
+| `dangerouslySetInnerHTML` | Place the markup beside the separator; a separator is only a line | manual |
+| `defaultValue` | Nothing: a separator holds no value, and the attribute never did anything | auto |
+| `defaultChecked` | Nothing: a separator holds no value, and the attribute never did anything | auto |
+| Outside a flex or grid row, a vertical separator with membrane drew its line 2px shorter than a control | The line is one control tall there. Without membrane it still takes its height only from its row or its own style | — |
+| The line’s thickness was pinned by min and max sizes, so no className or style could widen it (a resize handle stayed 1px wide) | A style on the line, or a className rule that outranks the library’s, widens it. A widened resize handle is painted in the separator color unless that rule also sets its background | — |
+| With membrane, a horizontal separator in a row kept its container’s full width and overflowed the row | It never overflows: it shrinks along with its siblings, so a multi-word label beside it wraps unless it is kept on one line | — |
+| In forced colors the line was repainted in the canvas color and disappeared | It is drawn in CanvasText | — |
+
 ### Slider
 
 | Before | After | Codemod |

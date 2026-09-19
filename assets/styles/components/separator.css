@@ -1,62 +1,50 @@
 /* =================================================================
  * SEPARATOR
+ * The line sets its thickness, --uf-separator-line-width, and takes its
+ * length from its container. No maximum caps it and no minimum holds its
+ * length: a style on the line, or a className rule that outranks these,
+ * makes it shorter, longer or wider.
  * ================================================================= */
 .uf-separator[data-scope] {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
   border: none;
   background: var(--uf-color-border);
-  display: block;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
+}
+/* Full width in a column. In a row it never overflows: it shrinks along with
+   its siblings, which keep at least their narrowest width. An overflowing
+   column cannot squeeze it thinner than its thickness. */
+.uf-separator[data-scope][data-orientation="horizontal"] {
+  block-size: var(--uf-separator-line-width);
+  min-block-size: var(--uf-separator-line-width);
   inline-size: 100%;
   min-inline-size: 0;
-  max-inline-size: 100%;
-  flex: 1 1 auto;
-  box-sizing: border-box;
-  padding: 0;
+  flex: 0 1 auto;
+  align-self: center;
+}
+/* The height of its row. */
+.uf-separator[data-scope][data-orientation="vertical"] {
+  inline-size: var(--uf-separator-line-width);
+  flex: none;
+  align-self: stretch;
 }
 .uf-separator-membrane {
-  display: flex;
-  width: 100%;
-  min-width: 0;
-  flex: 0 0 auto;
-  align-self: stretch;
-}
-.uf-separator-membrane--vertical {
-  align-self: stretch;
-  flex: none;
-  min-height: var(--uf-control-height);
-}
-.uf-separator[data-scope][data-orientation="horizontal"] {
-  display: block;
-  height: var(--uf-separator-line-width);
-  min-height: var(--uf-separator-line-width);
-  max-height: var(--uf-separator-line-width);
-  flex: 1 1 auto;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  inline-size: 100%;
   min-inline-size: 0;
-  max-inline-size: 100%;
-  margin: 0;
-  align-self: center;
-  border-top: none;
-  background: var(--uf-color-border);
-}
-.uf-separator-membrane > .uf-separator[data-scope][data-orientation="horizontal"] {
-  flex: 1 1 auto;
-  width: 100%;
-  inline-size: 100%;
-}
-.uf-separator[data-scope][data-orientation="vertical"] {
-  width: var(--uf-separator-line-width);
-  min-width: var(--uf-separator-line-width);
-  max-width: var(--uf-separator-line-width);
-  inline-size: var(--uf-separator-line-width);
-  min-inline-size: var(--uf-separator-line-width);
-  max-inline-size: var(--uf-separator-line-width);
+  flex: 0 1 auto;
   align-self: stretch;
-  border-left: none;
-  background: var(--uf-color-border);
+}
+/* A control's slot, at least a control and its spacing tall, so that outside
+   a row the line is one control tall. The minimum holds the slot, not the line. */
+.uf-separator-membrane--vertical {
+  flex: none;
+  align-self: stretch;
+  min-block-size: calc(var(--uf-control-height) + 2 * var(--uf-membrane));
+}
+/* Forced colors repaint backgrounds with Canvas, which would erase the line. */
+@media (forced-colors: active) {
+  .uf-separator[data-scope] {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
 }
