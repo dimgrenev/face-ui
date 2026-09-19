@@ -1,75 +1,42 @@
+/* =================================================================
+ * INTERACTION — what no single component owns.
+ *
+ * Imported last on purpose: a shared indicator has to win over a
+ * component variant. Everything here matches more than one scope;
+ * a rule that only ever matches one component lives in that
+ * component's file instead.
+ * ================================================================= */
+
 /* All owned keyboard stops share one high-contrast indicator. A composite can
    mark handled keyboard navigation when native focus-visible heuristics miss
-   modifier keys. Keep this after variant rules, including outline/ghost. */
-[data-scope][data-part]:focus-visible,
-[data-keyboard-focus][data-scope][data-part]:focus,
-[data-keyboard-focus] [data-scope][data-part]:focus {
+   modifier keys. Keep this after variant rules, including outline/ghost.
+
+   The :where() prefix limits the subject to a Face UI root or a descendant of
+   one. data-scope/data-part is not ours alone — a reference library rendered
+   next to us (Zag, Ark) writes the same attributes, and must keep its own
+   focus treatment (RFC §5 #17). :where() adds no specificity, so the rule
+   keeps the weight it had against every component variant. */
+:where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus-visible,
+[data-keyboard-focus]:where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus,
+[data-keyboard-focus] :where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus {
   outline: 2px solid var(--uf-color-fg);
   outline-offset: -2px;
 }
 
-[data-scope][data-part][hidden] {
+:where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part][hidden] {
   display: none;
 }
 
 @media (forced-colors: active) {
-  [data-scope][data-part]:focus-visible,
-  [data-keyboard-focus][data-scope][data-part]:focus,
-  [data-keyboard-focus] [data-scope][data-part]:focus {
+  :where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus-visible,
+  [data-keyboard-focus]:where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus,
+  [data-keyboard-focus] :where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus {
     outline-color: Highlight;
   }
 }
 
-/* Hidden actions must not receive keyboard focus. Hover actions also reveal
-   while tabbing through a row and on devices without hover. */
-.uf-tile[data-scope="tile"][data-action-visibility="hidden"] > [data-part="actions"] {
-  visibility: hidden;
-}
-.uf-tile[data-scope="tile"][data-action-visibility="hover"]:focus-within > [data-part="actions"] {
-  opacity: 1;
-  pointer-events: auto;
-}
-@media (hover: none) {
-  .uf-tile[data-scope="tile"]:is([data-action-visibility="hover"], [data-action-visibility="reveal"]) > [data-part="actions"] {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-/* Native form focus and composed row actions share the owned focus treatment. */
-.uf-radio-option:has(input:focus-visible) {
-  outline: 2px solid var(--uf-color-fg);
-  outline-offset: -2px;
-}
-.uf-tile {
-  position: relative;
-}
-.uf-tile-primary {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  border-radius: inherit;
-  background: transparent;
-  cursor: inherit;
-}
-.uf-tile > :not(.uf-tile-primary) {
-  position: relative;
-}
-
-.uf-checkbox:has(input:focus-visible),
-.uf-switcher:has(input:focus-visible) {
-  outline: 2px solid var(--uf-color-fg);
-  outline-offset: -2px;
-}
-
-[data-scope="navigation"] [data-part="list"][data-orientation="horizontal"] {
-  flex-wrap: wrap;
-}
-.uf-navigation-nestedGroup {
-  padding-inline-start: var(--uf-control-pad-text);
-}
+/* Interactive weight is a property of anything rendered as a control or an
+   option, whichever component renders it. */
 .uf-control[data-scope],
 .uf-option[data-scope] {
   font-weight: var(--uf-interactive-weight);

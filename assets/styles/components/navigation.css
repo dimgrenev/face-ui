@@ -117,3 +117,11 @@
 .uf-navigation-section[data-disabled] > .uf-navigation-sectionLabel {
   opacity: var(--uf-color-disabled-opacity);
 }
+
+/* A horizontal menubar wraps rather than overflowing its bar. */
+[data-scope="navigation"] [data-part="list"][data-orientation="horizontal"] {
+  flex-wrap: wrap;
+}
+.uf-navigation-nestedGroup {
+  padding-inline-start: var(--uf-control-pad-text);
+}

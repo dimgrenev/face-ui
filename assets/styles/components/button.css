@@ -209,56 +209,6 @@
   padding-inline-start: calc(var(--uf-control-pad-start) + (var(--face-runtime-option-level, 0) * var(--uf-option-indent)));
 }
 
-/* Membrane wrapper:
-   adds the membrane token outside the control rhythm, never mutates inner control paddings. */
-.uf-membrane {
-  display: inline-flex;
-  box-sizing: border-box;
-  padding: var(--uf-membrane);
-}
-.uf-membrane[data-membrane-interactive] {
-  cursor: pointer;
-}
-/* Links need native hit testing: synthetic forwarded clicks lose browser link
-   commands in WebKit. Extend the anchor into its membrane without changing layout. */
-.uf-membrane[data-membrane-interactive] > a[href] { position: relative; }
-.uf-membrane[data-membrane-interactive] > a[href]::before {
-  content: "";
-  position: absolute;
-  inset: calc(-1 * var(--uf-membrane));
-}
-.uf-membrane[data-membrane-interactive] > a[href]:is(
-  [inert], [disabled], [data-disabled], [aria-disabled="true"],
-  [inert] *, [disabled] *, [data-disabled] *, [aria-disabled="true"] *
-)::before { content: none; }
-
-.uf-membrane[data-membrane-interactive] > :is([disabled], [data-disabled], [aria-disabled="true"]) {
-  cursor: not-allowed;
-}
-.uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > :is(.uf-option, .uf-control, [data-part="trigger"], [data-part="item"], [data-part="option"]):not([disabled]):not([data-disabled]):not([aria-disabled="true"]),
-.uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > .uf-membrane[data-membrane-disabled] > :is(.uf-option, .uf-control, [data-part="trigger"], [data-part="item"], [data-part="option"]):not([disabled]):not([data-disabled]):not([aria-disabled="true"]) {
-  background: var(--uf-color-hover-bg);
-}
-.uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > .uf-button[data-scope]:not([disabled]):not([data-disabled]):not([aria-disabled="true"]),
-.uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > .uf-membrane[data-membrane-disabled] > .uf-button[data-scope]:not([disabled]):not([data-disabled]):not([aria-disabled="true"]) {
-  background: var(--uf-button-hover-bg);
-  color: var(--uf-button-hover-fg);
-}
-.uf-membrane--full {
-  display: flex;
-  width: 100%;
-}
-.uf-membrane--full > *,
-.uf-membrane--full > .uf-membrane[data-membrane-disabled] > * {
-  width: 100%;
-}
-/* Keep the React/DOM position stable while removing only the spacing box.
-   The wrapper has no semantics; roles, names and focus stay on its child. */
-.uf-membrane[data-membrane-disabled]:not([hidden]):not(:has(> [hidden])) {
-  display: contents;
-  padding: 0;
-}
-
 /* Spinner */
 .uf-button__spinner {
   position: absolute;
@@ -370,4 +320,25 @@
 .uf-button-group[data-orientation="vertical"] > .uf-membrane:not(:last-child) > .uf-button[data-scope] {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
+}
+
+/* Button icon box. It sat in the carousel section because the arrows were
+   what first needed it; every icon-only Button sizes its icon through it. */
+.uf-button[data-scope] [data-part="icon"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  flex: 0 0 auto;
+}
+.uf-button[data-scope] [data-part="icon"] :is(svg, img) {
+  display: block;
+}
+.uf-button[data-scope][data-icon-only]:not([data-selector]) [data-part="icon"] {
+  inline-size: 100%;
+  block-size: 100%;
+}
+.uf-button[data-scope][data-icon-only] [data-part="icon"] > :is(svg, img, .icon) {
+  margin: auto;
+  flex: 0 0 auto;
 }

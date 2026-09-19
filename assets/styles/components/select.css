@@ -10,61 +10,6 @@
 .uf-select[data-scope="select"][data-full-width] {
   width: 100%;
 }
-.uf-responsive-overlay-backdrop {
-  --uf-responsive-overlay-zero-blur: 0;
-  position: fixed;
-  inset: 0;
-  background: var(--uf-overlay-backdrop-bg);
-  z-index: var(--uf-z-overlay);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  backdrop-filter: blur(var(--uf-responsive-overlay-zero-blur)) saturate(1);
-  -webkit-backdrop-filter: blur(var(--uf-responsive-overlay-zero-blur)) saturate(1);
-  transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
-    -webkit-backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
-    visibility 0s linear var(--uf-duration-exit);
-}
-.uf-responsive-overlay-backdrop[data-state="open"] {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  backdrop-filter: blur(var(--uf-overlay-backdrop-blur)) saturate(1.12);
-  -webkit-backdrop-filter: blur(var(--uf-overlay-backdrop-blur)) saturate(1.12);
-  transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
-    -webkit-backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
-    visibility 0s linear 0s;
-}
-.uf-responsive-overlay-backdrop[data-state="closed"] {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-.uf-responsive-sheetHeader[data-scope="bar"] {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  width: 100%;
-  padding: 0;
-  gap: 0;
-  background: var(--uf-overlay-header-background);
-  border-radius: inherit;
-}
-.uf-responsive-sheetHeader[data-scope="bar"] > .uf-bar-section {
-  gap: 0;
-}
-.uf-responsive-sheetTitle[data-scope="text"] {
-  color: var(--uf-color-fg-muted);
-  width: 100%;
-}
-.uf-responsive-sheetClose[data-scope="button"][data-icon-only] {
-  --uf-icon-only-size: var(--uf-control-height);
-  opacity: 1;
-}
 /* Positioned: the form proxy covers the trigger, where the browser anchors its report. */
 .uf-select-wrapper {
   position: relative;

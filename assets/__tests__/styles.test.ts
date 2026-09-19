@@ -45,3 +45,120 @@ describe('components.css import list (import order = cascade order)', () => {
     expect(stripComments(libraryCss())).not.toMatch(/@import/)
   })
 })
+
+/**
+ * A rule belongs to the file named after the component it styles, so that
+ * changing one component means opening one file (RFC §7.4). A selector proves
+ * ownership by naming its owner's scope — `[data-scope="x"]` or `.uf-x…` —
+ * anywhere in the selector, subject or ancestor.
+ */
+const OWNED_BY = (file: string) => {
+  const owner = file.replace('.css', '')
+  return [`data-scope="${owner}"`, `.uf-${owner}`, `.uf-${owner.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}`]
+}
+
+/**
+ * Every exception, with the reason it is one. Anything not listed here has to
+ * move to its owner's file; this list is the argument for why a rule cannot.
+ */
+const ALLOWED: Record<string, { reason: string; selectors: RegExp }> = {
+  // Components whose DOM predates the file name.
+  'panel.css': {
+    reason: 'Panel renders the sidebar anatomy: data-scope="sidebar", .uf-sidebar-*',
+    selectors: /\.uf-sidebar|data-scope="sidebar"/,
+  },
+  'button.css': {
+    reason:
+      'Button is the only component that renders .uf-spinner, and its --uf-spinner-* tokens are declared in Button.json',
+    selectors: /^\.uf-spinner(--small)?$/,
+  },
+  'segmented-control.css': {
+    reason: 'SegmentedControl renders data-scope="toggle" and .uf-toggle-*',
+    selectors: /\.uf-toggle|data-scope="toggle"/,
+  },
+  'sheet.css': {
+    reason: 'the responsive sheet chrome is .uf-responsive-*, shared by every overlay that becomes a sheet',
+    selectors: /\.uf-responsive-/,
+  },
+  // Files that are a shared concern by design, not a component.
+  'icon.css': {
+    reason:
+      'one indicator icon, rendered by the three components that have one; three copies of the rule would be the duplication the split exists to remove',
+    selectors: /\[data-part="indicator"\]/,
+  },
+  'interaction.css': {
+    reason: 'the cross-component file: focus, hidden parts and control weight belong to no single scope',
+    selectors: /\[data-scope\]\[data-part\]|\.uf-control\[data-scope\]|\.uf-option\[data-scope\]/,
+  },
+}
+
+/**
+ * A direction boundary carries no component of its own: `:where([dir=…])` sets
+ * a custom property the owner's rules read, and the property names it.
+ */
+const DIRECTION = /^:where\(\[dir="(ltr|rtl)"\]\)$/
+
+describe('components/<x>.css owns what it styles', () => {
+  const splitSelectors = (list: string) => {
+    const out: string[] = []
+    let depth = 0
+    let current = ''
+    for (const char of list) {
+      if (char === '(' || char === '[') depth++
+      else if (char === ')' || char === ']') depth--
+      if (char === ',' && depth === 0) {
+        out.push(current)
+        current = ''
+      } else current += char
+    }
+    return [...out, current].map((selector) => selector.trim().replace(/\s+/g, ' ')).filter(Boolean)
+  }
+
+  /** Rules of one file as [selector, declarations], at-rules flattened. */
+  const rules = (css: string): [string, string][] => {
+    const out: [string, string][] = []
+    const walk = (source: string) => {
+      let depth = 0
+      let start = 0
+      for (let i = 0; i < source.length; i++) {
+        if (source.startsWith('/*', i)) {
+          i = source.indexOf('*/', i + 2) + 1
+          continue
+        }
+        if (source[i] === '{') depth++
+        else if (source[i] === '}' && --depth === 0) {
+          const block = source.slice(start, i + 1)
+          const open = block.indexOf('{')
+          const prelude = stripComments(block.slice(0, open)).trim()
+          const body = block.slice(open + 1, block.length - 1)
+          if (prelude.startsWith('@keyframes')) {
+            /* a frame is a percentage, not a selector */
+          } else if (prelude.startsWith('@')) walk(body)
+          else for (const selector of splitSelectors(prelude)) out.push([selector, body])
+          start = i + 1
+        }
+      }
+    }
+    walk(css)
+    return out
+  }
+
+  for (const file of componentFiles) {
+    const owners = OWNED_BY(file)
+    const allowed = ALLOWED[file]
+    it(`${file}${allowed ? ` (exception: ${allowed.reason})` : ''}`, () => {
+      const foreign = rules(read(`components/${file}`)).filter(([selector, body]) => {
+        if (owners.some((owner) => selector.includes(owner))) return false
+        if (allowed?.selectors.test(selector)) return false
+        // A direction boundary is owned when it only sets the owner's tokens.
+        if (DIRECTION.test(selector))
+          return !body
+            .split(';')
+            .filter((declaration) => declaration.trim())
+            .every((declaration) => declaration.trim().startsWith(`--uf-${file.replace('.css', '')}-`))
+        return true
+      })
+      expect(foreign.map(([selector]) => selector)).toEqual([])
+    })
+  }
+})

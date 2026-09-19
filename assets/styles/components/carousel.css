@@ -110,22 +110,3 @@
 .uf-carousel-navNext [data-part="icon"] {
   transform: scaleX(var(--uf-carousel-inline-sign, 1));
 }
-
-.uf-button[data-scope] [data-part="icon"] {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 0;
-  flex: 0 0 auto;
-}
-.uf-button[data-scope] [data-part="icon"] :is(svg, img) {
-  display: block;
-}
-.uf-button[data-scope][data-icon-only]:not([data-selector]) [data-part="icon"] {
-  inline-size: 100%;
-  block-size: 100%;
-}
-.uf-button[data-scope][data-icon-only] [data-part="icon"] > :is(svg, img, .icon) {
-  margin: auto;
-  flex: 0 0 auto;
-}
