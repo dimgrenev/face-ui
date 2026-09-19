@@ -18,8 +18,8 @@ const STATEFUL = new Set([
 /** Props a scenario lacks for its state to be reachable by a user. */
 const LONG_SOURCE = Array.from({ length: 12 }, (_, line) => `line ${line + 1}`).join('\n')
 const EXTRA_PROPS: Record<string, Props> = {
-  // Only a long source can collapse; `code` becomes `children` in W3-04.
-  Code: { code: LONG_SOURCE, children: LONG_SOURCE },
+  // Only a source longer than collapsedLines can collapse.
+  Code: { children: LONG_SOURCE },
   Modal: { trigger: 'Open' },
 }
 
