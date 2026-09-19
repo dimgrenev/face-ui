@@ -171,12 +171,20 @@
 }
 
 /* Edge placement variants */
-.uf-animated .uf-modal[data-variant="right"][data-state="open"] {
+.uf-animated .uf-modal[data-variant="end"][data-state="open"] {
   animation: uf-slide-in-right var(--uf-duration-enter) var(--uf-ease-enter);
 }
 
-.uf-animated .uf-modal[data-variant="left"][data-state="open"] {
+.uf-animated .uf-modal[data-variant="start"][data-state="open"] {
   animation: uf-slide-in-left var(--uf-duration-enter) var(--uf-ease-enter);
+}
+
+.uf-animated .uf-modal[data-variant="end"][data-state="open"]:dir(rtl) {
+  animation-name: uf-slide-in-left;
+}
+
+.uf-animated .uf-modal[data-variant="start"][data-state="open"]:dir(rtl) {
+  animation-name: uf-slide-in-right;
 }
 
 .uf-animated .uf-modal[data-variant="top"][data-state="open"] {

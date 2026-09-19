@@ -220,7 +220,7 @@ describe('face-ui-react contracts', () => {
     expect(contracts.get('Tile')?.props['aria-expanded']?.type).toBe('boolean')
     expect(contracts.get('Tile')?.props['aria-busy']?.type).toBe('boolean')
     expect(contracts.get('Modal')?.props).not.toHaveProperty('variant')
-    expect(contracts.get('Modal')?.props.placement?.options).toEqual(['center', 'left', 'right', 'top', 'bottom'])
+    expect(contracts.get('Modal')?.props.placement?.options).toEqual(['center', 'start', 'end', 'top', 'bottom'])
     expect(contracts.get('Modal')?.props.edge?.options).toEqual(['inset', 'flush'])
     expect(contracts.get('Modal')?.props.edge?.default).toBe('inset')
     expect(contracts.get('Modal')?.props.height?.type).toBe('number')

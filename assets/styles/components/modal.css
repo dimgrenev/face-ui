@@ -1,6 +1,9 @@
 /* =================================================================
  * MODAL
  * ================================================================= */
+/* The backdrop, positioner and surface mount when the dialog opens and
+ * unmount once the positioner's exit transitions end; @starting-style
+ * gives the entry the same transitions. */
 .uf-modal-backdrop[data-scope] {
   --uf-modal-zero-blur: 0;
   position: fixed;
@@ -43,11 +46,6 @@
     -webkit-backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
     visibility 0s linear 0s;
 }
-.uf-modal-backdrop[data-scope][data-state="closed"] {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
 .uf-modal-positioner[data-scope] {
   --uf-modal-edge-inset: var(--uf-spacing-1);
   position: fixed;
@@ -68,19 +66,16 @@
     opacity var(--uf-duration-enter) var(--uf-ease-enter),
     visibility 0s linear 0s;
 }
-.uf-modal-positioner[data-scope][data-state="closed"] {
-  opacity: 0;
-  visibility: hidden;
-}
 .uf-modal-positioner[data-scope][data-variant="center"] {
   align-items: center;
   justify-content: center;
 }
-.uf-modal-positioner[data-scope][data-variant="left"] {
+/* Flex start and end follow the positioner's direction. */
+.uf-modal-positioner[data-scope][data-variant="start"] {
   align-items: center;
   justify-content: flex-start;
 }
-.uf-modal-positioner[data-scope][data-variant="right"] {
+.uf-modal-positioner[data-scope][data-variant="end"] {
   align-items: center;
   justify-content: flex-end;
 }
@@ -98,6 +93,8 @@
   --uf-modal-enter-y: var(--uf-spacing-4);
   --uf-modal-side-enter-x: var(--uf-spacing-6);
   --uf-modal-side-w-default: 20rem;
+  /* Where the surface enters from and leaves to. */
+  --uf-modal-away: translateY(var(--uf-modal-enter-y)) scale(0.98);
   pointer-events: auto;
   max-height: 85vh;
   overflow-y: auto;
@@ -109,40 +106,55 @@
   flex-direction: column;
   gap: 0;
   color: var(--uf-color-fg);
-  transform: translateY(var(--uf-modal-enter-y)) scale(0.98);
+  transform: var(--uf-modal-away);
   opacity: 0;
   transition:
     opacity var(--uf-duration-enter) var(--uf-ease-enter),
     transform var(--uf-duration-enter) var(--uf-ease-enter);
 }
+.uf-modal[data-scope][data-variant="start"] {
+  --uf-modal-away: translateX(calc(var(--uf-modal-side-enter-x) * -1));
+}
+.uf-modal[data-scope][data-variant="end"] {
+  --uf-modal-away: translateX(var(--uf-modal-side-enter-x));
+}
+/* Separate rules: an engine without :dir() drops only these. */
+.uf-modal[data-scope][data-variant="start"]:dir(rtl) {
+  --uf-modal-away: translateX(var(--uf-modal-side-enter-x));
+}
+.uf-modal[data-scope][data-variant="end"]:dir(rtl) {
+  --uf-modal-away: translateX(calc(var(--uf-modal-side-enter-x) * -1));
+}
+.uf-modal[data-scope][data-variant="top"] {
+  --uf-modal-away: translateY(calc(var(--uf-modal-side-enter-x) * -1));
+}
+.uf-modal[data-scope][data-variant="bottom"] {
+  --uf-modal-away: translateY(var(--uf-modal-side-enter-x));
+}
+.uf-modal[data-scope][data-state="open"] {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  .uf-modal-backdrop[data-scope][data-state="open"] {
+    opacity: 0;
+    backdrop-filter: blur(var(--uf-modal-zero-blur)) saturate(1);
+    -webkit-backdrop-filter: blur(var(--uf-modal-zero-blur)) saturate(1);
+  }
+  .uf-modal-positioner[data-scope][data-state="open"] {
+    opacity: 0;
+  }
+  .uf-modal[data-scope][data-state="open"] {
+    opacity: 0;
+    transform: var(--uf-modal-away);
+  }
+}
 .uf-modal[data-scope][data-variant="center"] {
   width: min(var(--face-runtime-modal-w, 32rem), calc(100vw - var(--uf-modal-viewport-gap)));
   height: var(--face-runtime-modal-h, auto);
 }
-.uf-modal-positioner[data-scope][data-state="open"] .uf-modal[data-scope] {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-.uf-modal-positioner[data-scope][data-variant="left"] .uf-modal[data-scope] {
-  transform: translateX(calc(var(--uf-modal-side-enter-x) * -1));
-}
-.uf-modal-positioner[data-scope][data-variant="right"] .uf-modal[data-scope] {
-  transform: translateX(var(--uf-modal-side-enter-x));
-}
-.uf-modal-positioner[data-scope][data-variant="top"] .uf-modal[data-scope] {
-  transform: translateY(calc(var(--uf-modal-side-enter-x) * -1));
-}
-.uf-modal-positioner[data-scope][data-variant="bottom"] .uf-modal[data-scope] {
-  transform: translateY(var(--uf-modal-side-enter-x));
-}
-.uf-modal-positioner[data-scope][data-state="open"][data-variant="left"] .uf-modal[data-scope],
-.uf-modal-positioner[data-scope][data-state="open"][data-variant="right"] .uf-modal[data-scope],
-.uf-modal-positioner[data-scope][data-state="open"][data-variant="top"] .uf-modal[data-scope],
-.uf-modal-positioner[data-scope][data-state="open"][data-variant="bottom"] .uf-modal[data-scope] {
-  transform: translateX(0) translateY(0) scale(1);
-}
-.uf-modal[data-scope][data-variant="left"],
-.uf-modal[data-scope][data-variant="right"] {
+.uf-modal[data-scope][data-variant="start"],
+.uf-modal[data-scope][data-variant="end"] {
   height: var(--face-runtime-modal-h, 100%);
   max-height: 100vh;
   width: min(var(--face-runtime-modal-w, var(--uf-modal-side-w-default)), 100%);
@@ -162,28 +174,14 @@
 .uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="center"] {
   padding: var(--uf-spacing-6);
 }
-.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="left"] {
+/* Safe-area insets are physical, so every edge placement pads all four sides. */
+.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset:not([data-variant="center"]) {
   padding: calc(var(--uf-modal-edge-inset) + env(safe-area-inset-top, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-right, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-bottom, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-left, 0));
 }
-.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="right"] {
-  padding: calc(var(--uf-modal-edge-inset) + env(safe-area-inset-top, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-right, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-bottom, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-left, 0));
-}
-.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="top"] {
-  padding: calc(var(--uf-modal-edge-inset) + env(safe-area-inset-top, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-right, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-bottom, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-left, 0));
-}
-.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="bottom"] {
-  padding: calc(var(--uf-modal-edge-inset) + env(safe-area-inset-top, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-right, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-bottom, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-left, 0));
-}
-.uf-modal[data-scope].uf-modal--edge-inset:is([data-variant="left"], [data-variant="right"]) {
+.uf-modal[data-scope].uf-modal--edge-inset:not([data-variant="center"]) {
   max-height: calc(100vh - var(--uf-modal-edge-inset) - var(--uf-modal-edge-inset));
 }
-.uf-modal[data-scope].uf-modal--edge-inset:is([data-variant="top"], [data-variant="bottom"]) {
-  max-height: calc(100vh - var(--uf-modal-edge-inset) - var(--uf-modal-edge-inset));
-}
-.uf-modal[data-scope].uf-modal--edge-flush:is([data-variant="left"], [data-variant="right"]) {
-  max-height: 100vh;
-}
-.uf-modal[data-scope].uf-modal--edge-flush:is([data-variant="top"], [data-variant="bottom"]) {
+.uf-modal[data-scope].uf-modal--edge-flush {
   max-height: 100vh;
 }
 .uf-modal-bar {
@@ -196,7 +194,7 @@
 .uf-modal-description {
   color: var(--uf-color-fg-muted);
   font-size: var(--uf-font-size);
-  text-align: left;
+  text-align: start;
   width: 100%;
 }
 .uf-modal-body {
@@ -207,18 +205,15 @@
   min-height: 0;
   align-items: stretch;
   justify-content: flex-start;
-  text-align: left;
+  text-align: start;
   width: 100%;
 }
-.uf-modal-actionsBar {
+.uf-modal-footer {
   margin-top: auto;
   padding: 0;
   gap: 0;
   min-height: auto;
 }
-.uf-modal-actionsBar [data-part="actions"] {
-  width: 100%;
-}
-.uf-modal-closeButton[data-scope="button"][data-icon-only] {
+.uf-modal-closeButton[data-icon-only] {
   --uf-icon-only-size: var(--uf-control-height);
 }
