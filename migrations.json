@@ -860,6 +860,87 @@
       "after": "Both are `<span>`s, so a Select is valid inside a `<p>`; select them by class"
     },
     {
+      "kind": "rename-prop",
+      "component": "Select",
+      "from": "options",
+      "to": "items",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "SelectOption",
+      "to": "SelectItem",
+      "codemod": "auto"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Select",
+      "from": "closeLabel",
+      "key": "close",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Select",
+      "prop": "surfaceTitle",
+      "use": "The sheet is titled by `label`, else by `aria-label`; pass `aria-label` to name a field without a visible label",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Select",
+      "prop": "surfaceBreakpoint",
+      "use": "Remove it; `surface=\"auto\"` becomes a sheet below 900px",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Select",
+      "from": "labelOrientation",
+      "to": "labelPosition",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Select",
+      "prop": "labelPosition",
+      "values": {
+        "vertical": "top",
+        "horizontal": "start"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "`placeholder` defaulted to \"Select option\", which also titled a sheet without a label",
+      "after": "There is no default text: pass `placeholder`, and name the field with `label`, `aria-label` or `aria-labelledby` (an unnamed Select is reported in development)"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "A value missing from `options` showed its raw key in the trigger and was submitted",
+      "after": "It shows as unselected and is not submitted until an item with that value appears; the value itself is kept"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "The label was `[data-scope=\"select\"][data-part=\"label\"]` at 11px, and the root carried `data-label-orientation`",
+      "after": "Label, required marker, `description` and `error` are the shared Field parts (`.uf-field__*`, `[data-scope=\"field\"]`, 12px label); the root carries `data-label-position`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "A failed `required` check showed only the browser bubble",
+      "after": "The browser message also fills the field error slot and marks the trigger `aria-invalid` until a value is chosen; `error` wins over it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "Home and End did nothing on a closed list",
+      "after": "Home and End open the list at the first or last enabled item"
+    },
+    {
       "kind": "remove-prop",
       "component": "Slider",
       "prop": "variant",

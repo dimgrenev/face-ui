@@ -91,7 +91,7 @@ const cases: [string, (membrane: boolean) => React.ReactNode, string][] = [
   [
     'Select',
     (membrane) => (
-      <Select membrane={membrane} options={[{ value: 'a', label: 'A' }]} />
+      <Select membrane={membrane} aria-label="Plan" items={[{ value: 'a', label: 'A' }]} />
     ),
     '[data-part="trigger"]',
   ],

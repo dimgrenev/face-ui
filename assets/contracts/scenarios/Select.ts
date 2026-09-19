@@ -9,10 +9,9 @@ export default [
       defaultValue: 'balanced',
       'aria-label': 'AI model',
       surface: 'side',
-      surfaceTitle: 'Choose model',
       stretchText: true,
       membrane: true,
-      options: [
+      items: [
         { value: 'fast', label: 'Fast' },
         { value: 'balanced', label: 'Balanced' },
         { value: 'reasoning', label: 'Reasoning' },
@@ -28,10 +27,9 @@ export default [
       defaultValue: ['design', 'engineering'],
       'aria-label': 'Filter by team',
       surface: 'sheet',
-      surfaceTitle: 'Filter teams',
       stretchText: true,
       membrane: true,
-      options: [
+      items: [
         { value: 'design', label: 'Design' },
         { value: 'engineering', label: 'Engineering' },
         { value: 'sales', label: 'Sales' },

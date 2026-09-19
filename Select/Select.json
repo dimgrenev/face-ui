@@ -2,99 +2,112 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Select",
-  "description": "Option picker with single and multi-select support",
+  "description": "A button that opens a list of items to choose one value, or several with `multiple`.",
   "props": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ]
+    },
+    "items": {
+      "type": "array",
+      "required": false,
+      "description": "Choices in list and keyboard order; an item repeating an earlier value is dropped."
+    },
+    "placeholder": {
+      "type": "string",
+      "required": false,
+      "description": "Text in the trigger while nothing is selected and `displayValue` is empty."
+    },
+    "displayValue": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Replaces the selected labels in the trigger, for example with a count or an icon."
+    },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable focus, interaction and native form submission.",
+      "description": "Disables the trigger and leaves the value out of FormData.",
       "default": false
     },
     "name": {
       "type": "string",
       "required": false,
-      "description": "Native form key; multiple values produce repeated entries."
+      "description": "FormData key; a multiple value submits one entry per selected item."
     },
     "form": {
       "type": "string",
       "required": false,
-      "description": "Associate this field with a form by id."
+      "description": "Id of the form that submits and resets the value, when it is not an ancestor."
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Blocks form submission until an item is selected and marks the label.",
+      "default": false
     },
     "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Accessible field name when a visible label is not appropriate."
+      "description": "Names the field when there is no visible `label`, and then titles the sheet."
     },
-    "options": {
-      "type": "array",
-      "required": false,
-      "description": "Available choices, with unique values."
-    },
-    "placeholder": {
+    "aria-labelledby": {
       "type": "string",
       "required": false,
-      "description": "Hint shown when no value or display override is present.",
-      "default": "Select option"
-    },
-    "label": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Visible field label; native aria-label/aria-labelledby override its accessible name."
-    },
-    "labelOrientation": {
-      "type": "enum",
-      "required": false,
-      "description": "Label placement. Has no effect without a label.",
-      "options": [
-        "vertical",
-        "horizontal"
-      ],
-      "default": "vertical"
-    },
-    "displayValue": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Replace selected labels in the trigger, for example with a count or icon."
+      "description": "Ids of elements that name the field; they take precedence over `label` and `aria-label`."
     },
     "iconOnly": {
       "type": "boolean",
       "required": false,
-      "description": "A square trigger without a chevron. Supply an accessible field name.",
+      "description": "A square trigger without a chevron; name it with `aria-label`.",
       "default": false
     },
     "fullWidth": {
       "type": "boolean",
       "required": false,
-      "description": "Fill the available inline width. Defaults to true.",
+      "description": "Fills the available inline width.",
       "default": true
     },
     "stretchText": {
       "type": "boolean",
       "required": false,
-      "description": "Expand the value area and align the chevron to the inline end.",
-      "default": false
-    },
-    "required": {
-      "type": "boolean",
-      "required": false,
-      "description": "Require at least one selection for native form validation.",
+      "description": "Expands the value area so the chevron sits at the inline end.",
       "default": false
     },
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled popup visibility. Disabled/empty lists cannot be opened."
+      "description": "Controlled list visibility; a disabled Select, or one without enabled items, stays closed."
     },
     "defaultOpen": {
       "type": "boolean",
       "required": false,
-      "description": "Uncontrolled initial popup visibility.",
+      "description": "List visibility on mount when `open` is not set; read once.",
       "default": false
     },
     "surface": {
       "type": "enum",
       "required": false,
-      "description": "Auto uses a sheet on compact viewports; side is a hover/click inspector picker.",
+      "description": "Where the list opens: auto is a popover, or a bottom sheet below 900px; side opens beside the trigger on hover or click.",
       "options": [
         "auto",
         "popover",
@@ -103,48 +116,37 @@
       ],
       "default": "auto"
     },
-    "surfaceBreakpoint": {
-      "type": "number",
+    "labels": {
+      "type": "object",
       "required": false,
-      "description": "Viewport breakpoint used only by surface=\"auto\"."
-    },
-    "surfaceTitle": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Mobile sheet heading. Falls back to the field label or accessible name."
-    },
-    "closeLabel": {
-      "type": "string",
-      "required": false,
-      "description": "Accessible name for the sheet close button.",
-      "default": "Close"
+      "description": "Strings Select renders itself: `close` names the sheet's close button."
     },
     "contentMinWidth": {
       "type": "any",
       "required": false,
-      "description": "Minimum popover width, capped by the viewport. Does not resize side/sheet surfaces."
+      "description": "Minimum popover width in pixels or CSS length, capped by the viewport; side and sheet surfaces ignore it."
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Shared membrane around the trigger and option geometry.",
+      "description": "Shared outer spacing around the trigger and each item; toggling it keeps the trigger.",
       "default": true
     },
     "multiple": {
       "type": "boolean",
       "required": false,
-      "description": "Select one option.",
+      "description": "Lets the user select any number of items and makes the value a `string[]` instead of `string | null`; selecting then keeps the list open.",
       "default": false
     },
     "value": {
       "type": "any",
       "required": false,
-      "description": "Selected option, or null for no selection."
+      "description": "Selected value, or values with `multiple`; a value missing from `items` shows as unselected until it appears."
     },
     "defaultValue": {
       "type": "any",
       "required": false,
-      "description": "Initial selection, restored on form reset."
+      "description": "Selection on mount, restored by form reset; same shape as `value`."
     }
   },
   "states": [
@@ -153,11 +155,10 @@
       "props": {
         "placeholder": "Choose option",
         "disabled": false,
-        "labelOrientation": "vertical",
         "stretchText": false,
         "surface": "auto",
         "membrane": true,
-        "options": [
+        "items": [
           {
             "value": "1",
             "label": "Option 1"
@@ -173,7 +174,7 @@
     {
       "name": "Multiselect",
       "props": {
-        "options": [
+        "items": [
           {
             "value": "1",
             "label": "Option 1"
@@ -188,14 +189,15 @@
           }
         ],
         "placeholder": "Select items...",
-        "multiple": true
+        "multiple": true,
+        "label": "Tags"
       }
     },
     {
       "name": "Side",
       "props": {
         "stretchText": true,
-        "options": [
+        "items": [
           {
             "value": "icon",
             "label": "Icon"
@@ -206,7 +208,8 @@
           }
         ],
         "placeholder": "Select...",
-        "surface": "side"
+        "surface": "side",
+        "label": "Component"
       }
     },
     {
@@ -215,7 +218,7 @@
         "surface": "popover",
         "displayValue": "{}",
         "contentMinWidth": "10rem",
-        "options": [
+        "items": [
           {
             "value": "string",
             "label": "String"
@@ -239,7 +242,8 @@
       "name": "Disabled",
       "props": {
         "disabled": true,
-        "placeholder": "Disabled"
+        "placeholder": "Disabled",
+        "label": "Plan"
       }
     }
   ],

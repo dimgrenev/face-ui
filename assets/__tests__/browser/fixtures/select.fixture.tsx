@@ -5,7 +5,7 @@ import { Select, type SelectProps } from '../../../../Select/Select'
 import type { Flat } from '../helpers'
 const root = createRoot(document.getElementById('root')!),
   events: unknown[] = []
-const options = [
+const items = [
   { value: 'a', label: 'Alpha' },
   { value: '', label: 'Empty value' },
   { value: 'locked', label: 'Locked', disabled: true },
@@ -36,7 +36,7 @@ function Fixture({
         <div data-select-fixture>
           <Select
             label="Plan"
-            options={options}
+            items={items}
             {...(props as SelectProps)}
             {...(controlled ? { value: value as any } : {})}
             {...{

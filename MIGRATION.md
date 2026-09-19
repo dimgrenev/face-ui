@@ -243,6 +243,18 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `SelectSidePosition` from `Select/Select` | `SelectSidePosition` from `Select/select-side-position` | auto |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the native trigger `<button>` | — |
 | The `.uf-select` root and `.uf-select-wrapper` were `<div>`s | Both are `<span>`s, so a Select is valid inside a `<p>`; select them by class | — |
+| `options` | `items` | auto |
+| `SelectOption` | `SelectItem` | auto |
+| `closeLabel` | `labels.close` | auto |
+| `surfaceTitle` | The sheet is titled by `label`, else by `aria-label`; pass `aria-label` to name a field without a visible label | manual |
+| `surfaceBreakpoint` | Remove it; `surface="auto"` becomes a sheet below 900px | auto |
+| `labelOrientation` | `labelPosition` | auto |
+| `labelOrientation="vertical"`, `labelOrientation="horizontal"` | `labelPosition="top"`, `labelPosition="start"` | auto |
+| `placeholder` defaulted to "Select option", which also titled a sheet without a label | There is no default text: pass `placeholder`, and name the field with `label`, `aria-label` or `aria-labelledby` (an unnamed Select is reported in development) | — |
+| A value missing from `options` showed its raw key in the trigger and was submitted | It shows as unselected and is not submitted until an item with that value appears; the value itself is kept | — |
+| The label was `[data-scope="select"][data-part="label"]` at 11px, and the root carried `data-label-orientation` | Label, required marker, `description` and `error` are the shared Field parts (`.uf-field__*`, `[data-scope="field"]`, 12px label); the root carries `data-label-position` | — |
+| A failed `required` check showed only the browser bubble | The browser message also fills the field error slot and marks the trigger `aria-invalid` until a value is chosen; `error` wins over it | — |
+| Home and End did nothing on a closed list | Home and End open the list at the first or last enabled item | — |
 
 ### Slider
 

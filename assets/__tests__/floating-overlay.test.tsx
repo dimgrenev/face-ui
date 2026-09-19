@@ -871,7 +871,7 @@ it('§5 #5: Tooltip, Popover, Menu, Select and Modal inside <p> hydrate without 
         <button>[3]</button>
       </Popover>
       , <Menu items={items}>More</Menu>{' '}
-      <Select label="Plan" options={items} defaultValue="a" />{' '}
+      <Select label="Plan" items={items} defaultValue="a" />{' '}
       <Modal title="Details" trigger="Open">
         Body
       </Modal>
