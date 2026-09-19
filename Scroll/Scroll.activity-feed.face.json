@@ -59,7 +59,7 @@
       "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Names the scrolling region; while the region is a tab stop, the name defaults to \"Scrollable content\"."
+      "description": "Names the scrolling region; a tab stop without `aria-label` or `aria-labelledby` is named \"Scrollable content\"."
     }
   ],
   "meta": {

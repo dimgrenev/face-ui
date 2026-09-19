@@ -22,14 +22,25 @@ import { Text } from '../Text/Text'
 
 export const scrollAnatomy = createAnatomy('scroll').parts('root', 'viewport', 'content')
 
-export interface ScrollProps extends Omit<HTMLAttributes<HTMLDivElement>, 'role'> {
+export interface ScrollProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  | 'role'
+  | 'tabIndex'
+  | 'hidden'
+  | 'autoFocus'
+  | 'defaultValue'
+  | 'defaultChecked'
+  | 'dangerouslySetInnerHTML'
+  | 'contentEditable'
+  | 'suppressContentEditableWarning'
+> {
   /** Content to scroll; text keeps its line breaks and wraps only while the content cannot scroll sideways. */
   children?: ReactNode
   /** Axes the content scrolls along; overflow along the other axis is clipped. */
   orientation?: 'vertical' | 'horizontal' | 'both'
   /** Height of the box: pixels, or any CSS length. Without it the box is as tall as its content, or as its layout makes it. */
   height?: number | string
-  /** Names the scrolling region; while the region is a tab stop, the name defaults to "Scrollable content". */
+  /** Names the scrolling region; a tab stop without `aria-label` or `aria-labelledby` is named "Scrollable content". */
   'aria-label'?: string
   /** Class name of the outer box; the other native attributes and the ref go to the scrolling viewport. */
   className?: string
@@ -56,7 +67,6 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(function Scroll(
     'aria-labelledby': ariaLabelledBy,
     className,
     style,
-    tabIndex,
     ...rest
   },
   ref,
@@ -68,9 +78,17 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(function Scroll(
   // An orientation change moves the overflow without resizing anything.
   const scrollable = useScrollable(viewportRef, [axes])
   // A tab stop while it scrolls; still focusable after, so a focused region that stops scrolling keeps focus.
-  const stop = tabIndex ?? (scrollable ? 0 : -1)
+  // Unmeasured (server HTML, no ResizeObserver), no tabindex leaves the browser's own rule for scrollers.
+  const stop = scrollable === undefined ? undefined : scrollable ? 0 : -1
+  const labelledBy =
+    typeof ariaLabelledBy === 'string' && ariaLabelledBy.trim() ? ariaLabelledBy : undefined
   // Blank text cannot erase the name of a tab stop; without one, only the consumer's name makes a region.
-  const name = resolveLabel(ariaLabel, stop >= 0 ? defaultRootLabels.region : '', 'Scroll', 'aria-label')
+  const name = resolveLabel(
+    ariaLabel,
+    stop === 0 && !labelledBy ? defaultRootLabels.region : '',
+    'Scroll',
+    'aria-label',
+  )
 
   return (
     <div
@@ -89,11 +107,14 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(function Scroll(
     >
       <div
         {...rest}
+        // Scroll owns the viewport's role, tab stop, visibility and content: values passed anyway are dropped.
+        hidden={undefined}
+        dangerouslySetInnerHTML={undefined}
         ref={viewportRefs}
         {...scrollAnatomy.getPartAttrs('viewport')}
-        role={name || ariaLabelledBy ? 'region' : undefined}
+        role={name || labelledBy ? 'region' : undefined}
         aria-label={name || undefined}
-        aria-labelledby={ariaLabelledBy}
+        aria-labelledby={labelledBy}
         tabIndex={stop}
         style={overflow}
       >

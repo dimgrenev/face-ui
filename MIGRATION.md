@@ -358,8 +358,8 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | --- | --- | --- |
 | `ariaLabel` | `aria-label` | auto |
 | Without `height`, the box was 240px tall | Without `height`, the box is as tall as its content or as its layout makes it (a flex or grid cell, `style.maxHeight`); pass `height={240}` to keep the former size | — |
-| The viewport was always a tab stop and a region named "Scrollable text" or `ariaLabel` | It is a tab stop only while its content overflows along an axis it scrolls, or when `tabIndex` says so; a tab stop without `aria-label` or `aria-labelledby` is named "Scrollable content", and it is a region only while it is named | — |
-| The ref and `className` went to the outer box, and no other attribute or handler was passed on | The ref, native attributes and handlers (`id`, `onScroll`, `aria-*`, `data-*`) go to the scrolling viewport; `className` and `style` go to the outer box, and a `role` passed is ignored | — |
+| The viewport was always a tab stop and a region named "Scrollable text" or `ariaLabel` | It is a tab stop only while its content overflows along an axis it scrolls, and stays focusable by script after; until measured (server HTML, no ResizeObserver) it has no tabindex, so the browser decides. A tab stop without `aria-label` or `aria-labelledby` is named "Scrollable content", and it is a region only while it is named | — |
+| The ref and `className` went to the outer box, and no other attribute or handler was passed on | The ref, native attributes and handlers (`id`, `onScroll`, `aria-*`, `data-*`) go to the scrolling viewport; `className` and `style` go to the outer box. Scroll owns `role`, `tabIndex`, `hidden` and the content, so those are not accepted | — |
 | Text in a horizontal or both-axes Scroll wrapped at the box width (never narrower than 12 control heights), so it rarely scrolled sideways | Text that can scroll sideways keeps each line whole and scrolls; in a vertical Scroll it wraps as before | — |
 
 ### SegmentedControl

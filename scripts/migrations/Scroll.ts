@@ -12,13 +12,13 @@ export default [
     kind: 'behavior',
     component: 'Scroll',
     before: 'The viewport was always a tab stop and a region named "Scrollable text" or `ariaLabel`',
-    after: 'It is a tab stop only while its content overflows along an axis it scrolls, or when `tabIndex` says so; a tab stop without `aria-label` or `aria-labelledby` is named "Scrollable content", and it is a region only while it is named',
+    after: 'It is a tab stop only while its content overflows along an axis it scrolls, and stays focusable by script after; until measured (server HTML, no ResizeObserver) it has no tabindex, so the browser decides. A tab stop without `aria-label` or `aria-labelledby` is named "Scrollable content", and it is a region only while it is named',
   },
   {
     kind: 'behavior',
     component: 'Scroll',
     before: 'The ref and `className` went to the outer box, and no other attribute or handler was passed on',
-    after: 'The ref, native attributes and handlers (`id`, `onScroll`, `aria-*`, `data-*`) go to the scrolling viewport; `className` and `style` go to the outer box, and a `role` passed is ignored',
+    after: 'The ref, native attributes and handlers (`id`, `onScroll`, `aria-*`, `data-*`) go to the scrolling viewport; `className` and `style` go to the outer box. Scroll owns `role`, `tabIndex`, `hidden` and the content, so those are not accepted',
   },
   {
     kind: 'behavior',

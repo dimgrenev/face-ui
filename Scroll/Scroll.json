@@ -28,7 +28,7 @@
     "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Names the scrolling region; while the region is a tab stop, the name defaults to \"Scrollable content\"."
+      "description": "Names the scrolling region; a tab stop without `aria-label` or `aria-labelledby` is named \"Scrollable content\"."
     }
   },
   "states": [
@@ -61,8 +61,8 @@
   "aria": {
     "role": "region",
     "defaultName": "Scrollable content",
-    "label": "Native aria-label/aria-labelledby name the viewport; the default name applies only while it is a tab stop, and without a name it is no region.",
-    "focus": "The viewport is a tab stop only while its content overflows along an axis it scrolls; a native tabIndex overrides that."
+    "label": "Native aria-label/aria-labelledby name the viewport; a tab stop without either is named by default, and without a name it is no region.",
+    "focus": "The viewport is a tab stop only while its content overflows along an axis it scrolls, and stays focusable by script after; Scroll owns role, tabIndex and hidden. Until measured (server HTML, no ResizeObserver) it has no tabindex, so the browser's own rule for scrollers applies."
   },
   "composition": {
     "required": [

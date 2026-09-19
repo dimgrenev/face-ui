@@ -176,8 +176,11 @@ describe('Scroll tab stop and name', () => {
     await render({ children: 'x', 'aria-label': '  ' })
     expect(state().name).toBe('Scrollable content')
     await render({ children: 'x', 'aria-labelledby': 'heading' })
+    expect(state()).toEqual({ tabIndex: '0', role: 'region', name: null })
     expect(viewport().getAttribute('aria-labelledby')).toBe('heading')
-    expect(state().role).toBe('region')
+    await render({ children: 'x', 'aria-labelledby': ' ' })
+    expect(state()).toEqual({ tabIndex: '0', role: 'region', name: 'Scrollable content' })
+    expect(viewport().hasAttribute('aria-labelledby')).toBe(false)
   })
 
   it('a named region that fits stays a named region, not a tab stop', async () => {
@@ -225,22 +228,38 @@ describe('Scroll tab stop and name', () => {
     expect(state()).toEqual({ tabIndex: '-1', role: null, name: null })
   })
 
-  it('a tabIndex from the consumer wins: -1 keeps an overflowing region out of the Tab order and unnamed, 0 makes a fitting one a named stop', async () => {
-    await render({ children: 'x', tabIndex: -1 })
+  it('the component owns role, tabIndex, hidden and the content: values passed anyway are ignored', async () => {
+    const owned = { role: 'log', tabIndex: -1, hidden: true, dangerouslySetInnerHTML: { __html: '<b>html</b>' } }
+    await render({ children: 'rows', ...(owned as object) })
     measure({ height: 500 })
     await resize()
-    expect(state()).toEqual({ tabIndex: '-1', role: null, name: null })
-    await render({ children: 'x', tabIndex: 0 })
+    expect(state()).toEqual({ tabIndex: '0', role: 'region', name: 'Scrollable content' })
+    expect([viewport().hidden, root().hidden, content().textContent]).toEqual([false, false, 'rows'])
     measure({})
     await resize()
-    expect(state()).toEqual({ tabIndex: '0', role: 'region', name: 'Scrollable content' })
+    await render({ children: 'rows', 'aria-label': 'Feed', ...({ role: 'log', tabIndex: 0 } as object) })
+    expect(state()).toEqual({ tabIndex: '-1', role: 'region', name: 'Feed' })
   })
 
-  it('without ResizeObserver the region never becomes a tab stop', async () => {
+  it('without ResizeObserver it sets no tabindex, role or name, leaving the browser its own rule for scrollers', async () => {
     vi.stubGlobal('ResizeObserver', undefined)
     await render({ children: 'x' })
     measure({ height: 500 })
-    expect(state()).toEqual({ tabIndex: '-1', role: null, name: null })
+    expect(state()).toEqual({ tabIndex: null, role: null, name: null })
+  })
+
+  it('the server HTML has no tabindex, role or name; after hydrating, a measured overflow makes a named tab stop without a mismatch', async () => {
+    const ui = <Scroll height={120}>{'First line\nSecond line'}</Scroll>
+    const html = renderToString(ui)
+    expect(html).not.toMatch(/tabindex=|role=|aria-label=/)
+    const host = document.body.appendChild(document.createElement('div'))
+    const { recoverableErrors } = await hydrate(ui, host)
+    expect(recoverableErrors).toEqual([])
+    const node = host.querySelector<HTMLElement>('[data-part="viewport"]')!
+    sizes.set(node, { scrollWidth: 100, clientWidth: 100, scrollHeight: 500, clientHeight: 100 })
+    await resize()
+    expect([node.getAttribute('tabindex'), node.getAttribute('role'), node.getAttribute('aria-label')])
+      .toEqual(['0', 'region', 'Scrollable content'])
   })
 })
 
@@ -281,25 +300,5 @@ describe('Scroll native attributes and ref', () => {
     expect(root().style.maxHeight).toBe('180px')
     expect(viewport().classList).not.toContain('feed')
     expect(viewport().style.maxHeight).toBe('')
-  })
-
-  it('the component owns the role: a role passed anyway is ignored', async () => {
-    await render({ children: 'x', 'aria-label': 'Feed', ...({ role: 'log' } as object) })
-    expect(viewport().getAttribute('role')).toBe('region')
-    await render({ children: 'x', ...({ role: 'log' } as object) })
-    expect(viewport().getAttribute('role')).toBeNull()
-  })
-})
-
-describe('Scroll server rendering', () => {
-  it('renders no tab stop on the server and hydrates without a mismatch', async () => {
-    const ui = <Scroll height={120}>{'First line\nSecond line'}</Scroll>
-    const html = renderToString(ui)
-    expect(html).toContain('tabindex="-1"')
-    expect(html).not.toContain('role=')
-    const host = document.body.appendChild(document.createElement('div'))
-    const { recoverableErrors } = await hydrate(ui, host)
-    expect(host.querySelector('[data-part="viewport"]')!.getAttribute('tabindex')).toBe('-1')
-    expect(recoverableErrors).toEqual([])
   })
 })
