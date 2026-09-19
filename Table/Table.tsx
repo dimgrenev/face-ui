@@ -1,595 +1,674 @@
-/**
- * Table — data table with sorting, row selection, and reference-matching features.
- *
- * `<Table columns={[...]} rows={[...]} />`
- * `<Table columns={[...]} rows={[...]} selectable />`
- * `<Table columns={[...]} rows={[...]} showRowNumbers stickyHeader />`
- */
-
+/** Table — data table with sortable columns, row selection, and resizable, sticky columns. */
 import {
   forwardRef,
-  useEffect,
+  isValidElement,
+  useId,
   useMemo,
   useRef,
   useState,
-  isValidElement,
-  type ReactNode,
   type CSSProperties,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
+  type ReactNode,
+  type TableHTMLAttributes,
 } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { tableMachine, connectTable } from '../assets/machines/table.machine'
-import { Membrane } from '../assets/adapters/react/Membrane'
-import { cn } from '../assets/utils'
+import { Checkbox } from '../Checkbox/Checkbox'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
+import { Membrane } from '../assets/adapters/react/Membrane'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
+import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
+import { domId, readCollection, readKeys } from '../assets/runtime/collection'
+import { readDirection, stepIntent } from '../assets/runtime/keyboard'
+import { resolveLabels } from '../assets/runtime/labels'
+import { invalidProp, readNumber } from '../assets/runtime/props'
+import { sortRows } from '../assets/runtime/table'
+import { cn } from '../assets/utils'
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-export type TableAlign = 'left' | 'center' | 'right'
-// Text aligns by the inline axis; physical column values map onto it.
-const TEXT_ALIGN = { left: 'start', center: 'center', right: 'end' } as const
+/** The order of the rows: a column and a direction. */
+export interface TableSort {
+  /** `id` of the column whose values order the rows. */
+  column: string
+  /** `asc` puts the smallest values, earliest dates and A first; `desc` the reverse. */
+  direction: 'asc' | 'desc'
+}
 
 export interface TableColumn<T = any> {
-  /** Unique column identifier. */
+  /** Unique key of the column: `sort.column` names it, it reads `row[id]` without `accessor` and is the header without `header`. */
   id: string
-  /** Header content (face-ui-react native). */
+  /** Content of the header cell. */
   header?: ReactNode
-  /** Data accessor — string key or function returning cell content. */
-  accessor?: string | ((row: T) => ReactNode)
-  /** Whether this column is sortable. */
+  /** Cell value: a row field name or a function of the row; sorting compares it and `render` receives it. */
+  accessor?: string | ((row: T) => unknown)
+  /** The header becomes a button that sorts by this column: ascending, then descending, then the order of `rows`. */
   sortable?: boolean
-  /** Column width. */
+  /** Column width, in px or any CSS length; a px width holds when the table is narrow, and a user's resize replaces it. */
   width?: number | string
-  /** Minimum column width in px. */
+  /** Narrowest width in px, for layout and for resizing; resizing stops at 48 px when unset. */
   minWidth?: number
-  /** Maximum column width in px. */
+  /** Widest width in px, for layout and for resizing. */
   maxWidth?: number
-  /** Text alignment inside cells. */
-  align?: TableAlign
-  /** Truncate cell text with ellipsis. */
+  /** Inline alignment of the header and the cells, following text direction; `end` suits numbers. */
+  align?: 'start' | 'center' | 'end'
+  /** Keeps the cells on one line, cut with an ellipsis, so the column can narrow to its header; a text cell shows its full text as a tooltip. */
   truncate?: boolean
-  /** Custom render function for cell content. */
-  render?: (
-    value: unknown,
-    row: T,
-    ctx: { rowIndex: number; column: TableColumn<T> },
-  ) => ReactNode
+  /** Cell content built from the value; without it the value shows as text. */
+  render?: (details: TableCellDetails<T>) => ReactNode
 }
 
-export interface TableProps<T = any> {
-  /** Column definitions. */
-  columns?: TableColumn<T>[]
-  /** Row data. */
-  rows?: T[]
-  /** Key field on each row, or a function returning a unique key. */
-  rowKey?: string | ((row: T) => string)
-  /** Controlled sort column. */
-  sortColumn?: string
-  /** Controlled sort direction. */
-  sortDirection?: 'asc' | 'desc'
-  /** Callback when sort changes. */
-  onSortChange?: (details: {
-    column: string
-    direction: 'asc' | 'desc'
-  }) => void
-  /** Controlled selected row IDs. */
-  selectedRows?: string[]
-  /** Callback when selection changes. */
+/** What `render` receives for one cell. */
+export interface TableCellDetails<T = any> {
+  /** The cell value read by `accessor`. */
+  value: unknown
+  /** The row object from `rows`. */
+  row: T
+  /** Position of the row as shown, from 0. */
+  rowIndex: number
+  /** The column being rendered. */
+  column: TableColumn<T>
+}
+
+/** Names and text of the table's own controls. */
+export interface TableLabels {
+  /** Name of the header checkbox that selects or clears every row. */
+  selectAll: string
+  /** Name of a row checkbox, followed by the text of the row's first column. */
+  selectRow: string
+  /** Name of a column's resize handle, followed by the column's header. */
+  resizeColumn: string
+  /** Header of the row-number column. */
+  rowNumber: string
+}
+
+const defaultLabels: TableLabels = Object.freeze({
+  selectAll: 'Select all rows',
+  selectRow: 'Select',
+  resizeColumn: 'Resize',
+  rowNumber: '#',
+})
+
+/** What a row event reports. */
+export interface TableRowDetails<T = any> {
+  /** The row object from `rows`. */
+  row: T
+  /** Position of the row as shown, from 0. */
+  index: number
+  /** The mouse event on the row; Enter on a focused row arrives as its click. */
+  event: MouseEvent<HTMLTableRowElement>
+}
+
+export interface TableProps<T = any>
+  extends Omit<
+    TableHTMLAttributes<HTMLTableElement>,
+    | 'children'
+    | 'dangerouslySetInnerHTML'
+    | 'defaultValue'
+    | 'defaultChecked'
+    | 'contentEditable'
+    | 'suppressContentEditableWarning'
+    | 'align'
+    | 'bgcolor'
+    | 'border'
+    | 'cellPadding'
+    | 'cellSpacing'
+    | 'frame'
+    | 'rules'
+    | 'summary'
+    | 'width'
+  > {
+  /** Names the table when no visible heading does. */
+  'aria-label'?: string
+  /** Ids of the elements that name the table, such as the heading above it. */
+  'aria-labelledby'?: string
+  /** Columns in display order; a column without a unique string `id` is dropped. */
+  columns?: readonly TableColumn<T>[]
+  /** Row data, one object per row. */
+  rows?: readonly T[]
+  /** Row key: a row field name or a function of the row returning text or a number; `id` by default, else `#<position in rows>`. */
+  rowKey?: string | ((row: T) => string | number)
+  /** Controlled order of the rows: a sortable or any other column and a direction; `null` keeps the order of `rows`. */
+  sort?: TableSort | null
+  /** Order of the rows on mount (uncontrolled); read once. */
+  defaultSort?: TableSort | null
+  /** Called once per user change of the order; `sort` updates from the parent never call it. */
+  onSortChange?: (details: { sort: TableSort | null }) => void
+  /** Keys of the selected rows (controlled); keys without a row are kept and not shown. */
+  selectedRows?: readonly string[]
+  /** Keys of the rows selected on mount (uncontrolled); read once. */
+  defaultSelectedRows?: readonly string[]
+  /** Called once per user change of the selection; `selectedRows` updates from the parent never call it. */
   onSelectedRowsChange?: (details: { selectedRows: string[] }) => void
-  /** Enable row selection. */
+  /** Adds a leading checkbox column: one checkbox per row and a select-all checkbox in the header. */
   selectable?: boolean
-  /** Show row number column. */
+  /** Adds a leading column numbering the rows 1, 2, 3 in the order shown. */
   showRowNumbers?: boolean
-  /** Make header sticky on scroll. */
+  /** Keeps the header row at the top of the nearest scrolling container. */
   stickyHeader?: boolean
-  /** Show divider lines between rows. */
+  /** Draws a line under the header and under every row. */
   showDividers?: boolean
-  /** Additional CSS class. */
-  className?: string
-  /** Callback fired while a resizable column is dragged. */
-  onColumnResize?: (columnId: string, width: number) => void
-  /** Enable column resizing and fixed table layout. */
-  resizable?: boolean
-  /** Keep the last column visually sticky for dense action tables. */
+  /** Keeps the last column at the inline end of the nearest scrolling container while rows scroll sideways. */
   stickyLastColumn?: boolean
-  /** Callback when a row is clicked. */
-  onRowClick?: (row: T, index: number) => void
-  /** Callback when mouse enters a row. */
-  onRowMouseEnter?: (row: T, index: number) => void
-  /** Callback when mouse leaves a row. */
-  onRowMouseLeave?: (row: T, index: number) => void
-  /** Row ID to highlight as active (applies `data-active` attribute). */
-  activeRowId?: string
-  /** Outer spacing boundary, consistent with other Face UI components. */
+  /** Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys. */
+  resizable?: boolean
+  /** Called when the user finishes resizing a column: on pointer release, or per key press. */
+  onColumnResize?: (details: { column: string; width: number }) => void
+  /** Called when a row is clicked or Enter is pressed on it; clicks on controls inside the row do not count. Rows become focusable, arrows move between them. */
+  onRowClick?: (details: TableRowDetails<T>) => void
+  /** Called when the pointer enters a row. */
+  onRowMouseEnter?: (details: TableRowDetails<T>) => void
+  /** Called when the pointer leaves a row. */
+  onRowMouseLeave?: (details: TableRowDetails<T>) => void
+  /** Key of the row marked as the current one (`aria-current`), such as the row open in a detail view. */
+  activeRow?: string | null
+  /** Outer membrane spacing around the table. */
   membrane?: boolean
-  /** Plain table rows or separated rows with rounded hover surfaces. */
-  rowStyle?: 'plain' | 'tile'
-  /** Accessible label for the table when there is no visible caption. */
-  ariaLabel?: string
+  /** `tile` rounds every row into its own surface; `plain` keeps a flat grid. */
+  variant?: 'plain' | 'tile'
+  /** Names and text of the table's own controls; the table takes a native aria-label or aria-labelledby. */
+  labels?: Partial<TableLabels>
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+const none: readonly never[] = []
+/** Resizing never makes a column narrower than this unless `minWidth` says so. */
+const MIN_WIDTH = 48
+/** Pixels per arrow key on a resize handle; Page Up and Page Down move ten steps. */
+const STEP = 10
+/** Clicks on these inside a row, and on the selection cell, do not activate the row. */
+const CONTROL = 'a[href], button, input, select, textarea, label, [tabindex], [data-select]'
 
-function normalizeRowId(value: unknown, index: number): string {
-  if (value == null) return String(index)
-  const id = String(value)
-  return id.trim() ? id : String(index)
+interface RowEntry<T> {
+  key: string
+  row: T
 }
 
-function getRowId<T>(
-  row: T,
-  rowKey: string | ((row: T) => string) | undefined,
-  index: number,
-): string {
-  if (typeof rowKey === 'function') {
-    return normalizeRowId(rowKey(row), index)
+/** Rows with their keys; a row that is not an object, or repeats a key, is dropped with a report. */
+function readRows<T>(rows: unknown, rowKey: TableProps<T>['rowKey']): RowEntry<T>[] {
+  if (rows === undefined) return []
+  if (!Array.isArray(rows)) {
+    invalidProp('Table', 'rows', rows, 'using []')
+    return []
   }
-  if (typeof rowKey === 'string') {
-    const val = (row as Record<string, unknown>)[rowKey]
-    return normalizeRowId(val, index)
-  }
-  const asRecord = row as Record<string, unknown>
-  if (asRecord['id'] != null) return normalizeRowId(asRecord['id'], index)
-  return String(index)
-}
-
-function getCellValue<T>(
-  row: T,
-  accessor?: string | ((row: T) => ReactNode),
-): ReactNode {
-  if (accessor == null) return undefined
-  if (typeof accessor === 'function') return accessor(row)
-  return (row as Record<string, unknown>)[accessor] as ReactNode
-}
-
-function getRawValue<T>(
-  row: T,
-  accessor?: string | ((row: T) => ReactNode),
-): unknown {
-  if (accessor == null) return undefined
-  if (typeof accessor === 'string')
-    return (row as Record<string, unknown>)[accessor]
-  return accessor(row)
-}
-
-function compareTableValues(left: unknown, right: unknown): number {
-  if (left == null && right == null) return 0
-  if (left == null) return -1
-  if (right == null) return 1
-  if (typeof left === 'number' && typeof right === 'number') return left - right
-  if (typeof left === 'boolean' && typeof right === 'boolean')
-    return Number(left) - Number(right)
-  if (left instanceof Date && right instanceof Date)
-    return left.getTime() - right.getTime()
-  return String(left).localeCompare(String(right), undefined, {
-    numeric: true,
-    sensitivity: 'base',
+  const seen = new Set<string>()
+  const entries: RowEntry<T>[] = []
+  rows.forEach((row: unknown, index) => {
+    if (typeof row !== 'object' || row === null || Array.isArray(row))
+      return invalidProp('Table', `rows[${index}]`, row, 'dropping the row')
+    const raw =
+      typeof rowKey === 'function'
+        ? rowKey(row as T)
+        : (row as Record<string, unknown>)[rowKey ?? 'id']
+    let key = typeof raw === 'number' && Number.isFinite(raw) ? String(raw) : raw
+    if (typeof key !== 'string') {
+      key = `#${index}`
+      if (raw !== undefined) invalidProp('Table', `rows[${index}] key`, raw, `using "${key}"`)
+    }
+    if (seen.has(key as string))
+      return invalidProp('Table', `rows[${index}] key`, key, 'dropping the duplicate')
+    seen.add(key as string)
+    entries.push({ key: key as string, row: row as T })
   })
+  return entries
 }
 
-function renderCellContent(
-  content: ReactNode,
-  align: TableAlign = 'left',
+function cellValue<T>(row: T, column: TableColumn<T>): unknown {
+  const accessor = column.accessor ?? column.id
+  return typeof accessor === 'function'
+    ? accessor(row)
+    : (row as Record<string, unknown>)[accessor]
+}
+
+const isText = (value: unknown) =>
+  ['string', 'number', 'bigint', 'boolean'].includes(typeof value) ||
+  value instanceof Date
+const isNode = (value: unknown): boolean =>
+  value == null ||
+  (isText(value) && !(value instanceof Date)) ||
+  isValidElement(value) ||
+  (Array.isArray(value) && value.every(isNode))
+
+/**
+ * Cell or header content: text through `Text`, elements as they are; anything else is reported
+ * as `where` and left out.
+ */
+function content(
+  value: unknown,
+  where: string,
+  text: { align?: TableColumn['align']; truncate?: boolean; variant?: 'muted' } = {},
 ): ReactNode {
-  if (content == null) return null
-  if (isValidElement(content) || Array.isArray(content)) return content
-  if (
-    typeof content === 'string' ||
-    typeof content === 'number' ||
-    typeof content === 'boolean'
-  ) {
+  if (value == null || value === '') return null
+  if (isText(value))
     return (
-      <Text
-        as="div"
-        fullWidth
-        align={TEXT_ALIGN[align]}
-        inset="none"
-        membrane={false}
-        className="uf-table__cellText"
-      >
-        {String(content)}
+      <Text as="span" fullWidth inset="none" membrane={false} {...text}>
+        {String(value)}
       </Text>
     )
-  }
-  return content
+  if (isNode(value)) return value as ReactNode
+  invalidProp('Table', where, value, 'leaving the cell empty')
+  return null
 }
 
-function renderHeaderContent(
-  content: ReactNode,
-  align: TableAlign = 'left',
-): ReactNode {
-  if (content == null) return null
-  if (isValidElement(content) || Array.isArray(content)) return content
-  if (
-    typeof content === 'string' ||
-    typeof content === 'number' ||
-    typeof content === 'boolean'
-  ) {
-    return (
-      <Text
-        as="div"
-        fullWidth
-        align={TEXT_ALIGN[align]}
-        inset="none"
-        membrane={false}
-        className="uf-table__headerText"
-      >
-        {String(content)}
-      </Text>
+const sameSort = (a: TableSort | null, b: TableSort | null) =>
+  a === b || (!!a && !!b && a.column === b.column && a.direction === b.direction)
+
+/** A data table: sortable columns, row selection, row actions, and resizable, sticky columns. */
+export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(props, ref) {
+  const {
+    columns,
+    rows,
+    rowKey,
+    sort,
+    defaultSort = null,
+    onSortChange,
+    selectedRows,
+    defaultSelectedRows,
+    onSelectedRowsChange,
+    selectable = false,
+    showRowNumbers = false,
+    stickyHeader = false,
+    showDividers = true,
+    stickyLastColumn = false,
+    resizable = false,
+    onColumnResize,
+    onRowClick,
+    onRowMouseEnter,
+    onRowMouseLeave,
+    activeRow,
+    membrane = false,
+    variant = 'plain',
+    labels,
+    className,
+    ...rest
+  } = props
+  const base = useId()
+  const text = resolveLabels(defaultLabels, labels, 'Table')
+  const columnList = useMemo(
+    () =>
+      readCollection<TableColumn>(columns, {
+        component: 'Table',
+        prop: 'columns',
+        key: (column) => column.id,
+      }).entries.map(({ item }) => item),
+    [columns],
+  )
+  const entries = useMemo(() => readRows(rows, rowKey), [rows, rowKey])
+
+  const [order, setOrder] = useControllableState<TableSort | null>({
+    value: sort,
+    defaultValue: defaultSort,
+    onChange: (next) => onSortChange?.({ sort: next }),
+    equal: sameSort,
+    name: ['Table', 'sort'],
+  })
+  const sorted = columnList.find((column) => column.id === order?.column)
+  const direction = order?.direction === 'desc' ? 'desc' : 'asc'
+  const shown = useMemo(
+    () =>
+      sorted
+        ? sortRows(entries, ({ row }) => cellValue(row, sorted), direction)
+        : entries,
+    [entries, sorted, direction],
+  )
+  const cycle = (column: string) =>
+    setOrder((current) =>
+      current?.column !== column
+        ? { column, direction: 'asc' }
+        : current.direction === 'desc'
+          ? null
+          : { column, direction: 'desc' },
     )
+
+  const [chosen, setChosen] = useControllableState<readonly string[]>({
+    value:
+      selectedRows === undefined
+        ? undefined
+        : readKeys(selectedRows, 'Table', 'selectedRows'),
+    // Read only while uncontrolled: an unused default reports nothing.
+    defaultValue: () =>
+      selectedRows === undefined
+        ? readKeys(defaultSelectedRows, 'Table', 'defaultSelectedRows')
+        : none,
+    onChange: (next) => onSelectedRowsChange?.({ selectedRows: next as string[] }),
+    name: ['Table', 'selectedRows'],
+  })
+  const selected = new Set(chosen)
+  const keys = entries.map(({ key }) => key)
+  const all = keys.length > 0 && keys.every((key) => selected.has(key))
+  const some = keys.some((key) => selected.has(key))
+  const selectRow = (key: string, on: boolean) =>
+    setChosen((current) =>
+      on
+        ? current.includes(key)
+          ? current
+          : [...current, key]
+        : current.filter((other) => other !== key),
+    )
+  const selectAll = (on: boolean) =>
+    setChosen((current) => {
+      const own = new Set(keys)
+      return on
+        ? [...current, ...keys.filter((key) => !current.includes(key))]
+        : current.filter((key) => !own.has(key))
+    })
+
+  const roving = useRovingFocus({
+    keys: shown.map(({ key }) => key),
+    active: activeRow,
+    orientation: 'vertical',
+    loop: false,
+  })
+  const onBodyKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    roving.root.onKeyDown(event)
+    if (event.key !== 'Enter' || event.defaultPrevented) return
+    if (roving.keyOf(event.target) === null) return
+    event.preventDefault()
+    ;(event.target as HTMLElement).click()
   }
-  return content
-}
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
-export const Table = forwardRef<HTMLTableElement, TableProps>(
-  function Table(props, ref) {
-    const {
-      columns: rawColumns,
-      rows: rawRows,
-      rowKey,
-      sortColumn = null,
-      sortDirection = 'asc',
-      onSortChange,
-      selectedRows = [],
-      onSelectedRowsChange,
-      selectable = false,
-      showRowNumbers = false,
-      stickyHeader = true,
-      showDividers = true,
-      stickyLastColumn = false,
-      onColumnResize,
-      resizable = false,
-      className,
-      onRowClick,
-      onRowMouseEnter,
-      onRowMouseLeave,
-      activeRowId,
-      membrane = false,
-      rowStyle = 'plain',
-      ariaLabel,
-    } = props
-
-    const columns = (Array.isArray(rawColumns) ? rawColumns : []).map((col) => {
-      const c = col as TableColumn<any>
-      const normalizedHeader = c.header ?? c.id
-      const fallbackAccessor =
-        typeof (c as any).accessor === 'string' ||
-        typeof (c as any).accessor === 'function'
-          ? (c as any).accessor
-          : c.id
-      return {
-        ...c,
-        header: normalizedHeader,
-        accessor: fallbackAccessor,
-      } as TableColumn<any>
-    })
-    const rows = Array.isArray(rawRows) ? rawRows : []
-
-    const resolvedGetRowId = (row: any, i: number) => getRowId(row, rowKey, i)
-
-    const allRowIds = rows.map((row, i) => resolvedGetRowId(row, i))
-
-    const { state, send } = useMachine(tableMachine, {
-      sortColumn,
-      sortDirection,
-      selectedRows,
-      selectable,
-      rowKey: typeof rowKey === 'string' ? rowKey : 'id',
-      onSortChange: onSortChange ?? null,
-      onSelectedRowsChange: onSelectedRowsChange ?? null,
-      rowCount: rows.length,
-      allRowIds,
-    })
-
-    const api = connectTable(state, send)
-    const [resizedWidths, setResizedWidths] = useState<Record<string, number>>(
-      {},
-    )
-    const resizeStateRef = useRef<{
-      id: string
-      nextId: string | null
-      startX: number
-      startWidth: number
-      startNextWidth: number
-      minWidth: number
-      maxWidth: number
-      nextMinWidth: number
-      nextMaxWidth: number
-    } | null>(null)
-    const displayRows = useMemo(() => {
-      if (!api.sortColumn) return rows
-      const sortColumnDef = columns.find(
-        (column) => column.id === api.sortColumn,
-      )
-      if (!sortColumnDef || !sortColumnDef.accessor) return rows
-      const sorted = [...rows]
-      sorted.sort((leftRow, rightRow) => {
-        const leftValue = getRawValue(leftRow, sortColumnDef.accessor)
-        const rightValue = getRawValue(rightRow, sortColumnDef.accessor)
-        const result = compareTableValues(leftValue, rightValue)
-        return api.sortDirection === 'desc' ? result * -1 : result
-      })
-      return sorted
-    }, [api.sortColumn, api.sortDirection, columns, rows])
-
-    useEffect(() => {
-      const onPointerMove = (event: PointerEvent) => {
-        const drag = resizeStateRef.current
-        if (!drag) return
-        const delta = event.clientX - drag.startX
-        let width = Math.round(drag.startWidth + delta)
-        width = Math.max(drag.minWidth, Math.min(drag.maxWidth, width))
-
-        if (drag.nextId) {
-          const maxWidthByNext =
-            drag.startWidth + (drag.startNextWidth - drag.nextMinWidth)
-          width = Math.min(width, maxWidthByNext)
-          let nextWidth = drag.startNextWidth - (width - drag.startWidth)
-          nextWidth = Math.max(
-            drag.nextMinWidth,
-            Math.min(drag.nextMaxWidth, nextWidth),
-          )
-          width = drag.startWidth + (drag.startNextWidth - nextWidth)
-
-          setResizedWidths((prev) => ({
-            ...prev,
-            [drag.id]: width,
-            [drag.nextId as string]: nextWidth,
-          }))
-          onColumnResize?.(drag.id, width)
-          onColumnResize?.(drag.nextId, nextWidth)
-          return
+  // Resizing: widths the user set, and the rendered widths the handles announce.
+  const [widths, setWidths] = useState<Readonly<Record<string, number>>>({})
+  const [measured, setMeasured] = useState<Readonly<Record<string, number>>>({})
+  const headRow = useRef<HTMLTableRowElement>(null)
+  const drag = useRef<{
+    column: string
+    x: number
+    sign: number
+    start: number
+    width: number
+  } | null>(null)
+  const columnKey = columnList.map((column) => column.id).join('\n')
+  useIsomorphicLayoutEffect(() => {
+    const row = headRow.current
+    if (!resizable || !row || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(() =>
+      setMeasured((previous) => {
+        const next: Record<string, number> = {}
+        let changed = false
+        for (const cell of row.querySelectorAll<HTMLElement>('th[data-column]')) {
+          const width = Math.round(cell.getBoundingClientRect().width)
+          next[cell.dataset.column!] = width
+          changed ||= previous[cell.dataset.column!] !== width
         }
+        return changed ? next : previous
+      }),
+    )
+    for (const cell of row.cells) observer.observe(cell)
+    return () => observer.disconnect()
+  }, [resizable, columnKey])
+  const bounds = (column: TableColumn) => {
+    const min = readNumber('Table', 'columns[].minWidth', column.minWidth, MIN_WIDTH, {
+      min: 0,
+    })
+    const max = readNumber('Table', 'columns[].maxWidth', column.maxWidth, Infinity, { min })
+    return [min, max] as const
+  }
+  const resize = (column: TableColumn, width: number) => {
+    const [min, max] = bounds(column)
+    const next = Math.round(Math.min(max, Math.max(min, width)))
+    setWidths((current) =>
+      current[column.id] === next ? current : { ...current, [column.id]: next },
+    )
+    return next
+  }
+  const endDrag = () => {
+    const done = drag.current
+    drag.current = null
+    if (done && done.width !== done.start)
+      onColumnResize?.({ column: done.column, width: done.width })
+  }
+  const handleProps = (column: TableColumn, headerId: string) => {
+    const [min, max] = bounds(column)
+    const id = domId(base, 'resize', column.id)
+    const cellOf = (handle: HTMLElement) => handle.parentElement!
+    return {
+      id,
+      role: 'separator',
+      tabIndex: 0,
+      'aria-orientation': 'vertical',
+      'aria-label': text.resizeColumn,
+      'aria-labelledby': `${id} ${headerId}`,
+      'aria-valuenow': widths[column.id] ?? measured[column.id],
+      'aria-valuemin': min,
+      'aria-valuemax': Number.isFinite(max) ? max : Number.MAX_SAFE_INTEGER,
+      'data-scope': 'table',
+      'data-part': 'resizeHandle',
+      className: 'uf-table__resize-handle',
+      onPointerDown: (event: PointerEvent<HTMLElement>) => {
+        if (event.button !== 0) return
+        event.preventDefault()
+        event.currentTarget.setPointerCapture?.(event.pointerId)
+        const cell = cellOf(event.currentTarget)
+        const start = Math.round(cell.getBoundingClientRect().width)
+        const sign = readDirection(cell) === 'ltr' ? 1 : -1
+        drag.current = { column: column.id, x: event.clientX, sign, start, width: start }
+      },
+      onPointerMove: (event: PointerEvent<HTMLElement>) => {
+        const current = drag.current
+        if (current?.column !== column.id) return
+        current.width = resize(column, current.start + (event.clientX - current.x) * current.sign)
+      },
+      onPointerUp: endDrag,
+      onPointerCancel: endDrag,
+      onLostPointerCapture: endDrag,
+      onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
+        const cell = cellOf(event.currentTarget)
+        const intent = stepIntent(event, 'horizontal', readDirection(cell))
+        if (!intent) return
+        event.preventDefault()
+        const start = Math.round(cell.getBoundingClientRect().width)
+        const target =
+          'step' in intent ? start + intent.step * STEP : intent.to === 'min' ? min : max
+        if (!Number.isFinite(target)) return
+        const width = resize(column, target)
+        if (width !== start) onColumnResize?.({ column: column.id, width })
+      },
+    } as const
+  }
 
-        setResizedWidths((prev) => ({ ...prev, [drag.id]: width }))
-        onColumnResize?.(drag.id, width)
-      }
-      const onPointerUp = () => {
-        resizeStateRef.current = null
-      }
-      document.addEventListener('pointermove', onPointerMove)
-      document.addEventListener('pointerup', onPointerUp)
-      return () => {
-        document.removeEventListener('pointermove', onPointerMove)
-        document.removeEventListener('pointerup', onPointerUp)
-      }
-    }, [onColumnResize])
+  const firstColumn = columnList[0]
+  const cell = (part: 'headerCell' | 'cell') =>
+    ({ 'data-scope': 'table', 'data-part': part, role: part === 'cell' ? 'cell' : 'columnheader' }) as const
 
-    const table = (
-      <table
-        ref={ref}
-        {...api.getRootProps()}
-        data-sticky-header={stickyHeader || undefined}
-        data-show-dividers={showDividers || undefined}
-        data-row-style={rowStyle}
-        aria-label={ariaLabel}
-        className={cn('uf-table', className)}
-        style={resizable ? { tableLayout: 'fixed' } : undefined}
-      >
-        <thead {...api.getHeaderProps()}>
-          <tr {...api.getHeaderRowProps()}>
-            {selectable && (
-              <th role="columnheader">
-                <input {...api.getSelectAllProps()} />
-              </th>
-            )}
-            {showRowNumbers && (
-              <th role="columnheader" className="uf-table__row-number-header">
-                <div className="uf-table__cellSlot" data-align="left">
-                  {renderHeaderContent('#', 'left')}
-                </div>
-              </th>
-            )}
-            {columns.map((col, index) => {
-              const style: Record<string, unknown> = {}
-              if (resizedWidths[col.id] != null)
-                style.width = resizedWidths[col.id]
-              else if (col.width != null) style.width = col.width
-              if (col.minWidth != null) style.minWidth = col.minWidth
-              if (col.maxWidth != null) style.maxWidth = col.maxWidth
-              if (col.align) style.textAlign = col.align
-              const headerCellProps = api.getHeaderCellProps(col.id, {
-                sortable: col.sortable,
-              }) as any
-              const sortButtonProps = col.sortable
-                ? { type: 'button' as const, onClick: headerCellProps.onClick }
-                : null
-              const thProps = { ...headerCellProps }
-              delete thProps.onClick
-              delete thProps.onKeyDown
-              delete thProps.tabIndex
-              delete thProps.style
-
-              return (
-                <th
-                  key={col.id}
-                  {...thProps}
-                  style={
-                    Object.keys(style).length > 0
-                      ? (style as CSSProperties)
-                      : undefined
+  const table = (
+    <table
+      {...rest}
+      ref={ref}
+      role="table"
+      data-scope="table"
+      data-part="root"
+      data-variant={variant}
+      data-sticky-header={stickyHeader || undefined}
+      data-sticky-last-column={stickyLastColumn || undefined}
+      data-show-dividers={showDividers || undefined}
+      className={cn('uf-table', className)}
+    >
+      <thead data-scope="table" data-part="header" role="rowgroup">
+        <tr ref={headRow} data-scope="table" data-part="headerRow" role="row">
+          {selectable && (
+            <th {...cell('headerCell')} data-select="">
+              <div className="uf-table__cellSlot">
+                <Checkbox
+                  membrane={false}
+                  aria-label={text.selectAll}
+                  checked={all ? true : some ? 'indeterminate' : false}
+                  disabled={!keys.length}
+                  onCheckedChange={({ checked }) => selectAll(checked === true)}
+                />
+              </div>
+            </th>
+          )}
+          {showRowNumbers && (
+            <th {...cell('headerCell')} data-row-number="">
+              <div className="uf-table__cellSlot">
+                {content(text.rowNumber, 'labels.rowNumber', { variant: 'muted' })}
+              </div>
+            </th>
+          )}
+          {columnList.map((column) => {
+            const headerId = domId(base, 'column', column.id)
+            // A resize fixes the width; a px width is also the least the column narrows to.
+            const width = widths[column.id]
+            const style: CSSProperties =
+              width === undefined
+                ? {
+                    width: column.width,
+                    minWidth:
+                      column.minWidth ??
+                      (typeof column.width === 'number' ? column.width : undefined),
+                    maxWidth: column.maxWidth,
                   }
-                >
-                  <div
-                    className="uf-table__cellSlot"
-                    data-align={col.align ?? 'left'}
-                  >
-                    {sortButtonProps ? (
-                      <button
-                        {...sortButtonProps}
-                        className="uf-table__sort-button"
-                      >
-                        {renderHeaderContent(col.header, col.align ?? 'left')}
-                      </button>
-                    ) : (
-                      renderHeaderContent(col.header, col.align ?? 'left')
-                    )}
-                    {api.sortColumn === col.id && (
-                      <span aria-hidden="true" className="uf-table__sort-icon">
-                        <Icon
-                          name={
-                            api.sortDirection === 'asc'
-                              ? 'arrow-up'
-                              : 'arrow-down'
-                          }
-                        />
-                      </span>
-                    )}
-                  </div>
-                  {resizable && index < columns.length - 1 && (
-                    <span
-                      className="uf-table__resize-handle"
-                      onPointerDown={(event) => {
-                        event.preventDefault()
-                        const cell = event.currentTarget
-                          .parentElement as HTMLElement | null
-                        const measuredWidth =
-                          resizedWidths[col.id] ??
-                          cell?.getBoundingClientRect().width ??
-                          120
-                        const nextColumn = columns[index + 1]
-                        const nextCell =
-                          cell?.nextElementSibling as HTMLElement | null
-                        const nextWidth = nextColumn
-                          ? (resizedWidths[nextColumn.id] ??
-                            nextCell?.getBoundingClientRect().width ??
-                            120)
-                          : 0
-                        resizeStateRef.current = {
-                          id: col.id,
-                          nextId: nextColumn?.id ?? null,
-                          startX: event.clientX,
-                          startWidth: measuredWidth,
-                          startNextWidth: nextWidth,
-                          minWidth: col.minWidth ?? 80,
-                          maxWidth:
-                            typeof col.maxWidth === 'number'
-                              ? col.maxWidth
-                              : Number.MAX_SAFE_INTEGER,
-                          nextMinWidth: nextColumn?.minWidth ?? 80,
-                          nextMaxWidth:
-                            typeof nextColumn?.maxWidth === 'number'
-                              ? nextColumn.maxWidth
-                              : Number.MAX_SAFE_INTEGER,
-                        }
-                      }}
-                    />
-                  )}
-                </th>
-              )
-            })}
-          </tr>
-        </thead>
-
-        <tbody {...api.getBodyProps()}>
-          {displayRows.map((row, rowIndex) => {
-            const rowId = resolvedGetRowId(row, rowIndex)
-            const isLastColumnSticky = stickyLastColumn
-            const lastColumnId =
-              columns.length > 0
-                ? String(columns[columns.length - 1]?.id || '')
-                : ''
-            return (
-              <tr
-                key={rowId}
-                {...api.getRowProps(rowId)}
-                data-active={activeRowId === rowId || undefined}
-                onClick={
-                  onRowClick ? () => onRowClick(row, rowIndex) : undefined
-                }
-                onMouseEnter={
-                  onRowMouseEnter
-                    ? () => onRowMouseEnter(row, rowIndex)
-                    : undefined
-                }
-                onMouseLeave={
-                  onRowMouseLeave
-                    ? () => onRowMouseLeave(row, rowIndex)
-                    : undefined
-                }
-                style={onRowClick ? { cursor: 'pointer' } : undefined}
-              >
-                {selectable && (
-                  <td role="cell">
-                    <input {...api.getRowSelectProps(rowId)} />
-                  </td>
-                )}
-                {showRowNumbers && (
-                  <td data-row-number="" role="cell">
-                    <div className="uf-table__cellSlot" data-align="left">
-                      {renderCellContent(rowIndex + 1, 'left')}
-                    </div>
-                  </td>
-                )}
-                {columns.map((col) => {
-                  const cellStyle: Record<string, unknown> = {}
-                  if (col.align) cellStyle.textAlign = col.align
-                  if (col.maxWidth != null) cellStyle.maxWidth = col.maxWidth
-
-                  // Resolve cell content: custom render > accessor
-                  let content: ReactNode
-                  if (col.render) {
-                    const rawVal = getRawValue(row, col.accessor)
-                    content = col.render(rawVal, row, { rowIndex, column: col })
-                  } else {
-                    content = getCellValue(row, col.accessor)
-                  }
-                  const renderedContent = renderCellContent(
-                    content,
-                    col.align ?? 'left',
-                  )
-
-                  return (
-                    <td
-                      key={col.id}
-                      {...api.getCellProps(rowId, col.id)}
-                      data-truncate={col.truncate || undefined}
-                      data-sticky-right={
-                        isLastColumnSticky &&
-                        lastColumnId &&
-                        String(col.id) === lastColumnId
-                          ? ''
-                          : undefined
-                      }
-                      style={
-                        Object.keys(cellStyle).length > 0
-                          ? (cellStyle as CSSProperties)
-                          : undefined
-                      }
-                      title={
-                        col.truncate && typeof content === 'string'
-                          ? content
-                          : undefined
-                      }
-                    >
-                      <div
-                        className="uf-table__cellSlot"
-                        data-align={col.align ?? 'left'}
-                        data-truncate={col.truncate || undefined}
-                      >
-                        {renderedContent}
-                      </div>
-                    </td>
-                  )
+                : { width, minWidth: width, maxWidth: width }
+            const isSorted = column === sorted
+            const label = (
+              <>
+                {content(column.header ?? column.id, `columns.${column.id} header`, {
+                  align: column.align,
                 })}
-              </tr>
+                {isSorted && (
+                  <span
+                    aria-hidden="true"
+                    data-scope="table"
+                    data-part="sortIndicator"
+                    className="uf-table__sort-icon"
+                  >
+                    <Icon name={direction === 'asc' ? 'arrow-up' : 'arrow-down'} />
+                  </span>
+                )}
+              </>
+            )
+            return (
+              <th
+                key={column.id}
+                {...cell('headerCell')}
+                id={headerId}
+                data-column={column.id}
+                aria-sort={
+                  isSorted
+                    ? direction === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : column.sortable
+                      ? 'none'
+                      : undefined
+                }
+                style={style}
+              >
+                <div className="uf-table__cellSlot" data-align={column.align}>
+                  {column.sortable ? (
+                    <button
+                      type="button"
+                      // Explicit, so WebKit's Tab order includes the button.
+                      tabIndex={0}
+                      data-scope="table"
+                      data-part="sortButton"
+                      className="uf-table__sort-button"
+                      onClick={() => cycle(column.id)}
+                    >
+                      {label}
+                    </button>
+                  ) : (
+                    label
+                  )}
+                </div>
+                {resizable && <span {...handleProps(column, headerId)} />}
+              </th>
             )
           })}
-        </tbody>
-      </table>
-    )
-    return (
-      <Membrane enabled={membrane} as="div" fullWidth>
-        {table}
-      </Membrane>
-    )
-  },
-)
+        </tr>
+      </thead>
+      <tbody
+        data-scope="table"
+        data-part="body"
+        role="rowgroup"
+        {...(onRowClick && { ...roving.root, onKeyDown: onBodyKeyDown })}
+      >
+        {shown.map(({ key, row }, index) => {
+          const details = (event: MouseEvent<HTMLTableRowElement>) => ({ row, index, event })
+          const isActive = activeRow != null && key === activeRow
+          const labelId = domId(base, 'cell', key)
+          const checkboxId = domId(base, 'select', key)
+          return (
+            <tr
+              key={key}
+              data-scope="table"
+              data-part="row"
+              role="row"
+              data-row-id={key}
+              data-selected={selected.has(key) || undefined}
+              data-active={isActive || undefined}
+              aria-current={isActive || undefined}
+              data-interactive={onRowClick ? '' : undefined}
+              {...(onRowClick && roving.item(key))}
+              onClick={
+                onRowClick &&
+                ((event) => {
+                  const control = (event.target as Element).closest(CONTROL)
+                  if (control && control !== event.currentTarget) return
+                  onRowClick(details(event))
+                })
+              }
+              onMouseEnter={onRowMouseEnter && ((event) => onRowMouseEnter(details(event)))}
+              onMouseLeave={onRowMouseLeave && ((event) => onRowMouseLeave(details(event)))}
+            >
+              {selectable && (
+                <td {...cell('cell')} data-select="">
+                  <div className="uf-table__cellSlot">
+                    <Checkbox
+                      membrane={false}
+                      id={checkboxId}
+                      aria-label={text.selectRow}
+                      aria-labelledby={firstColumn && `${checkboxId} ${labelId}`}
+                      checked={selected.has(key)}
+                      onCheckedChange={({ checked }) => selectRow(key, checked === true)}
+                    />
+                  </div>
+                </td>
+              )}
+              {showRowNumbers && (
+                <td {...cell('cell')} data-row-number="">
+                  <div className="uf-table__cellSlot">
+                    {content(index + 1, 'row number', { variant: 'muted' })}
+                  </div>
+                </td>
+              )}
+              {columnList.map((column) => {
+                const value = cellValue(row, column)
+                const shownValue = column.render
+                  ? column.render({ value, row, rowIndex: index, column })
+                  : value
+                return (
+                  <td
+                    key={column.id}
+                    {...cell('cell')}
+                    id={column === firstColumn ? labelId : undefined}
+                    data-column={column.id}
+                    title={
+                      column.truncate && isText(shownValue) ? String(shownValue) : undefined
+                    }
+                  >
+                    <div
+                      className="uf-table__cellSlot"
+                      data-align={column.align}
+                      data-truncate={column.truncate || undefined}
+                    >
+                      {content(shownValue, `columns.${column.id} cell`, {
+                        align: column.align,
+                        truncate: column.truncate,
+                      })}
+                    </div>
+                  </td>
+                )
+              })}
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
+  )
+  return (
+    <Membrane enabled={membrane} as="div" fullWidth>
+      {table}
+    </Membrane>
+  )
+})

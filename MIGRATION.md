@@ -332,7 +332,26 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 
 | Before | After | Codemod |
 | --- | --- | --- |
-| `membrane` styled rows as tiles | `rowStyle="tile"` styles rows; `membrane` adds outer spacing only | — |
+| `ariaLabel` | `aria-label` | auto |
+| `activeRowId` | `activeRow` | auto |
+| `rowStyle` | `variant` | auto |
+| `sortColumn` | One `sort={{ column, direction }}` (controlled) or `defaultSort` (uncontrolled); `null` is unsorted | manual |
+| `sortDirection` | One `sort={{ column, direction }}` (controlled) or `defaultSort` (uncontrolled); `null` is unsorted | manual |
+| `onSortChange`: `{ column, direction }` | `{ sort }`, with `sort` as `{ column, direction }` or `null` | manual |
+| `onRowClick`: `(row, index)` | `({ row, index, event })`; `index` is the position shown | manual |
+| `onRowMouseEnter`: `(row, index)` | `({ row, index, event })`; `index` is the position shown | manual |
+| `onRowMouseLeave`: `(row, index)` | `({ row, index, event })`; `index` is the position shown | manual |
+| `onColumnResize`: `(columnId, width)` on every pointer move, for the column and its neighbour | `({ column, width })` once per finished resize of that column | manual |
+| `columns`: `align: "left" \| "center" \| "right"` | `align: "start" \| "center" \| "end"`, following text direction | manual |
+| `columns`: `render(value, row, { rowIndex, column })` | `render({ value, row, rowIndex, column })`; a one-argument `render: (value) =>` still compiles, so check every column | manual |
+| `TableAlign` from `Table/Table` | `TableColumn['align']` | manual |
+| `membrane` styled rows as tiles | `variant="tile"` styles rows; `membrane` adds outer spacing only | — |
+| The header stuck to the top of the scrolling container by default | `stickyHeader` is off by default; pass it where the table scrolls inside its own container | — |
+| Fixed layout: every cell stayed on one line with an ellipsis, `minWidth` and `maxWidth` had no effect, and resizing a column resized its neighbour | Columns size to their content: text wraps unless the column has `truncate`, `minWidth` and `maxWidth` hold, and a resize changes only its own column | — |
+| Without `sortColumn`/`selectedRows` sorting and selection did nothing, while their callbacks still fired | Both work uncontrolled; a third click on a sorted header returns to the order of `rows` | — |
+| A row without a key was keyed by its position on screen (`"0"`), and repeated keys rendered twice | It is keyed by its position in `rows` (`"#0"`), which sorting does not change; numeric keys become text and a repeated key drops the row with a report | — |
+| `onRowClick` also fired for clicks on the row checkbox or a control in a cell, and only a mouse could trigger it | Clicks on controls and on the selection cell do not activate the row; rows become one tab stop, arrows move between them and Enter activates | — |
+| Row checkboxes were named `Select row <key>`, the select-all box never showed a partial selection, and rows carried `aria-selected` | Row checkboxes are named by `labels.selectRow` plus the row first cell, select-all shows a mixed state, and `aria-selected` is gone (the checkbox carries the state) | — |
 
 ### Tabs
 

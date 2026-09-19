@@ -7,6 +7,12 @@
   "root": {
     "type": "Table",
     "props": {
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
       "columns": {
         "$ref": "props.columns"
       },
@@ -16,14 +22,17 @@
       "rowKey": {
         "$ref": "props.rowKey"
       },
-      "sortColumn": {
-        "$ref": "props.sortColumn"
+      "sort": {
+        "$ref": "props.sort"
       },
-      "sortDirection": {
-        "$ref": "props.sortDirection"
+      "defaultSort": {
+        "$ref": "props.defaultSort"
       },
       "selectedRows": {
         "$ref": "props.selectedRows"
+      },
+      "defaultSelectedRows": {
+        "$ref": "props.defaultSelectedRows"
       },
       "selectable": {
         "$ref": "props.selectable"
@@ -37,56 +46,62 @@
       "showDividers": {
         "$ref": "props.showDividers"
       },
-      "resizable": {
-        "$ref": "props.resizable"
-      },
       "stickyLastColumn": {
         "$ref": "props.stickyLastColumn"
       },
-      "activeRowId": {
-        "$ref": "props.activeRowId"
+      "resizable": {
+        "$ref": "props.resizable"
+      },
+      "activeRow": {
+        "$ref": "props.activeRow"
       },
       "membrane": {
         "$ref": "props.membrane"
       },
-      "rowStyle": {
-        "$ref": "props.rowStyle"
+      "variant": {
+        "$ref": "props.variant"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "labels": {
+        "$ref": "props.labels"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "sortColumn": "date",
-      "sortDirection": "desc",
+      "aria-label": "Invoice ledger",
+      "defaultSort": {
+        "column": "date",
+        "direction": "desc"
+      },
       "showRowNumbers": true,
       "stickyHeader": true,
-      "showDividers": true,
+      "stickyLastColumn": true,
       "resizable": true,
-      "ariaLabel": "Invoice ledger",
       "rowKey": "id",
       "columns": [
         {
           "id": "invoice",
           "header": "Invoice",
-          "accessor": "invoice",
           "width": 160
         },
         {
           "id": "date",
           "header": "Date",
-          "accessor": "date",
           "sortable": true,
           "width": 140
         },
         {
+          "id": "customer",
+          "header": "Customer",
+          "minWidth": 200,
+          "truncate": true
+        },
+        {
           "id": "amount",
           "header": "Amount",
-          "accessor": "amount",
-          "align": "right",
+          "sortable": true,
+          "align": "end",
           "width": 120
         }
       ],
@@ -95,121 +110,142 @@
           "id": "i1",
           "invoice": "INV-2048",
           "date": "2026-07-01",
-          "amount": "$420.00"
+          "customer": "Northwind Traders",
+          "amount": 420
         },
         {
           "id": "i2",
           "invoice": "INV-2017",
           "date": "2026-06-01",
-          "amount": "$420.00"
+          "customer": "Contoso Pharmaceuticals Europe",
+          "amount": 1280.5
+        },
+        {
+          "id": "i3",
+          "invoice": "INV-2051",
+          "date": "2026-07-14",
+          "customer": "Fabrikam",
+          "amount": 96
         }
       ]
     }
   },
   "controls": [
     {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Names the table when no visible heading does."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Ids of the elements that name the table, such as the heading above it."
+    },
+    {
       "name": "columns",
       "type": "array",
       "required": false,
-      "description": "Column definitions."
+      "description": "Columns in display order; a column without a unique string `id` is dropped."
     },
     {
       "name": "rows",
       "type": "array",
       "required": false,
-      "description": "Row data."
+      "description": "Row data, one object per row."
     },
     {
       "name": "rowKey",
       "type": "string",
       "required": false,
-      "description": "Key field on each row, or a function returning a unique key."
+      "description": "Row key: a row field name or a function of the row returning text or a number; `id` by default, else `#<position in rows>`."
     },
     {
-      "name": "sortColumn",
-      "type": "string",
+      "name": "sort",
+      "type": "object",
       "required": false,
-      "description": "Controlled sort column.",
+      "description": "Controlled order of the rows: a sortable or any other column and a direction; `null` keeps the order of `rows`."
+    },
+    {
+      "name": "defaultSort",
+      "type": "object",
+      "required": false,
+      "description": "Order of the rows on mount (uncontrolled); read once.",
       "defaultValue": null
-    },
-    {
-      "name": "sortDirection",
-      "type": "select",
-      "required": false,
-      "description": "Controlled sort direction.",
-      "options": [
-        "asc",
-        "desc"
-      ],
-      "defaultValue": "asc"
     },
     {
       "name": "selectedRows",
       "type": "array",
       "required": false,
-      "description": "Controlled selected row IDs.",
-      "defaultValue": []
+      "description": "Keys of the selected rows (controlled); keys without a row are kept and not shown."
+    },
+    {
+      "name": "defaultSelectedRows",
+      "type": "array",
+      "required": false,
+      "description": "Keys of the rows selected on mount (uncontrolled); read once."
     },
     {
       "name": "selectable",
       "type": "boolean",
       "required": false,
-      "description": "Enable row selection.",
+      "description": "Adds a leading checkbox column: one checkbox per row and a select-all checkbox in the header.",
       "defaultValue": false
     },
     {
       "name": "showRowNumbers",
       "type": "boolean",
       "required": false,
-      "description": "Show row number column.",
+      "description": "Adds a leading column numbering the rows 1, 2, 3 in the order shown.",
       "defaultValue": false
     },
     {
       "name": "stickyHeader",
       "type": "boolean",
       "required": false,
-      "description": "Make header sticky on scroll.",
-      "defaultValue": true
+      "description": "Keeps the header row at the top of the nearest scrolling container.",
+      "defaultValue": false
     },
     {
       "name": "showDividers",
       "type": "boolean",
       "required": false,
-      "description": "Show divider lines between rows.",
+      "description": "Draws a line under the header and under every row.",
       "defaultValue": true
-    },
-    {
-      "name": "resizable",
-      "type": "boolean",
-      "required": false,
-      "description": "Enable column resizing and fixed table layout.",
-      "defaultValue": false
     },
     {
       "name": "stickyLastColumn",
       "type": "boolean",
       "required": false,
-      "description": "Keep the last column visually sticky for dense action tables.",
+      "description": "Keeps the last column at the inline end of the nearest scrolling container while rows scroll sideways.",
       "defaultValue": false
     },
     {
-      "name": "activeRowId",
+      "name": "resizable",
+      "type": "boolean",
+      "required": false,
+      "description": "Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys.",
+      "defaultValue": false
+    },
+    {
+      "name": "activeRow",
       "type": "string",
       "required": false,
-      "description": "Row ID to highlight as active (applies `data-active` attribute)."
+      "description": "Key of the row marked as the current one (`aria-current`), such as the row open in a detail view."
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer spacing boundary, consistent with other Face UI components.",
+      "description": "Outer membrane spacing around the table.",
       "defaultValue": false
     },
     {
-      "name": "rowStyle",
+      "name": "variant",
       "type": "select",
       "required": false,
-      "description": "Plain table rows or separated rows with rounded hover surfaces.",
+      "description": "`tile` rounds every row into its own surface; `plain` keeps a flat grid.",
       "options": [
         "plain",
         "tile"
@@ -217,10 +253,10 @@
       "defaultValue": "plain"
     },
     {
-      "name": "ariaLabel",
-      "type": "string",
+      "name": "labels",
+      "type": "object",
       "required": false,
-      "description": "Accessible label for the table when there is no visible caption."
+      "description": "Names and text of the table's own controls; the table takes a native aria-label or aria-labelledby."
     }
   ],
   "meta": {

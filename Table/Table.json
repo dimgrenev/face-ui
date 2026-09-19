@@ -2,135 +2,138 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Table",
-  "description": "Data table with sorting and row selection",
+  "description": "A data table: sortable columns, row selection, row actions, and resizable, sticky columns.",
   "props": {
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Names the table when no visible heading does."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "Ids of the elements that name the table, such as the heading above it."
+    },
     "columns": {
       "type": "array",
       "required": false,
-      "description": "Column definitions."
+      "description": "Columns in display order; a column without a unique string `id` is dropped."
     },
     "rows": {
       "type": "array",
       "required": false,
-      "description": "Row data."
+      "description": "Row data, one object per row."
     },
     "rowKey": {
       "type": "string",
       "required": false,
-      "description": "Key field on each row, or a function returning a unique key."
+      "description": "Row key: a row field name or a function of the row returning text or a number; `id` by default, else `#<position in rows>`."
     },
-    "sortColumn": {
-      "type": "string",
+    "sort": {
+      "type": "object",
       "required": false,
-      "description": "Controlled sort column.",
+      "description": "Controlled order of the rows: a sortable or any other column and a direction; `null` keeps the order of `rows`."
+    },
+    "defaultSort": {
+      "type": "object",
+      "required": false,
+      "description": "Order of the rows on mount (uncontrolled); read once.",
       "default": null
-    },
-    "sortDirection": {
-      "type": "enum",
-      "required": false,
-      "description": "Controlled sort direction.",
-      "options": [
-        "asc",
-        "desc"
-      ],
-      "default": "asc"
     },
     "selectedRows": {
       "type": "array",
       "required": false,
-      "description": "Controlled selected row IDs.",
-      "default": []
+      "description": "Keys of the selected rows (controlled); keys without a row are kept and not shown."
+    },
+    "defaultSelectedRows": {
+      "type": "array",
+      "required": false,
+      "description": "Keys of the rows selected on mount (uncontrolled); read once."
     },
     "selectable": {
       "type": "boolean",
       "required": false,
-      "description": "Enable row selection.",
+      "description": "Adds a leading checkbox column: one checkbox per row and a select-all checkbox in the header.",
       "default": false
     },
     "showRowNumbers": {
       "type": "boolean",
       "required": false,
-      "description": "Show row number column.",
+      "description": "Adds a leading column numbering the rows 1, 2, 3 in the order shown.",
       "default": false
     },
     "stickyHeader": {
       "type": "boolean",
       "required": false,
-      "description": "Make header sticky on scroll.",
-      "default": true
+      "description": "Keeps the header row at the top of the nearest scrolling container.",
+      "default": false
     },
     "showDividers": {
       "type": "boolean",
       "required": false,
-      "description": "Show divider lines between rows.",
+      "description": "Draws a line under the header and under every row.",
       "default": true
-    },
-    "resizable": {
-      "type": "boolean",
-      "required": false,
-      "description": "Enable column resizing and fixed table layout.",
-      "default": false
     },
     "stickyLastColumn": {
       "type": "boolean",
       "required": false,
-      "description": "Keep the last column visually sticky for dense action tables.",
+      "description": "Keeps the last column at the inline end of the nearest scrolling container while rows scroll sideways.",
       "default": false
     },
-    "activeRowId": {
+    "resizable": {
+      "type": "boolean",
+      "required": false,
+      "description": "Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys.",
+      "default": false
+    },
+    "activeRow": {
       "type": "string",
       "required": false,
-      "description": "Row ID to highlight as active (applies `data-active` attribute)."
+      "description": "Key of the row marked as the current one (`aria-current`), such as the row open in a detail view."
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer spacing boundary, consistent with other Face UI components.",
+      "description": "Outer membrane spacing around the table.",
       "default": false
     },
-    "rowStyle": {
+    "variant": {
       "type": "enum",
       "required": false,
-      "description": "Plain table rows or separated rows with rounded hover surfaces.",
+      "description": "`tile` rounds every row into its own surface; `plain` keeps a flat grid.",
       "options": [
         "plain",
         "tile"
       ],
       "default": "plain"
     },
-    "ariaLabel": {
-      "type": "string",
+    "labels": {
+      "type": "object",
       "required": false,
-      "description": "Accessible label for the table when there is no visible caption."
+      "description": "Names and text of the table's own controls; the table takes a native aria-label or aria-labelledby."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "selectable": false,
         "showRowNumbers": true,
-        "stickyHeader": true,
         "showDividers": true,
-        "resizable": false,
-        "stickyLastColumn": false,
         "columns": [
           {
             "id": "name",
             "header": "Name",
-            "accessor": "name",
+            "sortable": true,
             "truncate": true
           },
           {
             "id": "status",
-            "header": "Status",
-            "accessor": "status"
+            "header": "Status"
           },
           {
             "id": "price",
             "header": "Price",
-            "accessor": "price",
-            "align": "right"
+            "align": "end"
           }
         ],
         "rows": [
@@ -158,41 +161,93 @@
     {
       "name": "Selectable",
       "props": {
-        "selectable": true
+        "selectable": true,
+        "defaultSelectedRows": [
+          "r2"
+        ]
       }
     },
     {
       "name": "Sorted Ascending",
       "props": {
-        "sortColumn": "name",
-        "sortDirection": "asc"
+        "defaultSort": {
+          "column": "name",
+          "direction": "asc"
+        }
       }
     },
     {
       "name": "Sorted Descending",
       "props": {
-        "sortColumn": "name",
-        "sortDirection": "desc"
+        "defaultSort": {
+          "column": "name",
+          "direction": "desc"
+        }
+      }
+    },
+    {
+      "name": "Tile Rows",
+      "props": {
+        "variant": "tile",
+        "activeRow": "r1"
       }
     }
   ],
-  "behavior": {},
+  "behavior": {
+    "stateModel": "sort/defaultSort/onSortChange and selectedRows/defaultSelectedRows/onSelectedRowsChange; both work uncontrolled. Selected keys without a row are kept and not shown.",
+    "sorting": "A sortable header cycles ascending, descending, then the order of rows. Values compare by number, date or text with numeric runs; empty values go last.",
+    "rowActivation": "With onRowClick rows form one tab stop; clicks on controls inside a row and on the selection cell do not activate it.",
+    "resizing": "A user's resize fixes the column width; onColumnResize reports it when the drag ends or per key press."
+  },
   "keyboard": {
-    "ArrowDown": {
-      "action": "focusNextRow"
-    },
-    "ArrowUp": {
-      "action": "focusPreviousRow"
+    "Enter": {
+      "action": "sortOrActivateRow",
+      "condition": "sortable header button sorts; a focused row calls onRowClick"
     },
     "Space": {
-      "action": "toggleRowSelection",
-      "condition": "selectable"
+      "action": "sortOrToggleSelection",
+      "condition": "sortable header button sorts; a row checkbox toggles its row"
+    },
+    "ArrowDown": {
+      "action": "focusNextRow",
+      "condition": "onRowClick"
+    },
+    "ArrowUp": {
+      "action": "focusPreviousRow",
+      "condition": "onRowClick"
+    },
+    "Home": {
+      "action": "focusFirstRowOrMinWidth",
+      "condition": "row: onRowClick; resize handle: minWidth"
+    },
+    "End": {
+      "action": "focusLastRowOrMaxWidth",
+      "condition": "row: onRowClick; resize handle: maxWidth"
+    },
+    "ArrowRight": {
+      "action": "resizeColumn",
+      "condition": "resize handle: 10 px wider in LTR, narrower in RTL"
+    },
+    "ArrowLeft": {
+      "action": "resizeColumn",
+      "condition": "resize handle: 10 px narrower in LTR, wider in RTL"
+    },
+    "PageUp": {
+      "action": "resizeColumn",
+      "condition": "resize handle: 100 px wider"
+    },
+    "PageDown": {
+      "action": "resizeColumn",
+      "condition": "resize handle: 100 px narrower"
     }
   },
   "aria": {
     "role": "table",
-    "required": [
-      "aria-label"
+    "label": "Native aria-label or aria-labelledby names the table.",
+    "notes": [
+      "Sortable headers are native buttons inside columnheader cells with aria-sort.",
+      "Row checkboxes are named by labels.selectRow plus the row's first column; the current row has aria-current.",
+      "Resize handles are focusable separators with aria-valuenow in px, named by labels.resizeColumn plus the header."
     ]
   },
   "composition": {
@@ -205,6 +260,7 @@
     ],
     "recommended": [
       "headerCell",
+      "sortButton",
       "sortIndicator"
     ],
     "parts": {
@@ -215,13 +271,25 @@
         "slot": "header",
         "parent": "root"
       },
+      "headerRow": {
+        "slot": "headerRow",
+        "parent": "header"
+      },
       "headerCell": {
         "slot": "headerCell",
-        "parent": "header",
+        "parent": "headerRow",
         "multiple": true
+      },
+      "sortButton": {
+        "slot": "sortButton",
+        "parent": "headerCell"
       },
       "sortIndicator": {
         "slot": "sortIndicator",
+        "parent": "headerCell"
+      },
+      "resizeHandle": {
+        "slot": "resizeHandle",
         "parent": "headerCell"
       },
       "body": {
@@ -257,18 +325,17 @@
       "--uf-control-pad-text",
       "--uf-membrane",
       "--uf-font-size-xs",
-      "--uf-font-weight-bold",
       "--uf-radius",
       "--uf-color-bg",
       "--uf-color-fg",
       "--uf-color-border",
       "--uf-color-hover-bg",
-      "--uf-motion-duration-emphasis",
-      "--uf-motion-ease-emphasized"
+      "--uf-color-fg-muted",
+      "--uf-color-active-bg"
     ],
     "notes": [
       "Table cell/header text is rendered through Text wrappers to keep typography centralized.",
-      "Resizable/sticky compatibility props map to table component tokens, and membrane row emphasis uses shared Face UI motion tokens."
+      "Row states tint cells with --uf-color-hover-bg (selected, hover on clickable rows) and --uf-color-active-bg (current row); sticky cells sit on --uf-color-bg."
     ]
   },
   "platform": {},
