@@ -5,6 +5,7 @@ export const markdown = (
   <Markdown
     ref={createRef<HTMLDivElement>()}
     gfm={false}
+    breaks
     html
     linkTarget="_blank"
     linkRel="nofollow ugc noopener"

@@ -13,6 +13,9 @@
       "gfm": {
         "$ref": "props.gfm"
       },
+      "breaks": {
+        "$ref": "props.breaks"
+      },
       "html": {
         "$ref": "props.html"
       },
@@ -45,8 +48,15 @@
       "name": "gfm",
       "type": "boolean",
       "required": false,
-      "description": "GitHub Flavored Markdown as in GitHub comments: tables, task lists, strikethrough, autolinks, a line break as a break; `false` parses plain CommonMark.",
+      "description": "GitHub Flavored Markdown: tables, task lists, strikethrough and autolinks; `false` parses plain CommonMark.",
       "defaultValue": true
+    },
+    {
+      "name": "breaks",
+      "type": "boolean",
+      "required": false,
+      "description": "A newline inside a paragraph breaks the line, as in GitHub comments and chat messages; otherwise it is a space, as in Markdown files.",
+      "defaultValue": false
     },
     {
       "name": "html",
@@ -59,7 +69,7 @@
       "name": "linkTarget",
       "type": "select",
       "required": false,
-      "description": "Where links to other sites (http(s) and protocol-relative URLs) open; relative links, anchors and mailto/tel links always open in place.",
+      "description": "Where absolute links (http(s) and protocol-relative URLs, which can lead to other sites) open; relative links, anchors and mailto/tel links always open in place.",
       "options": [
         "_self",
         "_blank"
@@ -70,7 +80,7 @@
       "name": "linkRel",
       "type": "string",
       "required": false,
-      "description": "`rel` of every link to another site, whatever its target, such as `nofollow ugc noopener` for user content; an empty string adds none.",
+      "description": "`rel` of every absolute link, whatever its target, such as `nofollow ugc noopener` for user content; an empty string adds none.",
       "defaultValue": "noopener noreferrer"
     },
     {

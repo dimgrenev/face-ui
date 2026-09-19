@@ -86,6 +86,36 @@ for (const direction of ['ltr', 'rtl'] as const)
     expect(code[0]!.left - (await box(pre)).left).toBeLessThan(40)
   })
 
+test('only a task checkbox takes its bullet’s place; a raw checkbox in running text stays in its line', { tag: ['@layout'] }, async ({
+  page,
+}) => {
+  await render(page, { html: true, children: 'Accept <input type="checkbox"> the terms\n\n- [ ] A task' })
+  const [before, after] = await subject(page).locator('p').evaluate((node) =>
+    [node.firstChild!, node.lastChild!].map((text) => {
+      const range = document.createRange()
+      range.selectNodeContents(text)
+      return range.getBoundingClientRect().toJSON() as DOMRect
+    }),
+  )
+  const inline = await box(subject(page).locator('p').getByRole('checkbox'))
+  expect(inline.left).toBeGreaterThanOrEqual(before!.right)
+  expect(after!.left).toBeGreaterThanOrEqual(inline.right)
+  const task = await box(subject(page).locator('li').getByRole('checkbox'))
+  const text = await lines(subject(page).locator('li label'))
+  expect(task.right).toBeLessThanOrEqual(text[0]!.left)
+  expect(task.left).toBeLessThan((await box(subject(page).locator('li'))).left)
+})
+
+test('a source nested deeper than the engine can parse shows as text, and the page keeps rendering', { tag: ['@native'] }, async ({
+  page,
+}) => {
+  const deep = `${'>'.repeat(20000)} deep`
+  await render(page, { children: deep })
+  await expect(subject(page)).toContainText('deep')
+  await render(page, { children: '# Next' })
+  await expect(subject(page).getByRole('heading', { name: 'Next' })).toBeVisible()
+})
+
 test('table columns follow their GFM alignment; unaligned cells start at the inline start', { tag: ['@layout'] }, async ({
   page,
 }) => {

@@ -12,8 +12,14 @@
     "gfm": {
       "type": "boolean",
       "required": false,
-      "description": "GitHub Flavored Markdown as in GitHub comments: tables, task lists, strikethrough, autolinks, a line break as a break; `false` parses plain CommonMark.",
+      "description": "GitHub Flavored Markdown: tables, task lists, strikethrough and autolinks; `false` parses plain CommonMark.",
       "default": true
+    },
+    "breaks": {
+      "type": "boolean",
+      "required": false,
+      "description": "A newline inside a paragraph breaks the line, as in GitHub comments and chat messages; otherwise it is a space, as in Markdown files.",
+      "default": false
     },
     "html": {
       "type": "boolean",
@@ -24,7 +30,7 @@
     "linkTarget": {
       "type": "enum",
       "required": false,
-      "description": "Where links to other sites (http(s) and protocol-relative URLs) open; relative links, anchors and mailto/tel links always open in place.",
+      "description": "Where absolute links (http(s) and protocol-relative URLs, which can lead to other sites) open; relative links, anchors and mailto/tel links always open in place.",
       "options": [
         "_self",
         "_blank"
@@ -34,7 +40,7 @@
     "linkRel": {
       "type": "string",
       "required": false,
-      "description": "`rel` of every link to another site, whatever its target, such as `nofollow ugc noopener` for user content; an empty string adds none.",
+      "description": "`rel` of every absolute link, whatever its target, such as `nofollow ugc noopener` for user content; an empty string adds none.",
       "default": "noopener noreferrer"
     },
     "membrane": {
@@ -52,9 +58,16 @@
       }
     },
     {
-      "name": "Paragraphs and Breaks",
+      "name": "Paragraphs",
       "props": {
-        "children": "First paragraph with a line break.\nStill first paragraph.\n\nSecond paragraph with a [link](/docs)."
+        "children": "A newline inside a paragraph\nis a space, as in Markdown files.\n\nSecond paragraph with a [link](/docs)."
+      }
+    },
+    {
+      "name": "Line Breaks",
+      "props": {
+        "children": "Thanks for the review!\nI fixed the typo and rebased.\nReady for another look.",
+        "breaks": true
       }
     },
     {

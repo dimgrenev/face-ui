@@ -1,6 +1,6 @@
 import { forwardRef, useMemo, type HTMLAttributes } from 'react'
 import sanitizeHtml, { type IOptions } from 'sanitize-html'
-import { Marked, type RendererObject, type Tokens } from 'marked'
+import { Marked, type RendererObject, type TokenizerExtension, type Tokens } from 'marked'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
 import { Membrane } from '../assets/adapters/react/Membrane'
@@ -15,13 +15,15 @@ export interface MarkdownProps
   > {
   /** Markdown source, rendered as HTML that never carries scripts, styles, event handlers or unsafe URLs. */
   children?: string
-  /** GitHub Flavored Markdown as in GitHub comments: tables, task lists, strikethrough, autolinks, a line break as a break; `false` parses plain CommonMark. */
+  /** GitHub Flavored Markdown: tables, task lists, strikethrough and autolinks; `false` parses plain CommonMark. */
   gfm?: boolean
+  /** A newline inside a paragraph breaks the line, as in GitHub comments and chat messages; otherwise it is a space, as in Markdown files. */
+  breaks?: boolean
   /** Render raw HTML in the source through an allowlist of text and block tags (no scripts, styles, forms, frames or attributes that run code); otherwise it shows as typed. */
   html?: boolean
-  /** Where links to other sites (http(s) and protocol-relative URLs) open; relative links, anchors and mailto/tel links always open in place. */
+  /** Where absolute links (http(s) and protocol-relative URLs, which can lead to other sites) open; relative links, anchors and mailto/tel links always open in place. */
   linkTarget?: '_self' | '_blank'
-  /** `rel` of every link to another site, whatever its target, such as `nofollow ugc noopener` for user content; an empty string adds none. */
+  /** `rel` of every absolute link, whatever its target, such as `nofollow ugc noopener` for user content; an empty string adds none. */
   linkRel?: string
   /** Wrap the block in the 1px outer spacing box that Face UI controls share, to line it up with controls in a row. */
   membrane?: boolean
@@ -44,12 +46,24 @@ const tasks: RendererObject = {
   // The checkbox takes its bullet's place, so no space separates it from its text.
   checkbox: ({ checked }) => `<input type="checkbox" disabled${checked ? ' checked' : ''}>`,
 }
+/** The parse call's `breaks` turns a newline inside a paragraph into a line break in either dialect; marked's own needs gfm. */
+const lineBreaks: TokenizerExtension = {
+  name: 'breaks',
+  level: 'inline',
+  start(src) {
+    return this.lexer.options.breaks ? src.search(/ *\n/) : undefined
+  },
+  tokenizer(src) {
+    const newline = this.lexer.options.breaks ? /^ *\n(?!\s*$)/.exec(src) : null
+    return newline ? { type: 'br', raw: newline[0] } : undefined
+  },
+}
 const escape = (text: string) => text.replace(/[&<>]/g, (char) => `&#${char.charCodeAt(0)};`)
 /** Private instances: a consumer's global `marked.use()` never changes what Markdown renders. */
 const parsers = {
-  html: new Marked({ breaks: true, renderer: tasks }),
+  html: new Marked({ renderer: tasks, extensions: [lineBreaks] }),
   text: new Marked({
-    breaks: true,
+    extensions: [lineBreaks],
     renderer: {
       ...tasks,
       // Raw HTML stays the text it was typed as; a block keeps its own paragraph.
@@ -68,8 +82,11 @@ const TAGS = [
   ...['details', 'summary', 'dl', 'dt', 'dd', 'figure', 'figcaption'],
 ]
 const CELL = ['align', 'colspan', 'rowspan']
-/** An http(s) URL with a host: a link that leaves the site. */
-const EXTERNAL = /^(?:https?:)?\/\//i
+/**
+ * An http(s) or protocol-relative URL, read as browsers read it: spaces and control characters
+ * around it and tabs and newlines in it are ignored, and `\` counts as `/`.
+ */
+const absolute = (href = '') => /^(?:https?:|[\\/]{2})/i.test(href.replace(/^[\0- ]+|[\t\n\r]/g, ''))
 
 function sanitizeOptions(linkTarget: MarkdownProps['linkTarget'], linkRel: string): IOptions {
   return {
@@ -93,7 +110,7 @@ function sanitizeOptions(linkTarget: MarkdownProps['linkTarget'], linkRel: strin
     transformTags: {
       // Only the component decides where a link opens.
       a: (tagName, { target, rel, ...attribs }) => {
-        if (EXTERNAL.test(attribs.href ?? '')) {
+        if (absolute(attribs.href)) {
           if (linkTarget === '_blank') attribs.target = '_blank'
           if (linkRel) attribs.rel = linkRel
         }
@@ -108,11 +125,22 @@ function sanitizeOptions(linkTarget: MarkdownProps['linkTarget'], linkRel: strin
   }
 }
 
+function render(source: string, gfm: boolean, breaks: boolean, html: boolean, options: IOptions) {
+  try {
+    return sanitizeHtml(parsers[html ? 'html' : 'text'].parse(source, { gfm, breaks, async: false }), options)
+  } catch {
+    // marked overflows the stack on a source nested thousands of levels deep.
+    invalidProp('Markdown', 'children', source, 'showing it as text')
+    return `<p>${escape(source)}</p>\n`
+  }
+}
+
 /** Renders a Markdown source as sanitized HTML: GitHub Flavored Markdown by default, raw HTML only through an allowlist. */
 export const Markdown = forwardRef<HTMLDivElement, MarkdownProps>(function Markdown(
   {
     children,
     gfm = true,
+    breaks = false,
     html = false,
     linkTarget = '_self',
     linkRel = 'noopener noreferrer',
@@ -128,12 +156,8 @@ export const Markdown = forwardRef<HTMLDivElement, MarkdownProps>(function Markd
     source = ''
   }
   const markup = useMemo(
-    () =>
-      sanitizeHtml(
-        parsers[html ? 'html' : 'text'].parse(source, { gfm, async: false }),
-        sanitizeOptions(linkTarget, linkRel),
-      ),
-    [source, gfm, html, linkTarget, linkRel],
+    () => render(source, gfm, breaks, html, sanitizeOptions(linkTarget, linkRel)),
+    [source, gfm, breaks, html, linkTarget, linkRel],
   )
   return (
     <Membrane enabled={membrane} as="div" fullWidth>

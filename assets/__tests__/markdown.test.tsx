@@ -40,6 +40,18 @@ describe('Markdown children', () => {
     )
     expect(root().innerHTML).toBe('')
   })
+
+  it('a source nested too deep to parse shows as text and reports instead of throwing', async () => {
+    const deep = `${'>'.repeat(20000)} <b>deep</b>`
+    await expectDevError(
+      () => render({ children: deep }),
+      /^Face UI Markdown: invalid children ">{20000} <b>deep<\/b>"; showing it as text\.$/,
+    )
+    expect(all('p').map((p) => p.textContent === deep)).toEqual([true])
+    expect(all('*')).toHaveLength(1)
+    await render({ children: '> quoted' })
+    expect(root().innerHTML).toBe('<blockquote>\n<p>quoted</p>\n</blockquote>\n')
+  })
 })
 
 describe('Markdown gfm', () => {
@@ -54,7 +66,7 @@ describe('Markdown gfm', () => {
     '- [x] Done',
   ].join('\n')
 
-  it('gfm renders tables, strikethrough, autolinks, line breaks and task lists; gfm={false} leaves them text', async () => {
+  it('gfm renders tables, strikethrough, autolinks and task lists; gfm={false} leaves them text', async () => {
     await render({ children: source })
     expect(all('th, td').map((cell) => [cell.textContent, cell.getAttribute('align')])).toEqual([
       ['Name', 'left'],
@@ -64,14 +76,32 @@ describe('Markdown gfm', () => {
     ])
     expect(all('del').map((node) => node.textContent)).toEqual(['old'])
     expect(all('a').map((a) => a.getAttribute('href'))).toEqual(['https://example.com'])
-    expect(all('br')).toHaveLength(1)
     expect(all('input[type="checkbox"]')).toHaveLength(1)
+    expect(all('br')).toEqual([])
 
     await render({ children: source, gfm: false })
     expect(all('table, del, a, br, input')).toEqual([])
     expect(root().textContent).toContain('| :--- | ---: |')
     expect(root().textContent).toContain('~~old~~ https://example.com\nnext line')
     expect(root().textContent).toContain('[x] Done')
+  })
+})
+
+describe('Markdown breaks', () => {
+  const source = 'one\ntwo  \nthree\n\n- item\n  wrapped\n\n```\ncode\nblock\n```'
+  /** Each paragraph's and item's text, a line break shown as `|`. */
+  const lines = () =>
+    all('p, li, pre').map((node) =>
+      [...node.childNodes].map((child) => (child.nodeName === 'BR' ? '|' : child.textContent)).join(''),
+    )
+
+  it('breaks turns a newline inside a paragraph into a line break, with or without gfm; otherwise it is a space', async () => {
+    await render({ children: source })
+    expect(lines()).toEqual(['one\ntwo|three', 'item\nwrapped', 'code\nblock\n'])
+    for (const gfm of [true, false]) {
+      await render({ children: source, breaks: true, gfm })
+      expect(lines()).toEqual(['one|two|three', 'item|wrapped', 'code\nblock\n'])
+    }
   })
 })
 
@@ -152,7 +182,7 @@ describe('Markdown links', () => {
     '[mail](mailto:team@example.com)',
   ].join(' ')
 
-  it('linkTarget opens only links to other sites in a new tab', async () => {
+  it('linkTarget opens only absolute links in a new tab', async () => {
     await render({ children: source, linkTarget: '_blank', linkRel: '' })
     expect(links()).toEqual({
       https: ['_blank', null],
@@ -166,7 +196,7 @@ describe('Markdown links', () => {
     expect(all('[target]')).toEqual([])
   })
 
-  it('linkRel is the rel of every link to another site, whatever its target', async () => {
+  it('linkRel is the rel of every absolute link, whatever its target', async () => {
     await render({ children: source })
     expect(links()).toMatchObject({
       https: [null, 'noopener noreferrer'],
@@ -178,6 +208,20 @@ describe('Markdown links', () => {
     expect(links()).toMatchObject({ https: [null, 'nofollow ugc'], anchor: [null, null] })
     await render({ children: source, linkTarget: '_blank', linkRel: 'nofollow ugc noopener' })
     expect(links().https).toEqual(['_blank', 'nofollow ugc noopener'])
+  })
+
+  it('a link a browser reads as absolute counts as one, however it is written', async () => {
+    const hrefs = [' //evil.example', '/\\evil.example', '\\\\evil.example', '/\t/evil.example', 'https:evil.example', 'HTTP://Evil.example']
+    await render({
+      html: true,
+      linkTarget: '_blank',
+      linkRel: 'nofollow ugc',
+      children: `${hrefs.map((href, index) => `<a href="${href}">${index}</a>`).join(' ')} <a href="/%5Cdocs">own</a>`,
+    })
+    expect(links()).toEqual({
+      ...Object.fromEntries(hrefs.map((_, index) => [index, ['_blank', 'nofollow ugc']])),
+      own: [null, null],
+    })
   })
 
   it('raw HTML cannot choose where a link opens', async () => {

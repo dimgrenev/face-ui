@@ -81,8 +81,8 @@
 [data-scope="markdown"] li {
   margin: 0 0 var(--uf-markdown-list-item-gap) 0;
 }
-/* A task's checkbox takes its bullet's place, so wrapped task text stays aligned. */
-[data-scope="markdown"] li:has(> label > input[type="checkbox"], > p:first-child > label > input[type="checkbox"]) {
+/* A task's checkbox leads its item and takes its bullet's place, so wrapped task text stays aligned. */
+[data-scope="markdown"] li:has(> label:first-child > input[type="checkbox"]:first-child, > p:first-child > label:first-child > input[type="checkbox"]:first-child) {
   list-style: none;
 }
 [data-scope="markdown"] li > ul,
@@ -93,8 +93,11 @@
   width: var(--uf-markdown-checkbox-size);
   height: var(--uf-markdown-checkbox-size);
   margin-block: 0;
-  margin-inline: calc(-1 * (var(--uf-markdown-checkbox-size) + var(--uf-markdown-task-gap))) var(--uf-markdown-task-gap);
   vertical-align: middle;
+}
+[data-scope="markdown"] li > label:first-child > input[type="checkbox"]:first-child,
+[data-scope="markdown"] li > p:first-child > label:first-child > input[type="checkbox"]:first-child {
+  margin-inline: calc(-1 * (var(--uf-markdown-checkbox-size) + var(--uf-markdown-task-gap))) var(--uf-markdown-task-gap);
 }
 [data-scope="markdown"] a {
   color: var(--uf-color-fg);
