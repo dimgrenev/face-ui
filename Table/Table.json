@@ -22,12 +22,12 @@
     "rows": {
       "type": "array",
       "required": false,
-      "description": "Row data, one object per row."
+      "description": "Row data, one object per row; a row that is not an object, or repeats a key, is dropped."
     },
     "rowKey": {
       "type": "string",
       "required": false,
-      "description": "Row key: a row field name or a function of the row returning text or a number; `id` by default, else `#<position in rows>`."
+      "description": "Row key: a row field name or a function of the row, `id` by default. A row whose key is not text is keyed `#<position in rows>`."
     },
     "sort": {
       "type": "object",
@@ -83,7 +83,7 @@
     "resizable": {
       "type": "boolean",
       "required": false,
-      "description": "Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys.",
+      "description": "Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys; the first resize fixes every column at its width, so only the resized one changes and the table grows or shrinks.",
       "default": false
     },
     "activeRow": {
@@ -100,7 +100,7 @@
     "variant": {
       "type": "enum",
       "required": false,
-      "description": "`tile` rounds every row into its own surface; `plain` keeps a flat grid.",
+      "description": "`tile` shows each row as one rounded surface, under the pointer and when selected or current, with its content inset; `plain` keeps full-width rows.",
       "options": [
         "plain",
         "tile"
@@ -197,7 +197,9 @@
     "stateModel": "sort/defaultSort/onSortChange and selectedRows/defaultSelectedRows/onSelectedRowsChange; both work uncontrolled. Selected keys without a row are kept and not shown.",
     "sorting": "A sortable header cycles ascending, descending, then the order of rows. Values compare by number, date or text with numeric runs; empty values go last.",
     "rowActivation": "With onRowClick rows form one tab stop; clicks on controls inside a row and on the selection cell do not activate it.",
-    "resizing": "A user's resize fixes the column width; onColumnResize reports it when the drag ends or per key press."
+    "resizing": "The first resize fixes every column at its rendered width, so a resize changes only its own column and the table grows or shrinks. A resize stops at minWidth (48 px without one); onColumnResize reports the rendered width when the drag ends or per key press.",
+    "layout": "A column without width sizes to its content and wraps its text; a column with width keeps it, its content wrapping inside (truncate cuts one line). In a full-width table the extra room goes to the columns without width.",
+    "cellValues": "Text and numbers show as text; a boolean or a date needs render, else the cell is empty and reported."
   },
   "keyboard": {
     "Enter": {
@@ -218,11 +220,11 @@
     },
     "Home": {
       "action": "focusFirstRowOrMinWidth",
-      "condition": "row: onRowClick; resize handle: minWidth"
+      "condition": "row: onRowClick; resize handle: minWidth, or 48 px"
     },
     "End": {
-      "action": "focusLastRowOrMaxWidth",
-      "condition": "row: onRowClick; resize handle: maxWidth"
+      "action": "focusLastRow",
+      "condition": "onRowClick"
     },
     "ArrowRight": {
       "action": "resizeColumn",
@@ -246,8 +248,8 @@
     "label": "Native aria-label or aria-labelledby names the table.",
     "notes": [
       "Sortable headers are native buttons inside columnheader cells with aria-sort.",
-      "Row checkboxes are named by labels.selectRow plus the row's first column; the current row has aria-current.",
-      "Resize handles are focusable separators with aria-valuenow in px, named by labels.resizeColumn plus the header."
+      "Row checkboxes are named by labels.selectRow, {name} being the row value in the first column; the current row has aria-current.",
+      "Resize handles are focusable separators named by labels.resizeColumn ({name}: the header text), with aria-valuenow in px and aria-valuetext from labels.columnWidth; they render after mount, once the width is known."
     ]
   },
   "composition": {
@@ -335,7 +337,7 @@
     ],
     "notes": [
       "Table cell/header text is rendered through Text wrappers to keep typography centralized.",
-      "Row states tint cells with --uf-color-hover-bg (selected, hover on clickable rows) and --uf-color-active-bg (current row); sticky cells sit on --uf-color-bg."
+      "Row states tint cells with --uf-color-hover-bg (selected; the pointer over a clickable row or any tile row) and --uf-color-active-bg (current row, which the pointer never overrides); sticky cells sit on --uf-color-bg."
     ]
   },
   "platform": {},

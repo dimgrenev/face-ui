@@ -11,12 +11,12 @@ interface Invoice {
   total: number
 }
 const invoiceColumns: TableColumn<Invoice>[] = [
-  { id: 'id', header: 'Invoice', sortable: true, width: 160, minWidth: 120, maxWidth: 240, truncate: true },
+  { id: 'id', header: 'Invoice', sortable: true, width: 160, minWidth: 120, truncate: true },
   { id: 'total', align: 'end', accessor: (row) => row.total, render: ({ value, row, rowIndex, column }) => `${String(value)} ${row.id} ${rowIndex} ${column.id}` },
 ]
-export const tableDictionary: Readonly<TableLabels> = { selectAll: 'Выбрать все', selectRow: 'Выбрать', resizeColumn: 'Ширина', rowNumber: '№' }
+export const tableDictionary: Readonly<TableLabels> = { selectAll: 'Выбрать все', selectRow: 'Выбрать {name}', resizeColumn: 'Ширина столбца {name}', columnWidth: '{width} пикселей', rowNumber: '№' }
 const byTotal: TableSort = { column: 'total', direction: 'desc' }
-export const tableNative = <AuditedTable ref={createTableRef<HTMLTableElement>()} columns={invoiceColumns} rows={[{ id: 'a', total: 1 }]} rowKey={(row) => row.id} sort={byTotal} defaultSort={null} onSortChange={({ sort }) => sort?.direction} selectedRows={['a']} defaultSelectedRows={[]} onSelectedRowsChange={({ selectedRows }) => selectedRows.push('b')} selectable showRowNumbers stickyHeader showDividers={false} stickyLastColumn resizable onColumnResize={({ column, width }) => `${column}${width.toFixed()}`} onRowClick={({ row, index, event }) => event.preventDefault() ?? row ?? index} onRowMouseEnter={({ row }) => row} onRowMouseLeave={({ index }) => index} activeRow="a" membrane variant="tile" labels={tableDictionary} aria-label="Invoices" aria-labelledby="heading" id="invoices" className="invoices" style={{ maxWidth: 600 }} dir="rtl" data-table="yes" />
+export const tableNative = <AuditedTable ref={createTableRef<HTMLTableElement>()} columns={invoiceColumns} rows={[{ id: 'a', total: 1 }]} rowKey={(row) => row.id} sort={byTotal} defaultSort={null} onSortChange={({ sort }) => sort?.direction} selectedRows={['a']} defaultSelectedRows={[]} onSelectedRowsChange={({ selectedRows }) => selectedRows.push('b')} selectable showRowNumbers stickyHeader showDividers={false} stickyLastColumn resizable onColumnResize={({ column, width }) => `${column}${width.toFixed()}`} onRowClick={({ row, index, event }) => event.preventDefault() ?? row ?? index} activeRow="a" membrane variant="tile" labels={tableDictionary} aria-label="Invoices" aria-labelledby="heading" id="invoices" className="invoices" style={{ maxWidth: 600 }} dir="rtl" data-table="yes" />
 // @ts-expect-error The table builds its rows and cells from columns and rows.
 export const tableInvalidChildren = <AuditedTable>rows</AuditedTable>
 // @ts-expect-error The native aria-label names the table.
@@ -43,3 +43,11 @@ export const tableInvalidBorder = <AuditedTable border={1} />
 export const tableInvalidRef = <AuditedTable ref={createTableRef<HTMLDivElement>()} />
 // @ts-expect-error Labels are text.
 export const tableInvalidLabels = <AuditedTable labels={{ selectRow: () => 'Select' }} />
+// @ts-expect-error maxWidth is gone: browsers ignore it on table cells.
+export const tableRemovedMaxWidth = <AuditedTable columns={[{ id: 'a', maxWidth: 200 }]} />
+// @ts-expect-error Row hover events are gone.
+export const tableRemovedRowMouseEnter = <AuditedTable onRowMouseEnter={() => undefined} />
+// @ts-expect-error Row hover events are gone.
+export const tableRemovedRowMouseLeave = <AuditedTable onRowMouseLeave={() => undefined} />
+// @ts-expect-error A row key is text: numbers are not converted.
+export const tableInvalidRowKey = <AuditedTable rows={[{ n: 1 }]} rowKey={(row) => row.n as number} />

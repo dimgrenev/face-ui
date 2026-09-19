@@ -74,15 +74,25 @@ for (const direction of ['ltr', 'rtl'])
       }
     })
 
-test('columns size to content at 360px: minWidth and maxWidth hold, truncate cuts one line, other text wraps', { tag: ['@layout'] }, async ({
+const email = 'someone.with.a.long.address@example-company.com'
+const widthOf = async (page: Page, selector: string) => (await page.locator(selector).boundingBox())!.width
+/** Number of lines the text of `selector` takes. */
+const lines = (page: Page, selector: string) =>
+  page.locator(selector).evaluate((node) => {
+    const range = document.createRange()
+    range.selectNodeContents(node)
+    return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size
+  })
+
+test('at 360px a width holds and wraps its content, minWidth holds, truncate cuts one line, other text wraps', { tag: ['@layout'] }, async ({
   page,
 }) => {
   await render(page, {
     columns: [
       { id: 'name', header: 'Name', truncate: true },
       { id: 'note', header: 'Note' },
-      { id: 'code', header: 'Code', minWidth: 90 },
-      { id: 'n', header: 'N', maxWidth: 48 },
+      { id: 'code', header: 'Code', minWidth: 80 },
+      { id: 'email', header: 'Email', width: 100 },
     ],
     rows: [
       {
@@ -90,54 +100,91 @@ test('columns size to content at 360px: minWidth and maxWidth hold, truncate cut
         name: 'A very long name that cannot fit on a phone screen at all',
         note: 'A note long enough to wrap onto several lines of this cell',
         code: 'X',
-        n: '7',
+        email,
       },
     ],
   }, { fresh: true })
-  const width = async (selector: string) => (await page.locator(selector).boundingBox())!.width
-  expect(await width('table')).toBeLessThanOrEqual(328)
-  expect(await width('th[data-column="code"]')).toBeGreaterThanOrEqual(90)
-  expect(await width('th[data-column="n"]')).toBeLessThanOrEqual(48)
+  expect(await widthOf(page, 'table')).toBeLessThanOrEqual(328)
+  // 'Code' and 'X' alone need about 50 px.
+  expect(await widthOf(page, 'th[data-column="code"]')).toBeGreaterThanOrEqual(80)
+  expect(Math.abs((await widthOf(page, 'th[data-column="email"]')) - 100)).toBeLessThanOrEqual(1)
+  expect(await lines(page, 'td[data-column="email"] .uf-text__content')).toBeGreaterThan(1)
   const cut = await page
     .locator('td[data-column="name"] .uf-text__content')
     .evaluate((node) => node.scrollWidth > node.clientWidth && getComputedStyle(node).textOverflow)
   expect(cut).toBe('ellipsis')
-  const lines = (selector: string) =>
-    page.locator(selector).evaluate((node) => {
-      const range = document.createRange()
-      range.selectNodeContents(node)
-      return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size
-    })
-  expect(await lines('td[data-column="name"] .uf-text__content')).toBe(1)
-  expect(await lines('td[data-column="note"] .uf-text__content')).toBeGreaterThan(1)
+  expect(await lines(page, 'td[data-column="name"] .uf-text__content')).toBe(1)
+  expect(await lines(page, 'td[data-column="note"] .uf-text__content')).toBeGreaterThan(1)
 })
 
-test('dividers, tile rows and the tints of selected and current rows', { tag: ['@css'] }, async ({ page }) => {
+test('in a wide table a column keeps its width and the columns without one take the room', { tag: ['@layout'] }, async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1000, height: 640 })
+  const long = 'Long text that would take the whole row on its own if nothing held it back'
+  await render(page, {
+    columns: [
+      { id: 'n', header: 'N', width: 60 },
+      { id: 'note', header: 'Note' },
+    ],
+    rows: [{ id: 'a', n: long, note: long }],
+  }, { fresh: true })
+  const table = await widthOf(page, 'table')
+  expect(Math.abs((await widthOf(page, 'th[data-column="n"]')) - 60)).toBeLessThanOrEqual(1)
+  expect(Math.abs((await widthOf(page, 'th[data-column="note"]')) - (table - 60))).toBeLessThanOrEqual(1)
+})
+
+test('dividers, tile rows and the tints of selected, current and hovered rows', { tag: ['@css', '@pointer'] }, async ({ page }) => {
   const style = (selector: string) =>
     page.locator(selector).evaluate((node) => {
       const s = getComputedStyle(node)
       return { divider: s.borderBottomWidth, radius: s.borderStartStartRadius, tint: s.boxShadow }
     })
-  await render(page, { ...people, selectable: true, defaultSelectedRows: ['b'], activeRow: 'a' }, { fresh: true })
+  const textStart = (selector: string) =>
+    page.locator(selector).evaluate((node) => node.getBoundingClientRect().left)
+  const first = 'tr[data-row-id="b"] td:first-child'
+  await render(page, { ...people, selectable: true, defaultSelectedRows: ['b'], activeRow: 'a' }, { fresh: true, rowClick: true })
   const selected = await style('tr[data-row-id="b"] td[data-column="name"]')
   const current = await style('tr[data-row-id="a"] td[data-column="name"]')
   expect(selected.divider).not.toBe('0px')
   expect(selected.radius).toBe('0px')
   expect(selected.tint).not.toBe(current.tint)
+  // The pointer over a clickable current row keeps its own tint.
+  await page.hover('tr[data-row-id="a"] td[data-column="status"]')
+  expect((await style('tr[data-row-id="a"] td[data-column="name"]')).tint).toBe(current.tint)
+  // A plain row is tinted by the pointer only when clicking it does something.
+  await render(page, { ...people }, { fresh: true })
+  const rest = await style(first)
+  await page.hover(first)
+  expect((await style(first)).tint).toBe(rest.tint)
+  await render(page, { ...people }, { fresh: true, rowClick: true })
+  await page.mouse.move(0, 0)
+  await page.hover(first)
+  expect((await style(first)).tint).toBe(selected.tint)
+
   await render(page, { ...people, showDividers: false, variant: 'tile' }, { fresh: true })
-  const tile = await style('tr[data-row-id="b"] td:first-child')
+  await page.mouse.move(0, 0)
+  const tile = await style(first)
   expect(tile.divider).toBe('0px')
   expect(tile.radius).not.toBe('0px')
-  expect(tile.tint).not.toBe(selected.tint)
+  expect(await textStart('thead th:first-child .uf-text__content')).toBeCloseTo(
+    await textStart(`${first} .uf-text__content`),
+    0,
+  )
+  // A tile row shows its surface under the pointer even when it does nothing.
+  await page.hover(first)
+  expect((await style(first)).tint).toBe(selected.tint)
 })
 
 for (const direction of ['ltr', 'rtl'])
-  test(`a pointer drag resizes only its column and reports once (${direction})`, { tag: ['@pointer', '@layout'] }, async ({
+  test(`a pointer drag widens only its column, the table grows, and the report is the rendered width (${direction})`, { tag: ['@pointer', '@layout'] }, async ({
     page,
   }) => {
     await render(page, { ...people, resizable: true }, { direction, fresh: true })
     const header = page.locator('th[data-column="name"]')
-    const before = (await header.boundingBox())!
+    const cells = ['name', 'status', 'score'].map((id) => page.locator(`th[data-column="${id}"]`))
+    const before = await Promise.all(cells.map(async (cell) => (await cell.boundingBox())!))
+    const table = await widthOf(page, 'table')
     const handle = (await header.locator('[role="separator"]').boundingBox())!
     const sign = direction === 'ltr' ? 1 : -1
     const x = handle.x + handle.width / 2
@@ -147,13 +194,46 @@ for (const direction of ['ltr', 'rtl'])
     await page.mouse.move(x + 20 * sign, y, { steps: 2 })
     await page.mouse.move(x + 40 * sign, y, { steps: 2 })
     await page.mouse.up()
-    const after = (await header.boundingBox())!
-    expect(Math.abs(after.width - before.width - 40)).toBeLessThanOrEqual(1)
-    const edge = direction === 'ltr' ? after.x + after.width : after.x
-    const start = direction === 'ltr' ? before.x + before.width : before.x
+    const after = await Promise.all(cells.map(async (cell) => (await cell.boundingBox())!))
+    const width = Math.round(before[0].width) + 40
+    expect(Math.abs(after[0].width - width)).toBeLessThanOrEqual(0.5)
+    expect(Math.abs(after[1].width - before[1].width)).toBeLessThanOrEqual(1)
+    expect(Math.abs(after[2].width - before[2].width)).toBeLessThanOrEqual(1)
+    expect(Math.abs((await widthOf(page, 'table')) - table - 40)).toBeLessThanOrEqual(2)
+    const edge = direction === 'ltr' ? after[0].x + after[0].width : after[0].x
+    const start = direction === 'ltr' ? before[0].x + before[0].width : before[0].x
     expect(Math.abs(edge - start - 40 * sign)).toBeLessThanOrEqual(1)
-    expect(await events(page)).toEqual([{ column: 'name', width: Math.round(before.width) + 40 }])
+    expect(await events(page)).toEqual([{ column: 'name', width }])
+    await expect(header.getByRole('separator')).toHaveAttribute('aria-valuenow', String(width))
   })
+
+test('a column narrows below its content: the drag, the report and aria-valuenow agree, and the text wraps', { tag: ['@pointer', '@layout'] }, async ({
+  page,
+}) => {
+  await render(page, {
+    resizable: true,
+    columns: [
+      { id: 'name', header: 'Name' },
+      { id: 'email', header: 'Email' },
+    ],
+    rows: [{ id: 'a', name: 'Ada', email }],
+  }, { fresh: true })
+  const header = page.locator('th[data-column="email"]')
+  const start = Math.round((await header.boundingBox())!.width)
+  expect(start).toBeGreaterThan(250)
+  const handle = (await header.locator('[role="separator"]').boundingBox())!
+  const x = handle.x + handle.width / 2
+  const y = handle.y + handle.height / 2
+  await page.mouse.move(x, y)
+  await page.mouse.down()
+  await page.mouse.move(x - 200, y, { steps: 4 })
+  await page.mouse.up()
+  const width = start - 200
+  expect(Math.abs((await header.boundingBox())!.width - width)).toBeLessThanOrEqual(0.5)
+  expect(await events(page)).toEqual([{ column: 'email', width }])
+  await expect(header.getByRole('separator')).toHaveAttribute('aria-valuenow', String(width))
+  expect(await lines(page, 'td[data-column="email"] .uf-text__content')).toBeGreaterThan(1)
+})
 
 test('keyboard: Enter and Space sort from the header, Space selects a row, arrows resize a column', { tag: ['@focus', '@native'] }, async ({
   page,
@@ -168,15 +248,20 @@ test('keyboard: Enter and Space sort from the header, Space selects a row, arrow
   await page.getByRole('checkbox', { name: 'Select Alpha' }).focus()
   await page.keyboard.press('Space')
   await expect(page.getByRole('checkbox', { name: 'Select Alpha' })).toBeChecked()
-  const before = (await header.boundingBox())!.width
+  const before = Math.round((await header.boundingBox())!.width)
   await header.getByRole('separator').focus()
   await page.keyboard.press('ArrowRight')
-  expect(Math.abs((await header.boundingBox())!.width - before - 10)).toBeLessThanOrEqual(1)
+  expect(Math.abs((await header.boundingBox())!.width - before - 10)).toBeLessThanOrEqual(0.5)
+  await page.keyboard.press('ArrowLeft')
+  await page.keyboard.press('ArrowLeft')
+  expect(Math.abs((await header.boundingBox())!.width - before + 10)).toBeLessThanOrEqual(0.5)
   expect(await events(page)).toEqual([
     { sort: { column: 'name', direction: 'asc' } },
     { sort: { column: 'name', direction: 'desc' } },
     { selectedRows: ['a'] },
-    { column: 'name', width: Math.round(before) + 10 },
+    { column: 'name', width: before + 10 },
+    { column: 'name', width: before },
+    { column: 'name', width: before - 10 },
   ])
 })
 
@@ -212,5 +297,8 @@ test('a full table passes axe and names its table, checkboxes and resize handles
   await expect(page.getByRole('table', { name: 'People' })).toBeVisible()
   await expect(page.getByRole('checkbox', { name: 'Select Alpha' })).toBeVisible()
   await expect(page.getByRole('checkbox', { name: 'Select all rows' })).toBeVisible()
-  await expect(page.getByRole('separator', { name: 'Resize Name' })).toHaveAttribute('aria-valuenow', /^\d+$/)
+  const separator = page.getByRole('separator', { name: 'Resize Name' })
+  const width = String(Math.round((await page.locator('th[data-column="name"]').boundingBox())!.width))
+  await expect(separator).toHaveAttribute('aria-valuenow', width)
+  await expect(separator).toHaveAttribute('aria-valuetext', `${width} pixels`)
 })

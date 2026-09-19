@@ -3,12 +3,11 @@ import type { Migration } from './types'
 const sort = 'One `sort={{ column, direction }}` (controlled) or `defaultSort` (uncontrolled); `null` is unsorted'
 // Handlers written for the positional arguments `(row, index)` or `(columnId, width)`.
 const positional = String.raw`^\s*(\(\s*[A-Za-z_$][\w$]*\s*[,)]|[A-Za-z_$][\w$]*\s*=>)`
-const rowEvent = {
-  before: '`(row, index)`',
-  after: '`({ row, index, event })`; `index` is the position shown',
-  codemod: 'manual',
-  legacy: positional,
-} as const
+// Columns the codemod cannot read (a variable, a call) or a `render` that does not destructure its
+// one argument: `render: (value: unknown) =>`, `render: (v) =>`, `render: v =>`, `render(value) {`,
+// `render: function (value)` or `render: renderCell`. `render: ({ value }) =>` and `render: () =>` pass.
+const legacyRender = String.raw`^[^\[]*$|\brender\s*(?::\s*(?:async\s+)?(?:function\b\s*[\w$]*\s*)?)?(?:\(\s*(?![{)])|[A-Za-z_$][\w$.]*\s*(?:=>|[,}\n]))`
+const noHover = 'No replacement: put pointer handlers on the content `render` returns'
 
 export default [
   { kind: 'rename-prop', component: 'Table', from: 'ariaLabel', to: 'aria-label', codemod: 'auto' },
@@ -25,9 +24,24 @@ export default [
     codemod: 'manual',
     legacy: String.raw`\{\s*(column|direction)\b`,
   },
-  { kind: 'retype-prop', component: 'Table', prop: 'onRowClick', ...rowEvent },
-  { kind: 'retype-prop', component: 'Table', prop: 'onRowMouseEnter', ...rowEvent },
-  { kind: 'retype-prop', component: 'Table', prop: 'onRowMouseLeave', ...rowEvent },
+  {
+    kind: 'retype-prop',
+    component: 'Table',
+    prop: 'onRowClick',
+    before: '`(row, index)`',
+    after: '`({ row, index, event })`; `index` is the position shown',
+    codemod: 'manual',
+    legacy: positional,
+  },
+  { kind: 'remove-prop', component: 'Table', prop: 'onRowMouseEnter', use: noHover, codemod: 'manual' },
+  { kind: 'remove-prop', component: 'Table', prop: 'onRowMouseLeave', use: noHover, codemod: 'manual' },
+  {
+    kind: 'remove-prop',
+    component: 'Table',
+    prop: 'columns[].maxWidth',
+    use: 'Browsers ignore a maximum width on table cells; give the column a `width`, which its content can no longer widen',
+    codemod: 'manual',
+  },
   {
     kind: 'retype-prop',
     component: 'Table',
@@ -51,9 +65,10 @@ export default [
     component: 'Table',
     prop: 'columns',
     before: '`render(value, row, { rowIndex, column })`',
-    after: '`render({ value, row, rowIndex, column })`; a one-argument `render: (value) =>` still compiles, so check every column',
+    after:
+      '`render({ value, row, rowIndex, column })`. A one-argument `render: (value) =>` still compiles and shows `[object Object]`, so every such render is reported, and so are columns passed as a variable or a call: check each render in them by hand',
     codemod: 'manual',
-    legacy: String.raw`render:\s*(\(\s*[A-Za-z_$][\w$]*\s*[,)]|[A-Za-z_$][\w$]*\s*=>)`,
+    legacy: legacyRender,
   },
   { kind: 'export', from: 'Table/Table#TableAlign', to: "`TableColumn['align']`", codemod: 'manual' },
   {
@@ -71,8 +86,9 @@ export default [
   {
     kind: 'behavior',
     component: 'Table',
-    before: 'Fixed layout: every cell stayed on one line with an ellipsis, `minWidth` and `maxWidth` had no effect, and resizing a column resized its neighbour',
-    after: 'Columns size to their content: text wraps unless the column has `truncate`, `minWidth` and `maxWidth` hold, and a resize changes only its own column',
+    before: 'Fixed layout: every cell stayed on one line with an ellipsis, `minWidth` had no effect, and resizing a column resized its neighbour',
+    after:
+      'A column without `width` sizes to its content and its text wraps; a column with `width` keeps it and wraps its content inside. Add `truncate` for one line with an ellipsis. `minWidth` holds. The first resize fixes every column at its width, so a resize changes only its own column and the table grows or shrinks',
   },
   {
     kind: 'behavior',
@@ -83,8 +99,9 @@ export default [
   {
     kind: 'behavior',
     component: 'Table',
-    before: 'A row without a key was keyed by its position on screen (`"0"`), and repeated keys rendered twice',
-    after: 'It is keyed by its position in `rows` (`"#0"`), which sorting does not change; numeric keys become text and a repeated key drops the row with a report',
+    before: 'A row without a key was keyed by its position on screen (`"0"`), a numeric key became text, and repeated keys rendered twice',
+    after:
+      'A row without a text key is keyed by its position in `rows` (`"#0"`), which sorting does not change; a key that is not text is reported (pass `rowKey={(row) => String(row.id)}`), and a repeated key drops the row with a report',
   },
   {
     kind: 'behavior',
@@ -96,6 +113,13 @@ export default [
     kind: 'behavior',
     component: 'Table',
     before: 'Row checkboxes were named `Select row <key>`, the select-all box never showed a partial selection, and rows carried `aria-selected`',
-    after: 'Row checkboxes are named by `labels.selectRow` plus the row first cell, select-all shows a mixed state, and `aria-selected` is gone (the checkbox carries the state)',
+    after:
+      'Row checkboxes are named by `labels.selectRow` (`Select {name}`, `{name}` being the row value in the first column), select-all shows a mixed state, and `aria-selected` is gone (the checkbox carries the state)',
+  },
+  {
+    kind: 'behavior',
+    component: 'Table',
+    before: 'A boolean cell value showed as `true` or `false`, and a date as `String(date)`',
+    after: 'Only text and numbers show as text; a boolean or a date needs `render` and is otherwise left out with a report',
   },
 ] satisfies Migration[]

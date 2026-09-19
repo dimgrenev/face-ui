@@ -2,7 +2,6 @@
 import {
   forwardRef,
   isValidElement,
-  useId,
   useMemo,
   useRef,
   useState,
@@ -20,9 +19,9 @@ import { Membrane } from '../assets/adapters/react/Membrane'
 import { useControllableState } from '../assets/adapters/react/use-controllable-state'
 import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
 import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
-import { domId, readCollection, readKeys } from '../assets/runtime/collection'
+import { readCollection, readKeys } from '../assets/runtime/collection'
 import { readDirection, stepIntent } from '../assets/runtime/keyboard'
-import { resolveLabels } from '../assets/runtime/labels'
+import { formatLabel, resolveLabels } from '../assets/runtime/labels'
 import { invalidProp, readNumber } from '../assets/runtime/props'
 import { sortRows } from '../assets/runtime/table'
 import { cn } from '../assets/utils'
@@ -44,17 +43,15 @@ export interface TableColumn<T = any> {
   accessor?: string | ((row: T) => unknown)
   /** The header becomes a button that sorts by this column: ascending, then descending, then the order of `rows`. */
   sortable?: boolean
-  /** Column width, in px or any CSS length; a px width holds when the table is narrow, and a user's resize replaces it. */
+  /** Width of the column, in px or any CSS length; its content wraps inside, or is cut with `truncate`, and never widens it. Extra room in a full-width table goes to the columns without a width, if any. A user's resize replaces it. */
   width?: number | string
-  /** Narrowest width in px, for layout and for resizing; resizing stops at 48 px when unset. */
+  /** Least width in px: a column without `width` never narrows below it, and a resize stops at it (48 px when unset). */
   minWidth?: number
-  /** Widest width in px, for layout and for resizing. */
-  maxWidth?: number
   /** Inline alignment of the header and the cells, following text direction; `end` suits numbers. */
   align?: 'start' | 'center' | 'end'
   /** Keeps the cells on one line, cut with an ellipsis, so the column can narrow to its header; a text cell shows its full text as a tooltip. */
   truncate?: boolean
-  /** Cell content built from the value; without it the value shows as text. */
+  /** Cell content built from the value; without it a text or number value shows as text, and any other value (a date, a boolean) needs `render`. */
   render?: (details: TableCellDetails<T>) => ReactNode
 }
 
@@ -74,28 +71,31 @@ export interface TableCellDetails<T = any> {
 export interface TableLabels {
   /** Name of the header checkbox that selects or clears every row. */
   selectAll: string
-  /** Name of a row checkbox, followed by the text of the row's first column. */
+  /** Name of a row checkbox; `{name}` is the row's value in the first column, or its position when that value is not text. */
   selectRow: string
-  /** Name of a column's resize handle, followed by the column's header. */
+  /** Name of a column's resize handle; `{name}` is the column header, or its `id` when the header is not text. */
   resizeColumn: string
+  /** What a resize handle announces as its value; `{width}` is the column width in px. */
+  columnWidth: string
   /** Header of the row-number column. */
   rowNumber: string
 }
 
 const defaultLabels: TableLabels = Object.freeze({
   selectAll: 'Select all rows',
-  selectRow: 'Select',
-  resizeColumn: 'Resize',
+  selectRow: 'Select {name}',
+  resizeColumn: 'Resize {name}',
+  columnWidth: '{width} pixels',
   rowNumber: '#',
 })
 
-/** What a row event reports. */
+/** What `onRowClick` reports. */
 export interface TableRowDetails<T = any> {
   /** The row object from `rows`. */
   row: T
   /** Position of the row as shown, from 0. */
   index: number
-  /** The mouse event on the row; Enter on a focused row arrives as its click. */
+  /** The click on the row; Enter on a focused row arrives as its click. */
   event: MouseEvent<HTMLTableRowElement>
 }
 
@@ -124,10 +124,10 @@ export interface TableProps<T = any>
   'aria-labelledby'?: string
   /** Columns in display order; a column without a unique string `id` is dropped. */
   columns?: readonly TableColumn<T>[]
-  /** Row data, one object per row. */
+  /** Row data, one object per row; a row that is not an object, or repeats a key, is dropped. */
   rows?: readonly T[]
-  /** Row key: a row field name or a function of the row returning text or a number; `id` by default, else `#<position in rows>`. */
-  rowKey?: string | ((row: T) => string | number)
+  /** Row key: a row field name or a function of the row, `id` by default. A row whose key is not text is keyed `#<position in rows>`. */
+  rowKey?: string | ((row: T) => string)
   /** Controlled order of the rows: a sortable or any other column and a direction; `null` keeps the order of `rows`. */
   sort?: TableSort | null
   /** Order of the rows on mount (uncontrolled); read once. */
@@ -150,21 +150,17 @@ export interface TableProps<T = any>
   showDividers?: boolean
   /** Keeps the last column at the inline end of the nearest scrolling container while rows scroll sideways. */
   stickyLastColumn?: boolean
-  /** Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys. */
+  /** Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys; the first resize fixes every column at its width, so only the resized one changes and the table grows or shrinks. */
   resizable?: boolean
   /** Called when the user finishes resizing a column: on pointer release, or per key press. */
   onColumnResize?: (details: { column: string; width: number }) => void
   /** Called when a row is clicked or Enter is pressed on it; clicks on controls inside the row do not count. Rows become focusable, arrows move between them. */
   onRowClick?: (details: TableRowDetails<T>) => void
-  /** Called when the pointer enters a row. */
-  onRowMouseEnter?: (details: TableRowDetails<T>) => void
-  /** Called when the pointer leaves a row. */
-  onRowMouseLeave?: (details: TableRowDetails<T>) => void
   /** Key of the row marked as the current one (`aria-current`), such as the row open in a detail view. */
   activeRow?: string | null
   /** Outer membrane spacing around the table. */
   membrane?: boolean
-  /** `tile` rounds every row into its own surface; `plain` keeps a flat grid. */
+  /** `tile` shows each row as one rounded surface, under the pointer and when selected or current, with its content inset; `plain` keeps full-width rows. */
   variant?: 'plain' | 'tile'
   /** Names and text of the table's own controls; the table takes a native aria-label or aria-labelledby. */
   labels?: Partial<TableLabels>
@@ -178,38 +174,27 @@ const STEP = 10
 /** Clicks on these inside a row, and on the selection cell, do not activate the row. */
 const CONTROL = 'a[href], button, input, select, textarea, label, [tabindex], [data-select]'
 
-interface RowEntry<T> {
-  key: string
-  row: T
-}
+const isRecord = (value: unknown): value is object =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
 
-/** Rows with their keys; a row that is not an object, or repeats a key, is dropped with a report. */
-function readRows<T>(rows: unknown, rowKey: TableProps<T>['rowKey']): RowEntry<T>[] {
-  if (rows === undefined) return []
-  if (!Array.isArray(rows)) {
-    invalidProp('Table', 'rows', rows, 'using []')
-    return []
-  }
-  const seen = new Set<string>()
-  const entries: RowEntry<T>[] = []
-  rows.forEach((row: unknown, index) => {
-    if (typeof row !== 'object' || row === null || Array.isArray(row))
-      return invalidProp('Table', `rows[${index}]`, row, 'dropping the row')
-    const raw =
+/**
+ * Rows with their keys, read as a display list: a row that is not an object, or repeats a key, is
+ * dropped with a report, and a row without a text key takes `#<position in rows>`. Each row is
+ * wrapped so that a data field such as `type: 'group'` is not read as collection structure.
+ */
+function readRows<T>(rows: unknown, rowKey: TableProps<T>['rowKey']) {
+  const list = Array.isArray(rows)
+    ? rows.map((row: unknown) => (isRecord(row) ? { row: row as T } : row))
+    : rows
+  return readCollection<{ row: T }>(list, {
+    component: 'Table',
+    prop: 'rows',
+    positional: true,
+    key: ({ row }) =>
       typeof rowKey === 'function'
-        ? rowKey(row as T)
-        : (row as Record<string, unknown>)[rowKey ?? 'id']
-    let key = typeof raw === 'number' && Number.isFinite(raw) ? String(raw) : raw
-    if (typeof key !== 'string') {
-      key = `#${index}`
-      if (raw !== undefined) invalidProp('Table', `rows[${index}] key`, raw, `using "${key}"`)
-    }
-    if (seen.has(key as string))
-      return invalidProp('Table', `rows[${index}] key`, key, 'dropping the duplicate')
-    seen.add(key as string)
-    entries.push({ key: key as string, row: row as T })
-  })
-  return entries
+        ? rowKey(row)
+        : (row as Record<string, unknown>)[rowKey ?? 'id'],
+  }).entries.map(({ key, item }) => ({ key, row: item.row }))
 }
 
 function cellValue<T>(row: T, column: TableColumn<T>): unknown {
@@ -219,18 +204,21 @@ function cellValue<T>(row: T, column: TableColumn<T>): unknown {
     : (row as Record<string, unknown>)[accessor]
 }
 
-const isText = (value: unknown) =>
-  ['string', 'number', 'bigint', 'boolean'].includes(typeof value) ||
-  value instanceof Date
+const isText = (value: unknown): value is string | number | bigint =>
+  typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint'
 const isNode = (value: unknown): boolean =>
   value == null ||
-  (isText(value) && !(value instanceof Date)) ||
+  typeof value === 'boolean' ||
+  isText(value) ||
   isValidElement(value) ||
   (Array.isArray(value) && value.every(isNode))
+/** Plain text of a value for a `{name}` placeholder, else `fallback`. */
+const nameOf = (value: unknown, fallback: string | number) =>
+  isText(value) && String(value).trim() ? String(value) : String(fallback)
 
 /**
- * Cell or header content: text through `Text`, elements as they are; anything else is reported
- * as `where` and left out.
+ * Cell or header content: text and numbers through `Text`, elements as they are; anything else
+ * (a date, a boolean, a plain object) is reported as `where` and left out.
  */
 function content(
   value: unknown,
@@ -244,7 +232,7 @@ function content(
         {String(value)}
       </Text>
     )
-  if (isNode(value)) return value as ReactNode
+  if (typeof value !== 'boolean' && isNode(value)) return value as ReactNode
   invalidProp('Table', where, value, 'leaving the cell empty')
   return null
 }
@@ -272,8 +260,6 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
     resizable = false,
     onColumnResize,
     onRowClick,
-    onRowMouseEnter,
-    onRowMouseLeave,
     activeRow,
     membrane = false,
     variant = 'plain',
@@ -281,7 +267,6 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
     className,
     ...rest
   } = props
-  const base = useId()
   const text = resolveLabels(defaultLabels, labels, 'Table')
   const columnList = useMemo(
     () =>
@@ -366,7 +351,8 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
     ;(event.target as HTMLElement).click()
   }
 
-  // Resizing: widths the user set, and the rendered widths the handles announce.
+  // Resizing: the widths a resize fixed, and the rendered widths the handles announce until then.
+  // A resize fixes every column at its rendered width (`base`), so only the resized one changes.
   const [widths, setWidths] = useState<Readonly<Record<string, number>>>({})
   const [measured, setMeasured] = useState<Readonly<Record<string, number>>>({})
   const headRow = useRef<HTMLTableRowElement>(null)
@@ -376,12 +362,14 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
     sign: number
     start: number
     width: number
+    least: number
+    base: Readonly<Record<string, number>>
   } | null>(null)
   const columnKey = columnList.map((column) => column.id).join('\n')
   useIsomorphicLayoutEffect(() => {
     const row = headRow.current
-    if (!resizable || !row || typeof ResizeObserver === 'undefined') return
-    const observer = new ResizeObserver(() =>
+    if (!resizable || !row) return
+    const measure = () =>
       setMeasured((previous) => {
         const next: Record<string, number> = {}
         let changed = false
@@ -391,82 +379,87 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
           changed ||= previous[cell.dataset.column!] !== width
         }
         return changed ? next : previous
-      }),
-    )
+      })
+    measure()
+    if (typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(measure)
     for (const cell of row.cells) observer.observe(cell)
     return () => observer.disconnect()
   }, [resizable, columnKey])
-  const bounds = (column: TableColumn) => {
-    const min = readNumber('Table', 'columns[].minWidth', column.minWidth, MIN_WIDTH, {
-      min: 0,
-    })
-    const max = readNumber('Table', 'columns[].maxWidth', column.maxWidth, Infinity, { min })
-    return [min, max] as const
-  }
-  const resize = (column: TableColumn, width: number) => {
-    const [min, max] = bounds(column)
-    const next = Math.round(Math.min(max, Math.max(min, width)))
-    setWidths((current) =>
-      current[column.id] === next ? current : { ...current, [column.id]: next },
-    )
-    return next
-  }
   const endDrag = () => {
     const done = drag.current
     drag.current = null
     if (done && done.width !== done.start)
       onColumnResize?.({ column: done.column, width: done.width })
   }
-  const handleProps = (column: TableColumn, headerId: string) => {
-    const [min, max] = bounds(column)
-    const id = domId(base, 'resize', column.id)
-    const cellOf = (handle: HTMLElement) => handle.parentElement!
-    return {
-      id,
-      role: 'separator',
-      tabIndex: 0,
-      'aria-orientation': 'vertical',
-      'aria-label': text.resizeColumn,
-      'aria-labelledby': `${id} ${headerId}`,
-      'aria-valuenow': widths[column.id] ?? measured[column.id],
-      'aria-valuemin': min,
-      'aria-valuemax': Number.isFinite(max) ? max : Number.MAX_SAFE_INTEGER,
-      'data-scope': 'table',
-      'data-part': 'resizeHandle',
-      className: 'uf-table__resize-handle',
-      onPointerDown: (event: PointerEvent<HTMLElement>) => {
-        if (event.button !== 0) return
-        event.preventDefault()
-        event.currentTarget.setPointerCapture?.(event.pointerId)
-        const cell = cellOf(event.currentTarget)
-        const start = Math.round(cell.getBoundingClientRect().width)
-        const sign = readDirection(cell) === 'ltr' ? 1 : -1
-        drag.current = { column: column.id, x: event.clientX, sign, start, width: start }
-      },
-      onPointerMove: (event: PointerEvent<HTMLElement>) => {
-        const current = drag.current
-        if (current?.column !== column.id) return
-        current.width = resize(column, current.start + (event.clientX - current.x) * current.sign)
-      },
-      onPointerUp: endDrag,
-      onPointerCancel: endDrag,
-      onLostPointerCapture: endDrag,
-      onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-        const cell = cellOf(event.currentTarget)
-        const intent = stepIntent(event, 'horizontal', readDirection(cell))
-        if (!intent) return
-        event.preventDefault()
-        const start = Math.round(cell.getBoundingClientRect().width)
-        const target =
-          'step' in intent ? start + intent.step * STEP : intent.to === 'min' ? min : max
-        if (!Number.isFinite(target)) return
-        const width = resize(column, target)
-        if (width !== start) onColumnResize?.({ column: column.id, width })
-      },
-    } as const
+  /** The column's resize handle, once its width is known (after mount, so never in server HTML). */
+  const handle = (column: TableColumn) => {
+    const now = widths[column.id] ?? measured[column.id]
+    if (now === undefined) return null
+    // A column already narrower than its minimum is not widened by the handle.
+    const least = Math.min(
+      readNumber('Table', 'columns[].minWidth', column.minWidth, MIN_WIDTH, { min: 0 }),
+      now,
+    )
+    return (
+      <span
+        role="separator"
+        tabIndex={0}
+        aria-orientation="vertical"
+        aria-label={formatLabel(text.resizeColumn, { name: nameOf(column.header, column.id) })}
+        aria-valuenow={now}
+        aria-valuemin={least}
+        // No upper bound: the table grows and scrolls.
+        aria-valuemax={Number.MAX_SAFE_INTEGER}
+        aria-valuetext={formatLabel(text.columnWidth, { width: now })}
+        data-scope="table"
+        data-part="resizeHandle"
+        className="uf-table__resize-handle"
+        onPointerDown={(event: PointerEvent<HTMLElement>) => {
+          if (event.button !== 0) return
+          event.preventDefault()
+          event.currentTarget.setPointerCapture?.(event.pointerId)
+          drag.current = {
+            column: column.id,
+            x: event.clientX,
+            sign: readDirection(event.currentTarget) === 'ltr' ? 1 : -1,
+            start: now,
+            width: now,
+            least,
+            base: { ...measured, ...widths },
+          }
+        }}
+        onPointerMove={(event: PointerEvent<HTMLElement>) => {
+          const current = drag.current
+          if (current?.column !== column.id) return
+          const width = Math.max(
+            current.least,
+            Math.round(current.start + (event.clientX - current.x) * current.sign),
+          )
+          if (width === current.width) return
+          current.width = width
+          setWidths({ ...current.base, [column.id]: width })
+        }}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onLostPointerCapture={endDrag}
+        onKeyDown={(event: KeyboardEvent<HTMLElement>) => {
+          const intent = stepIntent(event, 'horizontal', readDirection(event.currentTarget))
+          // End has no width to go to.
+          if (!intent || ('to' in intent && intent.to === 'max')) return
+          event.preventDefault()
+          const width = 'step' in intent ? Math.max(least, now + intent.step * STEP) : least
+          if (width === now) return
+          setWidths({ ...measured, ...widths, [column.id]: width })
+          onColumnResize?.({ column: column.id, width })
+        }}
+      />
+    )
   }
 
   const firstColumn = columnList[0]
+  /** The width a column keeps: the user's resize, else its `width`; `undefined` sizes it to its content. */
+  const widthOf = (column: TableColumn) => widths[column.id] ?? column.width
   const cell = (part: 'headerCell' | 'cell') =>
     ({ 'data-scope': 'table', 'data-part': part, role: part === 'cell' ? 'cell' : 'columnheader' }) as const
 
@@ -481,6 +474,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
       data-sticky-header={stickyHeader || undefined}
       data-sticky-last-column={stickyLastColumn || undefined}
       data-show-dividers={showDividers || undefined}
+      data-resized={Object.keys(widths).length > 0 || undefined}
       className={cn('uf-table', className)}
     >
       <thead data-scope="table" data-part="header" role="rowgroup">
@@ -506,19 +500,8 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
             </th>
           )}
           {columnList.map((column) => {
-            const headerId = domId(base, 'column', column.id)
-            // A resize fixes the width; a px width is also the least the column narrows to.
-            const width = widths[column.id]
-            const style: CSSProperties =
-              width === undefined
-                ? {
-                    width: column.width,
-                    minWidth:
-                      column.minWidth ??
-                      (typeof column.width === 'number' ? column.width : undefined),
-                    maxWidth: column.maxWidth,
-                  }
-                : { width, minWidth: width, maxWidth: width }
+            const width = widthOf(column)
+            const style: CSSProperties = { width, minWidth: width ?? column.minWidth }
             const isSorted = column === sorted
             const label = (
               <>
@@ -541,7 +524,6 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
               <th
                 key={column.id}
                 {...cell('headerCell')}
-                id={headerId}
                 data-column={column.id}
                 aria-sort={
                   isSorted
@@ -554,7 +536,11 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
                 }
                 style={style}
               >
-                <div className="uf-table__cellSlot" data-align={column.align}>
+                <div
+                  className="uf-table__cellSlot"
+                  data-align={column.align}
+                  data-sized={width !== undefined || undefined}
+                >
                   {column.sortable ? (
                     <button
                       type="button"
@@ -571,7 +557,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
                     label
                   )}
                 </div>
-                {resizable && <span {...handleProps(column, headerId)} />}
+                {resizable && handle(column)}
               </th>
             )
           })}
@@ -584,10 +570,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
         {...(onRowClick && { ...roving.root, onKeyDown: onBodyKeyDown })}
       >
         {shown.map(({ key, row }, index) => {
-          const details = (event: MouseEvent<HTMLTableRowElement>) => ({ row, index, event })
           const isActive = activeRow != null && key === activeRow
-          const labelId = domId(base, 'cell', key)
-          const checkboxId = domId(base, 'select', key)
           return (
             <tr
               key={key}
@@ -605,20 +588,18 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
                 ((event) => {
                   const control = (event.target as Element).closest(CONTROL)
                   if (control && control !== event.currentTarget) return
-                  onRowClick(details(event))
+                  onRowClick({ row, index, event })
                 })
               }
-              onMouseEnter={onRowMouseEnter && ((event) => onRowMouseEnter(details(event)))}
-              onMouseLeave={onRowMouseLeave && ((event) => onRowMouseLeave(details(event)))}
             >
               {selectable && (
                 <td {...cell('cell')} data-select="">
                   <div className="uf-table__cellSlot">
                     <Checkbox
                       membrane={false}
-                      id={checkboxId}
-                      aria-label={text.selectRow}
-                      aria-labelledby={firstColumn && `${checkboxId} ${labelId}`}
+                      aria-label={formatLabel(text.selectRow, {
+                        name: nameOf(firstColumn && cellValue(row, firstColumn), index + 1),
+                      })}
                       checked={selected.has(key)}
                       onCheckedChange={({ checked }) => selectRow(key, checked === true)}
                     />
@@ -641,7 +622,6 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
                   <td
                     key={column.id}
                     {...cell('cell')}
-                    id={column === firstColumn ? labelId : undefined}
                     data-column={column.id}
                     title={
                       column.truncate && isText(shownValue) ? String(shownValue) : undefined
@@ -651,11 +631,14 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
                       className="uf-table__cellSlot"
                       data-align={column.align}
                       data-truncate={column.truncate || undefined}
+                      data-sized={widthOf(column) !== undefined || undefined}
                     >
-                      {content(shownValue, `columns.${column.id} cell`, {
-                        align: column.align,
-                        truncate: column.truncate,
-                      })}
+                      {content(
+                        // `render` may return a boolean, as React allows, for nothing.
+                        column.render && typeof shownValue === 'boolean' ? null : shownValue,
+                        `columns.${column.id} cell`,
+                        { align: column.align, truncate: column.truncate },
+                      )}
                     </div>
                   </td>
                 )

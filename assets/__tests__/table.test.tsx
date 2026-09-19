@@ -1,5 +1,6 @@
 import { act, createRef, type ReactNode } from 'react'
 import type { Root } from 'react-dom/client'
+import { renderToString } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   Table,
@@ -261,19 +262,6 @@ describe('row events', () => {
     expect(rowsOf(host).some((row) => row.hasAttribute('tabindex') || row.hasAttribute('data-interactive'))).toBe(false)
   })
 
-  it('onRowMouseEnter and onRowMouseLeave report the row and its shown index', async () => {
-    const enter = vi.fn()
-    const leave = vi.fn()
-    await render({ onRowMouseEnter: enter, onRowMouseLeave: leave })
-    const row = host.querySelector('tr[data-row-id="c"]')!
-    await act(async () => {
-      row.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: document.body }))
-      row.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: document.body }))
-    })
-    expect(enter.mock.calls[0][0]).toMatchObject({ row: people[2], index: 2 })
-    expect(leave.mock.calls[0][0]).toMatchObject({ row: people[2], index: 2 })
-  })
-
   it('activeRow marks one row as current, apart from selection', async () => {
     await render({ activeRow: 'c', selectable: true, selectedRows: ['a'] })
     const current = host.querySelectorAll('tr[aria-current="true"]')
@@ -326,15 +314,24 @@ describe('columns', () => {
     expect(host.querySelector('td[data-column="status"] [data-truncate]')).toBeNull()
   })
 
-  it('width, minWidth and maxWidth size the header cell of their column; a px width is also its least width', async () => {
+  it('a width is also the least width of its column, and its cells cannot widen it; minWidth alone sets the least width', async () => {
     await render({
       columns: [
         { id: 'name', width: 160 },
-        { id: 'status', width: '25%', minWidth: 80, maxWidth: 240 },
+        { id: 'status', width: '25%', minWidth: 80 },
+        { id: 'score', minWidth: 80 },
       ],
     })
     expect(header('name').style.cssText).toBe('width: 160px; min-width: 160px;')
-    expect(header('status').style.cssText).toBe('width: 25%; min-width: 80px; max-width: 240px;')
+    expect(header('status').style.cssText).toBe('width: 25%; min-width: 25%;')
+    expect(header('score').style.cssText).toBe('min-width: 80px;')
+    const sized = (column: string) =>
+      [...host.querySelectorAll(`[data-column="${column}"] .uf-table__cellSlot`)].map((slot) =>
+        slot.hasAttribute('data-sized'),
+      )
+    expect(sized('name')).toEqual([true, true, true, true])
+    expect(sized('score')).toEqual([false, false, false, false])
+    expect(libraryCss()).toMatch(/\.uf-table__cellSlot\[data-sized\] \{\s*contain: inline-size;/)
   })
 
   it('a column without a unique string id is dropped with a report', async () => {
@@ -348,21 +345,35 @@ describe('columns', () => {
 })
 
 describe('rows and rowKey', () => {
-  it('rowKey names the key field or computes it; numbers become text and id is the default', async () => {
-    const data = [{ id: 7, code: 'x1', name: 'Seven' }]
+  it('rowKey names the key field or computes it, id by default; a key that is not text is replaced by the position, with a report', async () => {
+    const data = [{ id: 'x7', code: 'x1', name: 'Seven' }]
     await render({ rows: data })
-    expect(order(host)).toEqual(['7'])
+    expect(order(host)).toEqual(['x7'])
     await render({ rows: data, rowKey: 'code' })
     expect(order(host)).toEqual(['x1'])
     await render({ rows: data, rowKey: (row) => `${row.code}-${row.id}` })
-    expect(order(host)).toEqual(['x1-7'])
+    expect(order(host)).toEqual(['x1-x7'])
+    await expectDevError(
+      () => render({ rows: [{ id: 7, name: 'Seven' }] }),
+      /^Face UI Table: invalid rows\[0\] key 7; using "#0"\.$/,
+    )
+    expect(order(host)).toEqual(['#0'])
+  })
+
+  it('a row whose data has type "group" or items is still one row keyed by rowKey', async () => {
+    await render({
+      rows: [{ id: 'g', name: 'Folder', type: 'group', items: [{ id: 'inner' }] }],
+      columns: [{ id: 'name' }, { id: 'type' }],
+    })
+    expect(order(host)).toEqual(['g'])
+    expect(cellText('type')).toEqual(['group'])
   })
 
   it('rows that are not objects or repeat a key are dropped with a report; a cell value that is not content is left out', async () => {
     allowConsoleError(/^Face UI Table: invalid rows\[2\] key "b"; dropping the duplicate\.$/)
     await expectDevError(
       () => render({ rows: [people[0], null, people[0]] }),
-      /^Face UI Table: invalid rows\[1\] null; dropping the row\.$/,
+      /^Face UI Table: invalid rows\[1\] null; dropping the item\.$/,
     )
     expect(order(host)).toEqual(['b'])
     await expectDevError(
@@ -372,10 +383,17 @@ describe('rows and rowKey', () => {
     expect(cellText('name')).toEqual([''])
   })
 
-  it('booleans, numbers and dates show as text', async () => {
-    await render({ rows: [{ id: 'x', ok: false, n: 0, at: new Date(0) }], columns: [{ id: 'ok' }, { id: 'n' }, { id: 'at' }] })
-    expect([...cellText('ok'), ...cellText('n')]).toEqual(['false', '0'])
-    expect(cellText('at')[0]).toBe(String(new Date(0)))
+  it('text and numbers show as text; a date or a boolean needs render and is reported, while render may return false', async () => {
+    allowConsoleError(/^Face UI Table: invalid columns\.at cell object; leaving the cell empty\.$/)
+    await expectDevError(
+      () =>
+        render({
+          rows: [{ id: 'x', ok: false, n: 0, big: BigInt(9), at: new Date(0) }],
+          columns: [{ id: 'ok' }, { id: 'n' }, { id: 'big' }, { id: 'at' }, { id: 'flag', render: () => false }],
+        }),
+      /^Face UI Table: invalid columns\.ok cell false; leaving the cell empty\.$/,
+    )
+    expect([...cellText('ok'), ...cellText('n'), ...cellText('big'), ...cellText('at'), ...cellText('flag')]).toEqual(['', '0', '9', '', ''])
   })
 })
 
@@ -409,7 +427,7 @@ describe('layout props', () => {
     expect(host.querySelector('table')!.dataset.variant).toBe('plain')
     await render({ variant: 'tile' })
     expect(host.querySelector('table')!.dataset.variant).toBe('tile')
-    expect(libraryCss()).toContain('.uf-table[data-scope][data-variant="tile"] tbody td:first-child')
+    expect(libraryCss()).toContain('.uf-table[data-scope][data-variant="tile"] :is(th, td):first-child')
   })
 
   it('membrane adds the outer spacing box around the same table', async () => {
@@ -438,25 +456,46 @@ describe('resizing', () => {
       node.dispatchEvent(new PointerEvent(type, { bubbles: true, clientX, button: 0, pointerId: 1 }))
     })
 
-  it('resizable adds a named, focusable separator per column; without it there is none', async () => {
+  it('resizable adds a focusable separator per column, named from the header and valued in px; without it there is none', async () => {
     await render()
     expect(host.querySelector('[role="separator"]')).toBeNull()
-    await render({ resizable: true, labels: { resizeColumn: 'Change width of' } })
+    await render({
+      resizable: true,
+      labels: { resizeColumn: 'Change width of {name}', columnWidth: '{width} px' },
+      columns: [{ id: 'name', header: 'Name' }, { id: 'badge', header: <em>Badge</em> }],
+    })
     const separator = handle('name')
     expect(separator.tabIndex).toBe(0)
     expect(separator.getAttribute('aria-orientation')).toBe('vertical')
-    expect(separator.getAttribute('aria-label')).toBe('Change width of')
-    expect(separator.getAttribute('aria-labelledby')).toBe(`${separator.id} ${header('name').id}`)
+    expect(separator.getAttribute('aria-label')).toBe('Change width of Name')
+    expect(handle('badge').getAttribute('aria-label')).toBe('Change width of badge')
+    expect(separator.getAttribute('aria-valuenow')).toBe('120')
+    expect(separator.getAttribute('aria-valuetext')).toBe('120 px')
     expect(separator.getAttribute('aria-valuemin')).toBe('48')
   })
 
-  it('a drag sets the width and reports it once, when the pointer is released', async () => {
+  it('server HTML has no resize handles: they appear once the widths are measured, each with its value', async () => {
+    expect(renderToString(<Table columns={columns} rows={people} resizable />)).not.toContain('separator')
+    await render({ resizable: true })
+    expect([...host.querySelectorAll('[role="separator"]')].map((node) => node.getAttribute('aria-valuenow'))).toEqual([
+      '120',
+      '120',
+      '120',
+    ])
+  })
+
+  it('a drag fixes every column at its width, changes only its own, and reports it once, when the pointer is released', async () => {
     const resized = vi.fn()
     await render({ resizable: true, onColumnResize: resized })
+    const table = host.querySelector('table')!
+    expect(table.hasAttribute('data-resized')).toBe(false)
     await pointer(handle('name'), 'pointerdown', 100)
     await pointer(handle('name'), 'pointermove', 130)
     await pointer(handle('name'), 'pointermove', 160)
-    expect(header('name').style.cssText).toBe('width: 180px; min-width: 180px; max-width: 180px;')
+    expect(header('name').style.cssText).toBe('width: 180px; min-width: 180px;')
+    expect(header('status').style.cssText).toBe('width: 120px; min-width: 120px;')
+    expect(table.hasAttribute('data-resized')).toBe(true)
+    expect(host.querySelector('td[data-column="score"] .uf-table__cellSlot')!.hasAttribute('data-sized')).toBe(true)
     expect(handle('name').getAttribute('aria-valuenow')).toBe('180')
     expect(resized).not.toHaveBeenCalled()
     await pointer(handle('name'), 'pointerup', 160)
@@ -476,42 +515,52 @@ describe('resizing', () => {
     expect(header('name').style.width).toBe('150px')
   })
 
-  it('arrow keys step by 10 px, Home goes to minWidth and End to maxWidth, each reported', async () => {
+  it('arrow keys step by 10 px from the width shown and Home goes to minWidth, each change reported; End does nothing', async () => {
     const resized = vi.fn()
     await render({
       resizable: true,
       onColumnResize: resized,
-      columns: [{ id: 'name', minWidth: 60, maxWidth: 200 }],
+      columns: [{ id: 'name', minWidth: 60 }],
     })
     await key(handle('name'), 'ArrowRight')
-    width = 130
     await key(handle('name'), 'ArrowLeft')
+    await key(handle('name'), 'PageDown')
     await key(handle('name'), 'Home')
+    await key(handle('name'), 'ArrowLeft')
     await key(handle('name'), 'End')
-    expect(resized.mock.calls.map(([details]) => details.width)).toEqual([130, 120, 60, 200])
-    expect(header('name').style.width).toBe('200px')
+    expect(resized.mock.calls.map(([details]) => details.width)).toEqual([130, 120, 60])
+    expect(header('name').style.width).toBe('60px')
   })
 
-  it('a drag stops at minWidth, or at 48 px without one', async () => {
-    await render({ resizable: true, columns: [{ id: 'name' }, { id: 'status', minWidth: 100 }] })
+  it('a drag stops at minWidth, or at 48 px without one, and never widens a column already narrower', async () => {
+    const resized = vi.fn()
+    await render({ resizable: true, onColumnResize: resized, columns: [{ id: 'name' }, { id: 'status', minWidth: 100 }] })
     for (const column of ['name', 'status']) {
       await pointer(handle(column), 'pointerdown', 100)
       await pointer(handle(column), 'pointermove', -500)
       await pointer(handle(column), 'pointerup', -500)
     }
     expect([header('name').style.width, header('status').style.width]).toEqual(['48px', '100px'])
+    width = 40
+    await render({ resizable: true, onColumnResize: resized, columns: [{ id: 'tiny' }] })
+    expect(handle('tiny').getAttribute('aria-valuemin')).toBe('40')
+    await pointer(handle('tiny'), 'pointerdown', 100)
+    await pointer(handle('tiny'), 'pointermove', 90)
+    await pointer(handle('tiny'), 'pointerup', 90)
+    await key(handle('tiny'), 'Home')
+    expect(header('tiny').style.width).toBe('')
+    expect(resized.mock.calls.map(([details]) => details.column)).toEqual(['name', 'status'])
   })
 })
 
 describe('labels and native attributes', () => {
-  it('row checkboxes are named by labels.selectRow and the row first column; select-all by labels.selectAll', async () => {
-    await render({ selectable: true, labels: { selectAll: 'Alle', selectRow: 'Wählen' } })
-    const box = checkboxOf(host, 'a')
-    const [self, cell] = box.getAttribute('aria-labelledby')!.split(' ')
-    expect(self).toBe(box.id)
-    expect(box.getAttribute('aria-label')).toBe('Wählen')
-    expect(document.getElementById(cell)!.textContent).toBe('Alpha')
+  it('row checkboxes are named by labels.selectRow with the row first value, or its position; select-all by labels.selectAll', async () => {
+    await render({ selectable: true, labels: { selectAll: 'Alle', selectRow: '{name} wählen' } })
+    expect(checkboxOf(host, 'a').getAttribute('aria-label')).toBe('Alpha wählen')
+    expect(checkboxOf(host, 'a').hasAttribute('aria-labelledby')).toBe(false)
     expect(host.querySelector('thead input')!.getAttribute('aria-label')).toBe('Alle')
+    await render({ selectable: true, columns: [{ id: 'badge', accessor: (row) => <b>{row.name}</b> }] })
+    expect(checkboxOf(host, 'a').getAttribute('aria-label')).toBe('Select 2')
   })
 
   it('native attributes, className and ref belong to the table element', async () => {

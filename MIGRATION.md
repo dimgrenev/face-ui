@@ -339,19 +339,21 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `sortDirection` | One `sort={{ column, direction }}` (controlled) or `defaultSort` (uncontrolled); `null` is unsorted | manual |
 | `onSortChange`: `{ column, direction }` | `{ sort }`, with `sort` as `{ column, direction }` or `null` | manual |
 | `onRowClick`: `(row, index)` | `({ row, index, event })`; `index` is the position shown | manual |
-| `onRowMouseEnter`: `(row, index)` | `({ row, index, event })`; `index` is the position shown | manual |
-| `onRowMouseLeave`: `(row, index)` | `({ row, index, event })`; `index` is the position shown | manual |
+| `onRowMouseEnter` | No replacement: put pointer handlers on the content `render` returns | manual |
+| `onRowMouseLeave` | No replacement: put pointer handlers on the content `render` returns | manual |
+| `columns[].maxWidth` | Browsers ignore a maximum width on table cells; give the column a `width`, which its content can no longer widen | manual |
 | `onColumnResize`: `(columnId, width)` on every pointer move, for the column and its neighbour | `({ column, width })` once per finished resize of that column | manual |
 | `columns`: `align: "left" \| "center" \| "right"` | `align: "start" \| "center" \| "end"`, following text direction | manual |
-| `columns`: `render(value, row, { rowIndex, column })` | `render({ value, row, rowIndex, column })`; a one-argument `render: (value) =>` still compiles, so check every column | manual |
+| `columns`: `render(value, row, { rowIndex, column })` | `render({ value, row, rowIndex, column })`. A one-argument `render: (value) =>` still compiles and shows `[object Object]`, so every such render is reported, and so are columns passed as a variable or a call: check each render in them by hand | manual |
 | `TableAlign` from `Table/Table` | `TableColumn['align']` | manual |
 | `membrane` styled rows as tiles | `variant="tile"` styles rows; `membrane` adds outer spacing only | — |
 | The header stuck to the top of the scrolling container by default | `stickyHeader` is off by default; pass it where the table scrolls inside its own container | — |
-| Fixed layout: every cell stayed on one line with an ellipsis, `minWidth` and `maxWidth` had no effect, and resizing a column resized its neighbour | Columns size to their content: text wraps unless the column has `truncate`, `minWidth` and `maxWidth` hold, and a resize changes only its own column | — |
+| Fixed layout: every cell stayed on one line with an ellipsis, `minWidth` had no effect, and resizing a column resized its neighbour | A column without `width` sizes to its content and its text wraps; a column with `width` keeps it and wraps its content inside. Add `truncate` for one line with an ellipsis. `minWidth` holds. The first resize fixes every column at its width, so a resize changes only its own column and the table grows or shrinks | — |
 | Without `sortColumn`/`selectedRows` sorting and selection did nothing, while their callbacks still fired | Both work uncontrolled; a third click on a sorted header returns to the order of `rows` | — |
-| A row without a key was keyed by its position on screen (`"0"`), and repeated keys rendered twice | It is keyed by its position in `rows` (`"#0"`), which sorting does not change; numeric keys become text and a repeated key drops the row with a report | — |
+| A row without a key was keyed by its position on screen (`"0"`), a numeric key became text, and repeated keys rendered twice | A row without a text key is keyed by its position in `rows` (`"#0"`), which sorting does not change; a key that is not text is reported (pass `rowKey={(row) => String(row.id)}`), and a repeated key drops the row with a report | — |
 | `onRowClick` also fired for clicks on the row checkbox or a control in a cell, and only a mouse could trigger it | Clicks on controls and on the selection cell do not activate the row; rows become one tab stop, arrows move between them and Enter activates | — |
-| Row checkboxes were named `Select row <key>`, the select-all box never showed a partial selection, and rows carried `aria-selected` | Row checkboxes are named by `labels.selectRow` plus the row first cell, select-all shows a mixed state, and `aria-selected` is gone (the checkbox carries the state) | — |
+| Row checkboxes were named `Select row <key>`, the select-all box never showed a partial selection, and rows carried `aria-selected` | Row checkboxes are named by `labels.selectRow` (`Select {name}`, `{name}` being the row value in the first column), select-all shows a mixed state, and `aria-selected` is gone (the checkbox carries the state) | — |
+| A boolean cell value showed as `true` or `false`, and a date as `String(date)` | Only text and numbers show as text; a boolean or a date needs `render` and is otherwise left out with a report | — |
 
 ### Tabs
 

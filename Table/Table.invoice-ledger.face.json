@@ -153,13 +153,13 @@
       "name": "rows",
       "type": "array",
       "required": false,
-      "description": "Row data, one object per row."
+      "description": "Row data, one object per row; a row that is not an object, or repeats a key, is dropped."
     },
     {
       "name": "rowKey",
       "type": "string",
       "required": false,
-      "description": "Row key: a row field name or a function of the row returning text or a number; `id` by default, else `#<position in rows>`."
+      "description": "Row key: a row field name or a function of the row, `id` by default. A row whose key is not text is keyed `#<position in rows>`."
     },
     {
       "name": "sort",
@@ -225,7 +225,7 @@
       "name": "resizable",
       "type": "boolean",
       "required": false,
-      "description": "Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys.",
+      "description": "Adds a handle at the inline end of every header cell that resizes its column by pointer or arrow keys; the first resize fixes every column at its width, so only the resized one changes and the table grows or shrinks.",
       "defaultValue": false
     },
     {
@@ -245,7 +245,7 @@
       "name": "variant",
       "type": "select",
       "required": false,
-      "description": "`tile` rounds every row into its own surface; `plain` keeps a flat grid.",
+      "description": "`tile` shows each row as one rounded surface, under the pointer and when selected or current, with its content inset; `plain` keeps full-width rows.",
       "options": [
         "plain",
         "tile"
