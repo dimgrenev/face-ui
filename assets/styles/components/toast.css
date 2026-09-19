@@ -1,31 +1,35 @@
 /* =================================================================
  * TOAST
  * ================================================================= */
+/* The region is a fixed column at a viewport edge, clear of notches and home indicators.
+   Only the toasts take the pointer: the page stays usable between and around them. */
 .uf-toaster {
+  --uf-toaster-inset-x: calc(
+    var(--uf-toast-viewport-inset) + max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px))
+  );
   position: fixed;
   display: flex;
   flex-direction: column;
   gap: var(--uf-spacing-2);
   z-index: var(--uf-z-toast);
-  width: min(calc(100vw - (var(--uf-toast-viewport-inset) * 2)), var(--uf-toast-container-max-width));
-  max-width: var(--uf-toast-container-max-width);
+  width: min(calc(100% - 2 * var(--uf-toaster-inset-x)), var(--uf-toast-container-max-width));
   pointer-events: none;
 }
 .uf-toaster[data-placement^="bottom-"] {
-  bottom: var(--uf-toast-viewport-inset);
+  bottom: calc(var(--uf-toast-viewport-inset) + env(safe-area-inset-bottom, 0px));
 }
 .uf-toaster[data-placement^="top-"] {
-  top: var(--uf-toast-viewport-inset);
+  top: calc(var(--uf-toast-viewport-inset) + env(safe-area-inset-top, 0px));
 }
-.uf-toaster[data-placement$="-left"] {
-  left: var(--uf-toast-viewport-inset);
+.uf-toaster[data-placement$="-start"] {
+  inset-inline-start: var(--uf-toaster-inset-x);
 }
-.uf-toaster[data-placement$="-right"] {
-  right: var(--uf-toast-viewport-inset);
+.uf-toaster[data-placement$="-end"] {
+  inset-inline-end: var(--uf-toaster-inset-x);
 }
 .uf-toaster[data-placement$="-center"] {
-  left: 50%;
-  transform: translateX(-50%);
+  inset-inline: 0;
+  margin-inline: auto;
 }
 .uf-toast[data-scope] {
   --uf-card-border-width: var(--uf-toast-border-width);
@@ -85,8 +89,5 @@
 @media (max-width: 56.1875rem) {
   .uf-toaster {
     --uf-toast-viewport-inset: var(--uf-toast-compact-inset);
-  }
-  .uf-toast[data-scope] {
-    width: 100%;
   }
 }

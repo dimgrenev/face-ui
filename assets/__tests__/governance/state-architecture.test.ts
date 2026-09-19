@@ -168,7 +168,7 @@ const oneImplementation = (component: string) =>
 const PENDING = {
   'D2 throw': [],
   'D3 machines': [
-    'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Table', 'Toast', 'Toc', 'Tree', 'Upload',
+    'Carousel', 'Command', 'Menu', 'Modal', 'Navigation', 'Panel', 'Table', 'Toc', 'Tree', 'Upload',
   ],
   'D3 isomorphic layout effect': [],
   'D3 direction': [],

@@ -380,6 +380,28 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `rightText` sat inside the label area and joined a button row's accessible name | `meta` renders in its own part before the actions and is not part of the row's name | — |
 | A Tile with `aria-expanded` but no `onClick`, `role` or `interactive` rendered an inert `<div aria-expanded>` | `aria-expanded` makes the row a disclosure button; pass `interactive={false}` to opt out | — |
 
+### Toast
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `dismissible` | `closable` | auto |
+| `closeLabel` | `labels.close` | auto |
+| `onDismiss` | `onClose` | auto |
+| The close button rendered without `onDismiss` and did nothing | The close button, and Escape inside the toast, appear only when `onClose` can be called | — |
+| Clicking the action always closed the toast; `action.onClick` received no event | `action.onClick(event)` runs first; `event.preventDefault()` keeps the toast open | — |
+| Only the first toast of a series closed itself, and hovering did not pause it | Every toast closes after its own `duration`; a pointer over a toast, focus in the region or a background window pauses all of them, keeping the time left | — |
+| Toasts beyond `maxVisible` were dropped | They wait behind the newest ones with their time stopped and appear as those close | — |
+| `createToastContext({ defaultDuration })`; its `toaster` exposed the machine service | `createToastContext({ duration })`; its `toaster` is `{ toast, dismiss }`, the object `useToast()` returns | — |
+
+### Toaster
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `dismissible` | `closable` | auto |
+| `closeLabel` | `labels.close` | auto |
+| `placement="bottom-left"`, `placement="bottom-right"`, `placement="top-left"`, `placement="top-right"` | `placement="bottom-start"`, `placement="bottom-end"`, `placement="top-start"`, `placement="top-end"` | auto |
+| The newest toast was last in every placement | The newest toast sits nearest the viewport edge: last at the bottom, first at the top | — |
+
 ### Toggle
 
 | Before | After | Codemod |

@@ -7,7 +7,6 @@ export default [
       title: 'Workspace saved',
       description: 'Your changes are now visible to all collaborators.',
       tone: 'positive',
-      dismissible: true,
       action: { label: 'View changes' },
     },
   },
@@ -18,7 +17,7 @@ export default [
       description:
         'You can keep working while the remaining records are processed.',
       tone: 'warning',
-      dismissible: false,
+      closable: false,
       action: { label: 'Open activity' },
     },
   },
