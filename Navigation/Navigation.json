@@ -50,7 +50,7 @@
     "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Names the navigation landmark and titles the sheet; an untitled sheet is named by its trigger."
+      "description": "Names the navigation landmark (default \"Main\") and titles the sheet."
     },
     "labels": {
       "type": "object",

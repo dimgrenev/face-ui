@@ -138,14 +138,14 @@
       "name": "collapsible",
       "type": "boolean",
       "required": false,
-      "description": "Shows the button that collapses the panel to a rail; false leaves collapsing to `collapsed`. Default true.",
+      "description": "Shows the button that collapses the panel to a rail, and lets a group in the rail open the panel at it; false leaves `collapsed` to the parent, and groups then open in the rail. Default true.",
       "defaultValue": true
     },
     {
       "name": "width",
       "type": "any",
       "required": false,
-      "description": "Width of the expanded inline panel: pixels, or any CSS length. Default 260.",
+      "description": "Width of the expanded inline panel: pixels, or any CSS length. Default 260. It and `collapsedWidth` own the width, so `style.width` is ignored.",
       "defaultValue": 260
     },
     {
@@ -190,7 +190,7 @@
       "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Names the navigation landmark and titles the sheet; an untitled sheet is named by its trigger."
+      "description": "Names the navigation landmark (default \"Sidebar\") and titles the sheet."
     },
     {
       "name": "labels",

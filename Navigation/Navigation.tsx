@@ -22,7 +22,13 @@ import type {
   CollectionItem,
   ItemGroup,
 } from '../assets/internal/item'
-import { NavSheet, useNavSurface } from '../assets/internal/nav-sheet'
+import {
+  isDisabled,
+  kindOf,
+  NavSheet,
+  opensElsewhere,
+  useNavSurface,
+} from '../assets/internal/nav'
 import {
   domId,
   readCollection,
@@ -41,7 +47,7 @@ import { Icon } from '../Icon/Icon'
 
 /** A link or action of Navigation, in the bar, a dropdown or the sheet. */
 export interface NavigationLink extends Omit<CollectionItem, 'textValue'> {
-  /** Makes the item a link to this URL; modifier keys and middle click open it elsewhere, as for any link. */
+  /** Makes the item a link to this URL; a click with a modifier key or the middle button opens it elsewhere and changes nothing here. */
   href?: string
   /** Called with the click before the item becomes current or its dropdown toggles; `preventDefault()` cancels only a link's navigation. */
   onClick?: (event: MouseEvent<HTMLElement>) => void
@@ -54,7 +60,7 @@ export type NavigationEntry = NavigationLink | ItemGroup<NavigationLink>
 
 /** One item of the bar. */
 export interface NavigationItem extends Omit<NavigationLink, 'items'> {
-  /** Turns the item into a button that shows these entries in a dropdown (a section of the sheet); its `href` is then ignored. */
+  /** Turns the item into a button that shows these entries in a dropdown (a section of the sheet); its `href` is then ignored, and disabling it disables them. */
   items?: readonly NavigationEntry[]
 }
 
@@ -90,7 +96,7 @@ export interface NavigationProps
   onOpenChange?: (details: { open: boolean }) => void
   /** Element that opens the sheet, keeping its own props; text renders as a Button. Default: an icon button named `labels.open`. */
   trigger?: ReactNode
-  /** Names the navigation landmark and titles the sheet; an untitled sheet is named by its trigger. */
+  /** Names the navigation landmark (default "Main") and titles the sheet. */
   'aria-label'?: string
   /** Strings Navigation renders itself: `open` names the default sheet trigger, `close` the sheet's close button. */
   labels?: Partial<NavigationLabels>
@@ -116,14 +122,11 @@ const defaultLabels: NavigationLabels = Object.freeze({
   open: 'Open navigation',
   close: 'Close',
 })
+/** Landmark and sheet name until a native aria-label or aria-labelledby names the nav (K14). */
+const defaultRootLabels = Object.freeze({ nav: 'Main' })
 /** Hover opens a dropdown after this pause, and leaving closes it after the other. */
 const OPEN_DELAY = 200
 const CLOSE_DELAY = 150
-
-const kindOf = (item: unknown) => {
-  const { type } = item as { type?: unknown }
-  return type === 'group' || type === 'separator' ? type : 'item'
-}
 
 function renderIcon(icon: ReactNode) {
   if (!hasSlotContent(icon)) return null
@@ -157,7 +160,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
     } = props
     const strings = resolveLabels(defaultLabels, labels, 'Navigation')
 
-    // Items: the bar's own items open dropdowns of their entries; nothing nests deeper.
+    // Items: the bar's own items open dropdowns of links and groups of links; nothing nests deeper.
     const own = new Set<unknown>(Array.isArray(items) ? items : [])
     const collection = readCollection<unknown>(items, {
       component: 'Navigation',
@@ -165,12 +168,30 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
       children: (item) =>
         own.has(item) ? (item as NavigationItem).items : undefined,
     })
-    const itemsOf = (parent: string | null) =>
-      collection.children(parent).filter((entry) => kindOf(entry.item) !== 'separator')
-    const top = itemsOf(null).filter((entry) => kindOf(entry.item) === 'item')
+    const kept = (entry: Entry<unknown>) => {
+      const kind = kindOf(entry.item)
+      return kind === 'item' || (kind === 'group' && own.has(collection.get(entry.parent)?.item))
+    }
+    for (const entry of collection.entries) {
+      const kind = kindOf(entry.item)
+      const { items: nested } = entry.item as NavigationItem
+      if (!kept(entry))
+        invalidProp(
+          'Navigation',
+          'items[].type',
+          kind,
+          kind === 'group'
+            ? 'dropping it and its links: a group belongs directly in a dropdown'
+            : 'dropping it: Navigation has no separators',
+        )
+      else if (kind === 'item' && !own.has(entry.item) && nested !== undefined)
+        invalidProp('Navigation', 'items[].items', nested, 'ignoring it: only bar items open dropdowns')
+    }
+    const itemsOf = (parent: string | null) => collection.children(parent).filter(kept)
+    const top = itemsOf(null)
     const topKeys = top.map((entry) => entry.key)
     const hasMenu = (key: string) => itemsOf(key).length > 0
-    const disabled = (key: string) => collection.get(key)?.disabled !== false
+    const disabled = (key: string) => isDisabled(collection, key)
     /** The links under a bar item, groups flattened, in order. */
     const linksOf = (key: string) =>
       itemsOf(key).flatMap((entry) =>
@@ -271,7 +292,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
     // Down and Up on a trigger open its dropdown at the first or last link.
     const [opening, setOpening] = useState<'first' | 'last' | null>(null)
     const edgeLink = (edge: 'first' | 'last') => {
-      const enabled = links.filter((link) => !link.disabled)
+      const enabled = links.filter((link) => !disabled(link.key))
       return (edge === 'first' ? enabled[0] : enabled.at(-1))?.key
     }
     useIsomorphicLayoutEffect(() => {
@@ -286,8 +307,9 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
       event: MouseEvent<HTMLElement>,
       after: () => void,
     ) => {
-      if (entry.disabled) return
+      if (disabled(entry.key)) return
       ;(entry.item as NavigationLink).onClick?.(event)
+      if (opensElsewhere(event)) return
       setCurrent(entry.key)
       after()
     }
@@ -300,7 +322,8 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
         after: () => void
       },
     ) => {
-      const { key, disabled: off } = entry
+      const { key } = entry
+      const off = disabled(key)
       const { label, icon, href } = entry.item as NavigationLink
       const link = typeof href === 'string' && href ? href : undefined
       const shared = {
@@ -366,6 +389,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
       })
 
     const root = {
+      'aria-label': defaultRootLabels.nav,
       ...rest,
       ...part('root'),
       ref: rootRefs,
@@ -386,6 +410,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
             closeLabel={strings.close}
             title={rest['aria-label']}
             labelledBy={rest['aria-labelledby']}
+            name={defaultRootLabels.nav}
             placement="bottom"
             root={rootRef}
             className="uf-navigation-sheet"
@@ -405,6 +430,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
                     key={entry.key}
                     {...part('item')}
                     data-value={entry.key}
+                    data-disabled={disabled(entry.key) || undefined}
                     className="uf-navigation-section"
                   >
                     <span id={labelId} className="uf-navigation-sectionLabel">
@@ -444,7 +470,8 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
           }}
         >
           {top.map((entry) => {
-            const { key, disabled: off } = entry
+            const { key } = entry
+            const off = disabled(key)
             if (!hasMenu(key))
               return (
                 <li key={key} {...part('item')} data-value={key}>

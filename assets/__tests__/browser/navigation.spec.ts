@@ -86,9 +86,7 @@ test('Navigation follows APG disclosure navigation from the keyboard, arrows mir
 
 test('Tab reaches every enabled item and the open dropdown\'s links; leaving the item closes it', { tag: ['@focus'] }, async ({
   page,
-  browserName,
 }) => {
-  test.skip(browserName === 'webkit', "WebKit's Tab skips buttons and links by default")
   await page.locator('#before').focus()
   const order: string[] = []
   for (let i = 0; i < 4; i++) {
@@ -138,6 +136,21 @@ test('hover opens a dropdown after a pause, a click keeps it, crossing onto it k
   await expect(products).toHaveAttribute('aria-expanded', 'true')
   await page.mouse.move(2, 700)
   await expect(products).toHaveAttribute('aria-expanded', 'false')
+})
+
+test('a click with a modifier key leaves the page, the dropdown and the current item as they are', { tag: ['@pointer'] }, async ({
+  page,
+}) => {
+  const url = page.url()
+  const products = item(page, 'Products')
+  await products.click()
+  // Shift asks for a new window in every engine; the new page, if any, is closed.
+  await item(page, 'Fonts').click({ modifiers: ['Shift'] })
+  for (const other of page.context().pages()) if (other !== page) await other.close()
+  await expect(products).toHaveAttribute('aria-expanded', 'true')
+  await expect(item(page, 'Fonts')).not.toHaveAttribute('aria-current', 'page')
+  expect(page.url()).toBe(url)
+  expect(await events(page)).toEqual([])
 })
 
 test('at 360px both components become sheets inside the viewport: a bottom sheet and a start drawer', { tag: ['@layout'] }, async ({

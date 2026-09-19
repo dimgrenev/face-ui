@@ -47,7 +47,19 @@ export default [
     kind: 'behavior',
     component: 'Panel',
     before: 'The rail hid the rows of every group, and only string labels named icon-only rows',
-    after: 'A group in the rail expands the panel at that group; every label stays as the accessible name',
+    after: 'A group in the rail expands the panel at that group (in a rail without the toggle it shows its rows in place); every label stays as the accessible name',
+  },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: "A disabled group's rows stayed usable, and a click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed the sheet",
+    after: 'Disabling a group disables its rows; such a click opens the link elsewhere and leaves the current row and the sheet as they are',
+  },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: 'Rows had `data-selected` and `data-state`; parts were `itemIcon`, `itemLabel` and `groupContent`, and a group\'s button was `groupLabel`',
+    after: 'The current row has `aria-current="page"`; parts are `icon`, `label`, `group` (the rows of a group) and `trigger` (its button)',
   },
   {
     kind: 'behavior',
@@ -59,7 +71,7 @@ export default [
     kind: 'behavior',
     component: 'Panel',
     before: 'The sheet covered the whole viewport, titled "Panel"; `className` and `ref` moved to its host and dialog',
-    after: 'The sheet is a modal drawer at the start edge, titled by `aria-label`; the `<nav>` keeps native attributes, `className`, `style` and `ref`',
+    after: 'The sheet is a modal drawer at the start edge, titled by `aria-label`; the `<nav>` and the sheet are named "Sidebar" until `aria-label` or `aria-labelledby` names them; the `<nav>` keeps native attributes, `className`, `style` and `ref`',
   },
   {
     kind: 'behavior',

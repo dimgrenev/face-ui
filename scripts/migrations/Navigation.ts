@@ -65,4 +65,22 @@ export default [
     before: 'In the sheet, links were buttons that called `location.assign`, and the sheet was titled "Navigation"',
     after: 'The sheet is a modal bottom sheet of real links, titled by `aria-label`; `labels.open` and `labels.close` name its buttons',
   },
+  {
+    kind: 'behavior',
+    component: 'Navigation',
+    before: 'The landmark had no name unless `surfaceTitle` was set',
+    after: 'The `<nav>` and its sheet are named "Main" until `aria-label` or `aria-labelledby` names them',
+  },
+  {
+    kind: 'behavior',
+    component: 'Navigation',
+    before: 'A click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed its dropdown or the sheet',
+    after: 'Such a click opens the link elsewhere and leaves the current item, the dropdown and the sheet as they are',
+  },
+  {
+    kind: 'behavior',
+    component: 'Navigation',
+    before: 'Items had `data-active`; bar buttons were `.uf-navigation-trigger`, dropdown links `.uf-navigation-dropdownItem` Buttons, and the sheet used `.uf-navigation-sheet*` classes',
+    after: 'The current link has `aria-current="page"` and the bar button holding it `data-current`; style `[data-part="trigger"]`, `[data-part="link"]` and `.uf-navigation-section` instead',
+  },
 ] satisfies Migration[]

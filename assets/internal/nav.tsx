@@ -1,12 +1,43 @@
-import { cloneElement, useId, useRef, useState, type ReactNode, type RefObject } from 'react'
+/** What Navigation and Panel share: item rules, the surface choice and the sheet. */
+import { useRef, useState, type MouseEvent, type ReactNode, type RefObject } from 'react'
 import { getTriggerChild } from '../adapters/react/Trigger'
 import { useControllableState } from '../adapters/react/use-controllable-state'
 import { useIsomorphicLayoutEffect } from '../adapters/react/use-isomorphic-layout-effect'
 import { useIsCompactViewport } from '../adapters/react/use-responsive-overlay-surface'
+import type { Collection } from '../runtime/collection'
 import { readDirection, type Direction } from '../runtime/keyboard'
 import { hasSlotContent } from '../slot-content'
 import { Button } from '../../Button/Button'
 import { Modal } from '../../Modal/Modal'
+
+/** The K9 kind of an item: a `{ type: 'group' }`, a `{ type: 'separator' }`, or a plain item. */
+export const kindOf = (item: unknown) => {
+  const { type } = item as { type?: unknown }
+  return type === 'group' || type === 'separator' ? type : 'item'
+}
+
+/**
+ * Whether `key` is out of use: unknown, disabled itself (K9 groups and separators always are), or
+ * under a disabled item, which takes everything under it out of use.
+ */
+export function isDisabled(
+  collection: Collection<unknown>,
+  key: string | null | undefined,
+): boolean {
+  const entry = collection.get(key)
+  if (!entry || entry.disabled) return true
+  for (let up = collection.get(entry.parent); up; up = collection.get(up.parent))
+    if ((up.item as { disabled?: unknown }).disabled === true) return true
+  return false
+}
+
+/**
+ * Whether a click opens a link somewhere else — a modifier key asks for a new tab, a window or a
+ * download — so the page stays and the component should stay as it is.
+ */
+export const opensElsewhere = (event: MouseEvent<HTMLElement>) =>
+  event.currentTarget.matches('a[href]') &&
+  (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)
 
 export interface NavSurfaceProps {
   surface: 'auto' | 'inline' | 'sheet'
@@ -45,10 +76,12 @@ export interface NavSheetProps {
   icon: string
   openLabel: string
   closeLabel: string
-  /** The navigation's `aria-label`: the sheet's visible title and name. */
+  /** The navigation's own `aria-label`: the sheet's visible title and name. */
   title: string | undefined
   /** The navigation's `aria-labelledby`, naming an untitled sheet. */
   labelledBy: string | undefined
+  /** The landmark's default name, naming a sheet that has neither. */
+  name: string
   placement: 'start' | 'bottom'
   /** The navigation's root: the portaled sheet takes its direction on open. */
   root: RefObject<HTMLElement | null>
@@ -57,28 +90,21 @@ export interface NavSheetProps {
 }
 
 /**
- * The compact surface of Navigation and Panel: a trigger that opens their items
- * in a modal sheet. An untitled sheet is named by its trigger.
+ * The compact surface of Navigation and Panel: a trigger that opens their items in a modal
+ * sheet named like the landmark.
  */
 export function NavSheet(props: NavSheetProps) {
-  const { trigger, openLabel, title, labelledBy, open, root } = props
+  const { trigger, title, labelledBy, open, root } = props
   const [dir, setDir] = useState<Direction | undefined>(undefined)
   useIsomorphicLayoutEffect(() => {
     if (open) setDir(readDirection(root.current))
   }, [open, root])
-  const generated = `${useId()}trigger`
-  const child = getTriggerChild(trigger)
-  const childId = child?.props.id
-  const triggerId = typeof childId === 'string' ? childId : generated
   const custom = hasSlotContent(trigger)
-  const node = child ? (
-    childId === triggerId ? child : cloneElement(child, { id: triggerId })
-  ) : (
+  const node = getTriggerChild(trigger) ?? (
     <Button
-      id={triggerId}
       icon={custom ? undefined : props.icon}
       iconOnly={!custom}
-      aria-label={custom ? undefined : openLabel}
+      aria-label={custom ? undefined : props.openLabel}
       variant="ghost"
       fullWidth={false}
       className="uf-nav-sheetTrigger"
@@ -92,7 +118,8 @@ export function NavSheet(props: NavSheetProps) {
       open={open}
       onOpenChange={({ open }) => props.onOpenChange(open)}
       title={title}
-      aria-labelledby={title ? undefined : (labelledBy ?? triggerId)}
+      aria-labelledby={title ? undefined : labelledBy}
+      aria-label={title || labelledBy ? undefined : props.name}
       labels={{ close: props.closeLabel }}
       placement={props.placement}
       edge={props.placement === 'start' ? 'flush' : 'inset'}

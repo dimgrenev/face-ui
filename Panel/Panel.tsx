@@ -14,7 +14,13 @@ import { useControllableState } from '../assets/adapters/react/use-controllable-
 import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
 import { createAnatomy } from '../assets/anatomy'
 import type { CollectionItem } from '../assets/internal/item'
-import { NavSheet, useNavSurface } from '../assets/internal/nav-sheet'
+import {
+  isDisabled,
+  kindOf,
+  NavSheet,
+  opensElsewhere,
+  useNavSurface,
+} from '../assets/internal/nav'
 import {
   domId,
   readCollection,
@@ -34,11 +40,11 @@ import { Icon } from '../Icon/Icon'
 
 /** One row of Panel: a link, an action, or a group of rows. */
 export interface PanelItem extends Omit<CollectionItem, 'textValue'> {
-  /** Makes the item a link to this URL; modifier keys and middle click open it elsewhere, as for any link. */
+  /** Makes the item a link to this URL; a click with a modifier key or the middle button opens it elsewhere and changes nothing here. */
   href?: string
   /** Called with the click before the item becomes current or its group toggles; `preventDefault()` cancels only a link's navigation. */
   onClick?: (event: MouseEvent<HTMLElement>) => void
-  /** Turns the item into a group whose button shows these rows while it is expanded; its `href` is then ignored. */
+  /** Turns the item into a group whose button shows these rows while it is expanded; its `href` is then ignored, and disabling it disables them. */
   items?: readonly PanelItem[]
 }
 
@@ -76,9 +82,9 @@ export interface PanelProps
   defaultCollapsed?: boolean
   /** Called once per user request to collapse or expand the panel; a controlled parent may refuse it. */
   onCollapsedChange?: (details: { collapsed: boolean }) => void
-  /** Shows the button that collapses the panel to a rail; false leaves collapsing to `collapsed`. Default true. */
+  /** Shows the button that collapses the panel to a rail, and lets a group in the rail open the panel at it; false leaves `collapsed` to the parent, and groups then open in the rail. Default true. */
   collapsible?: boolean
-  /** Width of the expanded inline panel: pixels, or any CSS length. Default 260. */
+  /** Width of the expanded inline panel: pixels, or any CSS length. Default 260. It and `collapsedWidth` own the width, so `style.width` is ignored. */
   width?: number | string
   /** Width of the collapsed rail: pixels, or any CSS length. Default 60. */
   collapsedWidth?: number | string
@@ -92,7 +98,7 @@ export interface PanelProps
   onOpenChange?: (details: { open: boolean }) => void
   /** Element that opens the sheet, keeping its own props; text renders as a Button. Default: an icon button named `labels.open`. */
   trigger?: ReactNode
-  /** Names the navigation landmark and titles the sheet; an untitled sheet is named by its trigger. */
+  /** Names the navigation landmark (default "Sidebar") and titles the sheet. */
   'aria-label'?: string
   /** Strings Panel renders itself: `open` names the default sheet trigger, `close` the sheet's close button, `expand` and `collapse` the rail toggle. */
   labels?: Partial<PanelLabels>
@@ -120,6 +126,8 @@ const defaultLabels: PanelLabels = Object.freeze({
   expand: 'Expand panel',
   collapse: 'Collapse panel',
 })
+/** Landmark and sheet name until a native aria-label or aria-labelledby names the nav (K14). */
+const defaultRootLabels = Object.freeze({ nav: 'Sidebar' })
 const length = (value: number | string) =>
   typeof value === 'number' ? `${value}px` : value
 
@@ -161,10 +169,18 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
       key: (item) => item.value,
       children: (item) => item.items,
     })
-    const isGroup = (key: string) => collection.children(key).length > 0
-    for (const { key, item } of collection.entries)
-      if (isGroup(key) && item.href !== undefined)
+    /** Rows under `parent`; K9 groups and separators are not rows. */
+    const rowsOf = (parent: string | null) =>
+      collection.children(parent).filter((entry) => kindOf(entry.item) === 'item')
+    const isGroup = (key: string) => rowsOf(key).length > 0
+    const off = (key: string) => isDisabled(collection, key)
+    for (const { key, item } of collection.entries) {
+      const kind = kindOf(item)
+      if (kind !== 'item')
+        invalidProp('Panel', 'items[].type', kind, 'dropping it: a group is a row with items, and Panel has no separators')
+      else if (isGroup(key) && item.href !== undefined)
         invalidProp('Panel', 'items[].href', item.href, `ignoring it: ${JSON.stringify(key)} is a group`)
+    }
 
     // Current page.
     const [current, setCurrent] = useControllableState<string | null>({
@@ -215,11 +231,14 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
     })
 
     const rail = !isSheet && !!isCollapsed
-    const shows = (key: string) => !rail && expandedSet.has(key)
+    // A group in a rail the user may widen opens the panel at that group; in a fixed rail it
+    // shows its rows in place.
+    const widens = rail && collapsible
+    const shows = (key: string) => !widens && expandedSet.has(key)
     const holding = new Set(holders())
     const rows = useRovingFocus({
-      keys: rail ? collection.keys : visibleKeys(collection, expandedSet),
-      disabled: (key) => collection.get(key)?.disabled !== false,
+      keys: visibleKeys(collection, widens ? new Set() : expandedSet),
+      disabled: off,
       orientation: 'vertical',
       tabStops: 'all',
       loop: false,
@@ -229,8 +248,7 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
     const rootRefs = useComposedRefs(rootRef, ref)
 
     const toggleGroup = (key: string) => {
-      if (rail) {
-        // A group in the rail opens the panel at that group.
+      if (widens) {
         setCollapsed(false)
         if (!expandedSet.has(key)) setExpanded((keys) => [...keys, key])
       } else
@@ -240,8 +258,9 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
     }
 
     const renderRows = (parent: string | null, after: () => void): ReactNode =>
-      collection.children(parent).map((entry) => {
-        const { key, level, disabled: off } = entry
+      rowsOf(parent).map((entry) => {
+        const { key, level } = entry
+        const inert = off(key)
         const { label, icon, href, onClick } = entry.item
         const group = isGroup(key)
         const isOpen = group && shows(key)
@@ -271,12 +290,13 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
           className: 'uf-sidebar-item uf-option',
           style: { '--face-runtime-option-level': level - 1 } as CSSProperties,
           'data-value': key,
-          'data-disabled': off || undefined,
+          'data-disabled': inert || undefined,
         }
         const link = typeof href === 'string' && href && !group ? href : undefined
         const onActivate = (event: MouseEvent<HTMLElement>) => {
-          if (off) return
+          if (inert) return
           onClick?.(event)
+          if (opensElsewhere(event)) return
           if (group) toggleGroup(key)
           else {
             setCurrent(key)
@@ -291,7 +311,7 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
                   {...part('trigger')}
                   {...shared}
                   type="button"
-                  disabled={off}
+                  disabled={inert}
                   aria-expanded={isOpen}
                   aria-controls={isOpen ? groupId : undefined}
                   data-current={!isOpen && holding.has(key) ? '' : undefined}
@@ -303,8 +323,8 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
                 <a
                   {...part('link')}
                   {...shared}
-                  href={off ? undefined : link}
-                  aria-disabled={off || undefined}
+                  href={inert ? undefined : link}
+                  aria-disabled={inert || undefined}
                   aria-current={isCurrent(key) ? 'page' : undefined}
                   onClick={onActivate}
                 >
@@ -315,7 +335,7 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
                   {...part('link')}
                   {...shared}
                   type="button"
-                  disabled={off}
+                  disabled={inert}
                   aria-current={isCurrent(key) ? 'page' : undefined}
                   onClick={onActivate}
                 >
@@ -343,6 +363,7 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
       </ul>
     )
     const root = {
+      'aria-label': defaultRootLabels.nav,
       ...rest,
       ...part('root'),
       ref: rootRefs,
@@ -362,6 +383,7 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
             closeLabel={strings.close}
             title={rest['aria-label']}
             labelledBy={rest['aria-labelledby']}
+            name={defaultRootLabels.nav}
             placement="start"
             root={rootRef}
             className="uf-sidebar-sheet"
@@ -371,6 +393,8 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
         </nav>
       )
 
+    if (style?.width !== undefined)
+      invalidProp('Panel', 'style.width', style.width, 'ignoring it: width and collapsedWidth size the panel')
     return (
       <nav
         {...root}

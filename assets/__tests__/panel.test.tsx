@@ -46,6 +46,22 @@ const row = (value: string, scope: ParentNode = host) =>
 const nav = () => host.querySelector('nav')!
 const toggle = () => host.querySelector<HTMLButtonElement>('.uf-sidebar-toggleButton')
 const click = (node: Element) => act(async () => (node as HTMLElement).click())
+const clickWith = (node: Element, init: MouseEventInit) =>
+  act(async () => {
+    node.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, ...init }))
+  })
+const MODIFIERS: MouseEventInit[] = [
+  { ctrlKey: true },
+  { metaKey: true },
+  { shiftKey: true },
+  { altKey: true },
+]
+const press = (key: string) =>
+  act(async () => {
+    document.activeElement!.dispatchEvent(
+      new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }),
+    )
+  })
 const current = (scope: ParentNode = host) =>
   scope.querySelector('[aria-current="page"]')?.getAttribute('data-value') ?? null
 const expandedGroups = (scope: ParentNode = host) =>
@@ -136,11 +152,47 @@ describe('Panel rows', () => {
     expect(onValueChange.mock.calls.map(([details]) => details)).toEqual([{ value: 'files' }])
   })
 
-  it('href renders a real link; without href the row is a button', async () => {
+  it('href renders a real link; without href the row is a button; label is its text', async () => {
     await render()
     expect(row('overview')!.localName).toBe('a')
     expect(row('overview')!.getAttribute('href')).toBe('#overview')
+    expect(row('overview')!.textContent).toBe('Overview')
     expect(row('files')!.localName).toBe('button')
+  })
+
+  it('without preventDefault() a link row keeps its navigation', async () => {
+    let prevented: boolean | undefined
+    const after = (event: Event) => {
+      prevented = event.defaultPrevented
+      event.preventDefault()
+    }
+    document.addEventListener('click', after)
+    await render({ items: [{ value: 'a', label: 'A', href: '#a', onClick: () => {} }] })
+    await click(row('a')!)
+    document.removeEventListener('click', after)
+    expect(prevented).toBe(false)
+    expect(current()).toBe('a')
+  })
+
+  it('a click with a modifier key opens a link elsewhere: onClick runs, the current row stays', async () => {
+    const onClick = vi.fn()
+    const onValueChange = vi.fn()
+    await render({
+      defaultValue: 'files',
+      onValueChange,
+      items: [
+        { value: 'a', label: 'A', href: '#a', onClick },
+        { value: 'files', label: 'Files' },
+        { value: 'b', label: 'B' },
+      ],
+    })
+    for (const init of MODIFIERS) await clickWith(row('a')!, init)
+    expect(onClick).toHaveBeenCalledTimes(MODIFIERS.length)
+    expect(onValueChange).not.toHaveBeenCalled()
+    expect(current()).toBe('files')
+    // A button opens nothing elsewhere, so a modifier does not change its click.
+    await clickWith(row('b')!, { metaKey: true })
+    expect(onValueChange.mock.calls.map(([details]) => details)).toEqual([{ value: 'b' }])
   })
 
   it('onClick receives the click first; preventDefault() cancels only the link navigation', async () => {
@@ -200,6 +252,36 @@ describe('Panel rows', () => {
     expect([level('overview'), level('profile'), level('invoices')]).toEqual(['0', '1', '2'])
   })
 
+  it('a disabled group disables its rows, even while it shows them', async () => {
+    const onValueChange = vi.fn()
+    await render({
+      defaultValue: 'a',
+      onValueChange,
+      items: [
+        {
+          value: 'g',
+          label: 'G',
+          disabled: true,
+          items: [
+            { value: 'a', label: 'A' },
+            { value: 'b', label: 'B', href: '#b' },
+          ],
+        },
+        { value: 'z', label: 'Z' },
+      ],
+    })
+    expect(expandedGroups()).toEqual(['g'])
+    expect((row('a') as HTMLButtonElement).disabled).toBe(true)
+    expect(row('b')!.hasAttribute('href')).toBe(false)
+    expect(row('b')!.getAttribute('aria-disabled')).toBe('true')
+    await click(row('b')!)
+    expect(onValueChange).not.toHaveBeenCalled()
+    expect(current()).toBe('a')
+    await act(async () => row('z')!.focus())
+    await press('ArrowUp')
+    expect(document.activeElement).toBe(row('z'))
+  })
+
   it('a group ignores its href and reports it', async () => {
     await expectDevError(
       () => render({ items: [{ value: 'g', label: 'G', href: '#g', items: [{ value: 'x', label: 'X' }] }] }),
@@ -214,6 +296,25 @@ describe('Panel rows', () => {
       /^Face UI Panel: invalid items\[1\] key "a"; dropping the duplicate\.$/,
     )
     expect(host.querySelectorAll('[data-part="link"]')).toHaveLength(1)
+  })
+
+  it('K9 groups and separators are not rows: they are dropped with a report', async () => {
+    const items = [
+      { value: 'a', label: 'A' },
+      { type: 'separator' },
+      { type: 'group', label: 'G', items: [{ value: 'b', label: 'B' }] },
+      { value: 'g', label: 'Only a separator', items: [{ type: 'separator' }] },
+    ] as unknown as PanelItem[]
+    await expectDevError(
+      () => expectDevError(
+        () => render({ items }),
+        /^Face UI Panel: invalid items\[\]\.type "separator"; dropping it: a group is a row with items, and Panel has no separators\.$/,
+      ),
+      /^Face UI Panel: invalid items\[\]\.type "group"; dropping it: a group is a row with items, and Panel has no separators\.$/,
+    )
+    expect(Array.from(host.querySelectorAll('.uf-sidebar-content > li')).map((li) => li.getAttribute('data-value'))).toEqual(['a', 'g'])
+    expect(row('b')).toBeNull()
+    expect(row('g')!.hasAttribute('aria-expanded')).toBe(false)
   })
 })
 
@@ -284,6 +385,15 @@ describe('Panel rail', () => {
     expect(nav().style.width).toBe('100%')
   })
 
+  it('style.width is ignored with a report: width and collapsedWidth own the width', async () => {
+    await expectDevError(
+      () => render({ style: { width: 400, minWidth: 100 } }),
+      /^Face UI Panel: invalid style\.width 400; ignoring it: width and collapsedWidth size the panel\.$/,
+    )
+    expect(nav().style.width).toBe('260px')
+    expect(nav().style.minWidth).toBe('100px')
+  })
+
   it('collapsed hides labels visually but keeps them as accessible names, and hides group rows', async () => {
     await render({ defaultCollapsed: true, defaultExpanded: ['settings'] })
     const label = row('overview')!.querySelector('[data-part="label"]')!
@@ -317,6 +427,18 @@ describe('Panel rail', () => {
     expect(host.querySelector('[data-part="header"]')).toBeNull()
     await show(<Panel key="rail" surface="inline" items={ITEMS} collapsible={false} collapsed />)
     expect(nav().getAttribute('data-state')).toBe('collapsed')
+  })
+
+  it('in a fixed rail (collapsible={false}) a group shows its rows in place and the rail stays', async () => {
+    const onCollapsedChange = vi.fn()
+    await render({ collapsible: false, defaultCollapsed: true, defaultExpanded: [], onCollapsedChange })
+    await click(row('settings')!)
+    expect(nav().getAttribute('data-state')).toBe('collapsed')
+    expect(onCollapsedChange).not.toHaveBeenCalled()
+    expect(row('settings')!.getAttribute('aria-expanded')).toBe('true')
+    expect(row('profile')!.querySelector('[data-part="label"]')!.className).toBe('uf-visually-hidden')
+    await click(row('settings')!)
+    expect(row('profile')).toBeNull()
   })
 
   it('there is no hidden keyboard shortcut: "[" leaves the panel as it is', async () => {
@@ -381,12 +503,51 @@ describe('Panel surfaces', () => {
     await click(sheetTrigger())
     expect(document.getElementById(dialog()!.getAttribute('aria-labelledby')!)?.textContent).toBe('Workspace')
     expect(document.querySelector('[data-scope="modal"][data-part="close"]')!.getAttribute('aria-label')).toBe('Schließen')
-    await show(<Panel surface="sheet" items={ITEMS} />)
-    await click(sheetTrigger())
-    expect(document.getElementById(dialog()!.getAttribute('aria-labelledby')!)).toBe(sheetTrigger())
   })
 
-  it('trigger replaces the default button and keeps its own props', async () => {
+  it('by default the landmark and the sheet are named "Sidebar"; aria-labelledby names both', async () => {
+    await render()
+    expect(nav().getAttribute('aria-label')).toBe('Sidebar')
+    await show(<Panel key="sheet" surface="sheet" items={ITEMS} />)
+    expect(nav().getAttribute('aria-label')).toBe('Sidebar')
+    await click(sheetTrigger())
+    expect(dialog()!.getAttribute('aria-label')).toBe('Sidebar')
+    expect(dialog()!.hasAttribute('aria-labelledby')).toBe(false)
+
+    const heading = document.body.appendChild(document.createElement('h2'))
+    heading.id = 'workspace-heading'
+    heading.textContent = 'Workspace'
+    await show(<Panel key="labelled" surface="sheet" aria-labelledby="workspace-heading" items={ITEMS} />)
+    expect(nav().getAttribute('aria-labelledby')).toBe('workspace-heading')
+    await click(sheetTrigger())
+    expect(dialog()!.getAttribute('aria-labelledby')).toBe('workspace-heading')
+    expect(dialog()!.hasAttribute('aria-label')).toBe(false)
+    heading.remove()
+  })
+
+  it('a click with a modifier key on a sheet link keeps the sheet open and the current row', async () => {
+    const onOpenChange = vi.fn()
+    await show(
+      <Panel surface="sheet" defaultOpen defaultValue="files" items={ITEMS} onOpenChange={onOpenChange} />,
+    )
+    for (const init of MODIFIERS) await clickWith(row('overview', dialog()!)!, init)
+    expect(onOpenChange).not.toHaveBeenCalled()
+    expect(sheetTrigger().getAttribute('aria-expanded')).toBe('true')
+    expect(current(dialog()!)).toBe('files')
+  })
+
+  it('trigger: text renders as a Button that opens the sheet', async () => {
+    await show(<Panel surface="sheet" items={ITEMS} trigger="Sections" />)
+    const button = sheetTrigger()
+    expect(button.localName).toBe('button')
+    expect(button.classList.contains('uf-nav-sheetTrigger')).toBe(true)
+    expect(button.textContent).toBe('Sections')
+    expect(button.hasAttribute('aria-label')).toBe(false)
+    await click(button)
+    expect(button.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  it('trigger: an element replaces the default button and keeps its own props', async () => {
     const onClick = vi.fn()
     await show(<Panel surface="sheet" items={ITEMS} trigger={<button type="button" className="mine" onClick={onClick}>Menu</button>} />)
     const button = host.querySelector<HTMLButtonElement>('button.mine')!

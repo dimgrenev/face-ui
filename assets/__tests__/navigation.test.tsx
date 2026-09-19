@@ -57,6 +57,16 @@ const trigger = (value: string) =>
 const content = (value: string) =>
   document.getElementById(trigger(value).getAttribute('aria-controls')!)!
 const click = (node: Element) => act(async () => (node as HTMLElement).click())
+const clickWith = (node: Element, init: MouseEventInit) =>
+  act(async () => {
+    node.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, ...init }))
+  })
+const MODIFIERS: MouseEventInit[] = [
+  { ctrlKey: true },
+  { metaKey: true },
+  { shiftKey: true },
+  { altKey: true },
+]
 const focus = (node: HTMLElement) => act(async () => node.focus())
 const press = (key: string, init: KeyboardEventInit = {}) =>
   act(async () => {
@@ -144,12 +154,36 @@ describe('Navigation items', () => {
     expect(current()).toBe('hosting')
   })
 
-  it('href renders a real link; without href the item is a button', async () => {
+  it('href renders a real link; without href the item is a button; label is its text', async () => {
     await render()
     expect(byValue('home').localName).toBe('a')
     expect(byValue('home').getAttribute('href')).toBe('#home')
+    expect(byValue('home').textContent).toBe('Home')
     expect(byValue('docs').localName).toBe('button')
     expect(byValue('docs').getAttribute('type')).toBe('button')
+  })
+
+  it('a click with a modifier key opens a link elsewhere: onClick runs, the current item and the dropdown stay', async () => {
+    const onClick = vi.fn()
+    const onValueChange = vi.fn()
+    await render({
+      defaultValue: 'home',
+      onValueChange,
+      items: [
+        { value: 'home', label: 'Home', href: '#home' },
+        { value: 'p', label: 'P', items: [{ value: 'x', label: 'X', href: '#x', onClick }] },
+        { value: 'docs', label: 'Docs' },
+      ],
+    })
+    await click(trigger('p'))
+    for (const init of MODIFIERS) await clickWith(byValue('x'), init)
+    expect(onClick).toHaveBeenCalledTimes(MODIFIERS.length)
+    expect(onValueChange).not.toHaveBeenCalled()
+    expect(current()).toBe('home')
+    expect(content('p').hidden).toBe(false)
+    // A button opens nothing elsewhere, so a modifier does not change its click.
+    await clickWith(byValue('docs'), { ctrlKey: true })
+    expect(onValueChange.mock.calls.map(([details]) => details)).toEqual([{ value: 'docs' }])
   })
 
   it('onClick receives the click first; preventDefault() cancels only the link navigation', async () => {
@@ -238,6 +272,39 @@ describe('Navigation items', () => {
       /^Face UI Navigation: invalid items\[1\] key "a"; dropping the duplicate\.$/,
     )
     expect(host.querySelectorAll('[data-part="link"]')).toHaveLength(1)
+  })
+
+  it('structure it cannot show is reported: groups outside a dropdown and separators are dropped, items under a link ignored', async () => {
+    const items = [
+      { value: 'a', label: 'A' },
+      { type: 'group', label: 'Loose', items: [{ value: 'b', label: 'B' }] },
+      { type: 'separator' },
+      {
+        value: 'p',
+        label: 'P',
+        items: [
+          { value: 'x', label: 'X', items: [{ value: 'deep', label: 'Deep' }] },
+          { type: 'separator' },
+          { type: 'group', label: 'G', items: [{ type: 'group', label: 'Inner', items: [] }] },
+        ],
+      },
+    ] as unknown as NavigationItem[]
+    await expectDevError(
+      () =>
+        expectDevError(
+          () =>
+            expectDevError(
+              () => render({ items }),
+              /^Face UI Navigation: invalid items\[\]\.type "group"; dropping it and its links: a group belongs directly in a dropdown\.$/,
+            ),
+          /^Face UI Navigation: invalid items\[\]\.type "separator"; dropping it: Navigation has no separators\.$/,
+        ),
+      /^Face UI Navigation: invalid items\[\]\.items array; ignoring it: only bar items open dropdowns\.$/,
+    )
+    expect(Array.from(host.querySelectorAll('.uf-navigation-list > li')).map((li) => li.getAttribute('data-value'))).toEqual(['a', 'p'])
+    expect(byValue('b')).toBeNull()
+    expect(byValue('deep')).toBeNull()
+    expect(content('p').querySelectorAll('li')).toHaveLength(2)
   })
 })
 
@@ -451,15 +518,75 @@ describe('Navigation surfaces', () => {
     expect(dialog()!.querySelector('[aria-current="page"]')?.getAttribute('data-value')).toBe('hosting')
   })
 
-  it('aria-label names the landmark and titles the sheet; without it the sheet is named by its trigger', async () => {
-    await show(<Navigation surface="sheet" aria-label="Main" items={ITEMS} />)
+  it('aria-label names the landmark and titles the sheet; by default both are named "Main"; aria-labelledby names both', async () => {
+    await show(<Navigation surface="sheet" aria-label="Site" items={ITEMS} />)
+    expect(host.querySelector('nav')!.getAttribute('aria-label')).toBe('Site')
+    await click(sheetTrigger())
+    expect(document.getElementById(dialog()!.getAttribute('aria-labelledby')!)?.textContent).toBe('Site')
+
+    await show(<Navigation key="plain" surface="sheet" items={ITEMS} />)
     expect(host.querySelector('nav')!.getAttribute('aria-label')).toBe('Main')
     await click(sheetTrigger())
-    const titled = dialog()!
-    expect(document.getElementById(titled.getAttribute('aria-labelledby')!)?.textContent).toBe('Main')
-    await show(<Navigation surface="sheet" items={ITEMS} labels={{ open: 'Menu' }} />)
+    expect(dialog()!.getAttribute('aria-label')).toBe('Main')
+    expect(dialog()!.hasAttribute('aria-labelledby')).toBe(false)
+    await show(<Navigation key="inline" surface="inline" items={ITEMS} />)
+    expect(host.querySelector('nav')!.getAttribute('aria-label')).toBe('Main')
+
+    const heading = document.body.appendChild(document.createElement('h2'))
+    heading.id = 'store-heading'
+    heading.textContent = 'Store'
+    await show(<Navigation key="labelled" surface="sheet" aria-labelledby="store-heading" items={ITEMS} />)
+    expect(host.querySelector('nav')!.getAttribute('aria-labelledby')).toBe('store-heading')
     await click(sheetTrigger())
-    expect(document.getElementById(dialog()!.getAttribute('aria-labelledby')!)).toBe(sheetTrigger())
+    expect(dialog()!.getAttribute('aria-labelledby')).toBe('store-heading')
+    expect(dialog()!.hasAttribute('aria-label')).toBe(false)
+    heading.remove()
+  })
+
+  it('a disabled dropdown item is a disabled section of the sheet, and its links are inert', async () => {
+    const onValueChange = vi.fn()
+    await show(
+      <Navigation
+        surface="sheet"
+        defaultOpen
+        onValueChange={onValueChange}
+        items={[
+          { value: 'home', label: 'Home' },
+          {
+            value: 'p',
+            label: 'P',
+            disabled: true,
+            items: [
+              { value: 'x', label: 'X', href: '#x' },
+              { type: 'group', label: 'G', items: [{ value: 'y', label: 'Y' }] },
+            ],
+          },
+        ]}
+      />,
+    )
+    const sheet = dialog()!
+    expect(sheet.querySelector('[data-part="item"][data-value="p"]')!.hasAttribute('data-disabled')).toBe(true)
+    const x = sheet.querySelector<HTMLElement>('[data-part="link"][data-value="x"]')!
+    const y = sheet.querySelector<HTMLButtonElement>('[data-part="link"][data-value="y"]')!
+    expect(x.hasAttribute('href')).toBe(false)
+    expect(x.getAttribute('aria-disabled')).toBe('true')
+    expect(y.disabled).toBe(true)
+    await click(x)
+    await click(y)
+    expect(onValueChange).not.toHaveBeenCalled()
+    expect(sheetTrigger().getAttribute('aria-expanded')).toBe('true')
+  })
+
+  it('a click with a modifier key on a sheet link keeps the sheet open and the current item', async () => {
+    const onOpenChange = vi.fn()
+    await show(
+      <Navigation surface="sheet" defaultOpen defaultValue="home" items={ITEMS} onOpenChange={onOpenChange} />,
+    )
+    for (const init of MODIFIERS)
+      await clickWith(dialog()!.querySelector('[data-part="link"][data-value="fonts"]')!, init)
+    expect(onOpenChange).not.toHaveBeenCalled()
+    expect(sheetTrigger().getAttribute('aria-expanded')).toBe('true')
+    expect(dialog()!.querySelector('[aria-current="page"]')?.getAttribute('data-value')).toBe('home')
   })
 
   it('labels.open names the default trigger and labels.close the sheet close button; missing keys keep defaults', async () => {
@@ -472,7 +599,7 @@ describe('Navigation surfaces', () => {
     expect(document.querySelector('[data-scope="modal"][data-part="close"]')!.getAttribute('aria-label')).toBe('Schließen')
   })
 
-  it('trigger replaces the default button and keeps its own props', async () => {
+  it('trigger: an element replaces the default button and keeps its own props', async () => {
     const onClick = vi.fn()
     await show(
       <Navigation
@@ -491,6 +618,17 @@ describe('Navigation surfaces', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
     expect(button.getAttribute('aria-expanded')).toBe('true')
     expect(dialog()).not.toBeNull()
+  })
+
+  it('trigger: text renders as a Button that opens the sheet', async () => {
+    await show(<Navigation surface="sheet" items={ITEMS} trigger="Menu" />)
+    const button = sheetTrigger()
+    expect(button.localName).toBe('button')
+    expect(button.classList.contains('uf-nav-sheetTrigger')).toBe(true)
+    expect(button.textContent).toBe('Menu')
+    expect(button.hasAttribute('aria-label')).toBe(false)
+    await click(button)
+    expect(button.getAttribute('aria-expanded')).toBe('true')
   })
 
   it('leaving the sheet surface closes an uncontrolled sheet', async () => {

@@ -114,3 +114,6 @@
   font-weight: var(--uf-font-weight-bold);
   color: var(--uf-color-fg-muted);
 }
+.uf-navigation-section[data-disabled] > .uf-navigation-sectionLabel {
+  opacity: var(--uf-color-disabled-opacity);
+}

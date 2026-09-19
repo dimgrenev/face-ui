@@ -248,6 +248,9 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Items nested two levels deep rendered as a labelled section of the dropdown | A dropdown section is `{ type: "group", label, items }`; `items` of a dropdown link are ignored | — |
 | Hovering a dropdown item opened it at once, and `onActiveChange` also fired when `activeId` changed from the parent | Hover opens after 200 ms and closes 150 ms after leaving; `onValueChange` reports only user activations | — |
 | In the sheet, links were buttons that called `location.assign`, and the sheet was titled "Navigation" | The sheet is a modal bottom sheet of real links, titled by `aria-label`; `labels.open` and `labels.close` name its buttons | — |
+| The landmark had no name unless `surfaceTitle` was set | The `<nav>` and its sheet are named "Main" until `aria-label` or `aria-labelledby` names them | — |
+| A click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed its dropdown or the sheet | Such a click opens the link elsewhere and leaves the current item, the dropdown and the sheet as they are | — |
+| Items had `data-active`; bar buttons were `.uf-navigation-trigger`, dropdown links `.uf-navigation-dropdownItem` Buttons, and the sheet used `.uf-navigation-sheet*` classes | The current link has `aria-current="page"` and the bar button holding it `data-current`; style `[data-part="trigger"]`, `[data-part="link"]` and `.uf-navigation-section` instead | — |
 
 ### Overlay
 
@@ -281,9 +284,11 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `SidebarItem` from `Panel/Panel` | `SidebarItem` from `compat` | auto |
 | Rows were Buttons (`.uf-sidebar-itemButton`) with `aria-pressed`; `href` rows called `location.assign`, and `onClick()` took no event | Rows are links or buttons (`.uf-sidebar-item`) with `aria-current="page"`; `onClick(event)` runs first and `preventDefault()` cancels only the link | — |
 | Group rows always showed their children; the group button only flipped `aria-expanded` | A group shows its rows while expanded (`expanded`); on mount the groups holding the current row are expanded | — |
-| The rail hid the rows of every group, and only string labels named icon-only rows | A group in the rail expands the panel at that group; every label stays as the accessible name | — |
+| The rail hid the rows of every group, and only string labels named icon-only rows | A group in the rail expands the panel at that group (in a rail without the toggle it shows its rows in place); every label stays as the accessible name | — |
+| A disabled group's rows stayed usable, and a click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed the sheet | Disabling a group disables its rows; such a click opens the link elsewhere and leaves the current row and the sheet as they are | — |
+| Rows had `data-selected` and `data-state`; parts were `itemIcon`, `itemLabel` and `groupContent`, and a group's button was `groupLabel` | The current row has `aria-current="page"`; parts are `icon`, `label`, `group` (the rows of a group) and `trigger` (its button) | — |
 | The header always held the collapse toggle, an empty footer followed the rows, and "[" toggled the rail | `collapsible={false}` removes the toggle; there is no footer and no keyboard shortcut | — |
-| The sheet covered the whole viewport, titled "Panel"; `className` and `ref` moved to its host and dialog | The sheet is a modal drawer at the start edge, titled by `aria-label`; the `<nav>` keeps native attributes, `className`, `style` and `ref` | — |
+| The sheet covered the whole viewport, titled "Panel"; `className` and `ref` moved to its host and dialog | The sheet is a modal drawer at the start edge, titled by `aria-label`; the `<nav>` and the sheet are named "Sidebar" until `aria-label` or `aria-labelledby` names them; the `<nav>` keeps native attributes, `className`, `style` and `ref` | — |
 | `onSelectedChange` and `onCollapsedChange` also fired when the parent changed `selectedId` or `collapsed` | `onValueChange` and `onCollapsedChange` report only user actions | — |
 
 ### Popover
