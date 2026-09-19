@@ -58,7 +58,7 @@ const renderFloating = (
                   }}
                 >
                   Additional information
-                  {options.kind === 'popover' && <button>Action</button>}
+                  {options.kind !== 'tooltip' && options.kind && <button>Action</button>}
                 </div>
               )
             }

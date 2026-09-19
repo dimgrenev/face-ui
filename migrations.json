@@ -431,6 +431,19 @@
     },
     {
       "kind": "rename-prop",
+      "component": "FloatingOverlay",
+      "from": "trigger",
+      "to": "openOn",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "FloatingOverlay",
+      "before": "Its hover hook, `useHoverIntent({ enabled, open, triggerRef, contentRef, send })` from `assets/adapters/react/use-hover-intent`, sent pointer and focus events to a machine",
+      "after": "`useHoverIntent({ value, onValueChange, openDelay, closeDelay })` proposes the open key; spread `trigger(key)` on each trigger and `content` on the surface"
+    },
+    {
+      "kind": "rename-prop",
       "component": "Icon",
       "from": "label",
       "to": "aria-label",
@@ -543,6 +556,13 @@
       "component": "Modal",
       "before": "`scrollLock` defaulted to `false`",
       "after": "`scrollLock` defaults to `portal`: a portaled modal locks page scroll unless `scrollLock={false}`"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Overlay",
+      "from": "trigger",
+      "to": "openOn",
+      "codemod": "auto"
     },
     {
       "kind": "remove-prop",

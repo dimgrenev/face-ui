@@ -117,6 +117,13 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `weekStartsOn` defaulted to 1 (Monday) | The first weekday follows `locale`; set `weekStartsOn` to pin it | — |
 | `ref` pointed to the wrapper `<div>` | `ref` points to the trigger `<button>`; `className` and `style` still style the whole field | — |
 
+### FloatingOverlay
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `trigger` | `openOn` | auto |
+| Its hover hook, `useHoverIntent({ enabled, open, triggerRef, contentRef, send })` from `assets/adapters/react/use-hover-intent`, sent pointer and focus events to a machine | `useHoverIntent({ value, onValueChange, openDelay, closeDelay })` proposes the open key; spread `trigger(key)` on each trigger and `content` on the surface | — |
+
 ### Icon
 
 | Before | After | Codemod |
@@ -152,6 +159,12 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | Before | After | Codemod |
 | --- | --- | --- |
 | `scrollLock` defaulted to `false` | `scrollLock` defaults to `portal`: a portaled modal locks page scroll unless `scrollLock={false}` | — |
+
+### Overlay
+
+| Before | After | Codemod |
+| --- | --- | --- |
+| `trigger` | `openOn` | auto |
 
 ### Popover
 

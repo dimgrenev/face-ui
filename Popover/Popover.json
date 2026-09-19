@@ -2,12 +2,12 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Popover",
-  "description": "Floating interactive surface anchored to a trigger element",
+  "description": "Floating interactive surface anchored to a trigger element; a click on the trigger toggles it.",
   "props": {
     "content": {
       "type": "ReactNode",
       "required": false,
-      "description": "Floating content. Empty content leaves the trigger without a layer. Tooltip content must be noninteractive."
+      "description": "Content of the floating surface; empty content renders the trigger alone. Tooltip content must stay noninteractive."
     },
     "children": {
       "type": "ReactNode",
@@ -17,12 +17,12 @@
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled visibility. Changes from the parent do not emit onOpenChange."
+      "description": "Controlled visibility; updates from the parent never call onOpenChange."
     },
     "defaultOpen": {
       "type": "boolean",
       "required": false,
-      "description": "Initial uncontrolled visibility; later changes do not reset the layer."
+      "description": "Visibility on mount when `open` is not set; read once."
     },
     "side": {
       "type": "enum",
@@ -48,12 +48,12 @@
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Additional nonnegative gap in pixels before the content membrane."
+      "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2."
     },
     "dir": {
       "type": "string",
       "required": false,
-      "description": "Content direction. Omitted inherits the trigger; auto follows the content."
+      "description": "Content direction; omitted inherits the trigger's, auto follows the content."
     }
   },
   "states": [

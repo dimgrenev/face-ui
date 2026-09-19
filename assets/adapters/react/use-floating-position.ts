@@ -105,17 +105,6 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
     viewportInset = 8,
     matchTriggerWidth = false,
   } = options
-  if (!['top', 'right', 'bottom', 'left'].includes(side))
-    throw new TypeError('Floating side must be top, right, bottom or left')
-  if (!['start', 'center', 'end'].includes(align))
-    throw new TypeError('Floating align must be start, center or end')
-  if (dir !== undefined && !['ltr', 'rtl', 'auto'].includes(dir))
-    throw new TypeError('Floating dir must be ltr, rtl or auto')
-  for (const [name, value] of Object.entries({ sideOffset, viewportInset }))
-    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0)
-      throw new RangeError(
-        `Floating ${name} must be a finite nonnegative number`,
-      )
   const [position, setPosition] = useState({ style: initialStyle, side })
 
   const update = useCallback(() => {

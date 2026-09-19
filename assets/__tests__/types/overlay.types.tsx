@@ -1,8 +1,10 @@
 import { Overlay } from '../../../Overlay/Overlay'
 
-;<Overlay trigger="hover" interactive openDelay={80} closeDelay={40} content="Details">Trigger</Overlay>
-;<Overlay trigger="click" defaultOpen content="Details">Trigger</Overlay>
+;<Overlay openOn="hover" interactive openDelay={80} closeDelay={40} content="Details">Trigger</Overlay>
+;<Overlay openOn="click" defaultOpen content="Details">Trigger</Overlay>
 // @ts-expect-error Click compatibility overlay does not have hover-only options.
-;<Overlay trigger="click" openDelay={20} />
+;<Overlay openOn="click" openDelay={20} />
 // @ts-expect-error Click compatibility overlay does not have hover-only options.
-;<Overlay trigger="click" interactive />
+;<Overlay openOn="click" interactive />
+// @ts-expect-error The interaction mode is openOn; trigger was renamed.
+;<Overlay trigger="click" />

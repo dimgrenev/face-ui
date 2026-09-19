@@ -160,7 +160,6 @@ const PENDING_UNION_DOC_CONFLICTS: Record<string, string[]> = {
   Calendar: ['value', 'defaultValue', 'onValueChange'],
   Date: ['selection', 'valueFormat', 'onValueChange'],
   Input: ['multiline', 'type'],
-  Overlay: ['trigger'],
   Radio: ['name', 'required'],
   Rating: ['name', 'required'],
   SegmentedControl: ['multiple', 'value', 'defaultValue', 'onValueChange'],
