@@ -131,9 +131,9 @@ to fail while any listed usage remains. Rows marked `manual` are reported, never
 | `collapsedHeight` | `collapsedLines`, the number of lines a collapsed source shows (the old 160px showed about 7) | manual |
 | A source collapsed when it had more than 8 lines or 240 characters, to `collapsedHeight` pixels | A source collapses when it has more lines than `collapsedLines` (default 8), to exactly its first that many lines; it cannot scroll while collapsed and expands from its first line | — |
 | Without `title`, a short source had no copy button | The copy button is always there: in the header, which an untitled source of more than one line also gets, or at the inline end beside an untitled one-line source; a successful copy shows a check and announces `labels.copied` | — |
-| `tokenizedLines` supplied the source when `code` was omitted, and their text was shown even where it differed from `code` | `children` is the only source; a line whose tokens spell other text renders plain and is reported, so what is shown is what is copied | — |
+| `tokenizedLines` supplied the source when `code` was omitted, and their text was shown even where it differed from `code` | `children` is the only source; a line whose tokens are missing or spell other text (a highlighter still catching up) renders plain, so what is shown is what is copied | — |
 | A final line break rendered an empty, numbered last line | A final line break ends the last line; the copy button still copies it | — |
-| The root carried `data-language`; lines carried `data-line` and `data-highlight`; the `pre` carried `is-collapsed`/`is-scrollable` | `<code>` carries the `language-*` class; highlighted lines are `<mark>` elements; the root carries `data-state="collapsed" \| "expanded"` when the source can collapse; the `pre` is `dir="ltr"` and `translate="no"` | — |
+| The root carried `data-language`; lines carried `data-line` and `data-highlight`; the `pre` carried `is-collapsed`/`is-scrollable` | `<code>` carries the `language-*` class; highlighted lines are `<mark>` elements; the root carries `data-state="collapsed" \| "expanded"` when the source can collapse; the `pre` is `dir="ltr"`, `translate="no"`, and `tabindex="0"` while it scrolls, `-1` otherwise | — |
 
 ### Date
 

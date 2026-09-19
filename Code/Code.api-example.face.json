@@ -69,7 +69,7 @@
       "name": "tokenizedLines",
       "type": "array",
       "required": false,
-      "description": "Syntax colors from a highlighter, one token array per line of `children`; a line whose tokens spell other text renders plain."
+      "description": "Syntax colors from a highlighter, one token array per line of `children`; a line whose tokens are missing or spell other text (a highlighter still catching up) renders plain."
     },
     {
       "name": "title",
@@ -94,7 +94,7 @@
       "name": "collapsed",
       "type": "boolean",
       "required": false,
-      "description": "Controlled collapse: a source longer than `collapsedLines` shows only its first lines and cannot scroll; a shorter one always shows in full."
+      "description": "Controlled collapse: a source longer than `collapsedLines` shows only its first lines and cannot scroll, yet every line stays readable to assistive technology (so the toggle is named by `labels.expand`/`labels.collapse`, without `aria-expanded`); a shorter source shows in full."
     },
     {
       "name": "defaultCollapsed",

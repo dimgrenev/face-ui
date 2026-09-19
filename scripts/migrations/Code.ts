@@ -39,7 +39,7 @@ export default [
     kind: 'behavior',
     component: 'Code',
     before: '`tokenizedLines` supplied the source when `code` was omitted, and their text was shown even where it differed from `code`',
-    after: '`children` is the only source; a line whose tokens spell other text renders plain and is reported, so what is shown is what is copied',
+    after: '`children` is the only source; a line whose tokens are missing or spell other text (a highlighter still catching up) renders plain, so what is shown is what is copied',
   },
   {
     kind: 'behavior',
@@ -51,6 +51,6 @@ export default [
     kind: 'behavior',
     component: 'Code',
     before: 'The root carried `data-language`; lines carried `data-line` and `data-highlight`; the `pre` carried `is-collapsed`/`is-scrollable`',
-    after: '`<code>` carries the `language-*` class; highlighted lines are `<mark>` elements; the root carries `data-state="collapsed" | "expanded"` when the source can collapse; the `pre` is `dir="ltr"` and `translate="no"`',
+    after: '`<code>` carries the `language-*` class; highlighted lines are `<mark>` elements; the root carries `data-state="collapsed" | "expanded"` when the source can collapse; the `pre` is `dir="ltr"`, `translate="no"`, and `tabindex="0"` while it scrolls, `-1` otherwise',
   },
 ] satisfies Migration[]

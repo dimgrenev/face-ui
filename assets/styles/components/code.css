@@ -28,9 +28,7 @@
   min-inline-size: 0;
   max-inline-size: 100%;
   min-height: var(--uf-control-height);
-  height: auto;
   padding: var(--uf-code-header-pad);
-  gap: 0;
 }
 .uf-code-header > .uf-membrane:first-child {
   flex: 1 1 auto;
@@ -48,7 +46,6 @@
 .uf-code-actions {
   display: flex;
   align-items: center;
-  gap: 0;
   flex-shrink: 0;
   margin-inline-start: auto;
 }
@@ -124,10 +121,19 @@ mark[data-scope="code"][data-part="line"] {
   margin-inline: calc(-1 * var(--uf-code-pad));
   padding-inline: var(--uf-code-pad);
 }
+/* Unadjusted, forced colors put a Canvas text plate on the Mark bar. Syntax colors give way to
+   MarkText again; the number is a box of its own (it would get the plate), so it takes MarkText. */
 @media (forced-colors: active) {
   mark[data-scope="code"][data-part="line"] {
+    forced-color-adjust: none;
     background: Mark;
     color: MarkText;
+  }
+  mark[data-scope="code"][data-part="line"] > :not([data-part]) {
+    forced-color-adjust: auto;
+  }
+  mark[data-scope="code"][data-part="line"] > [data-part="lineNumber"] {
+    color: inherit;
   }
 }
 [data-scope="code"] [data-part="lineNumber"] {

@@ -41,6 +41,8 @@ test('a collapsed source is exactly as tall as collapsedLines lines and expands 
   // Five whole lines above the bottom padding; the sixth starts where the padding does.
   expect((await box(lines.nth(4))).bottom).toBeLessThanOrEqual(clip.bottom - padding + 0.5)
   expect((await box(lines.nth(5))).top).toBeCloseTo(clip.bottom - padding, 0)
+  // Clipping is visual only: the lines below stay in the accessibility tree.
+  expect(await pre.ariaSnapshot()).toContain('line 20')
 
   await subject(page).getByRole('button', { name: 'Expand code' }).click()
   const expanded = await pre.evaluate((node) => ({
@@ -261,7 +263,7 @@ test('the source takes keyboard focus only while it can scroll', { tag: ['@focus
     return page.evaluate(() => document.activeElement?.tagName)
   }
   await render(page, { children: 'npm install' })
-  await expect(pre).not.toHaveAttribute('tabindex')
+  await expect(pre).toHaveAttribute('tabindex', '-1')
   expect(await previousStop()).not.toBe('PRE')
 
   await render(page, { children: `const long = '${'x'.repeat(200)}'` })
@@ -270,7 +272,7 @@ test('the source takes keyboard focus only while it can scroll', { tag: ['@focus
 
   // Thirty lines outgrow the scroll limit once expanded.
   await render(page, { children: source(30), defaultCollapsed: true })
-  await expect(pre).not.toHaveAttribute('tabindex')
+  await expect(pre).toHaveAttribute('tabindex', '-1')
   expect(await previousStop()).not.toBe('PRE')
   await subject(page).getByRole('button', { name: 'Expand code' }).click()
   await expect(pre).toHaveAttribute('tabindex', '0')
@@ -280,6 +282,26 @@ test('the source takes keyboard focus only while it can scroll', { tag: ['@focus
   await page.keyboard.press('ArrowDown')
   await expect.poll(() => pre.evaluate((node) => node.scrollTop)).toBeGreaterThan(0)
 })
+
+for (const change of ['is collapsed by the prop', 'shrinks to fit'] as const)
+  test(`a focused source that ${change} keeps focus, and Tab continues after it`, { tag: ['@focus'] }, async ({
+    page,
+  }) => {
+    const props = { children: source(40), collapsed: false }
+    await render(page, props)
+    const pre = subject(page).locator('pre')
+    await expect(pre).toHaveAttribute('tabindex', '0')
+    await pre.focus()
+    await render(
+      page,
+      change === 'is collapsed by the prop' ? { ...props, collapsed: true } : { ...props, children: 'npm install' },
+      { update: true },
+    )
+    await expect(pre).toBeFocused()
+    await expect(pre).toHaveAttribute('tabindex', '-1')
+    await page.keyboard.press('Tab')
+    await expect(page.locator('#after')).toBeFocused()
+  })
 
 test('titled, untitled, numbered, marked and collapsed blocks pass axe', { tag: ['@a11y'] }, async ({
   page,
@@ -298,14 +320,74 @@ test('titled, untitled, numbered, marked and collapsed blocks pass axe', { tag: 
   expect(await axe(page)).toEqual([])
 })
 
-test('highlighted lines stay distinct in forced colors', { tag: ['@forced-colors'] }, async ({
-  page,
-}) => {
-  await page.emulateMedia({ forcedColors: 'active' })
-  await render(page, { children: source(3), highlightedLines: [2] })
-  const backgrounds = await subject(page)
-    .locator('[data-part="line"]')
-    .evaluateAll((lines) => lines.map((line) => getComputedStyle(line).backgroundColor))
-  expect(backgrounds[1]).not.toBe(backgrounds[0])
-  expect(backgrounds[0]).toBe(backgrounds[2])
-})
+/** Box of the text an element or text node holds. */
+const runBox = (locator: Locator, part: 'element' | 'text') =>
+  locator.evaluate((node, part) => {
+    const range = document.createRange()
+    const text = [...node.childNodes].find(
+      (child) => child.nodeType === Node.TEXT_NODE && child.textContent !== '\n',
+    )
+    range.selectNodeContents(part === 'text' ? text! : node)
+    return range.getBoundingClientRect().toJSON() as DOMRect
+  }, part)
+/** What the eye gets in `rect`: its dominant color, and how many pixels contrast with it by more than 3:1. */
+const look = async (page: Page, rect: DOMRect) => {
+  const [x, y] = [Math.floor(rect.left), Math.floor(rect.top)]
+  const clip = { x, y, width: Math.ceil(rect.right) - x, height: Math.ceil(rect.bottom) - y }
+  const png = (await page.screenshot({ clip, animations: 'disabled' })).toString('base64')
+  return page.evaluate(async (png) => {
+    const luminance = (rgb: number[]) => {
+      const [r, g, b] = rgb.map((c) => (c / 255 <= 0.03928 ? c / 255 / 12.92 : ((c / 255 + 0.055) / 1.055) ** 2.4))
+      return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!
+    }
+    const image = new Image()
+    image.src = `data:image/png;base64,${png}`
+    await image.decode()
+    const canvas = Object.assign(document.createElement('canvas'), { width: image.width, height: image.height })
+    const context = canvas.getContext('2d')!
+    context.drawImage(image, 0, 0)
+    const { data } = context.getImageData(0, 0, image.width, image.height)
+    const pixels = Array.from({ length: data.length / 4 }, (_, at) => [...data.subarray(at * 4, at * 4 + 3)])
+    const counts = new Map<string, number>()
+    for (const pixel of pixels) counts.set(`${pixel}`, (counts.get(`${pixel}`) ?? 0) + 1)
+    const backdrop = [...counts].sort((a, b) => b[1] - a[1])[0]![0].split(',').map(Number)
+    const light = luminance(backdrop)
+    const strokes = pixels.filter((pixel) => {
+      const [hi, lo] = [luminance(pixel), light].sort((a, b) => b - a)
+      return (hi! + 0.05) / (lo! + 0.05) > 3
+    }).length
+    return { backdrop, strokes }
+  }, png)
+}
+
+for (const colorScheme of ['light', 'dark'] as const)
+  test(`marked lines stay distinct and legible in forced colors, numbers and syntax colors included (${colorScheme})`, { tag: ['@forced-colors', '@css'] }, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme, forcedColors: 'active' })
+    await render(page, {
+      children: `${source(10)}\nconst marked = 11\nline 12`,
+      showLineNumbers: true,
+      highlightedLines: [11, 12],
+      // Line 12 has no tokens yet; line 11 colors "const" as Mark's own yellow.
+      tokenizedLines: [
+        ...Array.from({ length: 10 }, (_, index) => [{ content: `line ${index + 1}` }]),
+        [{ content: 'const', color: 'rgb(255, 255, 0)' }, { content: ' marked = 11' }],
+      ],
+    })
+    const lines = subject(page).locator('[data-part="line"]')
+    const plain = await look(page, await box(lines.nth(9)))
+    const bar = await look(page, await box(lines.nth(10)))
+    expect(bar.backdrop).not.toEqual(plain.backdrop)
+    const runs = {
+      number: runBox(lines.nth(10).locator('[data-part="lineNumber"]'), 'element'),
+      token: runBox(lines.nth(10).locator('span:not([data-part])').first(), 'element'),
+      text: runBox(lines.nth(11), 'text'),
+    }
+    for (const [run, rect] of Object.entries(runs)) {
+      // Ink on the mark itself, with no plate of another color behind the text.
+      const seen = await look(page, await rect)
+      expect(seen.backdrop, run).toEqual(bar.backdrop)
+      expect(seen.strokes, run).toBeGreaterThan(20)
+    }
+  })

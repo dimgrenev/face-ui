@@ -136,7 +136,7 @@ describe('Code props', () => {
     expect($('pre > code')!.hasAttribute('class')).toBe(false)
   })
 
-  it('tokenizedLines color the lines they spell and never change the text', async () => {
+  it('tokenizedLines color the lines they spell; a line they do not spell yet renders plain, silently', async () => {
     const tokenizedLines = [
       [
         { content: 'const', color: 'rgb(255, 0, 0)' },
@@ -144,22 +144,17 @@ describe('Code props', () => {
       ],
       [{ content: 'stale line' }],
     ]
-    await expectDevError(
-      () => render({ children: 'const a = 1\nconst b = 2', tokenizedLines }),
-      /^Face UI Code: invalid tokenizedLines array; rendering lines whose tokens do not spell children as plain text\.$/,
-    )
-    const [first, second] = lines()
+    // A highlighter catching up with a streamed source is a normal state, not a defect: no report.
+    await render({ children: 'const a = 1\nconst b = 2\nconst c = 3', tokenizedLines })
+    const [first, second, third] = lines()
     expect(first!.querySelector('span')!.style.color).toBe('rgb(255, 0, 0)')
     expect(lineText(first!)).toBe('const a = 1')
-    expect(second!.children).toHaveLength(0)
-    expect(lineText(second!)).toBe('const b = 2')
+    expect([second!.children.length, third!.children.length]).toEqual([0, 0])
+    expect([lineText(second!), lineText(third!)]).toEqual(['const b = 2', 'const c = 3'])
   })
 
   it('tokenizedLines without children color nothing, and a non-array is reported', async () => {
-    await expectDevError(
-      () => render({ tokenizedLines: [[{ content: 'orphan' }]] }),
-      /invalid tokenizedLines array/,
-    )
+    await render({ tokenizedLines: [[{ content: 'orphan' }]] })
     expect(lines().map(lineText)).toEqual([''])
     await expectDevError(
       () =>
@@ -167,7 +162,7 @@ describe('Code props', () => {
           children: 'a',
           tokenizedLines: 'a' as unknown as CodeProps['tokenizedLines'],
         }),
-      /invalid tokenizedLines "a"/,
+      /^Face UI Code: invalid tokenizedLines "a"; rendering plain text\.$/,
     )
     expect(lines().map(lineText)).toEqual(['a'])
   })
@@ -273,6 +268,19 @@ describe('Code collapse', () => {
     )
     // Truncated to 2, three lines still collapse (the mount default stays collapsed).
     expect(root().dataset.state).toBe('collapsed')
+  })
+
+  it('collapsing only clips the view: every line stays readable, so the toggle names its action without aria-expanded', async () => {
+    await render({ children: source(12), defaultCollapsed: true })
+    expect(root().dataset.state).toBe('collapsed')
+    expect(lines().map(lineText)).toEqual(source(12).split('\n'))
+    expect(pre().closest('[aria-hidden], [hidden], [inert]')).toBeNull()
+    expect(pre().querySelectorAll('[aria-hidden], [hidden], [inert]')).toHaveLength(0)
+    expect(toggle()?.textContent).toBe('Expand code')
+    expect(toggle()?.hasAttribute('aria-expanded')).toBe(false)
+    await act(async () => toggle()!.click())
+    expect(toggle()?.textContent).toBe('Collapse code')
+    expect(toggle()?.hasAttribute('aria-expanded')).toBe(false)
   })
 
   it('a controlled collapsed source that stops fitting is projected, never rewritten', async () => {

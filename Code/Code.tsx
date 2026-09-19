@@ -59,7 +59,7 @@ export interface CodeProps
   children?: string
   /** Language of the source, set as the `language-*` class of `<code>` for highlighters; Code itself does not color the text. */
   language?: string
-  /** Syntax colors from a highlighter, one token array per line of `children`; a line whose tokens spell other text renders plain. */
+  /** Syntax colors from a highlighter, one token array per line of `children`; a line whose tokens are missing or spell other text (a highlighter still catching up) renders plain. */
   tokenizedLines?: readonly (readonly CodeToken[])[]
   /** Header text such as a file name; without it a one-line source keeps its copy button beside it instead of a header. */
   title?: ReactNode
@@ -67,7 +67,7 @@ export interface CodeProps
   showLineNumbers?: boolean
   /** Numbers of the lines to mark, whole and from 1; each renders as a highlighted `<mark>`. */
   highlightedLines?: readonly number[]
-  /** Controlled collapse: a source longer than `collapsedLines` shows only its first lines and cannot scroll; a shorter one always shows in full. */
+  /** Controlled collapse: a source longer than `collapsedLines` shows only its first lines and cannot scroll, yet every line stays readable to assistive technology (so the toggle is named by `labels.expand`/`labels.collapse`, without `aria-expanded`); a shorter source shows in full. */
   collapsed?: boolean
   /** Uncontrolled `collapsed` on mount; read once. */
   defaultCollapsed?: boolean
@@ -89,20 +89,20 @@ function readLines(children: unknown): readonly string[] {
   return children.replace(/\r?\n$/, '').split(/\r?\n/)
 }
 
-/** Each line's tokens, or null where they are missing or spell other text (reported once). */
+/** Each line's tokens, or null where they are missing or spell other text, as while a highlighter catches up. */
 function readTokens(tokenizedLines: unknown, lines: readonly string[]) {
   if (tokenizedLines == null) return undefined
-  const rows: unknown[] = Array.isArray(tokenizedLines) ? tokenizedLines : []
-  const tokens = lines.map((line, index) => {
-    const row = rows[index]
+  if (!Array.isArray(tokenizedLines)) {
+    invalidProp('Code', 'tokenizedLines', tokenizedLines, 'rendering plain text')
+    return undefined
+  }
+  return lines.map((line, index) => {
+    const row: unknown = tokenizedLines[index]
     return Array.isArray(row) &&
       row.map((token: CodeToken | null) => token?.content).join('') === line
       ? (row as readonly CodeToken[])
       : null
   })
-  if (tokens.includes(null))
-    invalidProp('Code', 'tokenizedLines', tokenizedLines, 'rendering lines whose tokens do not spell children as plain text')
-  return tokens
 }
 
 function readMarked(highlightedLines: unknown): ReadonlySet<number> {
@@ -252,7 +252,8 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
         {...codeAnatomy.getPartAttrs('pre')}
         dir="ltr"
         translate="no"
-        tabIndex={scrollable ? 0 : undefined}
+        // A tab stop while it scrolls; still focusable after, so a focused source that stops scrolling keeps focus.
+        tabIndex={scrollable ? 0 : -1}
         style={{ '--uf-code-collapsed-lines': visibleLines } as CSSProperties}
       >
         <code className={language ? `language-${language}` : undefined}>
