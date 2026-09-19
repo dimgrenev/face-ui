@@ -10,17 +10,26 @@
       "items": {
         "$ref": "props.items"
       },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "expanded": {
+        "$ref": "props.expanded"
+      },
+      "defaultExpanded": {
+        "$ref": "props.defaultExpanded"
+      },
       "collapsed": {
         "$ref": "props.collapsed"
       },
       "defaultCollapsed": {
         "$ref": "props.defaultCollapsed"
       },
-      "selectedId": {
-        "$ref": "props.selectedId"
-      },
-      "defaultSelectedId": {
-        "$ref": "props.defaultSelectedId"
+      "collapsible": {
+        "$ref": "props.collapsible"
       },
       "width": {
         "$ref": "props.width"
@@ -31,9 +40,6 @@
       "surface": {
         "$ref": "props.surface"
       },
-      "surfaceBreakpoint": {
-        "$ref": "props.surfaceBreakpoint"
-      },
       "open": {
         "$ref": "props.open"
       },
@@ -43,8 +49,11 @@
       "trigger": {
         "$ref": "props.trigger"
       },
-      "surfaceTitle": {
-        "$ref": "props.surfaceTitle"
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "labels": {
+        "$ref": "props.labels"
       }
     },
     "children": []
@@ -52,28 +61,44 @@
   "currentState": {
     "props": {
       "surface": "inline",
+      "aria-label": "Admin",
       "width": 280,
-      "defaultSelectedId": "members",
+      "defaultValue": "members",
       "items": [
         {
-          "id": "overview",
+          "value": "overview",
           "label": "Overview",
-          "icon": "layout-sidebar-left-open"
+          "icon": "layout-sidebar-left-open",
+          "href": "#overview"
         },
         {
-          "id": "members",
+          "value": "members",
           "label": "Members",
-          "icon": "account"
+          "icon": "account",
+          "href": "#members"
         },
         {
-          "id": "billing",
+          "value": "billing",
           "label": "Billing",
-          "icon": "file"
+          "icon": "file",
+          "items": [
+            {
+              "value": "plan",
+              "label": "Plan",
+              "href": "#plan"
+            },
+            {
+              "value": "invoices",
+              "label": "Invoices",
+              "href": "#invoices"
+            }
+          ]
         },
         {
-          "id": "security",
+          "value": "security",
           "label": "Security",
-          "icon": "settings"
+          "icon": "settings",
+          "href": "#security"
         }
       ]
     }
@@ -83,52 +108,72 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Panel item definitions (supports nested groups)."
+      "description": "Rows in order, groups nesting their rows; an item repeating an earlier value is dropped."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Value of the current page's row, marked `aria-current=\"page\"`; `null` marks none, and an unknown value marks none."
+    },
+    {
+      "name": "defaultValue",
+      "type": "string",
+      "required": false,
+      "description": "Current row on mount when `value` is not set; read once.",
+      "defaultValue": null
+    },
+    {
+      "name": "expanded",
+      "type": "array",
+      "required": false,
+      "description": "Values of the groups showing their rows; unknown values are kept but show nothing."
+    },
+    {
+      "name": "defaultExpanded",
+      "type": "array",
+      "required": false,
+      "description": "Expanded groups on mount when `expanded` is not set; read once. Default: the groups that hold the current row."
     },
     {
       "name": "collapsed",
       "type": "boolean",
       "required": false,
-      "description": "Whether the panel is collapsed."
+      "description": "Whether the inline panel is a rail of icons, labels kept as accessible names; a sheet never collapses."
     },
     {
       "name": "defaultCollapsed",
       "type": "boolean",
       "required": false,
-      "description": "Uncontrolled initial collapsed state.",
+      "description": "Whether the panel is collapsed on mount when `collapsed` is not set; read once.",
       "defaultValue": false
     },
     {
-      "name": "selectedId",
-      "type": "string",
+      "name": "collapsible",
+      "type": "boolean",
       "required": false,
-      "description": "Currently selected item ID."
-    },
-    {
-      "name": "defaultSelectedId",
-      "type": "string",
-      "required": false,
-      "description": "Uncontrolled initial selected item ID."
+      "description": "Shows the button that collapses the panel to a rail; false leaves collapsing to `collapsed`. Default true.",
+      "defaultValue": true
     },
     {
       "name": "width",
       "type": "any",
       "required": false,
-      "description": "Width when expanded.",
+      "description": "Width of the expanded inline panel: pixels, or any CSS length. Default 260.",
       "defaultValue": 260
     },
     {
       "name": "collapsedWidth",
       "type": "any",
       "required": false,
-      "description": "Width when collapsed.",
+      "description": "Width of the collapsed rail: pixels, or any CSS length. Default 60.",
       "defaultValue": 60
     },
     {
       "name": "surface",
       "type": "select",
       "required": false,
-      "description": "Surface behavior on compact viewports.",
+      "description": "`inline` shows the panel; `sheet` shows a trigger that opens the rows in a drawer at the start edge; `auto` is a sheet below 900px.",
       "options": [
         "auto",
         "inline",
@@ -137,35 +182,35 @@
       "defaultValue": "auto"
     },
     {
-      "name": "surfaceBreakpoint",
-      "type": "number",
-      "required": false,
-      "description": "Breakpoint where auto surfaces switch to sheet mode."
-    },
-    {
       "name": "open",
       "type": "boolean",
       "required": false,
-      "description": "Controlled drawer state for sheet mode."
+      "description": "Whether the sheet is open; only a sheet surface opens, and leaving it closes an uncontrolled sheet."
     },
     {
       "name": "defaultOpen",
       "type": "boolean",
       "required": false,
-      "description": "Uncontrolled initial drawer state for sheet mode.",
+      "description": "Whether the sheet is open on mount when `open` is not set; read once.",
       "defaultValue": false
     },
     {
       "name": "trigger",
       "type": "any",
       "required": false,
-      "description": "Optional trigger for sheet mode."
+      "description": "Element that opens the sheet, keeping its own props; text renders as a Button. Default: an icon button named `labels.open`."
     },
     {
-      "name": "surfaceTitle",
-      "type": "any",
+      "name": "aria-label",
+      "type": "string",
       "required": false,
-      "description": "Optional title used in compact sheet header."
+      "description": "Names the navigation landmark and titles the sheet; an untitled sheet is named by its trigger."
+    },
+    {
+      "name": "labels",
+      "type": "object",
+      "required": false,
+      "description": "Strings Panel renders itself: `open` names the default sheet trigger, `close` the sheet's close button, `expand` and `collapse` the rail toggle."
     }
   ],
   "meta": {

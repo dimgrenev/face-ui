@@ -10,20 +10,14 @@
       "items": {
         "$ref": "props.items"
       },
-      "activeId": {
-        "$ref": "props.activeId"
+      "value": {
+        "$ref": "props.value"
       },
-      "defaultActiveId": {
-        "$ref": "props.defaultActiveId"
-      },
-      "orientation": {
-        "$ref": "props.orientation"
+      "defaultValue": {
+        "$ref": "props.defaultValue"
       },
       "surface": {
         "$ref": "props.surface"
-      },
-      "surfaceBreakpoint": {
-        "$ref": "props.surfaceBreakpoint"
       },
       "open": {
         "$ref": "props.open"
@@ -34,35 +28,56 @@
       "trigger": {
         "$ref": "props.trigger"
       },
-      "surfaceTitle": {
-        "$ref": "props.surfaceTitle"
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "labels": {
+        "$ref": "props.labels"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "orientation": "vertical",
       "surface": "sheet",
       "defaultOpen": true,
-      "surfaceTitle": "Navigate",
-      "defaultActiveId": "agents",
+      "aria-label": "Navigate",
+      "defaultValue": "agents",
       "items": [
         {
-          "id": "agents",
-          "label": "Agents"
+          "value": "agents",
+          "label": "Agents",
+          "icon": "component",
+          "href": "#agents"
         },
         {
-          "id": "runs",
-          "label": "Runs"
+          "value": "runs",
+          "label": "Runs",
+          "icon": "activity-running",
+          "href": "#runs"
         },
         {
-          "id": "knowledge",
-          "label": "Knowledge"
+          "value": "knowledge",
+          "label": "Knowledge",
+          "icon": "folder",
+          "items": [
+            {
+              "value": "sources",
+              "label": "Sources",
+              "href": "#sources"
+            },
+            {
+              "value": "indexes",
+              "label": "Indexes",
+              "href": "#indexes"
+            }
+          ]
         },
         {
-          "id": "settings",
-          "label": "Settings"
+          "value": "settings",
+          "label": "Settings",
+          "icon": "settings",
+          "href": "#settings"
         }
       ]
     }
@@ -72,37 +87,26 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Navigation item definitions (supports nested dropdowns)."
+      "description": "The bar's items in order; an item repeating an earlier value is dropped."
     },
     {
-      "name": "activeId",
+      "name": "value",
       "type": "string",
       "required": false,
-      "description": "Currently active item ID."
+      "description": "Value of the current page's item, marked `aria-current=\"page\"`; `null` marks none, and an unknown value marks none."
     },
     {
-      "name": "defaultActiveId",
+      "name": "defaultValue",
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial active item ID.",
+      "description": "Current item on mount when `value` is not set; read once.",
       "defaultValue": null
-    },
-    {
-      "name": "orientation",
-      "type": "select",
-      "required": false,
-      "description": "Orientation of the navigation bar.",
-      "options": [
-        "horizontal",
-        "vertical"
-      ],
-      "defaultValue": "horizontal"
     },
     {
       "name": "surface",
       "type": "select",
       "required": false,
-      "description": "Surface behavior on compact viewports.",
+      "description": "`inline` shows the bar; `sheet` shows a trigger that opens the items in a bottom sheet; `auto` is a sheet below 900px.",
       "options": [
         "auto",
         "inline",
@@ -111,35 +115,35 @@
       "defaultValue": "auto"
     },
     {
-      "name": "surfaceBreakpoint",
-      "type": "number",
-      "required": false,
-      "description": "Breakpoint where auto surfaces switch to sheet mode."
-    },
-    {
       "name": "open",
       "type": "boolean",
       "required": false,
-      "description": "Controlled sheet state for compact mode."
+      "description": "Whether the sheet is open; only a sheet surface opens, and leaving it closes an uncontrolled sheet."
     },
     {
       "name": "defaultOpen",
       "type": "boolean",
       "required": false,
-      "description": "Uncontrolled initial sheet state for compact mode.",
+      "description": "Whether the sheet is open on mount when `open` is not set; read once.",
       "defaultValue": false
     },
     {
       "name": "trigger",
       "type": "any",
       "required": false,
-      "description": "Optional trigger for compact mode."
+      "description": "Element that opens the sheet, keeping its own props; text renders as a Button. Default: an icon button named `labels.open`."
     },
     {
-      "name": "surfaceTitle",
-      "type": "any",
+      "name": "aria-label",
+      "type": "string",
       "required": false,
-      "description": "Optional title used in compact sheet header."
+      "description": "Names the navigation landmark and titles the sheet; an untitled sheet is named by its trigger."
+    },
+    {
+      "name": "labels",
+      "type": "object",
+      "required": false,
+      "description": "Strings Navigation renders itself: `open` names the default sheet trigger, `close` the sheet's close button."
     }
   ],
   "meta": {

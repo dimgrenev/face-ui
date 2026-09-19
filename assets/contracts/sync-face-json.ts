@@ -467,17 +467,26 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   Panel: {
     patchStates: () => {
       const items = [
-        { id: 'overview', label: 'Overview', icon: 'layout-sidebar-left-open' },
-        { id: 'projects', label: 'Projects', icon: 'folder' },
-        { id: 'automations', label: 'Automations', icon: 'component' },
-        { id: 'settings', label: 'Settings', icon: 'settings' },
+        { value: 'overview', label: 'Overview', icon: 'layout-sidebar-left-open' },
+        { value: 'projects', label: 'Projects', icon: 'folder' },
+        { value: 'automations', label: 'Automations', icon: 'component' },
+        {
+          value: 'settings',
+          label: 'Settings',
+          icon: 'settings',
+          items: [
+            { value: 'members', label: 'Members' },
+            { value: 'billing', label: 'Billing' },
+          ],
+        },
       ]
       return [
         {
           name: 'Default',
           props: {
             items,
-            defaultSelectedId: 'overview',
+            defaultValue: 'overview',
+            'aria-label': 'Workspace',
             surface: 'inline',
             width: 260,
           },
@@ -486,7 +495,8 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           name: 'Collapsed',
           props: {
             items,
-            defaultSelectedId: 'projects',
+            defaultValue: 'projects',
+            'aria-label': 'Workspace',
             surface: 'inline',
             defaultCollapsed: true,
           },
@@ -495,10 +505,10 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
           name: 'Compact overlay',
           props: {
             items,
-            defaultSelectedId: 'automations',
+            defaultValue: 'automations',
             surface: 'sheet',
             defaultOpen: true,
-            surfaceTitle: 'Workspace',
+            'aria-label': 'Workspace',
           },
         },
       ]

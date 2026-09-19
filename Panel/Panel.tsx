@@ -1,450 +1,397 @@
-/**
- * Panel — collapsible side panel navigation.
- *
- * Flat API: all items rendered from `items` prop.
- * Supports nested groups, expand/collapse, and item selection.
- *
- * `<Panel items={[{ id: 'home', label: 'Home', icon: <HomeIcon /> }]} />`
- */
-
+/** Panel — side navigation: links in expandable groups that collapses to a rail, or a sheet on narrow screens. */
 import {
   forwardRef,
-  useRef,
   useId,
-  type KeyboardEvent,
+  useRef,
+  type CSSProperties,
+  type HTMLAttributes,
+  type MouseEvent,
   type ReactNode,
 } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
+import { Membrane } from '../assets/adapters/react/Membrane'
+import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
+import { createAnatomy } from '../assets/anatomy'
+import type { CollectionItem } from '../assets/internal/item'
+import { NavSheet, useNavSurface } from '../assets/internal/nav-sheet'
 import {
-  DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
-  useIsCompactViewport,
-} from '../assets/adapters/react/use-responsive-overlay-surface'
-import { Trigger } from '../assets/adapters/react/Trigger'
-import { useLayer } from '../assets/adapters/react/use-layer'
-import { usePortalTarget } from '../assets/adapters/react/use-portal-target'
-import { createPortal } from 'react-dom'
-import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
-import { useControllableOpenState } from '../assets/adapters/react/use-controllable-open-state'
-import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
-import {
-  sidebarMachine,
-  connectSidebar,
-} from '../assets/machines/sidebar.machine'
+  domId,
+  readCollection,
+  readKeys,
+  visibleKeys,
+} from '../assets/runtime/collection'
+import { resolveLabels, type CommonLabels } from '../assets/runtime/labels'
+import { invalidProp } from '../assets/runtime/props'
+import { hasSlotContent } from '../assets/slot-content'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
-import { Card } from '../Card/Card'
 import { Icon } from '../Icon/Icon'
-import type { NavItemBase } from '../assets/nav-item'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface PanelItem extends NavItemBase {
-  icon?: ReactNode
+/** One row of Panel: a link, an action, or a group of rows. */
+export interface PanelItem extends Omit<CollectionItem, 'textValue'> {
+  /** Makes the item a link to this URL; modifier keys and middle click open it elsewhere, as for any link. */
   href?: string
-  onClick?: () => void
-  items?: PanelItem[]
+  /** Called with the click before the item becomes current or its group toggles; `preventDefault()` cancels only a link's navigation. */
+  onClick?: (event: MouseEvent<HTMLElement>) => void
+  /** Turns the item into a group whose button shows these rows while it is expanded; its `href` is then ignored. */
+  items?: readonly PanelItem[]
 }
 
-export interface PanelProps {
-  /** Panel item definitions (supports nested groups). */
-  items?: PanelItem[]
-  /** Whether the panel is collapsed. */
+/** Strings Panel renders itself. */
+export type PanelLabels = Pick<CommonLabels, 'open' | 'close' | 'expand' | 'collapse'>
+
+export interface PanelProps
+  extends Omit<
+    HTMLAttributes<HTMLElement>,
+    | 'children'
+    | 'role'
+    | 'defaultValue'
+    | 'defaultChecked'
+    | 'dangerouslySetInnerHTML'
+    | 'contentEditable'
+    | 'suppressContentEditableWarning'
+  > {
+  /** Rows in order, groups nesting their rows; an item repeating an earlier value is dropped. */
+  items?: readonly PanelItem[]
+  /** Value of the current page's row, marked `aria-current="page"`; `null` marks none, and an unknown value marks none. */
+  value?: string | null
+  /** Current row on mount when `value` is not set; read once. */
+  defaultValue?: string | null
+  /** Called once when the user activates an enabled row other than the current one; a controlled parent may refuse it. */
+  onValueChange?: (details: { value: string }) => void
+  /** Values of the groups showing their rows; unknown values are kept but show nothing. */
+  expanded?: readonly string[]
+  /** Expanded groups on mount when `expanded` is not set; read once. Default: the groups that hold the current row. */
+  defaultExpanded?: readonly string[]
+  /** Called once per user toggle of a group, with the new list; a controlled parent may refuse it. */
+  onExpandedChange?: (details: { expanded: string[] }) => void
+  /** Whether the inline panel is a rail of icons, labels kept as accessible names; a sheet never collapses. */
   collapsed?: boolean
-  /** Uncontrolled initial collapsed state. */
+  /** Whether the panel is collapsed on mount when `collapsed` is not set; read once. */
   defaultCollapsed?: boolean
-  /** Callback when collapsed state changes. */
+  /** Called once per user request to collapse or expand the panel; a controlled parent may refuse it. */
   onCollapsedChange?: (details: { collapsed: boolean }) => void
-  /** Currently selected item ID. */
-  selectedId?: string | null
-  /** Uncontrolled initial selected item ID. */
-  defaultSelectedId?: string
-  /** Callback when selected item changes. */
-  onSelectedChange?: (details: { selectedId: string }) => void
-  /** Width when expanded. */
+  /** Shows the button that collapses the panel to a rail; false leaves collapsing to `collapsed`. Default true. */
+  collapsible?: boolean
+  /** Width of the expanded inline panel: pixels, or any CSS length. Default 260. */
   width?: number | string
-  /** Width when collapsed. */
+  /** Width of the collapsed rail: pixels, or any CSS length. Default 60. */
   collapsedWidth?: number | string
-  /** Additional class name on the root element. */
-  className?: string
-  /** Surface behavior on compact viewports. */
+  /** `inline` shows the panel; `sheet` shows a trigger that opens the rows in a drawer at the start edge; `auto` is a sheet below 900px. */
   surface?: 'auto' | 'inline' | 'sheet'
-  /** Breakpoint where auto surfaces switch to sheet mode. */
-  surfaceBreakpoint?: number
-  /** Controlled drawer state for sheet mode. */
+  /** Whether the sheet is open; only a sheet surface opens, and leaving it closes an uncontrolled sheet. */
   open?: boolean
-  /** Uncontrolled initial drawer state for sheet mode. */
+  /** Whether the sheet is open on mount when `open` is not set; read once. */
   defaultOpen?: boolean
-  /** Callback when drawer state changes. */
+  /** Called once per user request to open or close the sheet; a controlled parent may refuse it. */
   onOpenChange?: (details: { open: boolean }) => void
-  /** Optional trigger for sheet mode. */
+  /** Element that opens the sheet, keeping its own props; text renders as a Button. Default: an icon button named `labels.open`. */
   trigger?: ReactNode
-  /** Optional title used in compact sheet header. */
-  surfaceTitle?: ReactNode
+  /** Names the navigation landmark and titles the sheet; an untitled sheet is named by its trigger. */
+  'aria-label'?: string
+  /** Strings Panel renders itself: `open` names the default sheet trigger, `close` the sheet's close button, `expand` and `collapse` the rail toggle. */
+  labels?: Partial<PanelLabels>
 }
 
 // ---------------------------------------------------------------------------
-// Sub-item renderer
+// Helpers
 // ---------------------------------------------------------------------------
 
-interface PanelItemRendererProps {
-  item: PanelItem
-  api: ReturnType<typeof connectSidebar>
-  collapsed: boolean
-  level?: number
-}
-
-function PanelItemRenderer(props: PanelItemRendererProps) {
-  const { item, api, collapsed, level = 0 } = props
-  const hasChildren = Array.isArray(item.items) && item.items.length > 0
-  const resolvedIcon =
-    typeof item.icon === 'string' ? <Icon name={item.icon} /> : item.icon
-  const iconNode = resolvedIcon && (
-    <span data-scope="sidebar" data-part="itemIcon">
-      {resolvedIcon}
-    </span>
-  )
-
-  if (!hasChildren) {
-    const itemProps = api.getItemProps({ id: item.id, disabled: item.disabled })
-    const {
-      className: itemClassName,
-      onClick: selectItem,
-      onKeyDown,
-      'data-scope': _itemScope,
-      'data-part': _itemPart,
-      ...itemDomProps
-    } = itemProps as typeof itemProps & {
-      className?: string
-      onClick?: () => void
-      onKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void
-      'data-scope'?: string
-      'data-part'?: string
-    }
-
-    const handleClick = () => {
-      selectItem?.()
-      item.onClick?.()
-      if (item.href && !item.onClick && typeof window !== 'undefined') {
-        window.location.assign(item.href)
-      }
-    }
-
-    return (
-      <Button
-        {...itemDomProps}
-        icon={iconNode}
-        iconOnly={collapsed}
-        fullWidth
-        align="start"
-        stretchText
-        membrane
-        variant="default"
-        indent={level}
-        aria-label={
-          collapsed && typeof item.label === 'string' ? item.label : undefined
-        }
-        disabled={item.disabled}
-        className={cn('uf-sidebar-itemButton', itemClassName)}
-        onClick={handleClick}
-        onKeyDown={onKeyDown}
-      >
-        {!collapsed && (
-          <span data-scope="sidebar" data-part="itemLabel">
-            {item.label}
-          </span>
-        )}
-      </Button>
-    )
-  }
-
-  // Group with sub-items
-  const groupLabelProps = api.getGroupLabelProps({ id: item.id })
-  const {
-    className: groupLabelClassName,
-    onClick: toggleGroup,
-    onKeyDown: onGroupKeyDown,
-    'data-scope': _groupLabelScope,
-    'data-part': _groupLabelPart,
-    ...groupLabelDomProps
-  } = groupLabelProps as typeof groupLabelProps & {
-    className?: string
-    onClick?: () => void
-    onKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void
-    'data-scope'?: string
-    'data-part'?: string
-  }
-  const isGroupOpen = groupLabelProps['data-state'] === 'open'
-
-  return (
-    <div {...api.getGroupProps({ id: item.id })}>
-      <Button
-        {...groupLabelDomProps}
-        icon={iconNode}
-        iconOnly={collapsed}
-        fullWidth
-        align="start"
-        stretchText
-        membrane
-        variant="default"
-        indent={level}
-        className={cn(
-          'uf-sidebar-itemButton',
-          'uf-sidebar-groupButton',
-          groupLabelClassName,
-        )}
-        disabled={item.disabled}
-        aria-label={
-          collapsed && typeof item.label === 'string' ? item.label : undefined
-        }
-        onClick={() => toggleGroup?.()}
-        onKeyDown={onGroupKeyDown}
-        chevron={!collapsed ? 'end' : undefined}
-        aria-expanded={isGroupOpen}
-      >
-        {!collapsed && (
-          <span data-scope="sidebar" data-part="itemLabel">
-            {item.label}
-          </span>
-        )}
-      </Button>
-      {!collapsed && (
-        <div data-scope="sidebar" data-part="groupContent">
-          {item.items!.map((child) => (
-            <PanelItemRenderer
-              key={child.id}
-              item={child}
-              api={api}
-              collapsed={collapsed}
-              level={level + 1}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
+const { getPartAttrs: part } = createAnatomy('sidebar').parts(
+  'root',
+  'header',
+  'content',
+  'item',
+  'link',
+  'trigger',
+  'group',
+  'icon',
+  'label',
+  'indicator',
+)
+const defaultLabels: PanelLabels = Object.freeze({
+  open: 'Open panel',
+  close: 'Close',
+  expand: 'Expand panel',
+  collapse: 'Collapse panel',
+})
+const length = (value: number | string) =>
+  typeof value === 'number' ? `${value}px` : value
 
 // ---------------------------------------------------------------------------
-// Component
+// Panel
 // ---------------------------------------------------------------------------
 
-export const Panel = forwardRef<HTMLDivElement, PanelProps>(
+/** Side navigation: links in expandable groups that collapses to a rail, or a sheet on narrow screens. */
+export const Panel = forwardRef<HTMLElement, PanelProps>(
   function Panel(props, ref) {
     const {
-      items: rawItems,
+      items,
+      value,
+      defaultValue = null,
+      onValueChange,
+      expanded,
+      defaultExpanded,
+      onExpandedChange,
       collapsed,
       defaultCollapsed = false,
       onCollapsedChange,
-      selectedId,
-      defaultSelectedId,
-      onSelectedChange,
+      collapsible = true,
       width = 260,
       collapsedWidth = 60,
-      className,
       surface = 'auto',
-      surfaceBreakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
       open,
       defaultOpen = false,
       onOpenChange,
       trigger,
-      surfaceTitle,
+      labels,
+      className,
+      style,
+      ...rest
     } = props
+    const strings = resolveLabels(defaultLabels, labels, 'Panel')
 
-    const items = Array.isArray(rawItems) ? rawItems : []
-    const isCompactViewport = useIsCompactViewport(surfaceBreakpoint)
-    const isSheetSurface =
-      surface === 'sheet' || (surface === 'auto' && isCompactViewport)
-    const machineCollapsed = useControllableMachineProp(
-      collapsed,
-      defaultCollapsed,
-    )
-    const machineSelectedId = useControllableMachineProp(
-      selectedId,
-      defaultSelectedId ?? null,
-    )
-    const [sheetOpen, setSheetOpen] = useControllableOpenState(
+    const collection = readCollection<PanelItem>(items, {
+      component: 'Panel',
+      key: (item) => item.value,
+      children: (item) => item.items,
+    })
+    const isGroup = (key: string) => collection.children(key).length > 0
+    for (const { key, item } of collection.entries)
+      if (isGroup(key) && item.href !== undefined)
+        invalidProp('Panel', 'items[].href', item.href, `ignoring it: ${JSON.stringify(key)} is a group`)
+
+    // Current page.
+    const [current, setCurrent] = useControllableState<string | null>({
+      value,
+      defaultValue,
+      onChange: (next) => {
+        if (next !== null) onValueChange?.({ value: next })
+      },
+      name: ['Panel', 'value'],
+    })
+    const isCurrent = (key: string) => key === current && !isGroup(key)
+    /** The groups that hold the current row, outermost first. */
+    const holders = () => {
+      const keys: string[] = []
+      for (let key = collection.get(current)?.parent ?? null; key !== null; key = collection.get(key)?.parent ?? null)
+        keys.unshift(key)
+      return keys
+    }
+
+    // Groups: expanded by value; on mount, the groups that hold the current row.
+    const [expandedKeys, setExpanded] = useControllableState<readonly string[]>({
+      value:
+        expanded === undefined
+          ? undefined
+          : readKeys(expanded, 'Panel', 'expanded'),
+      defaultValue: () =>
+        defaultExpanded === undefined
+          ? holders()
+          : readKeys(defaultExpanded, 'Panel', 'defaultExpanded'),
+      onChange: (next) => onExpandedChange?.({ expanded: next as string[] }),
+      name: ['Panel', 'expanded'],
+    })
+    const expandedSet = new Set(expandedKeys)
+
+    // Rail.
+    const [isCollapsed, setCollapsed] = useControllableState<boolean>({
+      value: collapsed,
+      defaultValue: defaultCollapsed,
+      onChange: (next) => onCollapsedChange?.({ collapsed: next }),
+      name: ['Panel', 'collapsed'],
+    })
+
+    const { isSheet, open: sheetOpen, setOpen: setSheetOpen } = useNavSurface('Panel', {
+      surface,
       open,
       defaultOpen,
       onOpenChange,
+    })
+
+    const rail = !isSheet && !!isCollapsed
+    const shows = (key: string) => !rail && expandedSet.has(key)
+    const holding = new Set(holders())
+    const rows = useRovingFocus({
+      keys: rail ? collection.keys : visibleKeys(collection, expandedSet),
+      disabled: (key) => collection.get(key)?.disabled !== false,
+      orientation: 'vertical',
+      tabStops: 'all',
+      loop: false,
+    })
+    const scope = useId()
+    const rootRef = useRef<HTMLElement | null>(null)
+    const rootRefs = useComposedRefs(rootRef, ref)
+
+    const toggleGroup = (key: string) => {
+      if (rail) {
+        // A group in the rail opens the panel at that group.
+        setCollapsed(false)
+        if (!expandedSet.has(key)) setExpanded((keys) => [...keys, key])
+      } else
+        setExpanded((keys) =>
+          keys.includes(key) ? keys.filter((other) => other !== key) : [...keys, key],
+        )
+    }
+
+    const renderRows = (parent: string | null, after: () => void): ReactNode =>
+      collection.children(parent).map((entry) => {
+        const { key, level, disabled: off } = entry
+        const { label, icon, href, onClick } = entry.item
+        const group = isGroup(key)
+        const isOpen = group && shows(key)
+        const groupId = domId(scope, 'group', key)
+        const content = (
+          <>
+            {hasSlotContent(icon) && (
+              <span {...part('icon')} className="uf-sidebar-itemIcon" aria-hidden="true">
+                {typeof icon === 'string' ? <Icon name={icon} /> : icon}
+              </span>
+            )}
+            <span
+              {...part('label')}
+              className={rail ? 'uf-visually-hidden' : 'uf-sidebar-itemLabel'}
+            >
+              {label}
+            </span>
+            {group && !rail && (
+              <span {...part('indicator')} className="uf-sidebar-itemIndicator" aria-hidden="true">
+                <Icon name="select-chevron-right" />
+              </span>
+            )}
+          </>
+        )
+        const shared = {
+          ...rows.item(key),
+          className: 'uf-sidebar-item uf-option',
+          style: { '--face-runtime-option-level': level - 1 } as CSSProperties,
+          'data-value': key,
+          'data-disabled': off || undefined,
+        }
+        const link = typeof href === 'string' && href && !group ? href : undefined
+        const onActivate = (event: MouseEvent<HTMLElement>) => {
+          if (off) return
+          onClick?.(event)
+          if (group) toggleGroup(key)
+          else {
+            setCurrent(key)
+            after()
+          }
+        }
+        return (
+          <li key={key} {...part('item')} data-value={key}>
+            <Membrane interactive fullWidth>
+              {group ? (
+                <button
+                  {...part('trigger')}
+                  {...shared}
+                  type="button"
+                  disabled={off}
+                  aria-expanded={isOpen}
+                  aria-controls={isOpen ? groupId : undefined}
+                  data-current={!isOpen && holding.has(key) ? '' : undefined}
+                  onClick={onActivate}
+                >
+                  {content}
+                </button>
+              ) : link ? (
+                <a
+                  {...part('link')}
+                  {...shared}
+                  href={off ? undefined : link}
+                  aria-disabled={off || undefined}
+                  aria-current={isCurrent(key) ? 'page' : undefined}
+                  onClick={onActivate}
+                >
+                  {content}
+                </a>
+              ) : (
+                <button
+                  {...part('link')}
+                  {...shared}
+                  type="button"
+                  disabled={off}
+                  aria-current={isCurrent(key) ? 'page' : undefined}
+                  onClick={onActivate}
+                >
+                  {content}
+                </button>
+              )}
+            </Membrane>
+            {isOpen && (
+              <ul {...part('group')} id={groupId} className="uf-sidebar-group">
+                {renderRows(key, after)}
+              </ul>
+            )}
+          </li>
+        )
+      })
+    const list = (after: () => void) => (
+      <ul
+        {...part('content')}
+        className="uf-sidebar-content"
+        onKeyDown={rows.root.onKeyDown}
+        onFocus={rows.root.onFocus}
+        onBlur={rows.root.onBlur}
+      >
+        {renderRows(null, after)}
+      </ul>
     )
-    const sheetRef = useRef<HTMLDivElement | null>(null)
-    const sheetTriggerRef = useRef<HTMLElement | null>(null)
-    const sheetId = useId()
-    const sheetTitleId = useId()
-    const portalTarget = usePortalTarget()
-    useLayer({
-      enabled: isSheetSurface && sheetOpen && portalTarget !== null,
-      contentRef: sheetRef,
-      triggerRef: sheetTriggerRef,
-      modal: true,
-      autoFocus: true,
-      restoreFocus: true,
-      onEscape: () => setSheetOpen(false),
-      onOutside: () => setSheetOpen(false),
-    })
-    useBodyScrollLock(isSheetSurface && sheetOpen)
-
-    const { state, send } = useMachine(sidebarMachine, {
-      collapsed: machineCollapsed,
-      selectedId: machineSelectedId,
-      width,
-      collapsedWidth,
-      onCollapsedChange: onCollapsedChange ?? null,
-      onSelectedChange: onSelectedChange ?? null,
-    })
-
-    const api = connectSidebar(state, send)
-    const isCollapsed = isSheetSurface ? false : api.collapsed
-
-    const getToggleButtonProps = () => {
-      const toggleProps = api.getToggleProps()
-      const {
-        className: toggleClassName,
-        'data-scope': _toggleScope,
-        'data-part': _togglePart,
-        ...toggleButtonProps
-      } = toggleProps as typeof toggleProps & {
-        className?: string
-        'data-scope'?: string
-        'data-part'?: string
-      }
-
-      return { toggleButtonProps, toggleClassName }
+    const root = {
+      ...rest,
+      ...part('root'),
+      ref: rootRefs,
+      className: cn('uf-sidebar', className),
+      'data-surface': isSheet ? 'sheet' : 'inline',
     }
 
-    const renderPanelItems = () => {
-      const { toggleButtonProps, toggleClassName } = getToggleButtonProps()
-
+    if (isSheet)
       return (
-        <>
-          {!isSheetSurface && (
-            <div {...api.getHeaderProps()}>
-              <Button
-                {...toggleButtonProps}
-                icon={
-                  <Icon
-                    name={
-                      isCollapsed
-                        ? 'layout-sidebar-left'
-                        : 'layout-sidebar-left-open'
-                    }
-                  />
-                }
-                iconOnly
-                fullWidth={false}
-                variant="default"
-                membrane
-                className={cn('uf-sidebar-toggleButton', toggleClassName)}
-                aria-label={isCollapsed ? 'Expand panel' : 'Collapse panel'}
-              />
-            </div>
-          )}
-          <div {...api.getContentProps()}>
-            {items.map((item) => (
-              <PanelItemRenderer
-                key={item.id}
-                item={item}
-                api={api}
-                collapsed={isCollapsed}
-              />
-            ))}
-          </div>
-          <div {...api.getFooterProps()} />
-        </>
-      )
-    }
-
-    if (isSheetSurface) {
-      const triggerNode = trigger ?? (
-        <Button
-          icon="layout-sidebar-left"
-          iconOnly
-          fullWidth={false}
-          variant="ghost"
-          membrane
-          aria-label="Open panel"
-        />
-      )
-
-      return (
-        <div className={cn('uf-sidebar-sheetHost', className)}>
-          <Trigger
-            ref={sheetTriggerRef}
-            aria-haspopup="dialog"
-            aria-expanded={sheetOpen}
-            aria-controls={sheetId}
-            className="uf-sidebar-sheetTrigger"
-            onClick={() => setSheetOpen(true)}
+        <nav {...root} style={style}>
+          <NavSheet
+            open={sheetOpen}
+            onOpenChange={setSheetOpen}
+            trigger={trigger}
+            icon="layout-sidebar-left"
+            openLabel={strings.open}
+            closeLabel={strings.close}
+            title={rest['aria-label']}
+            labelledBy={rest['aria-labelledby']}
+            placement="start"
+            root={rootRef}
+            className="uf-sidebar-sheet"
           >
-            {triggerNode}
-          </Trigger>
-          {portalTarget
-            ? createPortal(
-                <>
-                  <div
-                    className="uf-responsive-overlay-backdrop"
-                    data-state={sheetOpen ? 'open' : 'closed'}
-                    hidden={!sheetOpen}
-                  />
-                  <Card
-                    ref={(node) => {
-                      sheetRef.current = node
-                      if (typeof ref === 'function') ref(node)
-                      else if (ref) ref.current = node
-                    }}
-                    id={sheetId}
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby={sheetTitleId}
-                    tabIndex={-1}
-                    hidden={!sheetOpen}
-                    variant="plain"
-                    padding="none"
-                    radius="none"
-                    border={false}
-                    className="uf-responsive-panel uf-sidebar-sheet"
-                    data-state={sheetOpen ? 'open' : 'closed'}
-                    data-placement="left"
-                    style={
-                      {
-                        '--face-runtime-sidebar-sheet-w':
-                          typeof width === 'number'
-                            ? `${width}px`
-                            : String(width),
-                      } as any
-                    }
-                  >
-                    <ResponsiveSheetHeader
-                      title={
-                        <span id={sheetTitleId}>{surfaceTitle ?? 'Panel'}</span>
-                      }
-                      onClose={() => setSheetOpen(false)}
-                    />
-                    <nav className="uf-sidebar">{renderPanelItems()}</nav>
-                  </Card>
-                </>,
-                portalTarget,
-              )
-            : null}
-        </div>
+            {list(() => setSheetOpen(false))}
+          </NavSheet>
+        </nav>
       )
-    }
 
     return (
       <nav
-        ref={ref}
-        {...api.getRootProps()}
-        className={cn('uf-sidebar', className)}
+        {...root}
+        data-state={rail ? 'collapsed' : 'expanded'}
+        style={{ ...style, width: length(rail ? collapsedWidth : width) }}
       >
-        {renderPanelItems()}
+        {collapsible && (
+          <div {...part('header')}>
+            <Button
+              icon={rail ? 'layout-sidebar-left' : 'layout-sidebar-left-open'}
+              iconOnly
+              fullWidth={false}
+              variant="default"
+              aria-label={rail ? strings.expand : strings.collapse}
+              className="uf-sidebar-toggleButton"
+              onClick={() => setCollapsed(!rail)}
+            />
+          </div>
+        )}
+        {list(() => {})}
       </nav>
     )
   },
 )
-
-export const Sidebar = Panel
-export type SidebarProps = PanelProps
-export type SidebarItem = PanelItem
