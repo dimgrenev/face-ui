@@ -11,6 +11,10 @@ invisible to it, and both are in the products today:
 - **A one-argument `render`.** The legacy patterns match a function with a *second*
   parameter, because a one-parameter function is also the new shape. `render: (v) => …`
   keeps compiling and silently receives `{ value, row, rowIndex, column }`.
+- **Prop names written as data.** The app's live preview wires callbacks to props
+  through a table of plain strings (`previewEventBridge.ts`), which is neither JSX
+  nor typed against Face UI, so neither the codemod nor `tsc` can see that a name
+  in it no longer exists. R34 and R35.
 
 Every row below was read in the consumer source at the line given. Nothing here
 was inferred from a grep alone. The products still build against the old
@@ -27,6 +31,7 @@ update — none of them fails to compile.
 | kind | meaning |
 |---|---|
 | `render-arity` | a `render` written for the old positional arguments; the codemod cannot see it |
+| `handler` | a callback, or the wiring that feeds one, written for the old payload or for a prop that no longer exists |
 | `truncate` | the W3 wrap default changes this table; the cells need `truncate` to stay on one line |
 | `min-width` | `minWidth` now holds, so the table has a minimum width it did not have |
 | `scroll` | the table has no scrolling container and now needs one |
@@ -70,8 +75,11 @@ update — none of them fails to compile.
 | R31 | userface-site | `packages/userface-site-ui/Profile/DashboardSection.tsx:56` | ok | The three tables here (`:56`, `:72`, `:86`) have no `width` and no `minWidth`, and two to four short columns; the first two already pass `truncate` on the metric column, the third on all four. No wrapper needed. |
 | R32 | userface-app | `packages/engine/src/face-ui/patterns/crud-table.pattern.json` | note | Nine Table column lists across the `crud-table` (3), `list-detail` (3), `dashboard` (2) and `settings` (1) patterns write columns as `{ "key": …, "header": … }`. `TableColumn` reads `id`, in the old snapshot as well as the new one, so those cells have always rendered empty. Pre-existing, not part of this migration — for W4-06. |
 | R33 | defrictor | — | ok | No Face UI Table outside `_archive/**` (not in `tsconfig.json` `include`) and `src/vendor/**` (excluded). Nothing to migrate. |
+| R34 | userface-app | `packages/userface-app-ui/Renderer/previewEventBridge.ts:45` | handler | The live preview turns a missing callback into a state patch. `MULTI_PATCH_BRIDGE_RULES` (`:40`–`:51`) maps Table's `onSortChange` onto `sortColumn` (`valuePath: 'column'`, `:47`) and `sortDirection` (`valuePath: 'direction'`, `:48`). Both props are gone and the callback now carries `{ sort }` (`Table.tsx`: `onSortChange?: (details: { sort: TableSort \| null }) => void`), so after the update the guard at `:113` — `rule.patches.some(patch => hasOwnProperty(props, patch.targetProp))` — never matches a migrated Table and **sorting stops updating the preview, with no error**; on a document still carrying the old props the two `valuePath`s read `undefined`. Replace the multi-patch entry with one ordinary rule in `PREVIEW_BRIDGE_RULES` (`:24`–`:38`): `{ callbackProp: 'onSortChange', stateProp: 'sort', defaultProp: 'defaultSort', valuePath: 'sort' }` — the runtime resolver reads `details.sort` by that path (`packages/playground/src/node/dev-server/vitePreviewRuntimeScripts.ts:610`). `MULTI_PATCH_BRIDGE_RULES` then holds nothing: delete it with its loop (`:110`–`:117`). Also update `previewEventBridge.test.ts:58`–`:76`, which asserts the old two-patch payload against props it builds itself, so it passes either way and is not a safety net. The sibling rule at `:37` (`onSelectedRowsChange` → `selectedRows`) still matches the new API and stays. |
+| R35 | userface-app | `packages/userface-app-ui/Renderer/previewEventBridge.ts:29` | handler | Beyond Table, the same table of strings is stale for four more components — listed here because nothing else in the toolchain will find them. `:29` `onExpandedChange`/`expandedIds`/`expandedIds`: Accordion and Tree now take `expanded`/`defaultExpanded` and emit `{ expanded }` (`Accordion.tsx:59`, `:63`, `:137`; `Tree.tsx:78`, `:82`, `:152`) → `stateProp: 'expanded', defaultProp: 'defaultExpanded', valuePath: 'expanded'`. `:35` `onCropChange`/`cropRange`, `valuePath: ''`: Slider renamed it `onCropRangeChange` and it emits `{ cropRange }` (`Slider.tsx:131`, `:267`) → `callbackProp: 'onCropRangeChange', valuePath: 'cropRange'`. `:30` (`onSelectedChange`/`selectedId`) and `:31` (`onActiveChange`/`activeId`, `valuePath: 'id'`): Panel, Tree, Navigation and Toc are all on `value`/`defaultValue`/`onValueChange` with `{ value }` (`Panel.tsx:72`, `Tree.tsx`, `Navigation.tsx:88`, `Toc.tsx:47`), which the rule at `:26` already covers — the two entries can no longer match any Face UI prop, so delete them. Command lost its bridge entirely: `value` → `search`, `onValueChange` → `onSearchChange` with `{ search }` (`Command.tsx:83`, `:87`, `:165`) → add `{ callbackProp: 'onSearchChange', stateProp: 'search', defaultProp: 'defaultSearch', valuePath: 'search' }`. Every other rule (`checked`, `value`, `open`, `collapsed`, `page`, `step`, `index`, `files`, `selectedRows`) was checked name by name against `migrations.json` and is unchanged. |
 
-33 rows: 12 `render-arity`, 1 `truncate`, 5 `scroll`, 9 `min-width`, 5 `ok`, 1 `note`.
+35 rows: 12 `render-arity`, 2 `handler`, 1 `truncate`, 5 `scroll`, 9 `min-width`,
+5 `ok`, 1 `note`.
 
 ## What the codemod does report
 
