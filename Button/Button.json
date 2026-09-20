@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Button",
-  "description": "Action component with variants, icons, and clipboard support",
+  "description": "An action the reader can take: a labelled control with optional icons, a loading state and a copy-to-clipboard shortcut.",
   "props": {
     "children": {
       "type": "ReactNode",

@@ -1,13 +1,3 @@
-/**
- * Button — action component.
- *
- * Unifies: Button, ButtonGroup, Clipboard (copyText prop).
- *
- * `<Button>Save</Button>`
- * `<Button copyText={code}>Copy</Button>`
- * `<Button icon="search" iconOnly />`
- */
-
 import {
   forwardRef,
   useCallback,
@@ -133,6 +123,7 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
 // Button
 // ---------------------------------------------------------------------------
 
+/** An action the reader can take: a labelled control with optional icons, a loading state and a copy-to-clipboard shortcut. */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(props, ref) {
     const {

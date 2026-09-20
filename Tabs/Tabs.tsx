@@ -1,4 +1,3 @@
-/** Tabs select a persistent content panel. Header actions are ordinary controls. */
 import {
   forwardRef,
   useId,
@@ -101,6 +100,7 @@ export type TabsProps = TabsBaseProps &
       }
   )
 
+/** Tabs that show one content panel at a time; header actions stay ordinary controls. */
 export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
   function Tabs(props, ref) {
     const {

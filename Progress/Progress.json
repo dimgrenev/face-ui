@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Progress",
-  "description": "Task completion with known or unknown duration, as a linear bar or circular ring",
+  "description": "Completion of a task of known or unknown duration, drawn as a linear bar or a circular ring.",
   "props": {
     "value": {
       "type": "number",

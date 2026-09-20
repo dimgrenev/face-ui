@@ -1,15 +1,3 @@
-/**
- * Text — typography component.
- *
- * Unifies: Typography, Label, Kbd.
- *
- * `<Text>Hello</Text>`
- * `<Text variant="kbd">⌘K</Text>`
- * `<Text variant="label">Label</Text>`
- * `<Text icon="settings">Settings</Text>`
- * `<Text inset="none">Flush</Text>`
- */
-
 import {
   forwardRef,
   type ReactNode,
@@ -131,6 +119,7 @@ const HEADING = /^h[1-6]$/
 // Text
 // ---------------------------------------------------------------------------
 
+/** Every visible string the library renders: body copy, headings, labels, keyboard keys and inline code on one typographic scale. */
 export const Text = forwardRef<HTMLElement, TextProps>(
   function Text(props, ref) {
     const {

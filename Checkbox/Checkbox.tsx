@@ -1,4 +1,3 @@
-/** Checkbox — a native boolean choice or an indeterminate selection summary. */
 import { forwardRef, type CSSProperties, type ReactNode } from 'react'
 import { cn } from '../assets/utils'
 import {
@@ -47,6 +46,7 @@ export interface CheckboxProps extends CheckedInputAttributes {
   style?: CSSProperties
 }
 
+/** A native boolean choice, or an indeterminate summary of the choices below it, beside a visible label. */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   function Checkbox(
     {

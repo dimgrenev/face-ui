@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Tile",
-  "description": "Composed row with an optional primary action and independent leading/action controls. A composed button-like row uses a real sibling button; structural rows keep their explicit role.",
+  "description": "A row that acts as one clickable target while the controls nested in it keep their own clicks.",
   "props": {
     "children": {
       "type": "ReactNode",

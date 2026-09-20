@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Checkbox",
-  "description": "Boolean or indeterminate form control with a visible label and hidden native input",
+  "description": "A native boolean choice, or an indeterminate summary of the choices below it, beside a visible label.",
   "props": {
     "checked": {
       "type": "union",

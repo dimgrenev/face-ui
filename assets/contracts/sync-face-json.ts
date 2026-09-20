@@ -154,15 +154,6 @@ function isPlaygroundImplementationProp(propName: string, prop: FaceJsonProp): b
   return /(?:ClassName|Ref)$/.test(propName)
 }
 
-/** Props whose union branches still document them differently. Any other
- * disagreement fails the generator; an entry leaves once its JSDoc is unified. */
-const PENDING_UNION_DOC_CONFLICTS: Record<string, string[]> = {
-  Calendar: ['value', 'defaultValue', 'onValueChange'],
-  Date: ['selection', 'valueFormat', 'onValueChange'],
-  Input: ['multiline', 'type'],
-  SegmentedControl: ['multiple', 'value', 'defaultValue', 'onValueChange'],
-}
-
 // Defaults for the shared range presentation live in its internal component,
 // outside either public wrapper's source (the contract parser reads the wrapper).
 const RANGE_PRESENTATION_DEFAULTS = {
@@ -997,13 +988,32 @@ function authoredSource(fileName: string, code: string): SourceBundle {
 }
 
 function assertUnionDocs(componentName: string, docConflicts: ExtractedProp[]) {
-  const pending = new Set(PENDING_UNION_DOC_CONFLICTS[componentName])
-  const conflicts = docConflicts.filter((prop) => !pending.has(prop.name))
-  if (conflicts.length === 0) return
+  if (docConflicts.length === 0) return
   throw new Error(
-    `${componentName}: union branches must share one JSDoc per prop:\n${conflicts
+    `${componentName}: union branches must share one JSDoc per prop:\n${docConflicts
       .map((prop) => `  ${prop.name}: ${prop.docConflict!.map((doc) => JSON.stringify(doc)).join(' vs ')}`)
       .join('\n')}`,
+  )
+}
+
+/** Names of the props the component documents nowhere; the ones its contract omits are exempt. */
+function undocumentedProps(componentName: string, analyses: PropAnalysis[]): string[] {
+  const omitted = new Set(CONTRACT_OVERRIDES[componentName]?.omitProps)
+  return analyses.filter((prop) => !prop.description && !omitted.has(prop.name)).map((prop) => prop.name)
+}
+
+/** JSDoc is the only home of a description, so the generator has nowhere to
+ * read one from when it is missing. */
+function assertJsdoc(componentName: string, description: string | undefined, analyses: PropAnalysis[]) {
+  const missing = [
+    ...(description ? [] : ['the component declaration']),
+    ...undocumentedProps(componentName, analyses),
+  ]
+  if (missing.length === 0) return
+  throw new Error(
+    `${componentName}: every public declaration needs JSDoc, which becomes its contract description.` +
+      ` Undocumented:\n${missing.map((name) => `  ${name}`).join('\n')}\n` +
+      'Run `pnpm contracts:check --report-jsdoc` for the whole library.',
   )
 }
 
@@ -1152,7 +1162,7 @@ function toFaceProp(prop: PropAnalysis, existing?: FaceJsonProp): FaceJsonProp {
     ...(existing ?? {}),
     type: normalized.type,
     required: Boolean(prop.required),
-    description: prop.description ?? existing?.description ?? `${prop.name} prop`,
+    description: prop.description,
   }
 
   if (normalized.options && normalized.options.length > 0) {
@@ -1175,6 +1185,10 @@ function applyOverrides(componentName: string, props: Record<string, FaceJsonPro
 
   const omitProps = new Set(override.omitProps ?? [])
   const next: Record<string, FaceJsonProp> = {}
+
+  for (const [propName, patch] of Object.entries(override.patchProps ?? {}))
+    if ('description' in patch)
+      throw new Error(`CONTRACT_OVERRIDES.${componentName}.${propName}: a description belongs in the prop's JSDoc, not here`)
 
   for (const [propName, propDef] of Object.entries(props)) {
     if (isPlaygroundImplementationProp(propName, propDef) || omitProps.has(propName)) continue
@@ -1394,6 +1408,7 @@ export function buildFaceJsonContract(entry: ComponentContractEntry): FaceJsonCo
   const current = readJson<FaceJsonContract>(entry.contractPath)
   const { analyses, description, docConflicts } = analyzeComponent(entry)
   assertUnionDocs(entry.componentName, docConflicts)
+  assertJsdoc(entry.componentName, description, analyses)
   const nextProps: Record<string, FaceJsonProp> = {}
 
   for (const prop of analyses) {
@@ -1411,7 +1426,7 @@ export function buildFaceJsonContract(entry: ComponentContractEntry): FaceJsonCo
   return {
     ...current,
     name: current.name || entry.componentName,
-    description: description ?? (current.description || `${entry.componentName} component`),
+    description,
     props,
     states: normalizeContractStates(
       entry.componentName,
@@ -1463,12 +1478,9 @@ export function collectProductScenarioContracts(componentName?: string): Product
 export function collectJsdocReport(entries = listComponentContracts()): string[] {
   return entries.flatMap((entry) => {
     const { analyses, description, docConflicts } = analyzeComponent(entry)
-    const omitted = new Set(CONTRACT_OVERRIDES[entry.componentName]?.omitProps)
     return [
       ...(description ? [] : [`${entry.componentName} (component)`]),
-      ...analyses
-        .filter((prop) => !prop.description && !omitted.has(prop.name))
-        .map((prop) => `${entry.componentName}.${prop.name}`),
+      ...undocumentedProps(entry.componentName, analyses).map((name) => `${entry.componentName}.${name}`),
       ...docConflicts.map((prop) => `${entry.componentName}.${prop.name} (union branches differ)`),
     ]
   })
@@ -1534,7 +1546,7 @@ function main() {
   const componentArgIndex = process.argv.findIndex((arg) => arg === '--component')
   const componentName = componentArgIndex >= 0 ? process.argv[componentArgIndex + 1] : undefined
   if (args.has('--report-jsdoc')) {
-    // Report only: W4-03 turns missing JSDoc into a generator error.
+    // The whole library at once; a sync stops at the first component that is missing JSDoc.
     const report = collectJsdocReport(listComponentContracts(componentName))
     console.log(`JSDoc report: ${report.length} missing or inconsistent${report.map((line) => `\n  ${line}`).join('')}`)
     return

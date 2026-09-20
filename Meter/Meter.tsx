@@ -1,4 +1,3 @@
-/** Meter — a measurement within a known range, such as storage or quota usage. */
 import { forwardRef } from 'react'
 import {
   RangeIndicator,
@@ -16,6 +15,7 @@ export interface MeterProps extends RangeIndicatorProps {
   /** Finite upper bound, strictly above min. Defaults to 100. */
   max?: number
 }
+/** A measurement inside a known range, such as storage or quota usage, drawn as a bar or a ring. */
 export const Meter = forwardRef<HTMLDivElement, MeterProps>(function Meter(
   { value = 0, min = 0, max = 100, ...props },
   ref,

@@ -1,8 +1,3 @@
-/**
- * Bar — layout for grouped content and actions.
- *
- * `<Bar><Bar.Section grow>Title</Bar.Section><Bar.Section align="end">Actions</Bar.Section></Bar>`
- */
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
@@ -85,6 +80,7 @@ const BarRoot = forwardRef<HTMLDivElement, BarProps>(function Bar(
   )
 })
 
+/** A row whose sections lay out from the start edge to the end edge, so a title, controls and actions share one line. */
 export const Bar = Object.assign(BarRoot, { Section: BarSection })
 
 const BAR_SLOT_COMPONENTS = {

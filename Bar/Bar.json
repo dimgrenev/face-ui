@@ -2,7 +2,7 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Bar",
-  "description": "Layout bar with start/end sections; native control keyboard behavior is preserved",
+  "description": "A row whose sections lay out from the start edge to the end edge, so a title, controls and actions share one line.",
   "props": {
     "children": {
       "type": "ReactNode",
