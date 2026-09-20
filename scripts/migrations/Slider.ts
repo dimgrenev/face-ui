@@ -1,8 +1,18 @@
 import type { Migration } from './types'
 
 const leading = 'Put leading content in `label` or next to the slider'
-// Crop boundaries written as `{ min, max }`, and handlers reading the old payload.
-const legacyCrop = String.raw`\b(min|max)\b`
+// A crop range still written as `{ min, max }`: the key, quoted in JSON, not the word, which
+// the migrated `{ start: range.min, end: range.max }` keeps.
+const legacyCropRange = String.raw`[{,]\s*["']?(?:min|max)["']?\s*[:,}]`
+// A handler still reading the crop range itself: destructured as `({ min, max }) => …`, or
+// through its parameter, `(range) => … range.min …`. `({ cropRange }) => …` is migrated, and
+// a `min`/`max` of anything else in its body is not the payload.
+const legacyCropHandler = String.raw`^\s*\(?\s*(?:\{[^}]*\b(?:min|max)\b[\s\S]*?=>|([A-Za-z_$][\w$]*)\b[\s\S]*?=>[\s\S]*\b\1\s*\.\s*(?:min|max)\b)`
+// A handler reading the single value out of the array the payload always was: `details.value[0]`,
+// or `value[0]` once destructured.
+const legacyValue = String.raw`\bvalue\s*\[\s*0\s*\]`
+// Which is still the right read while the slider's own value is an array.
+const arrayValue = { value: String.raw`^\s*\[`, defaultValue: String.raw`^\s*\[` }
 const cropPayload = {
   before: 'The crop range itself, `{ min, max }`',
   after: '`{ cropRange }`, with `cropRange` as `{ start, end }`',
@@ -30,8 +40,8 @@ export default [
   { kind: 'export', from: 'Slider/SliderAdvanced#SliderCropRange', to: 'Slider/Slider#SliderCropRange', codemod: 'auto' },
   { kind: 'rename-prop', component: 'Slider', from: 'onCropChange', to: 'onCropRangeChange', codemod: 'auto' },
   { kind: 'rename-prop', component: 'Slider', from: 'onCropCommit', to: 'onCropRangeCommit', codemod: 'auto' },
-  { kind: 'retype-prop', component: 'Slider', prop: 'onCropRangeChange', ...cropPayload, codemod: 'manual', legacy: legacyCrop },
-  { kind: 'retype-prop', component: 'Slider', prop: 'onCropRangeCommit', ...cropPayload, codemod: 'manual', legacy: legacyCrop },
+  { kind: 'retype-prop', component: 'Slider', prop: 'onCropRangeChange', ...cropPayload, codemod: 'manual', legacy: legacyCropHandler },
+  { kind: 'retype-prop', component: 'Slider', prop: 'onCropRangeCommit', ...cropPayload, codemod: 'manual', legacy: legacyCropHandler },
   {
     kind: 'retype-prop',
     component: 'Slider',
@@ -39,7 +49,7 @@ export default [
     before: '`{ min, max }`',
     after: '`{ start, end }`; `min` and `max` name the ends of the scale',
     codemod: 'manual',
-    legacy: legacyCrop,
+    legacy: legacyCropRange,
   },
   {
     kind: 'retype-prop',
@@ -48,10 +58,10 @@ export default [
     before: '`{ min, max }`',
     after: '`{ start, end }`; `min` and `max` name the ends of the scale',
     codemod: 'manual',
-    legacy: legacyCrop,
+    legacy: legacyCropRange,
   },
-  { kind: 'retype-prop', component: 'Slider', prop: 'onValueChange', ...valuePayload, codemod: 'manual', legacy: String.raw`\.value\[0\]` },
-  { kind: 'retype-prop', component: 'Slider', prop: 'onValueCommit', ...valuePayload, codemod: 'manual', legacy: String.raw`\.value\[0\]` },
+  { kind: 'retype-prop', component: 'Slider', prop: 'onValueChange', ...valuePayload, codemod: 'manual', legacy: legacyValue, unless: arrayValue },
+  { kind: 'retype-prop', component: 'Slider', prop: 'onValueCommit', ...valuePayload, codemod: 'manual', legacy: legacyValue, unless: arrayValue },
   {
     kind: 'behavior',
     component: 'Slider',

@@ -28,7 +28,12 @@ import { useLayer } from '../assets/adapters/react/use-layer'
 import { usePortalTarget } from '../assets/adapters/react/use-portal-target'
 import { useResponsiveOverlaySurface } from '../assets/adapters/react/use-responsive-overlay-surface'
 import { createAnatomy } from '../assets/anatomy'
-import { FieldLayout, useField, type FieldProps } from '../assets/internal/field'
+import {
+  FieldLayout,
+  useField,
+  useNameReport,
+  type FieldProps,
+} from '../assets/internal/field'
 import type { CollectionItem } from '../assets/internal/item'
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
 import {
@@ -538,13 +543,6 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       'aria-invalid': ariaInvalid,
     })
     const accessibleName = field.controlProps['aria-label']
-    if (!field.labelledBy && !accessibleName)
-      invalidProp(
-        'Select',
-        'label',
-        undefined,
-        'the combobox has no accessible name; pass label, aria-label or aria-labelledby',
-      )
     const contentId = `${field.id}-content`
     const listboxId = `${field.id}-listbox`
     const titleId = `${field.id}-title`
@@ -552,6 +550,13 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 
     // Surfaces.
     const triggerElRef = useRef<HTMLButtonElement | null>(null)
+    // The trigger is a <button>, which a `<label for>` of the consumer's own names as
+    // well; no render can see that label, so the DOM is asked once it exists.
+    useNameReport(
+      'Select',
+      triggerElRef,
+      'the combobox has no accessible name; pass label, aria-label or aria-labelledby',
+    )
     const contentRef = useRef<HTMLDivElement | null>(null)
     const listboxRef = useRef<HTMLDivElement | null>(null)
     const responsive = useResponsiveOverlaySurface(

@@ -90,6 +90,9 @@ const isPart = (name: string) => !name.includes('#') && name.includes('.')
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 const rawOf = (value: Value) => ('literal' in value ? value.literal : value.raw)
+/** What a `legacy` pattern reads: the literal as written, or the expression's source. */
+const sourceOf = (value: Value | undefined) =>
+  value === undefined ? undefined : 'literal' in value ? String(value.literal) : value.code
 
 /** JavaScript source of a value. */
 function source(value: Value): string {
@@ -227,9 +230,14 @@ function applyRow(usage: Usage, row: Migration, report: Report) {
       return report('auto')
     }
     case 'retype-prop': {
-      const value = usage.get(row.prop)
-      const text = value && ('literal' in value ? String(value.literal) : value.code)
-      return text !== undefined && row.legacy && new RegExp(row.legacy).test(text) ? report('manual') : undefined
+      const text = sourceOf(usage.get(row.prop))
+      if (text === undefined || !row.legacy || !new RegExp(row.legacy).test(text)) return
+      // A migrated usage may still carry the pattern; another prop at the same usage settles it.
+      const migrated = Object.entries(row.unless ?? {}).some(([prop, pattern]) => {
+        const other = sourceOf(usage.get(prop))
+        return other !== undefined && new RegExp(pattern).test(other)
+      })
+      return migrated ? undefined : report('manual')
     }
     case 'move-to-labels': {
       if (!usage.has(row.from)) return

@@ -223,6 +223,36 @@ describe('Select prop contract', () => {
     )
     expect(trigger().hasAttribute('aria-label')).toBe(false)
   })
+  // The trigger is a <button>, so a `<label for>` written outside the component names it;
+  // the check runs after mount, where the DOM can say so, not during the render.
+  it('is silent when an external label names the trigger, and reports once when nothing does', async () => {
+    const errors: string[] = []
+    const print = console.error
+    console.error = (...args: unknown[]) => void errors.push(args.map(String).join(' '))
+    try {
+      await act(async () =>
+        root.render(
+          <>
+            <label htmlFor="plan-select">Plan</label>
+            <Select id="plan-select" items={items} surface="popover" />
+          </>,
+        ),
+      )
+      expect(trigger().hasAttribute('aria-label')).toBe(false)
+      expect(trigger().hasAttribute('aria-labelledby')).toBe(false)
+      expect(Array.from(trigger().labels ?? []).map((label) => label.textContent)).toEqual(['Plan'])
+      expect(errors).toEqual([])
+
+      await act(async () =>
+        root.render(<Select items={items} surface="popover" />),
+      )
+      expect(errors).toEqual([
+        'Face UI Select: missing label; the combobox has no accessible name; pass label, aria-label or aria-labelledby.',
+      ])
+    } finally {
+      console.error = print
+    }
+  })
   it('has no English placeholder: an empty selection leaves the value slot empty', async () => {
     await render()
     expect(trigger().hasAttribute('data-placeholder')).toBe(true)

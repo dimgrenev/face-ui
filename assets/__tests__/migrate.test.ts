@@ -251,6 +251,50 @@ export const view`)
     expect(own.findings).toEqual([])
   })
 
+  // The crop and value payloads are reported by pattern, and a pattern that also matches the
+  // migrated spelling would keep --check red on a migrated repo forever.
+  it('tells a Slider still on the old crop and value payloads from a migrated one', async () => {
+    const at = fixture({
+      'Legacy.tsx': `import { Slider } from '@userface/face-ui-react'
+export const view = <>
+  <Slider crop cropRange={{ min: 10, max: 90 }} onCropChange={(range) => zoom(range.min, range.max)} />
+  <Slider crop defaultCropRange={{ min: 0, max: 1 }} onCropCommit={({ min, max }) => zoom(min, max)} />
+  <Slider value={size} onValueChange={({ value }) => setSize(Number(value[0] ?? size))} />
+  <Slider value={size} onValueCommit={(details) => setSize(details.value[0])} />
+</>
+`,
+      // The same crop range in a document, where the keys are quoted.
+      'legacy.json': JSON.stringify({ __componentName__: 'Slider', crop: true, cropRange: { min: 0, max: 50 } }),
+      'Migrated.tsx': `import { Slider } from '@userface/face-ui-react'
+export const view = <>
+  <Slider crop cropRange={{ start: scale.min, end: scale.max }} onCropRangeChange={({ cropRange }) => zoom(cropRange.start, cropRange.end)} />
+  <Slider crop defaultCropRange={{ start: 0, end: 1 }} onCropRangeCommit={({ cropRange }) => patch({ min: cropRange.start, max: cropRange.end })} />
+  <Slider value={size} onValueChange={({ value }) => setSize(Number(value ?? size))} />
+  <Slider value={[first, second]} onValueCommit={({ value }) => setRange(value[0], value[1])} />
+</>
+`,
+      'migrated.json': JSON.stringify({ __componentName__: 'Slider', crop: true, cropRange: { start: 0, end: 50 } }),
+    })
+    const { findings } = await migrate({ paths: [directory], mode: 'check' })
+    const rows = (file: string) =>
+      findings
+        .filter((finding) => finding.file === at(file))
+        .map((finding) => `${finding.at} ${oldProp(finding.migration)} [${finding.fix}]`)
+    expect(rows('Legacy.tsx')).toEqual([
+      '3 onCropChange [auto]',
+      '3 onCropRangeChange [manual]',
+      '3 cropRange [manual]',
+      '4 onCropCommit [auto]',
+      '4 onCropRangeCommit [manual]',
+      '4 defaultCropRange [manual]',
+      '5 onValueChange [manual]',
+      '6 onValueCommit [manual]',
+    ])
+    expect(rows('legacy.json')).toEqual(['/ cropRange [manual]'])
+    expect(rows('Migrated.tsx')).toEqual([])
+    expect(rows('migrated.json')).toEqual([])
+  })
+
   it('exits non-zero from --check while legacy usages remain', () => {
     fixture({ 'a.json': JSON.stringify({ __componentName__: 'Tabs', withLine: true }) })
     const run = (...args: string[]) =>

@@ -49,7 +49,11 @@ export type Migration =
   /**
    * The prop keeps its name but takes another type. A value is reported when it matches
    * `legacy`, a regular expression tested against a literal or an expression's source;
-   * the type checker finds the rest.
+   * the type checker finds the rest. `legacy` must not match the migrated spelling, or
+   * `--check` can never reach zero: where one pattern cannot tell the two apart, `unless`
+   * names the other props that settle it — prop to a regular expression over its own
+   * value, any match leaving the usage alone (`onValueChange` reading `value[0]` stays
+   * right while the slider's `value` is an array).
    */
   | {
       kind: 'retype-prop'
@@ -59,6 +63,7 @@ export type Migration =
       after: string
       codemod: 'manual'
       legacy?: string
+      unless?: Record<string, string>
     }
   /**
    * A public name is gone. `from` is `Name` (any Face UI entry point),

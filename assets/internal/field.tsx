@@ -1,6 +1,13 @@
 /** Field — the one anatomy of every labelled value: label, required marker, control, description, error. */
-import { useId, type AriaAttributes, type ReactNode } from 'react'
+import {
+  useEffect,
+  useId,
+  type AriaAttributes,
+  type ReactNode,
+  type RefObject,
+} from 'react'
 import { createAnatomy } from '../anatomy'
+import { invalidProp } from '../runtime/props'
 import { hasSlotContent } from '../slot-content'
 
 /** Label, help and validation props shared by Input, Select, Date, Radio, Rating, Slider and SegmentedControl. */
@@ -76,6 +83,41 @@ export function idList(
 ): string | undefined {
   const ids = new Set(lists.join(' ').split(/\s+/).filter(Boolean))
   return ids.size ? [...ids].join(' ') : undefined
+}
+
+/** Whether the mounted control has a name: a reference with text, aria-label, a `<label>` or title. */
+function isNamed(control: HTMLElement) {
+  const referenced = idList(control.getAttribute('aria-labelledby') ?? undefined)
+  if (
+    referenced
+      ?.split(' ')
+      .some((id) => control.ownerDocument.getElementById(id)?.textContent?.trim())
+  )
+    return true
+  if (control.getAttribute('aria-label')?.trim()) return true
+  // A labelable control is also named by a `<label for>` the consumer wrote elsewhere.
+  const labels = (control as HTMLButtonElement).labels
+  if (labels && Array.from(labels).some((label) => label.textContent?.trim()))
+    return true
+  return !!control.getAttribute('title')?.trim()
+}
+
+/**
+ * Reports a control left without an accessible name, once after mount and in development
+ * only. The check belongs here rather than in the render: a labelable control is named by
+ * any `<label for>` pointing at it, which no render can see — only the mounted DOM answers.
+ */
+export function useNameReport(
+  component: string,
+  control: RefObject<HTMLElement | null>,
+  outcome: string,
+): void {
+  useEffect(() => {
+    const element = control.current
+    if (element && !isNamed(element))
+      invalidProp(component, 'label', undefined, outcome)
+    // Named once, at the usage: a name added later is the consumer's own doing.
+  }, [component, control, outcome])
 }
 
 /** Names, describes and marks one field value. The component places `controlProps` and `rootProps`. */

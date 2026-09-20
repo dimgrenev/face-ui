@@ -2154,7 +2154,7 @@
       "before": "The crop range itself, `{ min, max }`",
       "after": "`{ cropRange }`, with `cropRange` as `{ start, end }`",
       "codemod": "manual",
-      "legacy": "\\b(min|max)\\b"
+      "legacy": "^\\s*\\(?\\s*(?:\\{[^}]*\\b(?:min|max)\\b[\\s\\S]*?=>|([A-Za-z_$][\\w$]*)\\b[\\s\\S]*?=>[\\s\\S]*\\b\\1\\s*\\.\\s*(?:min|max)\\b)"
     },
     {
       "kind": "retype-prop",
@@ -2163,7 +2163,7 @@
       "before": "The crop range itself, `{ min, max }`",
       "after": "`{ cropRange }`, with `cropRange` as `{ start, end }`",
       "codemod": "manual",
-      "legacy": "\\b(min|max)\\b"
+      "legacy": "^\\s*\\(?\\s*(?:\\{[^}]*\\b(?:min|max)\\b[\\s\\S]*?=>|([A-Za-z_$][\\w$]*)\\b[\\s\\S]*?=>[\\s\\S]*\\b\\1\\s*\\.\\s*(?:min|max)\\b)"
     },
     {
       "kind": "retype-prop",
@@ -2172,7 +2172,7 @@
       "before": "`{ min, max }`",
       "after": "`{ start, end }`; `min` and `max` name the ends of the scale",
       "codemod": "manual",
-      "legacy": "\\b(min|max)\\b"
+      "legacy": "[{,]\\s*[\"']?(?:min|max)[\"']?\\s*[:,}]"
     },
     {
       "kind": "retype-prop",
@@ -2181,7 +2181,7 @@
       "before": "`{ min, max }`",
       "after": "`{ start, end }`; `min` and `max` name the ends of the scale",
       "codemod": "manual",
-      "legacy": "\\b(min|max)\\b"
+      "legacy": "[{,]\\s*[\"']?(?:min|max)[\"']?\\s*[:,}]"
     },
     {
       "kind": "retype-prop",
@@ -2190,7 +2190,11 @@
       "before": "`details.value` was always an array",
       "after": "`details.value` has the shape of `value`/`defaultValue`: a number for a number, an array for an array",
       "codemod": "manual",
-      "legacy": "\\.value\\[0\\]"
+      "legacy": "\\bvalue\\s*\\[\\s*0\\s*\\]",
+      "unless": {
+        "value": "^\\s*\\[",
+        "defaultValue": "^\\s*\\["
+      }
     },
     {
       "kind": "retype-prop",
@@ -2199,7 +2203,11 @@
       "before": "`details.value` was always an array",
       "after": "`details.value` has the shape of `value`/`defaultValue`: a number for a number, an array for an array",
       "codemod": "manual",
-      "legacy": "\\.value\\[0\\]"
+      "legacy": "\\bvalue\\s*\\[\\s*0\\s*\\]",
+      "unless": {
+        "value": "^\\s*\\[",
+        "defaultValue": "^\\s*\\["
+      }
     },
     {
       "kind": "behavior",
