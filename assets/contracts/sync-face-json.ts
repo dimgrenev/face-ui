@@ -160,6 +160,17 @@ const RANGE_PRESENTATION_DEFAULTS = {
   tone: { default: 'neutral' }, shape: { default: 'linear' },
   showValue: { default: false }, membrane: { default: true },
 }
+// Defaults for Tooltip, Popover and the Overlay alias live in the shared internal
+// implementation, outside the wrappers the contract parser reads.
+const FLOATING_SURFACE_DEFAULTS = {
+  defaultOpen: { default: false }, side: { default: 'top' },
+  align: { default: 'center' }, sideOffset: { default: 2 },
+}
+// A click surface forces both delays to 0, so only the hover surfaces publish them.
+const FLOATING_HOVER_DEFAULTS = {
+  ...FLOATING_SURFACE_DEFAULTS,
+  openDelay: { default: 200 }, closeDelay: { default: 0 },
+}
 const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   Accordion: {
     patchProps: {
@@ -894,8 +905,14 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     ],
   },
-  Upload: {
-    omitProps: ['size', 'type', 'reason'],
+  Popover: {
+    patchProps: FLOATING_SURFACE_DEFAULTS,
+  },
+  Tooltip: {
+    patchProps: FLOATING_HOVER_DEFAULTS,
+  },
+  Overlay: {
+    patchProps: FLOATING_HOVER_DEFAULTS,
   },
 }
 

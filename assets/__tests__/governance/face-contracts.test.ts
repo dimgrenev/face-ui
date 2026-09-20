@@ -54,6 +54,24 @@ describe('face-ui-react contracts', () => {
     expect(upload.currentContract.props).not.toHaveProperty('reason')
   })
 
+  it('publishes the floating surfaces own positioning defaults', () => {
+    // Tooltip, Popover and Overlay take theirs from the shared internal implementation,
+    // which the parser never reads, so an editor would offer the props with no value.
+    const expected: Record<string, Record<string, unknown>> = {
+      Popover: { defaultOpen: false, side: 'top', align: 'center', sideOffset: 2 },
+      Tooltip: { defaultOpen: false, side: 'top', align: 'center', sideOffset: 2, openDelay: 200, closeDelay: 0 },
+      Overlay: { defaultOpen: false, side: 'top', align: 'center', sideOffset: 2, openDelay: 200, closeDelay: 0 },
+    }
+    for (const [componentName, defaults] of Object.entries(expected)) {
+      const [entry] = collectFaceJsonContracts(componentName)
+      if (!entry) throw new Error(`${componentName} contract was not found`)
+      for (const [propName, value] of Object.entries(defaults))
+        expect(entry.currentContract.props[propName], `${componentName}.${propName}`).toMatchObject({
+          default: value,
+        })
+    }
+  })
+
   it('keeps composed component contracts aligned to inherited public props', () => {
     const contracts = new Map(
       collectFaceJsonContracts()

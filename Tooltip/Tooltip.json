@@ -22,7 +22,8 @@
     "defaultOpen": {
       "type": "boolean",
       "required": false,
-      "description": "Visibility on mount when `open` is not set; read once."
+      "description": "Visibility on mount when `open` is not set; read once.",
+      "default": false
     },
     "side": {
       "type": "enum",
@@ -33,7 +34,8 @@
         "right",
         "bottom",
         "left"
-      ]
+      ],
+      "default": "top"
     },
     "align": {
       "type": "enum",
@@ -43,12 +45,14 @@
         "start",
         "center",
         "end"
-      ]
+      ],
+      "default": "center"
     },
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2."
+      "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2.",
+      "default": 2
     },
     "dir": {
       "type": "string",
@@ -58,12 +62,14 @@
     "openDelay": {
       "type": "number",
       "required": false,
-      "description": "Milliseconds from hover or focus to showing the surface, 0–2147483647; default 200."
+      "description": "Milliseconds from hover or focus to showing the surface, 0–2147483647; default 200.",
+      "default": 200
     },
     "closeDelay": {
       "type": "number",
       "required": false,
-      "description": "Milliseconds from hover and focus leaving to hiding the surface, 0–2147483647; default 0."
+      "description": "Milliseconds from hover and focus leaving to hiding the surface, 0–2147483647; default 0.",
+      "default": 0
     }
   },
   "states": [

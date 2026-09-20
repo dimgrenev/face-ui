@@ -67,7 +67,8 @@
       "name": "defaultOpen",
       "type": "boolean",
       "required": false,
-      "description": "Visibility on mount when `open` is not set; read once."
+      "description": "Visibility on mount when `open` is not set; read once.",
+      "defaultValue": false
     },
     {
       "name": "side",
@@ -79,7 +80,8 @@
         "right",
         "bottom",
         "left"
-      ]
+      ],
+      "defaultValue": "top"
     },
     {
       "name": "align",
@@ -90,13 +92,15 @@
         "start",
         "center",
         "end"
-      ]
+      ],
+      "defaultValue": "center"
     },
     {
       "name": "sideOffset",
       "type": "number",
       "required": false,
-      "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2."
+      "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2.",
+      "defaultValue": 2
     },
     {
       "name": "dir",
