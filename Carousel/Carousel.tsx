@@ -51,7 +51,7 @@ export interface CarouselLabels
   play: string
   /** Name of the control that pauses automatic rotation. */
   pause: string
-  /** Name of each slide; `{index}` becomes its number from 1 and `{count}` the number of slides. */
+  /** Name of each slide; `{index}` becomes its number from 1 and `{count}` the number of slides. The kind is `roleSlide`, so the name does not repeat it. */
   slide: string
   /** Name of each indicator; `{index}` becomes the number of the first slide it shows. */
   goToSlide: string
@@ -111,7 +111,7 @@ const defaultLabels: CarouselLabels = Object.freeze({
   next: 'Next slide',
   play: 'Start rotation',
   pause: 'Pause rotation',
-  slide: 'Slide {index} of {count}',
+  slide: '{index} of {count}',
   goToSlide: 'Go to slide {index}',
   roleCarousel: 'carousel',
   roleSlide: 'slide',

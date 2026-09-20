@@ -527,6 +527,12 @@
     },
     {
       "kind": "behavior",
+      "component": "Carousel",
+      "before": "Each slide was named \"Slide 1 of 3\" beside `aria-roledescription=\"slide\"`, so the kind was announced twice",
+      "after": "The default `labels.slide` is `{index} of {count}`; pass `labels.slide` to restore the old wording"
+    },
+    {
+      "kind": "behavior",
       "component": "Checkbox",
       "before": "`ref` pointed to the `<label>`",
       "after": "`ref` points to the native checkbox `<input>`; `className` and `style` still style the label"

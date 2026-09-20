@@ -66,4 +66,10 @@ export default [
     before: 'The root and viewport carried `data-state` (`idle`, `dragging`, `auto-playing`); slides carried `aria-hidden` and `data-state`',
     after: 'Slides outside the view are `inert` (also on React 19) and marked by the absence of `data-current`; the root carries no state attribute',
   },
+  {
+    kind: 'behavior',
+    component: 'Carousel',
+    before: 'Each slide was named "Slide 1 of 3" beside `aria-roledescription="slide"`, so the kind was announced twice',
+    after: 'The default `labels.slide` is `{index} of {count}`; pass `labels.slide` to restore the old wording',
+  },
 ] satisfies Migration[]

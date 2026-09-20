@@ -149,6 +149,7 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 | In right-to-left text the track slid the wrong way and showed nothing; arrows and swipes did not mirror | The track, ArrowLeft/ArrowRight and swipes follow the computed text direction, however it is set; the arrow icons follow the nearest `dir` attribute; the track follows the pointer while dragged | — |
 | `slidesPerView` above the number of slides stretched the slides to fill the width | Each slide keeps its `1 / slidesPerView` share; a fractional or zero `slidesPerView` is reported and becomes a whole number from 1 | — |
 | The root and viewport carried `data-state` (`idle`, `dragging`, `auto-playing`); slides carried `aria-hidden` and `data-state` | Slides outside the view are `inert` (also on React 19) and marked by the absence of `data-current`; the root carries no state attribute | — |
+| Each slide was named "Slide 1 of 3" beside `aria-roledescription="slide"`, so the kind was announced twice | The default `labels.slide` is `{index} of {count}`; pass `labels.slide` to restore the old wording | — |
 
 ### Checkbox
 

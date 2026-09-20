@@ -505,10 +505,12 @@ describe('Carousel names and labels', () => {
   it('slides, indicators and controls have default English names', async () => {
     await render(three({ autoPlay: true }))
     expect(slides(view.host).map((slide) => slide.getAttribute('aria-label'))).toEqual([
-      'Slide 1 of 3',
-      'Slide 2 of 3',
-      'Slide 3 of 3',
+      '1 of 3',
+      '2 of 3',
+      '3 of 3',
     ])
+    // aria-roledescription already says "slide"; a name that repeats it is announced twice.
+    expect(slides(view.host).every((slide) => !/slide/i.test(slide.getAttribute('aria-label')!))).toBe(true)
     expect(slides(view.host).every((slide) => slide.getAttribute('role') === 'group')).toBe(true)
     expect(slides(view.host)[0]!.getAttribute('aria-roledescription')).toBe('slide')
     expect(indicators(view.host).map(nameOf)).toEqual(['Go to slide 1', 'Go to slide 2', 'Go to slide 3'])
