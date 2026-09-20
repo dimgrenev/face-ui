@@ -235,7 +235,8 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
         dir="ltr"
         translate="no"
         // A tab stop while it scrolls; still focusable after, so a focused source that stops scrolling keeps focus.
-        tabIndex={scrollable ? 0 : -1}
+        // Unmeasured (server HTML, no ResizeObserver), no tabindex leaves the browser's own rule for scrollers.
+        tabIndex={scrollable === undefined ? undefined : scrollable ? 0 : -1}
         style={{ '--uf-code-collapsed-lines': visibleLines } as CSSProperties}
       >
         <code className={language ? `language-${language}` : undefined}>

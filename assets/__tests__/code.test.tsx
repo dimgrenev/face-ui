@@ -129,6 +129,13 @@ describe('Code props', () => {
     expect($('.uf-code-header')).toBeNull()
   })
 
+  it('before measurement the source has no tabindex, leaving the browser its own rule for scrollers', async () => {
+    // jsdom has no ResizeObserver, which is also the server HTML and the no-support case.
+    // A -1 here would take an overflowing source out of the Tab order and never put it back.
+    await render({ children: source(40) })
+    expect(pre().hasAttribute('tabindex')).toBe(false)
+  })
+
   it('language names the language-* class of the code element', async () => {
     await render({ children: 'ls', language: 'bash' })
     expect($('pre > code')!.className).toBe('language-bash')
