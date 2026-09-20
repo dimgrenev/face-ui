@@ -324,5 +324,5 @@ const shared = createToastContext()
 /** Shows and dismisses toasts in the app's `<Toaster>`. */
 export const useToast = shared.useToast
 
-/** The app's notification region; mount it once, near the root. */
+/** The app's notification region; mount it once, near the document root: it is `position: fixed`, so a transformed ancestor becomes its containing block. */
 export const Toaster = shared.Toaster

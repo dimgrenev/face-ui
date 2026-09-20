@@ -92,6 +92,7 @@ Every piece of visible copy is either a control's own content prop or a `Text`. 
 | A region that scrolls | `Scroll` | an `overflow: auto` wrapper |
 | Existing `Overlay` code | `Tooltip`, `Popover` | `Overlay` |
 | Existing `Toggle` code | `SegmentedControl` | `Toggle` |
+| Existing `Sidebar` code | `Panel` | `Sidebar` |
 
 ### 1.5 Layers
 
@@ -843,7 +844,7 @@ const { toast, dismiss } = useToast()
 toast({ title: 'Workspace saved', tone: 'positive', action: { label: 'View changes', onClick: open } })
 ```
 
-- Mount one `Toaster`; `createToastContext()` gives an independent store when a surface needs its own.
+- Mount one `Toaster` near the document root — its region is `position: fixed`, so a transformed ancestor becomes its containing block; `createToastContext()` gives an independent store when a surface needs its own.
 - `toast()` returns an id, and passing the same `id` again updates that toast in place instead of stacking another.
 - `duration: 0` keeps a toast until it is closed; hover and focus pause the timers.
 
