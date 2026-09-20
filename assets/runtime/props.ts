@@ -5,9 +5,12 @@ declare const process: { env: { NODE_ENV?: string } }
 const MAX_REPORTS = 500
 const reported = new Set<string>()
 
+/** Longest string a report prints; the rest is elided. A whole Markdown source is a value here. */
+const SHOWN = 60
+
 const show = (value: unknown) =>
   typeof value === 'string'
-    ? JSON.stringify(value)
+    ? JSON.stringify(value.length > SHOWN ? `${value.slice(0, SHOWN)}…` : value)
     : Array.isArray(value)
       ? 'array'
       : typeof value === 'function'
@@ -27,6 +30,7 @@ function production() {
 /**
  * Reports a prop Face UI had to normalize, in development only and once per distinct message:
  * `Face UI <Component>: invalid <prop> <value>; <outcome>.` (`undefined` reads `missing <prop>`).
+ * A string value over 60 characters is shown elided, so a whole document never reaches the console.
  */
 export function invalidProp(
   component: string,

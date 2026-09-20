@@ -28,6 +28,16 @@ describe('invalidProp', () => {
     expect(reports()).toEqual([`Face UI Pagination: invalid total ${shown}; using 0.`])
   })
 
+  it('elides a long string instead of printing the whole value', () => {
+    const source = `${'a'.repeat(60)}TAIL${'b'.repeat(5_000)}`
+    invalidProp('Markdown', 'children', source, 'showing it as text')
+    const [message] = reports() as [string]
+    expect(message).toBe(`Face UI Markdown: invalid children "${'a'.repeat(60)}…"; showing it as text.`)
+    expect(message.length).toBeLessThan(120)
+    expect(message).not.toContain('TAIL')
+    expect(message).not.toContain('b')
+  })
+
   it('reads undefined as a missing prop', () => {
     invalidProp('Select', 'label', undefined, 'the combobox has no name')
     expect(reports()).toEqual(['Face UI Select: missing label; the combobox has no name.'])

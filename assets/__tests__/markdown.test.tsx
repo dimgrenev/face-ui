@@ -45,7 +45,7 @@ describe('Markdown children', () => {
     const deep = `${'>'.repeat(20000)} <b>deep</b>`
     await expectDevError(
       () => render({ children: deep }),
-      /^Face UI Markdown: invalid children ">{20000} <b>deep<\/b>"; showing it as text\.$/,
+      /^Face UI Markdown: invalid children ">{60}…"; showing it as text\.$/,
     )
     expect(all('p').map((p) => p.textContent === deep)).toEqual([true])
     expect(all('*')).toHaveLength(1)
