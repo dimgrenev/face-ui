@@ -101,7 +101,16 @@ const legacyHooks = (component: string) =>
     .map((path) => `${path}: use useControllableState`)
 
 // D5: one implementation per behaviour, recognised by its signature
-const FIELDS = new Set(['Date', 'Input', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider'])
+const FIELDS = new Set([
+  'Date',
+  'Input',
+  'Radio',
+  'Rating',
+  'SegmentedControl',
+  'Select',
+  'Slider',
+  'Upload',
+])
 const HOME_END = new Set(['Home', 'End'])
 /** The identifier a variable, function or property declaration introduces; '' otherwise. */
 const declaredName = (node: ts.Node) =>

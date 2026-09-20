@@ -293,9 +293,18 @@ const booleanViolations = (component: string) =>
     .map(({ path, types }) => `${path}: show*/-able are booleans, got ${types.map(typeText).join(' | ')} (K21)`)
 
 // ---------------------------------------------------------------------------
-// R-field (A4, K25): the seven fields share label, description, error, labelPosition
+// R-field (A4, K25): the eight fields share label, description, error, labelPosition
 
-const FIELDS = new Set(['Date', 'Input', 'Radio', 'Rating', 'SegmentedControl', 'Select', 'Slider'])
+const FIELDS = new Set([
+  'Date',
+  'Input',
+  'Radio',
+  'Rating',
+  'SegmentedControl',
+  'Select',
+  'Slider',
+  'Upload',
+])
 
 function fieldViolations(component: string): string[] {
   if (!FIELDS.has(component)) return []
