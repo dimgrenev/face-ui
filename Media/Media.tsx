@@ -183,6 +183,8 @@ export const Media = forwardRef<
     ...native
   } = props
   const kind: MediaType = type === 'video' || type === 'audio' ? type : 'image'
+  // Decidable here, unlike a field's: `<img>` is not a labelable element, so no `<label for>`
+  // outside the component can name it, and `alt` is the one text alternative HTML asks for.
   if (kind === 'image' && typeof alt !== 'string')
     invalidProp(
       'Media',

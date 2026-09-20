@@ -99,25 +99,30 @@ function isNamed(control: HTMLElement) {
   const labels = (control as HTMLButtonElement).labels
   if (labels && Array.from(labels).some((label) => label.textContent?.trim()))
     return true
-  return !!control.getAttribute('title')?.trim()
+  if (control.getAttribute('title')?.trim()) return true
+  // Last resort for a text field, as HTML-AAM has it: the placeholder names it.
+  return !!(control as HTMLInputElement).placeholder?.trim()
 }
 
 /**
  * Reports a control left without an accessible name, once after mount and in development
  * only. The check belongs here rather than in the render: a labelable control is named by
  * any `<label for>` pointing at it, which no render can see — only the mounted DOM answers.
+ * `prop` names what the report asks for, `label` for a field and the naming attribute for a
+ * component without one. Passing a different ref re-checks, for a control that mounts later.
  */
 export function useNameReport(
   component: string,
   control: RefObject<HTMLElement | null>,
   outcome: string,
+  prop = 'label',
 ): void {
   useEffect(() => {
     const element = control.current
     if (element && !isNamed(element))
-      invalidProp(component, 'label', undefined, outcome)
+      invalidProp(component, prop, undefined, outcome)
     // Named once, at the usage: a name added later is the consumer's own doing.
-  }, [component, control, outcome])
+  }, [component, control, outcome, prop])
 }
 
 /** Names, describes and marks one field value. The component places `controlProps` and `rootProps`. */

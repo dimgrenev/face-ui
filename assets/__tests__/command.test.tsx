@@ -482,6 +482,50 @@ describe('Command strings and naming', () => {
     )
     expect(listbox().hasAttribute('aria-label')).toBe(false)
   })
+
+  // The search is an <input> and the palette trigger a <button>: both labelable, so a `<label>`
+  // the consumer wrote outside names them, which no render can see; the check asks the DOM.
+  it('is silent when an external label names the search or the palette trigger', async () => {
+    const errors: string[] = []
+    const print = console.error
+    console.error = (...args: unknown[]) => void errors.push(args.map(String).join(' '))
+    try {
+      await show(
+        <>
+          <label htmlFor="palette">Commands</label>
+          <Command id="palette" surface="inline" items={items} />
+        </>,
+      )
+      expect(input().hasAttribute('aria-label')).toBe(false)
+      expect(input().hasAttribute('aria-labelledby')).toBe(false)
+      expect(Array.from(input().labels ?? []).map((label) => label.textContent)).toEqual([
+        'Commands',
+      ])
+      expect(errors).toEqual([])
+
+      // The closed palette shows only its trigger, which a wrapping label names just as well.
+      await show(
+        <label>
+          Commands
+          <Command surface="dialog" items={items} />
+        </label>,
+      )
+      expect(trigger().hasAttribute('aria-label')).toBe(false)
+      expect(Array.from(trigger().labels ?? [])).toHaveLength(1)
+      expect(errors).toEqual([])
+    } finally {
+      console.error = print
+    }
+  })
+
+  // The check follows the named element: unnamed is still reported before the palette opens.
+  it('reports the palette trigger left unnamed while it is still closed', async () => {
+    await expectDevError(
+      () => show(<Command surface="dialog" items={items} />),
+      /^Face UI Command: missing aria-label; the search has no accessible name/,
+    )
+    expect(trigger().hasAttribute('aria-label')).toBe(false)
+  })
 })
 
 // ---------------------------------------------------------------------------

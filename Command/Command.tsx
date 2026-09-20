@@ -19,6 +19,7 @@ import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorph
 import { useLayer } from '../assets/adapters/react/use-layer'
 import { useResponsiveOverlaySurface } from '../assets/adapters/react/use-responsive-overlay-surface'
 import { createAnatomy } from '../assets/anatomy'
+import { useNameReport } from '../assets/internal/field'
 import type { CollectionItem, ItemGroup } from '../assets/internal/item'
 import {
   domId,
@@ -258,13 +259,16 @@ export const Command = forwardRef<HTMLInputElement, CommandProps>(
     const naming = ariaLabelledby
       ? { 'aria-labelledby': ariaLabelledby }
       : { 'aria-label': name ?? hint }
-    if (!ariaLabelledby && !name && !hint)
-      invalidProp(
-        'Command',
-        'aria-label',
-        undefined,
-        'the search has no accessible name; pass aria-label, aria-labelledby or placeholder',
-      )
+    // The search is an `<input>` and the palette trigger a `<button>`: both labelable, so a
+    // `<label>` the consumer wrote outside names them, which no render can see. The mounted DOM
+    // is asked instead, about whichever of the two is there — a closed palette has only its
+    // trigger, and the ref it is given changes with it, so the check runs again when it opens.
+    useNameReport(
+      'Command',
+      dialog && !shown ? triggerRef : inputRef,
+      'the search has no accessible name; pass aria-label, aria-labelledby or placeholder',
+      'aria-label',
+    )
 
     const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
       // Home and End stay with the text caret.

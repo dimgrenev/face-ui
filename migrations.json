@@ -2190,10 +2190,13 @@
       "before": "`details.value` was always an array",
       "after": "`details.value` has the shape of `value`/`defaultValue`: a number for a number, an array for an array",
       "codemod": "manual",
-      "legacy": "\\bvalue\\s*\\[\\s*0\\s*\\]",
+      "legacy": "\\bvalue\\s*(?:\\[\\s*0\\s*\\]|\\.\\s*at\\s*\\(\\s*0\\s*\\))|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[\\s*[A-Za-z_$][\\w$]*\\s*\\]",
       "unless": {
         "value": "^\\s*\\[",
-        "defaultValue": "^\\s*\\["
+        "defaultValue": "^\\s*\\[",
+        "onValueChange": "\\bvalue\\s*(?:\\[\\s*[1-9]|\\.\\s*at\\s*\\(\\s*[1-9])|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[[^\\]]*,|\\.\\.\\.\\s*value\\b",
+        "onValueCommit": "\\bvalue\\s*(?:\\[\\s*[1-9]|\\.\\s*at\\s*\\(\\s*[1-9])|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[[^\\]]*,|\\.\\.\\.\\s*value\\b",
+        "labels": "[\"']?thumbs[\"']?\\s*:\\s*\\[[^\\]]*,"
       }
     },
     {
@@ -2203,10 +2206,13 @@
       "before": "`details.value` was always an array",
       "after": "`details.value` has the shape of `value`/`defaultValue`: a number for a number, an array for an array",
       "codemod": "manual",
-      "legacy": "\\bvalue\\s*\\[\\s*0\\s*\\]",
+      "legacy": "\\bvalue\\s*(?:\\[\\s*0\\s*\\]|\\.\\s*at\\s*\\(\\s*0\\s*\\))|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[\\s*[A-Za-z_$][\\w$]*\\s*\\]",
       "unless": {
         "value": "^\\s*\\[",
-        "defaultValue": "^\\s*\\["
+        "defaultValue": "^\\s*\\[",
+        "onValueChange": "\\bvalue\\s*(?:\\[\\s*[1-9]|\\.\\s*at\\s*\\(\\s*[1-9])|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[[^\\]]*,|\\.\\.\\.\\s*value\\b",
+        "onValueCommit": "\\bvalue\\s*(?:\\[\\s*[1-9]|\\.\\s*at\\s*\\(\\s*[1-9])|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[[^\\]]*,|\\.\\.\\.\\s*value\\b",
+        "labels": "[\"']?thumbs[\"']?\\s*:\\s*\\[[^\\]]*,"
       }
     },
     {

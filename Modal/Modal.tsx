@@ -190,6 +190,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
     })
     useBodyScrollLock(portal && isOpen && scrollLock)
 
+    // Decidable here, unlike a field's: the surface is a `<div role="dialog">`, which is not a
+    // labelable element, so no `<label for>` outside the component can name it — `title`,
+    // `aria-label` and `aria-labelledby` are the whole list, and all three are props.
     if (isOpen && !hasTitle && !rest['aria-label'] && !rest['aria-labelledby'])
       invalidProp(
         'Modal',

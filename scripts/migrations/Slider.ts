@@ -8,11 +8,23 @@ const legacyCropRange = String.raw`[{,]\s*["']?(?:min|max)["']?\s*[:,}]`
 // through its parameter, `(range) => … range.min …`. `({ cropRange }) => …` is migrated, and
 // a `min`/`max` of anything else in its body is not the payload.
 const legacyCropHandler = String.raw`^\s*\(?\s*(?:\{[^}]*\b(?:min|max)\b[\s\S]*?=>|([A-Za-z_$][\w$]*)\b[\s\S]*?=>[\s\S]*\b\1\s*\.\s*(?:min|max)\b)`
-// A handler reading the single value out of the array the payload always was: `details.value[0]`,
-// or `value[0]` once destructured.
-const legacyValue = String.raw`\bvalue\s*\[\s*0\s*\]`
-// Which is still the right read while the slider's own value is an array.
-const arrayValue = { value: String.raw`^\s*\[`, defaultValue: String.raw`^\s*\[` }
+// A handler reading the single value out of the array the payload always was: `details.value[0]`
+// or `value[0]` once destructured, `details.value.at(0)`, or a parameter that destructures the
+// one element, `({ value: [only] }) => …`.
+const legacyValue = String.raw`\bvalue\s*(?:\[\s*0\s*\]|\.\s*at\s*\(\s*0\s*\))|^\s*\(?\s*\{[^}]*\bvalue\s*:\s*\[\s*[A-Za-z_$][\w$]*\s*\]`
+// Which is still the right read while the slider has more than one thumb. Its own value says so
+// when it is written as an array; when it comes from a variable only the rest of the usage can,
+// so a handler that reads a further element, destructures more than one or spreads the payload
+// as a list, and a `labels.thumbs` naming two thumbs, each leave the usage alone.
+const arrayLiteral = String.raw`^\s*\[`
+const readsMoreThanOne = String.raw`\bvalue\s*(?:\[\s*[1-9]|\.\s*at\s*\(\s*[1-9])|^\s*\(?\s*\{[^}]*\bvalue\s*:\s*\[[^\]]*,|\.\.\.\s*value\b`
+const multiThumb = {
+  value: arrayLiteral,
+  defaultValue: arrayLiteral,
+  onValueChange: readsMoreThanOne,
+  onValueCommit: readsMoreThanOne,
+  labels: String.raw`["']?thumbs["']?\s*:\s*\[[^\]]*,`,
+}
 const cropPayload = {
   before: 'The crop range itself, `{ min, max }`',
   after: '`{ cropRange }`, with `cropRange` as `{ start, end }`',
@@ -60,8 +72,8 @@ export default [
     codemod: 'manual',
     legacy: legacyCropRange,
   },
-  { kind: 'retype-prop', component: 'Slider', prop: 'onValueChange', ...valuePayload, codemod: 'manual', legacy: legacyValue, unless: arrayValue },
-  { kind: 'retype-prop', component: 'Slider', prop: 'onValueCommit', ...valuePayload, codemod: 'manual', legacy: legacyValue, unless: arrayValue },
+  { kind: 'retype-prop', component: 'Slider', prop: 'onValueChange', ...valuePayload, codemod: 'manual', legacy: legacyValue, unless: multiThumb },
+  { kind: 'retype-prop', component: 'Slider', prop: 'onValueCommit', ...valuePayload, codemod: 'manual', legacy: legacyValue, unless: multiThumb },
   {
     kind: 'behavior',
     component: 'Slider',

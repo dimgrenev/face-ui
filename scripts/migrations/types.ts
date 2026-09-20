@@ -51,9 +51,10 @@ export type Migration =
    * `legacy`, a regular expression tested against a literal or an expression's source;
    * the type checker finds the rest. `legacy` must not match the migrated spelling, or
    * `--check` can never reach zero: where one pattern cannot tell the two apart, `unless`
-   * names the other props that settle it — prop to a regular expression over its own
-   * value, any match leaving the usage alone (`onValueChange` reading `value[0]` stays
-   * right while the slider's `value` is an array).
+   * names the props of the same usage that settle it — prop to a regular expression over
+   * its own value, any match leaving the usage alone (`onValueChange` reading `value[0]`
+   * stays right while the slider has more than one thumb). A key may be the row's own
+   * prop, for a value whose shape only its own source shows.
    */
   | {
       kind: 'retype-prop'

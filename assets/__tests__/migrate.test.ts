@@ -261,6 +261,8 @@ export const view = <>
   <Slider crop defaultCropRange={{ min: 0, max: 1 }} onCropCommit={({ min, max }) => zoom(min, max)} />
   <Slider value={size} onValueChange={({ value }) => setSize(Number(value[0] ?? size))} />
   <Slider value={size} onValueCommit={(details) => setSize(details.value[0])} />
+  <Slider value={size} onValueChange={({ value: [only] }) => setSize(only)} />
+  <Slider value={size} onValueCommit={(details) => setSize(details.value.at(0))} />
 </>
 `,
       // The same crop range in a document, where the keys are quoted.
@@ -271,6 +273,10 @@ export const view = <>
   <Slider crop defaultCropRange={{ start: 0, end: 1 }} onCropRangeCommit={({ cropRange }) => patch({ min: cropRange.start, max: cropRange.end })} />
   <Slider value={size} onValueChange={({ value }) => setSize(Number(value ?? size))} />
   <Slider value={[first, second]} onValueCommit={({ value }) => setRange(value[0], value[1])} />
+  <Slider value={pair} onValueChange={({ value }) => setPair([value[0], value[1]])} />
+  <Slider value={pair} onValueCommit={({ value: [low, high] }) => setPair([low, high])} />
+  <Slider value={pair} onValueChange={({ value }) => setPair([value.at(0), ...value.slice(1)])} />
+  <Slider value={pair} labels={{ thumbs: ['Low', 'High'] }} onValueCommit={({ value }) => setLow(value[0])} />
 </>
 `,
       'migrated.json': JSON.stringify({ __componentName__: 'Slider', crop: true, cropRange: { start: 0, end: 50 } }),
@@ -289,6 +295,8 @@ export const view = <>
       '4 defaultCropRange [manual]',
       '5 onValueChange [manual]',
       '6 onValueCommit [manual]',
+      '7 onValueChange [manual]',
+      '8 onValueCommit [manual]',
     ])
     expect(rows('legacy.json')).toEqual(['/ cropRange [manual]'])
     expect(rows('Migrated.tsx')).toEqual([])
