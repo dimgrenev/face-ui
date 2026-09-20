@@ -8,9 +8,18 @@ beforeEach(() => {
   view = mount()
 })
 const render = (ui: ReactNode) => act(async () => view.root.render(ui))
-const root = () => view.host.querySelector<HTMLElement>('[data-scope="media"][data-part="root"]')!
-const element = () => view.host.querySelector<HTMLElement>('[data-scope="media"][data-part="element"]')!
-const fallback = () => view.host.querySelector<HTMLElement>('[data-scope="media"][data-part="fallback"]')
+const root = () =>
+  view.host.querySelector<HTMLElement>(
+    '[data-scope="media"][data-part="root"]',
+  )!
+const element = () =>
+  view.host.querySelector<HTMLElement>(
+    '[data-scope="media"][data-part="element"]',
+  )!
+const fallback = () =>
+  view.host.querySelector<HTMLElement>(
+    '[data-scope="media"][data-part="fallback"]',
+  )
 const fire = (target: Element, type: string) =>
   act(async () => {
     target.dispatchEvent(new Event(type))
@@ -34,7 +43,11 @@ describe('Media type', () => {
     expect(root().getAttribute('data-variant')).toBe('default')
     await render(<Media src="/a.jpg" alt="" variant="circle" />)
     expect(root().getAttribute('data-variant')).toBe('circle')
-    const video = { type: 'video', src: '/a.mp4', variant: 'circle' } as unknown as MediaProps
+    const video = {
+      type: 'video',
+      src: '/a.mp4',
+      variant: 'circle',
+    } as unknown as MediaProps
     await render(<Media {...video} />)
     expect(root().hasAttribute('data-variant')).toBe(false)
     const css = libraryCss()
@@ -57,7 +70,13 @@ describe('Media source and fallback', () => {
   })
 
   it('a failed load shows the fallback in place of the element', async () => {
-    await render(<Media src="/broken.jpg" alt="Lobby" fallback={<span>Unavailable</span>} />)
+    await render(
+      <Media
+        src="/broken.jpg"
+        alt="Lobby"
+        fallback={<span>Unavailable</span>}
+      />,
+    )
     expect(element().hidden).toBe(false)
     await fire(element(), 'error')
     expect(element().hidden).toBe(true)
@@ -81,10 +100,14 @@ describe('Media source and fallback', () => {
   })
 
   it('a new src starts over after a failure', async () => {
-    await render(<Media src="/broken.jpg" alt="Preview" fallback="Unavailable" />)
+    await render(
+      <Media src="/broken.jpg" alt="Preview" fallback="Unavailable" />,
+    )
     await fire(element(), 'error')
     expect(fallback()).not.toBeNull()
-    await render(<Media src="/recovered.jpg" alt="Preview" fallback="Unavailable" />)
+    await render(
+      <Media src="/recovered.jpg" alt="Preview" fallback="Unavailable" />,
+    )
     expect(element().getAttribute('src')).toBe('/recovered.jpg')
     expect(element().hidden).toBe(false)
     expect(fallback()).toBeNull()
@@ -93,7 +116,12 @@ describe('Media source and fallback', () => {
 
 describe('Media events', () => {
   it('onLoad receives the native load event and the image is marked loaded', async () => {
-    const onLoad = vi.fn((event: { type: string; currentTarget: EventTarget }) => [event.type, event.currentTarget])
+    const onLoad = vi.fn(
+      (event: { type: string; currentTarget: EventTarget }) => [
+        event.type,
+        event.currentTarget,
+      ],
+    )
     await render(<Media src="/a.jpg" alt="" onLoad={onLoad} />)
     await fire(element(), 'load')
     expect(onLoad.mock.results[0]!.value).toEqual(['load', element()])
@@ -102,7 +130,14 @@ describe('Media events', () => {
 
   it('onError receives the native error event before the fallback shows', async () => {
     const onError = vi.fn((event: { type: string }) => [event.type, fallback()])
-    await render(<Media src="/broken.jpg" alt="" fallback="Unavailable" onError={onError} />)
+    await render(
+      <Media
+        src="/broken.jpg"
+        alt=""
+        fallback="Unavailable"
+        onError={onError}
+      />,
+    )
     await fire(element(), 'error')
     expect(onError.mock.results[0]!.value).toEqual(['error', null])
     expect(fallback()).not.toBeNull()
@@ -110,7 +145,12 @@ describe('Media events', () => {
 
   it('onError runs first; preventDefault() keeps the element instead of the fallback', async () => {
     await render(
-      <Media src="/broken.jpg" alt="" fallback="Unavailable" onError={(event) => event.preventDefault()} />,
+      <Media
+        src="/broken.jpg"
+        alt=""
+        fallback="Unavailable"
+        onError={(event) => event.preventDefault()}
+      />,
     )
     await fire(element(), 'error')
     expect(fallback()).toBeNull()
@@ -119,7 +159,9 @@ describe('Media events', () => {
 
   it('a player is loaded once its metadata arrives; onLoadedMetadata receives the native event', async () => {
     const onLoadedMetadata = vi.fn((event: { type: string }) => event.type)
-    await render(<Media type="video" src="/a.mp4" onLoadedMetadata={onLoadedMetadata} />)
+    await render(
+      <Media type="video" src="/a.mp4" onLoadedMetadata={onLoadedMetadata} />,
+    )
     expect(root().getAttribute('data-state')).toBe('loading')
     await fire(element(), 'loadedmetadata')
     expect(onLoadedMetadata.mock.results[0]!.value).toBe('loadedmetadata')
@@ -143,7 +185,10 @@ describe('Media events', () => {
       error: Object.getOwnPropertyDescriptor(proto, 'error'),
     }
     const stub = (name: keyof typeof original, value: unknown) =>
-      Object.defineProperty(proto, name, { configurable: true, get: () => value })
+      Object.defineProperty(proto, name, {
+        configurable: true,
+        get: () => value,
+      })
     try {
       stub('readyState', proto.HAVE_ENOUGH_DATA)
       await render(<Media type="video" src="/cached.mp4" />)
@@ -163,7 +208,9 @@ describe('Media events', () => {
 
   it('onLoadedData and the other native media events reach the player', async () => {
     const onLoadedData = vi.fn((event: { type: string }) => event.type)
-    await render(<Media type="video" src="/a.mp4" onLoadedData={onLoadedData} />)
+    await render(
+      <Media type="video" src="/a.mp4" onLoadedData={onLoadedData} />,
+    )
     await fire(element(), 'loadeddata')
     expect(onLoadedData.mock.results[0]!.value).toBe('loadeddata')
   })
@@ -189,12 +236,37 @@ describe('Media alt', () => {
     await render(<Media type="video" src="/a.mp4" />)
     expect(element().tagName).toBe('VIDEO')
   })
+
+  it('stays silent when ARIA names the image or marks it presentational', async () => {
+    // TypeScript requires alt; these are the JSON paths, where ARIA names the image instead.
+    // An unexpected console.error fails the test, so rendering is the assertion.
+    const named = { src: '/a.jpg', 'aria-label': 'Team at the offsite' }
+    await render(<Media {...(named as unknown as MediaProps)} />)
+    expect(element().getAttribute('aria-label')).toBe('Team at the offsite')
+    const referenced = { src: '/a.jpg', 'aria-labelledby': 'media-caption' }
+    await render(
+      <>
+        <span id="media-caption">Team at the offsite</span>
+        <Media {...(referenced as unknown as MediaProps)} />
+      </>,
+    )
+    expect(element().getAttribute('aria-labelledby')).toBe('media-caption')
+    const decorative = { src: '/a.jpg', role: 'presentation' }
+    await render(<Media {...(decorative as unknown as MediaProps)} />)
+    expect(element().getAttribute('role')).toBe('presentation')
+  })
 })
 
 describe('Media box', () => {
   it('width and height size the box and win over style', async () => {
     await render(
-      <Media src="/a.jpg" alt="" width={120} height="8rem" style={{ width: 10, height: 10, color: 'red' }} />,
+      <Media
+        src="/a.jpg"
+        alt=""
+        width={120}
+        height="8rem"
+        style={{ width: 10, height: 10, color: 'red' }}
+      />,
     )
     expect(root().style.width).toBe('120px')
     expect(root().style.height).toBe('8rem')
@@ -222,7 +294,9 @@ describe('Media box', () => {
   })
 
   it('className and style go to the box; other native attributes and ref to the media element', async () => {
-    const ref = createRef<HTMLImageElement | HTMLVideoElement | HTMLAudioElement>()
+    const ref = createRef<
+      HTMLImageElement | HTMLVideoElement | HTMLAudioElement
+    >()
     await render(
       <Media
         ref={ref}
@@ -253,7 +327,18 @@ describe('Media box', () => {
   })
 
   it('player attributes reach the player: controls, poster, autoPlay, loop, muted, playsInline', async () => {
-    await render(<Media type="video" src="/a.mp4" poster="/a.jpg" controls autoPlay loop muted playsInline />)
+    await render(
+      <Media
+        type="video"
+        src="/a.mp4"
+        poster="/a.jpg"
+        controls
+        autoPlay
+        loop
+        muted
+        playsInline
+      />,
+    )
     const video = element() as HTMLVideoElement
     expect(video.getAttribute('poster')).toBe('/a.jpg')
     expect(video.hasAttribute('controls')).toBe(true)
@@ -270,7 +355,9 @@ describe('Media box', () => {
   })
 
   it('aria-label names a video player', async () => {
-    await render(<Media type="video" src="/tour.mp4" controls aria-label="Product tour" />)
+    await render(
+      <Media type="video" src="/tour.mp4" controls aria-label="Product tour" />,
+    )
     expect(element().getAttribute('aria-label')).toBe('Product tour')
     expect(element().hasAttribute('controls')).toBe(true)
   })
@@ -288,7 +375,9 @@ describe('Media box', () => {
         <track kind="captions" src="/tour.vtt" srcLang="en" />
       </Media>,
     )
-    expect(element().querySelector('track')?.getAttribute('kind')).toBe('captions')
+    expect(element().querySelector('track')?.getAttribute('kind')).toBe(
+      'captions',
+    )
   })
 
   it('membrane wraps the box in the system spacing only when on', async () => {
@@ -298,9 +387,17 @@ describe('Media box', () => {
         <Media src="/membrane.jpg" alt="" width="100%" membrane />
       </>,
     )
-    const boxes = [...view.host.querySelectorAll('[data-scope="media"][data-part="root"]')]
-    expect(boxes[0]!.parentElement!.hasAttribute('data-membrane-disabled')).toBe(true)
-    expect(boxes[1]!.parentElement!.hasAttribute('data-membrane-disabled')).toBe(false)
-    expect(boxes[1]!.parentElement!.classList.contains('uf-membrane--full')).toBe(true)
+    const boxes = [
+      ...view.host.querySelectorAll('[data-scope="media"][data-part="root"]'),
+    ]
+    expect(
+      boxes[0]!.parentElement!.hasAttribute('data-membrane-disabled'),
+    ).toBe(true)
+    expect(
+      boxes[1]!.parentElement!.hasAttribute('data-membrane-disabled'),
+    ).toBe(false)
+    expect(
+      boxes[1]!.parentElement!.classList.contains('uf-membrane--full'),
+    ).toBe(true)
   })
 })

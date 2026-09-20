@@ -66,8 +66,12 @@ interface MediaBoxProps {
 }
 
 export interface MediaImageProps
-  extends MediaBoxProps,
-    Omit<ImgHTMLAttributes<HTMLImageElement>, Owned | 'alt' | 'loading' | 'decoding'> {
+  extends
+    MediaBoxProps,
+    Omit<
+      ImgHTMLAttributes<HTMLImageElement>,
+      Owned | 'alt' | 'loading' | 'decoding'
+    > {
   /** Element that renders the source: `image` (default), `video` or `audio`; the other props follow it. */
   type?: 'image'
   /** Text that stands for the image to people who cannot see it; `""` marks the image decorative. */
@@ -99,8 +103,12 @@ interface MediaPlayerProps extends MediaBoxProps {
 }
 
 export interface MediaVideoProps
-  extends MediaPlayerProps,
-    Omit<VideoHTMLAttributes<HTMLVideoElement>, Owned | 'onLoad' | keyof MediaPlayerProps | 'poster' | 'playsInline'> {
+  extends
+    MediaPlayerProps,
+    Omit<
+      VideoHTMLAttributes<HTMLVideoElement>,
+      Owned | 'onLoad' | keyof MediaPlayerProps | 'poster' | 'playsInline'
+    > {
   /** Element that renders the source: `image` (default), `video` or `audio`; the other props follow it. */
   type: 'video'
   /** How the media fills a box whose height is set: `cover` crops, `contain` letterboxes. Default: cover for images, contain for video. */
@@ -112,8 +120,12 @@ export interface MediaVideoProps
 }
 
 export interface MediaAudioProps
-  extends MediaPlayerProps,
-    Omit<AudioHTMLAttributes<HTMLAudioElement>, Owned | 'onLoad' | keyof MediaPlayerProps> {
+  extends
+    MediaPlayerProps,
+    Omit<
+      AudioHTMLAttributes<HTMLAudioElement>,
+      Owned | 'onLoad' | keyof MediaPlayerProps
+    > {
   /** Element that renders the source: `image` (default), `video` or `audio`; the other props follow it. */
   type: 'audio'
 }
@@ -124,6 +136,9 @@ export type MediaProps = MediaImageProps | MediaVideoProps | MediaAudioProps
 interface AnyMediaProps extends MediaBoxProps {
   type?: MediaType
   alt?: string
+  'aria-label'?: string
+  'aria-labelledby'?: string
+  role?: string
   variant?: MediaVariant
   objectFit?: MediaFit
   decoding?: MediaImageProps['decoding']
@@ -139,17 +154,16 @@ interface AnyMediaProps extends MediaBoxProps {
  * Settles a player that finished before React attached (server markup, a cached source): an
  * error, or metadata in hand or fetching held off, reads as the matching event would.
  */
-const readPlayer =
-  (load: ImageStatusProps) => (node: HTMLElement | null) => {
-    if (!node || !('readyState' in node)) return
-    const player = node as HTMLMediaElement
-    if (player.error) load.onError()
-    else if (
-      player.readyState >= player.HAVE_METADATA ||
-      player.networkState === player.NETWORK_IDLE
-    )
-      load.onLoad()
-  }
+const readPlayer = (load: ImageStatusProps) => (node: HTMLElement | null) => {
+  if (!node || !('readyState' in node)) return
+  const player = node as HTMLMediaElement
+  if (player.error) load.onError()
+  else if (
+    player.readyState >= player.HAVE_METADATA ||
+    player.networkState === player.NETWORK_IDLE
+  )
+    load.onLoad()
+}
 
 /**
  * An image, video or audio source in a box sized by `width` and `height`, with `fallback` content
@@ -183,9 +197,16 @@ export const Media = forwardRef<
     ...native
   } = props
   const kind: MediaType = type === 'video' || type === 'audio' ? type : 'image'
-  // Decidable here, unlike a field's: `<img>` is not a labelable element, so no `<label for>`
-  // outside the component can name it, and `alt` is the one text alternative HTML asks for.
-  if (kind === 'image' && typeof alt !== 'string')
+  // Decidable here, unlike a field's: `<img>` is not a labelable element, so nothing outside
+  // the component can name it — every naming path is a prop, and `alt` is the one HTML asks
+  // for. An image named by ARIA instead, or marked presentational, is already answered for.
+  const named =
+    typeof alt === 'string' ||
+    typeof native['aria-label'] === 'string' ||
+    typeof native['aria-labelledby'] === 'string' ||
+    native.role === 'presentation' ||
+    native.role === 'none'
+  if (kind === 'image' && !named)
     invalidProp(
       'Media',
       'alt',
