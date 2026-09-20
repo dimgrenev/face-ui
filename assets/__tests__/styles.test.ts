@@ -25,13 +25,17 @@ describe('components.css import list (import order = cascade order)', () => {
   })
 
   it('resolves every import, without duplicates', () => {
-    expect(imports.filter((file) => !existsSync(join(stylesDir, file)))).toEqual([])
+    expect(
+      imports.filter((file) => !existsSync(join(stylesDir, file))),
+    ).toEqual([])
     expect(new Set(imports).size).toBe(imports.length)
   })
 
   it('leaves no orphan in components/', () => {
     const imported = new Set(imports)
-    expect(componentFiles.filter((file) => !imported.has(`./components/${file}`))).toEqual([])
+    expect(
+      componentFiles.filter((file) => !imported.has(`./components/${file}`)),
+    ).toEqual([])
   })
 
   it('keeps components/ free of @import and url() (flattening must not move relative URLs)', () => {
@@ -54,7 +58,11 @@ describe('components.css import list (import order = cascade order)', () => {
  */
 const OWNED_BY = (file: string) => {
   const owner = file.replace('.css', '')
-  return [`data-scope="${owner}"`, `.uf-${owner}`, `.uf-${owner.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}`]
+  return [
+    `data-scope="${owner}"`,
+    `.uf-${owner}`,
+    `.uf-${owner.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}`,
+  ]
 }
 
 /**
@@ -64,7 +72,8 @@ const OWNED_BY = (file: string) => {
 const ALLOWED: Record<string, { reason: string; selectors: RegExp }> = {
   // Components whose DOM predates the file name.
   'panel.css': {
-    reason: 'Panel renders the sidebar anatomy: data-scope="sidebar", .uf-sidebar-*',
+    reason:
+      'Panel renders the sidebar anatomy: data-scope="sidebar", .uf-sidebar-*',
     selectors: /\.uf-sidebar|data-scope="sidebar"/,
   },
   'button.css': {
@@ -77,7 +86,8 @@ const ALLOWED: Record<string, { reason: string; selectors: RegExp }> = {
     selectors: /\.uf-toggle|data-scope="toggle"/,
   },
   'sheet.css': {
-    reason: 'the responsive sheet chrome is .uf-responsive-*, shared by every overlay that becomes a sheet',
+    reason:
+      'the responsive sheet chrome is .uf-responsive-*, shared by every overlay that becomes a sheet',
     selectors: /\.uf-responsive-/,
   },
   // Files that are a shared concern by design, not a component.
@@ -87,8 +97,10 @@ const ALLOWED: Record<string, { reason: string; selectors: RegExp }> = {
     selectors: /\[data-part="indicator"\]/,
   },
   'interaction.css': {
-    reason: 'the cross-component file: focus, hidden parts and control weight belong to no single scope',
-    selectors: /\[data-scope\]\[data-part\]|\.uf-control\[data-scope\]|\.uf-option\[data-scope\]/,
+    reason:
+      'the cross-component file: focus, hidden parts and control weight belong to no single scope',
+    selectors:
+      /\[data-scope\]\[data-part\]|\.uf-control\[data-scope\]|\.uf-option\[data-scope\]/,
   },
 }
 
@@ -111,7 +123,9 @@ describe('components/<x>.css owns what it styles', () => {
         current = ''
       } else current += char
     }
-    return [...out, current].map((selector) => selector.trim().replace(/\s+/g, ' ')).filter(Boolean)
+    return [...out, current]
+      .map((selector) => selector.trim().replace(/\s+/g, ' '))
+      .filter(Boolean)
   }
 
   /** Rules of one file as [selector, declarations], at-rules flattened. */
@@ -134,7 +148,9 @@ describe('components/<x>.css owns what it styles', () => {
           if (prelude.startsWith('@keyframes')) {
             /* a frame is a percentage, not a selector */
           } else if (prelude.startsWith('@')) walk(body)
-          else for (const selector of splitSelectors(prelude)) out.push([selector, body])
+          else
+            for (const selector of splitSelectors(prelude))
+              out.push([selector, body])
           start = i + 1
         }
       }
@@ -147,18 +163,47 @@ describe('components/<x>.css owns what it styles', () => {
     const owners = OWNED_BY(file)
     const allowed = ALLOWED[file]
     it(`${file}${allowed ? ` (exception: ${allowed.reason})` : ''}`, () => {
-      const foreign = rules(read(`components/${file}`)).filter(([selector, body]) => {
-        if (owners.some((owner) => selector.includes(owner))) return false
-        if (allowed?.selectors.test(selector)) return false
-        // A direction boundary is owned when it only sets the owner's tokens.
-        if (DIRECTION.test(selector))
-          return !body
-            .split(';')
-            .filter((declaration) => declaration.trim())
-            .every((declaration) => declaration.trim().startsWith(`--uf-${file.replace('.css', '')}-`))
-        return true
-      })
+      const foreign = rules(read(`components/${file}`)).filter(
+        ([selector, body]) => {
+          if (owners.some((owner) => selector.includes(owner))) return false
+          if (allowed?.selectors.test(selector)) return false
+          // A direction boundary is owned when it only sets the owner's tokens.
+          if (DIRECTION.test(selector))
+            return !body
+              .split(';')
+              .filter((declaration) => declaration.trim())
+              .every((declaration) =>
+                declaration
+                  .trim()
+                  .startsWith(`--uf-${file.replace('.css', '')}-`),
+              )
+          return true
+        },
+      )
       expect(foreign.map(([selector]) => selector)).toEqual([])
     })
   }
+})
+
+/**
+ * A component's stylesheet stays small enough to read in one sitting (RFC §0
+ * D4). Generated files are exempt: their size is the generator's decision.
+ */
+describe('authored stylesheets stay readable', () => {
+  const GENERATED = new Set(['tokens.css'])
+  const LIMIT = 450
+  const authored = [
+    ...componentFiles.map((file) => `components/${file}`),
+    'text.css',
+    'base.css',
+    'animations.css',
+    'component-tokens.css',
+    'tokens.css',
+  ]
+
+  it.each(
+    authored.filter((file) => !GENERATED.has(file.replace('components/', ''))),
+  )(`%s is at most ${LIMIT} lines`, (file) => {
+    expect(read(file).split('\n').length).toBeLessThanOrEqual(LIMIT)
+  })
 })
