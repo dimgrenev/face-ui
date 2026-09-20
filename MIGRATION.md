@@ -5,6 +5,24 @@ Generated from `scripts/migrations/*.ts` by `pnpm migration:sync`; do not edit b
 Run `pnpm migrate <paths…>` for a dry run, add `--write` to apply the `auto` rows, or `--check`
 to fail while any listed usage remains. Rows marked `manual` are reported, never rewritten.
 
+## Migrating a consumer
+
+1. Update the package, then `pnpm migrate <src>` for a dry run and read the report.
+2. `pnpm migrate <src> --write` applies the `auto` rows.
+3. Run `tsc`. It catches what the codemod cannot see: a renamed prop reached through a
+   variable, a handler declared away from the usage, a list passed as a variable.
+4. Work through the `manual` rows the report names, then `pnpm migrate <src> --check`.
+5. Re-read every list you pass: `items[].id` is now `items[].value` in every collection
+   component, and the codemod never looks inside a list passed as a variable.
+
+The codemod reads one JSX usage at a time and resolves a tag only when that same file
+imports it from Face UI. A component reached through a barrel or wrapper of your own is
+invisible to it — under the same name too, and for the `auto` rows as well — so a clean
+`pnpm migrate --check` says nothing about those files. `tsc` still types a plain
+re-export and catches a removed prop there; a wrapper that declares props of its own
+hides it, and it keeps compiling while rendering nothing where the prop used to be. Grep
+your own barrels and wrappers for each removed prop name before you trust a green build.
+
 ## 0.2.0 (unreleased)
 
 ### All components

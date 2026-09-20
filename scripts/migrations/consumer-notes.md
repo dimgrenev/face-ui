@@ -4,8 +4,8 @@ What `pnpm migrate` cannot find, for the people who migrate the products (W4-05,
 re-derived for every `codemod: manual` row in W4-07).
 
 The codemod reads one JSX usage at a time: it renames props and reports a `legacy`
-pattern only when it can see the value **written at the usage**. Five things stay
-invisible to it, and all five are in the products today:
+pattern only when it can see the value **written at the usage**. Six things stay
+invisible to it, and all six are in the products today:
 
 - **A list passed as a variable.** `columns={userColumns}` or `items={navItems}`
   gives the codemod the text `userColumns`, so nothing inside that array is ever
@@ -17,6 +17,15 @@ invisible to it, and all five are in the products today:
   identifier, so a retyped payload is never matched at the usage. R37, R39.
 - **Props spread through a wrapper of the consumer's own.** `<MyResizer aria-orientation="vertical" />`
   is not a Face UI element, so the codemod never looks at it. R40.
+- **A component re-exported by a barrel of the consumer's own, under the same name.**
+  `export { Tabs } from '@userface/face-ui-react/Tabs/Tabs'` (defrictor
+  `src/userface/defrictor/AdminUI/Selection.tsx:5`), used as `import { Tabs } from '../AdminUI/Selection'`.
+  The usage file does not import `Tabs` from Face UI, so the codemod skips it whole —
+  **including the `auto` rows**, which the wrapper bullet above does not cover: a clean
+  `pnpm migrate --check` proves nothing about such a file. Measured on a two-file fixture:
+  the same `<Table ariaLabel showRowNumbers>` gives 2 automatic findings when imported
+  directly and 0 through the barrel. `tsc` does still type a plain re-export, so it catches
+  a removed prop there; a wrapper that declares props of its own hides it.
 - **Prop names, and module paths, written as data.** The app's live preview wires
   callbacks to props through a table of plain strings (`previewEventBridge.ts`), which
   is neither JSX nor typed against Face UI, so neither the codemod nor `tsc` can see
