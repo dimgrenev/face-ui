@@ -166,7 +166,8 @@
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Gap in pixels between the trigger and a click menu's popover; negative values overlap them. Default 4."
+      "description": "Gap in pixels between the trigger and a click menu's popover; negative values overlap them. Default 4.",
+      "default": 4
     },
     "aria-label": {
       "type": "string",

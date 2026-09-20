@@ -905,6 +905,11 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       },
     ],
   },
+  Menu: {
+    // Menu resolves its own side, align and defaultOpen, which the parser reads from the
+    // destructuring; sideOffset it resolves through readNumber, which the parser does not read.
+    patchProps: { sideOffset: { default: 4 } },
+  },
   Popover: {
     patchProps: FLOATING_SURFACE_DEFAULTS,
   },

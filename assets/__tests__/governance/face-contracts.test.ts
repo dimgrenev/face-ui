@@ -61,6 +61,7 @@ describe('face-ui-react contracts', () => {
       Popover: { defaultOpen: false, side: 'top', align: 'center', sideOffset: 2 },
       Tooltip: { defaultOpen: false, side: 'top', align: 'center', sideOffset: 2, openDelay: 200, closeDelay: 0 },
       Overlay: { defaultOpen: false, side: 'top', align: 'center', sideOffset: 2, openDelay: 200, closeDelay: 0 },
+      Menu: { defaultOpen: false, side: 'bottom', align: 'end', sideOffset: 4 },
     }
     for (const [componentName, defaults] of Object.entries(expected)) {
       const [entry] = collectFaceJsonContracts(componentName)
@@ -70,6 +71,17 @@ describe('face-ui-react contracts', () => {
           default: value,
         })
     }
+  })
+
+  it('publishes every default a prop description promises', () => {
+    // A default resolved anywhere but the wrapper's destructuring — in a shared internal
+    // component, or through readNumber — is invisible to the parser and needs an override.
+    const promised: string[] = []
+    for (const { componentName, currentContract } of collectFaceJsonContracts())
+      for (const [propName, prop] of Object.entries(currentContract.props))
+        if (/\bDefault [^.]+\.\s*$/.test(prop.description ?? '') && !('default' in prop))
+          promised.push(`${componentName}.${propName}: ${prop.description}`)
+    expect(promised, promised.join('\n')).toEqual([])
   })
 
   it('keeps composed component contracts aligned to inherited public props', () => {
