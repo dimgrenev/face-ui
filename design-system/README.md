@@ -74,4 +74,4 @@ Focus indicators remain visible, including forced-colors mode. Reduced motion ap
 
 For each foundation change, inspect a mixed row of controls, text with headings, nested surfaces, light/dark themes, narrow viewports and focused/disabled/selected states. Validate computed geometry in a browser; matching token names alone does not establish alignment.
 
-See [the composition contract](../docs.md) for forms, layers, state ownership and migration guidance. The dated audit in `docs/audit/2026-09-11-quality.md` records the observed failures, fixes and verification scope.
+See [the composition contract](../docs.md) for forms, layers, state ownership and migration guidance.

@@ -87,8 +87,6 @@ function shouldSkipDir(relPath) {
     relPath === 'node_modules' ||
     relPath === 'out' ||
     relPath.startsWith('out/') ||
-    relPath === 'docs' ||
-    relPath.startsWith('docs/') ||
     relPath === 'scripts' ||
     relPath.endsWith('/__tests__') ||
     relPath === 'assets/__tests__' ||
@@ -135,7 +133,9 @@ function shouldCopyAsset(relPath) {
   if (relPath === 'pnpm-workspace.yaml') return false
   if (relPath === 'LICENSE') return false
   if (relPath === 'README.md') return false
+  // Shipped once, at the package root, where `files` and `exports` place them.
   if (relPath === 'docs.md') return false
+  if (relPath === 'migrations.json') return false
   if (relPath.endsWith('.md')) return false
   if (relPath === 'package-types.d.ts') return false
   if (relPath === 'vitest.config.ts') return false

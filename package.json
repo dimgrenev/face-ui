@@ -67,7 +67,8 @@
       "require": "./dist/cjs/assets/adapters/react/*.js"
     },
     "./docs.md": "./docs.md",
-    "./docs/*": "./docs/*",
+    "./MIGRATION.md": "./MIGRATION.md",
+    "./migrations.json": "./migrations.json",
     "./Accordion/*.json": "./dist/esm/Accordion/*.json",
     "./Accordion": {
       "types": "./dist/types/Accordion/Accordion.d.ts",
@@ -582,8 +583,8 @@
     "dist/types",
     "README.md",
     "docs.md",
-    "docs",
-    "!docs/audit",
+    "MIGRATION.md",
+    "migrations.json",
     "design-system",
     "LICENSE"
   ],
