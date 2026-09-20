@@ -163,7 +163,7 @@ Eight components are fields — `Input`, `Select`, `Date`, `Radio`, `Rating`, `S
 
 - Rendering never throws on data. A value a component cannot use is normalized — fallback to the
   documented default, clamp numbers (integers truncate), drop invalid or duplicate items (first wins),
-  project a value shaped for the other mode — and reported once in development:
+  key a row by position, project a value shaped for the other mode — and reported once in development:
   `Face UI <Component>: invalid <prop> <value>; <outcome>.` Production is silent.
 - Empty text means "not provided". Nothing is coerced: "50" for a number is replaced by the default, and a size a component only forwards to `style` is the browser's to reject.
 - Types are checked by TypeScript in code and by the contract validator in face documents.
