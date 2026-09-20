@@ -76,11 +76,26 @@ describe('face-ui-react contracts', () => {
   it('publishes every default a prop description promises', () => {
     // A default resolved anywhere but the wrapper's destructuring — in a shared internal
     // component, or through readNumber — is invisible to the parser and needs an override.
+    // Both spellings count: a closing sentence "Default <x>." and an inline "defaults to <x>".
+    // The first stays case-sensitive, or "names the default trigger" would match it too.
+    const PROMISE = [/\bDefault [^.]+\.\s*$/, /\bdefaults to\b|\bby default\b/i]
+    // Defaults the contract cannot carry because the component computes them, each with the
+    // word its description has to name, so the exemption stays tied to a truthful sentence.
+    const COMPUTED: Record<string, string> = {
+      'Date.closeOnSelect': 'single date',
+      'Slider.defaultValue': 'min',
+      'Slider.defaultCropRange': 'scale',
+      'Table.rowKey': 'id',
+    }
     const promised: string[] = []
     for (const { componentName, currentContract } of collectFaceJsonContracts())
-      for (const [propName, prop] of Object.entries(currentContract.props))
-        if (/\bDefault [^.]+\.\s*$/.test(prop.description ?? '') && !('default' in prop))
-          promised.push(`${componentName}.${propName}: ${prop.description}`)
+      for (const [propName, prop] of Object.entries(currentContract.props)) {
+        const id = `${componentName}.${propName}`
+        const description = prop.description ?? ''
+        if (!PROMISE.some((promise) => promise.test(description))) continue
+        if ('default' in prop || description.includes(COMPUTED[id] ?? '\0')) continue
+        promised.push(`${id}: ${description}`)
+      }
     expect(promised, promised.join('\n')).toEqual([])
   })
 

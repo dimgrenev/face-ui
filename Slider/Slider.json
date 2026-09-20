@@ -36,7 +36,8 @@
       "options": [
         "top",
         "start"
-      ]
+      ],
+      "default": "top"
     },
     "min": {
       "type": "number",

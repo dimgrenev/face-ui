@@ -25,7 +25,8 @@
       "options": [
         "top",
         "start"
-      ]
+      ],
+      "default": "top"
     },
     "items": {
       "type": "array",

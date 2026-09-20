@@ -96,7 +96,8 @@
       "options": [
         "top",
         "start"
-      ]
+      ],
+      "defaultValue": "top"
     },
     {
       "name": "value",

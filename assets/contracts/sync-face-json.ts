@@ -171,7 +171,22 @@ const FLOATING_HOVER_DEFAULTS = {
   ...FLOATING_SURFACE_DEFAULTS,
   openDelay: { default: 200 }, closeDelay: { default: 0 },
 }
+// The shared field resolves `labelPosition` in assets/internal/field.tsx, outside every
+// field component's own destructuring, so each one publishes the default from here.
+const FIELD_DEFAULTS = { labelPosition: { default: 'top' } }
 const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
+  SegmentedControl: {
+    patchProps: { ...FIELD_DEFAULTS },
+  },
+  Select: {
+    patchProps: { ...FIELD_DEFAULTS },
+  },
+  Toggle: {
+    patchProps: { ...FIELD_DEFAULTS },
+  },
+  Upload: {
+    patchProps: { ...FIELD_DEFAULTS },
+  },
   Accordion: {
     patchProps: {
       icon: {
@@ -417,6 +432,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
       : state),
   },
   Date: {
+    patchProps: { ...FIELD_DEFAULTS },
     patchStates: (states) => states.map((state) => {
       if (state.props.mode !== 'week') return state
       const props = { ...state.props }
@@ -551,6 +567,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
     ],
   },
   Input: {
+    patchProps: { ...FIELD_DEFAULTS },
     patchStates: (states) => states.map((state) => ({
       ...state,
       props: state.props?.type === 'default'
@@ -610,6 +627,7 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
     ],
   },
   Radio: {
+    patchProps: { ...FIELD_DEFAULTS },
     patchStates: () => [
       {
         name: 'Default',
@@ -667,11 +685,13 @@ const CONTRACT_OVERRIDES: Record<string, ContractOverride> = {
   },
   Rating: {
     patchProps: {
+      ...FIELD_DEFAULTS,
       max: { min: 1, max: 10, step: 1 },
     },
   },
   Slider: {
     patchProps: {
+      ...FIELD_DEFAULTS,
       min: { default: 0 }, max: { default: 100 }, step: { default: 1 },
       disabled: { default: false }, orientation: { default: 'horizontal' },
       showValue: { default: false }, crop: { default: false },
