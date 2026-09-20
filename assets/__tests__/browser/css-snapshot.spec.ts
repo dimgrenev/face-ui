@@ -83,7 +83,6 @@ const MOVES: {
     { id: 'membrane-truncate', file: './components/membrane.css', start: '/* Truncate — ellipsis overflow.', count: 1 },
     { id: 'membrane', file: './components/membrane.css' },
     { id: 'button-icon', file: './components/button.css', start: '/* Button icon box.', count: 4 },
-    { id: 'table-sticky', file: './components/table.css', start: '/* Parity with the reference library: a consumer', count: 1 },
     { id: 'media-image', file: './components/media.css', start: '/* Parity with the reference library, whose image', count: 1 },
     { id: 'text-body', file: './text.css', start: '/* The class a consumer puts on non-Text markup', count: 1 },
     { id: 'tile-actions', file: './components/tile.css', start: '/* Hidden actions must not receive keyboard focus.', count: 3 },
@@ -100,7 +99,7 @@ const MOVES: {
     { file: './components/button.css', at: { after: '.uf-button[data-scope][data-indent]' }, runs: ['membrane'] },
     { file: './text.css', at: { after: '.uf-text[data-scope][data-size="xl"]' }, runs: ['membrane-truncate'] },
     { file: './components/carousel.css', at: 'end', runs: ['button-icon'] },
-    { file: './components/compat.css', at: 'end', runs: ['table-sticky', 'media-image'] },
+    { file: './components/compat.css', at: 'end', runs: ['media-image'] },
     { file: './components/gallery.css', at: 'start', runs: ['text-body'] },
     {
       file: './components/interaction.css',
