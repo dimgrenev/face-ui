@@ -28,7 +28,7 @@ import {
   visibleKeys,
 } from '../assets/runtime/collection'
 import { resolveLabels, type CommonLabels } from '../assets/runtime/labels'
-import { invalidProp } from '../assets/runtime/props'
+import { invalidProp, readCssSize } from '../assets/runtime/props'
 import { hasSlotContent } from '../assets/slot-content'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
@@ -84,9 +84,9 @@ export interface PanelProps
   onCollapsedChange?: (details: { collapsed: boolean }) => void
   /** Shows the button that collapses the panel to a rail, and lets a group in the rail open the panel at it; false leaves `collapsed` to the parent, and groups then open in the rail. Default true. */
   collapsible?: boolean
-  /** Width of the expanded inline panel: pixels, or any CSS length. Default 260. It and `collapsedWidth` own the width, so `style.width` is ignored. */
+  /** Width of the expanded inline panel: a number or numeric string is pixels, or pass a CSS length. Wins over `style.width`; otherwise that style is used, then 260px. */
   width?: number | string
-  /** Width of the collapsed rail: pixels, or any CSS length. Default 60. */
+  /** Width of the collapsed rail: a number or numeric string is pixels, or pass a CSS length. Wins over `style.width`; default 60px. */
   collapsedWidth?: number | string
   /** `inline` shows the panel; `sheet` shows a trigger that opens the rows in a drawer at the start edge; `auto` is a sheet below 900px. */
   surface?: 'auto' | 'inline' | 'sheet'
@@ -128,9 +128,6 @@ const defaultLabels: PanelLabels = Object.freeze({
 })
 /** Landmark and sheet name until a native aria-label or aria-labelledby names the nav (K14). */
 const defaultRootLabels = Object.freeze({ nav: 'Sidebar' })
-const length = (value: number | string) =>
-  typeof value === 'number' ? `${value}px` : value
-
 // ---------------------------------------------------------------------------
 // Panel
 // ---------------------------------------------------------------------------
@@ -393,13 +390,15 @@ export const Panel = forwardRef<HTMLElement, PanelProps>(
         </nav>
       )
 
-    if (style?.width !== undefined)
-      invalidProp('Panel', 'style.width', style.width, 'ignoring it: width and collapsedWidth size the panel')
+    const expandedWidth = props.width === undefined
+      ? style?.width ?? '260px'
+      : readCssSize('Panel', 'width', width) ?? style?.width ?? '260px'
+    const railWidth = readCssSize('Panel', 'collapsedWidth', collapsedWidth) ?? '60px'
     return (
       <nav
         {...root}
         data-state={rail ? 'collapsed' : 'expanded'}
-        style={{ ...style, width: length(rail ? collapsedWidth : width) }}
+        style={{ ...style, width: rail ? railWidth : expandedWidth }}
       >
         {collapsible && (
           <div {...part('header')}>

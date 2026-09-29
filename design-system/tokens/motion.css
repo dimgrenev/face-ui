@@ -2,10 +2,10 @@
 
 :root {
   --uf-motion-instant: 0ms;
-  --uf-motion-fast: 120ms;
-  --uf-motion-snappy: 140ms;
-  --uf-motion-normal: 240ms;
-  --uf-motion-slow: 300ms;
-  --uf-ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --uf-ease-in-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --uf-motion-fast: var(--uf-motion-duration-fast, 120ms);
+  --uf-motion-snappy: var(--uf-motion-duration-short, 150ms);
+  --uf-motion-normal: var(--uf-motion-duration-control, 200ms);
+  --uf-motion-slow: var(--uf-motion-duration-medium, 250ms);
+  --uf-ease-out: var(--uf-motion-ease-out, ease-out);
+  --uf-ease-in-out: var(--uf-motion-ease-in-out, ease-in-out);
 }

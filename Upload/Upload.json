@@ -17,7 +17,7 @@
     "error": {
       "type": "ReactNode",
       "required": false,
-      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
     },
     "labelPosition": {
       "type": "enum",
@@ -32,7 +32,7 @@
     "files": {
       "type": "array",
       "required": false,
-      "description": "Controlled list; an entry without a string `id`, or repeating an earlier one, is dropped."
+      "description": "Controlled list; an entry without a unique string `id`, or a group or separator, is dropped with a report."
     },
     "defaultFiles": {
       "type": "array",

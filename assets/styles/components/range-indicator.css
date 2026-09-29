@@ -56,7 +56,7 @@
   block-size: 100%;
   border-radius: var(--uf-radius-full);
   background: var(--uf-range-fill-bg);
-  transition: inline-size var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
+  transition: inline-size var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard);
 }
 .uf-range-indicator[data-tone="positive"] {
   --uf-range-fill-bg: var(--uf-range-indicator-positive-bg);

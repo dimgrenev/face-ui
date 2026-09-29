@@ -73,7 +73,7 @@
   flex: none;
 }
 [data-scope="navigation"] [data-part="indicator"] {
-  transition: transform var(--uf-duration-enter) var(--uf-ease-enter);
+  transition: transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
 }
 [data-scope="navigation"] [data-part="trigger"][aria-expanded="true"] [data-part="indicator"] {
   transform: rotate(180deg);
@@ -92,8 +92,8 @@
   max-inline-size: calc(100vw - var(--uf-spacing-4));
   transform-origin: top;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    transform var(--uf-duration-enter) var(--uf-ease-enter);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
 }
 [data-scope="navigation"][data-part="content"][hidden] {
   display: none;

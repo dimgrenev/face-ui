@@ -23,7 +23,7 @@
     "height": {
       "type": "any",
       "required": false,
-      "description": "Height of the box: pixels, or any CSS length. Without it the box is as tall as its content, or as its layout makes it."
+      "description": "Height of the box: a number or numeric string is pixels, or pass a CSS length. Wins over `style.height`; without it the box follows its content or layout."
     },
     "aria-label": {
       "type": "string",

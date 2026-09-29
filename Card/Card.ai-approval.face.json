@@ -152,7 +152,7 @@
       "name": "footerAlign",
       "type": "select",
       "required": false,
-      "description": "Alignment of the `footer` content; compound usage sets `Card.Footer align` instead. Default: end.",
+      "description": "Alignment of a nonempty `footer` shorthand only; use `Card.Footer align` in compound content, or this prop reports in development. Default: end.",
       "options": [
         "start",
         "end",

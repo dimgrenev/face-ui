@@ -16,8 +16,9 @@ import { composeHandlers } from '../assets/adapters/react/merge-props'
 import { useControllableState } from '../assets/adapters/react/use-controllable-state'
 import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
 import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
+import { readFlatCollection } from '../assets/internal/flat-collection'
 import type { CollectionItem } from '../assets/internal/item'
-import { domId, nearest, readCollection } from '../assets/runtime/collection'
+import { domId, nearest } from '../assets/runtime/collection'
 import { invalidProp } from '../assets/runtime/props'
 import { hasSlotContent } from '../assets/slot-content'
 
@@ -89,13 +90,13 @@ export type TabsProps = TabsBaseProps &
     | {
         /** Renders a persistent panel per tab; `false` leaves panels to the consumer, referenced by each item's `panelId`. */
         renderPanels?: true
-        /** The tabs in order, keyed by `value`: label, icon, content, disabled, panelId and native naming (id, title, aria-*). */
+        /** The tabs in order, keyed by `value`: label, icon, content, disabled, panelId and native naming (id, title, aria-*). Groups and separators are dropped with a report. */
         items?: readonly TabItem[]
       }
     | {
         /** Renders a persistent panel per tab; `false` leaves panels to the consumer, referenced by each item's `panelId`. */
         renderPanels: false
-        /** The tabs in order, keyed by `value`: label, icon, content, disabled, panelId and native naming (id, title, aria-*). */
+        /** The tabs in order, keyed by `value`: label, icon, content, disabled, panelId and native naming (id, title, aria-*). Groups and separators are dropped with a report. */
         items?: readonly ExternalTabItem[]
       }
   )
@@ -127,7 +128,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       onBlur,
       ...nativeProps
     } = props
-    const collection = readCollection<TabItem>(items, {
+    const collection = readFlatCollection<TabItem>(items, {
       component: 'Tabs',
       key: (item) => item.value,
     })

@@ -1,5 +1,5 @@
 import { cn } from '../utils'
-import type { CardProps } from '../../Card/Card'
+import type { CardSurfaceOptions } from './card-surface-options'
 
 /** Shared surface presentation; native attributes remain on the owning div.
  * Card's title/description/footer shorthand is not part of a floating surface's DOM API. */
@@ -11,13 +11,7 @@ export function getCardSurfaceProps({
   hoverable,
   fullWidth,
   className,
-}: Required<
-  Pick<
-    CardProps,
-    'variant' | 'padding' | 'radius' | 'border' | 'hoverable' | 'fullWidth'
-  >
-> &
-  Pick<CardProps, 'className'>) {
+}: CardSurfaceOptions & { className?: string }) {
   return {
     'data-card-variant': variant,
     'data-padding': padding,

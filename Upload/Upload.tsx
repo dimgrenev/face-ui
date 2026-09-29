@@ -15,7 +15,7 @@ import { useFormReset } from '../assets/adapters/react/use-form-reset'
 import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
 import { createAnatomy } from '../assets/anatomy'
 import { FieldLayout, useField, type FieldProps } from '../assets/internal/field'
-import { readCollection } from '../assets/runtime/collection'
+import { readFlatCollection } from '../assets/internal/flat-collection'
 import {
   formatLabel,
   resolveLabel,
@@ -37,7 +37,7 @@ import { Text } from '../Text/Text'
 
 /** One entry of the list: a picked or dropped file, or a file already stored elsewhere. */
 export interface UploadFile {
-  /** Unique key of the entry. A picked or dropped file gets one from its size, date and name, so it is never listed twice. */
+  /** Unique key of the entry. Picked files start with a size, date and name key; collisions get a suffix. */
   id: string
   /** File name, shown in the entry and in its remove button's name. */
   name: string
@@ -84,7 +84,7 @@ export interface UploadProps
       HTMLAttributes<HTMLDivElement>,
       'children' | 'dangerouslySetInnerHTML' | 'defaultValue' | 'defaultChecked' | 'role'
     > {
-  /** Controlled list; an entry without a string `id`, or repeating an earlier one, is dropped. */
+  /** Controlled list; an entry without a unique string `id`, or a group or separator, is dropped with a report. */
   files?: readonly UploadFile[]
   /** List on mount when `files` is not set, restored by form reset; read once. */
   defaultFiles?: readonly UploadFile[]
@@ -213,7 +213,7 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(function Upload(
     onChange: (next) => onFilesChange?.({ files: next as UploadFile[] }),
     name: ['Upload', 'files'],
   })
-  const collection = readCollection<UploadFile>(current, {
+  const collection = readFlatCollection<UploadFile>(current, {
     component: 'Upload',
     prop: 'files',
     key: (entry) => entry.id,
@@ -233,6 +233,7 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(function Upload(
     labelPosition,
     required,
     nativeError: report && !(report.validity && list.length) ? report.text : null,
+    announcementKey: report,
     labelable: false,
     'aria-label': resolveLabel(ariaLabel, '', 'Upload', 'aria-label') || undefined,
     'aria-labelledby': ariaLabelledby,
@@ -262,10 +263,13 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(function Upload(
   })
 
   const add = (picked: ArrayLike<File> | null | undefined) => {
-    // The same file again is already listed, in either mode.
-    const fresh = Array.from(picked ?? []).filter(
-      (file) => !list.some((entry) => entry.id === fileId(file)),
-    )
+    // Only the same File object is a repeat. Metadata can match for different files.
+    const seen = new Set(list.flatMap((entry) => entry.file ? [entry.file] : []))
+    const fresh = Array.from(picked ?? []).filter((file) => {
+      if (seen.has(file)) return false
+      seen.add(file)
+      return true
+    })
     const room = multiple ? Math.max(0, fileLimit - list.length) : 1
     const { accepted, rejected } = validateFiles(fresh, {
       accept,
@@ -285,11 +289,20 @@ export const Upload = forwardRef<HTMLDivElement, UploadProps>(function Upload(
     })
     setReport(messages.length ? { text: messages.join('\n'), validity: false } : null)
     if (rejected.length) onReject?.({ files: rejected })
-    if (accepted.length)
+    if (accepted.length) {
+      const ids = new Set((multiple ? list : none).map((entry) => entry.id))
+      const entries = accepted.map((file) => {
+        const base = fileId(file)
+        let id = base
+        for (let suffix = 2; ids.has(id); suffix++) id = `${base}#${suffix}`
+        ids.add(id)
+        return { id, name: file.name, size: file.size, file }
+      })
       setFiles([
         ...(multiple ? list : none),
-        ...accepted.map((file) => ({ id: fileId(file), name: file.name, size: file.size, file })),
+        ...entries,
       ])
+    }
   }
   const remove = (key: string) => {
     setReport(null)

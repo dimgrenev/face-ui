@@ -37,4 +37,10 @@ export default [
     before: '`content` without `title`, `description` or `footer` was wrapped in the content part',
     after: 'Children without `title`, `description` or `footer` render directly in the card; wrap them in `Card.Content` to keep the part',
   },
+  {
+    kind: 'behavior',
+    component: 'Card',
+    before: 'Root `footerAlign` on a compound Card without `footer` silently did nothing',
+    after: 'Move it to `Card.Footer align`; development builds report the unsupported root combination',
+  },
 ] satisfies Migration[]

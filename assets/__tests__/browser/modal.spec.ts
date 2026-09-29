@@ -2,7 +2,7 @@ import { expect, test, type Page } from './test'
 import { hooks, open } from './helpers'
 import type { Hooks } from './fixtures/modal.fixture'
 
-const { renderModal } = hooks<Hooks>()
+const { renderModal, renderScopedModal } = hooks<Hooks>()
 const button = (page: Page, name: string) =>
   page.getByRole('button', { name, exact: true })
 const dialog = (page: Page, name = 'Dialog') =>
@@ -22,6 +22,62 @@ const rect = (page: Page, selector: string) =>
 test.beforeEach(async ({ page }) => {
   await open(page, 'modal')
 })
+
+test('a scoped modal covers only its instance and leaves its sibling interactive', { tag: ['@layout', '@pointer', '@focus'] }, async ({ page }) => {
+  await renderScopedModal(page)
+  await button(page, 'Open scoped dialog').click()
+  const scoped = dialog(page, 'Scoped dialog')
+  await expect(scoped).toBeVisible()
+  await expect(scoped).not.toHaveAttribute('aria-modal')
+  await expect(page.locator('[data-instance="A"]')).toHaveCSS('overflow', 'hidden')
+  await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden')
+  const bounds = await page.locator('[data-instance="A"]').boundingBox()
+  expect(bounds).not.toBeNull()
+  for (const part of ['backdrop', 'positioner']) {
+    const frame = await page.locator(`[data-scope="modal"][data-part="${part}"]`).boundingBox()
+    expect(frame).not.toBeNull()
+    expect(frame!.x).toBeCloseTo(bounds!.x, 0)
+    expect(frame!.y).toBeCloseTo(bounds!.y, 0)
+    expect(frame!.width).toBeCloseTo(bounds!.width, 0)
+    expect(frame!.height).toBeCloseTo(bounds!.height, 0)
+  }
+  await button(page, 'B action').click()
+  await expect(page.locator('[data-b-clicks]')).toHaveText('1')
+  // WebKit does not focus a button on mouse click.
+  await button(page, 'B action').focus()
+  await expect(button(page, 'B action')).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(scoped).toBeVisible()
+  await button(page, 'A inside').focus()
+  await page.keyboard.press('Escape')
+  await expect(scoped).toHaveCount(0)
+  await button(page, 'Open scoped dialog').click()
+  await page.mouse.click(bounds!.x + 8, bounds!.y + bounds!.height - 8)
+  await expect(scoped).toHaveCount(0)
+})
+
+for (const variant of ['transformed', 'externalPortal'] as const)
+  test(`a scoped modal stays usable with a ${variant} portal geometry`, { tag: ['@layout', '@pointer'] }, async ({ page }) => {
+    await renderScopedModal(page, { [variant]: true })
+    await button(page, 'Open scoped dialog').click()
+    const dialog = page.getByRole('dialog', { name: 'Scoped dialog' })
+    await expect(dialog).toBeVisible()
+    await expect(page.locator('[data-instance="A"] [role="dialog"]')).toHaveCount(1)
+    const root = await page.locator('[data-instance="A"]').boundingBox()
+    const positioner = await page.locator('[data-part="positioner"][data-scope="modal"]').boundingBox()
+    expect(root).not.toBeNull()
+    expect(positioner).not.toBeNull()
+    expect(Math.abs(positioner!.x - root!.x)).toBeLessThan(2)
+    expect(Math.abs(positioner!.y - root!.y)).toBeLessThan(2)
+    expect(Math.abs(positioner!.width - root!.width)).toBeLessThan(2)
+    expect(Math.abs(positioner!.height - root!.height)).toBeLessThan(2)
+    await button(page, 'B action').click()
+    await expect(page.locator('[data-b-clicks]')).toHaveText('1')
+    await expect(dialog).toBeVisible()
+    await dialog.getByRole('button', { name: 'Close' }).click()
+    await expect(dialog).toHaveCount(0)
+    await expect(page.locator('[data-instance="A"]')).not.toHaveCSS('position', 'relative')
+  })
 
 test.describe('layer contract (T1–T5)', () => {
   test('T1: Escape closes only the top dialog, and focus steps back down', { tag: ['@focus', '@react'] }, async ({ page }) => {
@@ -167,7 +223,8 @@ test.describe('geometry', () => {
   })
 })
 
-test('the surface fades in, and on close stays inert until it has faded out, then unmounts', { tag: ['@css', '@react'] }, async ({ page }) => {
+test('with motion opted in, the surface fades in and stays inert through its exit', { tag: ['@css', '@react'] }, async ({ page }) => {
+  await page.evaluate(() => document.documentElement.classList.add('uf-animated'))
   await renderModal(page)
   const entering = await page.evaluate(async () => {
     document.querySelector<HTMLElement>('[data-part="trigger"]')!.click()

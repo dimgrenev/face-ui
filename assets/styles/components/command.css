@@ -23,10 +23,9 @@
   align-items: center;
   width: 100%;
   min-height: var(--uf-control-height);
-  padding-top: var(--uf-control-pad-y);
-  padding-bottom: var(--uf-control-pad-y);
-  padding-left: var(--uf-control-pad-icon);
-  padding-right: var(--uf-control-pad-text);
+  padding-block: var(--uf-control-pad-y);
+  padding-inline-start: var(--uf-control-pad-icon);
+  padding-inline-end: var(--uf-control-pad-text);
   border: none;
   border-radius: var(--uf-radius);
   background: var(--uf-color-black-0);
@@ -68,15 +67,15 @@
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    visibility 0s linear var(--uf-duration-exit);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--face-runtime-transition-duration-exit);
 }
 .uf-command__dialog[data-state="open"] {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
     visibility 0s linear 0s;
 }
 .uf-command__dialog[data-state="closed"] {
@@ -92,8 +91,8 @@
   transform-origin: bottom center;
   opacity: 0;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    transform var(--uf-duration-enter) var(--uf-ease-enter);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
 }
 .uf-command__dialog[data-state="open"] .uf-command[data-surface="dialog"] {
   opacity: 1;

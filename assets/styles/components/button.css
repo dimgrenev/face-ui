@@ -31,7 +31,7 @@
   line-height: var(--uf-control-line-height);
   cursor: pointer;
   user-select: none;
-  transition: font-weight var(--uf-motion-duration-emphasis) var(--uf-motion-ease-emphasized);
+  transition: font-weight var(--face-runtime-transition-duration-emphasis) var(--uf-motion-ease-emphasized);
   text-decoration: none;
   white-space: nowrap;
   min-width: 0;

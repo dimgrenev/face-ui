@@ -102,11 +102,14 @@ test('the marker sits on the current entry at the inline start and follows it', 
   await onCurrent(page)
 })
 
-test('the marker appears on its entry without sliding in, on mount and when a hidden Toc is shown', { tag: ['@layout'] }, async ({ page }) => {
+test('with motion opted in, the marker appears on mount without sliding and then follows selection', { tag: ['@layout'] }, async ({ page }) => {
   const frames = () => page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))))
   const sliding = () => page.evaluate(() => document.getAnimations().length)
   // A slide would still be running whenever it is looked for.
-  await page.evaluate(() => document.documentElement.style.setProperty('--uf-motion-duration-control', '10s'))
+  await page.evaluate(() => {
+    document.documentElement.classList.add('uf-animated')
+    document.documentElement.style.setProperty('--uf-motion-duration-control', '10s')
+  })
   await render(page, { defaultValue: 'usage' })
   await frames()
   expect(await sliding()).toBe(0)

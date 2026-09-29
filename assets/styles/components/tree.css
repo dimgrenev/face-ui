@@ -46,7 +46,7 @@
   inline-size: var(--uf-tree-branch-indicator-size);
   min-inline-size: 0;
   transform: rotate(var(--uf-tree-closed-angle, 0deg));
-  transition: transform var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
+  transition: transform var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard);
 }
 .uf-tree-item[aria-expanded="true"] > .uf-tree-indicator {
   transform: rotate(90deg);

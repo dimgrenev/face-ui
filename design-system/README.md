@@ -9,7 +9,7 @@ The design system defines the geometry, type, color and motion used by Face UI a
 - `generated/token-manifest.json`: generated values, selectors and ownership for tooling.
 - `generated/preview-metadata.json`: generated sheet descriptions and representative tokens.
 - `assets/styles/component-tokens.css`: runtime component-specific tokens.
-- `assets/styles/tokens.css`: generated runtime bundle of foundations and component tokens, including the packaged mono font.
+- `assets/styles/tokens.css`: generated runtime bundle of foundations and component tokens. The mono token uses the system font.
 - CSS index files and utilities compose these outputs; they are not alternate token authorities.
 
 ```bash
@@ -17,7 +17,7 @@ pnpm tokens:sync   # regenerate authored outputs and runtime bundle
 pnpm tokens:check  # fail on source/output drift
 ```
 
-The generator rejects duplicate declarations within an output/selector and invalid source/output paths. It runs as part of `pnpm check`. Review source changes together with their generated diff. Updating only a CSS output is not a persistent edit.
+The generator rejects duplicate declarations for the same selector and token across all source files and output paths, including `:root` defaults in `assets/styles/component-tokens.css`. Default theme values are owned by `source/themes-default.jsonc`; geometry and typography contain only their distinct foundation tokens. Foundation z-index and motion aliases are also owned by their source files. The generator runs as part of `pnpm check`. Review source changes together with their generated diff. Updating only a CSS output is not a persistent edit.
 
 ## Consumption
 

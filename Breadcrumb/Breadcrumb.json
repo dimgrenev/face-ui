@@ -7,7 +7,7 @@
     "items": {
       "type": "array",
       "required": false,
-      "description": "Ordered locations from root to current; the last item is the current page."
+      "description": "Ordered locations from root to current; the last kept item is the current page. Groups and separators are dropped with a report."
     },
     "separator": {
       "type": "ReactNode",

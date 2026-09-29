@@ -138,6 +138,8 @@ test('width and height are the size it paints, below one control as well as abov
   }
   await render(page, { shape: 'rect', width: 240, height: 160 }, 'column')
   expect((await measure(page)).bar).toMatchObject({ width: 240, height: 160 })
+  await render(page, { shape: 'rect', width: '50', height: '25' }, 'column')
+  expect((await measure(page)).bar).toMatchObject({ width: 50, height: 25 })
 
   // A text line paints a bar of that size, however small, with a one-line Text's space around it.
   const space = { inline: 2 * (membrane + inset), block: text + 2 * membrane - font }
@@ -207,10 +209,10 @@ test('in a container sized by its content a text line or rect adds no width of i
   expect((await measure(page)).skeleton).toMatchObject({ width: control, height: control })
 })
 
-test('a style width or height wins over the props and is the size it paints', { tag: ['@layout'] }, async ({ page }) => {
+test('explicit width and height win over style and are the size it paints', { tag: ['@layout'] }, async ({ page }) => {
   for (const shape of ['text', 'rect', 'circle'] as const) {
     await render(page, { shape, width: 100, height: 40, style: { width: 30, height: 10 } }, 'column')
-    expect((await measure(page)).bar).toMatchObject({ width: 30, height: 10 })
+    expect((await measure(page)).bar).toMatchObject({ width: 100, height: 40 })
   }
 })
 

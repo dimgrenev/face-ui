@@ -143,6 +143,22 @@ test('names and descriptions reach the accessibility tree without the required m
   }
 })
 
+test('an error added after focus updates a persistent polite status', { tag: ['@a11y', '@focus'] }, async ({ page }) => {
+  await renderField(page, { label: 'Email' })
+  const input = page.getByRole('textbox', { name: 'Email' })
+  const status = page.locator('.uf-field [role="status"][aria-live="polite"]')
+  await expect(status).toBeEmpty()
+  await input.focus()
+  await renderField(page, { label: 'Email', error: 'Enter an email address' })
+  await expect(status).toHaveText('Enter an email address')
+  await expect(input).toBeFocused()
+  await renderField(page, { label: 'Email', error: 'Use your work email' })
+  await expect(status).toHaveText('Use your work email')
+  await expect(input).toBeFocused()
+  await renderField(page, { label: 'Email' })
+  await expect(status).toBeEmpty()
+})
+
 test('every layout passes axe', { tag: ['@a11y'] }, async ({ page }) => {
   for (const labelPosition of ['top', 'start'] as const)
     for (const mode of modes) {

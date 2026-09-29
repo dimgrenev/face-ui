@@ -1,11 +1,35 @@
 /**
  * Face UI — Opt-in Animations
  *
- * All animations are OFF by default (instant transitions).
- * Activate via `.uf-animated` class on any ancestor or the component itself.
+ * State transitions and entrance animations are OFF by default.
+ * Activate via `.uf-animated` on an ancestor that contains the rendered surface.
+ * Portaled surfaces need that class on the portal container or a document ancestor.
+ * Indeterminate/loading indicators keep their functional animation.
  * Respects prefers-reduced-motion.
  * No @layer — top-level for isolation from external CSS.
  */
+
+/* Components reference these effective durations, so the same opt-in controls
+ * every state transition, including visibility delays on dismissing overlays. */
+:root {
+  --face-runtime-transition-duration-fast: 0s;
+  --face-runtime-transition-duration-short: 0s;
+  --face-runtime-transition-duration-control: 0s;
+  --face-runtime-transition-duration-medium: 0s;
+  --face-runtime-transition-duration-emphasis: 0s;
+  --face-runtime-transition-duration-enter: 0s;
+  --face-runtime-transition-duration-exit: 0s;
+}
+
+.uf-animated {
+  --face-runtime-transition-duration-fast: var(--uf-motion-duration-fast);
+  --face-runtime-transition-duration-short: var(--uf-motion-duration-short);
+  --face-runtime-transition-duration-control: var(--uf-motion-duration-control);
+  --face-runtime-transition-duration-medium: var(--uf-motion-duration-medium);
+  --face-runtime-transition-duration-emphasis: var(--uf-motion-duration-emphasis);
+  --face-runtime-transition-duration-enter: var(--uf-duration-enter);
+  --face-runtime-transition-duration-exit: var(--uf-duration-exit);
+}
 
 /* ---------------------------------------------------------------
  * Animation keyframes
@@ -270,7 +294,9 @@
   .uf-animated *::before,
   .uf-animated *::after {
     animation-duration: var(--uf-motion-duration-reduced) !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: var(--uf-motion-duration-reduced) !important;
+    transition-delay: 0s !important;
   }
 }

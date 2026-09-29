@@ -2,6 +2,8 @@ import { forwardRef, type ReactNode, type HTMLAttributes } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
 import { getCardSurfaceProps } from '../assets/internal/card-surface'
+import type { CardVariant, CardPadding, CardRadius } from '../assets/internal/card-surface-options'
+import { invalidProp } from '../assets/runtime/props'
 import { Button } from '../Button/Button'
 import { Icon } from '../Icon/Icon'
 import { Text, type TextProps } from '../Text/Text'
@@ -22,9 +24,7 @@ export const cardAnatomy = createAnatomy('card').parts(
   'actions',
 )
 
-export type CardVariant = 'default' | 'code' | 'plain'
-export type CardPadding = 'none' | 'membrane' | 'control' | 'default'
-export type CardRadius = 'none' | 'md' | 'lg'
+export type { CardVariant, CardPadding, CardRadius } from '../assets/internal/card-surface-options'
 export type CardHeaderOrientation = 'vertical' | 'horizontal'
 export type CardAlign = 'start' | 'end' | 'between'
 
@@ -56,7 +56,7 @@ export interface CardProps
   hoverable?: boolean
   /** Stretch to the available inline size; `false` fits the content and keeps the parent's alignment. Default: true. */
   fullWidth?: boolean
-  /** Alignment of the `footer` content; compound usage sets `Card.Footer align` instead. Default: end. */
+  /** Alignment of a nonempty `footer` shorthand only; use `Card.Footer align` in compound content, or this prop reports in development. Default: end. */
   footerAlign?: CardAlign
   /** Body of the card: the content part beside `title`/`description`/`footer`, or free composition of Card parts. */
   children?: SlotContent
@@ -256,6 +256,14 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
       title != null || description != null || footer != null
     const hasTitle = hasSlotContent(title)
     const hasDescription = hasSlotContent(description)
+    const hasFooter = hasSlotContent(footer)
+    if (props.footerAlign !== undefined && !hasFooter)
+      invalidProp(
+        'Card',
+        'footerAlign',
+        footerAlign,
+        'it only applies to nonempty footer; use Card.Footer align for compound content',
+      )
 
     return (
       <div
@@ -277,7 +285,7 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
             {hasSlotContent(children) ? (
               <CardContent>{children}</CardContent>
             ) : null}
-            {hasSlotContent(footer) ? (
+            {hasFooter ? (
               <CardFooter align={footerAlign}>{footer}</CardFooter>
             ) : null}
           </>

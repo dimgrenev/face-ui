@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
-import { invalidProp, readNumber, resetInvalidPropReports } from '../runtime/props'
+import { invalidProp, readCssSize, readNumber, resetInvalidPropReports } from '../runtime/props'
 
 let errors: MockInstance<typeof console.error>
 beforeEach(() => {
@@ -129,6 +129,28 @@ describe('readNumber', () => {
       'Face UI Pagination: invalid total null; using 0.',
       'Face UI Pagination: invalid total true; using 0.',
       'Face UI Pagination: invalid total object; using 0.',
+    ])
+  })
+})
+
+describe('readCssSize', () => {
+  it('keeps CSS lengths and normalizes unitless numeric strings to pixels', () => {
+    expect(readCssSize('Media', 'width', 50)).toBe('50px')
+    expect(readCssSize('Media', 'width', ' 50 ')).toBe('50px')
+    expect(readCssSize('Media', 'width', '2.5rem')).toBe('2.5rem')
+    expect(readCssSize('Media', 'width', 'calc(100% - 1rem)')).toBe('calc(100% - 1rem)')
+    expect(readCssSize('Media', 'width', '')).toBeUndefined()
+    expect(reports()).toEqual(['Face UI Media: invalid width " 50 "; using 50px.'])
+  })
+
+  it('rejects negative and nonfinite values without passing them to CSS', () => {
+    expect(readCssSize('Scroll', 'height', -5)).toBeUndefined()
+    expect(readCssSize('Scroll', 'height', '-5px')).toBeUndefined()
+    expect(readCssSize('Scroll', 'height', Infinity)).toBeUndefined()
+    expect(reports()).toEqual([
+      'Face UI Scroll: invalid height -5; ignoring it: expected a nonnegative CSS length.',
+      'Face UI Scroll: invalid height "-5px"; ignoring it: expected a nonnegative CSS length.',
+      'Face UI Scroll: invalid height Infinity; ignoring it: expected a nonnegative CSS length.',
     ])
   })
 })

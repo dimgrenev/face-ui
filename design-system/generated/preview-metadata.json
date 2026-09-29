@@ -70,18 +70,17 @@
       "title": "Geometry",
       "generatedPath": "design-system/tokens/geometry.css",
       "previewKind": "geometry",
-      "tokenCount": 40,
+      "tokenCount": 10,
       "selectors": [
-        ":root",
-        ":root,\n[data-theme='light'],\n[data-theme='dark']"
+        ":root"
       ],
       "sampleTokens": [
-        "uf-control-height",
-        "uf-control-font-size",
-        "uf-control-line-height",
-        "uf-control-letter-spacing",
-        "uf-control-pad-y",
-        "uf-control-pad-text"
+        "uf-topbar-height",
+        "uf-panel-pad-x",
+        "uf-panel-pad-y",
+        "uf-workspace-resize-hit-size",
+        "uf-workspace-resize-hit-offset",
+        "uf-workspace-resize-line-width"
       ]
     },
     {
@@ -249,7 +248,7 @@
       "title": "Typography",
       "generatedPath": "design-system/tokens/typography.css",
       "previewKind": "typography",
-      "tokenCount": 64,
+      "tokenCount": 57,
       "selectors": [
         ":root",
         ":root,\n[data-theme='light'],\n[data-theme='dark']"

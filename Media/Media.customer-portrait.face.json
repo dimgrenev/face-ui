@@ -22,6 +22,9 @@
       "membrane": {
         "$ref": "props.membrane"
       },
+      "hidden": {
+        "$ref": "props.hidden"
+      },
       "type": {
         "$ref": "props.type"
       },
@@ -88,13 +91,13 @@
       "name": "width",
       "type": "any",
       "required": false,
-      "description": "Width of the box, pixels or a CSS length; wins over `style.width`. Default: the full available width."
+      "description": "Width of the box: a number or numeric string is pixels, or pass a CSS length. Wins over `style.width`; default: full available width."
     },
     {
       "name": "height",
       "type": "any",
       "required": false,
-      "description": "Height of the box, pixels or a CSS length, which the media then fills; wins over `style.height`. Default: the media's own ratio."
+      "description": "Height of the box: a number or numeric string is pixels, or pass a CSS length. Wins over `style.height`; default: the media's own ratio."
     },
     {
       "name": "fallback",
@@ -108,6 +111,12 @@
       "required": false,
       "description": "Membrane spacing around the box, for media aligned with a row of controls.",
       "defaultValue": false
+    },
+    {
+      "name": "hidden",
+      "type": "boolean",
+      "required": false,
+      "description": "Hide the entire media box, including its fallback and outer spacing."
     },
     {
       "name": "type",

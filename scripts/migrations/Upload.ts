@@ -64,7 +64,7 @@ export default [
     kind: 'behavior',
     component: 'Upload',
     before: 'Without `multiple`, a drop of several files kept only the first one, even when it was rejected; picking or dropping the same file again listed it twice',
-    after: 'Without `multiple`, the first acceptable file replaces the listed one and the rest are `tooMany`; a file already listed (same size, date and name) is not added again',
+    after: 'Without `multiple`, the first acceptable file replaces the listed one and the rest are `tooMany`; reusing the same File object does not add it again, while distinct files with matching metadata remain separate',
   },
   {
     kind: 'behavior',

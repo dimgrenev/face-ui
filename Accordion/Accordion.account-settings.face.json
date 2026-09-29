@@ -69,7 +69,7 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Sections in order; an item without a string `value`, or repeating one, is dropped."
+      "description": "Sections in order; an item without a unique string `value`, or a group or separator, is dropped with a report."
     },
     {
       "name": "icon",

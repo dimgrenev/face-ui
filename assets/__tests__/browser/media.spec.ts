@@ -23,6 +23,8 @@ test('width and height size the box, which the image fills without distortion', 
   expect(await image(page).evaluate((img) => getComputedStyle(img).objectFit)).toBe('cover')
   await render(page, { width: 200, height: 100, objectFit: 'contain' })
   expect(await image(page).evaluate((img) => getComputedStyle(img).objectFit)).toBe('contain')
+  await render(page, { width: '200', height: '100' })
+  expect(await size(page, 'root')).toEqual([200, 100])
   // Without a height the image keeps its own square ratio.
   await render(page, { width: 200 })
   await expect(root(page)).toHaveAttribute('data-state', 'loaded')
@@ -31,6 +33,22 @@ test('width and height size the box, which the image fills without distortion', 
   await render(page)
   await expect(root(page)).toHaveAttribute('data-state', 'loaded')
   expect(await size(page, 'root')).toEqual([320, 320])
+})
+
+test('hidden removes image, fallback and player geometry with or without membrane', { tag: ['@layout'] }, async ({ page }) => {
+  for (const membrane of [false, true]) {
+    await render(page, { hidden: true, membrane, width: 200, height: 100, source: 'broken', fallback: 'Unavailable' })
+    await expect(root(page)).toHaveAttribute('data-state', 'error')
+    await expect(root(page)).toBeHidden()
+    await expect(page.getByText('Unavailable')).toBeHidden()
+    expect(await root(page).boundingBox()).toBeNull()
+    await render(page, { hidden: false, membrane, width: 200, height: 100 })
+    await expect(root(page)).toBeVisible()
+    expect(await size(page, 'root')).toEqual([200, 100])
+  }
+  await renderPlayer(page, { hidden: true, fallback: 'No audio' })
+  await expect(root(page)).toBeHidden()
+  expect(await root(page).boundingBox()).toBeNull()
 })
 
 test('variant circle crops a round square and thumbnail draws a border', { tag: ['@css'] }, async ({ page }) => {

@@ -7,6 +7,7 @@ import {
   type ToasterProps,
   type ToastOptions,
 } from '../../../../Toast/Toast'
+import { Modal } from '../../../../Modal/Modal'
 
 const root = createRoot(document.getElementById('root')!)
 const clicks: string[] = []
@@ -43,6 +44,22 @@ const showToast = (options: ToastOptions) => {
   flushSync(() => void context.toaster.toast(options))
 }
 
-Object.assign(window, { renderToaster, showToast, toastClicks: clicks })
-export type Hooks = { renderToaster: typeof renderToaster; showToast: typeof showToast }
+const renderToasterInModal = () => {
+  context = createToastContext()
+  flushSync(() => root.render(
+    <StrictMode>
+      <Modal title="Work" trigger={<button>Open work</button>}>
+        <button>Continue work</button>
+      </Modal>
+      <context.Toaster />
+    </StrictMode>,
+  ))
+}
+
+Object.assign(window, { renderToaster, renderToasterInModal, showToast, toastClicks: clicks })
+export type Hooks = {
+  renderToaster: typeof renderToaster
+  renderToasterInModal: typeof renderToasterInModal
+  showToast: typeof showToast
+}
 renderToaster()

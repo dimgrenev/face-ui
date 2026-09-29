@@ -130,6 +130,14 @@ describe('Scroll height', () => {
     expect(viewport().style.height).toBe('')
   })
 
+  it('normalizes a unitless numeric string height to pixels', async () => {
+    await expectDevError(
+      () => render({ children: 'x', height: '50' }),
+      /^Face UI Scroll: invalid height "50"; using 50px\.$/,
+    )
+    expect(root().style.height).toBe('50px')
+  })
+
   it('without height the box sets none and takes its height from its content or layout', async () => {
     await render({ children: 'x' })
     expect(root().style.height).toBe('')

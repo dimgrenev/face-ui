@@ -2,7 +2,7 @@
 
 :root {
   --uf-font-family-base: 'Akt', sans-serif;
-  --uf-font-family-mono: 'Begriffsschrift', monospace;
+  --uf-font-family-mono: ui-monospace, monospace;
   --uf-font-size-xs: 10px;
   --uf-font-size-sm: 11px;
   --uf-font-size-base: 12px;
@@ -27,8 +27,6 @@
   --uf-text-transform-none: none;
   --uf-text-transform-uppercase: uppercase;
   --uf-text-transform-lowercase: lowercase;
-  --uf-control-font-size: 14px;
-  --uf-control-line-height: 20px;
   --uf-control-letter-spacing: 0;
   --font-base: var(--uf-font-family-base);
   --uf-font-family: var(--uf-font-family-base);
@@ -42,11 +40,6 @@
   --uf-text-letter-spacing: 0;
   --uf-text-min-height: var(--uf-control-height);
   --uf-text-pad-x: var(--uf-control-pad-text);
-  --uf-text-pad-y: var(--uf-control-pad-y);
-  --uf-text-body-size: var(--uf-control-font-size);
-  --uf-text-body-line-height: var(--uf-control-line-height);
-  --uf-text-section-size: var(--uf-control-font-size);
-  --uf-text-section-line-height: var(--uf-control-line-height);
   --uf-text-label-font-size: var(--uf-font-size-base);
   --uf-text-label-line-height: 16px;
   --uf-text-label-min-height: var(--uf-spacing-6);

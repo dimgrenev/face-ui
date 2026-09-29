@@ -91,7 +91,7 @@
   justify-content: center;
   flex-shrink: 0;
   transform: rotate(var(--uf-accordion-closed-angle, 0deg));
-  transition: transform var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
+  transition: transform var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard);
 }
 [data-scope="accordion"][data-part="item"][data-state="open"] > .uf-membrane > [data-part="trigger"] > .uf-accordion-arrow {
   transform: rotate(90deg);

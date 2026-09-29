@@ -3,7 +3,7 @@ import type { Root } from 'react-dom/client'
 import { beforeEach, expect, it, vi, describe } from 'vitest'
 import { Card } from '../../Card/Card'
 import { Button } from '../../Button/Button'
-import { libraryCss, mount } from './harness'
+import { expectDevError, libraryCss, mount } from './harness'
 
 let host: HTMLDivElement
 let root: Root
@@ -61,6 +61,16 @@ it('Card children are the content part beside convenience slots, or the compound
   expect(host.textContent).toBe('HeadingDescriptionBodyAction')
   expect(host.querySelector('h3[data-part="title"]')).not.toBeNull()
   expect(host.querySelectorAll('[data-part="header"]')).toHaveLength(1)
+})
+it('Card footerAlign applies to shortcut footer and reports compound-only misuse', async () => {
+  await render(<Card footer="Save" footerAlign="between" />)
+  expect(host.querySelector('[data-part="footer"]')?.getAttribute('data-align')).toBe('between')
+
+  await expectDevError(
+    () => render(<Card footerAlign="between"><Card.Footer>Save</Card.Footer></Card>),
+    /^Face UI Card: invalid footerAlign "between"; it only applies to nonempty footer; use Card\.Footer align for compound content\.$/,
+  )
+  expect(host.querySelector('[data-part="footer"]')?.getAttribute('data-align')).toBe('end')
 })
 it('Card root and slots forward native props and refs to the intended DOM element', async () => {
   const refs = [
@@ -261,7 +271,7 @@ describe('component smoke', () => {
   it('Card supports compound slots for modal-grade surfaces', async () => {
     await act(async () => {
       root.render(
-        <Card radius="lg" footerAlign="between">
+        <Card radius="lg">
           <Card.Header orientation="horizontal">
             <Card.Title>System surface</Card.Title>
             <Card.Actions>

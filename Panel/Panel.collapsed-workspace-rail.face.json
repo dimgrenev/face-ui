@@ -145,14 +145,14 @@
       "name": "width",
       "type": "any",
       "required": false,
-      "description": "Width of the expanded inline panel: pixels, or any CSS length. Default 260. It and `collapsedWidth` own the width, so `style.width` is ignored.",
+      "description": "Width of the expanded inline panel: a number or numeric string is pixels, or pass a CSS length. Wins over `style.width`; otherwise that style is used, then 260px.",
       "defaultValue": 260
     },
     {
       "name": "collapsedWidth",
       "type": "any",
       "required": false,
-      "description": "Width of the collapsed rail: pixels, or any CSS length. Default 60.",
+      "description": "Width of the collapsed rail: a number or numeric string is pixels, or pass a CSS length. Wins over `style.width`; default 60px.",
       "defaultValue": 60
     },
     {

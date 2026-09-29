@@ -16,10 +16,10 @@
   backdrop-filter: blur(var(--uf-responsive-overlay-zero-blur)) saturate(1);
   -webkit-backdrop-filter: blur(var(--uf-responsive-overlay-zero-blur)) saturate(1);
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
-    -webkit-backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
-    visibility 0s linear var(--uf-duration-exit);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    backdrop-filter var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    -webkit-backdrop-filter var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--face-runtime-transition-duration-exit);
 }
 .uf-responsive-overlay-backdrop[data-state="open"] {
   opacity: 1;
@@ -28,9 +28,9 @@
   backdrop-filter: blur(var(--uf-overlay-backdrop-blur)) saturate(1.12);
   -webkit-backdrop-filter: blur(var(--uf-overlay-backdrop-blur)) saturate(1.12);
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
-    -webkit-backdrop-filter var(--uf-duration-enter) var(--uf-ease-enter),
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    backdrop-filter var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    -webkit-backdrop-filter var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
     visibility 0s linear 0s;
 }
 .uf-responsive-overlay-backdrop[data-state="closed"] {

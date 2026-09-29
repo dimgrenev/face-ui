@@ -18,7 +18,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "120ms"
+          "value": "var(--uf-motion-duration-fast, 120ms)"
         }
       ]
     },
@@ -28,7 +28,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "140ms"
+          "value": "var(--uf-motion-duration-short, 150ms)"
         }
       ]
     },
@@ -38,7 +38,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "240ms"
+          "value": "var(--uf-motion-duration-control, 200ms)"
         }
       ]
     },
@@ -48,7 +48,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "300ms"
+          "value": "var(--uf-motion-duration-medium, 250ms)"
         }
       ]
     },
@@ -58,7 +58,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "cubic-bezier(0, 0, 0.2, 1)"
+          "value": "var(--uf-motion-ease-out, ease-out)"
         }
       ]
     },
@@ -68,7 +68,7 @@
       "variants": [
         {
           "selector": ":root",
-          "value": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+          "value": "var(--uf-motion-ease-in-out, ease-in-out)"
         }
       ]
     }

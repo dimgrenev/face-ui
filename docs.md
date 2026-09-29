@@ -41,6 +41,7 @@ Every piece of visible copy is either a control's own content prop or a `Text`. 
 - A single-line control is a 32px body plus 1px of membrane per side, so 34px. A labelled field is taller; align rows by control body on purpose.
 - Icon placement belongs to the control: `icon` with `iconPosition="start" | "end"`. Never put a margin on `Icon`.
 - Width comes from `fullWidth` where the contract offers it, otherwise from `style.width`.
+- CSS size: unitless values mean pixels.
 
 ### 1.4 Choosing a component
 
@@ -161,11 +162,8 @@ Eight components are fields — `Input`, `Select`, `Date`, `Radio`, `Rating`, `S
 
 ### 2.8 Invalid input
 
-- Rendering never throws on data. A value a component cannot use is normalized — fallback to the
-  documented default, clamp numbers (integers truncate), drop invalid or duplicate items (first wins),
-  key a row by position, project a value shaped for the other mode — and reported once in development:
-  `Face UI <Component>: invalid <prop> <value>; <outcome>.` Production is silent.
-- Empty text means "not provided". Nothing is coerced: "50" for a number is replaced by the default, and a size a component only forwards to `style` is the browser's to reject.
+- Invalid data never throws. Components fall back, clamp numbers (integers truncate), drop bad or duplicate items (first wins), key rows by position, or project values across modes. Development reports once: `Face UI <Component>: invalid <prop> <value>; <outcome>.` Production is silent.
+- Empty text means "not provided". Numeric strings normalize to pixels on CSS size props (reported in development); on number props they fall back.
 - Types are checked by TypeScript in code and by the contract validator in face documents.
 - A report is a defect in your data: fix the document. Face UI's own scenarios render with zero reports.
 
@@ -328,7 +326,7 @@ A contained surface. Either fill its regions with props, or compose the parts.
 ```
 
 - With `title`, `description` or `footer` set, `children` fills the content part; without them `children` is free composition.
-- In compound use, alignment comes from `Card.Footer align`, not from `footerAlign`.
+- Use `footerAlign` with `footer`; in compound use, set `Card.Footer align`. An orphan `footerAlign` reports an error.
 - `hoverable` only highlights the surface; it creates no action.
 
 ### Carousel
@@ -398,13 +396,13 @@ A date, time, week, month or year field with a picker, and the form control behi
 <Date label="Launch time" mode="datetime" timezone="UTC" name="launch"
   onValueChange={({ value }) => setLaunch(value)} />
 
-<Date label="Reporting period" selection="range" surface="sheet"
-  presets={[{ id: 'q3', label: 'Q3 2026', value: { start: '2026-07-01', end: '2026-09-30' } }]} />
+<Date label="Reporting period" selection="range" surface="sheet" />
 ```
 
 - `valueFormat` decides what callbacks receive — civil ISO strings (`iso`) or `Date` instants (`date`) — while form submission always sends civil ISO, a range as `start`/`end`.
 - `timezone` resolves instants and "today"; `locale` only formats.
 - `labels` names the picker's own controls; `label`, `description` and `placeholder` stay field props.
+- `membrane` applies to the trigger; the picker keeps its own spacing.
 
 ### Icon
 
@@ -459,8 +457,9 @@ An image, video or audio source in a box, with fallback content when it fails.
 ```
 
 - `alt=""` marks an image decorative; any other text stands in for it.
-- `width` and `height` size the box and win over `style`; `objectFit` then crops or letterboxes.
-- Native attributes and `ref` reach the `<img>`, `<video>` or `<audio>`; `children` holds `<track>` elements.
+- `width` and `height` beat `style` on the box; `objectFit` crops or letterboxes.
+- `hidden` hides the box, fallback and outer spacing.
+- Other native attributes and `ref` reach the `<img>`, `<video>` or `<audio>`; `children` holds `<track>` elements.
 
 ### Menu
 
@@ -574,7 +573,7 @@ Side navigation: links in expandable groups, collapsing to a rail or a sheet.
 ```
 
 - An item with `items` is a group whose rows show while it is expanded; its own `href` is ignored.
-- `width` and `collapsedWidth` own the width, so `style.width` is ignored; a sheet surface never collapses.
+- `width` beats `style.width` on the expanded panel; `collapsedWidth` owns the rail. Sheets do not collapse.
 - `collapsible={false}` hides the rail toggle and leaves `collapsed` to the parent.
 
 ### Popover
@@ -651,7 +650,7 @@ A framed box whose content scrolls natively.
 
 - The box is a named tab stop only while it can actually scroll, so give it `aria-label` when it holds long content.
 - `orientation` picks the axes that scroll; overflow on the other axis is clipped.
-- Without `height` the box is as tall as its content or as its layout makes it.
+- Without `height`, `style.height` or content sets the box height.
 
 ### SegmentedControl
 
@@ -677,13 +676,14 @@ A trigger that opens a list to choose one value, or several with `multiple`.
 <Select label="Region" name="region" defaultValue="eu"
   items={[{ value: 'eu', label: 'Europe' }, { value: 'us', label: 'United States' }]} />
 
-<Select label="Teams" multiple value={teams} surface="sheet"
-  onValueChange={({ value }) => setTeams(value)} items={allTeams} />
+<Select label="Teams" multiple value={teams} items={allTeams} />
 ```
 
 - `multiple` makes the value a `string[]`, keeps the list open while selecting, and submits one entry per selected item.
 - It submits and resets like a native select: `name`, `form` and `required` work inside a `<form>`.
 - `iconOnly` makes a square trigger without a chevron: put an icon in `displayValue` and name it with `aria-label`.
+- `contentMinWidth` sizes popovers only, capped by the viewport.
+- `membrane` applies to trigger and options; the layer keeps its own spacing.
 
 ### Separator
 

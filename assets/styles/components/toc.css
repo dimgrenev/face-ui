@@ -77,8 +77,8 @@
 }
 .uf-toc > .uf-toc-list[data-indicator="moving"]::after {
   transition:
-    transform var(--uf-motion-duration-control) var(--uf-motion-ease-standard),
-    height var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
+    transform var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard),
+    height var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard);
 }
 .uf-toc[data-line="start"] > .uf-toc-list::before {
   inset-inline-start: calc(var(--uf-toc-line-inset) - var(--uf-toc-rail-w));

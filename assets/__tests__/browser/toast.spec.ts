@@ -2,7 +2,27 @@ import { test, expect, type Page } from './test'
 import { axe, hooks, open } from './helpers'
 import type { Hooks } from './fixtures/toast.fixture'
 
-const { renderToaster, showToast } = hooks<Hooks>()
+const { renderToaster, renderToasterInModal, showToast } = hooks<Hooks>()
+
+test('toasts announced during a modal remain inside its live and focus boundary', { tag: ['@focus', '@a11y'] }, async ({ page }) => {
+  await renderToasterInModal(page)
+  await page.getByRole('button', { name: 'Open work' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Work' })
+  await expect(dialog).toBeVisible()
+  await expect(dialog.locator('.uf-toaster')).toHaveAttribute('aria-live', 'polite')
+  await showToast(page, { title: 'Saved in modal', duration: 0 })
+  const status = dialog.getByRole('status', { name: 'Saved in modal' })
+  await expect(status).toBeVisible()
+  expect(await status.evaluate((node) => !!node.closest('[inert]'))).toBe(false)
+  await dialog.getByRole('button', { name: 'Continue work' }).focus()
+  await page.keyboard.press('F8')
+  await expect(dialog.locator('.uf-toaster')).toBeFocused()
+  await status.focus()
+  await page.keyboard.press('Escape')
+  await expect(status).toHaveCount(0)
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByRole('button', { name: 'Continue work' })).toBeFocused()
+})
 const region = (page: Page) => page.getByRole('region', { name: 'Notifications (F8)' })
 const toasts = (page: Page) => page.locator('[data-scope="toast"][data-part="root"]')
 const toast = (page: Page, title: string) => page.getByRole('status', { name: title, exact: true })

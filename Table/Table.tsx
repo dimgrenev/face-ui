@@ -17,6 +17,7 @@ import { Checkbox } from '../Checkbox/Checkbox'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 import { Membrane } from '../assets/adapters/react/Membrane'
+import { readFlatCollection } from '../assets/internal/flat-collection'
 import { useControllableState } from '../assets/adapters/react/use-controllable-state'
 import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
 import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
@@ -123,7 +124,7 @@ export interface TableProps<T = any>
   'aria-label'?: string
   /** Ids of the elements that name the table, such as the heading above it. */
   'aria-labelledby'?: string
-  /** Columns in display order; a column without a unique string `id` is dropped. */
+  /** Columns in display order; a column without a unique string `id`, or a group or separator, is dropped with a report. */
   columns?: readonly TableColumn<T>[]
   /** Row data, one object per row; a row that is not an object, or repeats a key, is dropped. */
   rows?: readonly T[]
@@ -390,7 +391,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(pro
   const text = resolveLabels(defaultLabels, labels, 'Table')
   const columnList = useMemo(
     () =>
-      readCollection<TableColumn>(columns, {
+      readFlatCollection<TableColumn>(columns, {
         component: 'Table',
         prop: 'columns',
         key: (column) => column.id,

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { flushSync } from 'react-dom'
 import { Button } from '../../../../Button/Button'
 import { Modal, type ModalProps } from '../../../../Modal/Modal'
+import { FaceUiOverlayProvider } from '../../../adapters/react/overlay-context'
 
 const root = createRoot(document.getElementById('root')!)
 Object.assign(document.body.style, {
@@ -76,5 +77,36 @@ function renderModal(options: Options = {}) {
   document.documentElement.dir = options.dir ?? 'ltr'
   flushSync(() => root.render(<StrictMode><Fixture {...options} /></StrictMode>))
 }
-Object.assign(window, { renderModal })
-export type Hooks = { renderModal: typeof renderModal }
+
+function ScopedFixture({ transformed = false, externalPortal = false }: {
+  transformed?: boolean
+  externalPortal?: boolean
+}) {
+  const [scopeRoot, setScopeRoot] = useState<HTMLElement | null>(null)
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null)
+  const [externalContainer, setExternalContainer] = useState<HTMLDivElement | null>(null)
+  const [neighborClicks, setNeighborClicks] = useState(0)
+  return <div style={{ display: 'flex', gap: 24, padding: 24 }}>
+    <section data-instance="A" ref={setScopeRoot} style={{ width: 420, height: 360, border: '1px solid',
+      transform: transformed ? 'translate(64px, 20px) scale(0.8)' : undefined }}>
+      <FaceUiOverlayProvider scopeRoot={scopeRoot} portalContainer={externalPortal ? externalContainer : portalContainer}>
+        <Modal title="Scoped dialog" trigger="Open scoped dialog" scrollLock>
+          <button>A inside</button>
+        </Modal>
+        <button>A neighbor</button>
+      </FaceUiOverlayProvider>
+      <div data-portal="A" ref={setPortalContainer} />
+    </section>
+    <section data-instance="B" style={{ width: 420, height: 360, border: '1px solid' }}>
+      <button onClick={() => setNeighborClicks((count) => count + 1)}>B action</button>
+      <output data-b-clicks>{neighborClicks}</output>
+    </section>
+    <div data-portal="external" ref={setExternalContainer} />
+  </div>
+}
+
+function renderScopedModal(options: { transformed?: boolean; externalPortal?: boolean } = {}) {
+  flushSync(() => root.render(<StrictMode><ScopedFixture {...options} /></StrictMode>))
+}
+Object.assign(window, { renderModal, renderScopedModal })
+export type Hooks = { renderModal: typeof renderModal; renderScopedModal: typeof renderScopedModal }

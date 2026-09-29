@@ -23,9 +23,6 @@
   width: max-content;
 }
 .uf-select[data-scope="select"] [data-part="trigger"] {
-  --uf-select-indicator-gap: var(--uf-selector-indicator-gap);
-  --uf-select-indicator-edge-gap: var(--uf-selector-indicator-edge-gap);
-  --uf-select-indicator-size: var(--uf-selector-indicator-size);
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -112,24 +109,18 @@
   width: var(--uf-select-indicator-size);
   height: var(--uf-select-indicator-size);
   opacity: 0.7;
-  transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-out);
+  transition: opacity var(--face-runtime-transition-duration-fast) var(--uf-motion-ease-out);
 }
 .uf-select[data-scope="select"][data-state="open"] .uf-select__indicator,
 .uf-select[data-scope="select"][data-state="open"] [data-part="indicator"] {
   opacity: 1;
 }
 :is(.uf-select[data-scope="select"] [data-part="content"], .uf-select__content[data-scope="select"][data-part="content"]) {
-  --uf-select-sheet-inset: var(--uf-spacing-1);
-  --uf-select-sheet-gap: calc(var(--uf-select-sheet-inset) * 2);
-  --uf-select-content-min-width: var(--face-runtime-select-content-min-width, 0px);
-  --uf-select-content-max-height: 15rem;
-  --uf-select-panel-pad: var(--uf-membrane);
-  --uf-select-sheet-enter-y: 1.125rem;
   position: absolute;
   top: 100%;
   left: 0;
   width: 100%;
-  min-width: min(var(--uf-select-content-min-width), calc(100vw - var(--uf-spacing-2)));
+  min-width: min(var(--face-runtime-select-content-min-width, 0px), calc(100vw - var(--uf-spacing-2)));
   max-width: calc(100vw - var(--uf-spacing-2));
   z-index: var(--uf-z-dropdown);
   padding: 0;
@@ -141,17 +132,16 @@
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    visibility 0s linear var(--uf-duration-exit);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--face-runtime-transition-duration-exit);
 }
 :is(.uf-select[data-scope="select"] [data-part="content"], .uf-select__content[data-scope="select"][data-part="content"])[data-surface="popover"] {
   width: auto;
 }
 :is(.uf-select[data-scope="select"] [data-part="content"], .uf-select__content[data-scope="select"][data-part="content"])[data-icon-only] {
-  --uf-select-content-min-width: var(--face-runtime-select-content-min-width, 10rem);
+  min-width: min(var(--face-runtime-select-content-min-width, 10rem), calc(100vw - var(--uf-spacing-2)));
 }
 :is(.uf-select[data-scope="select"] [data-part="content"], .uf-select__content[data-scope="select"][data-part="content"])[data-surface="side"] {
-  --uf-select-content-max-height: 30rem;
   position: fixed;
   top: auto;
   left: auto;
@@ -173,7 +163,7 @@
   visibility: visible;
   pointer-events: auto;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
     visibility 0s linear 0s;
 }
 :is(.uf-select[data-scope="select"] [data-part="content"], .uf-select__content[data-scope="select"][data-part="content"])[data-state="closed"] {
@@ -213,8 +203,8 @@
   transform-origin: top center;
   opacity: 0;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    transform var(--uf-duration-enter) var(--uf-ease-enter);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
 }
 :is(.uf-select[data-scope="select"] [data-part="content"], .uf-select__content[data-scope="select"][data-part="content"])[data-surface="sheet"] .uf-select__contentPanel {
   max-height: min(70vh, calc(100vh - var(--uf-select-sheet-gap) - env(safe-area-inset-bottom, 0)));
@@ -222,7 +212,11 @@
   transform-origin: bottom center;
 }
 :is(.uf-select[data-scope="select"] [data-part="content"], .uf-select__content[data-scope="select"][data-part="content"])[data-surface="side"] .uf-select__contentPanel {
-  max-height: min(var(--uf-select-content-max-height), calc(100vh - var(--uf-spacing-2)));
+  max-height: min(
+    var(--uf-select-side-content-max-height),
+    var(--face-runtime-select-side-content-max-height, var(--uf-select-side-content-max-height)),
+    calc(100vh - var(--uf-spacing-2))
+  );
   transform: translateX(calc(var(--uf-overlay-enter-y) * -1)) scale(var(--uf-overlay-enter-scale));
   transform-origin: left center;
 }

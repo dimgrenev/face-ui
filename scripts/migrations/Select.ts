@@ -95,6 +95,18 @@ export default [
   {
     kind: 'behavior',
     component: 'Select',
+    before: '`membrane={false}` also removed spacing around the open list surface',
+    after: 'It now affects the trigger and options only; the list surface retains its own spacing',
+  },
+  {
+    kind: 'behavior',
+    component: 'Select',
+    before: '`contentMinWidth="280"` was inserted into CSS math without a unit and silently ignored',
+    after: 'A numeric string now means pixels and reports its normalization once in development',
+  },
+  {
+    kind: 'behavior',
+    component: 'Select',
     before: 'Home and End did nothing on a closed list',
     after: 'Home and End open the list at the first or last enabled item',
   },

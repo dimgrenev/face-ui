@@ -26,8 +26,12 @@
   color: var(--uf-color-fg);
   font-weight: var(--uf-font-weight);
 }
-[data-scope="markdown"] :where(p, li, td, th, a, blockquote, code, pre, span, strong, em, del) {
+[data-scope="markdown"] :where(p, li, td, a, blockquote, code, pre, span, em, del) {
   font-weight: var(--uf-font-weight);
+  letter-spacing: normal;
+}
+[data-scope="markdown"] :where(strong, th) {
+  font-weight: var(--uf-font-weight-bold);
   letter-spacing: normal;
 }
 [data-scope="markdown"] > :first-child {

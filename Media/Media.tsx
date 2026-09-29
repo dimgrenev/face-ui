@@ -25,7 +25,7 @@ import {
   useImageStatus,
   type ImageStatusProps,
 } from '../assets/adapters/react/use-image-status'
-import { invalidProp } from '../assets/runtime/props'
+import { invalidProp, readCssSize } from '../assets/runtime/props'
 import { hasSlotContent } from '../assets/slot-content'
 
 const { getPartAttrs: part } = createAnatomy('media').parts(
@@ -45,24 +45,27 @@ type Owned =
   | 'height'
   | 'className'
   | 'style'
+  | 'hidden'
   | 'children'
   | 'dangerouslySetInnerHTML'
 
 interface MediaBoxProps {
   /** URL of the source; a missing or empty one counts as a failed load. */
   src: string
-  /** Width of the box, pixels or a CSS length; wins over `style.width`. Default: the full available width. */
+  /** Width of the box: a number or numeric string is pixels, or pass a CSS length. Wins over `style.width`; default: full available width. */
   width?: number | string
-  /** Height of the box, pixels or a CSS length, which the media then fills; wins over `style.height`. Default: the media's own ratio. */
+  /** Height of the box: a number or numeric string is pixels, or pass a CSS length. Wins over `style.height`; default: the media's own ratio. */
   height?: number | string
   /** Content shown in place of the media while its source is missing or failed to load. */
   fallback?: ReactNode
   /** Membrane spacing around the box, for media aligned with a row of controls. */
   membrane?: boolean
-  /** Class of the box around the media; every other native attribute goes to the media element. */
+  /** Class of the box around the media. */
   className?: string
-  /** Style of the box around the media; every other native attribute goes to the media element. */
+  /** Style of the box around the media. */
   style?: CSSProperties
+  /** Hide the entire media box, including its fallback and outer spacing. */
+  hidden?: boolean
 }
 
 export interface MediaImageProps
@@ -167,7 +170,8 @@ const readPlayer = (load: ImageStatusProps) => (node: HTMLElement | null) => {
 
 /**
  * An image, video or audio source in a box sized by `width` and `height`, with `fallback` content
- * when it fails. Native attributes and `ref` go to the `<img>`, `<video>` or `<audio>` element.
+ * when it fails. Native attributes and `ref` go to the `<img>`, `<video>` or `<audio>` element;
+ * `hidden` hides the whole box and its fallback.
  * The box's `data-state` is `loading`, then `loaded` or `error`; a player counts as loaded once its
  * metadata arrives or the browser holds off fetching until playback (`preload="none"`).
  */
@@ -256,12 +260,15 @@ export const Media = forwardRef<
       </Player>
     )
 
-  const boxWidth = width ?? style?.width
+  const boxWidth = readCssSize('Media', 'width', width)
+  const boxHeight = readCssSize('Media', 'height', height)
+  const effectiveWidth = boxWidth ?? style?.width
   return (
     <Membrane
       enabled={membrane}
       as="div"
-      fullWidth={boxWidth == null || boxWidth === '100%'}
+      hidden={hidden}
+      fullWidth={effectiveWidth == null || effectiveWidth === '100%'}
       className="uf-mediaMembrane"
     >
       <div
@@ -272,8 +279,8 @@ export const Media = forwardRef<
         className={cn('uf-media', className)}
         style={{
           ...style,
-          ...(width != null && { width }),
-          ...(height != null && { height }),
+          ...(boxWidth !== undefined && { width: boxWidth }),
+          ...(boxHeight !== undefined && { height: boxHeight }),
         }}
       >
         {media}

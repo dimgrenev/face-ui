@@ -6,7 +6,7 @@ export default [
     kind: 'behavior',
     component: 'Media',
     before: '`ref`, `id`, `role`, `tabIndex` and `aria-label` went to the wrapping box, `title` to both the box and the element; other native attributes were dropped',
-    after: '`ref` and every native attribute go to the `<img>`, `<video>` or `<audio>` element; only `className` and `style` stay on the box',
+    after: '`ref` and native attributes go to the `<img>`, `<video>` or `<audio>` element; `className` and `style` stay on the box, while `hidden` hides the whole box and its fallback',
   },
   {
     kind: 'behavior',
@@ -38,6 +38,12 @@ export default [
     component: 'Media',
     before: 'The JSON contract listed `title`',
     after: '`title` is left out of the contract, as it names nothing reliably; an image is named by `alt` and a player by `aria-label`. In TSX it still reaches the element as a native attribute',
+  },
+  {
+    kind: 'behavior',
+    component: 'Media',
+    before: '`width="50"` or `height="50"` was passed as an invalid unitless CSS length and silently ignored',
+    after: 'Numeric strings now mean pixels and report their normalization once in development',
   },
   { kind: 'export', from: 'Media/Media#MediaLoading', to: "`ImgHTMLAttributes<HTMLImageElement>['loading']`", codemod: 'manual' },
   { kind: 'export', from: 'Media/Media#MediaDecoding', to: "`ImgHTMLAttributes<HTMLImageElement>['decoding']`", codemod: 'manual' },

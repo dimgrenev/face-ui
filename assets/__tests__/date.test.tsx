@@ -38,6 +38,22 @@ describe('Date component', () => {
     expect(content?.hidden).toBe(false)
   })
 
+  it('membrane changes the trigger boundary without changing picker surface spacing', async () => {
+    await act(async () => {
+      root.render(<DateField label="Date" membrane={false} surface="popover" open />)
+    })
+    const trigger = container.querySelector<HTMLElement>('[data-part="trigger"]')!
+    expect(trigger.parentElement?.hasAttribute('data-membrane-disabled')).toBe(true)
+    const surfaceBoundary = document.querySelector<HTMLElement>('.uf-date__contentMembrane')!
+    expect(surfaceBoundary.hasAttribute('data-membrane-disabled')).toBe(false)
+
+    await act(async () => {
+      root.render(<DateField label="Date" membrane surface="popover" open />)
+    })
+    expect(trigger.parentElement?.hasAttribute('data-membrane-disabled')).toBe(false)
+    expect(document.querySelector('.uf-date__contentMembrane')).toBe(surfaceBoundary)
+  })
+
   it('writes the picked date back into the trigger label', async () => {
     await act(async () => {
       root.render(<DateField label="Date" placeholder="Pick date" />)

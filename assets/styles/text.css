@@ -168,7 +168,7 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-standard);
+  transition: opacity var(--face-runtime-transition-duration-fast) var(--uf-motion-ease-standard);
 }
 .uf-text__content {
   min-width: 0;

@@ -23,9 +23,9 @@
   transform: translateY(var(--uf-overlay-enter-y)) scale(var(--uf-overlay-enter-scale));
   transform-origin: top center;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    transform var(--uf-duration-enter) var(--uf-ease-enter),
-    visibility 0s linear var(--uf-duration-exit);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--face-runtime-transition-duration-exit);
 }
 .uf-overlay-content[data-scope][data-trigger="click"] {
   --uf-card-bg: var(--uf-dropdown-surface-bg);
@@ -43,8 +43,8 @@
   pointer-events: auto;
   transform: translateY(0) scale(1);
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    transform var(--uf-duration-enter) var(--uf-ease-enter),
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
     visibility 0s linear 0s;
 }
 .uf-overlay-content[data-scope][data-state="closed"] {

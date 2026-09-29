@@ -22,8 +22,8 @@
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    visibility 0s linear var(--uf-duration-exit);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--face-runtime-transition-duration-exit);
 }
 .uf-menu {
   position: relative;
@@ -49,7 +49,7 @@
   visibility: visible;
   pointer-events: auto;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
     visibility 0s linear 0s;
 }
 .uf-menu-contentMembrane {
@@ -72,8 +72,8 @@
   transform-origin: top center;
   opacity: 0;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    transform var(--uf-duration-enter) var(--uf-ease-enter);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
 }
 .uf-menu-content[data-scope][data-surface="sheet"] .uf-menu-contentPanel {
   max-height: min(70vh, calc(100vh - var(--uf-menu-sheet-gap) - env(safe-area-inset-bottom, 0)));

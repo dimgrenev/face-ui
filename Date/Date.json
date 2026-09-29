@@ -17,7 +17,7 @@
     "error": {
       "type": "ReactNode",
       "required": false,
-      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
     },
     "labelPosition": {
       "type": "enum",
@@ -160,7 +160,7 @@
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Wrap the trigger in the membrane spacing of controls in a row.",
+      "description": "Wrap the trigger in control-row spacing; the picker surface keeps its own spacing.",
       "default": true
     },
     "fullWidth": {

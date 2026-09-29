@@ -73,4 +73,16 @@ export default [
     before: 'In forced colors the placeholder was repainted in the canvas color and disappeared',
     after: 'It is painted in GrayText',
   },
+  {
+    kind: 'behavior',
+    component: 'Skeleton',
+    before: '`style.width` and `style.height` won over explicit `width` and `height` props',
+    after: 'Explicit size props win; `style` supplies only an omitted axis',
+  },
+  {
+    kind: 'behavior',
+    component: 'Skeleton',
+    before: '`width="50"` or `height="50"` reached CSS without a unit and silently left the default size',
+    after: 'Numeric strings now mean pixels and report their normalization once in development',
+  },
 ] satisfies Migration[]

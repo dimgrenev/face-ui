@@ -55,7 +55,7 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Entries in document order; an empty list renders nothing."
+      "description": "Entries in document order; an empty list renders nothing. Groups and separators are dropped with a report."
     },
     {
       "name": "value",

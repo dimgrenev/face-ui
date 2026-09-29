@@ -227,3 +227,13 @@ test('the Panel rail keeps every row named and sized by collapsedWidth', { tag: 
   await nav.getByRole('button', { name: 'Expand panel' }).click()
   expect((await nav.boundingBox())!.width).toBeCloseTo(260, 0)
 })
+
+test('Panel width props and style follow one explicit-size precedence', { tag: ['@layout'] }, async ({ page }) => {
+  await renderPanel(page, { style: { width: 400 }, collapsedWidth: '60' })
+  const nav = page.getByRole('navigation', { name: 'Workspace' })
+  expect((await nav.boundingBox())!.width).toBeCloseTo(400, 0)
+  await nav.getByRole('button', { name: 'Collapse panel' }).click()
+  expect((await nav.boundingBox())!.width).toBeCloseTo(60, 0)
+  await renderPanel(page, { width: '280', style: { width: 400 } })
+  expect((await nav.boundingBox())!.width).toBeCloseTo(280, 0)
+})

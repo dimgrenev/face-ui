@@ -17,7 +17,7 @@ const sources = {
 
 /** One image in a 320px column; its load and error events are recorded with their type. */
 const renderMedia = (
-  props: Pick<MediaImageProps, 'variant' | 'objectFit' | 'width' | 'height' | 'membrane'> & {
+  props: Pick<MediaImageProps, 'variant' | 'objectFit' | 'width' | 'height' | 'membrane' | 'hidden'> & {
     source?: keyof typeof sources
     fallback?: string
   } = {},
@@ -65,7 +65,7 @@ const silence = (() => {
 
 /** One audio player with native controls; `broken` is a source no engine can decode. */
 const renderPlayer = (
-  props: Pick<MediaAudioProps, 'preload'> & { broken?: boolean; fallback?: string } = {},
+  props: Pick<MediaAudioProps, 'preload' | 'hidden'> & { broken?: boolean; fallback?: string } = {},
 ) => {
   const { broken, ...rest } = props
   flushSync(() =>

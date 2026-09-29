@@ -34,19 +34,19 @@ import {
   useNameReport,
   type FieldProps,
 } from '../assets/internal/field'
+import { readFlatCollection } from '../assets/internal/flat-collection'
 import type { CollectionItem } from '../assets/internal/item'
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
 import {
   domId,
   move,
-  readCollection,
   readKeys,
   typeahead,
   type Typeahead,
 } from '../assets/runtime/collection'
 import { keyToMove, readDirection, type Direction } from '../assets/runtime/keyboard'
 import { resolveLabel, resolveLabels, type CommonLabels } from '../assets/runtime/labels'
-import { invalidProp } from '../assets/runtime/props'
+import { readCssSize } from '../assets/runtime/props'
 import { hasSlotContent } from '../assets/slot-content'
 import { cn } from '../assets/utils'
 import { Card } from '../Card/Card'
@@ -121,9 +121,9 @@ interface SelectBaseProps
   fullWidth?: boolean
   /** Expands the value area so the chevron sits at the inline end. */
   stretchText?: boolean
-  /** Controlled list visibility; a disabled Select, or one without enabled items, stays closed. */
+  /** Controlled list visibility; hidden, disabled, or unavailable Selects expose no list. */
   open?: boolean
-  /** List visibility on mount when `open` is not set; read once. */
+  /** List visibility on mount when `open` is not set; read once. Hiding an uncontrolled list closes it. */
   defaultOpen?: boolean
   /** Called once per user request to open or close the list; a controlled parent may refuse it. */
   onOpenChange?: (details: { open: boolean }) => void
@@ -131,9 +131,9 @@ interface SelectBaseProps
   surface?: SelectSurface
   /** Strings Select renders itself: `close` names the sheet's close button. */
   labels?: Partial<SelectLabels>
-  /** Minimum popover width in pixels or CSS length, capped by the viewport; side and sheet surfaces ignore it. */
+  /** Minimum popover width: a number or numeric string is pixels, or pass a CSS length; capped by the viewport. Side and sheet surfaces ignore it. */
   contentMinWidth?: number | string
-  /** Shared outer spacing around the trigger and each item; toggling it keeps the trigger. */
+  /** Outer spacing around the trigger and each option; the list surface keeps its own spacing. */
   membrane?: boolean
   /** Class on the trigger button; `className` and `style` go on the field root. */
   triggerClassName?: string
@@ -242,13 +242,18 @@ function readSideMetrics(content: HTMLElement) {
       : 1
   const offset = (y: number) => (y - bounds.top) / scale + viewport.scrollTop
   const contentHeight = Math.max(viewport.scrollHeight, viewport.offsetHeight)
-  const maxVisibleHeight = computeSelectSideOptionViewportHeight({
+  const desiredVisibleHeight = computeSelectSideOptionViewportHeight({
     contentHeight,
     optionBottomOffsets: Array.from(
       content.querySelectorAll<HTMLElement>(OPTION),
       (option) => offset(option.getBoundingClientRect().bottom),
     ),
   })
+  // The public side height token may be smaller than five options. Read the rendered
+  // viewport before applying the runtime cap so placement and clipping agree.
+  const maxVisibleHeight = viewport.offsetHeight > 0
+    ? Math.min(desiredVisibleHeight, viewport.offsetHeight)
+    : desiredVisibleHeight
   const anchor = SIDE_ANCHORS.map((selector) =>
     content.querySelector<HTMLElement>(selector),
   ).find(Boolean)
@@ -265,6 +270,25 @@ function readSideMetrics(content: HTMLElement) {
   }
 }
 
+function readNaturalSideMetrics(content: HTMLDivElement) {
+  // A previous placement can cap the panel below the public CSS limit. Temporarily
+  // remove only that runtime cap while measuring, so a wider viewport or a larger
+  // consumer token can grow the panel again on the next positioning update.
+  const name = '--face-runtime-select-side-content-max-height'
+  const value = content.style.getPropertyValue(name)
+  if (!value) return readSideMetrics(content)
+  const priority = content.style.getPropertyPriority(name)
+  const viewport = content.querySelector<HTMLElement>(PANEL)
+  const scrollTop = viewport?.scrollTop
+  content.style.removeProperty(name)
+  try {
+    return readSideMetrics(content)
+  } finally {
+    content.style.setProperty(name, value, priority)
+    if (viewport && scrollTop !== undefined) viewport.scrollTop = scrollTop
+  }
+}
+
 /** Places the side surface beside the trigger with the selected row on the trigger's line. */
 function useSelectSidePosition(
   open: boolean,
@@ -273,13 +297,14 @@ function useSelectSidePosition(
 ) {
   const [style, setStyle] = useState<CSSProperties>(sideInitialStyle)
   const initialScrollSynced = useRef(false)
+  const positionedHeight = useRef<number | null>(null)
   const pendingScroll = useRef(0)
 
   const update = useCallback(() => {
     const trigger = triggerRef.current
     const content = contentRef.current
     if (!trigger || !content) return
-    const metrics = readSideMetrics(content)
+    const metrics = readNaturalSideMetrics(content)
     const position = computeSelectSidePosition({
       triggerRect: trigger.getBoundingClientRect(),
       boundaryRect: trigger.closest(SIDE_BOUNDARY)?.getBoundingClientRect(),
@@ -290,6 +315,10 @@ function useSelectSidePosition(
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
     })
+    if (positionedHeight.current !== position.maxHeight) {
+      initialScrollSynced.current = false
+      positionedHeight.current = position.maxHeight
+    }
     setStyle({
       position: 'fixed',
       top: position.top,
@@ -299,7 +328,7 @@ function useSelectSidePosition(
       width: position.width,
       maxWidth: `calc(100vw - ${SELECT_SIDE_VIEWPORT_INSET * 2}px)`,
       maxHeight: position.maxHeight,
-      '--uf-select-content-max-height': `${position.maxHeight}px`,
+      '--face-runtime-select-side-content-max-height': `${position.maxHeight}px`,
       overflowY: 'visible',
     } as CSSProperties)
     pendingScroll.current = position.initialScrollTop
@@ -317,6 +346,7 @@ function useSelectSidePosition(
   useEffect(() => {
     if (!open) {
       initialScrollSynced.current = false
+      positionedHeight.current = null
       setStyle(sideInitialStyle)
       return
     }
@@ -402,18 +432,13 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       ...rest
     } = props
 
-    // Items: a flat list of options; groups and separators have no place in it.
-    const collection = readCollection<SelectItem>(items, {
+    // A flat list must discard structural items before they can reserve option keys.
+    const collection = readFlatCollection<SelectItem>(items, {
       component: 'Select',
       key: (item) => item.value,
       text: (item) => item.textValue ?? (plainText(item.label) || item.value),
     })
-    const entries = collection.children(null).filter(({ item }) => {
-      const { type } = item as { type?: unknown }
-      if (type !== 'group' && type !== 'separator') return true
-      invalidProp('Select', 'item type', type, 'dropping the item')
-      return false
-    })
+    const entries = collection.children(null)
     const keys = entries.map((entry) => entry.key)
     const enabled = disabled
       ? []
@@ -453,11 +478,12 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       onChange: (next) => onOpenChange?.({ open: next }),
       name: ['Select', 'open'],
     })
-    const isOpen = available && !!openState
-    // An uncontrolled list that loses every enabled item closes quietly and stays closed.
+    const isOpen = !hidden && available && !!openState
+    // A hidden or unavailable uncontrolled list closes quietly and stays closed.
+    // A controlled `open` remains the parent's intent, but cannot expose a hidden surface.
     useIsomorphicLayoutEffect(() => {
-      if (!available && openState) replaceOpen(false)
-    }, [available, openState, replaceOpen])
+      if ((!available || hidden) && openState) replaceOpen(false)
+    }, [available, hidden, openState, replaceOpen])
     const [highlight, setHighlight] = useState<string | null>(null)
     const [wasOpen, setWasOpen] = useState(isOpen)
     if (wasOpen !== isOpen) {
@@ -477,7 +503,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
     // Focus returns to the trigger on close, unless the close is focus moving elsewhere.
     const [restoreFocus, setRestoreFocus] = useState(true)
     const openList = (key: string | null) => {
-      if (!available) return
+      if (!available || hidden) return
       setHighlight(key)
       setRestoreFocus(true)
       setOpen(true)
@@ -502,7 +528,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
     }
     const onListKeyDown = (event: KeyboardEvent<HTMLElement>) => {
       const { key, altKey, ctrlKey, metaKey, nativeEvent } = event
-      if (!available || altKey || ctrlKey || metaKey || nativeEvent.isComposing)
+      if (!available || hidden || altKey || ctrlKey || metaKey || nativeEvent.isComposing)
         return
       const step = keyToMove(event, 'vertical', 'ltr')
       const [search, match] =
@@ -599,7 +625,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       openDelay: 0,
       closeDelay: 150,
       focus: false,
-      disabled: !isSide || !available,
+      disabled: !isSide || !available || hidden,
     })
     const hoverTrigger = hover.trigger('list')
     const triggerRefs = useComposedRefs(triggerElRef, ref, hoverTrigger.ref)
@@ -654,7 +680,9 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
         ? resolveLabel(placeholder, '', 'Select', 'placeholder')
         : selectedLabel
     const sheetTitle = field.label ?? accessibleName
-    const minWidth = cssSize(contentMinWidth)
+    const minWidth = resolvedSurface === 'popover'
+      ? readCssSize('Select', 'contentMinWidth', contentMinWidth)
+      : undefined
     const contentStyle =
       resolvedSurface === 'popover'
         ? ({
@@ -771,7 +799,6 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
         onPointerLeave={hover.content.onPointerLeave}
       >
         <Membrane
-          enabled={membrane}
           as="div"
           fullWidth
           className="uf-select__contentMembrane"

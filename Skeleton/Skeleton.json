@@ -18,12 +18,12 @@
     "width": {
       "type": "any",
       "required": false,
-      "description": "Width it paints, in pixels or any CSS length, in place of the shape's default (a text line or rect fills its column, so give one in a container sized by its content); a circle given only a width is as tall."
+      "description": "Width it paints: a number or numeric string is pixels, or pass a CSS length. Wins over `style.width`; a circle given only a width is as tall."
     },
     "height": {
       "type": "any",
       "required": false,
-      "description": "Height it paints, in pixels or any CSS length, in place of the shape's default; a circle given only a height is as wide."
+      "description": "Height it paints: a number or numeric string is pixels, or pass a CSS length. Wins over `style.height`; a circle given only a height is as wide."
     }
   },
   "states": [

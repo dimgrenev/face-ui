@@ -124,6 +124,48 @@ test('sheet content has a named modal dialog and a separate, keyboard-operable l
   await expect(page.getByRole('combobox')).toBeFocused()
   await expect(page.getByRole('combobox')).toContainText('Blue')
 })
+test('hidden removes sheet modal effects and popover portals for initial and live open state', { tag: ['@a11y', '@focus'] }, async ({
+  page,
+}) => {
+  const inertOutside = () =>
+    page.locator('#after').evaluate((node) => Boolean(node.closest('[inert]')))
+  const bodyOverflow = () => page.evaluate(() => document.body.style.overflow)
+  const originalOverflow = await bodyOverflow()
+
+  await render(page, { surface: 'sheet', hidden: true, open: true }, false, 'hidden-sheet')
+  await expect(page.locator('.uf-select__content')).toHaveCount(0)
+  expect(await inertOutside()).toBe(false)
+  expect(await bodyOverflow()).toBe(originalOverflow)
+
+  await render(page, { surface: 'sheet', hidden: true, defaultOpen: true }, false, 'hidden-default-sheet')
+  await expect(page.locator('.uf-select__content')).toHaveCount(0)
+  await render(page, { surface: 'sheet', defaultOpen: true }, false, 'hidden-default-sheet')
+  await expect(page.locator('.uf-select__content')).toHaveCount(0)
+
+  await render(page, { surface: 'sheet', defaultOpen: true }, false, 'live-sheet')
+  await expect(page.getByRole('dialog', { name: 'Plan' })).toBeVisible()
+  await expect.poll(inertOutside).toBe(true)
+  await expect.poll(bodyOverflow).toBe('hidden')
+  await render(page, { surface: 'sheet', defaultOpen: true, hidden: true }, false, 'live-sheet')
+  await expect(page.locator('.uf-select__content')).toHaveCount(0)
+  await expect.poll(inertOutside).toBe(false)
+  await expect.poll(bodyOverflow).toBe(originalOverflow)
+  await page.locator('#after').focus()
+  await expect(page.locator('#after')).toBeFocused()
+  await render(page, { surface: 'sheet', defaultOpen: true }, false, 'live-sheet')
+  await expect(page.locator('.uf-select__content')).toHaveCount(0)
+
+  await render(page, { surface: 'popover', hidden: true, open: true }, false, 'hidden-popover')
+  await expect(page.locator('.uf-select__content')).toHaveCount(0)
+  await render(page, { surface: 'popover', open: true }, false, 'live-popover')
+  await expect(page.getByRole('listbox')).toBeVisible()
+  await render(page, { surface: 'popover', open: true, hidden: true }, false, 'live-popover')
+  await expect(page.locator('.uf-select__content')).toHaveCount(0)
+  expect(await inertOutside()).toBe(false)
+  expect(await bodyOverflow()).toBe(originalOverflow)
+  await render(page, { surface: 'popover', open: true }, false, 'live-popover')
+  await expect(page.getByRole('listbox')).toBeVisible()
+})
 test('native accessible names and disabled opacity remain consistent in both themes', { tag: ['@css', '@a11y'] }, async ({
   page,
 }) => {
@@ -190,7 +232,7 @@ test('contentMinWidth changes measured popover width and remains inside a narrow
       fullWidth: false,
       surface: 'popover',
       displayValue: '{}',
-      contentMinWidth: 280,
+      contentMinWidth: membrane ? 280 : '280',
       membrane,
     })
     const trigger = page.getByRole('combobox')
@@ -332,6 +374,35 @@ test('a low side trigger keeps the selected row visible on a wide viewport', { t
     .toBeLessThan(3)
   await field.press('Escape')
   await field.press('Enter')
+  await expect(row).toBeInViewport()
+})
+
+test('side placement responds when its public height cap grows while open', { tag: ['@layout', '@css'] }, async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1000, height: 720 })
+  await page.evaluate(() =>
+    document.documentElement.style.setProperty('--uf-select-side-content-max-height', '6rem'),
+  )
+  await render(page, {
+    surface: 'side',
+    defaultValue: '8',
+    items: Array.from({ length: 16 }, (_, i) => ({
+      value: String(i),
+      label: `Option ${i}`,
+    })),
+  })
+  const field = page.getByRole('combobox')
+  await field.press('Enter')
+  const panel = page.locator('.uf-select__contentPanel')
+  await expect.poll(async () => (await panel.boundingBox())!.height).toBeLessThan(100)
+
+  await page.evaluate(() =>
+    document.documentElement.style.setProperty('--uf-select-side-content-max-height', '30rem'),
+  )
+  await page.setViewportSize({ width: 1001, height: 720 })
+  await expect.poll(async () => (await panel.boundingBox())!.height).toBeGreaterThan(150)
+  const row = page.getByRole('option', { name: 'Option 8', exact: true })
   await expect(row).toBeInViewport()
 })
 

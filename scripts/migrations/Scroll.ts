@@ -26,4 +26,10 @@ export default [
     before: 'Text in a horizontal or both-axes Scroll wrapped at the box width (never narrower than 12 control heights), so it rarely scrolled sideways',
     after: 'Text that can scroll sideways keeps each line whole and scrolls; in a vertical Scroll it wraps as before',
   },
+  {
+    kind: 'behavior',
+    component: 'Scroll',
+    before: '`height="50"` reached CSS as an invalid unitless length and was silently ignored',
+    after: 'A numeric string now means pixels and reports its normalization once in development',
+  },
 ] satisfies Migration[]

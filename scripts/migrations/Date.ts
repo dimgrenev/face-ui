@@ -65,4 +65,10 @@ export default [
     before: 'An unreadable `value`, `defaultValue`, `min`, `max`, `disabledDates`, `presets`, `format`, `locale`, `timezone` or `weekStartsOn`, or an out-of-range `disabledTime`, threw during render',
     after: 'The picker renders without it (a preset is dropped, a format or locale falls back) and reports it once in development; a point given for a range, or a range for a point, is projected silently',
   },
+  {
+    kind: 'behavior',
+    component: 'Date',
+    before: '`membrane={false}` also removed spacing around the open picker surface',
+    after: 'It now affects the trigger only; the picker surface retains its own spacing',
+  },
 ] satisfies Migration[]

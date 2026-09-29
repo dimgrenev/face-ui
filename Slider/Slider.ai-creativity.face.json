@@ -127,7 +127,7 @@
       "name": "error",
       "type": "any",
       "required": false,
-      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
     },
     {
       "name": "labelPosition",

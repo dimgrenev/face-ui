@@ -154,7 +154,7 @@ interface DateSharedProps
   readOnly?: boolean
   /** Trigger text while nothing is selected. */
   placeholder?: string
-  /** Wrap the trigger in the membrane spacing of controls in a row. */
+  /** Wrap the trigger in control-row spacing; the picker surface keeps its own spacing. */
   membrane?: boolean
   /** Stretch the field to the width of its container. */
   fullWidth?: boolean
@@ -848,7 +848,6 @@ export const Date = forwardRef<HTMLButtonElement, DateProps>(
                   data-surface={resolvedSurface}
                 >
                   <Membrane
-                    enabled={membrane}
                     as="div"
                     fullWidth
                     className="uf-date__contentMembrane"

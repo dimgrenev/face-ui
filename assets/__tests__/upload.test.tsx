@@ -92,17 +92,56 @@ describe('Upload files', () => {
     expect(part('fileSize')!.textContent).toBe('2.0 KB')
   })
 
-  it('id: the same file picked or dropped again is listed once and reports nothing', async () => {
+  it('id: the same File object picked or dropped again is listed once and reports nothing', async () => {
     const onFilesChange = vi.fn()
     await render({ multiple: true, onFilesChange })
     await pick([brief])
-    await drop([file('brief.pdf', 2048, 'application/pdf')])
+    await drop([brief])
     await pick([brief, notes])
     expect(names()).toEqual(['brief.pdf', 'notes.txt'])
     expect(onFilesChange.mock.calls.map(([{ files }]) => files.map((entry: UploadFile) => entry.name))).toEqual([
       ['brief.pdf'],
       ['brief.pdf', 'notes.txt'],
     ])
+  })
+
+  it('keeps distinct files with matching metadata, and rejects one only when the count limit is reached', async () => {
+    const first = new File(['a'], 'same.txt', { type: 'text/plain', lastModified: 42 })
+    const second = new File(['b'], 'same.txt', { type: 'text/plain', lastModified: 42 })
+    const third = new File(['c'], 'same.txt', { type: 'text/plain', lastModified: 42 })
+    const onFilesChange = vi.fn()
+    const onReject = vi.fn()
+    await render({ multiple: true, maxFiles: 2, onFilesChange, onReject })
+
+    await pick([first])
+    await drop([first])
+    expect(onFilesChange).toHaveBeenCalledTimes(1)
+    await drop([second])
+    expect(names()).toEqual(['same.txt', 'same.txt'])
+    const accepted = onFilesChange.mock.lastCall![0].files as UploadFile[]
+    expect(accepted.map((entry) => entry.id)).toEqual([fileId(first), `${fileId(second)}#2`])
+    expect(accepted.map((entry) => entry.file)).toEqual([first, second])
+    expect(onReject).not.toHaveBeenCalled()
+
+    await drop([third])
+    expect(names()).toEqual(['same.txt', 'same.txt'])
+    expect(onFilesChange).toHaveBeenCalledTimes(2)
+    expect(onReject.mock.lastCall![0].files).toEqual([{ file: third, reason: 'tooMany' }])
+  })
+
+  it('proposes both matching-metadata files in controlled mode without changing the rendered list', async () => {
+    const first = new File(['a'], 'same.txt', { lastModified: 42 })
+    const second = new File(['b'], 'same.txt', { lastModified: 42 })
+    const onFilesChange = vi.fn()
+    await render({ files: [entryOf(first)], multiple: true, onFilesChange })
+
+    await drop([second])
+    const proposed = onFilesChange.mock.lastCall![0].files as UploadFile[]
+    expect(proposed.map((entry) => entry.id)).toEqual([fileId(first), `${fileId(second)}#2`])
+    expect(names()).toEqual(['same.txt'])
+
+    await render({ files: proposed, multiple: true, onFilesChange })
+    expect(names()).toEqual(['same.txt', 'same.txt'])
   })
 
   it('id: an entry without a string id, or repeating one, is dropped and reported', async () => {

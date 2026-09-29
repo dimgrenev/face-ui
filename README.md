@@ -76,19 +76,16 @@ Each question has exactly one source. Nothing else documents props.
 
 Behaviour no prop controls, kept here because it changes what you build around it. What a prop does is in its JSDoc.
 
-- A toast raised while a `Modal` is open is inert: a modal layer marks every other subtree of `<body>` `inert`, and the toast region is not a layer. Raise toasts after the dialog closes.
-- Mount `Toaster` near the document root. Its region is `position: fixed`, so a transformed ancestor becomes its containing block.
-- Three status messages are not announced: a field `error`, `Upload`'s rejection messages and `Command`'s empty result are plain elements. (`Toast` and `Code`'s copy confirmation do use live regions.)
+- Mount `Toaster` near the document root. Its region moves into an active modal so notifications remain accessible there; outside a modal it is `position: fixed`, so a transformed ancestor becomes its containing block.
 - Only `Select` and `Command` report a control left without an accessible name; the other seven fields do not.
 - `Markdown` has no size limit: the whole source is parsed and sanitized on every change, memoized per source, so cap user-supplied sources yourself. A source nested thousands of levels deep overflows the parser and is shown as escaped text with a report. It brings `marked` and `sanitize-html` — and, through that, PostCSS — into your bundle.
 - Every default string is English: the root names of `Breadcrumb`, `Carousel`, `Navigation` ("Main"), `Pagination`, `Panel` ("Sidebar"), `Scroll`, `Toast`, `Toc` and `Tree`, every `labels` default, and `Upload`'s `B`/`KB`/`MB` sizes with a `.` decimal. Pass `aria-label` and `labels` per instance.
-- A size a component only forwards to `style` is not validated: `width="50"` on `Skeleton`, `Media` or `Panel`, or `height="50"` on `Scroll`, reaches `style`, and the browser drops it with no report.
 - `Scroll` is a tab stop while it overflows and drops a `tabIndex` of your own, so content that is itself entirely tabbable gets one extra stop. From a JSON face document its only sizing is the fixed `height`; grow-then-cap needs `style`, which contracts omit.
 - `Command` with `surface="dialog"` is a bottom sheet at every width.
 - An autoplaying `Carousel` renders its rotation control after the slides, not before them as APG suggests. Keyboard focus anywhere inside stops the rotation until that control starts it again.
 - `Modal`'s `role="alertdialog"` cannot be asked for from a JSON face document: `role` is omitted from every contract.
 - An image that finished loading before hydration and reports a zero natural size — a sizeless SVG — counts as failed and shows the fallback (`Avatar`, `Media`).
-- TypeScript rejects `{ "type": "group" }` and `{ "type": "separator" }` in a flat list, but a hand-written face document can still carry them: `Select` and `SegmentedControl` drop them with a report, and other flat lists render an entry with no label.
+- TypeScript rejects `{ "type": "group" }` and `{ "type": "separator" }` in a flat list, but a hand-written face document can still carry them. Flat lists drop them with a development report; `Menu` and `Command` support groups and separators, while `Navigation` supports groups only inside dropdowns.
 - `pnpm migrate --check` cannot reach zero on every codebase. The codemod reads one JSX usage at a time, so a list or handler held in a variable, a one-argument `render`, props spread through a wrapper of your own, a component reached through your own re-export, and prop names or module paths written as plain data are invisible to it. Run `tsc` after it, and read "Migrating a consumer" in [`MIGRATION.md`](MIGRATION.md).
 
 ## Contracts
@@ -127,7 +124,7 @@ No Tailwind, CSS-in-JS runtime, or provider is required. Component styling is sc
 
 Set `data-theme="light"` or `data-theme="dark"` on the document element and apply background/foreground tokens to the host surface. Body portals require document-level theme overrides. The runtime stylesheet already includes tokens.
 
-Typography is token-driven. `Akt` is intentionally loaded by the application shell through Google Fonts; the package keeps only the local `Begriffsschrift` mono face for code UI.
+Typography is token-driven. `Akt` is intentionally loaded by the application shell through Google Fonts; code UI uses the system monospace font through `--uf-font-family-mono`. Face UI does not bundle fonts.
 
 ## Example Media
 

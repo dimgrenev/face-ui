@@ -29,6 +29,7 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 
 | Before | After | Codemod |
 | --- | --- | --- |
+| `assets/adapters/react/* deep imports except use-floating-position` | Use public components and FaceUiOverlayProvider from the package root; only use-floating-position remains a supported adapter deep import | manual |
 | `normalizeProps` from `assets/adapters/react/normalize-props` | Spread the props onto the element directly | manual |
 | `NormalizedProps` from `assets/adapters/react/normalize-props` | The props type itself | manual |
 | `useDismissOutside` from `assets/adapters/react/use-dismiss-outside` | `useLayer` from `assets/adapters/react/use-layer` | manual |
@@ -132,6 +133,7 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 | `Card.Title align="left"`, `Card.Title align="right"` | `align="start"`, `align="end"` | auto |
 | `Card.Description align="left"`, `Card.Description align="right"` | `align="start"`, `align="end"` | auto |
 | `content` without `title`, `description` or `footer` was wrapped in the content part | Children without `title`, `description` or `footer` render directly in the card; wrap them in `Card.Content` to keep the part | — |
+| Root `footerAlign` on a compound Card without `footer` silently did nothing | Move it to `Card.Footer align`; development builds report the unsupported root combination | — |
 
 ### Carousel
 
@@ -216,6 +218,7 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 | The trigger showed "Pick date" or "Pick time", and an unlabelled field was named "Choose date" or "Choose time" | There is no English default: pass `placeholder`, and `label` or `aria-label` | — |
 | Label, help and error were `.uf-date__label`, `.uf-date__description` and `.uf-date__error` inside `.uf-date__triggerWrap` | They are the shared Field parts `.uf-field__label`, `.uf-field__description`, `.uf-field__error` and `.uf-field__required` (`[data-scope="field"]`); `labelPosition` places the label | — |
 | An unreadable `value`, `defaultValue`, `min`, `max`, `disabledDates`, `presets`, `format`, `locale`, `timezone` or `weekStartsOn`, or an out-of-range `disabledTime`, threw during render | The picker renders without it (a preset is dropped, a format or locale falls back) and reports it once in development; a point given for a range, or a range for a point, is projected silently | — |
+| `membrane={false}` also removed spacing around the open picker surface | It now affects the trigger only; the picker surface retains its own spacing | — |
 
 ### FloatingOverlay
 
@@ -279,13 +282,14 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 | Before | After | Codemod |
 | --- | --- | --- |
 | `ariaLabel` | `aria-label` | auto |
-| `ref`, `id`, `role`, `tabIndex` and `aria-label` went to the wrapping box, `title` to both the box and the element; other native attributes were dropped | `ref` and every native attribute go to the `<img>`, `<video>` or `<audio>` element; only `className` and `style` stay on the box | — |
+| `ref`, `id`, `role`, `tabIndex` and `aria-label` went to the wrapping box, `title` to both the box and the element; other native attributes were dropped | `ref` and native attributes go to the `<img>`, `<video>` or `<audio>` element; `className` and `style` stay on the box, while `hidden` hides the whole box and its fallback | — |
 | `alt` defaulted to `""`, so an image without it was silently decorative; any type accepted every prop | `type` selects the props: an image requires `alt` (`""` marks it decorative) and takes `variant`; video and audio take player attributes and `<track>` children | — |
 | `variant="rounded"` | `variant="default"` | auto |
 | `onLoad()` and `onError()` received no event; on video and audio `onLoad` ran on `loadeddata` | `onLoad(event)` and `onError(event)` are the element's native events; video and audio report loading through the native `onLoadedData(event)` | — |
 | An image in a box with a height stretched to fill it unless `objectFit` was set; a video kept its own width | Images default to `objectFit="cover"`; video and audio fill the box width and video keeps `contain` | — |
 | A failed load replaced the element with the fallback and set `data-error` on the box; an empty `src` requested the page | The box carries `data-state` (`loading`, `loaded`, `error`), a player counting as loaded once its metadata arrives or the browser holds off fetching until playback; a missing or empty `src` counts as failed; the fallback shows beside the element, which is hidden | — |
 | The JSON contract listed `title` | `title` is left out of the contract, as it names nothing reliably; an image is named by `alt` and a player by `aria-label`. In TSX it still reaches the element as a native attribute | — |
+| `width="50"` or `height="50"` was passed as an invalid unitless CSS length and silently ignored | Numeric strings now mean pixels and report their normalization once in development | — |
 | `MediaLoading` from `Media/Media` | `ImgHTMLAttributes<HTMLImageElement>['loading']` | manual |
 | `MediaDecoding` from `Media/Media` | `ImgHTMLAttributes<HTMLImageElement>['decoding']` | manual |
 | `mediaAnatomy` from `Media/Media` | The `[data-scope="media"][data-part="root" \| "element" \| "fallback"]` attributes | manual |
@@ -387,6 +391,8 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 | The header always held the collapse toggle, an empty footer followed the rows, and "[" toggled the rail | `collapsible={false}` removes the toggle; there is no footer and no keyboard shortcut | — |
 | The sheet covered the whole viewport, titled "Panel"; `className` and `ref` moved to its host and dialog | The sheet is a modal drawer at the start edge, titled by `aria-label`; the `<nav>` and the sheet are named "Sidebar" until `aria-label` or `aria-labelledby` names them; the `<nav>` keeps native attributes, `className`, `style` and `ref` | — |
 | `onSelectedChange` and `onCollapsedChange` also fired when the parent changed `selectedId` or `collapsed` | `onValueChange` and `onCollapsedChange` report only user actions | — |
+| `style.width` on an expanded inline panel was ignored and reported even without a `width` prop | `style.width` sizes the expanded panel when `width` is omitted; explicit `width` wins, and `collapsedWidth` still sizes the rail | — |
+| `width="280"` or `collapsedWidth="60"` silently produced invalid CSS | Numeric strings now mean pixels and report their normalization once in development | — |
 
 ### Popover
 
@@ -434,6 +440,7 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 | The viewport was always a tab stop and a region named "Scrollable text" or `ariaLabel` | It is a tab stop only while its content overflows along an axis it scrolls, and stays focusable by script after; until measured (server HTML, no ResizeObserver) it has no tabindex, so the browser decides. A tab stop without `aria-label` or `aria-labelledby` is named "Scrollable content", and it is a region only while it is named | — |
 | The ref and `className` went to the outer box, and no other attribute or handler was passed on | The ref, native attributes and handlers (`id`, `onScroll`, `aria-*`, `data-*`) go to the scrolling viewport; `className` and `style` go to the outer box. Scroll owns `role`, `tabIndex`, `hidden` and the content, so those are not accepted | — |
 | Text in a horizontal or both-axes Scroll wrapped at the box width (never narrower than 12 control heights), so it rarely scrolled sideways | Text that can scroll sideways keeps each line whole and scrolls; in a vertical Scroll it wraps as before | — |
+| `height="50"` reached CSS as an invalid unitless length and was silently ignored | A numeric string now means pixels and reports its normalization once in development | — |
 
 ### SegmentedControl
 
@@ -471,6 +478,8 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 | A value missing from `options` showed its raw key in the trigger and was submitted | It shows as unselected and is not submitted until an item with that value appears; the value itself is kept | — |
 | The label was `[data-scope="select"][data-part="label"]` at 11px, and the root carried `data-label-orientation` | Label, required marker, `description` and `error` are the shared Field parts (`.uf-field__*`, `[data-scope="field"]`, 12px label); the root carries `data-label-position` | — |
 | A failed `required` check showed only the browser bubble | The browser message also fills the field error slot and marks the trigger `aria-invalid` until a value is chosen; `error` wins over it | — |
+| `membrane={false}` also removed spacing around the open list surface | It now affects the trigger and options only; the list surface retains its own spacing | — |
+| `contentMinWidth="280"` was inserted into CSS math without a unit and silently ignored | A numeric string now means pixels and reports its normalization once in development | — |
 | Home and End did nothing on a closed list | Home and End open the list at the first or last enabled item | — |
 
 ### Separator
@@ -504,6 +513,8 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 | The rect shape was a square one control across | It is as wide as its column and one control tall; set `height` for an image or a card, and a width in a container sized by its content | — |
 | A circle given only a width or only a height was one control across the other way | It stays round from the one side it is given, a percentage of its column included | — |
 | In forced colors the placeholder was repainted in the canvas color and disappeared | It is painted in GrayText | — |
+| `style.width` and `style.height` won over explicit `width` and `height` props | Explicit size props win; `style` supplies only an omitted axis | — |
+| `width="50"` or `height="50"` reached CSS without a unit and silently left the default size | Numeric strings now mean pixels and report their normalization once in development | — |
 
 ### Slider
 
@@ -724,7 +735,7 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 | `UploadSourceFile` | `UploadFile`, whose `size`, `file`, `progress` and `error` are optional | manual |
 | `progress`, `status` and `error` of an entry were never shown | `progress` shows a bar named by the file (`null`: an unknown amount), `error` a message under the entry that also describes its remove button | — |
 | Rejected files only reached `onReject`; the user saw nothing | The field also shows why, one line per reason, from `labels.invalidType`, `tooLarge` and `tooMany`, until the next pick, drop or removal; a consumer `error` wins | — |
-| Without `multiple`, a drop of several files kept only the first one, even when it was rejected; picking or dropping the same file again listed it twice | Without `multiple`, the first acceptable file replaces the listed one and the rest are `tooMany`; a file already listed (same size, date and name) is not added again | — |
+| Without `multiple`, a drop of several files kept only the first one, even when it was rejected; picking or dropping the same file again listed it twice | Without `multiple`, the first acceptable file replaces the listed one and the rest are `tooMany`; reusing the same File object does not add it again, while distinct files with matching metadata remain separate | — |
 | Upload took no native attributes and never joined a form: `name`, `required` and the listed files were not submitted | Native attributes and `ref` reach the root `role="group"`; `label`, `description`, `error` and `labelPosition` make it a Field; `name`, `form`, `required`, `disabled` and `autoFocus` work as on native controls, and the listed browser files are submitted | — |
 | Only the borderless drop area took drops and carried `data-dragging`; text and link drags highlighted it too | The whole field takes file drags and carries `data-dragging` (nested enters are counted); the drop area has a dashed border; text and link drags are left to the browser | — |
 | `files` that was not an array crashed the render; entries without an `id` or repeating one rendered with React key warnings | A non-array list renders as empty, and entries without a string `id` or repeating one are dropped, each with a development report | — |

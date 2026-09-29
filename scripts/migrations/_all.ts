@@ -3,6 +3,12 @@ import type { Migration } from './types'
 export default [
   {
     kind: 'export',
+    from: 'assets/adapters/react/* deep imports except use-floating-position',
+    to: 'Use public components and FaceUiOverlayProvider from the package root; only use-floating-position remains a supported adapter deep import',
+    codemod: 'manual',
+  },
+  {
+    kind: 'export',
     from: 'assets/adapters/react/normalize-props#normalizeProps',
     to: 'Spread the props onto the element directly',
     codemod: 'manual',

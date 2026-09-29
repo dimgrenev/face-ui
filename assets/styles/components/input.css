@@ -147,7 +147,7 @@
   color: var(--uf-color-fg-muted);
   cursor: pointer;
   opacity: 0;
-  transition: opacity var(--uf-motion-duration-short) var(--uf-motion-ease-standard);
+  transition: opacity var(--face-runtime-transition-duration-short) var(--uf-motion-ease-standard);
   box-shadow: none;
   outline: none;
 }

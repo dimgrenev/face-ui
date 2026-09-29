@@ -60,7 +60,7 @@
   position: relative;
   display: inline-flex;
   color: var(--uf-color-fg-muted);
-  transition: color var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
+  transition: color var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard);
 }
 .uf-switcher[data-scope] [data-part="track"][data-state="checked"] {
   color: var(--uf-color-fg);
@@ -80,7 +80,7 @@
   position: absolute;
   inset-block-start: 25%;
   inset-inline-start: 10%;
-  transition: inset-inline-start var(--uf-motion-duration-control) var(--uf-motion-ease-standard);
+  transition: inset-inline-start var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard);
 }
 .uf-switcher[data-scope] [data-part="track"][data-state="checked"] [data-part="thumb"] {
   inset-inline-start: 40%;

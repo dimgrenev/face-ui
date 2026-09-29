@@ -15,7 +15,7 @@ import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
 import { useControllableState } from '../assets/adapters/react/use-controllable-state'
 import { useFocusRecovery } from '../assets/adapters/react/use-focus-recovery'
 import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
-import { readCollection } from '../assets/runtime/collection'
+import { readFlatCollection } from '../assets/internal/flat-collection'
 import { readNumber } from '../assets/runtime/props'
 import { hasSlotContent } from '../assets/slot-content'
 
@@ -39,7 +39,7 @@ export interface StepsProps extends Omit<
   | 'role'
   | 'aria-disabled'
 > {
-  /** Ordered steps; an omitted or empty list renders no navigation. */
+  /** Ordered steps; an omitted or empty list renders no navigation. Groups and separators are dropped with a report. */
   items?: readonly StepItem[]
   /** Controlled index of the current step, from 0; an index past the last step shows the last one. */
   step?: number
@@ -77,7 +77,7 @@ export const Steps = forwardRef<HTMLDivElement, StepsProps>(
       onClick,
       ...rest
     } = props
-    const { entries } = readCollection<StepItem>(items, {
+    const { entries } = readFlatCollection<StepItem>(items, {
       component: 'Steps',
       positional: true,
       key: keyOf,

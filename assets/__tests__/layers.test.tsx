@@ -83,6 +83,21 @@ describe('the outside press walks the stack', () => {
     document.body.replaceChildren()
   })
 
+  it('routes Escape to the focused provider scope instead of a neighboring later layer', async () => {
+    nodes('left', 'right')
+    byId('left').tabIndex = 0
+    byId('right').tabIndex = 0
+    const closeLeft = vi.fn()
+    const closeRight = vi.fn()
+    const left = { elements: () => [byId('left')], scope: {}, onEscape: closeLeft }
+    const right = { elements: () => [byId('right')], scope: {}, onEscape: closeRight }
+    stack.push(registerLayer(document, left), registerLayer(document, right))
+    await focus(byId('left'))
+    await key(byId('left'), 'Escape')
+    expect(closeLeft).toHaveBeenCalledTimes(1)
+    expect(closeRight).not.toHaveBeenCalled()
+  })
+
   it('dismisses every layer above the nearest modal the press is outside of', async () => {
     nodes('page', 'base', 'dialog', 'popover', 'tooltip')
     const base = layer('base')

@@ -2,11 +2,14 @@
 import {
   useEffect,
   useId,
+  useRef,
+  useState,
   type AriaAttributes,
   type ReactNode,
   type RefObject,
 } from 'react'
 import { createAnatomy } from '../anatomy'
+import { useIsomorphicLayoutEffect } from '../adapters/react/use-isomorphic-layout-effect'
 import { invalidProp } from '../runtime/props'
 import { hasSlotContent } from '../slot-content'
 
@@ -16,7 +19,7 @@ export interface FieldProps {
   label?: ReactNode
   /** Help for entering the value, announced with the focused control. */
   description?: ReactNode
-  /** Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region. */
+  /** Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region. */
   error?: ReactNode
   /** Label above the control, or at its inline start (stacks when narrow). Defaults to top. */
   labelPosition?: 'top' | 'start'
@@ -32,6 +35,8 @@ export interface FieldOptions extends FieldProps {
   required?: boolean
   /** Browser validation message from FormValue; shown when `error` is empty. */
   nativeError?: string | null
+  /** Changes when the same native validation message needs to be announced again. */
+  announcementKey?: unknown
   // The consumer's naming attributes, taken from the component's native props.
   'aria-label'?: string
   'aria-labelledby'?: string
@@ -66,6 +71,7 @@ export interface Field {
   error?: ReactNode
   required: boolean
   labelable: boolean
+  announcementKey?: unknown
 }
 
 const { getPartAttrs: part } = createAnatomy('field').parts(
@@ -174,6 +180,7 @@ export function useField(options: FieldOptions): Field {
     error,
     required: !!options.required,
     labelable: options.labelable,
+    announcementKey: options.announcementKey,
   }
 }
 
@@ -186,6 +193,18 @@ export function FieldLayout({
   children?: ReactNode
 }) {
   const { id, label, description, error } = field
+  const errorRef = useRef<HTMLSpanElement>(null)
+  const [announcement, setAnnouncement] = useState('')
+  // Commit an empty region before the next task restores the message. A passive
+  // effect can batch both writes under load, losing repeated announcements.
+  useIsomorphicLayoutEffect(() => {
+    setAnnouncement('')
+    if (error === undefined) return
+    const timer = setTimeout(() => {
+      setAnnouncement(errorRef.current?.textContent?.trim() ?? '')
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [error, field.announcementKey])
   const labelProps = {
     ...part('label'),
     id: field.labelId,
@@ -227,10 +246,13 @@ export function FieldLayout({
         </span>
       )}
       {error !== undefined && (
-        <span {...part('error')} id={`${id}-error`} className="uf-field__error">
+        <span ref={errorRef} {...part('error')} id={`${id}-error`} className="uf-field__error">
           {error}
         </span>
       )}
+      <span className="uf-visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </span>
     </>
   )
 }

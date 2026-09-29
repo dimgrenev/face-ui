@@ -23,7 +23,7 @@ import { Text } from '../../Text/Text'
 import { Membrane } from '../adapters/react/Membrane'
 import { getFocusableElements } from '../runtime/layers'
 import { readNumber } from '../runtime/props'
-import type { FloatingOverlayProps } from '../adapters/react/FloatingOverlay'
+import type { FloatingOverlayProps } from '../adapters/react/floating-overlay-props'
 
 const MAX_DELAY = 2147483647
 const hasContent = (node: ReactNode) =>

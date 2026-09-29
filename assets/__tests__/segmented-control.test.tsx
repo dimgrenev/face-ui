@@ -257,10 +257,13 @@ it('the strip is a list inside the field root, between label and help', async ()
     'list',
     'description',
     null,
+    null,
   ])
   const list = rootNode.children[1]
   expect(list.className).toBe('uf-toggle-list')
   expect(list.querySelectorAll('.uf-toggle-item')).toHaveLength(3)
+  expect(rootNode.children[3].getAttribute('role')).toBe('status')
+  expect(rootNode.children[4].tagName).toBe('SELECT')
 })
 it('allows empty-string key as a keyboard target', async () => {
   await render({ defaultValue: 'a' })
@@ -685,17 +688,21 @@ it('groups and separators are dropped with a report: the strip is flat', async (
         items: [
           { value: 'a', label: 'A' },
           { type: 'separator' },
-          { type: 'group', label: 'G', items: [{ value: 'g1', label: 'G1' }] },
+          { value: '#1', label: 'Hash' },
+          { type: 'group', label: 'G', items: [{ value: 'b', label: 'Shadow' }] },
           { value: 'b', label: 'B' },
         ],
       }),
-    /^Face UI SegmentedControl: invalid item type "(separator|group)"; dropping the item\.$/,
+    /^Face UI SegmentedControl: invalid items\[\]\.type "(separator|group)"; dropping the item\.$/,
   )
   expect(buttons().map((button) => [button.textContent, button.tabIndex])).toEqual([
     ['A', 0],
+    ['Hash', -1],
     ['B', -1],
   ])
+  expect(host.textContent).not.toContain('Shadow')
   await key(0, 'ArrowRight')
+  await key(1, 'ArrowRight')
   expect(selected()).toEqual(['B'])
 })
 it('empty items do not create phantom choices or keyboard targets', async () => {

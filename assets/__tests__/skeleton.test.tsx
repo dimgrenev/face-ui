@@ -2,7 +2,7 @@ import { act, createRef, type ComponentProps } from 'react'
 import type { Root } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Skeleton } from '../../Skeleton/Skeleton'
-import { mount } from './harness'
+import { expectDevError, mount } from './harness'
 
 let host: HTMLDivElement
 let root: Root
@@ -59,11 +59,25 @@ describe('Skeleton prop contract', () => {
     expect(size()).toEqual({ width: '', height: '12px' })
   })
 
-  it('a width or height in style wins over the props', async () => {
+  it('explicit size props win over style, which remains the fallback on omitted axes', async () => {
     for (const shape of ['text', 'rect', 'circle'] as const) {
       await render({ shape, width: 100, height: 40, style: { width: 30, height: 10 } })
-      expect(size()).toEqual({ width: '30px', height: '10px' })
+      expect(size()).toEqual({ width: '100px', height: '40px' })
     }
+    await render({ shape: 'rect', width: 100, style: { width: 30, height: 10 } })
+    expect(size()).toEqual({ width: '100px', height: '10px' })
+  })
+
+  it('normalizes unitless numeric strings instead of leaving the shape at its default size', async () => {
+    await expectDevError(
+      () => render({ shape: 'rect', width: '50' }),
+      /^Face UI Skeleton: invalid width "50"; using 50px\.$/,
+    )
+    await expectDevError(
+      () => render({ shape: 'rect', width: 50, height: '25' }),
+      /^Face UI Skeleton: invalid height "25"; using 25px\.$/,
+    )
+    expect(size()).toEqual({ width: '50px', height: '25px' })
   })
 
   it('is always hidden from assistive technology, even when a face document passes aria-hidden', async () => {

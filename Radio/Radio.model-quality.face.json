@@ -99,7 +99,7 @@
       "name": "error",
       "type": "any",
       "required": false,
-      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
     },
     {
       "name": "labelPosition",
@@ -116,7 +116,7 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Choices in navigation order; an item repeating an earlier value is dropped."
+      "description": "Choices in navigation order; an item without a unique string `value`, or a group or separator, is dropped with a report."
     },
     {
       "name": "value",

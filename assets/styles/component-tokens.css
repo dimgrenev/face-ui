@@ -63,13 +63,13 @@
   --uf-calendar-cell-size: 32px;
   --uf-calendar-nav-size: 32px;
   --uf-calendar-weekday-height: 24px;
-  --uf-date-panel-pad: var(--uf-spacing-3);
-  --uf-date-sheet-gap: var(--uf-spacing-2);
-  --uf-date-sheet-inset: var(--uf-spacing-3);
-  --uf-date-sheet-enter-y: 8px;
-  --uf-date-content-max-width: 320px;
-  --uf-date-content-max-height: 420px;
-  --uf-date-content-viewport-gap: var(--uf-spacing-3);
+  --uf-date-panel-pad: var(--uf-membrane);
+  --uf-date-sheet-inset: var(--uf-spacing-1);
+  --uf-date-sheet-gap: calc(var(--uf-date-sheet-inset) * 2);
+  --uf-date-sheet-enter-y: 1.125rem;
+  --uf-date-content-max-width: 23.75rem;
+  --uf-date-content-max-height: 40rem;
+  --uf-date-content-viewport-gap: var(--uf-spacing-8);
   --uf-menu-min-w: 180px;
   --uf-menu-border-width: var(--uf-border-width-thin);
   --uf-menu-separator-h: var(--uf-border-width-thin);
@@ -80,14 +80,15 @@
   --uf-selector-indicator-offset-inline-start: calc(var(--uf-membrane) * -2);
   --uf-selector-indicator-edge-gap: var(--uf-spacing-1);
   --uf-selector-indicator-size: var(--uf-icon-size);
-  --uf-select-content-max-height: 320px;
+  --uf-select-content-max-height: 15rem;
+  --uf-select-side-content-max-height: 30rem;
   --uf-select-indicator-gap: var(--uf-selector-indicator-gap);
   --uf-select-indicator-edge-gap: var(--uf-selector-indicator-edge-gap);
   --uf-select-indicator-size: var(--uf-selector-indicator-size);
-  --uf-select-panel-pad: var(--uf-spacing-2);
-  --uf-select-sheet-gap: var(--uf-spacing-2);
-  --uf-select-sheet-inset: var(--uf-spacing-2);
-  --uf-select-sheet-enter-y: 6px;
+  --uf-select-panel-pad: var(--uf-membrane);
+  --uf-select-sheet-inset: var(--uf-spacing-1);
+  --uf-select-sheet-gap: calc(var(--uf-select-sheet-inset) * 2);
+  --uf-select-sheet-enter-y: 1.125rem;
   --uf-command-border-width: var(--uf-border-width-thin);
   --uf-command-list-max-height: 320px;
   --uf-command-dialog-inset: var(--uf-spacing-4);
@@ -136,8 +137,8 @@
   --uf-tree-branch-indicator-size: 16px;
   --uf-breadcrumb-separator-w: 12px;
   --uf-breadcrumb-separator-h: 12px;
-  --uf-carousel-viewport-pad: var(--uf-spacing-2);
-  --uf-carousel-controls-inset: var(--uf-spacing-2);
+  --uf-carousel-viewport-pad: 0px;
+  --uf-carousel-controls-inset: 0px;
   --uf-carousel-preview-min-height: 400px;
   --uf-media-fallback-size: 160px;
   --uf-scroll-card-inset: var(--uf-card-padding-default);
@@ -167,14 +168,6 @@
   --uf-markdown-h5-size: 1em;
 
   /* ---------------------------------------------------------------
-   * Z-index layers
-   * --------------------------------------------------------------- */
-  --uf-z-dropdown: 2300;
-  --uf-z-overlay: 1900;
-  --uf-z-modal: 2100;
-  --uf-z-toast: 2400;
-
-  /* ---------------------------------------------------------------
    * Extended motion
    * --------------------------------------------------------------- */
   --uf-motion-duration-fast: 120ms;
@@ -192,13 +185,7 @@
   --uf-motion-ease-in-out: ease-in-out;
   --uf-motion-ease-linear: linear;
   --uf-motion-ease-emphasized: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --uf-motion-fast: var(--uf-motion-duration-fast);
-  --uf-motion-snappy: var(--uf-motion-duration-short);
-  --uf-motion-normal: var(--uf-motion-duration-control);
-  --uf-motion-slow: var(--uf-motion-duration-medium);
   --uf-ease-standard: var(--uf-motion-ease-standard);
-  --uf-ease-out: var(--uf-motion-ease-out);
-  --uf-ease-in-out: var(--uf-motion-ease-in-out);
   --uf-duration-enter: 300ms;
   --uf-duration-exit: 200ms;
   --uf-ease-enter: cubic-bezier(0.32, 0.72, 0, 1);

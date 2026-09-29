@@ -3,6 +3,12 @@
   "migrations": [
     {
       "kind": "export",
+      "from": "assets/adapters/react/* deep imports except use-floating-position",
+      "to": "Use public components and FaceUiOverlayProvider from the package root; only use-floating-position remains a supported adapter deep import",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
       "from": "assets/adapters/react/normalize-props#normalizeProps",
       "to": "Spread the props onto the element directly",
       "codemod": "manual"
@@ -448,6 +454,12 @@
       "after": "Children without `title`, `description` or `footer` render directly in the card; wrap them in `Card.Content` to keep the part"
     },
     {
+      "kind": "behavior",
+      "component": "Card",
+      "before": "Root `footerAlign` on a compound Card without `footer` silently did nothing",
+      "after": "Move it to `Card.Footer align`; development builds report the unsupported root combination"
+    },
+    {
       "kind": "remove-prop",
       "component": "Carousel",
       "prop": "slides",
@@ -830,6 +842,12 @@
       "after": "The picker renders without it (a preset is dropped, a format or locale falls back) and reports it once in development; a point given for a range, or a range for a point, is projected silently"
     },
     {
+      "kind": "behavior",
+      "component": "Date",
+      "before": "`membrane={false}` also removed spacing around the open picker surface",
+      "after": "It now affects the trigger only; the picker surface retains its own spacing"
+    },
+    {
       "kind": "rename-prop",
       "component": "FloatingOverlay",
       "from": "trigger",
@@ -1091,7 +1109,7 @@
       "kind": "behavior",
       "component": "Media",
       "before": "`ref`, `id`, `role`, `tabIndex` and `aria-label` went to the wrapping box, `title` to both the box and the element; other native attributes were dropped",
-      "after": "`ref` and every native attribute go to the `<img>`, `<video>` or `<audio>` element; only `className` and `style` stay on the box"
+      "after": "`ref` and native attributes go to the `<img>`, `<video>` or `<audio>` element; `className` and `style` stay on the box, while `hidden` hides the whole box and its fallback"
     },
     {
       "kind": "behavior",
@@ -1131,6 +1149,12 @@
       "component": "Media",
       "before": "The JSON contract listed `title`",
       "after": "`title` is left out of the contract, as it names nothing reliably; an image is named by `alt` and a player by `aria-label`. In TSX it still reaches the element as a native attribute"
+    },
+    {
+      "kind": "behavior",
+      "component": "Media",
+      "before": "`width=\"50\"` or `height=\"50\"` was passed as an invalid unitless CSS length and silently ignored",
+      "after": "Numeric strings now mean pixels and report their normalization once in development"
     },
     {
       "kind": "export",
@@ -1594,6 +1618,18 @@
       "after": "`onValueChange` and `onCollapsedChange` report only user actions"
     },
     {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "`style.width` on an expanded inline panel was ignored and reported even without a `width` prop",
+      "after": "`style.width` sizes the expanded panel when `width` is omitted; explicit `width` wins, and `collapsedWidth` still sizes the rail"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "`width=\"280\"` or `collapsedWidth=\"60\"` silently produced invalid CSS",
+      "after": "Numeric strings now mean pixels and report their normalization once in development"
+    },
+    {
       "kind": "remove-prop",
       "component": "Popover",
       "prop": "interactive",
@@ -1738,6 +1774,12 @@
       "component": "Scroll",
       "before": "Text in a horizontal or both-axes Scroll wrapped at the box width (never narrower than 12 control heights), so it rarely scrolled sideways",
       "after": "Text that can scroll sideways keeps each line whole and scrolls; in a vertical Scroll it wraps as before"
+    },
+    {
+      "kind": "behavior",
+      "component": "Scroll",
+      "before": "`height=\"50\"` reached CSS as an invalid unitless length and was silently ignored",
+      "after": "A numeric string now means pixels and reports its normalization once in development"
     },
     {
       "kind": "rename-prop",
@@ -1931,6 +1973,18 @@
     {
       "kind": "behavior",
       "component": "Select",
+      "before": "`membrane={false}` also removed spacing around the open list surface",
+      "after": "It now affects the trigger and options only; the list surface retains its own spacing"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "`contentMinWidth=\"280\"` was inserted into CSS math without a unit and silently ignored",
+      "after": "A numeric string now means pixels and reports its normalization once in development"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
       "before": "Home and End did nothing on a closed list",
       "after": "Home and End open the list at the first or last enabled item"
     },
@@ -2082,6 +2136,18 @@
       "component": "Skeleton",
       "before": "In forced colors the placeholder was repainted in the canvas color and disappeared",
       "after": "It is painted in GrayText"
+    },
+    {
+      "kind": "behavior",
+      "component": "Skeleton",
+      "before": "`style.width` and `style.height` won over explicit `width` and `height` props",
+      "after": "Explicit size props win; `style` supplies only an omitted axis"
+    },
+    {
+      "kind": "behavior",
+      "component": "Skeleton",
+      "before": "`width=\"50\"` or `height=\"50\"` reached CSS without a unit and silently left the default size",
+      "after": "Numeric strings now mean pixels and report their normalization once in development"
     },
     {
       "kind": "remove-prop",
@@ -3204,7 +3270,7 @@
       "kind": "behavior",
       "component": "Upload",
       "before": "Without `multiple`, a drop of several files kept only the first one, even when it was rejected; picking or dropping the same file again listed it twice",
-      "after": "Without `multiple`, the first acceptable file replaces the listed one and the rest are `tooMany`; a file already listed (same size, date and name) is not added again"
+      "after": "Without `multiple`, the first acceptable file replaces the listed one and the rest are `tooMany`; reusing the same File object does not add it again, while distinct files with matching metadata remain separate"
     },
     {
       "kind": "behavior",

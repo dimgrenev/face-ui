@@ -147,7 +147,7 @@
       "name": "columns",
       "type": "array",
       "required": false,
-      "description": "Columns in display order; a column without a unique string `id` is dropped."
+      "description": "Columns in display order; a column without a unique string `id`, or a group or separator, is dropped with a report."
     },
     {
       "name": "rows",

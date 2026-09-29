@@ -8,6 +8,7 @@ import {
   type Layer,
 } from '../../runtime/layers'
 import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
+import { useFaceUiOverlayBoundary } from './overlay-context'
 
 interface LayerOptions {
   /** Registers the layer while true; turning it off is a close. */
@@ -32,6 +33,7 @@ interface LayerOptions {
 
 /** Registers a dismissable layer in the document stack and owns its focus on open and close. */
 export function useLayer(options: LayerOptions) {
+  const overlay = useFaceUiOverlayBoundary()
   const latest = useRef(options)
   useIsomorphicLayoutEffect(() => {
     latest.current = options
@@ -45,6 +47,8 @@ export function useLayer(options: LayerOptions) {
     const opener = doc.activeElement as HTMLElement | null
     let outside = false
     const layer: Layer = {
+      scope: overlay?.scope,
+      scopeRoot: overlay?.scopeRoot ?? null,
       elements: () => [
         contentRef.current,
         latest.current.triggerRef?.current ?? null,
@@ -91,5 +95,5 @@ export function useLayer(options: LayerOptions) {
         : previous
       if (restore && returnTo && isAvailable(returnTo)) restoreFocus(returnTo)
     }
-  }, [enabled, modal, contentRef])
+  }, [enabled, modal, contentRef, overlay?.scope, overlay?.scopeRoot])
 }

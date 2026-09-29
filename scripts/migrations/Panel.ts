@@ -79,4 +79,16 @@ export default [
     before: '`onSelectedChange` and `onCollapsedChange` also fired when the parent changed `selectedId` or `collapsed`',
     after: '`onValueChange` and `onCollapsedChange` report only user actions',
   },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: '`style.width` on an expanded inline panel was ignored and reported even without a `width` prop',
+    after: '`style.width` sizes the expanded panel when `width` is omitted; explicit `width` wins, and `collapsedWidth` still sizes the rail',
+  },
+  {
+    kind: 'behavior',
+    component: 'Panel',
+    before: '`width="280"` or `collapsedWidth="60"` silently produced invalid CSS',
+    after: 'Numeric strings now mean pixels and report their normalization once in development',
+  },
 ] satisfies Migration[]

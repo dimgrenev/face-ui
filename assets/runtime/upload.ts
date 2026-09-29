@@ -72,7 +72,7 @@ export function validateFiles<F extends FileLike>(
   return { accepted, rejected }
 }
 
-/** The same id every time the same file is picked or dropped: its size, modification time and name. */
+/** Base id from size, modification time and name; Upload suffixes collisions between distinct files. */
 export function fileId(file: Pick<File, 'name' | 'size' | 'lastModified'>): string {
   return `${file.size}:${file.lastModified}:${file.name}`
 }

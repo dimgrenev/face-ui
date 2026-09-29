@@ -57,6 +57,26 @@ describe('Media type', () => {
 })
 
 describe('Media source and fallback', () => {
+  it('hidden removes the complete boundary, including fallback, for every media kind', async () => {
+    const cases: ReactNode[] = [
+      <Media src="/broken.jpg" alt="Preview" fallback="Unavailable" hidden width={200} height={100} />,
+      <Media type="video" src="/broken.mp4" fallback="Unavailable" hidden width={200} height={100} />,
+      <Media type="audio" src="/broken.mp3" fallback="Unavailable" hidden width={200} height={100} />,
+    ]
+    for (const media of cases) {
+      await render(media)
+      const boundary = root().parentElement!
+      expect(boundary.classList.contains('uf-membrane')).toBe(true)
+      expect(boundary.hidden).toBe(true)
+      expect(element().hidden).toBe(true)
+      await fire(element(), 'error')
+      expect(fallback()?.textContent).toBe('Unavailable')
+      expect(boundary.hidden).toBe(true)
+    }
+    await render(<Media src="/broken.jpg" alt="Preview" fallback="Unavailable" width={200} height={100} />)
+    expect(root().parentElement?.hidden).toBe(false)
+  })
+
   it('src reaches the element; a missing or empty src shows the fallback at once', async () => {
     await render(<Media src="/a.jpg" alt="Lobby" fallback="Unavailable" />)
     expect(element().getAttribute('src')).toBe('/a.jpg')
@@ -272,6 +292,19 @@ describe('Media box', () => {
     expect(root().style.height).toBe('8rem')
     expect(root().style.color).toBe('red')
     expect(element().getAttribute('width')).toBeNull()
+  })
+
+  it('normalizes unitless numeric strings for both dimensions', async () => {
+    await expectDevError(
+      () => render(<Media src="/a.jpg" alt="" width="50" />),
+      /^Face UI Media: invalid width "50"; using 50px\.$/,
+    )
+    await expectDevError(
+      () => render(<Media src="/a.jpg" alt="" width={50} height="25" />),
+      /^Face UI Media: invalid height "25"; using 25px\.$/,
+    )
+    expect(root().style.width).toBe('50px')
+    expect(root().style.height).toBe('25px')
   })
 
   it('without width or height the box takes the full width and the media its own ratio', async () => {

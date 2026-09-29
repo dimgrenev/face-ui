@@ -14,7 +14,8 @@ import { composeHandlers } from '../assets/adapters/react/merge-props'
 import { useControllableState } from '../assets/adapters/react/use-controllable-state'
 import { useEventCallback } from '../assets/adapters/react/use-event-callback'
 import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
-import { readCollection, type Entry } from '../assets/runtime/collection'
+import { readFlatCollection } from '../assets/internal/flat-collection'
+import type { Entry } from '../assets/runtime/collection'
 import { readNumber } from '../assets/runtime/props'
 
 export interface TocItem {
@@ -37,7 +38,7 @@ export interface TocProps extends Omit<
   | 'contentEditable'
   | 'suppressContentEditableWarning'
 > {
-  /** Entries in document order; an empty list renders nothing. */
+  /** Entries in document order; an empty list renders nothing. Groups and separators are dropped with a report. */
   items?: readonly TocItem[]
   /** Controlled current entry, marked `aria-current="location"`; `null` or a value missing from `items` marks none. */
   value?: string | null
@@ -100,12 +101,11 @@ export const Toc = forwardRef<HTMLElement, TocProps>(function Toc(props, ref) {
     onClick,
     ...rest
   } = props
-  // Groups and separators are not entries of an outline.
-  const entries = readCollection<TocItem>(items, {
+  const entries = readFlatCollection<TocItem>(items, {
     component: 'Toc',
     key: (item) => item.value,
     disabled: () => false,
-  }).entries.filter((entry) => entry.parent === null && !entry.disabled)
+  }).entries
   const [stored, setValue] = useControllableState<string | null>({
     value,
     defaultValue,

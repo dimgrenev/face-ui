@@ -19,5 +19,5 @@
   height: var(--uf-selector-indicator-size);
   margin-inline-start: var(--uf-selector-indicator-offset-inline-start, 0px);
   opacity: 0.7;
-  transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-out);
+  transition: opacity var(--face-runtime-transition-duration-fast) var(--uf-motion-ease-out);
 }

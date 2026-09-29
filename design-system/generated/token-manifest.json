@@ -3094,330 +3094,6 @@
       ]
     },
     {
-      "name": "uf-control-height",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "32px"
-      ]
-    },
-    {
-      "name": "uf-control-font-size",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "14px"
-      ]
-    },
-    {
-      "name": "uf-control-line-height",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "20px"
-      ]
-    },
-    {
-      "name": "uf-control-letter-spacing",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "0"
-      ]
-    },
-    {
-      "name": "uf-control-pad-y",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "6px"
-      ]
-    },
-    {
-      "name": "uf-control-pad-text",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "8px"
-      ]
-    },
-    {
-      "name": "uf-control-pad-start",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-control-pad-text)"
-      ]
-    },
-    {
-      "name": "uf-control-pad-end",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-control-pad-text)"
-      ]
-    },
-    {
-      "name": "uf-control-pad-icon",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "6px"
-      ]
-    },
-    {
-      "name": "uf-control-gap",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "8px"
-      ]
-    },
-    {
-      "name": "uf-option-indent",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "calc(var(--uf-icon-size) + var(--uf-control-gap) - var(--uf-spacing-1))"
-      ]
-    },
-    {
-      "name": "uf-content-inset",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-icon-size",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "20px"
-      ]
-    },
-    {
-      "name": "uf-icon-only-size",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "32px"
-      ]
-    },
-    {
-      "name": "uf-hidden-input-size",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "1px"
-      ]
-    },
-    {
-      "name": "uf-hidden-input-offset",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "-1px"
-      ]
-    },
-    {
-      "name": "uf-text-body-size",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "14px"
-      ]
-    },
-    {
-      "name": "uf-text-body-line-height",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "20px"
-      ]
-    },
-    {
-      "name": "uf-text-section-size",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-text-section-line-height",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "16px"
-      ]
-    },
-    {
-      "name": "uf-text-pad-y",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "0px"
-      ]
-    },
-    {
-      "name": "uf-topbar-control-height",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "32px"
-      ]
-    },
-    {
-      "name": "uf-topbar-pad-top",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-topbar-pad-right",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-topbar-pad-bottom",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "2px"
-      ]
-    },
-    {
-      "name": "uf-topbar-pad-left",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "12px"
-      ]
-    },
-    {
-      "name": "uf-topbar-slot-pad-y",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "0px"
-      ]
-    },
-    {
       "name": "uf-topbar-height",
       "sheet": "geometry",
       "profile": "design-system",
@@ -3490,30 +3166,6 @@
       ]
     },
     {
-      "name": "uf-workspace-resize-line-color",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root,\n[data-theme='light'],\n[data-theme='dark']"
-      ],
-      "values": [
-        "var(--uf-color-border)"
-      ]
-    },
-    {
-      "name": "uf-workspace-resize-line-active-color",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root,\n[data-theme='light'],\n[data-theme='dark']"
-      ],
-      "values": [
-        "var(--uf-color-border-hover)"
-      ]
-    },
-    {
       "name": "uf-workspace-resize-line-transition",
       "sheet": "geometry",
       "profile": "design-system",
@@ -3523,18 +3175,6 @@
       ],
       "values": [
         "none"
-      ]
-    },
-    {
-      "name": "uf-interactive-weight",
-      "sheet": "geometry",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/geometry.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "500"
       ]
     },
     {
@@ -3594,7 +3234,7 @@
         ":root"
       ],
       "values": [
-        "120ms"
+        "var(--uf-motion-duration-fast, 120ms)"
       ]
     },
     {
@@ -3606,7 +3246,7 @@
         ":root"
       ],
       "values": [
-        "140ms"
+        "var(--uf-motion-duration-short, 150ms)"
       ]
     },
     {
@@ -3618,7 +3258,7 @@
         ":root"
       ],
       "values": [
-        "240ms"
+        "var(--uf-motion-duration-control, 200ms)"
       ]
     },
     {
@@ -3630,7 +3270,7 @@
         ":root"
       ],
       "values": [
-        "300ms"
+        "var(--uf-motion-duration-medium, 250ms)"
       ]
     },
     {
@@ -3642,7 +3282,7 @@
         ":root"
       ],
       "values": [
-        "cubic-bezier(0, 0, 0.2, 1)"
+        "var(--uf-motion-ease-out, ease-out)"
       ]
     },
     {
@@ -3654,7 +3294,7 @@
         ":root"
       ],
       "values": [
-        "cubic-bezier(0.2, 0.8, 0.2, 1)"
+        "var(--uf-motion-ease-in-out, ease-in-out)"
       ]
     },
     {
@@ -5606,7 +5246,7 @@
         ":root"
       ],
       "values": [
-        "'Begriffsschrift', monospace"
+        "ui-monospace, monospace"
       ]
     },
     {
@@ -5898,30 +5538,6 @@
       ]
     },
     {
-      "name": "uf-control-font-size",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "14px"
-      ]
-    },
-    {
-      "name": "uf-control-line-height",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "20px"
-      ]
-    },
-    {
       "name": "uf-control-letter-spacing",
       "sheet": "typography",
       "profile": "design-system",
@@ -6087,66 +5703,6 @@
       ],
       "values": [
         "var(--uf-control-pad-text)"
-      ]
-    },
-    {
-      "name": "uf-text-pad-y",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-control-pad-y)"
-      ]
-    },
-    {
-      "name": "uf-text-body-size",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-control-font-size)"
-      ]
-    },
-    {
-      "name": "uf-text-body-line-height",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-control-line-height)"
-      ]
-    },
-    {
-      "name": "uf-text-section-size",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-control-font-size)"
-      ]
-    },
-    {
-      "name": "uf-text-section-line-height",
-      "sheet": "typography",
-      "profile": "design-system",
-      "generatedPath": "design-system/tokens/typography.css",
-      "selectors": [
-        ":root"
-      ],
-      "values": [
-        "var(--uf-control-line-height)"
       ]
     },
     {

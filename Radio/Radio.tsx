@@ -19,8 +19,8 @@ import {
   useField,
   type FieldProps,
 } from '../assets/internal/field'
+import { readFlatCollection } from '../assets/internal/flat-collection'
 import type { CollectionItem } from '../assets/internal/item'
-import { readCollection } from '../assets/runtime/collection'
 import { resolveLabel } from '../assets/runtime/labels'
 import { cn } from '../assets/utils'
 import { Text } from '../Text/Text'
@@ -67,7 +67,7 @@ interface RadioBaseProps
       | 'role'
       | 'aria-orientation'
     > {
-  /** Choices in navigation order; an item repeating an earlier value is dropped. */
+  /** Choices in navigation order; an item without a unique string `value`, or a group or separator, is dropped with a report. */
   items?: readonly RadioItem[]
   /** Controlled selection; `null`, or a value missing from `items`, checks nothing. */
   value?: string | null
@@ -137,7 +137,7 @@ export const Radio = forwardRef<HTMLDivElement, RadioProps>(function Radio(
   },
   ref,
 ) {
-  const collection = readCollection<RadioItem>(items, {
+  const collection = readFlatCollection<RadioItem>(items, {
     component: 'Radio',
     key: (item) => item.value,
   })

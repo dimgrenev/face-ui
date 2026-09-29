@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import ts from 'typescript'
 
@@ -7,7 +7,7 @@ export function generateDesignSystem(root, write) {
   const outputs = new Map()
   const manifest = []
   const sheets = new Map()
-  const declarations = new Set()
+  const declarations = new Map()
   for (const file of readdirSync(join(root, 'design-system/source'))
     .filter((file) => file.endsWith('.jsonc'))
     .sort()) {
@@ -28,10 +28,15 @@ export function generateDesignSystem(root, write) {
       if (!/^--[\w-]+$/.test(token.name) || !token.variants.length)
         throw new Error(`Invalid token in ${file}`)
       for (const { selector, value } of token.variants) {
-        const key = `${source.generatedPath}:${selector}:${token.name}`
-        if (declarations.has(key))
-          throw new Error(`Duplicate declaration: ${key}`)
-        declarations.add(key)
+        // A declaration in a later shard would silently win in the runtime bundle.
+        // Ownership therefore applies across every source/output, not per file.
+        const key = `${selector}\0${token.name}`
+        const previous = declarations.get(key)
+        if (previous)
+          throw new Error(
+            `Duplicate declaration: ${token.name} at ${JSON.stringify(selector)} in ${previous} and ${file}`,
+          )
+        declarations.set(key, file)
         const values = blocks.get(selector) ?? []
         values.push(`  ${token.name}: ${value};`)
         blocks.set(selector, values)
@@ -48,6 +53,23 @@ export function generateDesignSystem(root, write) {
       const sheet = sheets.get(token.sheet) ?? []
       sheet.push(entry)
       sheets.set(token.sheet, sheet)
+    }
+  }
+  // Component defaults share the runtime :root cascade with authored tokens.
+  // Keep their names distinct so a later bundle section cannot shadow a source.
+  const componentTokensPath = join(root, 'assets/styles/component-tokens.css')
+  if (existsSync(componentTokensPath)) {
+    const css = readFileSync(componentTokensPath, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+    const defaults = /^\s*:root\s*\{([^}]*)\}/m.exec(css)?.[1]
+    if (!defaults) throw new Error('Missing component token :root defaults')
+    for (const [, name] of defaults.matchAll(/^\s*(--[\w-]+)\s*:/gm)) {
+      const key = `:root\0${name}`
+      const previous = declarations.get(key)
+      if (previous)
+        throw new Error(
+          `Duplicate declaration: ${name} at ":root" in ${previous} and assets/styles/component-tokens.css`,
+        )
+      declarations.set(key, 'assets/styles/component-tokens.css')
     }
   }
   const generated = new Map(

@@ -7,12 +7,42 @@ export interface Layer {
   onEscape?: (event: KeyboardEvent) => void
   /** A press outside this layer and every layer above it, down to the nearest modal layer. */
   onOutside?: (event: Event) => void
+  /** Omitted layers retain the document-wide legacy stack. */
+  scope?: object
+  /** Instance boundary used for scoped modal inertness and outside activity. */
+  scopeRoot?: HTMLElement | null
 }
 
 const documents = new WeakMap<
   Document,
   { layers: Layer[]; update: () => void }
 >()
+const modalListeners = new WeakMap<Document, Set<() => void>>()
+
+/** The active modal surface for one overlay scope, if one is registered. */
+export function activeModal(doc: Document, scope?: object): HTMLElement | null {
+  const layers = documents.get(doc)?.layers ?? []
+  return layers.findLast((entry) => entry.scope === scope && !!entry.modal?.()?.isConnected)
+    ?.modal?.() ?? null
+}
+
+/** Notifies notification regions when their owning modal opens or closes. */
+export function subscribeActiveModal(doc: Document, listener: () => void): () => void {
+  let listeners = modalListeners.get(doc)
+  if (!listeners) {
+    listeners = new Set()
+    modalListeners.set(doc, listeners)
+  }
+  listeners.add(listener)
+  return () => {
+    listeners!.delete(listener)
+    if (!listeners!.size) modalListeners.delete(doc)
+  }
+}
+
+function notifyActiveModal(doc: Document) {
+  modalListeners.get(doc)?.forEach((listener) => listener())
+}
 
 /** Available elements in `container` that are in the tab order, in DOM order. */
 export function getFocusableElements(container: HTMLElement): HTMLElement[] {
@@ -62,45 +92,63 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
       }
       inert.clear()
     }
+    const scopeFor = (node: Node | null, path: EventTarget[] = []): object | null => {
+      if (!node) return null
+      const owned = layers.findLast(
+        (entry) => entry.scope && holds(entry, node, path),
+      )
+      if (owned?.scope) return owned.scope
+      const rooted = layers.findLast(
+        (entry) => entry.scope && entry.scopeRoot?.contains(node),
+      )
+      return rooted?.scope ?? null
+    }
+    const modalIndexFor = (scope: object | undefined) =>
+      layers.findLastIndex(
+        (entry) =>
+          entry.scope === scope && !!entry.modal?.()?.isConnected,
+      )
     const update = () => {
       restoreInert()
-      let modalIndex = -1
-      for (let i = 0; i < layers.length; i++)
-        if (layers[i].modal?.()) modalIndex = i
-      if (modalIndex < 0) return
-      const allowed = [
-        layers[modalIndex].modal!()!,
-        ...layers
-          .slice(modalIndex + 1)
-          .flatMap((entry) => entry.elements())
-          .filter((node): node is Element => !!node),
-      ]
-      const visit = (parent: Element) => {
+      const visit = (parent: Element, allowed: Element[]) => {
         for (const child of Array.from(parent.children)) {
           if (allowed.includes(child)) continue
-          if (allowed.some((node) => child.contains(node))) visit(child)
+          if (allowed.some((node) => child.contains(node))) visit(child, allowed)
           else {
             inert.set(child, child.getAttribute('inert'))
             child.setAttribute('inert', '')
           }
         }
       }
-      visit(doc.body)
+      for (const scope of new Set(layers.map((entry) => entry.scope))) {
+        const modalIndex = modalIndexFor(scope)
+        if (modalIndex < 0) continue
+        const root = scope === undefined
+          ? doc.body
+          : layers[modalIndex].scopeRoot
+        if (!root || root.ownerDocument !== doc) continue
+        const allowed = [
+          layers[modalIndex].modal!()!,
+          ...layers.slice(modalIndex + 1)
+            .filter((entry) => entry.scope === scope)
+            .flatMap((entry) => entry.elements())
+            .filter((node): node is Element => !!node),
+        ]
+        visit(root, allowed)
+      }
       // React descendants may focus themselves before the parent layer effect.
       const active = doc.activeElement as HTMLElement | null
       if (active && isAvailable(active)) rememberFocus(active)
     }
-    const top = () => layers[layers.length - 1]
-    const focusBoundary = () => {
-      const index = layers.findLastIndex(
-        (entry) => !!entry.modal?.()?.isConnected,
-      )
+    const focusBoundary = (scope: object | undefined) => {
+      const index = modalIndexFor(scope)
       if (index < 0) return null
       const modal = layers[index].modal!()!
       const roots = [
         modal,
         ...layers
           .slice(index + 1)
+          .filter((entry) => entry.scope === scope)
           .flatMap((entry) => entry.elements())
           .filter(
             (node): node is HTMLElement =>
@@ -117,8 +165,11 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
         },
       }
     }
+    let lastScopedFocus: object | null = null
     const rememberFocus = (element: HTMLElement) => {
-      const boundary = focusBoundary()
+      const scope = scopeFor(element)
+      if (scope) lastScopedFocus = scope
+      const boundary = focusBoundary(undefined) ?? focusBoundary(scope ?? undefined)
       const root = boundary?.roots.findLast((root) => root.contains(element))
       if (!boundary || !root) return false
       focused.set(boundary.modal, { element, root })
@@ -132,9 +183,13 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
       // Layers below the nearest modal are inert. From the top down, each layer
       // the press is outside of is dismissed; the first layer containing it is
       // inside every layer below it, so the walk stops there.
-      const floor = layers.findLastIndex((entry) => !!entry.modal?.())
       const path = event.composedPath()
-      for (const entry of layers.slice(Math.max(0, floor)).reverse()) {
+      // A press in a sibling instance must not inherit the focused instance's
+      // layer stack. The target alone decides which scope owns the gesture.
+      const scope = scopeFor(event.target as Node, path)
+      const candidates = layers.filter((entry) => entry.scope === (scope ?? undefined))
+      const floor = candidates.findLastIndex((entry) => !!entry.modal?.())
+      for (const entry of candidates.slice(Math.max(0, floor)).reverse()) {
         if (holds(entry, event.target as Node, path)) return
         entry.onOutside?.(event)
       }
@@ -158,14 +213,15 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
     }
     const onKeyDown = (event: KeyboardEvent) => {
       gesture = undefined
-      const entry = top()
+      const scope = scopeFor(event.target as Node) ?? scopeFor(doc.activeElement)
+      const entry = layers.findLast((item) => item.scope === (scope ?? undefined))
       if (!entry || event.defaultPrevented) return
       if (event.key === 'Escape' && entry.onEscape) {
         event.preventDefault()
         event.stopPropagation()
         entry.onEscape(event)
       }
-      const boundary = focusBoundary()
+      const boundary = focusBoundary(undefined) ?? focusBoundary(scope ?? undefined)
       if (event.key !== 'Tab' || !boundary) return
       const { modal, roots, stops } = boundary
       const first = stops[0] ?? modal
@@ -182,14 +238,18 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
     }
     const onFocusIn = (event: FocusEvent) => {
       if (rememberFocus(event.target as HTMLElement)) return
-      const boundary = focusBoundary()
+      const scope = scopeFor(event.target as Node)
+      const boundary = focusBoundary(undefined) ?? focusBoundary(scope ?? undefined)
       if (!boundary) return
       ;(boundary.stops[0] ?? boundary.modal).focus({ preventScroll: true })
     }
     const recoverFocus = () => {
-      const boundary = focusBoundary()
-      if (!boundary || !isAvailable(boundary.modal)) return
       const active = doc.activeElement as HTMLElement | null
+      const scope = scopeFor(active) ?? (active === doc.body ? lastScopedFocus : null)
+      const boundary = focusBoundary(undefined) ?? focusBoundary(scope ?? undefined)
+      if (!boundary || !isAvailable(boundary.modal)) return
+      if (active && active !== doc.body && isAvailable(active) &&
+          !boundary.roots.some((root) => root.contains(active))) return
       if (
         active &&
         boundary.roots.some((root) => root.contains(active)) &&
@@ -250,17 +310,20 @@ export function registerLayer(doc: Document, layer: Layer): () => void {
   }
   // Child effects mount first. Insert a parent below layers already inside it.
   const childIndex = state.layers.findIndex((existing) =>
+    existing.scope === layer.scope &&
     existing.elements().some((child) => !!child && holds(layer, child)),
   )
   if (childIndex < 0) state.layers.push(layer)
   else state.layers.splice(childIndex, 0, layer)
   state.update()
+  notifyActiveModal(doc)
   let removed = false
   return () => {
     if (removed) return
     removed = true
     state.layers.splice(state.layers.indexOf(layer), 1)
     state.update()
+    notifyActiveModal(doc)
     if (!state.layers.length) cleanups.get(state)?.()
   }
 }
@@ -286,6 +349,7 @@ export function layerContains(layer: Layer, node: Node | null): boolean {
   const index = stack.indexOf(layer)
   for (const entry of index < 0 ? [] : stack.slice(index + 1))
     if (
+      entry.scope === layer.scope &&
       entry
         .elements()
         .some((child) => !!child && nested.some((one) => holds(one, child)))

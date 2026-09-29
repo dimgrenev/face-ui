@@ -56,15 +56,15 @@
     },
     "./component-registry.json": "./dist/esm/component-registry.json",
     "./face-ui-react.json": "./dist/esm/face-ui-react.json",
+    "./assets/styles/text.css": "./dist/esm/assets/styles/text.css",
     "./assets/styles/*": "./dist/esm/assets/styles/*",
-    "./assets/fonts/*": "./dist/esm/assets/fonts/*",
     "./assets/Icons/*": "./dist/esm/assets/Icons/*",
     "./assets/media/*": "./dist/esm/assets/media/*",
     "./design-system/*": "./dist/esm/design-system/*",
-    "./assets/adapters/react/*": {
-      "types": "./dist/types/assets/adapters/react/*.d.ts",
-      "import": "./dist/esm/assets/adapters/react/*.js",
-      "require": "./dist/cjs/assets/adapters/react/*.js"
+    "./assets/adapters/react/use-floating-position": {
+      "types": "./dist/types/assets/adapters/react/use-floating-position.d.ts",
+      "import": "./dist/esm/assets/adapters/react/use-floating-position.js",
+      "require": "./dist/cjs/assets/adapters/react/use-floating-position.js"
     },
     "./docs.md": "./docs.md",
     "./MIGRATION.md": "./MIGRATION.md",
@@ -256,17 +256,19 @@
       "import": "./dist/esm/Media/*.js",
       "require": "./dist/cjs/Media/*.js"
     },
-    "./Meter/*.json": "./dist/esm/Meter/*.json",
     "./Meter": {
       "types": "./dist/types/Meter/Meter.d.ts",
       "import": "./dist/esm/Meter/Meter.js",
       "require": "./dist/cjs/Meter/Meter.js"
     },
-    "./Meter/*": {
-      "types": "./dist/types/Meter/*.d.ts",
-      "import": "./dist/esm/Meter/*.js",
-      "require": "./dist/cjs/Meter/*.js"
+    "./Meter/Meter": {
+      "types": "./dist/types/Meter/Meter.d.ts",
+      "import": "./dist/esm/Meter/Meter.js",
+      "require": "./dist/cjs/Meter/Meter.js"
     },
+    "./Meter/Meter.context-window.face.json": "./dist/esm/Meter/Meter.context-window.face.json",
+    "./Meter/Meter.json": "./dist/esm/Meter/Meter.json",
+    "./Meter/Meter.storage-quota.face.json": "./dist/esm/Meter/Meter.storage-quota.face.json",
     "./Menu/*.json": "./dist/esm/Menu/*.json",
     "./Menu": {
       "types": "./dist/types/Menu/Menu.d.ts",

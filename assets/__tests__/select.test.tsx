@@ -131,6 +131,29 @@ describe('Select as a field', () => {
 })
 
 describe('Select prop contract', () => {
+  it('membrane changes trigger and option boundaries while the list surface keeps its spacing', async () => {
+    await render({ membrane: false, open: true })
+    expect(trigger().parentElement?.hasAttribute('data-membrane-disabled')).toBe(true)
+    expect(option('a').parentElement?.hasAttribute('data-membrane-disabled')).toBe(true)
+    const surfaceBoundary = document.querySelector<HTMLElement>('.uf-select__contentMembrane')!
+    expect(surfaceBoundary.hasAttribute('data-membrane-disabled')).toBe(false)
+
+    await render({ membrane: true, open: true })
+    expect(trigger().parentElement?.hasAttribute('data-membrane-disabled')).toBe(false)
+    expect(option('a').parentElement?.hasAttribute('data-membrane-disabled')).toBe(false)
+    expect(document.querySelector('.uf-select__contentMembrane')).toBe(surfaceBoundary)
+  })
+
+  it('normalizes numeric string contentMinWidth before inserting it into CSS math', async () => {
+    await expectDevError(
+      () => render({ contentMinWidth: '280', open: true }),
+      /^Face UI Select: invalid contentMinWidth "280"; using 280px\.$/,
+    )
+    const surface = document.querySelector<HTMLElement>('.uf-select__content')!
+    expect(surface.style.minWidth).toContain('280px')
+    expect(surface.style.getPropertyValue('--face-runtime-select-content-min-width')).toBe('280px')
+  })
+
   it('exposes a stable native trigger ref', async () => {
     const ref = vi.fn()
     await render({ ref, value: 'a' })
@@ -376,6 +399,43 @@ describe('Select prop contract', () => {
     expect(list()).toBeNull()
     expect(onOpenChange).not.toHaveBeenCalled()
   })
+  it.each(['sheet', 'popover'] as const)(
+    'does not expose an initially hidden %s with open or defaultOpen',
+    async (surface) => {
+      const onOpenChange = vi.fn()
+      await render({ surface, hidden: true, open: true, onOpenChange })
+      expect(trigger().getAttribute('aria-expanded')).toBe('false')
+      expect(list()).toBeNull()
+      expect(document.querySelector('.uf-select__content')).toBeNull()
+      expect(document.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
+      expect(document.body.style.overflow).not.toBe('hidden')
+      expect(onOpenChange).not.toHaveBeenCalled()
+
+      await act(async () => root.render(null))
+      await render({ surface, hidden: true, defaultOpen: true, onOpenChange })
+      expect(trigger().getAttribute('aria-expanded')).toBe('false')
+      expect(list()).toBeNull()
+      await render({ surface, defaultOpen: true, onOpenChange })
+      expect(list()).toBeNull()
+      expect(onOpenChange).not.toHaveBeenCalled()
+    },
+  )
+  it.each(['sheet', 'popover'] as const)(
+    'tears down an open %s when hidden becomes true',
+    async (surface) => {
+      const onOpenChange = vi.fn()
+      await render({ surface, defaultOpen: true, onOpenChange })
+      expect(list()).not.toBeNull()
+      await render({ surface, defaultOpen: true, hidden: true, onOpenChange })
+      expect(list()).toBeNull()
+      expect(document.querySelector('.uf-select__content')).toBeNull()
+      expect(document.querySelector('.uf-responsive-overlay-backdrop')).toBeNull()
+      expect(document.body.style.overflow).not.toBe('hidden')
+      await render({ surface, defaultOpen: true, onOpenChange })
+      expect(list()).toBeNull()
+      expect(onOpenChange).not.toHaveBeenCalled()
+    },
+  )
   it('uses multiple as the mode even before any values are selected', async () => {
     const onValueChange = vi.fn()
     await render({ multiple: true, onValueChange })
@@ -542,19 +602,23 @@ describe('Select prop contract', () => {
       () =>
         render({
           items: [
-            { type: 'group', label: 'Group', items: [{ value: 'x', label: 'X' }] },
+            { type: 'group', label: 'Group', items: [{ value: 'a', label: 'Shadow' }] },
             { type: 'separator' },
+            { value: '#1', label: 'Hash' },
             ...abc,
           ],
+          defaultValue: 'a',
         }),
-      /^Face UI Select: invalid item type "(group|separator)"; dropping the item/,
+      /^Face UI Select: invalid items\[\]\.type "(group|separator)"; dropping the item/,
     )
     await act(async () => trigger().click())
     expect(
       Array.from(list()!.querySelectorAll('[role="option"]'), (node) =>
         node.getAttribute('data-value'),
       ),
-    ).toEqual(['a', 'b', 'c'])
+    ).toEqual(['#1', 'a', 'b', 'c'])
+    expect(trigger().textContent).toContain('Alpha')
+    expect(list()?.textContent).not.toContain('Shadow')
   })
 
   it('renders hostile sizes and labels without throwing', async () => {

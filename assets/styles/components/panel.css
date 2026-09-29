@@ -86,7 +86,7 @@
 .uf-sidebar-itemIndicator {
   display: inline-flex;
   flex: none;
-  transition: transform var(--uf-duration-enter) var(--uf-ease-enter);
+  transition: transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
 }
 .uf-sidebar-itemIndicator:dir(rtl) {
   transform: scaleX(-1);

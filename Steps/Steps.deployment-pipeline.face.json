@@ -57,7 +57,7 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Ordered steps; an omitted or empty list renders no navigation."
+      "description": "Ordered steps; an omitted or empty list renders no navigation. Groups and separators are dropped with a report."
     },
     {
       "name": "step",

@@ -2,13 +2,6 @@
  * DATE
  * ================================================================= */
 .uf-date[data-scope="date"] {
-  --uf-date-content-max-width: 23.75rem;
-  --uf-date-content-max-height: 40rem;
-  --uf-date-content-viewport-gap: var(--uf-spacing-8);
-  --uf-date-sheet-inset: var(--uf-spacing-1);
-  --uf-date-sheet-gap: calc(var(--uf-date-sheet-inset) * 2);
-  --uf-date-panel-pad: var(--uf-membrane);
-  --uf-date-sheet-enter-y: 1.125rem;
   position: relative; /* the form proxy covers the root */
   width: 100%;
 }
@@ -21,10 +14,9 @@
   justify-content: space-between;
   min-height: var(--uf-control-height);
   width: 100%;
-  padding-top: var(--uf-control-pad-y);
-  padding-bottom: var(--uf-control-pad-y);
-  padding-left: var(--uf-control-pad-text);
-  padding-right: var(--uf-control-pad-icon);
+  padding-block: var(--uf-control-pad-y);
+  padding-inline-start: var(--uf-control-pad-text);
+  padding-inline-end: var(--uf-control-pad-icon);
   border: none;
   border-radius: var(--uf-radius);
   background: var(--uf-color-black-0);
@@ -65,8 +57,8 @@
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    visibility 0s linear var(--uf-duration-exit);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--face-runtime-transition-duration-exit);
 }
 .uf-date__content[data-surface="sheet"] {
   position: fixed;
@@ -84,7 +76,7 @@
   visibility: visible;
   pointer-events: auto;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
     visibility 0s linear 0s;
 }
 .uf-date__content[data-state="closed"] {
@@ -115,8 +107,8 @@
   transform-origin: top center;
   opacity: 0;
   transition:
-    opacity var(--uf-duration-enter) var(--uf-ease-enter),
-    transform var(--uf-duration-enter) var(--uf-ease-enter);
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
 }
 .uf-date__content[data-surface="sheet"] .uf-date__contentPanel {
   width: 100%;

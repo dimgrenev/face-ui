@@ -99,6 +99,8 @@ test('height sizes the box and the viewport fills it and scrolls', { tag: ['@lay
   await render(page, { children: rows(2), height: '10rem' })
   const rem = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).fontSize))
   expect((await box(outer(page))).height).toBeCloseTo(10 * rem, 0)
+  await render(page, { children: rows(40), height: '50' })
+  expect((await box(outer(page))).height).toBeCloseTo(50, 0)
 })
 
 test('without height the box is as tall as its content; style.maxHeight caps it and the rest scrolls', { tag: ['@layout'] }, async ({

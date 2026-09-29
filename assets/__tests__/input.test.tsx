@@ -186,11 +186,12 @@ describe('Input prop contract', () => {
     }
   })
 
-  it('the error is a described message, never an alert', async () => {
+  it('the visible error describes the control and a separate polite status announces changes', async () => {
     await render({ id: 'name', label: 'Name', error: 'Required' })
     expect(part('error')!.id).toBe('name-error')
     expect(part('error')!.hasAttribute('role')).toBe(false)
-    expect(host.querySelector('[role="alert"], [aria-live]')).toBeNull()
+    expect(host.querySelector('[role="alert"]')).toBeNull()
+    expect(host.querySelector('[role="status"][aria-live="polite"]')).not.toBeNull()
     expect(field().getAttribute('aria-describedby')).toBe('name-error')
   })
 

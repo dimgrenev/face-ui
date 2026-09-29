@@ -385,13 +385,29 @@ describe('Panel rail', () => {
     expect(nav().style.width).toBe('100%')
   })
 
-  it('style.width is ignored with a report: width and collapsedWidth own the width', async () => {
-    await expectDevError(
-      () => render({ style: { width: 400, minWidth: 100 } }),
-      /^Face UI Panel: invalid style\.width 400; ignoring it: width and collapsedWidth size the panel\.$/,
-    )
-    expect(nav().style.width).toBe('260px')
+  it('style.width sizes the expanded panel when width is omitted, while explicit widths win', async () => {
+    await render({ style: { width: 400, minWidth: 100 } })
+    expect(nav().style.width).toBe('400px')
     expect(nav().style.minWidth).toBe('100px')
+    await render({ width: 280, style: { width: 400 } })
+    expect(nav().style.width).toBe('280px')
+    await render({ collapsedWidth: 60, style: { width: 400 } })
+    await click(toggle()!)
+    expect(nav().style.width).toBe('60px')
+  })
+
+  it('normalizes numeric string widths for the expanded panel and rail', async () => {
+    await expectDevError(
+      () => render({ width: '280' }),
+      /^Face UI Panel: invalid width "280"; using 280px\.$/,
+    )
+    expect(nav().style.width).toBe('280px')
+    await expectDevError(
+      () => render({ width: 280, collapsedWidth: '60' }),
+      /^Face UI Panel: invalid collapsedWidth "60"; using 60px\.$/,
+    )
+    await click(toggle()!)
+    expect(nav().style.width).toBe('60px')
   })
 
   it('collapsed hides labels visually but keeps them as accessible names, and hides group rows', async () => {

@@ -105,6 +105,23 @@ test('drag and drop: a file drag marks the field, the drop lists the files and t
   ])
 })
 
+test('distinct files with matching metadata are both listed and submitted', { tag: ['@native'] }, async ({ page }) => {
+  await render(page, { name: 'attachments', multiple: true, label: 'Attachments' })
+  const transfer = await page.evaluateHandle(() => {
+    const data = new DataTransfer()
+    data.items.add(new File(['a'], 'same.txt', { type: 'text/plain', lastModified: 42 }))
+    data.items.add(new File(['b'], 'same.txt', { type: 'text/plain', lastModified: 42 }))
+    return data
+  })
+  await part(page, 'dropzone').dispatchEvent('drop', { dataTransfer: transfer })
+  expect(await names(page)).toEqual(['same.txt', 'same.txt'])
+  expect(await submit(page)).toEqual([
+    ['attachments', 'same.txt'],
+    ['attachments', 'same.txt'],
+  ])
+  expect(await events(page)).not.toContainEqual({ reject: [['same.txt', 'tooMany']] })
+})
+
 test('drag and drop: leaving through a nested element keeps the mark until the drag leaves the field', { tag: ['@native'] }, async ({ page }) => {
   await render(page, { label: 'Attachments' })
   const files = [{ name: 'a.txt', size: 3, type: 'text/plain' }]
@@ -123,6 +140,8 @@ test('drag and drop: leaving through a nested element keeps the mark until the d
 
 test('validation messages: rejected files are named under the drop area, one line per reason', { tag: ['@native', '@css'] }, async ({ page }) => {
   await render(page, { accept: '.pdf', maxSize: 1024, multiple: true, maxFiles: 2, label: 'Contracts' })
+  const status = page.locator('.uf-upload [role="status"][aria-live="polite"]')
+  await expect(status).toBeEmpty()
   await input(page).setInputFiles([
     file('notes.txt'),
     file('big.pdf', 4096, 'application/pdf'),
@@ -134,6 +153,7 @@ test('validation messages: rejected files are named under the drop area, one lin
   expect(await message(page).evaluate((node: HTMLElement) => node.innerText)).toBe(
     'File type not accepted: notes.txt\nLarger than 1.0 KB: big.pdf\nLimit of 2 reached: c.pdf',
   )
+  await expect(status).toHaveText('File type not accepted: notes.txt\nLarger than 1.0 KB: big.pdf\nLimit of 2 reached: c.pdf')
   await expect(part(page, 'root')).toHaveAttribute('data-invalid', '')
   await expect(page.getByRole('button', { name: 'Choose files' })).toHaveAccessibleDescription(/File type not accepted: notes\.txt/)
   expect(await events(page)).toContainEqual({
@@ -145,6 +165,7 @@ test('validation messages: rejected files are named under the drop area, one lin
   })
   await page.getByRole('button', { name: 'Remove a.pdf' }).click()
   await expect(message(page)).toHaveCount(0)
+  await expect(status).toBeEmpty()
 })
 
 test('validation messages: a required empty field blocks submission, shows the browser message and focuses the button', { tag: ['@native', '@focus'] }, async ({ page }) => {
@@ -162,6 +183,23 @@ test('validation messages: a required empty field blocks submission, shows the b
   await input(page).setInputFiles([file('signed.pdf', 8, 'application/pdf')])
   await expect(message(page)).toHaveCount(0)
   expect(await submit(page)).toEqual([['contract', 'signed.pdf']])
+})
+
+test('repeating the same rejection refreshes its live announcement', { tag: ['@native', '@a11y'] }, async ({ page }) => {
+  await render(page, { accept: '.pdf', label: 'Contracts' })
+  const status = page.locator('.uf-upload [role="status"][aria-live="polite"]')
+  const refused = [{ name: 'notes.txt', size: 3, type: 'text/plain' }]
+  await drag(page, refused, ['drop'])
+  await expect(status).toHaveText('File type not accepted: notes.txt')
+  await status.evaluate((node) => {
+    const changes: string[] = []
+    new MutationObserver(() => changes.push(node.textContent ?? ''))
+      .observe(node, { childList: true, characterData: true, subtree: true })
+    ;(window as any).announcementChanges = changes
+  })
+  await drag(page, refused, ['drop'])
+  await expect.poll(() => page.evaluate(() => (window as any).announcementChanges)).toContain('')
+  await expect(status).toHaveText('File type not accepted: notes.txt')
 })
 
 test('the covering input anchors the browser bubble on the drop area', { tag: ['@layout'] }, async ({ page }) => {

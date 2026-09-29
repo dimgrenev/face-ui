@@ -193,7 +193,7 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "The tabs in order, keyed by `value`: label, icon, content, disabled, panelId and native naming (id, title, aria-*).",
+      "description": "The tabs in order, keyed by `value`: label, icon, content, disabled, panelId and native naming (id, title, aria-*). Groups and separators are dropped with a report.",
       "defaultValue": []
     }
   ],

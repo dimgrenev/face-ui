@@ -131,7 +131,7 @@
       "name": "error",
       "type": "any",
       "required": false,
-      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Not a live region."
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
     },
     {
       "name": "labelPosition",
@@ -225,13 +225,13 @@
       "name": "open",
       "type": "boolean",
       "required": false,
-      "description": "Controlled list visibility; a disabled Select, or one without enabled items, stays closed."
+      "description": "Controlled list visibility; hidden, disabled, or unavailable Selects expose no list."
     },
     {
       "name": "defaultOpen",
       "type": "boolean",
       "required": false,
-      "description": "List visibility on mount when `open` is not set; read once.",
+      "description": "List visibility on mount when `open` is not set; read once. Hiding an uncontrolled list closes it.",
       "defaultValue": false
     },
     {
@@ -257,13 +257,13 @@
       "name": "contentMinWidth",
       "type": "any",
       "required": false,
-      "description": "Minimum popover width in pixels or CSS length, capped by the viewport; side and sheet surfaces ignore it."
+      "description": "Minimum popover width: a number or numeric string is pixels, or pass a CSS length; capped by the viewport. Side and sheet surfaces ignore it."
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Shared outer spacing around the trigger and each item; toggling it keeps the trigger.",
+      "description": "Outer spacing around the trigger and each option; the list surface keeps its own spacing.",
       "defaultValue": true
     },
     {

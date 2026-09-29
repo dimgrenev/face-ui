@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
+import { useFaceUiOverlayBoundary } from './overlay-context'
 
 const locks = new WeakMap<Document, { count: number; restore: () => void }>()
+const scopeLocks = new WeakMap<HTMLElement, { count: number; restore: () => void }>()
 
 /**
  * Stops document scrolling until every owner has released it, so nested
@@ -54,10 +56,40 @@ export function acquireBodyScrollLock(doc: Document): () => void {
   }
 }
 
-/** Holds a body scroll lock while `locked` is true. */
+/** Locks only the host instance; sibling providers retain their own scrolling. */
+function acquireScopeScrollLock(root: HTMLElement): () => void {
+  let lock = scopeLocks.get(root)
+  if (!lock) {
+    const style = root.style
+    const value = style.getPropertyValue('overflow')
+    const priority = style.getPropertyPriority('overflow')
+    style.setProperty('overflow', 'hidden')
+    lock = {
+      count: 0,
+      restore: () => {
+        if (value) style.setProperty('overflow', value, priority)
+        else style.removeProperty('overflow')
+      },
+    }
+    scopeLocks.set(root, lock)
+  }
+  lock.count++
+  let released = false
+  return () => {
+    if (released) return
+    released = true
+    if (--lock.count !== 0) return
+    lock.restore()
+    scopeLocks.delete(root)
+  }
+}
+
+/** Holds a scroll lock while `locked` is true, within the provider when present. */
 export function useBodyScrollLock(locked: boolean) {
+  const overlay = useFaceUiOverlayBoundary()
   useEffect(() => {
-    if (!locked || typeof document === 'undefined') return
-    return acquireBodyScrollLock(document)
-  }, [locked])
+    if (!locked) return
+    if (overlay?.scopeRoot) return acquireScopeScrollLock(overlay.scopeRoot)
+    if (typeof document !== 'undefined') return acquireBodyScrollLock(document)
+  }, [locked, overlay?.scope, overlay?.scopeRoot])
 }

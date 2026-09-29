@@ -18,6 +18,7 @@ import { getCardSurfaceProps } from '../assets/internal/card-surface'
 import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
 import { useScrollable } from '../assets/adapters/react/use-scrollable'
 import { resolveLabel } from '../assets/runtime/labels'
+import { readCssSize } from '../assets/runtime/props'
 import { Text } from '../Text/Text'
 
 export const scrollAnatomy = createAnatomy('scroll').parts('root', 'viewport', 'content')
@@ -38,7 +39,7 @@ export interface ScrollProps extends Omit<
   children?: ReactNode
   /** Axes the content scrolls along; overflow along the other axis is clipped. */
   orientation?: 'vertical' | 'horizontal' | 'both'
-  /** Height of the box: pixels, or any CSS length. Without it the box is as tall as its content, or as its layout makes it. */
+  /** Height of the box: a number or numeric string is pixels, or pass a CSS length. Wins over `style.height`; without it the box follows its content or layout. */
   height?: number | string
   /** Names the scrolling region; a tab stop without `aria-label` or `aria-labelledby` is named "Scrollable content". */
   'aria-label'?: string
@@ -72,6 +73,7 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(function Scroll(
   ref,
 ) {
   const axes = orientation === 'horizontal' || orientation === 'both' ? orientation : 'vertical'
+  const boxHeight = readCssSize('Scroll', 'height', height)
   const overflow = OVERFLOW[axes]
   const viewportRef = useRef<HTMLDivElement>(null)
   const viewportRefs = useComposedRefs(viewportRef, ref)
@@ -103,7 +105,7 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(function Scroll(
         className: cn('uf-scroll', className),
       })}
       data-orientation={axes}
-      style={height == null ? style : { ...style, height }}
+      style={boxHeight === undefined ? style : { ...style, height: boxHeight }}
     >
       <div
         {...rest}

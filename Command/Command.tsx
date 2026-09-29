@@ -419,6 +419,9 @@ export const Command = forwardRef<HTMLInputElement, CommandProps>(
             </Text>
           </div>
         )}
+        <span className="uf-visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+          {!visible.size ? strings.empty : ''}
+        </span>
       </Card>
     )
 

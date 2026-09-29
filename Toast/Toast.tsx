@@ -3,18 +3,21 @@ import {
   useEffect,
   useId,
   useRef,
+  useState,
   useSyncExternalStore,
   type ForwardRefExoticComponent,
   type HTMLAttributes,
   type ReactNode,
   type RefAttributes,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { composeHandlers } from '../assets/adapters/react/merge-props'
+import { useFaceUiOverlayBoundary } from '../assets/adapters/react/overlay-context'
 import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
 import { useFocusRecovery } from '../assets/adapters/react/use-focus-recovery'
 import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
 import { nearest } from '../assets/runtime/collection'
-import { isAvailable } from '../assets/runtime/layers'
+import { activeModal, isAvailable, subscribeActiveModal } from '../assets/runtime/layers'
 import { resolveLabels, type CommonLabels } from '../assets/runtime/labels'
 import { hasSlotContent } from '../assets/slot-content'
 import { cn } from '../assets/utils'
@@ -203,6 +206,16 @@ export function createToastContext(options?: ToasterOptions): ToastContextValue 
     const keys = toasts.map((toast) => toast.id)
     const regionRef = useRef<HTMLDivElement>(null)
     const composedRef = useComposedRefs(ref, regionRef)
+    const scope = useFaceUiOverlayBoundary()?.scope
+    const [modalTarget, setModalTarget] = useState<HTMLElement | null>(null)
+    useEffect(() => {
+      const doc = regionRef.current?.ownerDocument
+      if (!doc) return
+      const sync = () => setModalTarget(activeModal(doc, scope))
+      const unsubscribe = subscribeActiveModal(doc, sync)
+      sync()
+      return unsubscribe
+    }, [scope])
     const previousKeys = useRef<readonly string[]>([])
     // Where focus came from when it entered the region, and whether a pointer was last used in it.
     const origin = useRef<HTMLElement | null>(null)
@@ -274,9 +287,9 @@ export function createToastContext(options?: ToasterOptions): ToastContextValue 
         holds.current.clear()
         store.resume()
       }
-    }, [])
+    }, [modalTarget])
 
-    return (
+    const region = (
       <div
         aria-label={defaultRootLabels.region}
         tabIndex={-1}
@@ -314,6 +327,9 @@ export function createToastContext(options?: ToasterOptions): ToastContextValue 
         ))}
       </div>
     )
+    // A modal makes sibling content inert. Put the same live region and its
+    // controls inside that modal so announcements and F8 remain available.
+    return modalTarget ? createPortal(region, modalTarget) : region
   })
 
   return { toaster, useToast: () => toaster, Toaster }

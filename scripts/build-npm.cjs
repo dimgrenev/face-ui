@@ -60,6 +60,33 @@ function fixEsmExtensions(dir) {
   }
 }
 
+function fixDeclarationExtensions(dir) {
+  for (const entry of fs.readdirSync(dir)) {
+    const full = path.join(dir, entry)
+    if (fs.statSync(full).isDirectory()) {
+      fixDeclarationExtensions(full)
+      continue
+    }
+    if (!entry.endsWith('.d.ts')) continue
+
+    const content = fs.readFileSync(full, 'utf8')
+    const fixed = content.replace(
+      /(from\s+['"]|import\s*(?:\(\s*)?['"])(\.[^'"]+)(['"])/g,
+      (match, prefix, importPath, quote) => {
+        if (/\.(js|mjs|cjs|json|css|svg)$/.test(importPath)) return match
+        const target = path.resolve(path.dirname(full), importPath)
+        if (fs.existsSync(`${target}.d.ts`)) return `${prefix}${importPath}.js${quote}`
+        if (fs.existsSync(path.join(target, 'index.d.ts'))) {
+          const separator = importPath.endsWith('/') ? '' : '/'
+          return `${prefix}${importPath}${separator}index.js${quote}`
+        }
+        throw new Error(`Unresolved declaration import ${importPath} in ${full}`)
+      },
+    )
+    if (fixed !== content) fs.writeFileSync(full, fixed, 'utf8')
+  }
+}
+
 function shouldSkipDir(relPath) {
   return (
     relPath.split('/').some((part) => part.startsWith('.')) ||
@@ -205,6 +232,7 @@ function main() {
   })
 
   fixEsmExtensions(path.join(PACKAGE_ROOT, 'dist', 'esm'))
+  fixDeclarationExtensions(path.join(PACKAGE_ROOT, 'dist', 'types'))
   console.log(
     '[face-ui-react:npm] fixed ESM import extensions and JSON attributes',
   )
@@ -212,6 +240,6 @@ function main() {
   console.log('[face-ui-react:npm] done.')
 }
 
-module.exports = { flattenCss }
+module.exports = { flattenCss, fixDeclarationExtensions }
 
 if (require.main === module) main()

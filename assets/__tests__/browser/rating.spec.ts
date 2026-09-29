@@ -236,6 +236,8 @@ test('required native validity, exact submission and original-default reset', { 
   ).toBe(true)
   await render(page, { required: true, defaultValue: 3 })
   await page.locator('#reset').click()
+  // Native reset clears checked first; the deferred React reset then commits the original score.
+  await expect(fills(page).first()).toHaveCSS('width', '0px')
   await expect(page.getByRole('radio', { checked: true })).toHaveCount(0)
   expect(await data(page)).toEqual([])
   expect(await changes(page)).toEqual([4])
@@ -266,6 +268,7 @@ test('external form rendered later owns validation, data and reset', { tag: ['@n
   expect(await data(page)).toEqual([])
   expect(await data(page, true)).toEqual([['score', '3']])
   await page.locator('#external-reset').click()
+  await expect(fills(page).first()).toHaveCSS('width', '0px')
   await expect(page.getByRole('radio', { checked: true })).toHaveCount(0)
   expect(await data(page, true)).toEqual([])
 })

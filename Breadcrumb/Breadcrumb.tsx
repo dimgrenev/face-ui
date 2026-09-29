@@ -18,7 +18,8 @@ import { Membrane } from '../assets/adapters/react/Membrane'
 import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
 import { useFocusRecovery } from '../assets/adapters/react/use-focus-recovery'
 import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
-import { readCollection, type Entry } from '../assets/runtime/collection'
+import { readFlatCollection } from '../assets/internal/flat-collection'
+import type { Entry } from '../assets/runtime/collection'
 import { resolveLabels, type CommonLabels } from '../assets/runtime/labels'
 import { isAvailable } from '../assets/runtime/layers'
 import { readNumber } from '../assets/runtime/props'
@@ -61,7 +62,7 @@ export interface BreadcrumbProps extends Omit<
   | 'contentEditable'
   | 'suppressContentEditableWarning'
 > {
-  /** Ordered locations from root to current; the last item is the current page. */
+  /** Ordered locations from root to current; the last kept item is the current page. Groups and separators are dropped with a report. */
   items?: readonly BreadcrumbItem[]
   /** Decorative separator. '/' uses the slash icon; empty content removes the separator. */
   separator?: ReactNode
@@ -96,7 +97,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
       hidden,
       ...rest
     } = props
-    const { entries } = readCollection<BreadcrumbItem>(items, {
+    const { entries } = readFlatCollection<BreadcrumbItem>(items, {
       component: 'Breadcrumb',
       positional: true,
       key: keyOf,

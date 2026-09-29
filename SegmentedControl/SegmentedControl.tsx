@@ -14,9 +14,9 @@ import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
 import { useControllableState } from '../assets/adapters/react/use-controllable-state'
 import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
 import { FieldLayout, idList, useField, type FieldProps } from '../assets/internal/field'
+import { readFlatCollection } from '../assets/internal/flat-collection'
 import type { CollectionItem } from '../assets/internal/item'
-import { readCollection, readKeys } from '../assets/runtime/collection'
-import { invalidProp } from '../assets/runtime/props'
+import { readKeys } from '../assets/runtime/collection'
 
 /** One choice of the strip; `id` and native `aria-*` name the choice's button. */
 export interface SegmentedControlItem
@@ -124,17 +124,12 @@ export const SegmentedControl = forwardRef<
     onBlur,
     ...nativeProps
   } = props
-  const collection = readCollection<SegmentedControlItem>(items, {
+  // Structural entries must be dropped before they can reserve a valid choice key.
+  const collection = readFlatCollection<SegmentedControlItem>(items, {
     component: 'SegmentedControl',
     key: (item) => item.value,
   })
-  // The strip is flat: groups and separators (K9) have no place in it.
-  const choices = collection.children(null).filter(({ item }) => {
-    const { type } = item as { type?: unknown }
-    if (type !== 'group' && type !== 'separator') return true
-    invalidProp('SegmentedControl', 'item type', type, 'dropping the item')
-    return false
-  })
+  const choices = collection.children(null)
   const keys = choices.map((entry) => entry.key)
   const off = (key: string) =>
     disabled || collection.get(key)?.disabled === true

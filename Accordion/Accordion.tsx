@@ -18,7 +18,8 @@ import { composeHandlers } from '../assets/adapters/react/merge-props'
 import { useControllableState } from '../assets/adapters/react/use-controllable-state'
 import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
 import { Membrane } from '../assets/adapters/react/Membrane'
-import { domId, readCollection, readKeys } from '../assets/runtime/collection'
+import { readFlatCollection } from '../assets/internal/flat-collection'
+import { domId, readKeys } from '../assets/runtime/collection'
 import { readNumber } from '../assets/runtime/props'
 import { hasSlotContent } from '../assets/slot-content'
 import { RightIcon } from '../assets/icons'
@@ -51,7 +52,7 @@ export interface AccordionProps extends Omit<
   | 'contentEditable'
   | 'suppressContentEditableWarning'
 > {
-  /** Sections in order; an item without a string `value`, or repeating one, is dropped. */
+  /** Sections in order; an item without a unique string `value`, or a group or separator, is dropped with a report. */
   items?: readonly AccordionItem[]
   /** Decorative icon (an icon name or a node) at the start of every trigger; `item.icon` overrides it. */
   icon?: ReactNode
@@ -116,7 +117,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
     },
     ref,
   ) {
-    const collection = readCollection<AccordionItem>(items, {
+    const collection = readFlatCollection<AccordionItem>(items, {
       component: 'Accordion',
       key: (item) => item.value,
     })

@@ -72,6 +72,39 @@ export function readNumber(
   return result
 }
 
+const CSS_NUMBER = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i
+const NEGATIVE_CSS_LENGTH = /^-(?:\d+(?:\.\d*)?|\.\d+)(?:[a-z]+|%)$/i
+
+/**
+ * Public size props use pixels for numbers (including numeric strings) and preserve authored
+ * CSS lengths. Native `style` remains the escape hatch for other sizing keywords. Parsing the
+ * full CSS grammar belongs to the browser; normalize the unitless form it would silently drop.
+ */
+export function readCssSize(
+  component: string,
+  prop: string,
+  value: unknown,
+): string | undefined {
+  if (value === undefined || value === '') return undefined
+  if (typeof value === 'number') {
+    if (Number.isFinite(value) && value >= 0) return `${value}px`
+  } else if (typeof value === 'string') {
+    const text = value.trim()
+    if (!text) return undefined
+    if (CSS_NUMBER.test(text)) {
+      const pixels = Number(text)
+      if (Number.isFinite(pixels) && pixels >= 0) {
+        if (text !== '0') invalidProp(component, prop, value, `using ${pixels}px`)
+        return `${pixels}px`
+      }
+    } else if (!NEGATIVE_CSS_LENGTH.test(text)) {
+      return text
+    }
+  }
+  invalidProp(component, prop, value, 'ignoring it: expected a nonnegative CSS length')
+  return undefined
+}
+
 /** @internal Test harness only: forgets which messages were already reported. */
 export function resetInvalidPropReports(): void {
   reported.clear()

@@ -44,7 +44,6 @@ async function main() {
     'dist/esm/Button/Button.json',
     'dist/esm/component-registry.json',
     'dist/esm/assets/styles/index.css',
-    'dist/esm/assets/fonts/Begriffsschrift.ttf',
     'dist/esm/assets/media/examples/office-core/manifest.json',
     'dist/esm/assets/media/examples/office-core/lobby-day.webp',
     'dist/esm/design-system/source/color-system.jsonc',
@@ -69,6 +68,7 @@ async function main() {
 
   if (fs.existsSync(dist)) {
     const distFiles = walk(dist).map(rel);
+    assert(!distFiles.some((file) => /Begriffsschrift\.(?:ttf|woff2?|otf|eot)$/i.test(file)), 'Licensed Begriffsschrift font must not ship in dist');
     const forbiddenPatterns = [
       /(^|\/)\.git(\/|$)/,
       /(^|\/)\.cache(\/|$)/,
@@ -115,10 +115,12 @@ async function main() {
   assert(packageJson.files?.includes('design-system'), 'package files must include design-system/');
   assert(packageJson.exports?.['./design-system/*'] === './dist/esm/design-system/*', 'package exports must expose design-system artifacts');
   assert(packageJson.exports?.['./assets/media/*'] === './dist/esm/assets/media/*', 'package exports must expose media example assets');
+  assert(!packageJson.exports?.['./assets/fonts/*'], 'package must not expose a bundled font directory');
   assert(!packageJson.exports?.['./*'], 'package exports must not expose a generic JS wildcard');
   assert(!packageJson.exports?.['./*.json'], 'package exports must not expose a generic JSON wildcard');
   assert(packageJson.exports?.['./gallery']?.import === './dist/esm/gallery.js', 'package exports must expose gallery metadata');
-  assert(packageJson.exports?.['./assets/adapters/react/*']?.import === './dist/esm/assets/adapters/react/*.js', 'package exports must expose React adapters explicitly');
+  assert(packageJson.exports?.['./assets/adapters/react/use-floating-position']?.import === './dist/esm/assets/adapters/react/use-floating-position.js', 'package exports must expose the supported floating-position adapter');
+  assert(!packageJson.exports?.['./assets/adapters/react/*'], 'Internal React adapters must not be exposed through a wildcard');
   assert(packageJson.exports?.['./Button/*']?.import === './dist/esm/Button/*.js', 'package exports must expose component modules explicitly');
   assert(packageJson.exports?.['./Button/*.json'] === './dist/esm/Button/*.json', 'package exports must expose component contracts explicitly');
 

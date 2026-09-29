@@ -38,7 +38,7 @@
   line-height: var(--uf-control-line-height);
   cursor: default;
   user-select: text;
-  transition: font-weight var(--uf-motion-duration-emphasis) var(--uf-motion-ease-emphasized);
+  transition: font-weight var(--face-runtime-transition-duration-emphasis) var(--uf-motion-ease-emphasized);
   text-decoration: none;
   white-space: nowrap;
   min-width: 0;
@@ -275,7 +275,7 @@
 [data-scope="tile"] > [data-part="actions"] {
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--uf-motion-duration-fast) var(--uf-motion-ease-standard);
+  transition: opacity var(--face-runtime-transition-duration-fast) var(--uf-motion-ease-standard);
 }
 .uf-tile[data-scope="tile"][data-action-visibility="always"] > [data-part="actions"] {
   opacity: 1;
