@@ -1,0 +1,83 @@
+/* =================================================================
+ * CHECKBOX
+ * ================================================================= */
+.uf-checkbox[data-scope="checkbox"] {
+  --uf-checkbox-control-size: var(--uf-control-line-height);
+  --uf-control-pad-start: var(--uf-control-pad-icon);
+  --uf-control-pad-end: var(--uf-control-pad-text);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--uf-control-gap);
+  min-height: var(--uf-control-height);
+  height: auto;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  font: var(--uf-control-font-size) / var(--uf-control-line-height) var(--uf-font-family-base);
+  padding-top: var(--uf-control-pad-y);
+  padding-bottom: var(--uf-control-pad-y);
+  padding-inline-start: var(--uf-control-pad-start);
+  padding-inline-end: var(--uf-control-pad-end);
+  border-radius: var(--uf-radius);
+  cursor: pointer;
+  user-select: none;
+  text-align: start;
+}
+.uf-checkbox[data-scope="checkbox"]:hover {
+  background: var(--uf-color-hover-bg);
+}
+.uf-checkbox[data-scope="checkbox"][data-icon-only] {
+  width: var(--uf-control-height);
+  min-width: var(--uf-control-height);
+  justify-content: center;
+}
+/* The boundary and label share the same available width. */
+.uf-membrane:has(> .uf-checkbox) { min-width: 0; max-width: 100%; }
+.uf-checkbox[data-scope="checkbox"][data-full-width] { width: 100%; }
+.uf-checkbox[data-scope="checkbox"][hidden] { display: none; }
+.uf-checkbox[data-scope="checkbox"][data-disabled] { pointer-events: auto; }
+.uf-checkbox[data-scope="checkbox"][data-disabled]:hover { background: var(--uf-color-black-0); }
+/* Decorative indicator matches the canonical SVG viewBox. */
+[data-scope="checkbox"] [data-part="indicator"] {
+  width: var(--uf-checkbox-control-size);
+  height: var(--uf-checkbox-control-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--uf-color-fg);
+  background: var(--uf-color-black-0);
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+[data-scope="checkbox"] [data-part="indicator"] svg {
+  display: block;
+}
+.uf-checkbox[data-scope="checkbox"] [data-part="label"] {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: start;
+}
+/* Hide the actual hidden input completely */
+[data-scope="checkbox"] [data-part="input"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The visible row is the <label>; the input it hides is what actually takes
+   focus, so the ring has to be drawn on the row. */
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-checkbox:has(input:focus-visible),
+:where(:root[data-uf-focus-modality="keyboard"]) .uf-checkbox:has(input:focus) {
+  outline: 2px solid var(--uf-color-fg);
+  outline-offset: -2px;
+}

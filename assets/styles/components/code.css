@@ -1,0 +1,147 @@
+/* =================================================================
+ * CODE
+ * ================================================================= */
+.uf-code[data-scope] {
+  --uf-code-header-pad: var(--uf-membrane);
+  --uf-code-scroll-max-height: calc(var(--uf-control-height) * 15);
+  --uf-code-fade-height: var(--uf-control-height);
+  --uf-code-line-number-width: var(--uf-control-height);
+  --uf-code-pad: var(--uf-spacing-3);
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  align-self: stretch;
+  color: var(--uf-color-text-code);
+  overflow: hidden;
+  /* A header row above the source, except for an untitled one-line source: its copy button sits at its inline end. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+/* Header bar (title + copy/collapse actions) */
+.uf-code-header {
+  box-sizing: border-box;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-height: var(--uf-control-height);
+  padding: var(--uf-code-header-pad);
+}
+.uf-code-header > .uf-membrane:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.uf-code-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--uf-color-fg-muted);
+  font-size: var(--uf-control-font-size);
+}
+.uf-code-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+}
+.uf-code[data-scope] > .uf-code-actions {
+  grid-column: 2;
+  grid-row: 1;
+  padding: var(--uf-code-header-pad);
+}
+.uf-code-action {
+  --uf-icon-only-size: var(--uf-control-height);
+  color: var(--uf-color-text-code);
+  box-shadow: none;
+  outline: none;
+}
+.uf-code-action:hover {
+  color: var(--uf-color-fg);
+}
+/* Pre block */
+.uf-code[data-scope] pre {
+  box-sizing: border-box;
+  grid-column: 1 / -1;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  max-block-size: var(--uf-code-scroll-max-height);
+  margin: 0;
+  padding: var(--uf-code-pad);
+  font-family: var(--uf-font-family-mono);
+  font-size: var(--uf-font-size-sm);
+  line-height: 1.6;
+  overflow-x: auto;
+  overflow-y: auto;
+  white-space: pre;
+  tab-size: 2;
+  background: var(--uf-color-bg-code);
+  color: var(--uf-color-text-code);
+}
+.uf-code[data-scope] > .uf-code-actions + pre {
+  grid-column: 1;
+  grid-row: 1;
+}
+.uf-code[data-scope] code {
+  display: block;
+  min-inline-size: 100%;
+  width: max-content;
+}
+/* Collapsed: exactly the first `collapsedLines` lines, never taller than the expanded source, faded out; clip, not hidden, so nothing can scroll it. */
+.uf-code[data-scope][data-state="collapsed"] pre {
+  max-block-size: min(
+    calc(var(--uf-code-collapsed-lines) * 1lh + 2 * var(--uf-code-pad)),
+    var(--uf-code-scroll-max-height)
+  );
+  overflow: clip;
+  position: relative;
+}
+.uf-code[data-scope][data-state="collapsed"] pre::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: var(--uf-code-fade-h, var(--uf-code-fade-height));
+  background: linear-gradient(to bottom, transparent, var(--uf-color-bg-code));
+  pointer-events: none;
+}
+/* Lines */
+[data-scope="code"] [data-part="line"] {
+  display: block;
+  min-inline-size: max-content;
+}
+mark[data-scope="code"][data-part="line"] {
+  background: var(--uf-color-hover-bg);
+  color: inherit;
+  margin-inline: calc(-1 * var(--uf-code-pad));
+  padding-inline: var(--uf-code-pad);
+}
+/* Unadjusted, forced colors put a Canvas text plate on the Mark bar. Syntax colors give way to
+   MarkText again; the number is a box of its own (it would get the plate), so it takes MarkText. */
+@media (forced-colors: active) {
+  mark[data-scope="code"][data-part="line"] {
+    forced-color-adjust: none;
+    background: Mark;
+    color: MarkText;
+  }
+  mark[data-scope="code"][data-part="line"] > :not([data-part]) {
+    forced-color-adjust: auto;
+  }
+  mark[data-scope="code"][data-part="line"] > [data-part="lineNumber"] {
+    color: inherit;
+  }
+}
+[data-scope="code"] [data-part="lineNumber"] {
+  display: inline-block;
+  width: var(--uf-code-line-number-width);
+  color: var(--uf-color-text-secondary);
+  text-align: end;
+  margin-inline-end: var(--uf-code-pad);
+  -webkit-user-select: none;
+  user-select: none;
+}

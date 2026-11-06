@@ -4,50 +4,50 @@
   "name": "Toc / API Documentation",
   "description": "API Documentation product scenario for the Toc component.",
   "framework": "react",
+  "preview": {
+    "entryPath": "./Toc.preview.tsx",
+    "exportName": "TocPreview"
+  },
   "root": {
     "type": "Toc",
     "props": {
       "items": {
         "$ref": "props.items"
       },
-      "activeId": {
-        "$ref": "props.activeId"
+      "value": {
+        "$ref": "props.value"
       },
-      "defaultActiveId": {
-        "$ref": "props.defaultActiveId"
+      "defaultValue": {
+        "$ref": "props.defaultValue"
       },
-      "withLine": {
-        "$ref": "props.withLine"
-      },
-      "lineSide": {
-        "$ref": "props.lineSide"
+      "line": {
+        "$ref": "props.line"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "withLine": true,
-      "lineSide": "left",
-      "defaultActiveId": "authentication",
+      "line": "start",
+      "defaultValue": "authentication",
       "items": [
         {
-          "id": "overview",
+          "value": "overview",
           "label": "Overview",
           "level": 1
         },
         {
-          "id": "authentication",
+          "value": "authentication",
           "label": "Authentication",
           "level": 1
         },
         {
-          "id": "api-keys",
+          "value": "api-keys",
           "label": "API keys",
           "level": 2
         },
         {
-          "id": "errors",
+          "value": "errors",
           "label": "Errors",
           "level": 1
         }
@@ -59,37 +59,32 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Section items to render."
+      "description": "Entries in document order; an empty list renders nothing. Groups and separators are dropped with a report."
     },
     {
-      "name": "activeId",
+      "name": "value",
       "type": "string",
       "required": false,
-      "description": "Currently active section id (controlled)."
+      "description": "Controlled current entry, marked `aria-current=\"location\"`; `null` or a value missing from `items` marks none."
     },
     {
-      "name": "defaultActiveId",
+      "name": "defaultValue",
       "type": "string",
       "required": false,
-      "description": "Initial active section id (uncontrolled). Falls back to first item."
+      "description": "Uncontrolled current entry on mount, read once; by default no entry is current.",
+      "defaultValue": null
     },
     {
-      "name": "withLine",
-      "type": "boolean",
-      "required": false,
-      "description": "Show the active indicator line + baseline rail.",
-      "defaultValue": true
-    },
-    {
-      "name": "lineSide",
+      "name": "line",
       "type": "select",
       "required": false,
-      "description": "Side of the indicator/rail.",
+      "description": "Rail with a marker at the current entry, at the inline start or end of the list; `none` removes both.",
       "options": [
-        "left",
-        "right"
+        "start",
+        "end",
+        "none"
       ],
-      "defaultValue": "left"
+      "defaultValue": "start"
     }
   ],
   "meta": {

@@ -1,0 +1,152 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Meter / Context Window",
+  "description": "Context Window product scenario for the Meter component.",
+  "framework": "react",
+  "root": {
+    "type": "Meter",
+    "props": {
+      "value": {
+        "$ref": "props.value"
+      },
+      "min": {
+        "$ref": "props.min"
+      },
+      "max": {
+        "$ref": "props.max"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "aria-valuetext": {
+        "$ref": "props.aria-valuetext"
+      },
+      "tone": {
+        "$ref": "props.tone"
+      },
+      "shape": {
+        "$ref": "props.shape"
+      },
+      "showValue": {
+        "$ref": "props.showValue"
+      },
+      "label": {
+        "$ref": "props.label"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "value": 74,
+      "max": 100,
+      "tone": "warning",
+      "shape": "circle",
+      "showValue": true,
+      "label": "Context used"
+    }
+  },
+  "controls": [
+    {
+      "name": "value",
+      "type": "number",
+      "required": false,
+      "description": "Finite measured value; values outside min..max are bounded. Defaults to 0.",
+      "defaultValue": 0
+    },
+    {
+      "name": "min",
+      "type": "number",
+      "required": false,
+      "description": "Finite lower bound, strictly below max. Defaults to 0.",
+      "defaultValue": 0
+    },
+    {
+      "name": "max",
+      "type": "number",
+      "required": false,
+      "description": "Finite upper bound, strictly above min. Defaults to 100.",
+      "defaultValue": 100
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name when no visible label is present, or an explicit name override."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "IDs of external naming elements; takes precedence over label and aria-label."
+    },
+    {
+      "name": "aria-valuetext",
+      "type": "string",
+      "required": false,
+      "description": "Speech-only value description; formatValue controls visible text as well."
+    },
+    {
+      "name": "tone",
+      "type": "select",
+      "required": false,
+      "description": "Semantic feedback color, independent of the numeric value. Defaults to neutral.",
+      "options": [
+        "neutral",
+        "positive",
+        "warning",
+        "destructive"
+      ],
+      "defaultValue": "neutral"
+    },
+    {
+      "name": "shape",
+      "type": "select",
+      "required": false,
+      "description": "Linear bar or circular ring; both display the same exact fraction. Defaults to linear.",
+      "options": [
+        "linear",
+        "circle"
+      ],
+      "defaultValue": "linear"
+    },
+    {
+      "name": "showValue",
+      "type": "boolean",
+      "required": false,
+      "description": "Show formatted value text. Unknown task progress never displays a numeric value.",
+      "defaultValue": false
+    },
+    {
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Noninteractive visible label. Name an unlabelled indicator with native aria-label or aria-labelledby."
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around the complete indicator. Defaults to true.",
+      "defaultValue": true
+    }
+  ],
+  "meta": {
+    "name": "Context Window",
+    "component": "Meter",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Meter/Meter.tsx",
+    "contract": "Meter/Meter.json"
+  }
+}

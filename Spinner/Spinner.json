@@ -1,0 +1,68 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Spinner",
+  "description": "A fixed 20×20 indeterminate loading icon, with a flowing arc and no motion under reduced-motion preferences.",
+  "props": {
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name when used alone; omit when the parent already announces loading."
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "description": "Optional native pointer hint; also names the icon when label is absent."
+    }
+  },
+  "states": [
+    {
+      "name": "Default",
+      "props": {}
+    },
+    {
+      "name": "Named",
+      "props": {
+        "label": "Loading preview"
+      }
+    }
+  ],
+  "behavior": {
+    "must": [
+      "Keep a 20×20 frame and inherit currentColor.",
+      "Use the same glyph inside Button loading and product loaders.",
+      "Remain static under system or application reduced motion."
+    ]
+  },
+  "aria": {
+    "notes": [
+      "Without label the glyph is decorative. The parent owns pending announcements and aria-busy."
+    ]
+  },
+  "usage": {
+    "context": "both",
+    "whenToUse": [
+      "An operation is pending and its progress is unknown."
+    ],
+    "whenNotToUse": [
+      "Known progress percentage: use Progress."
+    ],
+    "alternatives": [
+      "Progress",
+      "Skeleton"
+    ]
+  },
+  "tokenMapping": {
+    "component": [],
+    "semanticFallbacks": [
+      "--uf-motion-duration-spin",
+      "--uf-motion-duration-loading",
+      "--uf-motion-ease-linear",
+      "--uf-motion-ease-in-out",
+      "--uf-motion-iteration-indefinite"
+    ],
+    "notes": [
+      "The fixed 20px frame matches Icon. Its 1.625px line matches the 1.95px Iconoteka stroke scaled from 24px to 20px."
+    ]
+  }
+}

@@ -1,7 +1,1 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <g stroke="black" stroke-width="1">
-    <circle cx="10" cy="8.75" r="3.75" />
-    <path d="M10 12.5V15.5" />
-    <path d="M6 15.5H14" />
-  </g>
-</svg>
+<svg class="uf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" data-icon="activity-idle" data-iconset="iconoteka" data-icon-source="pause_in_circle/stroke" aria-hidden="true"><path d="M12.0005 2C17.6005 2 22.0005 6.4 22.0005 12C22.0005 17.6 17.6005 22 12.0005 22C6.40049 22 2.00049 17.6 2.00049 12C2.00049 6.4 6.40049 2 12.0005 2ZM12.0005 3.85C7.45049 3.85 3.90049 7.4 3.90049 12C3.90049 16.6 7.45049 20.15 12.0005 20.15C16.5505 20.15 20.1005 16.6 20.1005 12C20.1005 7.4 16.5505 3.85 12.0005 3.85ZM15.0005 16H13.0755V8H15.0005V16ZM10.9255 16H9.00049V8H10.9255V16Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>

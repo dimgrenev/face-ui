@@ -1,56 +1,59 @@
 /* Generated from canonical design-system source. */
 
 :root {
-  --uf-backdrop-blur-overlay: 120px;
-  --uf-dropdown-surface-blur: var(--uf-overlay-surface-blur);
+  --uf-shadow-none: none;
   --uf-elevation-0: var(--uf-shadow-none);
+  --uf-z-dropdown: 2300;
+  --uf-z-overlay: 1900;
+  --uf-z-modal: 2100;
+  --uf-z-toast: 2400;
+  --uf-overlay-backdrop-blur: 28px;
+  --uf-overlay-surface-blur: 24px;
+  --uf-overlay-surface-shadow: none;
+  --uf-dropdown-surface-blur: var(--uf-overlay-surface-blur);
+  --uf-overlay-enter-y: 10px;
+  --uf-overlay-enter-scale: 0.985;
+}
+
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
+  --uf-shadow-sm: 0 1px 2px var(--uf-color-black-6);
+  --uf-shadow-base: 0 1px 3px var(--uf-color-black-10), 0 1px 2px var(--uf-color-black-6);
+  --uf-shadow-md: 0 4px 6px var(--uf-color-black-10), 0 2px 4px var(--uf-color-black-6);
+  --uf-shadow-lg: 0 10px 15px var(--uf-color-black-10), 0 4px 6px var(--uf-color-black-6);
+  --uf-shadow-xl: 0 20px 25px var(--uf-color-black-10), 0 10px 10px var(--uf-color-black-4);
   --uf-elevation-1: var(--uf-shadow-sm);
   --uf-elevation-2: var(--uf-shadow-base);
   --uf-elevation-3: var(--uf-shadow-md);
   --uf-elevation-4: var(--uf-shadow-lg);
   --uf-elevation-5: var(--uf-shadow-xl);
-  --uf-overlay-backdrop-blur: 28px;
-  --uf-overlay-enter-scale: 0.985;
-  --uf-overlay-enter-y: 10px;
-  --uf-overlay-surface-blur: 24px;
-  --uf-overlay-surface-shadow: none;
-  --uf-shadow-base: 0 1px 3px var(--uf-color-black-10), 0 1px 2px var(--uf-color-black-6);
-  --uf-shadow-lg: 0 10px 15px var(--uf-color-black-10), 0 4px 6px var(--uf-color-black-6);
-  --uf-shadow-md: 0 4px 6px var(--uf-color-black-10), 0 2px 4px var(--uf-color-black-6);
-  --uf-shadow-none: none;
-  --uf-shadow-sm: 0 1px 2px var(--uf-color-black-6);
-  --uf-shadow-xl: 0 20px 25px var(--uf-color-black-10), 0 10px 10px var(--uf-color-black-4);
-  --uf-z-dropdown: 2300;
-  --uf-z-modal: 2100;
-  --uf-z-overlay: 1900;
-  --uf-z-toast: 2400;
+  --uf-backdrop-blur-overlay: 120px;
 }
 
-:root[data-theme='light'] {
-  --uf-backdrop-blur-overlay: 120px;
-  --uf-shadow-base: 0 1px 3px var(--uf-color-black-10), 0 1px 2px var(--uf-color-black-6);
-  --uf-shadow-lg: 0 10px 15px var(--uf-color-black-10), 0 4px 6px var(--uf-color-black-6);
-  --uf-shadow-md: 0 4px 6px var(--uf-color-black-10), 0 2px 4px var(--uf-color-black-6);
+:root[data-theme='light'],
+[data-theme='light'] {
   --uf-shadow-sm: 0 1px 2px var(--uf-color-black-6);
+  --uf-shadow-base: 0 1px 3px var(--uf-color-black-10), 0 1px 2px var(--uf-color-black-6);
+  --uf-shadow-md: 0 4px 6px var(--uf-color-black-10), 0 2px 4px var(--uf-color-black-6);
+  --uf-shadow-lg: 0 10px 15px var(--uf-color-black-10), 0 4px 6px var(--uf-color-black-6);
   --uf-shadow-xl: 0 20px 25px var(--uf-color-black-10), 0 10px 10px var(--uf-color-black-4);
+  --uf-backdrop-blur-overlay: 120px;
+  --uf-dropdown-surface-shadow: var(--uf-shadow-lg);
 }
 
 :root[data-theme='dark'],
-:root:not([data-theme]) {
-  --uf-backdrop-blur-overlay: 120px;
-  --uf-shadow-base: 0 1px 3px var(--uf-color-black-40), 0 1px 2px var(--uf-color-black-30);
-  --uf-shadow-lg: 0 10px 15px var(--uf-color-black-50), 0 4px 6px var(--uf-color-black-40);
-  --uf-shadow-md: 0 4px 6px var(--uf-color-black-40), 0 2px 4px var(--uf-color-black-30);
+:root:not([data-theme]),
+[data-theme='dark'] {
   --uf-shadow-sm: 0 1px 2px var(--uf-color-black-30);
+  --uf-shadow-base: 0 1px 3px var(--uf-color-black-40), 0 1px 2px var(--uf-color-black-30);
+  --uf-shadow-md: 0 4px 6px var(--uf-color-black-40), 0 2px 4px var(--uf-color-black-30);
+  --uf-shadow-lg: 0 10px 15px var(--uf-color-black-50), 0 4px 6px var(--uf-color-black-40);
   --uf-shadow-xl: 0 20px 25px var(--uf-color-black-50), 0 10px 10px var(--uf-color-black-40);
+  --uf-backdrop-blur-overlay: 120px;
 }
 
 :root,
 [data-theme='dark'] {
   --uf-dropdown-surface-shadow: none;
-}
-
-:root[data-theme='light'],
-[data-theme='light'] {
-  --uf-dropdown-surface-shadow: var(--uf-shadow-lg);
 }

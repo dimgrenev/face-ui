@@ -7,11 +7,11 @@
   "root": {
     "type": "Button",
     "props": {
-      "text": {
-        "$ref": "props.text"
+      "children": {
+        "$ref": "props.children"
       },
-      "rightText": {
-        "$ref": "props.rightText"
+      "meta": {
+        "$ref": "props.meta"
       },
       "variant": {
         "$ref": "props.variant"
@@ -34,14 +34,11 @@
       "stretchText": {
         "$ref": "props.stretchText"
       },
-      "selector": {
-        "$ref": "props.selector"
+      "chevron": {
+        "$ref": "props.chevron"
       },
-      "selectorOpen": {
-        "$ref": "props.selectorOpen"
-      },
-      "selectorDirection": {
-        "$ref": "props.selectorDirection"
+      "aria-expanded": {
+        "$ref": "props.aria-expanded"
       },
       "fullWidth": {
         "$ref": "props.fullWidth"
@@ -49,24 +46,21 @@
       "align": {
         "$ref": "props.align"
       },
-      "level": {
-        "$ref": "props.level"
+      "indent": {
+        "$ref": "props.indent"
       },
       "membrane": {
         "$ref": "props.membrane"
       },
       "copyText": {
         "$ref": "props.copyText"
-      },
-      "children": {
-        "$ref": "props.children"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "text": "Revoke key",
+      "children": "Revoke key",
       "icon": "close",
       "variant": "destructive",
       "fullWidth": false,
@@ -76,22 +70,22 @@
   },
   "controls": [
     {
-      "name": "text",
-      "type": "string",
+      "name": "children",
+      "type": "any",
       "required": false,
-      "description": "Button label text."
+      "description": "Label of the button; with `iconOnly` it stays as the accessible name only."
     },
     {
-      "name": "rightText",
-      "type": "string",
+      "name": "meta",
+      "type": "any",
       "required": false,
-      "description": "Optional secondary text, rendered at the far right inside the text area."
+      "description": "Secondary text at the inline end of the label area, such as a shortcut or count."
     },
     {
       "name": "variant",
       "type": "select",
       "required": false,
-      "description": "Visual style variant",
+      "description": "Visual variant.",
       "options": [
         "default",
         "primary",
@@ -105,7 +99,7 @@
     },
     {
       "name": "icon",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Icon (string from registry, ReactNode, or SVG element)."
     },
@@ -113,56 +107,59 @@
       "name": "iconPosition",
       "type": "select",
       "required": false,
-      "description": "Icon position relative to text.",
+      "description": "Icon at the start or end of the label, following text direction. Default: start.",
       "options": [
-        "left",
-        "right"
-      ]
+        "start",
+        "end"
+      ],
+      "defaultValue": "start"
     },
     {
       "name": "iconOnly",
       "type": "boolean",
       "required": false,
-      "description": "Icon-only mode (no text, square button)."
+      "description": "Hide the visual label while preserving its accessible text. Compact buttons are square.",
+      "defaultValue": false
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state."
+      "description": "Disabled state.",
+      "defaultValue": false
     },
     {
       "name": "loading",
       "type": "boolean",
       "required": false,
-      "description": "Loading state (shows spinner, dims text)."
+      "description": "Loading state: disables activation and places a 20×20 spinner at the inline end; icon-only buttons replace their icon.",
+      "defaultValue": false
     },
     {
       "name": "stretchText",
       "type": "boolean",
       "required": false,
-      "description": "Stretch text area (flex:1)."
+      "description": "Stretch text area (flex:1).",
+      "defaultValue": false
     },
     {
-      "name": "selector",
-      "type": "boolean",
-      "required": false,
-      "description": "Render a compact selector indicator after the label."
-    },
-    {
-      "name": "selectorOpen",
-      "type": "boolean",
-      "required": false,
-      "description": "Open state for the selector indicator."
-    },
-    {
-      "name": "selectorDirection",
+      "name": "chevron",
       "type": "select",
       "required": false,
-      "description": "Direction of the selector indicator. Use side for side-panel selectors.",
+      "description": "Trailing disclosure chevron: `down` flips with aria-expanded; `end` points to the inline end and mirrors in right-to-left text.",
       "options": [
-        "vertical",
-        "side"
+        "down",
+        "end"
+      ]
+    },
+    {
+      "name": "aria-expanded",
+      "type": "boolean",
+      "required": false,
+      "description": "Standard expanded state, also used to orient the disclosure chevron.",
+      "options": [
+        "false",
+        "true"
       ]
     },
     {
@@ -176,36 +173,31 @@
       "name": "align",
       "type": "select",
       "required": false,
-      "description": "Text alignment.",
+      "description": "Inline alignment of the content, following text direction.",
       "options": [
-        "left",
-        "right",
-        "center"
+        "start",
+        "center",
+        "end"
       ]
     },
     {
-      "name": "level",
+      "name": "indent",
       "type": "number",
       "required": false,
-      "description": "Nesting level for option-like rows: 0..9"
+      "description": "Indent steps for nested option-like rows, an integer from 0 to 9."
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing around the button."
+      "description": "Membrane spacing around the button.",
+      "defaultValue": true
     },
     {
       "name": "copyText",
       "type": "string",
       "required": false,
       "description": "Copy text to clipboard on click (Clipboard integration)."
-    },
-    {
-      "name": "children",
-      "type": "string",
-      "required": false,
-      "description": "Custom children (overrides text/icon rendering)."
     }
   ],
   "meta": {

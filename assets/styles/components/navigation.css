@@ -1,0 +1,127 @@
+/* =================================================================
+ * NAVIGATION (a bar of links with dropdowns; a sheet when compact)
+ * ================================================================= */
+.uf-navigation[data-scope] {
+  --uf-navigation-content-min-width: calc(var(--uf-spacing-10) * 5);
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.uf-navigation-list[data-scope],
+.uf-navigation-menu,
+.uf-navigation-groupList,
+.uf-navigation-sheetList[data-scope] {
+  display: flex;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.uf-navigation-list[data-scope] {
+  align-items: center;
+  flex-wrap: wrap;
+}
+.uf-navigation-menu,
+.uf-navigation-groupList,
+.uf-navigation-sheetList[data-scope] {
+  flex-direction: column;
+}
+[data-scope="navigation"] [data-part="item"] {
+  position: relative;
+}
+[data-scope="navigation"] [data-part="trigger"],
+[data-scope="navigation"] [data-part="link"] {
+  display: flex;
+  align-items: center;
+  gap: var(--uf-control-gap);
+  min-height: var(--uf-control-height);
+  height: auto;
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+  border: none;
+  border-radius: var(--uf-radius);
+  background: var(--uf-color-black-0);
+  font: inherit;
+  color: var(--uf-color-fg-muted);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+[data-scope="navigation"] [data-part="trigger"]:hover,
+[data-scope="navigation"] [data-part="link"]:hover {
+  background: var(--uf-color-hover-bg);
+  color: var(--uf-color-fg);
+}
+[data-scope="navigation"] [data-part="link"][aria-current="page"],
+[data-scope="navigation"] [data-part="trigger"][data-current] {
+  color: var(--uf-color-fg);
+}
+[data-scope="navigation"] [data-part="link"][aria-disabled="true"] {
+  opacity: var(--uf-color-disabled-opacity);
+  cursor: not-allowed;
+}
+/* Rows of a dropdown or the sheet span its width and may wrap. */
+.uf-navigation-menu [data-part="link"],
+.uf-navigation-sheetList [data-part="link"] {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: start;
+  white-space: normal;
+}
+[data-scope="navigation"] [data-part="icon"],
+[data-scope="navigation"] [data-part="indicator"] {
+  display: inline-flex;
+  flex: none;
+}
+[data-scope="navigation"] [data-part="indicator"] {
+  transition: transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
+}
+[data-scope="navigation"] [data-part="trigger"][aria-expanded="true"] [data-part="indicator"] {
+  transform: rotate(180deg);
+}
+.uf-navigation-label {
+  min-width: 0;
+}
+/* The dropdown opens under its item, from the item's inline start. */
+[data-scope="navigation"][data-part="content"] {
+  position: absolute;
+  top: 100%;
+  inset-inline-start: 0;
+  z-index: var(--uf-z-dropdown);
+  inline-size: max-content;
+  min-inline-size: var(--uf-navigation-content-min-width);
+  max-inline-size: calc(100vw - var(--uf-spacing-4));
+  transform-origin: top;
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
+}
+[data-scope="navigation"][data-part="content"][hidden] {
+  display: none;
+}
+@starting-style {
+  [data-scope="navigation"][data-part="content"] {
+    opacity: 0;
+    transform: translateY(var(--uf-overlay-enter-y)) scale(var(--uf-overlay-enter-scale));
+  }
+}
+.uf-navigation-groupLabel,
+.uf-navigation-sectionLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--uf-control-gap);
+  padding: var(--uf-spacing-1) var(--uf-control-pad-text);
+  font-size: var(--uf-font-size-xs);
+  font-weight: var(--uf-font-weight-bold);
+  color: var(--uf-color-fg-muted);
+}
+.uf-navigation-section[data-disabled] > .uf-navigation-sectionLabel {
+  opacity: var(--uf-color-disabled-opacity);
+}
+
+/* A horizontal menubar wraps rather than overflowing its bar. */
+[data-scope="navigation"] [data-part="list"][data-orientation="horizontal"] {
+  flex-wrap: wrap;
+}
+.uf-navigation-nestedGroup {
+  padding-inline-start: var(--uf-control-pad-text);
+}

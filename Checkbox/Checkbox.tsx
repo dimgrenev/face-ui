@@ -1,134 +1,145 @@
-/**
- * Checkbox — form control for boolean/indeterminate selection.
- *
- * `<Checkbox label="Accept terms" />`
- * `<Checkbox checked disabled />`
- */
-
-import { forwardRef, useEffect, useMemo, useRef, type ReactNode } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { checkboxMachine, connectCheckbox } from '../assets/machines/checkbox.machine'
+import { forwardRef, type CSSProperties, type ReactNode } from 'react'
 import { cn } from '../assets/utils'
+import {
+  useCheckedInput,
+  type CheckedInputAttributes,
+} from '../assets/adapters/react/use-checked-input'
+import { hasSlotContent } from '../assets/slot-content'
 import { Text } from '../Text/Text'
-import { CheckOnIcon, CheckOffIcon, MinusIcon } from '../assets/icons'
-import type { FormControlProps } from '../assets/form-control-props'
+import { CheckOnIcon, CheckOffIcon, CheckMixedIcon } from '../assets/icons'
+import { Membrane } from '../assets/adapters/react/Membrane'
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-export interface CheckboxProps extends FormControlProps {
-  /** Checked state (boolean or 'indeterminate'). */
+export interface CheckboxProps extends CheckedInputAttributes {
+  /** Controlled selection. Indeterminate summarizes a partially selected collection; it does not submit a value. */
   checked?: boolean | 'indeterminate'
-  /** Uncontrolled initial checked state. */
+  /** Uncontrolled initial selection, also restored by form reset. */
   defaultChecked?: boolean | 'indeterminate'
-  /** Label content. */
+  /** Visible label content. Empty content adds no label slot; zero remains visible. */
   label?: ReactNode
-  /** Callback when checked state changes. */
+  /** User selection notification; parent updates and form reset are silent. Native activation produces true or false. */
   onCheckedChange?: (details: { checked: boolean | 'indeterminate' }) => void
+  /** Accessible name, including when there is no visible label. */
+  'aria-label'?: string
+  /** External label element IDs; takes native precedence over aria-label. */
+  'aria-labelledby'?: string
+  /** External description element IDs. */
+  'aria-describedby'?: string
+  /** Exclude the checkbox from activation, focus navigation and form submission. */
+  disabled?: boolean
+  /** Require an actual checked value for native form validation; mixed is not checked. */
+  required?: boolean
+  /** FormData key. Without a name the checkbox does not contribute a field. */
+  name?: string
+  /** Value submitted only when checked. It does not control selection. */
+  value?: string
+  /** ID of an external native form that owns the input. */
+  form?: string
+  /** Focus the native input on mount. */
+  autoFocus?: boolean
+  /** Expand the membrane and clickable label to the container width. */
+  fullWidth?: boolean
+  /** Shared outer spacing; toggling it preserves input identity and state. */
+  membrane?: boolean
+  /** CSS class on the visual label. Other native attributes and events target the input. */
+  className?: string
+  /** Style on the visual label; use scoped CSS for individual parts. */
+  style?: CSSProperties
 }
 
-function initialCheckboxState(checked: boolean | 'indeterminate'): 'unchecked' | 'checked' | 'indeterminate' {
-  if (checked === 'indeterminate') return 'indeterminate'
-  return checked ? 'checked' : 'unchecked'
-}
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
-export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
-  function Checkbox(props, ref) {
-    const {
-      checked,
+/** A native boolean choice, or an indeterminate summary of the choices below it, beside a visible label. */
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
+  function Checkbox(
+    {
+      checked: checkedProp,
       defaultChecked = false,
+      onCheckedChange,
+      onChange,
       disabled = false,
       required = false,
-      name = '',
+      value = 'on',
       label,
-      onCheckedChange,
       className,
+      style,
+      hidden,
+      dir,
+      lang,
+      title,
       membrane = true,
-    } = props
-    const resolvedInitial = checked ?? defaultChecked
-    const initialCheckedRef = useRef(resolvedInitial)
-    const checkboxMachineConfig = useMemo(() => ({
-      ...checkboxMachine,
-      initial: initialCheckboxState(initialCheckedRef.current),
-      context: {
-        ...checkboxMachine.context,
-        checked: initialCheckedRef.current,
-      },
-    }), [])
-
-    const { state, send } = useMachine(checkboxMachineConfig, {
-      disabled,
-      required,
-      name,
-      onCheckedChange: ((details: { checked: boolean | 'indeterminate' }) => {
-        onCheckedChange?.(details)
-      }) as any,
+      fullWidth = false,
+      ...nativeProps
+    },
+    ref,
+  ) {
+    const { checked, inputProps } = useCheckedInput({
+      component: 'Checkbox',
+      checked: checkedProp,
+      defaultChecked,
+      onCheckedChange,
+      onChange,
+      ref,
     })
-
-    useEffect(() => {
-      if (checked === undefined) return
-      if (state.context.checked === checked) return
-      send({ type: 'SET', checked })
-    }, [checked, send, state.context.checked])
-
-    const api = connectCheckbox(state, send)
-
-    const hasLabel = label != null && String(label).trim().length > 0
-    const controlVisualProps = { ...(api.getControlProps() as any) }
-    const labelVisualProps = { ...(api.getLabelProps() as any) }
-    const hiddenInputProps = { ...(api.getHiddenInputProps() as any) }
-    delete controlVisualProps.onClick
-    delete labelVisualProps.onClick
-    delete hiddenInputProps.onChange
-
-    const rootNode = (
-      <label
-        ref={ref}
-        {...api.getRootProps()}
-        onClick={(event) => {
-          const target = event.target as HTMLElement | null
-          event.preventDefault()
-          if (target?.tagName === 'INPUT') return
-          send({ type: 'TOGGLE' })
-        }}
-        data-has-label={hasLabel ? '' : undefined}
-        data-icon-left={hasLabel ? '' : undefined}
-        data-icon-only={!hasLabel ? '' : undefined}
-        className={cn(
-          'uf-checkbox',
-          'uf-option',
-          'uf-control',
-          className,
-        )}
+    const state =
+      checked === 'indeterminate'
+        ? 'indeterminate'
+        : checked
+          ? 'checked'
+          : 'unchecked'
+    const part = (name: string) => ({
+      'data-scope': 'checkbox',
+      'data-part': name,
+      'data-state': state,
+      'data-disabled': disabled || undefined,
+    })
+    const hasLabel = hasSlotContent(label)
+    const shared = { hidden, dir, lang, title }
+    return (
+      <Membrane
+        enabled={membrane}
+        fullWidth={fullWidth}
+        interactive
+        target="input"
       >
-        <span {...controlVisualProps}>
-          {state.matches('indeterminate')
-            ? <MinusIcon />
-            : state.matches('checked')
-              ? <CheckOnIcon />
-              : <CheckOffIcon />}
-        </span>
-        <input
-          {...hiddenInputProps}
-          readOnly
-          onClick={(event) => {
-            event.preventDefault()
-          }}
-        />
-        {hasLabel && (
-          <Text as="span" inset="none" membrane={false} {...labelVisualProps}>
-            {label}
-          </Text>
-        )}
-      </label>
+        <label
+          {...part('root')}
+          {...shared}
+          style={style}
+          data-has-label={hasLabel ? '' : undefined}
+          data-icon-left={hasLabel ? '' : undefined}
+          data-icon-only={!hasLabel ? '' : undefined}
+          data-full-width={fullWidth || undefined}
+          className={cn('uf-checkbox', 'uf-option', 'uf-control', className)}
+        >
+          <span {...part('indicator')} aria-hidden="true">
+            {checked === 'indeterminate' ? (
+              <CheckMixedIcon />
+            ) : checked ? (
+              <CheckOnIcon />
+            ) : (
+              <CheckOffIcon />
+            )}
+          </span>
+          <input
+            // Explicit, so WebKit's Tab order includes the checkbox.
+            tabIndex={disabled ? -1 : 0}
+            aria-disabled={disabled || undefined}
+            aria-required={required || undefined}
+            {...nativeProps}
+            {...part('input')}
+            {...shared}
+            {...inputProps}
+            role="checkbox"
+            aria-checked={checked === 'indeterminate' ? 'mixed' : checked}
+            disabled={disabled}
+            required={required}
+            value={value}
+          />
+          {hasLabel && (
+            <Text {...part('label')} as="span" inset="none" membrane={false}>
+              {label}
+            </Text>
+          )}
+        </label>
+      </Membrane>
     )
-
-    if (!membrane) return rootNode
-    return <span className="uf-membrane">{rootNode}</span>
   },
 )

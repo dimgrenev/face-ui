@@ -31,7 +31,7 @@
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Separator direction",
+      "description": "Draws a horizontal line across the available width, or a vertical line down the height of its row.",
       "options": [
         "horizontal",
         "vertical"
@@ -42,14 +42,14 @@
       "name": "decorative",
       "type": "boolean",
       "required": false,
-      "description": "Whether the separator is purely decorative",
+      "description": "Hides the line from assistive technology; `false` exposes it as a separator with its orientation, for a break between sections or a resize handle.",
       "defaultValue": true
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing",
+      "description": "Insets the line by the control spacing so its ends meet the visible edges of neighbouring controls; a vertical line also keeps at least one control's height.",
       "defaultValue": true
     }
   ],

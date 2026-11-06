@@ -2,22 +2,22 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Icon",
-  "description": "Face UI icon renderer. Built-in icons always render at 20x20; unsupported sources render notdef.",
+  "description": "Local Iconoteka pictograms, with Face UI's stable sizing and API.",
   "props": {
     "name": {
       "type": "string",
       "required": true,
-      "description": "Built-in Face UI icon name. Unknown names render the notdef glyph."
+      "description": "Stable Face UI alias. Unknown names render notdef; a blank name renders nothing."
     },
-    "label": {
+    "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Accessible label. If omitted, icon is decorative."
+      "description": "Accessible name; icons without a label or title are decorative."
     },
     "title": {
       "type": "string",
       "required": false,
-      "description": "Optional title element for inline SVG."
+      "description": "Native pointer hint and accessible name when aria-label is absent."
     }
   },
   "states": [
@@ -40,16 +40,10 @@
       }
     },
     {
-      "name": "Unknown Fallback",
-      "props": {
-        "name": "unknown-icon"
-      }
-    },
-    {
       "name": "Accessible",
       "props": {
         "name": "account",
-        "label": "Account"
+        "aria-label": "Account"
       }
     }
   ],
@@ -76,9 +70,9 @@
       "--uf-color-background"
     ],
     "notes": [
-      "Icon inherits color through currentColor and does not own palette semantics.",
-      "Parent component slots may provide --uf-icon-size, but the rendered Icon DOM box remains 20x20.",
-      "Some built-in glyphs use --uf-color-background for internal knockouts; keep this tied to theme background until icon theming is formalized."
+      "Icon inherits currentColor and does not own palette semantics.",
+      "Rendered icons keep a 20x20 box; Iconoteka contours use a native 24x24 viewBox.",
+      "SVG counters are transparent and remain correct in both themes."
     ]
   },
   "platform": {},

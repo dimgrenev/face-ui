@@ -2,38 +2,28 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Navigation",
-  "description": "Horizontal or vertical navigation bar with hover dropdowns",
+  "description": "The main links of a site or app in a bar, with dropdowns; a sheet on narrow screens.",
   "props": {
     "items": {
       "type": "array",
       "required": false,
-      "description": "Navigation item definitions (supports nested dropdowns)."
+      "description": "The bar's items in order; an item repeating an earlier value is dropped."
     },
-    "activeId": {
+    "value": {
       "type": "string",
       "required": false,
-      "description": "Currently active item ID."
+      "description": "Value of the current page's item, marked `aria-current=\"page\"`; `null` marks none, and an unknown value marks none."
     },
-    "defaultActiveId": {
+    "defaultValue": {
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial active item ID.",
+      "description": "Current item on mount when `value` is not set; read once.",
       "default": null
-    },
-    "orientation": {
-      "type": "enum",
-      "required": false,
-      "description": "Orientation of the navigation bar.",
-      "options": [
-        "horizontal",
-        "vertical"
-      ],
-      "default": "horizontal"
     },
     "surface": {
       "type": "enum",
       "required": false,
-      "description": "Surface behavior on compact viewports.",
+      "description": "`inline` shows the bar; `sheet` shows a trigger that opens the items in a bottom sheet; `auto` is a sheet below 900px.",
       "options": [
         "auto",
         "inline",
@@ -41,105 +31,129 @@
       ],
       "default": "auto"
     },
-    "surfaceBreakpoint": {
-      "type": "number",
-      "required": false,
-      "description": "Breakpoint where auto surfaces switch to sheet mode."
-    },
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled sheet state for compact mode."
+      "description": "Whether the sheet is open; only a sheet surface opens, and leaving it closes an uncontrolled sheet."
     },
     "defaultOpen": {
       "type": "boolean",
       "required": false,
-      "description": "Uncontrolled initial sheet state for compact mode.",
+      "description": "Whether the sheet is open on mount when `open` is not set; read once.",
       "default": false
     },
     "trigger": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Optional trigger for compact mode."
+      "description": "Element that opens the sheet, keeping its own props; text renders as a Button. Default: an icon button named `labels.open`."
     },
-    "surfaceTitle": {
+    "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Optional title used in compact sheet header."
+      "description": "Names the navigation landmark (default \"Main\") and titles the sheet."
+    },
+    "labels": {
+      "type": "object",
+      "required": false,
+      "description": "Strings Navigation renders itself: `open` names the default sheet trigger, `close` the sheet's close button."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "defaultActiveId": "home",
-        "orientation": "horizontal",
-        "surface": "auto",
-        "defaultOpen": false,
+        "defaultValue": "home",
+        "surface": "inline",
+        "aria-label": "Main",
         "items": [
           {
-            "id": "home",
-            "label": "Home"
+            "value": "home",
+            "label": "Home",
+            "href": "#home"
           },
           {
-            "id": "library",
+            "value": "library",
             "label": "Library",
             "items": [
               {
-                "id": "typefaces",
-                "label": "Typefaces"
+                "value": "typefaces",
+                "label": "Typefaces",
+                "href": "#typefaces"
               },
               {
-                "id": "components",
-                "label": "Components"
+                "value": "components",
+                "label": "Components",
+                "href": "#components"
               }
             ]
           },
           {
-            "id": "settings",
+            "value": "settings",
             "label": "Settings"
           }
         ]
       }
     },
     {
-      "name": "Vertical",
+      "name": "Sheet",
       "props": {
-        "orientation": "vertical"
+        "surface": "sheet",
+        "aria-label": "Main"
       }
     }
   ],
   "behavior": {
-    "rovingFocus": true
+    "rovingFocus": true,
+    "pattern": "APG disclosure navigation: links and disclosure buttons, no menu roles.",
+    "dropdowns": "One open at a time; a click toggles, hover opens after 200 ms and closes 150 ms after leaving; focus leaving the item, Escape and an outside press close it.",
+    "autoFocusOnOpen": "ArrowDown/ArrowUp on a trigger: the first or last link; click or hover: none",
+    "sheet": "Below 900px with surface auto: a trigger opens the items in a modal bottom sheet; activating a link closes it."
   },
   "keyboard": {
+    "Tab": {
+      "action": "focusNextFocusable",
+      "condition": "every enabled item and every link of the open dropdown is in the tab sequence"
+    },
     "ArrowRight": {
       "action": "focusNext",
-      "condition": "horizontal"
+      "scope": "bar",
+      "condition": "mirrored in right-to-left text"
     },
     "ArrowLeft": {
       "action": "focusPrevious",
-      "condition": "horizontal"
-    },
-    "ArrowDown": {
-      "action": "focusNext",
-      "condition": "vertical"
-    },
-    "ArrowUp": {
-      "action": "focusPrevious",
-      "condition": "vertical"
+      "scope": "bar",
+      "condition": "mirrored in right-to-left text"
     },
     "Home": {
       "action": "focusFirst"
     },
     "End": {
       "action": "focusLast"
+    },
+    "ArrowDown": {
+      "action": "openAndFocusFirst",
+      "scope": "trigger; focusNext inside a dropdown"
+    },
+    "ArrowUp": {
+      "action": "openAndFocusLast",
+      "scope": "trigger; focusPrevious inside a dropdown"
+    },
+    "Enter": {
+      "action": "activate"
+    },
+    "Space": {
+      "action": "activate"
+    },
+    "Escape": {
+      "action": "closeDropdown",
+      "condition": "focus returns to its trigger"
     }
   },
   "aria": {
     "role": "navigation",
-    "required": [
-      "aria-label"
+    "notes": [
+      "The root is a <nav> landmark; aria-label names it when a page has several.",
+      "The current page's link has aria-current=\"page\"; dropdown triggers are buttons with aria-expanded and aria-controls."
     ]
   },
   "composition": {
@@ -151,7 +165,8 @@
     ],
     "recommended": [
       "trigger",
-      "content"
+      "content",
+      "group"
     ],
     "parts": {
       "root": {
@@ -177,55 +192,72 @@
       "content": {
         "slot": "content",
         "parent": "item"
+      },
+      "group": {
+        "slot": "group",
+        "parent": "content",
+        "multiple": true
+      },
+      "group-label": {
+        "slot": "group-label",
+        "parent": "group"
+      },
+      "icon": {
+        "slot": "icon",
+        "parent": "link"
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "trigger"
       }
     }
   },
   "tokenMapping": {
     "component": [
-      "--uf-navigation-content-min-width",
-      "--uf-navigation-sheet-viewport-gap",
-      "--uf-navigation-nested-inset"
+      "--uf-navigation-content-min-width"
     ],
     "semanticFallbacks": [
-      "--uf-spacing-2",
-      "--uf-spacing-3",
-      "--uf-membrane",
+      "--uf-spacing-1",
+      "--uf-spacing-4",
+      "--uf-spacing-10",
       "--uf-control-height",
       "--uf-control-pad-y",
       "--uf-control-pad-text",
-      "--uf-radius-md",
+      "--uf-control-gap",
+      "--uf-radius",
+      "--uf-font-size-xs",
       "--uf-font-weight-bold",
       "--uf-color-fg",
       "--uf-color-fg-muted",
-      "--uf-overlay-surface-bg",
-      "--uf-overlay-surface-blur",
-      "--uf-overlay-surface-shadow",
+      "--uf-color-hover-bg",
+      "--uf-color-disabled-opacity",
       "--uf-overlay-enter-y",
       "--uf-overlay-enter-scale",
       "--uf-duration-enter",
-      "--uf-duration-exit",
       "--uf-ease-enter",
       "--uf-z-dropdown"
     ],
     "notes": [
-      "Navigation uses Button/Text for interactive items and sheet groups.",
-      "Dropdown and compact sheet surfaces inherit overlay/sheet tokens; nested item indentation is the only navigation-local geometry token."
+      "The dropdown surface is a Card surface; the compact sheet is a Modal at the bottom edge."
     ]
   },
   "platform": {},
   "usage": {
     "whenToUse": [
-      "Primary app navigation",
-      "Sidebar menu links",
-      "Header nav links"
+      "Primary site or app navigation in a header",
+      "Top-level sections with dropdowns of links"
     ],
     "whenNotToUse": [
-      "Content switching within page (use Tabs)",
-      "Breadcrumb trail (use Breadcrumb)"
+      "Side navigation (use Panel)",
+      "Content switching within a page (use Tabs)",
+      "Breadcrumb trail (use Breadcrumb)",
+      "A list of actions (use Menu)"
     ],
     "alternatives": [
+      "Panel",
       "Tabs",
-      "Breadcrumb"
+      "Breadcrumb",
+      "Menu"
     ],
     "context": "app"
   }

@@ -1,201 +1,307 @@
-/**
- * SegmentedControl — mode-switch strip with single or multiple selection.
- *
- * Canonical engine for the segmented/toggle control. `Toggle` is a thin
- * compatibility wrapper over this component (see Toggle/Toggle.tsx).
- *
- * `<SegmentedControl items={[...]} />`
- * `<SegmentedControl selectionMode="multiple" items={[...]} />`
- */
-
 import {
   forwardRef,
-  useCallback,
   useRef,
   useState,
-  type KeyboardEvent,
-  type ReactNode,
+  type ButtonHTMLAttributes,
+  type HTMLAttributes,
+  type MouseEvent,
 } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
-import { toggleMachine, connectToggle } from '../assets/machines/toggle.machine'
 import { cn } from '../assets/utils'
+import { Membrane } from '../assets/adapters/react/Membrane'
+import { FormValue } from '../assets/adapters/react/FormValue'
+import { composeHandlers } from '../assets/adapters/react/merge-props'
+import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
+import { FieldLayout, idList, useField, type FieldProps } from '../assets/internal/field'
+import { readFlatCollection } from '../assets/internal/flat-collection'
+import type { CollectionItem } from '../assets/internal/item'
+import { readKeys } from '../assets/runtime/collection'
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+/** One choice of the strip; `id` and native `aria-*` name the choice's button. */
+export interface SegmentedControlItem
+  extends Omit<CollectionItem, 'textValue' | 'icon'>,
+    Pick<
+      ButtonHTMLAttributes<HTMLButtonElement>,
+      'id' | 'aria-label' | 'aria-labelledby' | 'aria-describedby' | 'title'
+    > {}
 
-export interface SegmentedControlItem {
-  value: string
-  label: ReactNode
+interface SegmentedControlBaseProps
+  extends FieldProps,
+    Omit<
+      HTMLAttributes<HTMLDivElement>,
+      | 'children'
+      | 'dangerouslySetInnerHTML'
+      | 'defaultValue'
+      | 'defaultChecked'
+      | 'role'
+      | 'aria-checked'
+      | 'aria-pressed'
+      | 'aria-orientation'
+      | 'aria-disabled'
+      | 'aria-readonly'
+      | 'aria-required'
+    > {
+  /** Choices in visual, keyboard and form order; an item with a missing or repeated `value` is skipped. */
+  items?: readonly SegmentedControlItem[]
+  /** Disables every choice and leaves the value out of FormData. */
   disabled?: boolean
-}
-
-export interface SegmentedControlProps {
-  /** Segment options. */
-  items?: SegmentedControlItem[]
-  /** Currently selected segment values. */
-  value?: string[]
-  /** Uncontrolled initial selected segment values. */
-  defaultValue?: string[]
-  /** Selection mode: single or multiple. */
-  selectionMode?: 'single' | 'multiple'
-  /** Disabled state for the entire group. */
-  disabled?: boolean
-  /** Layout orientation. */
+  /** Lays the choices out in a row or a column; without `multiple`, all four arrow keys move between choices. */
   orientation?: 'horizontal' | 'vertical'
-  /** Accessible name for the segmented group. */
-  ariaLabel?: string
-  /** Callback when selected segment values change. */
-  onValueChange?: (details: { value: string[] }) => void
-  /** Additional CSS class. */
-  className?: string
-  /** Outer membrane wrapper around each segment item. */
+  /** Names the group when there is no visible label. */
+  'aria-label'?: string
+  /** Ids of visible elements that name the group; they take precedence over `label`. */
+  'aria-labelledby'?: string
+  /** FormData key; a multiple value submits one entry per choice. */
+  name?: string
+  /** Id of the form that submits and resets the value, when it is not an ancestor. */
+  form?: string
+  /** Blocks form submission until a choice is selected and marks the group required; a group with no enabled choice never blocks. */
+  required?: boolean
+  /** Focuses the selected enabled choice, or the first enabled one, on mount. */
+  autoFocus?: boolean
+  /** Shared outer spacing around each choice; toggling it keeps DOM and focus. */
   membrane?: boolean
 }
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
-function normalizeSegmentValue(value: unknown): string[] | undefined {
-  return Array.isArray(value) ? value.map((item) => String(item)) : undefined
+interface SegmentedControlSingleProps {
+  /** Lets the user press any number of choices, and makes the value a `string[]` instead of `string | null`. */
+  multiple?: false
+  /** Selected key, or keys with `multiple`; keys missing from `items` select nothing until they appear. */
+  value?: string | null
+  /** Selection on mount, restored by form reset; same shape as `value`. */
+  defaultValue?: string | null
+  /** Called once per user change with the new value, a fresh array with `multiple`; never for prop updates or reset. */
+  onValueChange?: (details: { value: string | null }) => void
 }
-
-function segmentValuesEqual(left: string[] | undefined, right: string[] | undefined): boolean {
-  if (left === right) return true
-  if (!left || !right) return false
-  if (left.length !== right.length) return false
-  return left.every((item, index) => item === right[index])
+interface SegmentedControlMultipleProps {
+  /** Lets the user press any number of choices, and makes the value a `string[]` instead of `string | null`. */
+  multiple: true
+  /** Selected key, or keys with `multiple`; keys missing from `items` select nothing until they appear. */
+  value?: readonly string[]
+  /** Selection on mount, restored by form reset; same shape as `value`. */
+  defaultValue?: readonly string[]
+  /** Called once per user change with the new value, a fresh array with `multiple`; never for prop updates or reset. */
+  onValueChange?: (details: { value: string[] }) => void
 }
+export type SegmentedControlProps = SegmentedControlBaseProps &
+  (SegmentedControlSingleProps | SegmentedControlMultipleProps)
 
-export const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps>(
-  function SegmentedControl(props, ref) {
-    const {
-      items: rawItems,
-      value,
-      defaultValue,
-      selectionMode = 'single',
-      disabled = false,
-      orientation = 'horizontal',
-      ariaLabel,
-      onValueChange,
-      className,
-      membrane = true,
-    } = props
+type Value = string | readonly string[] | null
+const same = (a: readonly string[], b: readonly string[]) =>
+  a.length === b.length && a.every((key, index) => key === b[index])
 
-    const items = Array.isArray(rawItems) ? rawItems : []
-    const controlledValue = normalizeSegmentValue(value)
-    const isControlled = controlledValue !== undefined
-    const machineValue = useControllableMachineProp(controlledValue, normalizeSegmentValue(defaultValue) ?? [])
-
-    const { state, send } = useMachine(toggleMachine, {
-      value: machineValue,
-      type: selectionMode,
-      disabled,
-      orientation,
-      onValueChange: ((details: { value: string[] }) => {
-        if (isControlled && segmentValuesEqual(details.value, controlledValue)) return
-        onValueChange?.(details)
-      }) as any,
-    })
-
-    const api = connectToggle(state, send)
-    const itemRefs = useRef(new Map<string, HTMLButtonElement>())
-    const [focusedValue, setFocusedValue] = useState<string | null>(null)
-    const enabledValues = items
-      .filter((item) => !disabled && !item.disabled)
-      .map((item) => item.value)
-    const rovingValue = (
-      (focusedValue && enabledValues.includes(focusedValue) ? focusedValue : null)
-      ?? state.context.value.find((itemValue) => enabledValues.includes(itemValue))
-      ?? enabledValues[0]
-      ?? null
+/** Compact choice strip: one radio choice, or independently pressed options with `multiple`. */
+export const SegmentedControl = forwardRef<
+  HTMLDivElement,
+  SegmentedControlProps
+>(function SegmentedControl(props, ref) {
+  const {
+    items,
+    value,
+    defaultValue,
+    multiple = false,
+    onValueChange,
+    disabled = false,
+    orientation = 'horizontal',
+    name,
+    form,
+    required = false,
+    autoFocus = false,
+    membrane = true,
+    label,
+    description,
+    error,
+    labelPosition,
+    id,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    'aria-invalid': ariaInvalid,
+    className,
+    onClick,
+    onKeyDown,
+    onFocus,
+    onBlur,
+    ...nativeProps
+  } = props
+  // Structural entries must be dropped before they can reserve a valid choice key.
+  const collection = readFlatCollection<SegmentedControlItem>(items, {
+    component: 'SegmentedControl',
+    key: (item) => item.value,
+  })
+  const choices = collection.children(null)
+  const keys = choices.map((entry) => entry.key)
+  const off = (key: string) =>
+    disabled || collection.get(key)?.disabled === true
+  // The stored value is the intent; what is shown is its projection onto the current items and
+  // mode, computed here and never written back, so late or briefly empty items keep the choice.
+  const project = (intent: unknown): readonly string[] => {
+    const wanted = new Set(
+      typeof intent === 'string'
+        ? [intent]
+        : Array.isArray(intent)
+          ? readKeys(intent, 'SegmentedControl', 'value')
+          : [],
     )
-
-    const moveFocus = useCallback((currentValue: string, direction: 'next' | 'previous' | 'first' | 'last') => {
-      const values = items
-        .filter((item) => !disabled && !item.disabled)
-        .map((item) => item.value)
-      if (values.length === 0) return
-
-      const currentIndex = Math.max(0, values.indexOf(currentValue))
-      const nextIndex = direction === 'first'
-        ? 0
-        : direction === 'last'
-          ? values.length - 1
-          : direction === 'next'
-            ? (currentIndex + 1) % values.length
-            : (currentIndex - 1 + values.length) % values.length
-      const nextValue = values[nextIndex]
-      if (!nextValue) return
-
-      setFocusedValue(nextValue)
-      itemRefs.current.get(nextValue)?.focus()
-      if (selectionMode === 'single' && !state.context.value.includes(nextValue)) {
-        send({ type: 'TOGGLE', value: nextValue })
-      }
-    }, [disabled, items, selectionMode, send, state.context.value])
-
-    const handleItemKeyDown = useCallback((event: KeyboardEvent<HTMLButtonElement>, itemValue: string) => {
-      const nextKey = orientation === 'vertical' ? 'ArrowDown' : 'ArrowRight'
-      const previousKey = orientation === 'vertical' ? 'ArrowUp' : 'ArrowLeft'
-
-      if (event.key === nextKey) {
-        event.preventDefault()
-        moveFocus(itemValue, 'next')
-      } else if (event.key === previousKey) {
-        event.preventDefault()
-        moveFocus(itemValue, 'previous')
-      } else if (event.key === 'Home') {
-        event.preventDefault()
-        moveFocus(itemValue, 'first')
-      } else if (event.key === 'End') {
-        event.preventDefault()
-        moveFocus(itemValue, 'last')
-      }
-    }, [moveFocus, orientation])
-
-    return (
-      <div
-        ref={ref}
-        {...api.getRootProps()}
-        aria-label={ariaLabel}
-        className={cn('uf-toggle', className)}
-      >
-        {items.map((item) => {
-          const itemProps = api.getItemProps({
-            value: item.value,
-            disabled: item.disabled,
-            tabIndex: item.value === rovingValue ? 0 : -1,
-          })
-          const itemNode = (
-            <button
-              key={item.value}
-              type="button"
-              {...itemProps}
-              ref={(node) => {
-                if (node) itemRefs.current.set(item.value, node)
-                else itemRefs.current.delete(item.value)
-              }}
-              onFocus={() => {
-                setFocusedValue(item.value)
-                itemProps.onFocus()
-              }}
-              onKeyDown={(event) => handleItemKeyDown(event, item.value)}
-              className={cn('uf-toggle-item', 'uf-option', 'uf-control')}
-            >
-              {item.label}
-            </button>
-          )
-          if (!membrane) return itemNode
-          return (
-            <span key={`segment-membrane:${item.value}`} className="uf-membrane" data-membrane-interactive="">
-              {itemNode}
-            </span>
-          )
-        })}
-      </div>
+    const shown = keys.filter((key) => wanted.has(key))
+    return multiple ? shown : shown.slice(0, 1)
+  }
+  const toValue = (shown: readonly string[]): Value =>
+    multiple ? shown : (shown[0] ?? null)
+  // A copy: the default is read once, so later mutation of the caller's array changes nothing.
+  const [initial] = useState<Value>(() =>
+    Array.isArray(defaultValue) ? [...defaultValue] : (defaultValue ?? null),
+  )
+  const [intent, setIntent, replaceIntent] = useControllableState<Value>({
+    value,
+    defaultValue: initial,
+    onChange: (next) =>
+      (onValueChange as ((details: { value: Value }) => void) | undefined)?.({
+        value: next,
+      }),
+    name: ['SegmentedControl', 'value'],
+  })
+  const selected = project(intent)
+  const propose = (candidate: readonly string[]) => {
+    const next = project(candidate)
+    if (!disabled && !same(next, selected)) setIntent(toValue(next))
+  }
+  const [nativeError, setNativeError] = useState<string | null>(null)
+  const field = useField({
+    label,
+    description,
+    error,
+    labelPosition,
+    id,
+    labelable: false,
+    required,
+    nativeError,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    'aria-invalid': ariaInvalid,
+  })
+  const roving = useRovingFocus({
+    keys,
+    disabled: off,
+    active: selected.find((key) => !off(key)) ?? null,
+    orientation: multiple ? orientation : 'both',
+    // Keyboard selection clicks the reached choice, so a cancelled click cancels it as well.
+    activateOnMove: !multiple,
+    autoFocus,
+  })
+  const rootRef = useRef<HTMLDivElement>(null)
+  const composedRef = useComposedRefs(rootRef, ref)
+  const choose = (event: MouseEvent<HTMLDivElement>) => {
+    const key = roving.keyOf(
+      (event.target as Element).closest('.uf-toggle-item'),
     )
-  },
-)
+    if (key === null || event.defaultPrevented || off(key)) return
+    propose(
+      !multiple
+        ? [key]
+        : selected.includes(key)
+          ? selected.filter((other) => other !== key)
+          : [...selected, key],
+    )
+  }
+  return (
+    <div
+      {...nativeProps}
+      {...field.controlProps}
+      {...field.rootProps}
+      ref={composedRef}
+      role={multiple ? 'group' : 'radiogroup'}
+      aria-orientation={multiple ? undefined : orientation}
+      aria-disabled={disabled || undefined}
+      aria-invalid={!multiple && field.invalid ? true : undefined}
+      aria-required={!multiple && required ? true : undefined}
+      data-scope="toggle"
+      data-part="root"
+      data-type={multiple ? 'multiple' : 'single'}
+      data-orientation={orientation}
+      data-disabled={disabled || undefined}
+      className={cn('uf-field uf-toggle', className)}
+      onClick={composeHandlers(onClick, choose)}
+      onKeyDown={composeHandlers(onKeyDown, roving.root.onKeyDown)}
+      onFocus={composeHandlers(onFocus, roving.root.onFocus)}
+      onBlur={composeHandlers(onBlur, roving.root.onBlur)}
+    >
+      <FieldLayout field={field}>
+        <div className="uf-toggle-list" data-scope="toggle" data-part="list">
+          {choices.map(({ key, item }) => {
+            const checked = selected.includes(key)
+            const itemDisabled = off(key)
+            const tab = roving.item(key)
+            return (
+              <Membrane enabled={membrane} key={key} interactive>
+                <button
+                  {...tab}
+                  id={item.id}
+                  title={item.title}
+                  aria-label={item['aria-label']}
+                  aria-labelledby={item['aria-labelledby']}
+                  type="button"
+                  role={multiple ? undefined : 'radio'}
+                  disabled={itemDisabled}
+                  form={form}
+                  aria-checked={multiple ? undefined : checked}
+                  aria-pressed={multiple ? checked : undefined}
+                  aria-disabled={itemDisabled || undefined}
+                  aria-describedby={idList(
+                    item['aria-describedby'],
+                    field.describedBy,
+                  )}
+                  data-scope="toggle"
+                  data-part="item"
+                  data-value={key}
+                  data-state={checked ? 'on' : 'off'}
+                  data-disabled={itemDisabled || undefined}
+                  data-orientation={orientation}
+                  data-autofocus={autoFocus && tab.tabIndex === 0 ? '' : undefined}
+                  className="uf-toggle-item uf-option uf-control"
+                >
+                  {item.label}
+                </button>
+              </Membrane>
+            )
+          })}
+        </div>
+      </FieldLayout>
+      <FormValue
+        name={name}
+        form={form}
+        disabled={disabled}
+        // Like a native radio group, nothing enabled to choose cannot block submission.
+        required={required && keys.some((key) => !off(key))}
+        options={choices.map(({ key, disabled }) => ({
+          value: key,
+          disabled,
+        }))}
+        value={toValue(selected)}
+        resetValue={toValue(project(initial))}
+        // Interactive validation focuses the proxy; focus then goes to the group's tab stop.
+        triggerRef={{
+          get current() {
+            return (
+              rootRef.current?.querySelector<HTMLElement>(
+                '.uf-toggle-item[tabindex="0"]',
+              ) ?? null
+            )
+          },
+        }}
+        onReset={() => {
+          replaceIntent()
+          return toValue(project(value === undefined ? initial : intent))
+        }}
+        onChange={(candidate) => {
+          const next = project(candidate)
+          // A native candidate may only add choices a user could press.
+          if (next.every((key) => selected.includes(key) || !off(key)))
+            propose(next)
+        }}
+        onReport={setNativeError}
+      />
+    </div>
+  )
+})

@@ -1,0 +1,170 @@
+/* =================================================================
+ * MARKDOWN
+ * ================================================================= */
+.uf-markdown[data-scope="markdown"] {
+  --uf-markdown-block-gap: var(--uf-spacing-3);
+  --uf-markdown-heading-gap: var(--uf-spacing-2);
+  --uf-markdown-h1-size: calc(var(--uf-font-size-xl) + var(--uf-spacing-1));
+  --uf-markdown-h2-size: calc(var(--uf-font-size-xl) + (var(--uf-membrane) * 2));
+  --uf-markdown-h3-size: var(--uf-font-size-xl);
+  --uf-markdown-h4-size: var(--uf-font-size-lg);
+  --uf-markdown-h5-size: var(--uf-font-size-md);
+  --uf-markdown-list-indent: var(--uf-spacing-3);
+  --uf-markdown-list-item-gap: calc(var(--uf-spacing-2) - (var(--uf-membrane) * 2));
+  --uf-markdown-task-gap: var(--uf-spacing-1);
+  --uf-markdown-checkbox-size: var(--uf-font-size);
+  --uf-markdown-underline-offset: calc(var(--uf-membrane) * 2);
+  --uf-markdown-blockquote-border-width: calc(var(--uf-membrane) * 2);
+  --uf-markdown-code-pad-y: calc(var(--uf-membrane) * 2);
+  --uf-markdown-code-pad-x: calc(var(--uf-spacing-2) - (var(--uf-membrane) * 2));
+  --uf-markdown-table-pad-y: var(--uf-spacing-2);
+  --uf-markdown-table-pad-x: calc(var(--uf-spacing-2) + (var(--uf-membrane) * 2));
+  --uf-markdown-table-border-width: var(--uf-membrane);
+  display: block;
+  width: 100%;
+  min-width: 0;
+  color: var(--uf-color-fg);
+  font-weight: var(--uf-font-weight);
+}
+[data-scope="markdown"] :where(p, li, td, a, blockquote, code, pre, span, em, del) {
+  font-weight: var(--uf-font-weight);
+  letter-spacing: normal;
+}
+[data-scope="markdown"] :where(strong, th) {
+  font-weight: var(--uf-font-weight-bold);
+  letter-spacing: normal;
+}
+[data-scope="markdown"] > :first-child {
+  margin-top: 0;
+}
+[data-scope="markdown"] > :last-child {
+  margin-bottom: 0;
+}
+[data-scope="markdown"] p,
+[data-scope="markdown"] ul,
+[data-scope="markdown"] ol,
+[data-scope="markdown"] pre,
+[data-scope="markdown"] blockquote,
+[data-scope="markdown"] table,
+[data-scope="markdown"] hr {
+  margin: 0 0 var(--uf-markdown-block-gap) 0;
+}
+[data-scope="markdown"] h1,
+[data-scope="markdown"] h2,
+[data-scope="markdown"] h3,
+[data-scope="markdown"] h4,
+[data-scope="markdown"] h5,
+[data-scope="markdown"] h6 {
+  margin: 0 0 var(--uf-markdown-heading-gap) 0;
+  line-height: 1.3;
+  font-weight: var(--uf-font-weight-bold);
+}
+[data-scope="markdown"] h1 {
+  font-size: var(--uf-markdown-h1-size);
+}
+[data-scope="markdown"] h2 {
+  font-size: var(--uf-markdown-h2-size);
+}
+[data-scope="markdown"] h3 {
+  font-size: var(--uf-markdown-h3-size);
+}
+[data-scope="markdown"] h4 {
+  font-size: var(--uf-markdown-h4-size);
+}
+[data-scope="markdown"] h5 {
+  font-size: var(--uf-markdown-h5-size);
+}
+[data-scope="markdown"] h6 {
+  font-size: var(--uf-control-font-size);
+  opacity: 0.8;
+}
+[data-scope="markdown"] ul,
+[data-scope="markdown"] ol {
+  padding-inline-start: calc(var(--uf-control-pad-text) + var(--uf-markdown-list-indent));
+}
+[data-scope="markdown"] li {
+  margin: 0 0 var(--uf-markdown-list-item-gap) 0;
+}
+/* A task's checkbox leads its item and takes its bullet's place, so wrapped task text stays aligned. */
+[data-scope="markdown"] li:has(> label:first-child > input[type="checkbox"]:first-child, > p:first-child > label:first-child > input[type="checkbox"]:first-child) {
+  list-style: none;
+}
+[data-scope="markdown"] li > ul,
+[data-scope="markdown"] li > ol {
+  margin-top: var(--uf-markdown-list-item-gap);
+}
+[data-scope="markdown"] input[type="checkbox"] {
+  width: var(--uf-markdown-checkbox-size);
+  height: var(--uf-markdown-checkbox-size);
+  margin-block: 0;
+  vertical-align: middle;
+}
+[data-scope="markdown"] li > label:first-child > input[type="checkbox"]:first-child,
+[data-scope="markdown"] li > p:first-child > label:first-child > input[type="checkbox"]:first-child {
+  margin-inline: calc(-1 * (var(--uf-markdown-checkbox-size) + var(--uf-markdown-task-gap))) var(--uf-markdown-task-gap);
+}
+[data-scope="markdown"] a {
+  color: var(--uf-color-fg);
+  text-decoration: underline;
+  text-decoration-color: var(--uf-color-fg-muted);
+  text-underline-offset: var(--uf-markdown-underline-offset);
+}
+[data-scope="markdown"] a:hover {
+  color: var(--uf-color-fg);
+  text-decoration-color: var(--uf-color-fg);
+}
+[data-scope="markdown"] blockquote {
+  border-inline-start: var(--uf-markdown-blockquote-border-width) solid var(--uf-color-border);
+  padding-inline-start: var(--uf-markdown-block-gap);
+  color: var(--uf-color-fg-muted);
+}
+[data-scope="markdown"] code {
+  font-family: var(--uf-font-family-mono);
+  font-size: 0.92em;
+  background: var(--uf-color-hover-bg);
+  border-radius: var(--uf-radius-sm);
+  padding: var(--uf-markdown-code-pad-y) var(--uf-markdown-code-pad-x);
+}
+[data-scope="markdown"] pre {
+  background: var(--uf-color-hover-bg);
+  border: none;
+  border-radius: var(--uf-radius-md);
+  padding: var(--uf-markdown-block-gap);
+  overflow-x: auto;
+  /* Source code reads left to right on any page. */
+  direction: ltr;
+}
+[data-scope="markdown"] pre code {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+}
+[data-scope="markdown"] table {
+  width: 100%;
+  border-collapse: collapse;
+}
+[data-scope="markdown"] thead tr {
+  border-bottom: var(--uf-markdown-table-border-width) solid var(--uf-color-border);
+}
+[data-scope="markdown"] th,
+[data-scope="markdown"] td {
+  padding: var(--uf-markdown-table-pad-y) var(--uf-markdown-table-pad-x);
+  vertical-align: top;
+}
+/* A column's GFM alignment arrives as the align attribute; only unaligned cells start at the inline start. */
+[data-scope="markdown"] :is(th, td):not([align]) {
+  text-align: start;
+}
+[data-scope="markdown"] tbody tr + tr td {
+  border-top: var(--uf-markdown-table-border-width) solid var(--uf-color-border);
+}
+[data-scope="markdown"] hr {
+  border: none;
+  border-top: var(--uf-markdown-table-border-width) solid var(--uf-color-border);
+}
+[data-scope="markdown"] img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--uf-radius);
+}

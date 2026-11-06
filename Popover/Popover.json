@@ -2,89 +2,88 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Popover",
-  "description": "Floating interactive surface anchored to a trigger element",
+  "description": "Floating interactive surface anchored to a trigger element; a click on the trigger toggles it.",
   "props": {
-    "interactive": {
-      "type": "boolean",
-      "required": false,
-      "description": "Whether the popover content is interactive (focusable).",
-      "default": true
-    },
     "content": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Content rendered inside the floating surface."
+      "description": "Content of the floating surface; empty content renders the trigger alone. Tooltip content must stay noninteractive."
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Trigger element (the anchor)."
+      "description": "One trigger element forwarding props/ref, or text rendered as a Button."
     },
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled open state."
+      "description": "Controlled visibility; updates from the parent never call onOpenChange."
     },
-    "openDelay": {
-      "type": "number",
+    "defaultOpen": {
+      "type": "boolean",
       "required": false,
-      "description": "Delay before opening (ms)."
-    },
-    "closeDelay": {
-      "type": "number",
-      "required": false,
-      "description": "Delay before closing (ms)."
+      "description": "Visibility on mount when `open` is not set; read once.",
+      "default": false
     },
     "side": {
       "type": "enum",
       "required": false,
-      "description": "Preferred side placement.",
+      "description": "Preferred side; may flip when the opposite side has more room.",
       "options": [
         "top",
         "right",
         "bottom",
         "left"
-      ]
+      ],
+      "default": "top"
     },
     "align": {
       "type": "enum",
       "required": false,
-      "description": "Alignment along the side.",
+      "description": "Logical alignment on the cross axis, following dir or the trigger's direction.",
       "options": [
         "start",
         "center",
         "end"
-      ]
+      ],
+      "default": "center"
     },
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Offset from the trigger along the side axis (px)."
+      "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2.",
+      "default": 2
+    },
+    "attachmentSelector": {
+      "type": "string",
+      "required": false,
+      "description": "Nearest ancestor used for left/right attachment; --uf-dropdown-panel-gap measures the painted surface gap. Vertical alignment still follows the trigger."
+    },
+    "alignToOption": {
+      "type": "string",
+      "required": false,
+      "description": "Aligns a measured visible row opposite the trigger on left/right surfaces; pass the row's selector."
+    },
+    "dir": {
+      "type": "string",
+      "required": false,
+      "description": "Content direction; omitted inherits the trigger's, auto follows the content."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "interactive": true,
         "children": "Open popover",
         "content": "Popover content"
-      }
-    },
-    {
-      "name": "Non-Interactive",
-      "props": {
-        "interactive": false,
-        "children": "Hover me",
-        "content": "Info tooltip-like"
       }
     }
   ],
   "behavior": {
     "dismissOnEscape": true,
     "dismissOnClickOutside": true,
-    "returnFocusOnClose": false,
-    "autoFocusOnOpen": "none"
+    "returnFocusOnClose": true,
+    "autoFocusOnOpen": "first-focusable"
   },
   "keyboard": {
     "Escape": {
@@ -92,9 +91,10 @@
     }
   },
   "aria": {
+    "role": "dialog",
     "notes": [
-      "The trigger exposes aria-expanded reflecting the open/closed state.",
-      "No ARIA role is set on the floating content in the click (popover) variant; supply aria-label or aria-labelledby on the popover to give the content an accessible name when needed."
+      "The trigger exposes aria-haspopup=\"dialog\", aria-expanded and aria-controls while open.",
+      "Content uses aria-label/aria-labelledby when supplied, otherwise it is named by the trigger. Focus enters the first focusable child or the content surface and returns on dismissal when focus remains inside."
     ]
   },
   "composition": {
@@ -102,26 +102,18 @@
       "trigger",
       "content"
     ],
-    "recommended": [
-      "arrow"
-    ],
     "parts": {
       "trigger": {
         "slot": "trigger"
       },
       "content": {
         "slot": "content"
-      },
-      "arrow": {
-        "slot": "arrow",
-        "parent": "content"
       }
     }
   },
   "tokenMapping": {
     "component": [
-      "--uf-overlay-content-max-w",
-      "--uf-overlay-content-border-width"
+      "--uf-overlay-content-max-w"
     ],
     "semanticFallbacks": [
       "--uf-spacing-2",
@@ -146,12 +138,12 @@
     ]
   },
   "platform": {
-    "popover": true,
-    "anchorPositioning": true
+    "popover": false,
+    "anchorPositioning": false
   },
   "usage": {
     "whenToUse": [
-      "Additional info on hover/click",
+      "Additional information on click",
       "Mini forms or filters",
       "Rich tooltip content"
     ],

@@ -1,8 +1,1 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="5.5" y="5.5" width="1" height="1" fill="black"/>
-  <path d="M9.5 6H15" stroke="black"/>
-  <rect x="5.5" y="9.5" width="1" height="1" fill="black"/>
-  <path d="M9.5 10H15" stroke="black"/>
-  <rect x="5.5" y="13.5" width="1" height="1" fill="black"/>
-  <path d="M9.5 14H13.5" stroke="black"/>
-</svg>
+<svg class="uf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" data-icon="plan" data-iconset="iconoteka" data-icon-source="list/stroke" aria-hidden="true"><path d="M3.00049 19.1H21.0005V21H3.00049V19.1ZM3.00049 11.05H21.0005V12.95H3.00049V11.05ZM3.00049 3H21.0005V4.9H3.00049V3Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>

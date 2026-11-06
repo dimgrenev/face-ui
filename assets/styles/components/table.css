@@ -1,0 +1,237 @@
+/* =================================================================
+ * TABLE
+ * Automatic layout: a column without a width sizes to its content within
+ * the table's width; a column with one keeps it, since its content cannot
+ * widen it. After a resize every column keeps its width and the table
+ * takes their sum.
+ * ================================================================= */
+.uf-table[data-scope] {
+  --uf-table-row-number-width: var(--uf-spacing-12);
+  --uf-table-resize-hit-width: var(--uf-workspace-resize-hit-size, var(--uf-spacing-5));
+  --uf-table-resize-line-width: var(--uf-workspace-resize-line-width, var(--uf-table-divider-width));
+  --uf-table-resize-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-chat-border-focus, var(--uf-color-border-hover, var(--uf-color-border))));
+  --uf-table-resize-line-offset-x: calc(var(--uf-table-resize-hit-width) - var(--uf-table-resize-line-width));
+  --uf-table-resize-line-inset-y: var(--uf-spacing-2);
+  --uf-table-divider-width: var(--uf-membrane);
+  --uf-table-membrane-cell-pad-x: calc(var(--uf-membrane) * 3);
+  --uf-table-sort-icon-gap: calc(var(--uf-membrane) * 2);
+  inline-size: 100%;
+  table-layout: auto;
+  /* Separate borders stay with sticky cells; collapsed ones scroll away. */
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--uf-control-font-size);
+}
+.uf-table[data-scope][data-resized] {
+  inline-size: auto;
+}
+.uf-table[data-scope] :is(th, td) {
+  box-sizing: border-box;
+  padding: 0;
+  border: none;
+  color: var(--uf-color-fg);
+  font-weight: inherit;
+  text-align: start;
+  vertical-align: middle;
+  /* Row states tint every cell, over the opaque background of sticky cells. */
+  box-shadow: inset 0 0 0 100vmax var(--uf-table-tint, transparent);
+}
+
+/* Resize handles are placed against their header cell. */
+.uf-table[data-scope] th {
+  position: relative;
+}
+
+/* Row states: pointer over a clickable or tile row, then selected, then
+   current; the pointer never hides the other two. */
+.uf-table[data-scope] tbody tr[data-interactive] {
+  cursor: pointer;
+}
+:where(.uf-table[data-scope]) > tbody > tr:where([data-interactive]):hover,
+:where(.uf-table[data-scope][data-variant="tile"]) > tbody > tr:hover {
+  --uf-table-tint: var(--uf-color-hover-bg);
+}
+.uf-table[data-scope] tbody tr[data-selected] {
+  --uf-table-tint: var(--uf-color-hover-bg);
+}
+.uf-table[data-scope] tbody tr[data-active] {
+  --uf-table-tint: var(--uf-color-active-bg);
+}
+/* A current plain row also carries a bar at its inline start. */
+.uf-table[data-scope][data-variant="plain"] tbody tr[data-active] > :first-child::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-inline-start: calc(var(--uf-membrane) * 2) solid var(--uf-color-fg);
+}
+/* Low specificity, so a sticky first cell stays sticky. */
+:where(.uf-table[data-scope] tbody tr[data-active]) > :first-child {
+  position: relative;
+}
+/* Forced colors drop the tints, which are box shadows: a row under the
+   pointer, selected or current is drawn between two lines instead (Highlight
+   when selected, thicker when current), over the cells so no row moves. */
+@media (forced-colors: active) {
+  :where(.uf-table[data-scope]) > tbody > tr > * {
+    position: relative;
+  }
+  :where(.uf-table[data-scope]) > tbody > tr:where([data-interactive]):hover > *::after,
+  :where(.uf-table[data-scope][data-variant="tile"]) > tbody > tr:hover > *::after,
+  .uf-table[data-scope] tbody tr:is([data-selected], [data-active]) > *::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-block: var(--uf-table-divider-width) solid CanvasText;
+    pointer-events: none;
+  }
+  .uf-table[data-scope] tbody tr[data-selected] > *::after {
+    border-block-color: Highlight;
+  }
+  .uf-table[data-scope] tbody tr[data-active] > *::after {
+    border-block-width: calc(var(--uf-table-divider-width) * 3);
+  }
+}
+
+/* Dividers */
+.uf-table[data-scope][data-show-dividers] :is(th, td) {
+  border-block-end: var(--uf-table-divider-width) solid var(--uf-color-border);
+}
+
+/* Sticky header and last column, within the nearest scrolling container. */
+.uf-table[data-scope][data-sticky-header] thead th {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  background-color: var(--uf-color-bg);
+}
+.uf-table[data-scope][data-sticky-last-column] tr > :last-child {
+  position: sticky;
+  inset-inline-end: 0;
+  z-index: 1;
+  background-color: var(--uf-color-bg);
+}
+.uf-table[data-scope][data-sticky-header][data-sticky-last-column] thead th:last-child {
+  z-index: 3;
+}
+
+/* Leading columns: checkboxes and row numbers take only their content. */
+.uf-table[data-scope] [data-select] {
+  inline-size: 1px;
+}
+.uf-table[data-scope] [data-row-number] {
+  inline-size: var(--uf-table-row-number-width);
+  font-size: var(--uf-font-size-xs);
+}
+
+/* Cell content */
+.uf-table__cellSlot {
+  display: flex;
+  align-items: center;
+  gap: var(--uf-table-sort-icon-gap);
+  min-block-size: var(--uf-control-height);
+  padding: 0 var(--uf-control-pad-text);
+  box-sizing: border-box;
+}
+.uf-table__cellSlot[data-align="center"] {
+  justify-content: center;
+}
+.uf-table__cellSlot[data-align="end"] {
+  justify-content: end;
+}
+/* A column with a width keeps it: its content adds no width and wraps
+   inside, long words included. */
+.uf-table__cellSlot[data-sized] {
+  contain: inline-size;
+  overflow-wrap: anywhere;
+}
+/* One line cut with an ellipsis, for text and for elements such as a link.
+   Each piece of content takes a track that can shrink below it while its
+   full width still counts when the table has room. */
+.uf-table__cellSlot[data-truncate] {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, max-content);
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* Every box inside the cell, not only the outermost one: an element with a
+   layout of its own — Face UI's Text, a Badge, any flex or grid box — keeps
+   its whole shape, border included, and hands the cut down to the text it
+   holds, which is the only thing an ellipsis can replace. Clipped overflow is
+   also what lets each of those boxes shrink below its content: it drops the
+   automatic minimum size that would otherwise push it out of the cell. */
+.uf-table__cellSlot[data-truncate] * {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.uf-table__cellSlot > svg {
+  flex-shrink: 0;
+}
+
+/* Sort */
+.uf-table__sort-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--uf-table-sort-icon-gap);
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: inherit;
+}
+.uf-table__sort-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--uf-color-fg-muted);
+}
+
+/* Resize handle at the inline end of each header cell */
+.uf-table__resize-handle {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  inline-size: var(--uf-table-resize-hit-width);
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 1;
+}
+.uf-table__resize-handle::after {
+  content: "";
+  position: absolute;
+  inset-block: var(--uf-table-resize-line-inset-y);
+  inset-inline-start: var(--uf-table-resize-line-offset-x);
+  inline-size: var(--uf-table-resize-line-width);
+  background: var(--uf-table-resize-line-color);
+  opacity: 0;
+}
+.uf-table[data-scope] th:hover > .uf-table__resize-handle::after,
+.uf-table__resize-handle:focus-visible::after {
+  opacity: 1;
+}
+
+/* Tile rows: each row one rounded surface, its content (and the header's)
+   inset by the same amount. */
+.uf-table[data-scope][data-variant="tile"] :is(th, td):first-child {
+  padding-inline-start: var(--uf-table-membrane-cell-pad-x);
+}
+.uf-table[data-scope][data-variant="tile"] :is(th, td):last-child {
+  padding-inline-end: var(--uf-table-membrane-cell-pad-x);
+}
+.uf-table[data-scope][data-variant="tile"] tbody td:first-child {
+  border-start-start-radius: var(--uf-radius);
+  border-end-start-radius: var(--uf-radius);
+}
+.uf-table[data-scope][data-variant="tile"] tbody td:last-child {
+  border-start-end-radius: var(--uf-radius);
+  border-end-end-radius: var(--uf-radius);
+}

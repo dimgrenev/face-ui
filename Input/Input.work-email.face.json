@@ -7,24 +7,6 @@
   "root": {
     "type": "Input",
     "props": {
-      "value": {
-        "$ref": "props.value"
-      },
-      "defaultValue": {
-        "$ref": "props.defaultValue"
-      },
-      "type": {
-        "$ref": "props.type"
-      },
-      "textLayout": {
-        "$ref": "props.textLayout"
-      },
-      "autoGrow": {
-        "$ref": "props.autoGrow"
-      },
-      "readOnly": {
-        "$ref": "props.readOnly"
-      },
       "label": {
         "$ref": "props.label"
       },
@@ -34,17 +16,44 @@
       "error": {
         "$ref": "props.error"
       },
-      "labelOrientation": {
-        "$ref": "props.labelOrientation"
+      "labelPosition": {
+        "$ref": "props.labelPosition"
       },
       "placeholder": {
         "$ref": "props.placeholder"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "disabled": {
+        "$ref": "props.disabled"
+      },
+      "readOnly": {
+        "$ref": "props.readOnly"
+      },
+      "required": {
+        "$ref": "props.required"
+      },
+      "name": {
+        "$ref": "props.name"
       },
       "spellCheck": {
         "$ref": "props.spellCheck"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "autoComplete": {
+        "$ref": "props.autoComplete"
+      },
+      "minLength": {
+        "$ref": "props.minLength"
+      },
+      "maxLength": {
+        "$ref": "props.maxLength"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
       },
       "icon": {
         "$ref": "props.icon"
@@ -52,14 +61,23 @@
       "iconPosition": {
         "$ref": "props.iconPosition"
       },
-      "stretchText": {
-        "$ref": "props.stretchText"
+      "clearable": {
+        "$ref": "props.clearable"
       },
-      "autoFocus": {
-        "$ref": "props.autoFocus"
+      "labels": {
+        "$ref": "props.labels"
       },
-      "autoComplete": {
-        "$ref": "props.autoComplete"
+      "fullWidth": {
+        "$ref": "props.fullWidth"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "multiline": {
+        "$ref": "props.multiline"
+      },
+      "type": {
+        "$ref": "props.type"
       },
       "min": {
         "$ref": "props.min"
@@ -70,26 +88,20 @@
       "step": {
         "$ref": "props.step"
       },
-      "minLength": {
-        "$ref": "props.minLength"
-      },
-      "maxLength": {
-        "$ref": "props.maxLength"
-      },
       "pattern": {
         "$ref": "props.pattern"
       },
-      "disabled": {
-        "$ref": "props.disabled"
+      "list": {
+        "$ref": "props.list"
       },
-      "required": {
-        "$ref": "props.required"
+      "multiple": {
+        "$ref": "props.multiple"
       },
-      "name": {
-        "$ref": "props.name"
+      "rows": {
+        "$ref": "props.rows"
       },
-      "membrane": {
-        "$ref": "props.membrane"
+      "autoGrow": {
+        "$ref": "props.autoGrow"
       }
     },
     "children": []
@@ -102,208 +114,236 @@
       "placeholder": "name@company.com",
       "autoComplete": "email",
       "required": true,
-      "name": "email",
-      "membrane": true
+      "name": "email"
     }
   },
   "controls": [
     {
-      "name": "value",
-      "type": "string",
-      "required": false,
-      "description": "Current input value."
-    },
-    {
-      "name": "defaultValue",
-      "type": "string",
-      "required": false,
-      "description": "Uncontrolled initial input value."
-    },
-    {
-      "name": "type",
-      "type": "select",
-      "required": false,
-      "description": "Native input type. Text inputs can switch between single-line and wrapping layouts.",
-      "options": [
-        "number",
-        "text",
-        "email",
-        "date",
-        "password"
-      ],
-      "defaultValue": "text"
-    },
-    {
-      "name": "textLayout",
-      "type": "select",
-      "required": false,
-      "description": "Text layout for type=\"text\": 'scroll' (single-line) or 'wrap' (multi-line auto-grow).",
-      "options": [
-        "scroll",
-        "wrap"
-      ],
-      "defaultValue": "scroll"
-    },
-    {
-      "name": "autoGrow",
-      "type": "boolean",
-      "required": false,
-      "description": "Auto-grow textarea height in wrap mode.",
-      "defaultValue": true
-    },
-    {
-      "name": "readOnly",
-      "type": "boolean",
-      "required": false,
-      "description": "Make the input read-only.",
-      "defaultValue": false
-    },
-    {
       "name": "label",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Label rendered above/beside the input."
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
     },
     {
       "name": "description",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Description/help text shown below the input."
+      "description": "Help for entering the value, announced with the focused control."
     },
     {
       "name": "error",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Error message shown below the input.",
-      "defaultValue": ""
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
     },
     {
-      "name": "labelOrientation",
+      "name": "labelPosition",
       "type": "select",
       "required": false,
-      "description": "Label placement relative to the control.",
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
       "options": [
-        "vertical",
-        "horizontal"
+        "top",
+        "start"
       ],
-      "defaultValue": "vertical"
+      "defaultValue": "top"
     },
     {
       "name": "placeholder",
       "type": "string",
       "required": false,
-      "description": "Placeholder text."
-    },
-    {
-      "name": "ariaLabel",
-      "type": "string",
-      "required": false,
-      "description": "Accessible label when no visible label is provided."
-    },
-    {
-      "name": "spellCheck",
-      "type": "boolean",
-      "required": false,
-      "description": "Enable/disable spellcheck."
-    },
-    {
-      "name": "icon",
-      "type": "string",
-      "required": false,
-      "description": "Optional icon inside the control."
-    },
-    {
-      "name": "iconPosition",
-      "type": "select",
-      "required": false,
-      "description": "Icon side inside the control. Default: left.",
-      "options": [
-        "left",
-        "right"
-      ],
-      "defaultValue": "left"
-    },
-    {
-      "name": "stretchText",
-      "type": "boolean",
-      "required": false,
-      "description": "Stretch the input text area so right-side icons pin to the edge.",
-      "defaultValue": false
-    },
-    {
-      "name": "autoFocus",
-      "type": "boolean",
-      "required": false,
-      "description": "Auto-focus on mount."
-    },
-    {
-      "name": "autoComplete",
-      "type": "string",
-      "required": false,
-      "description": "Native browser autocomplete hint."
-    },
-    {
-      "name": "min",
-      "type": "any",
-      "required": false,
-      "description": "Min value (for type=\"number\")."
-    },
-    {
-      "name": "max",
-      "type": "any",
-      "required": false,
-      "description": "Max value (for type=\"number\")."
-    },
-    {
-      "name": "step",
-      "type": "any",
-      "required": false,
-      "description": "Step value (for type=\"number\")."
-    },
-    {
-      "name": "minLength",
-      "type": "number",
-      "required": false,
-      "description": "Minimum text length for native validation."
-    },
-    {
-      "name": "maxLength",
-      "type": "number",
-      "required": false,
-      "description": "Maximum text length for native validation."
-    },
-    {
-      "name": "pattern",
-      "type": "string",
-      "required": false,
-      "description": "Native validation pattern for single-line inputs."
+      "description": "Hint while empty; use label or aria-label for the accessible name."
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Exclude the field from editing, focus navigation, and form submission.",
+      "defaultValue": false
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "description": "Prevent edits while preserving focus, selection, and form submission.",
       "defaultValue": false
     },
     {
       "name": "required",
       "type": "boolean",
       "required": false,
-      "description": "Show the required indicator (*).",
+      "description": "Require a value for native form validation and show the required indicator.",
       "defaultValue": false
     },
     {
       "name": "name",
       "type": "string",
       "required": false,
-      "description": "Form field name."
+      "description": "Field key used by native FormData."
+    },
+    {
+      "name": "spellCheck",
+      "type": "boolean",
+      "required": false,
+      "description": "Browser spelling assistance for editable text."
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the control on mount."
+    },
+    {
+      "name": "autoComplete",
+      "type": "string",
+      "required": false,
+      "description": "Native autocomplete token, such as email or current-password."
+    },
+    {
+      "name": "minLength",
+      "type": "number",
+      "required": false,
+      "description": "Minimum length for native text validation."
+    },
+    {
+      "name": "maxLength",
+      "type": "number",
+      "required": false,
+      "description": "Maximum length for native text entry."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Controlled value. User edits notify callbacks; the parent owns the result."
+    },
+    {
+      "name": "defaultValue",
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial value, also restored by form reset.",
+      "defaultValue": ""
+    },
+    {
+      "name": "icon",
+      "type": "any",
+      "required": false,
+      "description": "Decorative icon from the registry or a custom element."
+    },
+    {
+      "name": "iconPosition",
+      "type": "select",
+      "required": false,
+      "description": "Icon at inline start or end, following the control's text direction.",
+      "options": [
+        "start",
+        "end"
+      ],
+      "defaultValue": "start"
+    },
+    {
+      "name": "clearable",
+      "type": "boolean",
+      "required": false,
+      "description": "Opt in to a clear action for a nonempty, editable field; off by default.",
+      "defaultValue": false
+    },
+    {
+      "name": "labels",
+      "type": "object",
+      "required": false,
+      "description": "Accessible names of the field's own controls."
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch the field to its container; false keeps the control's native width.",
+      "defaultValue": true
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around control geometry.",
+      "description": "Outer spacing around the native control, independent of label and help.",
+      "defaultValue": true
+    },
+    {
+      "name": "multiline",
+      "type": "boolean",
+      "required": false,
+      "description": "Use a native textarea, including newline entry and textarea form behavior.",
       "defaultValue": false
+    },
+    {
+      "name": "type",
+      "type": "select",
+      "required": false,
+      "description": "Native single-line type. Multiline fields always use textarea text semantics.",
+      "options": [
+        "text",
+        "email",
+        "number",
+        "date",
+        "password",
+        "search",
+        "tel",
+        "url",
+        "time",
+        "datetime-local",
+        "month",
+        "week"
+      ],
+      "defaultValue": "text"
+    },
+    {
+      "name": "min",
+      "type": "any",
+      "required": false,
+      "description": "Lower bound for numeric or temporal input types."
+    },
+    {
+      "name": "max",
+      "type": "any",
+      "required": false,
+      "description": "Upper bound for numeric or temporal input types."
+    },
+    {
+      "name": "step",
+      "type": "any",
+      "required": false,
+      "description": "Numeric or temporal increment; use any to allow arbitrary precision."
+    },
+    {
+      "name": "pattern",
+      "type": "string",
+      "required": false,
+      "description": "Native regular expression for single-line text validation."
+    },
+    {
+      "name": "list",
+      "type": "string",
+      "required": false,
+      "description": "Datalist id for native single-line suggestions."
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "required": false,
+      "description": "Allow several addresses when type is email."
+    },
+    {
+      "name": "rows",
+      "type": "number",
+      "required": false,
+      "description": "Minimum visible rows. A fixed row count when autoGrow is false.",
+      "defaultValue": 1
+    },
+    {
+      "name": "autoGrow",
+      "type": "boolean",
+      "required": false,
+      "description": "Grow and shrink a multiline field with its content and available width.",
+      "defaultValue": true
     }
   ],
   "meta": {

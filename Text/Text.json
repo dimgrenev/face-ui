@@ -2,17 +2,17 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Text",
-  "description": "Typography component unifying body, heading, label, kbd, and code",
+  "description": "Every visible string the library renders: body copy, headings, labels, keyboard keys and inline code on one typographic scale.",
   "props": {
-    "text": {
-      "type": "string",
+    "children": {
+      "type": "ReactNode",
       "required": false,
-      "description": "Text content."
+      "description": "Content of the text; a string is the common case. Empty content renders no content slot."
     },
     "variant": {
       "type": "enum",
       "required": false,
-      "description": "Semantic typography role. Body is the canonical default.",
+      "description": "Typography treatment. `markdown` supplies paragraph rhythm; it does not parse Markdown.",
       "options": [
         "body",
         "heading",
@@ -34,7 +34,7 @@
     "size": {
       "type": "enum",
       "required": false,
-      "description": "Text size.",
+      "description": "Explicit font size, overriding the variant's default.",
       "options": [
         "xs",
         "sm",
@@ -48,6 +48,9 @@
       "required": false,
       "description": "HTML element to render. Auto-detected from variant if not specified.",
       "options": [
+        "p",
+        "span",
+        "div",
         "h1",
         "h2",
         "h3",
@@ -57,28 +60,26 @@
         "label",
         "kbd",
         "code",
-        "p",
-        "span",
-        "div",
         "strong",
         "em",
-        "small"
+        "small",
+        "blockquote"
       ]
     },
     "icon": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Icon element (ReactNode)."
+      "description": "Built-in icon name or custom node. Empty content creates no icon slot."
     },
     "iconPosition": {
       "type": "enum",
       "required": false,
-      "description": "Icon position relative to text.",
+      "description": "Icon at the start or end of the label, following text direction. Default: start.",
       "options": [
-        "left",
-        "right"
+        "start",
+        "end"
       ],
-      "default": "left"
+      "default": "start"
     },
     "inset": {
       "type": "enum",
@@ -87,6 +88,16 @@
       "options": [
         "control",
         "none"
+      ],
+      "default": "control"
+    },
+    "heightMode": {
+      "type": "enum",
+      "required": false,
+      "description": "Block sizing. `control` keeps the variant's control height; `content` fits its line boxes without vertical padding. Horizontal inset is preserved.",
+      "options": [
+        "control",
+        "content"
       ],
       "default": "control"
     },
@@ -105,13 +116,13 @@
     "align": {
       "type": "enum",
       "required": false,
-      "description": "Text alignment.",
+      "description": "Inline alignment of the content, following text direction. Default: start.",
       "options": [
-        "left",
-        "right",
-        "center"
+        "start",
+        "center",
+        "end"
       ],
-      "default": "left"
+      "default": "start"
     },
     "membrane": {
       "type": "boolean",
@@ -125,35 +136,30 @@
       "description": "Truncate text with ellipsis when it overflows.",
       "default": false
     },
-    "children": {
-      "type": "string",
-      "required": false,
-      "description": "Custom children (overrides text)."
-    },
     "htmlFor": {
       "type": "string",
       "required": false,
-      "description": "For label variant: htmlFor attribute."
+      "description": "Associated control ID when the resolved element is a label."
     }
   },
   "states": [
     {
       "name": "Default (Body)",
       "props": {
+        "children": "Text",
         "variant": "body",
-        "iconPosition": "left",
+        "iconPosition": "start",
         "inset": "control",
         "stretchText": false,
         "fullWidth": false,
-        "align": "left",
-        "membrane": true,
-        "text": "Text"
+        "align": "start",
+        "membrane": true
       }
     },
     {
       "name": "Heading",
       "props": {
-        "text": "Heading Text",
+        "children": "Heading Text",
         "variant": "heading",
         "inset": "control"
       }
@@ -161,7 +167,7 @@
     {
       "name": "Label",
       "props": {
-        "text": "Label Text",
+        "children": "Label Text",
         "variant": "label",
         "inset": "control"
       }
@@ -169,38 +175,38 @@
     {
       "name": "Kbd",
       "props": {
-        "text": "⌘K",
+        "children": "⌘K",
         "variant": "kbd"
       }
     },
     {
       "name": "Code",
       "props": {
-        "text": "const x = 1",
+        "children": "const x = 1",
         "variant": "code"
       }
     },
     {
       "name": "Muted",
       "props": {
-        "text": "Muted text",
+        "children": "Muted text",
         "variant": "muted"
       }
     },
     {
       "name": "With Icon",
       "props": {
-        "text": "With left icon",
+        "children": "With left icon",
         "icon": "search",
-        "iconPosition": "left"
+        "iconPosition": "start"
       }
     },
     {
       "name": "Stretch + Full Width",
       "props": {
-        "text": "Pinned right icon",
+        "children": "Pinned right icon",
         "icon": "arrow-right",
-        "iconPosition": "right",
+        "iconPosition": "end",
         "stretchText": true,
         "fullWidth": true
       }
@@ -208,7 +214,7 @@
     {
       "name": "Inset None",
       "props": {
-        "text": "Flush text",
+        "children": "Flush text",
         "inset": "none",
         "membrane": false
       }

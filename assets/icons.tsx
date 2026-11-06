@@ -1,4 +1,4 @@
-import React, { type ReactElement } from 'react'
+import { type ReactElement } from 'react'
 import { Icon, type IconName } from './Icon'
 
 type LegacyIconProps = {
@@ -11,6 +11,15 @@ function FaceUiIcon(name: IconName, className?: string): ReactElement {
 
 export function CheckOffIcon({ className }: LegacyIconProps = {}) {
   return FaceUiIcon('check-off', className)
+}
+
+
+
+
+
+
+export function CheckMixedIcon({ className }: LegacyIconProps = {}) {
+  return FaceUiIcon('check-mixed', className)
 }
 
 export function CheckOnIcon({ className }: LegacyIconProps = {}) {

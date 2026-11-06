@@ -7,17 +7,11 @@
   "root": {
     "type": "Tile",
     "props": {
-      "text": {
-        "$ref": "props.text"
-      },
-      "rightText": {
-        "$ref": "props.rightText"
+      "children": {
+        "$ref": "props.children"
       },
       "variant": {
         "$ref": "props.variant"
-      },
-      "intent": {
-        "$ref": "props.intent"
       },
       "density": {
         "$ref": "props.density"
@@ -43,14 +37,8 @@
       "disabled": {
         "$ref": "props.disabled"
       },
-      "busy": {
-        "$ref": "props.busy"
-      },
       "active": {
         "$ref": "props.active"
-      },
-      "selectedDescendant": {
-        "$ref": "props.selectedDescendant"
       },
       "interactive": {
         "$ref": "props.interactive"
@@ -58,11 +46,14 @@
       "stretchText": {
         "$ref": "props.stretchText"
       },
-      "selector": {
-        "$ref": "props.selector"
+      "chevron": {
+        "$ref": "props.chevron"
       },
-      "selectorOpen": {
-        "$ref": "props.selectorOpen"
+      "aria-expanded": {
+        "$ref": "props.aria-expanded"
+      },
+      "aria-busy": {
+        "$ref": "props.aria-busy"
       },
       "fullWidth": {
         "$ref": "props.fullWidth"
@@ -70,8 +61,8 @@
       "align": {
         "$ref": "props.align"
       },
-      "level": {
-        "$ref": "props.level"
+      "indent": {
+        "$ref": "props.indent"
       },
       "truncate": {
         "$ref": "props.truncate"
@@ -81,39 +72,29 @@
       },
       "actions": {
         "$ref": "props.actions"
-      },
-      "children": {
-        "$ref": "props.children"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "text": "Production API",
-      "rightText": "Healthy",
-      "intent": "default",
+      "children": "Production API",
+      "meta": "Healthy",
       "tone": "positive",
       "icon": "folder",
       "active": true,
       "fullWidth": true,
-      "align": "left",
+      "align": "start",
       "actionVisibility": "hover",
       "membrane": true
     }
   },
   "controls": [
     {
-      "name": "text",
-      "type": "string",
+      "name": "children",
+      "type": "any",
       "required": false,
-      "description": "Primary label."
-    },
-    {
-      "name": "rightText",
-      "type": "string",
-      "required": false,
-      "description": "Optional secondary text at the far right of the label area."
+      "description": "Label of the row; plain text truncates, rich content keeps its own layout."
     },
     {
       "name": "variant",
@@ -127,24 +108,10 @@
       "defaultValue": "default"
     },
     {
-      "name": "intent",
-      "type": "select",
-      "required": false,
-      "description": "Semantic row intent. Use default for generic and navigation rows, disclosure for parent rows, tree for nested project rows, tab for tab controls, and section for non-interactive headings.",
-      "options": [
-        "default",
-        "disclosure",
-        "tree",
-        "tab",
-        "section"
-      ],
-      "defaultValue": "default"
-    },
-    {
       "name": "density",
       "type": "select",
       "required": false,
-      "description": "Internal spacing density. Default follows the shared control rhythm; spacious gives inspection rows more breathing room.",
+      "description": "Density adjusts internal padding while keeping the shared control rhythm.",
       "options": [
         "default",
         "spacious"
@@ -155,7 +122,7 @@
       "name": "tone",
       "type": "select",
       "required": false,
-      "description": "Semantic visual tone for row foreground and hover treatment.",
+      "description": "Semantic visual tone for muted, accent, status, or destructive rows.",
       "options": [
         "neutral",
         "muted",
@@ -170,7 +137,7 @@
       "name": "actionVisibility",
       "type": "select",
       "required": false,
-      "description": "How the actions slot is exposed: reveal on hover/focus/active, hover only, always visible, or hidden.",
+      "description": "Controls how the actions slot is revealed.",
       "options": [
         "reveal",
         "hover",
@@ -181,7 +148,7 @@
     },
     {
       "name": "icon",
-      "type": "string",
+      "type": "any",
       "required": false,
       "description": "Icon (string from registry or ReactNode)."
     },
@@ -189,37 +156,30 @@
       "name": "iconPosition",
       "type": "select",
       "required": false,
-      "description": "Icon position relative to text.",
+      "description": "Icon at the start or end of the label, following text direction. Default: start.",
       "options": [
-        "left",
-        "right"
+        "start",
+        "end"
       ],
-      "defaultValue": "left"
+      "defaultValue": "start"
     },
     {
       "name": "leading",
       "type": "any",
       "required": false,
-      "description": "Isolated leading slot for nested controls. Use icon for decorative icons and leading for actionable controls."
+      "description": "Isolated leading slot for nested controls such as disclosure or file action buttons."
     },
     {
       "name": "meta",
       "type": "any",
       "required": false,
-      "description": "Trailing non-interactive metadata rendered before actions."
+      "description": "Secondary text or status at the inline end of the row, before actions."
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
-      "defaultValue": false
-    },
-    {
-      "name": "busy",
-      "type": "boolean",
-      "required": false,
-      "description": "Marks the row busy with data-busy and aria-busy without disabling it by itself.",
+      "description": "Disable the primary action. Nested controls own their disabled state.",
       "defaultValue": false
     },
     {
@@ -230,17 +190,10 @@
       "defaultValue": false
     },
     {
-      "name": "selectedDescendant",
-      "type": "boolean",
-      "required": false,
-      "description": "Marks parent rows that contain the selected descendant, commonly while collapsed.",
-      "defaultValue": false
-    },
-    {
       "name": "interactive",
       "type": "boolean",
       "required": false,
-      "description": "Override interactive semantics. Set false for section/header rows that should not expose button behavior."
+      "description": "Enable a primary action; inferred from onClick, aria-expanded or an explicit button/tab role."
     },
     {
       "name": "stretchText",
@@ -249,18 +202,34 @@
       "description": "Stretch text area (flex:1)."
     },
     {
-      "name": "selector",
-      "type": "boolean",
+      "name": "chevron",
+      "type": "select",
       "required": false,
-      "description": "Render a compact selector indicator after the label.",
-      "defaultValue": false
+      "description": "Trailing disclosure chevron: `down` flips with aria-expanded; `end` points to the inline end, mirrors in right-to-left text and turns down when expanded.",
+      "options": [
+        "down",
+        "end"
+      ]
     },
     {
-      "name": "selectorOpen",
+      "name": "aria-expanded",
       "type": "boolean",
       "required": false,
-      "description": "Open state for the selector indicator.",
-      "defaultValue": false
+      "description": "Expanded state of the controlled region; makes the row a disclosure button and orients the chevron.",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    {
+      "name": "aria-busy",
+      "type": "boolean",
+      "required": false,
+      "description": "Busy state of the row region, reflected by the wait cursor.",
+      "options": [
+        "false",
+        "true"
+      ]
     },
     {
       "name": "fullWidth",
@@ -273,19 +242,19 @@
       "name": "align",
       "type": "select",
       "required": false,
-      "description": "Text alignment.",
+      "description": "Inline alignment of the content, following text direction. Default: start.",
       "options": [
-        "left",
-        "right",
-        "center"
+        "start",
+        "center",
+        "end"
       ],
-      "defaultValue": "left"
+      "defaultValue": "start"
     },
     {
-      "name": "level",
+      "name": "indent",
       "type": "number",
       "required": false,
-      "description": "Nesting level for option-like rows: 0..9"
+      "description": "Indent steps for nested rows, an integer from 0 to 9."
     },
     {
       "name": "truncate",
@@ -303,15 +272,9 @@
     },
     {
       "name": "actions",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Nested action buttons. Rendered at the far right; their clicks do not bubble to the tile."
-    },
-    {
-      "name": "children",
-      "type": "string",
-      "required": false,
-      "description": "Custom children (overrides text/icon rendering)."
+      "description": "Nested action buttons at the inline end; their clicks do not reach the tile."
     }
   ],
   "meta": {

@@ -1,0 +1,93 @@
+/* =================================================================
+ * TOAST
+ * ================================================================= */
+/* The region is a fixed column at a viewport edge, clear of notches and home indicators.
+   Only the toasts take the pointer: the page stays usable between and around them. */
+.uf-toaster {
+  --uf-toaster-inset-x: calc(
+    var(--uf-toast-viewport-inset) + max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px))
+  );
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: var(--uf-spacing-2);
+  z-index: var(--uf-z-toast);
+  width: min(calc(100% - 2 * var(--uf-toaster-inset-x)), var(--uf-toast-container-max-width));
+  pointer-events: none;
+}
+.uf-toaster[data-placement^="bottom-"] {
+  bottom: calc(var(--uf-toast-viewport-inset) + env(safe-area-inset-bottom, 0px));
+}
+.uf-toaster[data-placement^="top-"] {
+  top: calc(var(--uf-toast-viewport-inset) + env(safe-area-inset-top, 0px));
+}
+.uf-toaster[data-placement$="-start"] {
+  inset-inline-start: var(--uf-toaster-inset-x);
+}
+.uf-toaster[data-placement$="-end"] {
+  inset-inline-end: var(--uf-toaster-inset-x);
+}
+.uf-toaster[data-placement$="-center"] {
+  inset-inline: 0;
+  margin-inline: auto;
+}
+.uf-toast[data-scope] {
+  --uf-card-border-width: var(--uf-toast-border-width);
+  --uf-card-border: var(--uf-overlay-surface-border);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  pointer-events: auto;
+}
+.uf-toast[data-scope][data-tone="positive"] {
+  --uf-card-border: var(--uf-color-success);
+}
+.uf-toast[data-scope][data-tone="warning"] {
+  --uf-card-border: var(--uf-color-warning);
+}
+.uf-toast[data-scope][data-tone="destructive"] {
+  --uf-card-border: var(--uf-color-destructive);
+}
+.uf-toast-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.uf-toast-bar[data-scope="bar"] {
+  min-height: auto;
+  gap: 0;
+}
+.uf-toast-bar[data-scope="bar"] > .uf-bar-section {
+  min-height: auto;
+}
+.uf-toast-title {
+  font-weight: var(--uf-font-weight-bold);
+  font-size: var(--uf-font-size);
+  min-width: 0;
+}
+.uf-toast-description {
+  font-size: var(--uf-font-size-sm);
+  color: var(--uf-color-fg-muted);
+  margin-top: 0;
+}
+.uf-toast-actionRow {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: var(--uf-spacing-2);
+}
+.uf-toast-action[data-scope="button"] {
+  opacity: 1;
+}
+.uf-toast-close {
+  color: var(--uf-color-fg-muted);
+}
+.uf-toast-close[data-scope="button"][data-icon-only] {
+  --uf-icon-only-size: var(--uf-control-height);
+}
+@media (max-width: 56.1875rem) {
+  .uf-toaster {
+    --uf-toast-viewport-inset: var(--uf-toast-compact-inset);
+  }
+}

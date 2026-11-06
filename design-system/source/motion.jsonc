@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "generatedPath": "design-system/tokens/motion.css",
+  "tokens": [
+    {
+      "sheet": "motion",
+      "name": "--uf-motion-instant",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "0ms"
+        }
+      ]
+    },
+    {
+      "sheet": "motion",
+      "name": "--uf-motion-fast",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-motion-duration-fast, 120ms)"
+        }
+      ]
+    },
+    {
+      "sheet": "motion",
+      "name": "--uf-motion-snappy",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-motion-duration-short, 150ms)"
+        }
+      ]
+    },
+    {
+      "sheet": "motion",
+      "name": "--uf-motion-normal",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-motion-duration-control, 200ms)"
+        }
+      ]
+    },
+    {
+      "sheet": "motion",
+      "name": "--uf-motion-slow",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-motion-duration-medium, 250ms)"
+        }
+      ]
+    },
+    {
+      "sheet": "motion",
+      "name": "--uf-ease-out",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-motion-ease-out, ease-out)"
+        }
+      ]
+    },
+    {
+      "sheet": "motion",
+      "name": "--uf-ease-in-out",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "var(--uf-motion-ease-in-out, ease-in-out)"
+        }
+      ]
+    }
+  ]
+}

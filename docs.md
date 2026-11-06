@@ -1,1351 +1,923 @@
-# Face UI React — Agent Operating Manual
+# Face UI — agent guide
 
-> **This document is part of the FaceUI Design Operating System.**
-> - **Principles** — this file (constitution + reference)
-> - **Component Contracts** — `<Component>/<Component>.json` (machine-readable API per component)
-> - **Patterns** — owned by Userface Engine and generated from the same component contracts
-> - **Assembly Policy** — owned by Userface Engine quality rules
-> - **Orchestrator** — external tooling can read this package through the published contracts
+How to build interfaces with `@userface/face-ui-react`. Sections 1–2 are the constitution: read them before composing UI. Sections 3–4 are reference: read them on demand.
 
-This is the canonical usage guide for agents and developers building interfaces with Face UI React.
-It is not marketing copy. It is the source of truth for component selection, composition rules, spacing, typography, and architectural decisions.
+This guide never lists props, defaults or token values; they live in generated sources:
 
----
+| Question | Source |
+| --- | --- |
+| Props, types, defaults, keyboard, ARIA | `<Name>/<Name>.json`, generated from the JSDoc in `<Name>/<Name>.tsx` |
+| Token names and values | `design-system/generated/token-manifest.json` |
+| Status, category, related components | `component-registry.json` |
+| Removed or renamed API | `MIGRATION.md` and `migrations.json` |
 
-## 1. Source Of Truth
+## 1. Rules
 
-- Primary public API: `index.ts`
-- Governance metadata: `component-registry.json`
-- Per-component contracts: `<Component>/<Component>.json`
+### 1.1 Imports
 
-Import only from the primary barrel or canonical component paths.
-Do not introduce new usage of deprecated aliases.
-Do not invent new component names if an existing canonical component already covers the case.
+Use `@userface/face-ui-react`; load its `assets/styles/index.css` once. No provider is required. Optional overlay hosts use `@userface/face-ui-react/overlay-provider`; metadata uses `@userface/face-ui-react/gallery/meta`. `Overlay`, `Toggle`, `Sidebar` are `/compat` only for old code. Reuse 1.4 components.
 
----
+### 1.2 Text owns visible copy
 
-## 2. Fundamental Rules
+Every piece of visible copy is either a control's own content prop or a `Text`. Never write a bare `<p>`, `<span>`, `<h1>`–`<h6>`, `<label>` or a text node inside a layout container.
 
-### 2.1 Text Rendering — The Single Most Important Rule
-
-**ALL visible text on any page MUST be rendered through the `<Text>` component.**
-
-This is non-negotiable. There are no exceptions except controls that own their own text internally (Button, Input, Select, etc.).
-
-What this means:
-- Every heading → `<Text variant="h1">`, `<Text variant="h2">`, etc.
-- Every paragraph → `<Text>` or `<Text variant="body">`
-- Every label → `<Text variant="label">`
-- Every caption or metadata line → `<Text variant="muted" size="xs">`
-- Every muted helper text → `<Text variant="muted">`
-- Every inline code → `<Text variant="code">`
-- Every keyboard shortcut → `<Text variant="kbd">`
-
-What is NOT allowed:
-- `<span>text</span>` — NEVER. Use `<Text as="span">`.
-- `<p>text</p>` — NEVER. Use `<Text as="p">`.
-- `<h1>text</h1>` — NEVER. Use `<Text variant="h1">`.
-- `<div>text</div>` — NEVER. Use `<Text as="div">`.
-- `<label>text</label>` — NEVER. Use `<Text variant="label">`.
-- Bare text nodes inside layout containers — NEVER. Wrap in `<Text>`.
-
-Components that own their text internally and do NOT need `<Text>` wrapping:
-- `Button` (text prop)
-- `Input` (label, description, error, placeholder)
-- `Select` (label, options)
-- `Checkbox` (label)
-- `Radio` (option labels)
-- `Switcher` (label)
-- `Tabs` (tab labels — string labels are auto-wrapped internally)
-- `Accordion` (item labels — auto-wrapped internally)
-- `Breadcrumb` (item labels)
-- `Steps` (item labels — auto-wrapped internally)
-- `Modal` (title, description)
-- `Menu` (item labels)
-- `Command` (item labels)
-- `Code` (title)
-- `Date` (label, description, error)
-
-For all other text content — headings, descriptions, paragraphs, metadata, status text, section titles, card content text — use `<Text>`.
-
-### 2.2 Text Variants — Full Typography System
-
-`Text` provides a complete typography system matching Markdown heading hierarchy:
-
-| Variant | Default element | Size | Weight | Use case |
-|---------|----------------|------|--------|----------|
-| `h1` | `h1` | +10px (24px) | 600 | Page title, hero heading |
-| `h2` | `h2` | +8px (22px) | 600 | Section heading |
-| `h3` | `h3` | +6px (20px) | 600 | Subsection heading |
-| `h4` | `h4` | +4px (18px) | 600 | Card heading, group title |
-| `h5` | `h5` | +2px (16px) | 600 | Small heading |
-| `h6` | `h6` | base (14px) | 600 | Micro heading (0.8 opacity) |
-| `heading` | `h2` | bold | 600 | Generic heading (legacy, prefer h1–h6) |
-| `body` / `default` | `div` / `p` | base | 400 | Body text, paragraphs |
-| `muted` | `p` | base | 400 | Secondary/helper text (reduced opacity) |
-| `label` | `label` | base | 400 | Form labels, section labels |
-| `caption` | `small` | small | 400 | Fine print, timestamps, metadata |
-| `kbd` | `kbd` | mono | 400 | Keyboard shortcuts |
-| `code` | `code` | mono | 400 | Inline code |
-| `blockquote` | `div` | base | 400 | Quoted/highlighted text block |
-
-**Size modifiers** (apply on top of variant):
-- `xs` (12px), `sm` (13px), `md` (16px), `lg` (18px), `xl` (20px)
-
-**Element override** with `as` prop:
-- Any variant can render as any HTML element: `<Text variant="h1" as="div">` renders h1 styling on a `<div>`.
-
-**Usage examples:**
+- `variant` sets presentation: `body` (default), `muted`, `heading`, `h1`–`h6`, `label`, `kbd`, `code`, `markdown`, `blockquote`. `as` sets the element; keep heading order. `size` (`xs`–`xl`) overrides the variant's size.
+- App UI keeps the defaults, so text aligns with controls.
+- Editorial and landing copy: `heightMode="content" inset="none" membrane={false}`.
+- Inside an inline parent: `as="span" membrane={false}`.
+- Controls own their text. Pass content to `Button` children, `Input label`, `Checkbox label`, `Modal title` and the like; do not wrap those in `Text`.
 
 ```tsx
-// Page title
-<Text variant="h1">Dashboard</Text>
-
-// Section heading
-<Text variant="h2">Recent activity</Text>
-
-// Card-level heading
-<Text variant="h4">Revenue breakdown</Text>
-
-// Body paragraph
-<Text>Your workspace has 12 active members.</Text>
-
-// Helper/secondary text
-<Text variant="muted">Last updated 3 minutes ago.</Text>
-
-// Label for a form group
-<Text variant="label" htmlFor="email">Email address</Text>
-
-// Caption / metadata
-<Text variant="muted" size="xs">Created on 2026-03-15 by @grenev</Text>
-
-// Keyboard shortcut
-<Text variant="kbd">⌘K</Text>
-
-// Inline code
-<Text variant="code">npx userface connect</Text>
-
-// Blockquote
-<Text variant="blockquote">Structure powers intelligence.</Text>
-
-// Landing page — flush text (no control padding, no membrane)
-<Text variant="h1" inset="none" membrane={false} className={styles.heroTitle}>
-  Make AI build with your real UI.
-</Text>
-
-// Size override — small heading with large size
-<Text variant="h5" size="lg">Section title</Text>
-
-// Element override — heading style on a span (inline context)
-<Text variant="h3" as="span">Inline heading</Text>
+<Text variant="h2">Billing</Text>
+<Text variant="muted" size="sm">Invoices are sent on the 1st.</Text>
+<Text as="p" heightMode="content" inset="none" membrane={false}>Long-form paragraph.</Text>
 ```
 
-**Two modes of use:**
+### 1.3 Geometry
 
-| Context | `inset` | `membrane` | Result |
-|---------|---------|------------|--------|
-| App UI (controls, panels, sidebars) | `"control"` (default) | `true` (default) | Padded to match button/input rhythm |
-| Landing / marketing / content | `"none"` | `false` | Flush text, no extra spacing |
-| Inside other components (Tile, Accordion) | `"none"` | `false` | No double-padding |
+- Each component owns one outer boundary, the membrane (`--uf-membrane`, 1px). The spacing between adjacent controls comes from it. Never add margins or negative offsets between components.
+- Separate groups with `gap` on a flex or grid container, using `--uf-spacing-*` tokens.
+- Set `membrane={false}` only where a parent boundary already owns the spacing; it removes the box and keeps identity, state and focus.
+- A single-line control is a 32px body plus 1px of membrane per side, so 34px. A labelled field is taller; align rows by control body on purpose.
+- Icon placement belongs to the control: `icon` with `iconPosition="start" | "end"`. Never put a margin on `Icon`.
+- Width comes from `fullWidth` where the contract offers it, otherwise from `style.width`.
+- CSS size: unitless values mean pixels.
 
-### 2.3 Spacing Between Elements
+### 1.4 Choosing a component
 
-The library uses a 4px grid. Follow these spacing guidelines:
+| Need | Use | Not |
+| --- | --- | --- |
+| Any visible copy | `Text` | bare HTML text |
+| Prose from a Markdown string | `Markdown` | hand-written HTML |
+| Code sample or log | `Code` | `<pre>` |
+| A glyph inside a control | `Icon` | inline `<svg>` |
+| Grouped content surface | `Card` | a styled `div` |
+| Toolbar or header row | `Bar` | an ad hoc flex row |
+| A line between sections | `Separator` | `<hr>`, borders |
+| Status label or count | `Badge` | coloured `Text` |
+| Row with icon, meta and actions | `Tile` | `Button` with custom children |
+| Action | `Button` | `<button>`, a clickable `div` |
+| Text or number entry | `Input` (`multiline` for long text) | `<input>`, `<textarea>` |
+| One value from a list | `Select` | `Menu` |
+| Two to five options in one strip | `SegmentedControl` | `Tabs` |
+| Options that each need a visible row | `Radio` | `Select` |
+| Independent on/off inside a form | `Checkbox` | `Switcher` |
+| Setting that applies immediately | `Switcher` | `Checkbox` |
+| Number on a scale | `Slider` | `Input type="number"` |
+| Score | `Rating` | stars in `Text` |
+| Date, time or period field | `Date` | `Input type="date"` |
+| Always-visible month grid | `Calendar` | `Date` |
+| Files | `Upload` | `<input type="file">` |
+| Switching sibling panels | `Tabs` | `SegmentedControl` |
+| Collapsible sections | `Accordion` | `Tile` plus state |
+| Location in a hierarchy | `Breadcrumb` | `Text` with slashes |
+| Paged results | `Pagination` | two `Button`s |
+| Multi-step flow | `Steps` | `Tabs` |
+| Product navigation at the top | `Navigation` | a `Bar` of links |
+| Product navigation at the side | `Panel` | `Tree` |
+| Hierarchy that expands | `Tree` | `Accordion` |
+| Sections of the current document | `Toc` | `Tree`, `Navigation` |
+| Non-interactive hint | `Tooltip` | `Popover` |
+| Small interactive surface | `Popover` | `Tooltip` |
+| List of actions | `Menu` | `Select` |
+| Search over commands | `Command` | `Menu` |
+| Focused task or inspection | `Modal` | `Popover` |
+| Transient notice | `Toast` through `useToast()` | `Modal`, `alert()` |
+| Task completion | `Progress` | `Meter` |
+| Known measurement, such as a quota | `Meter` | `Progress` |
+| Loading placeholder | `Skeleton` | a spinner in content |
+| Person or entity | `Avatar` | `Media` |
+| Image, video or audio | `Media` | `<img>`, `<video>` |
+| Rotating showcase | `Carousel` | a scroller |
+| Tabular data | `Table` | a grid of `Card` |
+| A region that scrolls | `Scroll` | an `overflow: auto` wrapper |
+| Existing `Overlay` code | `Tooltip`, `Popover` | `Overlay` |
+| Existing `Toggle` code | `SegmentedControl` | `Toggle` |
+| Existing `Sidebar` code | `Panel` | `Sidebar` |
 
-**Between text blocks:**
-- Heading → body text: 8px (margin-bottom on heading)
-- Paragraph → paragraph: 12px
-- Section → section: 24px–32px
+### 1.5 Layers
 
-**Between text and controls:**
-- Label → control: 0px (label component has built-in spacing via membrane)
-- Text block → button row: 16px
-- Description → action: 12px
+- `Tooltip` informs, `Popover` holds interactive content, `Menu` runs actions, `Select` chooses a value, `Command` searches, `Modal` holds a named task.
+- Keep `surface="auto"` on `Select`, `Date`, `Menu`, `Command`, `Navigation` and `Panel`: contextual on wide screens, a sheet or dialog below 900px.
+- Pass one real trigger element; a custom trigger forwards `ref` and props, and a string renders as a `Button`.
+- Escape and an outside press dismiss the top layer only; a modal layer traps focus, restores it on close and makes the page behind inert.
+- Set `data-theme` and theme overrides on `html`: a portaled layer cannot inherit a theme scoped to a subtree.
+- Name every dialog and floating surface with `title`, `aria-label` or `aria-labelledby`.
 
-**Between controls:**
-- Control → control (same group): use membrane rhythm (1px × 2 = 2px gap)
-- Control groups: 8px–12px
-- Action buttons side by side: membrane-driven gap
+### 1.6 Before shipping
 
-**General rules:**
-- Do NOT add manual margins between membrane-wrapped components. The membrane system handles spacing.
-- Use `var(--uf-space-*)` tokens for custom gaps: 4, 8, 12, 16, 20, 24, 32, 40, 48px.
-- Prefer `gap` on flex/grid containers over individual margins.
+- [ ] All copy goes through 1.2; heading levels are in order.
+- [ ] Components chosen by meaning (1.4); no compat names; no raw `<button>`, `<input>`, `<select>`.
+- [ ] No margins between components; gaps use spacing tokens.
+- [ ] Icon-only controls and unlabelled fields have `aria-label`.
+- [ ] Overlays keep `surface="auto"` and work at 360px wide.
+- [ ] The console shows no `Face UI <Component>: invalid …` report (2.8).
 
-### 2.4 Membranes
+## 2. API conventions
 
-Membranes are the 1px outer spacing contract used by the library.
+Every component follows these rules. Where a contract contradicts them, trust the contract and report the difference as a library bug.
 
-- Control spacing comes from membranes and control insets, not random external gaps.
-- If two interactive controls sit next to each other, prefer membrane-driven rhythm over ad hoc margins.
-- If you intentionally use a single shared membrane wrapper, inner controls may have `membrane={false}`. That is allowed when done deliberately to avoid double membranes.
+### 2.1 State
 
-### 2.5 Icon Spacing
+- Each piece of state is one triple: `x` (controlled), `defaultX` (read once on mount) and `onXChange({ x })` (user proposals only). The names in use are `value`, `checked`, `files`, `open`, `expanded`, `collapsed`, `search`, `page`, `step`, `index`, `viewDate`, `sort` and `selectedRows`.
+- A parent update, a reset or a normalization never calls `onXChange`. If the parent refuses a proposal, the accepted value stays.
+- `null` is a value (nothing selected), not a switch to uncontrolled mode.
+- `disabled` and `readOnly` block the user, never the parent.
+- The end of a gesture is `onXCommit({ x })`, alongside the live `onXChange`.
 
-- Icon placement is owned by the control, not by `Icon`.
-- Do not use negative margins on `Icon`.
-- If an icon sits at the control edge, it should use the icon-side inset contract so that side/top/bottom spacing feel equal.
+### 2.2 Collections and selection
 
-### 2.6 Responsive Overlays
+- A collection is `items`. A base item is `{ value, label, disabled?, icon?, textValue? }`; a group is `{ type: 'group', label, items }`, a divider is `{ type: 'separator' }`, and nesting goes through the item's own `items`.
+- Keys are strings and `''` is a real key. An item without a `value`, or repeating one, is dropped. Arrays arrive `readonly` and are never mutated; callbacks receive a fresh array.
+- `multiple` switches the shape of the value: `string | null` becomes `string[]`. There is no `selectionMode` or `type`.
+- Display-only items (`Breadcrumb`, `Steps`) take an optional `key`; structural definitions (`columns`, `presets`) take an `id`. An `Id` suffix means a DOM id, as in `panelId`.
 
-These components have first-class responsive surface behavior:
-`Select`, `Date`, `Menu`, `Command`, `Modal`, `Panel`, `Navigation`.
+### 2.3 Names
 
-Default rule:
-- Desktop/wide viewport: keep contextual surface behavior.
-- Compact viewport: move to sheet/dialog/drawer behavior when that is the canonical mobile pattern.
-- Use the default `surface="auto"` unless you have a strong reason to force a specific surface.
+- ARIA uses native attributes: `aria-label`, `aria-labelledby`, `aria-describedby`, `aria-expanded`, `aria-busy`. There are no camelCase aliases.
+- Axes are logical: `start` and `end` for `align`, `iconPosition`, `placement` and `labelPosition`; `chevron="down" | "end"` mirrors in right-to-left text. A physical `side` exists only on floating surfaces anchored to a trigger.
+- One concept has one name. There are no aliases and no deprecated synonyms; every removed name is in `MIGRATION.md`.
 
-### 2.7 Canonical Naming
+### 2.4 Content and strings
 
-Use these names in new code:
-- `Panel`, not `Sidebar`
-- `SegmentedControl`, not `Toggle`
-- `Modal` for both centered and edge-aligned modal surfaces
-- `Date`
-- `Tooltip` or `Popover`, not `Overlay`
+- `children` is the main content. `content` is a second region, used when `children` is the trigger (`Tooltip`, `Popover`) or on an item that owns a panel.
+- A surface names its regions `title`, `description` and `footer`. A label is made of `label`, `meta`, `icon` with `iconPosition`, and `actions`.
+- Strings a component renders for its own controls — close, clear, next page, remove — come from one `labels` object with shared keys. Copy the caller owns (`label`, `placeholder`, `title`, `description`) stays a separate prop, has no English default, and never loses an accessible name to an empty string.
+- JSON face documents address components with slot descriptors `{ "__componentName__": "Name", ...props }`.
 
-### 2.8 Protocol of Use — How an Agent Should Work
+### 2.5 Fields
 
-When building UI:
-1. **Understand intent** — what screen/section is being built?
-2. **Choose a pattern** — select a composition pattern that matches the intent (form, dashboard, settings, etc.)
-3. **Pick components by contract** — use Component Contracts (face.json) as the source of truth for props, types, defaults
-4. **Apply assembly policy** — validate the result against quality rules: structural, a11y, contract compliance
-5. **Iterate** — fix violations, re-validate until score ≥ 90
+Eight components are fields — `Input`, `Select`, `Date`, `Radio`, `Rating`, `Slider`, `SegmentedControl` and `Upload`. Each takes the same `label`, `description`, `error` and `labelPosition`, renders the same anatomy, and resolves its name as `aria-labelledby` over `aria-label` over the visible `label`. `error` marks the field invalid and is not a live region; `required` adds the marker. `Checkbox` and `Switcher` are not fields: their `label` names one option, and a set of them belongs in a `<fieldset>`.
 
-When modifying existing UI:
-1. Read the relevant Component Contract
-2. Check current violations with `component_validate`
-3. Make changes within contract boundaries
-4. Re-validate
+### 2.6 Forms
+
+- Form controls take native `name`, `form`, `required`, `disabled` and `autoFocus`, and submit through `FormData` — `Select`, `Date` and `SegmentedControl` included.
+- `form.reset()` restores defaults silently. A `disabled` control, including one inside `<fieldset disabled>`, is left out of submission.
+- The browser runs interactive validation; the component supplies the constraints and shows the message.
+
+### 2.7 DOM ownership and events
+
+- `ref`, `id`, `className`, `style` and native attributes land on the real control or semantic root, never on a spacing wrapper; on an overlay they land on the content surface.
+- A native handler keeps its native signature, runs before the component's own, and `preventDefault()` cancels the built-in action. A semantic callback receives one details object instead.
+
+### 2.8 Invalid input
+
+- Invalid data never throws. Components fall back, clamp numbers (integers truncate), drop bad or duplicate items (first wins), key rows by position, or project values across modes. Development reports once: `Face UI <Component>: invalid <prop> <value>; <outcome>.` Production is silent.
+- Empty text means "not provided". Numeric strings normalize to pixels on CSS size props (reported in development); on number props they fall back.
+- Types are checked by TypeScript in code and by the contract validator in face documents.
+- A report is a defect in your data: fix the document. Face UI's own scenarios render with zero reports.
+
+### 2.9 Extending
+
+Add a prop only for an observable effect no existing prop has. Never add a second name for one concept, a prop that does nothing, or a switch whose effect cancels another. Prefer the native attribute or `style` when it already works, and put the decision in the prop's JSDoc, which is where the contract comes from.
 
 ---
 
 <!-- SEPARATOR:CONSTITUTION_END -->
-## ⚡ Constitution ends here. Below is the reference section.
-## Agents: read the constitution always. Consult reference on demand.
-<!-- /SEPARATOR -->
 
----
+## 3. Recipes
 
-## 3. Component Selection Decision Matrix
+### 3.1 Settings screen
 
-Before composing UI, use this matrix to choose the right component.
+`Panel` for the sections, `Bar` for the page header and its actions, `Text` for section titles and help, `Input`, `Select`, `Switcher`, `Checkbox` and `Date` for the values, `Button` for save and reset. One `<form>` around the fields leaves reset and validation to the browser.
 
-### Text & Structure
+### 3.2 Search and commands
 
-| Need | Component | NOT this |
-|------|-----------|----------|
-| Any visible text | `Text` | bare `<span>`, `<p>`, `<div>` |
-| Rich text from markdown source | `Markdown` | manual HTML |
-| Code snippet | `Code` | `<pre><code>` |
-| Grouped content block | `Card` | raw `<div>` wrapper |
-| Visual divider | `Separator` (sparingly!) | `<hr>`, border hacks |
-| Toolbar / action row | `Bar` | flex wrapper |
-| Status indicator | `Badge` | colored `<span>` |
+`Command` for search and action discovery, `Menu` for a short list of actions on one object, `Popover` for a small rich surface. Keep `surface="auto"` so both become a sheet on a phone.
 
-### Actions & Controls
+### 3.3 Documentation page
 
-| Need | Component | NOT this |
-|------|-----------|----------|
-| Explicit action | `Button` | `<button>`, clickable `<div>` |
-| Boolean toggle | `Checkbox` or `Switcher` | |
-| One from small set | `Radio` | |
-| Mode switch strip | `SegmentedControl` | `Toggle` (deprecated) |
-| Option picker | `Select` | |
-| Text input | `Input` | `<input>` |
-| Numeric range | `Slider` | |
-| Star rating | `Rating` | |
-| File input | `Upload` | `<input type="file">` |
+`Toc` for the sections, `Text` for the hierarchy, `Markdown` for authored prose, `Code` for samples, `Table` for reference data, `Accordion` for the FAQ.
+
+### 3.4 Data-heavy page
+
+`Bar` for filters and actions, `Table` for the data, `Pagination` under it, `Modal` with `placement="end"` as an edge sheet for the row detail, `Skeleton` while the first page loads.
+
+### 3.5 Landing page
+
+All copy through `Text` with `heightMode="content" inset="none" membrane={false}`; `Card` for blocks, `Media` and `Carousel` for imagery, `Button` for the calls to action, `Code` for install commands, `Accordion` for the FAQ.
+
+## 4. Components
+
+### Accordion
+
+Stacked sections that open and close, several at a time by default.
+
+```tsx
+<Accordion
+  defaultExpanded={['profile']}
+  items={[
+    { value: 'profile', label: 'Profile', icon: 'account', content: <Text>Identity.</Text> },
+    { value: 'security', label: 'Security', content: <Text>Sessions.</Text> },
+  ]}
+  onExpandedChange={({ expanded }) => setOpen(expanded)}
+/>
+```
+
+- `multiple={false}` keeps one section open, and only the first value of `expanded` shows.
+- `collapsible={false}` leaves the last open trigger `aria-disabled` instead of closing it.
+- Panels stay mounted while collapsed, so their controls keep local state; `item.region` exposes a complex panel as a landmark.
+
+### Avatar
+
+A person's image, with initials or custom content while it is missing, pending or broken.
+
+```tsx
+<Avatar src={user.photo} name="Maya Chen" />
+<Avatar name="Research assistant" fallback="AI" />
+```
+
+- `name` is both the accessible name and the source of the initials; `fallback` replaces the initials, not the name.
+- `fallbackDelay` only holds back a pending image — a missing or broken one falls back at once.
+
+### Badge
+
+A status label or a count. It is not interactive: put actions in `Button` or `Tile`.
+
+```tsx
+<Badge tone="positive" variant="fill">Ready to deploy</Badge>
+<Badge tone="warning">Quota almost used</Badge>
+```
+
+- `tone` carries the meaning and `variant` only the treatment, so they are set independently.
+
+### Bar
+
+A row of content with sections that push apart. Children keep their own keyboard behaviour.
+
+```tsx
+<Bar>
+  <Text truncate>Acme Workspace</Text>
+  <Bar.Section align="end">
+    <Button icon="plus" fullWidth={false}>Invite</Button>
+  </Bar.Section>
+</Bar>
+```
+
+- `Bar.Section align="end"` moves a section to the inline end; `grow` gives it the spare room.
+- `orientation="vertical"` stacks the sections; the same alignment rules follow the block axis.
+
+### Breadcrumb
+
+The trail from the root to the current page, collapsing its middle into an overflow list.
+
+```tsx
+<Breadcrumb
+  maxItems={4}
+  items={[
+    { label: 'Projects', href: '/projects' },
+    { label: 'Dashboard' },
+  ]}
+/>
+```
+
+- An item with `href` is a link, an item with only `onClick` is a button, and an item with neither is plain text; the last item is the current page.
+- `maxItems` counts the overflow button and starts at 3; `maxItems={null}` shows the whole trail.
+- Name the nav with `aria-label`; `labels.more` names the overflow button.
+
+### Button
+
+An action; one `accent` per action group.
+
+```tsx
+<Button variant="accent" icon="plus">Create workspace</Button>
+```
+
+`iconOnly` hides children visually; without children supply `aria-label`. `chevron` follows `aria-expanded`. `loading` disables activation, sets `aria-busy` and keeps the label beside a trailing Spinner; icon-only buttons replace their icon.
+
+### Calendar
+
+An always-visible month grid for a civil day or a range. It is not a form control.
+
+```tsx
+<Calendar
+  selection="range"
+  defaultValue={{ start: '2026-07-14', end: '2026-07-18' }}
+  min="2026-07-01"
+  locale="en-GB"
+  weekStartsOn={1}
+  aria-label="Booking dates"
+  onValueChange={({ value }) => setRange(value)}
+/>
+```
+
+- Values are `YYYY-MM-DD` strings, independent of the browser's timezone; use `Date` for a field that submits.
+- A range excludes `disabledDates` from the whole interval; `excludeDisabledDates={false}` constrains only its endpoints.
+- `locale` formats and picks the first weekday; `labels` translates the navigation buttons.
+
+### Card
+
+A contained surface. Either fill its regions with props, or compose the parts.
+
+```tsx
+<Card title="API usage" description="This month"
+  footer={<Button variant="outline" fullWidth={false}>View usage</Button>}>
+  <Text>1.8M of 2M tokens used.</Text>
+</Card>
+
+<Card variant="plain" padding="none">
+  <Card.Header><Card.Title>Settings</Card.Title></Card.Header>
+  <Card.Content>…</Card.Content>
+</Card>
+```
+
+- With `title`, `description` or `footer` set, `children` fills the content part; without them `children` is free composition.
+- Use `footerAlign` with `footer`; in compound use, set `Card.Footer align`. An orphan `footerAlign` reports an error.
+- `hoverable` only highlights the surface; it creates no action.
+
+### Carousel
+
+Slides shown one position at a time, with previous, next and indicators.
+
+```tsx
+<Carousel aria-label="Product tour" loop autoPlay autoPlayInterval={5000}>
+  <Media src="/tour/overview.webp" alt="Workspace overview" height={320} />
+  <Media src="/tour/analytics.webp" alt="Analytics" height={320} />
+</Carousel>
+```
+
+- Each top-level child is one slide; `slidesPerView` shows several and each takes that share of the width.
+- `autoPlay` adds a rotation control and stops on keyboard focus or a user move; reduced motion disables it.
+- Name the region with `aria-label`; `labels` translates the slide and control names.
+
+### Checkbox
+
+An independent on/off option with its own visible label.
+
+```tsx
+<Checkbox label="I agree to the Terms of Service" name="terms" required />
+<Checkbox label="Select all" checked={allChecked} onCheckedChange={({ checked }) => selectAll(checked)} />
+```
+
+- `checked="indeterminate"` summarizes a partly selected collection; it submits nothing and does not satisfy `required`.
+- `value` is the string submitted while checked; it never controls the selection.
+- Use `Switcher` for a setting that applies at once, and a `<fieldset>` with a `<legend>` to group several checkboxes.
+
+### Code
+
+A block of source with an optional title, line numbers, marked lines, copy and collapse.
+
+```tsx
+<Code title="request.ts" language="ts" showLineNumbers highlightedLines={[2, 3]}>{source}</Code>
+<Code collapsedLines={3} defaultCollapsed>{buildLog}</Code>
+```
+
+- `children` is a plain string copied verbatim. `Code` colours nothing: `language` only sets the `language-*` class, and colours arrive as `tokenizedLines`, one token array per line.
+- `collapsed` hides lines visually past `collapsedLines` while assistive technology still reads them all, so the toggle is named by `labels`, not `aria-expanded`.
+
+### Command
+
+A search field over a list of commands, in the page or in a dialog.
+
+```tsx
+<Command
+  aria-label="Commands"
+  placeholder="Ask or run a command…"
+  items={[{ type: 'group', label: 'Create', items: [
+    { value: 'agent', label: 'Create an agent', keywords: ['assistant'] },
+  ] }]}
+  onSelect={({ value }) => run(value)}
+/>
+```
+
+- `surface="auto"` is a dialog below 900px and the list in the page above it; an inline Command is always visible and ignores `open`.
+- `keywords` widen what an item matches without being shown.
+- `labels.empty` replaces the list when nothing matches.
+
+### Date
+
+A date, time, week, month or year field with a picker, and the form control behind it.
+
+```tsx
+<Date label="Launch time" mode="datetime" timezone="UTC" name="launch"
+  onValueChange={({ value }) => setLaunch(value)} />
+
+<Date label="Reporting period" selection="range" surface="sheet" />
+```
+
+- `valueFormat` decides what callbacks receive — civil ISO strings (`iso`) or `Date` instants (`date`) — while form submission always sends civil ISO, a range as `start`/`end`.
+- `timezone` resolves instants and "today"; `locale` only formats.
+- `labels` names the picker's own controls; `label`, `description` and `placeholder` stay field props.
+- `membrane` applies to the trigger; the picker keeps its own spacing.
+
+### Icon
+
+20×20 glyph.
+
+```tsx
+<Icon name="check" aria-label="Verified" />
+```
+
+- `aria-label` or `title` names it; otherwise decorative.
+- Unknown names report and render notdef; blanks render nothing.
+- Controls own spacing.
+
+`IconProvider renderer={ProductIcon}` also covers internal and portalled icons.
+The host owns 20×20 sizing and accessibility; `null` restores built-ins.
+See [README](README.md#application-icon-libraries).
+
+### Input
+
+Native text entry with a label, help, validation and optional clear action.
+
+```tsx
+<Input label="Work email" type="email" name="email" autoComplete="email" required
+  description="Used for security alerts." placeholder="name@company.com" />
+
+<Input label="System instruction" multiline maxLength={4000}
+  value={prompt} onValueChange={({ value }) => setPrompt(value)} />
+```
+
+- `multiline` renders a textarea, so `type` and the single-line constraints no longer apply.
+- `clearable` opts in to clearing a non-empty editable field; it aligns with the first line.
+- Multiline starts at one control-height row and grows with wrapping and content. `rows` sets the minimum; `autoGrow={false}` fixes it.
+- `placeholder` is a hint, never the accessible name: keep `label` or `aria-label`.
+
+### Markdown
+
+A Markdown string rendered as sanitized HTML.
+
+```tsx
+<Markdown linkTarget="_blank">{article}</Markdown>
+```
+
+- The output is always sanitized. `html` only widens an allowlist of text and block tags; it is no escape hatch for trusted HTML.
+- `linkTarget` and `linkRel` apply to absolute links; relative links, anchors and `mailto:` always open in place.
+- A standalone code sample belongs in `Code`, which offers copy, line numbers and collapse.
+
+### Media
+
+An image, video or audio source in a box, with fallback content when it fails.
+
+```tsx
+<Media src="/shots/dashboard.webp" alt="Analytics dashboard" height={320} objectFit="contain"
+  fallback={<Text variant="muted">Screenshot unavailable</Text>} />
+
+<Media type="video" src="/tour.mp4" controls poster="/tour.webp" playsInline />
+```
+
+- `alt=""` marks an image decorative; any other text stands in for it.
+- `width` and `height` beat `style` on the box; `objectFit` crops or letterboxes.
+- `hidden` hides the box, fallback and outer spacing.
+- Other native attributes and `ref` reach the `<img>`, `<video>` or `<audio>`; `children` holds `<track>` elements.
+
+### Menu
+
+Actions from a trigger or pointer.
+
+```tsx
+<Menu items={[{ value: 'copy', label: 'Copy' }]} onSelect={({ value }) => run(value)}>
+  <Button fullWidth={false}>Actions</Button>
+</Menu>
+```
+
+- `children` is the trigger; a string becomes a `Button`.
+- `href` uses native link behavior; `checked` makes a checkbox item.
+- `openOn="context"` uses the pointer and ignores placement props.
+- Lateral menus use `attachmentSelector` and `alignToOption` to face a visible row.
+
+### Meter
+
+A known measurement inside a bounded range, such as a quota.
+
+```tsx
+<Meter label="Storage used" value={82} tone="warning" showValue />
+<Meter label="Context used" value={74} shape="circle" showValue />
+```
+
+- Use `Progress` for work being done and `Meter` for something being measured.
+- `value` is bounded into `min..max`; `tone` is chosen by you and never follows the number.
+- An unlabelled meter still needs `aria-label` or `aria-labelledby`.
+
+### Modal
+
+A dialog that takes over the page, centered or attached to an edge.
+
+```tsx
+<Modal title="Create project" description="Start from a blank workspace."
+  trigger={<Button variant="accent" fullWidth={false}>New project</Button>}
+  footer={<Button variant="accent" fullWidth={false} onClick={create}>Create</Button>}>
+  <Text>Name, region and environment.</Text>
+</Modal>
+
+<Modal open={open} onOpenChange={({ open }) => setOpen(open)}
+  placement="end" edge="flush" title="Customer details">…</Modal>
+```
+
+- `title` gives the dialog its accessible name; without one, name it with `aria-label`.
+- `footer` buttons close nothing by themselves — close through `onOpenChange` or your own state.
+- `closable={false}` removes the close button and blocks Escape and backdrop presses; `portal={false}` is a static preview that leaves focus, keys and the page alone.
 
 ### Navigation
 
-| Need | Component | NOT this |
-|------|-----------|----------|
-| Sibling view switching | `Tabs` | |
-| Expand/collapse sections | `Accordion` | |
-| Location hierarchy | `Breadcrumb` | |
-| Page stepping | `Pagination` | |
-| Workflow progress | `Steps` | |
-| App/site navigation | `Navigation` | |
-| Persistent side panel | `Panel` | `Sidebar` (deprecated) |
-| Hierarchical tree | `Tree` | |
-| Document section nav | `Toc` | `Tree` misuse |
-
-### Overlays
-
-| Need | Component | NOT this |
-|------|-----------|----------|
-| Non-interactive hint | `Tooltip` | `Overlay` (deprecated) |
-| Small interactive popup | `Popover` | |
-| Action menu | `Menu` | |
-| Focused dialog | `Modal placement="center"` | |
-| Edge slide-in panel | `Modal placement="left\|right\|top\|bottom"` | |
-| Search/command palette | `Command` | |
-| Notifications | `Toaster` + `useToast()` | alert() |
-
-### Data & Content
-
-| Need | Component |
-|------|-----------|
-| Tabular data | `Table` |
-| Progress bar | `Progress` |
-| Loading placeholder | `Skeleton` |
-| User avatar | `Avatar` |
-| Image/video/audio | `Media` |
-| Carousel | `Carousel` |
-| Scrollable area | `Scroll` |
-| Date grid | `Calendar` |
-| Date input + picker | `Date` |
-
----
-
-## 4. Component Reference
-
-### 4.1 Text
-
-**Purpose:** The universal typography primitive. ALL visible text goes through this component.
-
-**When to use:** Always, for any text that is not internally owned by a control component.
-
-**When NOT to use:** Inside components that already handle their own text rendering (Button text prop, Input label, etc.).
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `text` | string | — | Text content |
-| `variant` | TextVariant | `'body'` | Typography style (see §2.2) |
-| `size` | `'xs'\|'sm'\|'md'\|'lg'\|'xl'` | — | Size override |
-| `as` | TextElement | auto | HTML element override |
-| `icon` | ReactNode \| string | — | Optional icon |
-| `iconPosition` | `'left'\|'right'` | `'left'` | Icon placement |
-| `inset` | `'control'\|'none'` | `'control'` | Padding mode |
-| `stretchText` | boolean | `false` | Flex-stretch text area |
-| `fullWidth` | boolean | `false` | Full width |
-| `align` | `'left'\|'center'\|'right'` | `'left'` | Text alignment |
-| `membrane` | boolean | `true` | Outer membrane spacing |
-| `children` | ReactNode | — | Custom content (overrides `text`) |
-| `htmlFor` | string | — | Label association (for `variant="label"`) |
-
-**Inset modes:**
-- `inset="control"` (default) — adds control-height padding so text aligns with buttons, inputs, and other controls. Use in app UI.
-- `inset="none"` — flush text with zero padding. Use on marketing pages, landing pages, or when text sits inside a component that manages its own padding.
-
-**Examples:**
-```tsx
-// Page heading
-<Text variant="h1">Dashboard</Text>
-
-// Section heading
-<Text variant="h2">Settings</Text>
-
-// Body paragraph
-<Text>Component contracts give agents real prop data.</Text>
-
-// Muted description
-<Text variant="muted">Last updated 2 hours ago.</Text>
-
-// Label for a form field
-<Text variant="label" htmlFor="name">Full name</Text>
-
-// Caption / fine print
-<Text variant="muted" size="xs">* Required fields</Text>
-
-// Landing page (no control padding)
-<Text variant="h1" inset="none" membrane={false}>Hero Title</Text>
-```
-
-**Agent rules:**
-- Default to `variant="body"` for regular text.
-- Use specific heading variants (`h1`–`h6`) instead of generic `heading` when document structure matters.
-- Do NOT center text unless the design explicitly requires it.
-- When `Text` sits inside `Accordion`, `Card`, `Tabs` content, or any container — still use `<Text>`, not bare strings.
-
----
-
-### 4.2 Separator
-
-**Purpose:** Thin visual divider line between sections.
-
-**DEFAULT BEHAVIOR: Do not use.** Separator should be added only in rare cases where an explicit visual boundary is genuinely needed and spacing alone is insufficient. Prefer whitespace and layout rhythm first.
-
-**When to use (rare):**
-- Between visually distinct content sections inside a panel or card where spacing alone does not communicate the boundary.
-- Between groups in a settings form only if explicitly requested by the designer.
-- Never between every item in a list. Never between a heading and its content.
-
-**When NOT to use:**
-- Between consecutive form fields (membrane spacing handles this).
-- Between heading and body text (spacing handles this).
-- Between cards or sections (visual boundary is already clear).
-- As a default "just in case" divider.
-- Without explicit instruction from the person designing the interface.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `orientation` | `'horizontal'\|'vertical'` | `'horizontal'` | Divider direction |
-| `decorative` | boolean | `true` | If true, hidden from a11y tree |
-| `membrane` | boolean | `true` | Outer membrane spacing |
-
----
-
-### 4.3 Button
-
-**Purpose:** Explicit user action.
-
-**When to use:** User is invoking an action, or a row-like option behaves as a button.
-
-**When NOT to use:**
-- Pure text display → use `Text`
-- Binary state toggle → use `Switcher`
-- Selection among peers → use `SegmentedControl`, `Radio`, `Tabs`, or `Menu`
-- Navigation link → use `<Link>` or `Navigation`
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `text` | string | — | Primary label |
-| `rightText` | string | — | Secondary right-aligned text |
-| `variant` | `'default'\|'primary'\|'secondary'\|'accent'\|'outline'\|'ghost'\|'destructive'\|'suggestion'` | `'default'` | Visual style |
-| `icon` | ReactNode \| string | — | Icon |
-| `iconPosition` | `'left'\|'right'` | `'left'` | Icon placement |
-| `iconOnly` | boolean | `false` | Square icon-only button |
-| `disabled` | boolean | `false` | Disabled state |
-| `loading` | boolean | `false` | Loading state |
-| `stretchText` | boolean | `false` | Flex-stretch text |
-| `fullWidth` | boolean | `false` | Full width |
-| `align` | `'left'\|'center'\|'right'` | `'center'` | Text alignment |
-| `level` | number (0–9) | — | Nesting indent level |
-| `membrane` | boolean | `true` | Outer membrane |
-| `copyText` | string | — | Copies text on click |
-| `onCopied` | function | — | Copy success callback |
-
-**Variant guide:**
-- `default` — neutral secondary action
-- `accent` — primary CTA (one per view ideally)
-- `ghost` — minimal, text-like button
-- `destructive` — dangerous/irreversible actions
-- `outline` — bordered secondary style
-- `suggestion` — soft prompt/suggestion
-
-**Agent rules:**
-- Use `Button` for close/copy/more triggers instead of raw `<button>`.
-- Prefer `iconOnly` for compact utility actions.
-- At most one `accent` button per visible group of actions.
-
----
-
-### 4.4 Badge
-
-**Purpose:** Small status/tone indicator label.
-
-**When to use:** Marking state, status, category, or count-like metadata.
-
-**When NOT to use:**
-- As a substitute for `Text` in headings or body copy.
-- As interactive elements (badges are not clickable).
-- For long text content.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `text` | string | — | Badge label |
-| `variant` | `'default'\|'primary'\|'secondary'\|'accent'\|'destructive'` | `'default'` | Tone |
-| `appearance` | `'fill'\|'outline'` | `'fill'` | Visual style |
-| `children` | ReactNode | — | Custom content |
-
----
-
-### 4.5 Icon
-
-**Purpose:** Universal icon renderer from the shared icon registry.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `name` | string | — | Icon name from registry |
-| `icon` | any | — | Universal icon input (name/component/node/url) |
-| `src` | string | — | External source URL |
-| `size` | number | — | Icon box size |
-| `square` | boolean | — | Keep square box |
-| `label` | string | — | Accessible label (omit for decorative) |
-
-**Agent rules:**
-- `Icon` is NOT a spacing component. Do not solve layout with icon margins.
-
----
-
-### 4.6 Card
-
-**Purpose:** Generic grouped content block.
-
-**When to use:** Grouping related content visually — settings section, stat card, feature card.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `title` | string | — | Card title |
-| `description` | string | — | Supporting description |
-| `content` | string | — | Main content string |
-| `footer` | string | — | Footer string |
-| `membrane` | boolean | `true` | Outer membrane |
-| `children` | ReactNode | — | Custom content |
-
-**Agent rules:**
-- Prefer `children` for real layouts. String props (`title`, `description`) are for simple showcase use.
-- Text inside Card children must use `<Text>`, not bare strings.
-
----
-
-### 4.7 Input
-
-**Purpose:** Text-like field input.
-
-**When to use:** Free-form typing is required.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | string | — | Controlled value |
-| `defaultValue` | string | — | Uncontrolled initial value |
-| `type` | `'text'\|'email'\|'number'\|'date'\|'password'` | `'text'` | Field mode |
-| `textLayout` | `'scroll'\|'wrap'` | `'scroll'` | Text overflow behavior |
-| `disabled` | boolean | `false` | Disabled |
-| `readOnly` | boolean | `false` | Read-only |
-| `label` | string | — | Field label |
-| `description` | string | — | Helper text |
-| `error` | string | — | Error message |
-| `labelOrientation` | `'vertical'\|'horizontal'` | `'vertical'` | Label position |
-| `placeholder` | string | — | Placeholder |
-| `icon` | ReactNode | — | Edge icon |
-| `iconPosition` | `'left'\|'right'` | — | Icon placement |
-| `required` | boolean | `false` | Required state |
-| `autoFocus` | boolean | `false` | Auto-focus |
-| `onValueChange` | function | — | Canonical value callback |
-| `membrane` | boolean | `true` | Outer membrane |
-
----
-
-### 4.8 Checkbox
-
-**Purpose:** Boolean or indeterminate selection.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `checked` | `boolean\|'indeterminate'` | — | Controlled state |
-| `defaultChecked` | boolean | — | Initial state |
-| `disabled` | boolean | `false` | Disabled |
-| `required` | boolean | `false` | Required |
-| `name` | string | — | Form name |
-| `label` | string | — | Visible label |
-| `onCheckedChange` | function | — | State callback |
-| `membrane` | boolean | `true` | Outer membrane |
-
----
-
-### 4.9 Radio
-
-**Purpose:** Single selection from a small explicit set.
-
-**When to use:** 2–5 mutually exclusive options that should all be visible at once.
-
-**When NOT to use:** More than 5 options → use `Select`. Binary toggle → use `Switcher`.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `options` | `{value, label, disabled?}[]` | — | Radio options |
-| `value` | string | — | Controlled selected value |
-| `defaultValue` | string | — | Initial value |
-| `orientation` | `'horizontal'\|'vertical'` | `'vertical'` | Layout |
-| `onValueChange` | function | — | Change callback |
-| `membrane` | boolean | `true` | Outer membrane |
-
----
-
-### 4.10 Switcher
-
-**Purpose:** Binary on/off switch.
-
-**When to use:** Immediate toggle between two states (enabled/disabled, on/off).
-
-**When NOT to use:** Choosing between labeled options → use `SegmentedControl` or `Radio`.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `checked` | boolean | — | Controlled state |
-| `defaultChecked` | boolean | — | Initial state |
-| `disabled` | boolean | `false` | Disabled |
-| `label` | string | — | Visible label |
-| `text` | string | — | Inline text |
-| `withText` | boolean | — | Show text next to switch |
-| `textWrap` | `'truncate'\|'wrap'` | `'truncate'` | Text overflow |
-| `onCheckedChange` | function | — | State callback |
-| `membrane` | boolean | `true` | Outer membrane |
-
----
-
-### 4.11 SegmentedControl
-
-**Purpose:** Compact segment-based mode selector. Canonical replacement for deprecated `Toggle`.
-
-**When to use:** 2–4 mutually exclusive views/modes in a compact strip.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | segment items | — | Segment items |
-| `value` | string[] | — | Controlled selected values |
-| `defaultValue` | string[] | — | Initial values |
-| `selectionMode` | `'single'\|'multiple'` | `'single'` | Selection mode |
-| `orientation` | orientation | — | Layout |
-| `onValueChange` | function | — | Change callback |
-| `membrane` | boolean | `true` | Outer membrane |
-
----
-
-### 4.12 Select
-
-**Purpose:** Option picker without free typing.
-
-**When to use:** Choosing from a known set without needing text entry.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `options` | `{value, label, disabled?}[]` | — | Options |
-| `value` | string[] | — | Controlled value |
-| `defaultValue` | string[] | — | Initial value |
-| `placeholder` | string | — | Placeholder |
-| `type` | `'select'\|'multiselect'` | `'select'` | Mode |
-| `label` | string | — | Label |
-| `surface` | `'auto'\|'popover'\|'sheet'` | `'auto'` | Surface mode |
-| `surfaceBreakpoint` | number | 900 | Responsive breakpoint |
-| `onValueChange` | function | — | Value callback |
-| `membrane` | boolean | `true` | Outer membrane |
-
-**Agent rules:** Default to `surface="auto"`. On mobile, this becomes a sheet.
-
----
-
-### 4.13 Slider
-
-**Purpose:** Continuous or ranged numeric selection. **Status: beta.**
-
-**When to use:** Dragging is more natural than discrete option picking.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `variant` | `'simple'\|'advanced'` | `'simple'` | Mode |
-| `value` | number[] | — | Thumb values |
-| `min` | number | 0 | Minimum |
-| `max` | number | 100 | Maximum |
-| `step` | number | 1 | Step |
-| `label` | string | — | Label |
-| `onValueChange` | function | — | Value callback |
-
----
-
-### 4.14 Rating
-
-**Purpose:** Rating input or display. **Status: beta.**
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | number | — | Rating value |
-| `max` | number | 5 | Max stars |
-| `allowHalf` | boolean | `false` | Half-step support |
-| `label` | string | — | Label |
-| `onValueChange` | function | — | Change callback |
-
----
-
-### 4.15 Calendar
-
-**Purpose:** Standalone date grid (always visible, no trigger).
-
-**When to use:** Calendar is permanently visible in the layout.
-**When NOT to use:** Need trigger + overlay → use `Date`.
-
----
-
-### 4.16 Date
-
-**Purpose:** Canonical date selection component.
-
-**When to use:** UI needs a trigger/control plus calendar/time selection.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `mode` | `'date'\|'datetime'` | `'date'` | Mode |
-| `value` | string | — | Controlled value |
-| `label` | string | — | Label |
-| `format` | string | — | Display format |
-| `min` / `max` | string | — | Date bounds |
-| `surface` | `'auto'\|'popover'\|'sheet'` | `'auto'` | Surface mode |
-| `membrane` | boolean | `true` | Outer membrane |
-
----
-
-### 4.17 Tabs
-
-**Purpose:** Switch between sibling views or panels.
-
-**When to use:** Content has 2–7 parallel views/sections.
-**When NOT to use:** Binary mode switch → `SegmentedControl`. Deep navigation → `Navigation` or `Panel`.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | `{value, label, content, disabled?}[]` | — | Tab items |
-| `value` | string | — | Controlled active tab |
-| `defaultValue` | string | — | Initial tab |
-| `orientation` | `'horizontal'\|'vertical'` | `'horizontal'` | Layout |
-| `withLine` | boolean | `false` | Active indicator line |
-| `wrap` | boolean | `false` | Allow tab wrapping |
-| `membrane` | boolean | `true` | Outer membrane |
-| `onValueChange` | function | — | Tab change callback |
-
-**Agent rules:**
-- String `label` values are automatically wrapped in `<Text>` internally.
-- ReactNode labels should use `<Text>` explicitly.
-- Prefer horizontal overflow scrolling rather than forcing many tabs into too little width.
-
----
-
-### 4.18 Accordion
-
-**Purpose:** Expand/collapse stacked sections.
-
-**When to use:** FAQ, collapsible settings groups, show/hide detail.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | `{value, label, content, disabled?}[]` | — | Items |
-| `expandedIds` | string[] | — | Controlled expanded IDs |
-| `defaultExpandedIds` | string[] | — | Initial expanded IDs |
-| `multiple` | boolean | `false` | Allow multiple open |
-| `collapsible` | boolean | `false` | Allow closing all |
-| `onExpandedChange` | function | — | Expanded callback |
-
-**Agent rules:**
-- Labels are rendered through `<Text>` internally.
-- Content passed as `content` prop: if it's a string, it's auto-wrapped in `<Text>`. If it's a ReactNode, it is rendered as-is — the caller must use `<Text>` inside.
-- Example of correct content:
-```tsx
-content: <Text variant="muted">Detailed explanation here.</Text>
-```
-
----
-
-### 4.19 Modal
-
-**Purpose:** Canonical dialog-like overlay. Focused task, confirmation, review, or edit.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `open` | boolean | — | Controlled open state |
-| `placement` | `'center'\|'left'\|'right'\|'top'\|'bottom'` | `'center'` | Viewport placement |
-| `edge` | `'inset'\|'flush'` | `'inset'` | Inset card or flush viewport-edge treatment |
-| `closeOnOverlayClick` | boolean | `true` | Close on backdrop click |
-| `closable` | boolean | `true` | Show close button |
-| `title` | string | — | Title |
-| `description` | string | — | Description |
-| `children` | ReactNode | — | Body content |
-| `actions` | `{label, variant?, disabled?}[]` | — | Action buttons |
-| `trigger` | ReactNode | — | Trigger content |
-| `width` / `height` | number | — | Surface size in pixels, capped by the viewport |
-| `onOpenChange` | function | — | Open state callback |
-
-**Agent rules:**
-- Use `placement` for geometry and `edge` for viewport treatment. Both axes are valid for every modal workflow.
-
----
-
-### 4.20 Tooltip
-
-**Purpose:** Short, non-interactive contextual explanation.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `content` | ReactNode | — | Floating content |
-| `children` | ReactNode | — | Trigger |
-| `side` | side | — | Preferred side |
-| `align` | alignment | — | Alignment |
-| `openDelay` / `closeDelay` | number | — | Timing |
-
-**Agent rules:** Keep content short. If content becomes interactive → use `Popover`.
-
----
-
-### 4.22 Popover
-
-**Purpose:** Small contextual interactive surface.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `interactive` | boolean | — | Interactive content |
-| `content` | ReactNode | — | Popover content |
-| `children` | ReactNode | — | Trigger |
-| `side` | side | — | Preferred side |
-
----
-
-### 4.23 Menu
-
-**Purpose:** Action list surface.
-
-**When to use:** User is choosing an action, not entering text.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `trigger` | `'click'\|'context'` | `'click'` | Trigger mode |
-| `items` | menu items | — | Action items |
-| `children` | ReactNode | — | Trigger content |
-| `onSelect` | function | — | Selection callback |
-| `surface` | surface mode | `'auto'` | Surface mode |
-
----
-
-### 4.24 Command
-
-**Purpose:** Searchable command/action palette.
-
-**When to use:** Fuzzy search or command selection with many options.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | command items | — | Flat items |
-| `groups` | command groups | — | Grouped sections |
-| `placeholder` | string | — | Search placeholder |
-| `onSelect` | function | — | Selection callback |
-| `surface` | `'auto'\|'inline'\|'dialog'` | `'auto'` | Surface mode |
-
----
-
-### 4.25 Toaster / Toast
-
-**Purpose:** Transient notification system.
-
-**Usage:** Place one `<Toaster>` at app root. Push notifications via `useToast()`.
-
-**Props (Toaster):**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `placement` | placement | `'bottom-center'` | Toast stack position |
-| `membrane` | boolean | `true` | Use Face UI membrane spacing on toast surfaces |
-| `dismissible` | boolean | `true` | Show the internal icon-only close button |
-
----
-
-### 4.26 Breadcrumb
-
-**Purpose:** Hierarchy trail for current location.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | breadcrumb items | — | Trail items |
-| `separator` | ReactNode | — | Separator display |
-| `allowNavigation` | boolean | — | Interactive items |
-| `collapseAfter` | number | — | Collapse threshold |
-
----
-
-### 4.27 Pagination
-
-**Purpose:** Page stepping for paged data.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `page` | number | — | Current page |
-| `total` | number | — | Total items |
-| `pageSize` | number | — | Items per page |
-| `onPageChange` | function | — | Page callback |
-
----
-
-### 4.28 Steps
-
-**Purpose:** Workflow progress / step navigator.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | `{label}[]` | — | Step items |
-| `step` | number | — | Current step |
-| `linear` | boolean | `false` | Enforce linear flow |
-| `onStepChange` | function | — | Step callback |
-
----
-
-### 4.29 Navigation
-
-**Purpose:** App/site navigation bar.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | nav items | — | Navigation items |
-| `activeId` | string | — | Active item |
-| `orientation` | `'horizontal'\|'vertical'` | — | Layout |
-| `surface` | surface mode | `'auto'` | Surface mode |
-
----
-
-### 4.30 Panel
-
-**Purpose:** Collapsible panel navigation with nested groups. Canonical replacement for `Sidebar`.
-
-**When to use:** Persistent or responsive side/drawer navigation surface.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | panel items | — | Navigation items |
-| `collapsed` | boolean | — | Collapsed state |
-| `selectedId` | string | — | Selected item |
-| `width` | string | — | Expanded width |
-| `collapsedWidth` | string | — | Collapsed width |
-| `surface` | surface mode | `'auto'` | Surface mode |
-
----
-
-### 4.31 Tree
-
-**Purpose:** Hierarchical tree with expand/collapse and selection. **Status: beta.**
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | tree nodes | — | Tree items |
-| `expandedIds` | string[] | — | Expanded nodes |
-| `selectedId` | string | — | Selected node |
-| `onExpandedChange` | function | — | Expand callback |
-| `onSelectedChange` | function | — | Selection callback |
-
----
-
-### 4.32 Toc
-
-**Purpose:** In-page or in-panel table of contents. **Status: beta.**
-
-**When to use:** Document/section navigation within one page.
-**When NOT to use:** App-wide navigation → use `Navigation` or `Panel`.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | toc items | — | Sections |
-| `activeId` | string | — | Active section |
-| `withLine` | boolean | — | Indicator line |
-| `lineSide` | `'left'\|'right'` | — | Line side |
-
----
-
-### 4.33 Tile
-
-**Purpose:** Interactive row primitive. Used for list items, tree nodes, file browser entries. **Status: beta.**
-
-**When to use:** Row-level interactive element in a list, sidebar, or tree. Visually a flat selectable row with icon, text, and optional actions.
-
-**When NOT to use:** Button action → use `Button`. Navigation link → use `Navigation`.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `text` | string | — | Primary label |
-| `rightText` | ReactNode | — | Secondary right text |
-| `variant` | `'default'\|'ghost'\|'accent'` | `'default'` | Visual variant |
-| `icon` | ReactNode | — | Icon |
-| `iconPosition` | `'left'\|'right'` | `'left'` | Icon placement |
-| `disabled` | boolean | `false` | Disabled |
-| `active` | boolean | `false` | Active/selected state |
-| `level` | number (0–9) | — | Nesting indent level |
-| `actions` | ReactNode | — | Right-side action buttons |
-| `membrane` | boolean | `true` | Outer membrane |
-
----
-
-### 4.34 Code
-
-**Purpose:** Code snippet / block display.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `code` | string | — | Code text |
-| `language` | string | — | Language label |
-| `title` | string | — | Block title |
-| `showLineNumbers` | boolean | — | Line numbers |
-| `highlight` | number[] | — | Highlighted lines |
-| `defaultCollapsed` | boolean | — | Initial collapse state |
-| `collapsedHeight` | number | — | Collapsed preview height |
-
----
-
-### 4.35 Markdown
-
-**Purpose:** Safe GFM renderer for rich text from markdown source.
-
-**When to use:** Rendering user-generated or API-provided markdown content.
-**When NOT to use:** Static text content → use `Text`. Code blocks → use `Code`.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `content` | string | — | Markdown source |
-| `gfm` | boolean | `true` | GitHub Flavored Markdown |
-| `safeMode` | boolean | `true` | Strict sanitization |
-| `allowRawHtml` | boolean | `false` | Allow raw HTML |
-| `linkTarget` | `'_self'\|'_blank'` | `'_self'` | Link target |
-| `membrane` | boolean | `true` | Outer membrane |
-| `fullWidth` | boolean | `true` | Full width |
-
-**Agent rules:** Default to safe/sanitized markdown. Do not use raw HTML unless the content source is trusted.
-
----
-
-### 4.36 Bar
-
-**Purpose:** Horizontal/vertical toolbar container for actions, headers, footers.
-
-**When to use:** Page header with title + actions. Modal footer. Filter row. Any action strip.
-
-**Compound parts:**
-- `Bar.Left` — left-aligned content
-- `Bar.LeftEllipsis` — left content with text truncation
-- `Bar.LeftOverlap` — overlapping left content (e.g., avatar stack)
-- `Bar.Right` — right-aligned content
-
-**Agent rules:** Use `Bar` instead of ad hoc flex wrappers for action rows and headers.
-
----
-
-### 4.37 Table
-
-**Purpose:** Structured tabular data. **Status: beta.**
-
-**When to use:** Columns matter, sorting/selection matter, row comparison is important.
-**When NOT to use:** Simple list → use Card or Tile. On mobile, reconsider dense tables.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `columns` | column defs | — | Column definitions |
-| `rows` | data rows | — | Row data |
-| `sortColumn` | string | — | Sort column |
-| `sortDirection` | `'asc'\|'desc'` | — | Sort direction |
-| `onSortChange` | function | — | Sort callback |
-| `selectable` | boolean | — | Enable row selection |
-| `stickyHeader` | boolean | — | Sticky header |
-| `resizable` | boolean | — | Column resize |
-
----
-
-### 4.38 Progress
-
-**Purpose:** Continuous progress display.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | number | 0 | Current value, clamped to `0..max` |
-| `max` | number | 100 | Maximum |
-| `indeterminate` | boolean | false | Unknown-duration progress state |
-| `tone` | `'neutral'\|'positive'\|'warning'\|'destructive'` | `'neutral'` | Semantic feedback tone |
-| `shape` | `'linear'\|'circle'` | `'linear'` | Progress geometry |
-| `showValue` | boolean | false | Show computed percentage |
-| `label` | ReactNode | — | Visible progress label |
-| `ariaLabel` | string | — | Accessible label when no visible label is rendered |
-
----
-
-### 4.39 Avatar
-
-**Purpose:** Identity image with fallback initials.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `src` | string | — | Image URL |
-| `name` | string | — | Name for initials fallback |
-| `fallback` | string | — | Explicit fallback text |
-
----
-
-### 4.40 Media
-
-**Purpose:** Unified image/video/audio renderer. **Status: beta.**
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `type` | `'image'\|'video'\|'audio'` | — | Media type |
-| `src` | string | — | Source URL |
-| `alt` | string | — | Alt text |
-| `objectFit` | CSS object-fit | — | Fit mode |
-| `fallback` | ReactNode | — | Fallback content |
-
----
-
-### 4.41 Skeleton
-
-**Purpose:** Loading placeholder.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `width` | string/number | — | Width |
-| `height` | string/number | — | Height |
-| `variant` | string | — | Shape variant |
-
----
-
-### 4.42 Carousel
-
-**Purpose:** Slide-based content container. **Status: beta.**
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | ReactNode | — | Slides |
-| `loop` | boolean | — | Loop slides |
-| `autoPlay` | boolean | — | Enable autoplay |
-| `slidesPerView` | number | 1 | Visible slides |
-
----
-
-### 4.43 Upload
-
-**Purpose:** File selection and dropzone. **Status: beta.**
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `accept` | string | — | File type filter |
-| `multiple` | boolean | — | Multi-file |
-| `maxSize` | number | — | Max file size |
-| `maxFiles` | number | — | Max file count |
-| `files` | file objects | — | Controlled files |
-| `onFilesChange` | function | — | Files callback |
-
----
-
-### 4.44 Scroll
-
-**Purpose:** Scrollable viewport wrapper.
-
-**Props:**
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `type` | string | — | Scroll behavior |
-| `orientation` | `'horizontal'\|'vertical'` | — | Scroll axis |
-| `height` | string | — | Explicit height |
-
----
-
-## 5. Design Tokens
-
-The library uses CSS custom properties as design tokens:
-
-**Spacing (4px grid):**
-`--uf-space-1` (4px) through `--uf-space-12` (48px)
-
-**Typography:**
-- `--uf-font-size-xs`: 12px
-- `--uf-font-size-sm`: 13px
-- `--uf-font-size`: 14px (base)
-- `--uf-font-size-md`: 16px
-- `--uf-font-size-lg`: 18px
-- `--uf-font-size-xl`: 20px
-- `--uf-font-weight`: 400
-- `--uf-font-weight-bold`: 600
-
-**Control geometry:**
-- `--uf-control-height`: 32px
-- `--uf-control-font-size`: 14px
-- `--uf-control-pad-y`: 6px
-- `--uf-control-pad-text`: 8px
-- `--uf-control-pad-icon`: 6px
-- `--uf-control-gap`: 8px
-
-**Radius:**
-- `--uf-radius-sm`: 4px
-- `--uf-radius`: 6px
-- `--uf-radius-md`: 8px
-- `--uf-radius-lg`: 12px
-
-**Size modifiers:**
-- `.uf-compact`: height 28px, font-size 13px
-- `.uf-large`: height 40px, font-size 16px
-
----
-
-## 6. Deprecated Components
-
-Do NOT use in new code:
-
-| Deprecated | Use instead |
-|-----------|-------------|
-| `Overlay` | `Tooltip` or `Popover` |
-| `Toggle` | `SegmentedControl` |
-| `Sidebar` | `Panel` |
-
----
-
-## 7. Build Recipes
-
-### Settings screen
-- `Panel` for app structure
-- `Bar` for page header/actions
-- `Text` for section labels and help
-- `Input`, `Select`, `Switcher`, `Checkbox`, `Date` for fields
-- `Button` for save/reset actions
-
-### Command/search workflow
-- `Command` for search and action discovery
-- `Menu` only for short action lists
-- `Popover` only for lightweight rich contextual content
-
-### Documentation page
-- `Toc` for section navigation
-- `Text` for content hierarchy (h1–h6, body, muted)
-- `Code` for snippets
-- `Table` for structured reference data
-- `Accordion` for FAQ / collapsed explanations
-
-### Data-heavy page
-- `Bar` for filters/actions
-- `Table` for desktop comparison
-- `Pagination` for page stepping
-- `Modal` with the placement appropriate for row detail/edit flows
-
-### Landing / marketing page
-- `Text` with `inset="none" membrane={false}` for all typography
-- `Card` for content blocks
-- `Code` for CLI examples
-- `Button` for CTAs
-- `Accordion` for FAQ
-- Do NOT use `Badge` as text substitute — use `Text` with appropriate CSS class
-
-### 7.5 Landing Page Methodology (Cursor / Sanity / Sandpack)
-
-Deep guide for building product landing pages with face-ui-react. The quick recipe in section 7 covers component selection; this section covers structure, narrative, and rules.
-
-#### Narrative Arc
-
-| Phase | Purpose | Typical Section |
-|-------|---------|-----------------|
-| **Promise** | One-sentence value prop | Hero |
-| **Proof** | Show the product working | Live demo / interactive |
-| **Depth** | Progressive feature disclosure | Feature sections, tabs |
-| **Trust** | Social proof + authority | Logos, testimonials, stats |
-| **Action** | Low-friction conversion | Install command / Download |
-
-Every claim must be immediately followed by visual or interactive proof. Never pitch without proving.
-
-#### Section Inventory
-
-| Section | Purpose |
-|---------|---------|
-| **Hero** | Headline (5-10 words) + subheadline + primary/secondary CTA + product visual |
-| **Metrics** | 3-4 stat cards proving substance (uptime, users, rules count) |
-| **Steps** | 3 numbered steps (01/02/03) showing the workflow |
-| **Feature Tabs** | Horizontal numbered tabs with text + visual panels |
-| **Alternating Features** | Left-right sections, each with heading + paragraph + code/visual |
-| **Demo** | Interactive product embed or live code editor |
-| **Pricing** | Tiered cards with featured plan highlight |
-| **FAQ** | Expandable Q&A, 5-8 items |
-| **Pre-footer CTA** | Final conversion: install command or download button |
-| **Footer** | Links, social, legal |
-
-Target 8-12 sections total. Alternate background shades every 2-3 sections to create rhythm.
-
-#### Component Mapping
-
-| Landing Section | face-ui-react Components |
-|-----------------|-------------------------|
-| Hero | `Text` (h1, lead), `Button` (CTAs), `Code` (quickstart), `Card` (container) |
-| Metrics | `Card` + `Text` (value / label / detail) |
-| Steps | `Card` + `Text` (number / title / body) |
-| Demo | `Tabs` + `Code` + `Card` |
-| Alternating Features | `Text` (title / body) + `Code` (example) in CSS grid |
-| Desktop / Download | `Text` + `Button` + `Code` |
-| Pricing | `Card` + `Text` + `Button` |
-| FAQ | `Card` + `Accordion` + `Text` |
-| Pre-footer CTA | `Text` + `Button` + `Code` |
-| Footer | `Text` + links (plain `<a>` or router Link) |
-
-#### Landing Text Rule
-
-All text on landing pages MUST use `Text` with `inset="none" membrane={false}`. No bare HTML text elements (`<h1>`, `<p>`, `<span>`). This removes control-height padding and membrane spacing, giving full layout control to CSS.
+The main links of a site or app in a bar, becoming a sheet on narrow screens.
 
 ```tsx
-<Text variant="h1" inset="none" membrane={false}>Hero Title</Text>
-<Text variant="body" inset="none" membrane={false}>Subheadline text.</Text>
+<Navigation
+  aria-label="Main"
+  value={section}
+  onValueChange={({ value }) => setSection(value)}
+  items={[
+    { value: 'dashboard', label: 'Dashboard', href: '/' },
+    { value: 'projects', label: 'Projects', items: [
+      { value: 'active', label: 'Active', href: '/projects' },
+    ] },
+  ]}
+/>
 ```
 
-#### Typography Scale
+- An item with `items` is a dropdown button and its own `href` is ignored.
+- `value` marks the current item `aria-current="page"`; an unknown value marks none.
+- `surface="auto"` is a sheet below 900px, opened by `trigger` or a default icon button.
 
-| Role | Size |
-|------|------|
-| Hero title | `clamp(52px, 8vw, 96px)` |
-| Section title | `clamp(34px, 4.2vw, 58px)` |
-| Body / description | 16-18px |
-| Code | 14px |
+### Overlay
 
-Use at most 2 weights (400, 600). Control hierarchy through size, not weight. Line height for hero/section titles: tight (~1.0).
+Compatibility adapter, exported only from `@userface/face-ui-react/compat`. Use `Tooltip` for a hint and `Popover` for interactive content.
 
-#### CTA Copy Rules
+### Pagination
 
-| Bad | Good |
-|-----|------|
-| Sign up | Download for macOS |
-| Learn more | Open playground |
-| Get started | `npx create userface@latest` |
-| Try now | `npm install @userface/react` |
+Previous, next and numbered page buttons, plus a dialog for jumping to a page.
 
-CTAs for developer products must be concrete actions or install commands. Never generic marketing verbs.
+```tsx
+<Pagination total={248} pageSize={20} page={page}
+  onPageChange={({ page }) => setPage(page)} aria-label="Search results" />
+```
 
-#### Anti-patterns
+- The number of pages comes from `total` and `pageSize`; there is no page-count prop, and a page past the last shows the last.
+- `siblingCount` sets how many buttons flank the current page while the bar keeps its length near either end.
+- Name the nav with `aria-label`; `labels` translates the buttons and the page picker.
 
-- No stock imagery — always show real product UI or code
-- No generic CTAs ("Learn more", "Sign up") — be specific
-- No feature lists without visual proof (code, screenshot, or demo)
-- Max 2 sentences per feature block — concise, active voice
-- No more than 2 primary CTAs per page — avoid decision paralysis
-- No walls of same-shade background — alternate to create rhythm
-- No animations for decoration — only for content reveal and interaction response
+### Panel
 
----
+Side navigation: links in expandable groups, collapsing to a rail or a sheet.
 
-## 8. Pre-Ship Checklist
+```tsx
+<Panel
+  aria-label="Admin"
+  value={page}
+  onValueChange={({ value }) => setPage(value)}
+  items={[
+    { value: 'overview', label: 'Overview', icon: 'folder', href: '/overview' },
+    { value: 'billing', label: 'Billing', icon: 'file', items: [
+      { value: 'invoices', label: 'Invoices', href: '/invoices' },
+    ] },
+  ]}
+/>
+```
 
-Before shipping an interface, verify:
+- An item with `items` is a group whose rows show while it is expanded; its own `href` is ignored.
+- `width` beats `style.width` on the expanded panel; `collapsedWidth` owns the rail. Sheets do not collapse.
+- `collapsible={false}` hides the rail toggle and leaves `collapsed` to the parent.
 
-- [ ] All text rendered through `<Text>` (no bare `<span>`, `<p>`, `<div>` with text)
-- [ ] Canonical components used (no deprecated aliases)
-- [ ] Spacing comes from membranes and control insets, not random margins
-- [ ] Heading hierarchy uses proper Text variants (h1 → h6)
-- [ ] Separator NOT used unless explicitly needed and approved
-- [ ] Overlay components use `surface="auto"` by default
-- [ ] Mobile behavior tested for responsive overlay components
-- [ ] Action rows use `Bar` instead of ad hoc flex wrappers
-- [ ] Document navigation uses `Toc`, not `Tree` or `Navigation`
-- [ ] Component choice is semantically correct, not just visually similar
-- [ ] No manual `<button>`, `<input>`, `<select>` — use library components
+### Popover
+
+A floating interactive surface anchored to a trigger; a click toggles it.
+
+```tsx
+<Popover content={<Text>Status is Active and owner is you.</Text>} side="bottom" align="start">
+  <Button fullWidth={false}>Add filter</Button>
+</Popover>
+```
+
+- Use `Tooltip` for a non-interactive hint: `Popover` has no hover delays and its content may hold controls.
+- `children` is one real trigger element that forwards `ref` and props; a string renders as a `Button`.
+- `side` is a preference and flips when the opposite side has more room; `align` and the content direction stay logical.
+
+### Progress
+
+Completion of a task, with a known or unknown amount of work.
+
+```tsx
+<Progress label="Uploading dataset" value={68} showValue />
+<Progress label="Analyzing documents" value={null} />
+```
+
+- `value={null}` is an unknown amount: it is announced without a number and never shows one.
+- Use `Meter` for a measurement such as storage — `Progress` is only for work in flight.
+- `tone` is semantic and independent of the number.
+
+### Radio
+
+One choice among items that each need a visible row.
+
+```tsx
+<Radio
+  label="Model quality"
+  description="Higher quality answers take longer."
+  name="model-quality"
+  defaultValue="balanced"
+  items={[
+    { value: 'fast', label: 'Fast' },
+    { value: 'balanced', label: 'Balanced' },
+  ]}
+/>
+```
+
+- Native group validation needs a non-empty `name`; give each independent group in a form its own.
+- `value={null}`, or a value no item has, checks nothing.
+- All four arrow keys move and select in either `orientation`; use `Select` when the list is long.
+
+### Rating
+
+A star scale for choosing a score, or for showing an average read-only.
+
+```tsx
+<Rating label="How helpful was this answer?" name="helpfulness" defaultValue={4}
+  onValueChange={({ value }) => send(value)} />
+<Rating label="4.2 average rating" value={4.2} readOnly />
+```
+
+- `readOnly` shows the exact fraction as a meter: not focusable, still submitted, and never blocked by `required`.
+- An editable rating rounds `value` to the nearest choice; `allowHalf` adds a half-star choice before each star.
+- `required` needs a non-empty `name` to have any effect.
+
+### Scroll
+
+A framed box whose content scrolls natively.
+
+```tsx
+<Scroll height={180} aria-label="Recent activity">
+  <Text heightMode="content">…</Text>
+</Scroll>
+```
+
+- The box is a named tab stop only while it can actually scroll, so give it `aria-label` when it holds long content.
+- `orientation` picks the axes that scroll; overflow on the other axis is clipped.
+- Without `height`, `style.height` or content sets the box height.
+
+### SegmentedControl
+
+A compact strip of two to five choices: one radio choice, or several pressed independently.
+
+```tsx
+<SegmentedControl aria-label="Dashboard view" defaultValue="table"
+  items={[{ value: 'table', label: 'Table' }, { value: 'board', label: 'Board' }]}
+  onValueChange={({ value }) => setView(value)} />
+
+<SegmentedControl multiple aria-label="Channels" defaultValue={['email']} items={channels} />
+```
+
+- `multiple` makes the value a `string[]` instead of `string | null`, and submits one FormData entry per pressed choice.
+- Without `multiple` all four arrow keys move between choices in either orientation.
+- Use `Tabs` when the choice switches sibling panels, and `Radio` when each option needs its own row.
+
+### Select
+
+A trigger that opens a list to choose one value, or several with `multiple`.
+
+```tsx
+<Select label="Region" name="region" defaultValue="eu"
+  items={[{ value: 'eu', label: 'Europe' }, { value: 'us', label: 'United States' }]} />
+
+<Select label="Teams" multiple value={teams} items={allTeams} />
+```
+
+- `multiple` makes the value a `string[]`, keeps the list open while selecting, and submits one entry per selected item.
+- It submits and resets like a native select: `name`, `form` and `required` work inside a `<form>`.
+- `iconOnly` makes a square trigger without a chevron: put an icon in `displayValue` and name it with `aria-label`.
+- `contentMinWidth` sizes popovers only, capped by the viewport.
+- `membrane` applies to trigger and options; the layer keeps its own spacing.
+
+`SelectTrigger`: the same trigger.
+
+### Separator
+
+A thin line between sections or between controls in a row.
+
+```tsx
+<Separator />
+<Separator orientation="vertical" decorative={false} />
+```
+
+- It is decorative by default and hidden from assistive technology; `decorative={false}` exposes a real break between sections.
+- `membrane` insets the line so its ends meet the visible edges of the neighbouring controls.
+- Prefer spacing to show grouping; reach for a line only when spacing cannot.
+
+### Skeleton
+
+A pulsing placeholder in the shape of the content being loaded.
+
+```tsx
+<Skeleton shape="circle" width={40} />
+<Skeleton shape="rect" height={160} />
+```
+
+- It is hidden from assistive technology: mark the loading region itself with `aria-busy`.
+- `text` and `rect` fill their column by default: give a `width` inside a container sized by its content.
+- A circle given only one dimension uses it for both.
+
+### Slider
+
+A number, or several ordered numbers, chosen on a scale.
+
+```tsx
+<Slider label="Creativity" name="creativity" defaultValue={62} max={100} showValue
+  onValueCommit={({ value }) => save(value)} />
+
+<Slider label="Monthly price" defaultValue={[40, 180]} max={250} step={10}
+  labels={{ thumbs: ['Minimum price', 'Maximum price'] }} />
+```
+
+- The shape you pass is the shape you get back: a number gives one thumb, an array one thumb per entry and a fresh sorted array.
+- `onValueChange` fires while dragging and `onValueCommit` once at the end of the gesture.
+- `crop` adds two independently edited boundaries on a second rail, with their own `cropRange` triple and `cropName`.
+
+### Spinner
+
+Fixed 20×20 loading arc: `<Spinner label="Loading preview" />`.
+
+Inherits color. Omit `label` when the parent names loading; `title` adds a pointer hint. Reduced motion stops animation. Used by Button loading; use Progress for known percentages.
+
+### Steps
+
+Ordered wizard navigation with a persistent panel per step.
+
+```tsx
+<Steps
+  step={step}
+  onStepChange={({ step }) => setStep(step)}
+  items={[
+    { label: 'Workspace', content: <Text>Choose a name and region.</Text> },
+    { label: 'Team', content: <Text>Invite collaborators.</Text> },
+  ]}
+/>
+```
+
+- `linear` allows only the current, an earlier or the next step; it validates no forms, so gate the move yourself.
+- Panels stay mounted, so the fields in an earlier step keep their state.
+- A `step` past the last one shows the last; give items a `key` when the list reorders.
+
+### Switcher
+
+A binary setting that takes effect as soon as it is switched.
+
+```tsx
+<Switcher label="Auto save" defaultChecked name="auto-save" />
+<Switcher label="Product analytics" checked={consent}
+  onCheckedChange={({ checked }) => setConsent(checked)} />
+```
+
+- Use `Checkbox` inside a form that is submitted, and `Switcher` for a setting applied at once.
+- `value` is the string submitted while on; it never controls the setting.
+- The label wraps by default; `truncate` cuts it to one line instead.
+
+### Table
+
+A data table with sortable columns, row selection, row actions and sticky, resizable columns.
+
+```tsx
+<Table
+  aria-label="Workspace members"
+  rowKey="id"
+  selectable
+  columns={[
+    { id: 'name', header: 'Member', sortable: true, truncate: true },
+    { id: 'seats', header: 'Seats', align: 'end', render: ({ value }) => <Badge>{String(value)}</Badge> },
+  ]}
+  rows={members}
+  onSortChange={({ sort }) => setSort(sort)}
+/>
+```
+
+- Every column needs a unique `id`; it reads `row[id]` unless `accessor` says otherwise, and only a `sortable` column gets a header button.
+- A cell value that is not text or a number needs `render` — a date or a boolean shows nothing without it.
+- `rowKey` keys selection and identity; a row whose key is not text falls back to its position.
+
+### Tabs
+
+Tabs that switch sibling panels.
+
+```tsx
+<Tabs
+  aria-label="Analytics views"
+  defaultValue="overview"
+  variant="underline"
+  items={[
+    { value: 'overview', label: 'Overview', content: <Text>Key metrics.</Text> },
+    { value: 'funnels', label: 'Funnels', content: <Text>Conversion.</Text> },
+  ]}
+/>
+```
+
+- `renderPanels={false}` hands the panels to you, and every item then needs its own `panelId`.
+- `activationMode="manual"` waits for a click, Space or Enter instead of selecting the tab an arrow key reaches.
+- Use `SegmentedControl` when the choice is a value rather than a panel; `actions` holds header controls outside the tablist.
+
+### Text
+
+Every piece of visible copy. `variant` chooses the presentation and `as` the element.
+
+```tsx
+<Text variant="h2">Revenue overview</Text>
+<Text variant="muted" size="sm" as="small">Updated 2 minutes ago.</Text>
+<Text as="p" heightMode="content" inset="none" membrane={false}>Long-form paragraph.</Text>
+```
+
+- Keep heading order when `variant` and `as` differ, and use `htmlFor` when the element resolves to a `<label>`.
+- Defaults align text with controls; editorial copy needs `heightMode="content" inset="none"` so it is sized by its line boxes.
+- `variant="markdown"` only supplies paragraph rhythm — parsing a Markdown string is `Markdown`.
+
+### Tile
+
+A composed row: label, icon, meta and nested actions, with an optional primary action.
+
+```tsx
+<Tile icon="folder" meta="Healthy" tone="positive" active onClick={open}>Production API</Tile>
+
+<Tile icon="folder" chevron="down" aria-expanded={open} onClick={toggle}
+  actions={<Button icon="more" iconOnly aria-label="More" fullWidth={false} />}>
+  Customer success
+</Tile>
+```
+
+- The primary action is inferred from `onClick`, `aria-expanded` or an explicit button role; `interactive={false}` makes a structural row.
+- Controls inside `actions` and `leading` keep their own clicks and disabled state — a press there never reaches the row.
+- `chevron` orients itself from `aria-expanded`; `actionVisibility` decides when the actions appear.
+
+### Toast
+
+A transient notification. `Toaster` shows, times and stacks them; `useToast()` raises them.
+
+```tsx
+<Toaster placement="bottom-center" />
+
+const { toast, dismiss } = useToast()
+toast({ title: 'Workspace saved', tone: 'positive', action: { label: 'View changes', onClick: open } })
+```
+
+- Mount one `Toaster` near the document root — its region is `position: fixed`, so a transformed ancestor becomes its containing block; `createToastContext()` gives an independent store when a surface needs its own.
+- `toast()` returns an id, and passing the same `id` again updates that toast in place instead of stacking another.
+- `duration: 0` keeps a toast until it is closed; hover and focus pause the timers.
+
+### Toc
+
+A table of contents: native links to the sections of the current document.
+
+```tsx
+<Toc
+  value={current}
+  onValueChange={({ value }) => setCurrent(value)}
+  items={[
+    { value: 'overview', label: 'Overview', level: 1 },
+    { value: 'api-keys', label: 'API keys', level: 2 },
+  ]}
+/>
+```
+
+- Each entry is a link to `#value`, so the browser scrolls, sets the hash and honours a middle click; `onSelect` sees that event.
+- `level` nests an entry under the previous entry of a smaller level.
+- `value` marks the current entry `aria-current="location"`; `line` moves or removes the rail.
+
+### Toggle
+
+Compatibility adapter, exported only from `@userface/face-ui-react/compat`. Use `SegmentedControl`, whose `multiple` replaces `type="multiple"`.
+
+### Tooltip
+
+A non-interactive hint shown on hover and keyboard focus.
+
+```tsx
+<Tooltip content="Search workspace — Cmd K">
+  <Button icon="search" iconOnly aria-label="Search" />
+</Tooltip>
+```
+
+- The content must stay non-interactive: anything with a control belongs in `Popover`.
+- A tooltip is not an accessible name — an icon-only trigger still needs its own `aria-label`.
+- `openDelay` and `closeDelay` are milliseconds; `side` flips when the opposite side has more room.
+
+### Tree
+
+Nested items that expand and collapse, with one item selected.
+
+```tsx
+<Tree
+  aria-label="Repository files"
+  variant="lines"
+  defaultExpanded={['src']}
+  value={selected}
+  onValueChange={({ value }) => setSelected(value)}
+  items={[{ value: 'src', label: 'src', icon: 'folder', items: [
+    { value: 'app', label: 'App.tsx', icon: 'file', meta: 'M' },
+  ] }]}
+/>
+```
+
+- An item with `items` is a branch; values must be unique across the whole tree, and a repeat is dropped.
+- A `disabled` item takes everything nested in it out of selection, expansion and focus.
+- Use `Panel` for product navigation, `Accordion` for a flat set of sections.
+
+### Upload
+
+A field that collects files picked from the system or dropped onto it, and lists them.
+
+```tsx
+<Upload label="Product images" description="PNG or JPEG, up to 5 MB each."
+  accept="image/png,image/jpeg" multiple maxSize={5_242_880} maxFiles={8} name="images"
+  onFilesChange={({ files }) => setFiles(files)}
+  onReject={({ files }) => report(files)} />
+```
+
+- It collects files; it never uploads them. Submit them with the form or send them yourself, and show progress through each file's `progress`.
+- `accept`, `maxSize` and `maxFiles` are UX, not validation: check them again on the server.
+- Without `multiple` a new file replaces the one already listed.

@@ -1,5 +1,5 @@
 /**
- * @face-ui/core — State Machine Runtime
+ * Face UI — State Machine Runtime
  *
  * Framework-agnostic finite state machine.
  * ~330 LOC, zero dependencies.
@@ -14,29 +14,17 @@
  * - Subscribe for external listeners (React adapter uses this)
  */
 
-import type { MachineSchema, MachineConfig, MachineService, MachineSnapshot, SendFn, ActionFn, EventHandler, TransitionConfig, StateNode } from './types'
-
-// ---------------------------------------------------------------------------
-// Guard combinators
-// ---------------------------------------------------------------------------
-
-export function and<S extends MachineSchema>(
-  ...guards: ((ctx: S['context'], event: S['event']) => boolean)[]
-): (ctx: S['context'], event: S['event']) => boolean {
-  return (ctx, event) => guards.every((g) => g(ctx, event))
-}
-
-export function or<S extends MachineSchema>(
-  ...guards: ((ctx: S['context'], event: S['event']) => boolean)[]
-): (ctx: S['context'], event: S['event']) => boolean {
-  return (ctx, event) => guards.some((g) => g(ctx, event))
-}
-
-export function not<S extends MachineSchema>(
-  guard: (ctx: S['context'], event: S['event']) => boolean,
-): (ctx: S['context'], event: S['event']) => boolean {
-  return (ctx, event) => !guard(ctx, event)
-}
+import type {
+  MachineSchema,
+  MachineConfig,
+  MachineService,
+  MachineSnapshot,
+  SendFn,
+  ActionFn,
+  EventHandler,
+  TransitionConfig,
+  StateNode,
+} from './types'
 
 // ---------------------------------------------------------------------------
 // createMachine — returns a config object (not a running service)
@@ -93,8 +81,18 @@ export function interpret<S extends MachineSchema>(
 ): MachineService<S> {
   // -- Mutable state ---------------------------------------------------------
   let currentState = config.initial as S['state']
-  let ctx = { ...config.context, ...overrides } as S['context']
+  let ctx = {
+    ...config.context,
+    ...Object.fromEntries(
+      Object.entries(overrides ?? {}).filter(
+        ([, value]) => value !== undefined,
+      ),
+    ),
+  } as S['context']
   let running = false
+  let started = false
+  let initializing = false
+  const pendingEvents: S['event'][] = []
   const listeners = new Set<(snap: MachineSnapshot<S>) => void>()
   let effectCleanups: (() => void)[] = []
   let cachedSnapshot: MachineSnapshot<S> | null = null
@@ -121,13 +119,15 @@ export function interpret<S extends MachineSchema>(
 
   const buildSnapshot = (): MachineSnapshot<S> => {
     const node = config.states[currentState] as StateNode<S> | undefined
+    const value = currentState
+    const tags = new Set(node?.tags ?? [])
     return {
-      value: currentState,
-      context: ctx,
-      tags: new Set(node?.tags ?? []),
+      value,
+      context: { ...ctx },
+      tags,
       computed: computeAll(),
-      matches,
-      hasTag,
+      matches: (...states) => states.includes(value),
+      hasTag: (tag) => tags.has(tag),
     }
   }
 
@@ -147,7 +147,9 @@ export function interpret<S extends MachineSchema>(
     nameOrFn: string | ActionFn<S>,
   ): ActionFn<S> | undefined => {
     if (typeof nameOrFn === 'function') return nameOrFn
-    return config.implementations?.actions?.[nameOrFn] as ActionFn<S> | undefined
+    return config.implementations?.actions?.[nameOrFn] as
+      | ActionFn<S>
+      | undefined
   }
 
   const runActions = (
@@ -162,10 +164,9 @@ export function interpret<S extends MachineSchema>(
   }
 
   const cleanupEffects = () => {
-    for (const cleanup of effectCleanups) {
-      cleanup()
-    }
+    const cleanups = effectCleanups
     effectCleanups = []
+    for (const cleanup of cleanups) cleanup()
   }
 
   const runEffects = () => {
@@ -214,7 +215,11 @@ export function interpret<S extends MachineSchema>(
           break
         }
       }
-    } else if ('actions' in handler && !('target' in handler) && !('guard' in handler)) {
+    } else if (
+      'actions' in handler &&
+      !('target' in handler) &&
+      !('guard' in handler)
+    ) {
       // Action-only: { actions: [...] }
       const actionOnly = handler as { actions: (string | ActionFn<S>)[] }
       resolved = { actions: actionOnly.actions as ActionFn<S>[] }
@@ -237,7 +242,10 @@ export function interpret<S extends MachineSchema>(
     }
 
     // State change
-    if (resolved.target && resolved.target !== currentState) {
+    if (
+      resolved.target &&
+      (resolved.target !== currentState || resolved.reenter)
+    ) {
       // Exit current state
       cleanupEffects()
       const exitNode = config.states[prevState] as StateNode<S> | undefined
@@ -246,10 +254,13 @@ export function interpret<S extends MachineSchema>(
       // Enter new state
       currentState = resolved.target
       const enterNode = config.states[currentState] as StateNode<S> | undefined
-      runActions(enterNode?.entry as (string | ActionFn<S>)[] | undefined, event)
+      runActions(
+        enterNode?.entry as (string | ActionFn<S>)[] | undefined,
+        event,
+      )
 
       // Start effects of new state
-      runEffects()
+      if (!initializing) runEffects()
     }
 
     // Watch for context changes
@@ -263,7 +274,6 @@ export function interpret<S extends MachineSchema>(
 
   const syncContext = (patch: Partial<S['context']>) => {
     if (!running) return
-    const prevCtx = { ...ctx } as Record<string, unknown>
     let changed = false
     let shouldNotify = false
 
@@ -279,18 +289,36 @@ export function interpret<S extends MachineSchema>(
     }
 
     if (!changed) return
-    if (!shouldNotify) return
-    runWatch(prevCtx)
-    notify()
+    // Props describe external state; change callbacks are for machine events.
+    // Updating callback identities must still refresh the public snapshot.
+    if (shouldNotify) notify()
+    else invalidateSnapshot()
   }
 
   // -- Public API ------------------------------------------------------------
 
+  let processing = false
+  const eventQueue: S['event'][] = []
+  const drainEvents = () => {
+    if (processing) return
+    processing = true
+    try {
+      while (running && eventQueue.length) transition(eventQueue.shift()!)
+    } finally {
+      processing = false
+    }
+  }
   const send: SendFn<S> = (event) => {
-    if (!running) return
     const normalized: S['event'] =
       typeof event === 'string' ? ({ type: event } as S['event']) : event
-    transition(normalized)
+    if (!running) {
+      if (!started) pendingEvents.push(normalized)
+      return
+    }
+    // Effects, change callbacks and subscribers can send synchronously. Finish
+    // the current transition and collect its cleanups before entering another.
+    eventQueue.push(normalized)
+    drainEvents()
   }
 
   const service: MachineService<S> = {
@@ -310,25 +338,41 @@ export function interpret<S extends MachineSchema>(
     start: () => {
       if (running) return service
       running = true
+      processing = true
 
-      // Run entry actions of initial state
-      const initialNode = config.states[currentState] as StateNode<S> | undefined
-      const dummyEvent = { type: '__init__' } as S['event']
-      runActions(initialNode?.entry as (string | ActionFn<S>)[] | undefined, dummyEvent)
+      // The initial entry actions and the events sent before the first start
+      // run once. A later start() resumes a stopped service (StrictMode replay,
+      // Suspense reveal) in its current state: it only re-arms the effects.
+      if (!started) {
+        started = true
+        const initialNode = config.states[currentState] as
+          | StateNode<S>
+          | undefined
+        const dummyEvent = { type: '__init__' } as S['event']
+        runActions(
+          initialNode?.entry as (string | ActionFn<S>)[] | undefined,
+          dummyEvent,
+        )
+        initializing = true
+        for (const event of pendingEvents.splice(0)) transition(event)
+        initializing = false
+      }
 
-      // Start effects of initial state
       runEffects()
-
-      // Initial notification
       notify()
+      processing = false
+      drainEvents()
 
       return service
     },
 
+    // Subscribers own their subscriptions: a stopped service keeps them so a
+    // resumed one is still observed (Suspense keeps the useSyncExternalStore
+    // subscription of hidden content while its layout effects are destroyed).
     stop: () => {
       running = false
+      eventQueue.length = 0
       cleanupEffects()
-      listeners.clear()
     },
   }
 

@@ -1,11 +1,12 @@
 import { forwardRef } from 'react'
-import { Overlay, type OverlayProps } from '../Overlay/Overlay'
+import type { FloatingSurfaceProps } from '../assets/adapters/react/FloatingOverlay'
+import { useFloatingOverlay } from '../assets/internal/floating-overlay'
 
-export interface PopoverProps extends Omit<OverlayProps, 'trigger' | 'interactive'> {
-  interactive?: boolean
-}
+export interface PopoverProps extends FloatingSurfaceProps {}
 
-export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover(props, ref) {
-  const { interactive = true, ...rest } = props
-  return <Overlay ref={ref} trigger="click" interactive={interactive} {...rest} />
-})
+/** Floating interactive surface anchored to a trigger element; a click on the trigger toggles it. */
+export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
+  function Popover(props, ref) {
+    return useFloatingOverlay('Popover', { ...props, openOn: 'click' }, ref)
+  },
+)

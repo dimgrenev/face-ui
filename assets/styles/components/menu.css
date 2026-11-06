@@ -1,0 +1,155 @@
+/* =================================================================
+ * MENU (DropdownMenu / ContextMenu)
+ * ================================================================= */
+.uf-menu-content[data-scope] {
+  --uf-menu-min-w: 10rem;
+  --uf-menu-sheet-inset: var(--uf-spacing-1);
+  --uf-menu-sheet-gap: calc(var(--uf-menu-sheet-inset) * 2);
+  --uf-menu-sheet-enter-y: 1.125rem;
+  --uf-menu-separator-h: var(--uf-membrane);
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--uf-spacing-1);
+  z-index: var(--uf-z-dropdown);
+  min-width: var(--uf-menu-min-w);
+  padding: 0;
+  background: var(--uf-color-black-0);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--face-runtime-transition-duration-exit);
+}
+.uf-menu {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+}
+.uf-menu-content[data-scope][data-surface="sheet"] {
+  position: fixed;
+  inset-inline: var(--uf-menu-sheet-inset);
+  top: auto;
+  bottom: calc(var(--uf-menu-sheet-inset) + env(safe-area-inset-bottom, 0));
+  width: auto;
+  max-width: none;
+  z-index: calc(var(--uf-z-overlay) + 1);
+}
+.uf-menu-content[data-scope][data-surface="popover"] {
+  right: auto;
+  bottom: auto;
+  margin-top: 0;
+}
+.uf-menu-content[data-scope][data-state="open"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear 0s;
+}
+.uf-menu-contentMembrane {
+  display: flex;
+  width: 100%;
+}
+:where(.uf-menu-contentPanel.uf-card[data-scope]) {
+  --uf-surface-pad-block: var(--uf-dropdown-surface-padding);
+  --uf-surface-pad-inline: var(--uf-dropdown-surface-padding);
+}
+.uf-menu-contentPanel.uf-card[data-scope] {
+  --uf-card-bg: var(--uf-dropdown-surface-bg);
+  --uf-card-border: var(--uf-dropdown-surface-border);
+  --uf-card-underlay-bg: var(--uf-dropdown-surface-underlay-bg);
+  --uf-card-background: var(--uf-dropdown-surface-background);
+  --uf-card-pad: var(--uf-dropdown-surface-padding);
+  --uf-card-radius: var(--uf-dropdown-surface-radius);
+  --uf-card-border-width: var(--uf-dropdown-surface-border-width);
+  --uf-card-shadow: var(--uf-dropdown-surface-shadow);
+  --uf-card-blur: var(--uf-dropdown-surface-blur);
+  width: 100%;
+  box-sizing: border-box;
+  transform: translateY(var(--uf-overlay-enter-y)) scale(var(--uf-overlay-enter-scale));
+  transform-origin: top center;
+  opacity: 0;
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
+}
+.uf-menu-content[data-scope][data-surface="sheet"] .uf-menu-contentPanel {
+  max-height: min(70vh, calc(100vh - var(--uf-menu-sheet-gap) - env(safe-area-inset-bottom, 0)));
+  transform: translateY(var(--uf-menu-sheet-enter-y));
+  transform-origin: bottom center;
+}
+.uf-menu-content[data-scope][data-state="open"] .uf-menu-contentPanel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+/* The list takes focus only as a starting point for keys after a pointer open; items show the ring. */
+.uf-menu-content .uf-menu-list[data-scope][data-part]:focus {
+  outline: none;
+}
+.uf-menu-item {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: start;
+  text-decoration: none;
+}
+.uf-menu-item:hover,
+.uf-menu-item[data-highlighted] {
+  background: var(--uf-color-hover-bg);
+}
+.uf-menu-item[data-tone="destructive"] {
+  --uf-text-color: var(--uf-color-destructive);
+  color: var(--uf-color-destructive);
+}
+.uf-menu-itemIcon,
+.uf-menu-itemCheck {
+  display: inline-flex;
+  flex: none;
+}
+.uf-menu-itemLabel {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.uf-menu-item[aria-checked="false"] .uf-menu-itemCheck {
+  visibility: hidden;
+}
+.uf-menu-separator {
+  height: var(--uf-menu-separator-h);
+  background: var(--uf-color-border);
+  margin: 0;
+}
+.uf-menu-group-label {
+  --uf-text-size-font-size: var(--uf-font-size-xs);
+  --uf-text-font-weight: var(--uf-font-weight-bold);
+  padding: var(--uf-spacing-1) var(--uf-control-pad-text);
+  font-size: var(--uf-font-size-xs);
+  color: var(--uf-color-fg-muted);
+  font-weight: var(--uf-font-weight-bold);
+}
+/* The surface mounts open, so its entrance starts from the closed look. */
+@starting-style {
+  .uf-menu-content[data-scope][data-state="open"] {
+    opacity: 0;
+  }
+  .uf-menu-content[data-scope][data-state="open"] .uf-menu-contentPanel {
+    opacity: 0;
+    transform: translateY(var(--uf-overlay-enter-y)) scale(var(--uf-overlay-enter-scale));
+  }
+  .uf-menu-content[data-scope][data-surface="sheet"][data-state="open"] .uf-menu-contentPanel {
+    transform: translateY(var(--uf-menu-sheet-enter-y));
+  }
+}
+
+/* A label slot renders a Text; the slot's own typography wins, so the Text
+   inherits rather than imposing its own weight, color and rhythm. */
+.uf-menu-group-label .uf-text[data-scope] {
+  color: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+}

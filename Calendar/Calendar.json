@@ -2,72 +2,124 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Calendar",
-  "description": "Standalone date picker grid",
+  "description": "A civil-day selector. ISO dates are independent of the browser's timezone.",
   "props": {
-    "value": {
-      "type": "object",
+    "viewDate": {
+      "type": "string",
       "required": false,
-      "description": "Selected date."
+      "description": "Displayed month as YYYY-MM-DD, independently of selection."
     },
-    "defaultValue": {
+    "defaultViewDate": {
+      "type": "string",
+      "required": false,
+      "description": "Initial displayed month as YYYY-MM-DD; read only on initialization."
+    },
+    "min": {
+      "type": "string",
+      "required": false,
+      "description": "Earliest selectable civil date, inclusive, as YYYY-MM-DD."
+    },
+    "max": {
+      "type": "string",
+      "required": false,
+      "description": "Latest selectable civil date, inclusive, as YYYY-MM-DD."
+    },
+    "disabledDates": {
+      "type": "array",
+      "required": false,
+      "description": "Unavailable civil dates as YYYY-MM-DD strings."
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Disable date selection and month navigation; remove internal controls from Tab.",
+      "default": false
+    },
+    "readOnly": {
+      "type": "boolean",
+      "required": false,
+      "description": "Prevent user selection while keeping focus and month navigation available.",
+      "default": false
+    },
+    "locale": {
+      "type": "string",
+      "required": false,
+      "description": "Date formatting language, numbering system and default first weekday; dates stay Gregorian.",
+      "default": "en-US"
+    },
+    "labels": {
       "type": "object",
       "required": false,
-      "description": "Default selected date (uncontrolled)."
+      "description": "Internal navigation labels; use aria-label/aria-labelledby to name the calendar group."
+    },
+    "weekStartsOn": {
+      "type": "enum",
+      "required": false,
+      "description": "Override the locale's first weekday: 0=Sunday through 6=Saturday.",
+      "options": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name of the calendar group; the inner grid is named by its displayed month."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "External label IDs for the calendar group; takes precedence over aria-label."
+    },
+    "aria-describedby": {
+      "type": "string",
+      "required": false,
+      "description": "External description IDs for the calendar group."
     },
     "selection": {
       "type": "enum",
       "required": false,
-      "description": "Selection model.",
+      "description": "Select one day, or a range from a start day to an end day.",
       "options": [
         "single",
         "range"
       ],
       "default": "single"
     },
-    "min": {
+    "value": {
       "type": "object",
       "required": false,
-      "description": "Minimum selectable date."
+      "description": "Selected day or range as YYYY-MM-DD; null clears the controlled value."
     },
-    "max": {
+    "defaultValue": {
       "type": "object",
       "required": false,
-      "description": "Maximum selectable date."
+      "description": "Initial uncontrolled day or range as YYYY-MM-DD."
     },
-    "disabledDates": {
-      "type": "array",
+    "excludeDisabledDates": {
+      "type": "boolean",
       "required": false,
-      "description": "Array of dates that cannot be selected."
-    },
-    "locale": {
-      "type": "string",
-      "required": false,
-      "description": "Locale for month and weekday names.",
-      "default": "en-US"
-    },
-    "weekStartsOn": {
-      "type": "enum",
-      "required": false,
-      "description": "First day of the week: 0=Sunday, 1=Monday, etc.",
-      "options": [
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6"
-      ],
-      "default": 0
+      "description": "Exclude unavailable days from the whole range; false constrains only its endpoints.",
+      "default": true
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
+        "defaultValue": "2026-03-06"
+      }
+    },
+    {
+      "name": "Date Range",
+      "props": {
         "selection": "range",
         "locale": "en-US",
-        "weekStartsOn": 0,
         "defaultValue": {
           "start": "2026-03-06",
           "end": "2026-03-12"

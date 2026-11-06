@@ -63,7 +63,6 @@
       "--face-gallery-inset",
       "--face-gallery-header-height",
       "--face-gallery-header-inset",
-      "--face-gallery-header-action-gap",
       "--face-gallery-header-control-height",
       "--face-gallery-grid-gap",
       "--face-gallery-grid-pad-top",

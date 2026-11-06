@@ -2,133 +2,164 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Select",
-  "description": "Option picker with single and multi-select support",
+  "description": "A button that opens a list of items to choose one value, or several with `multiple`.",
   "props": {
-    "variant": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    "labelPosition": {
       "type": "enum",
       "required": false,
-      "description": "Visual/behavioral variant.",
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
       "options": [
-        "default",
-        "side",
-        "iconOnly"
+        "top",
+        "start"
       ],
-      "default": "default"
+      "default": "top"
     },
-    "options": {
+    "items": {
       "type": "array",
       "required": false,
-      "description": "Available options."
-    },
-    "value": {
-      "type": "array",
-      "required": false,
-      "description": "Current selected value. String for single, string[] for multiselect."
-    },
-    "defaultValue": {
-      "type": "array",
-      "required": false,
-      "description": "Uncontrolled initial selected value."
+      "description": "Choices in list and keyboard order; an item repeating an earlier value is dropped."
     },
     "placeholder": {
       "type": "string",
       "required": false,
-      "description": "Placeholder text when no value is selected.",
-      "default": "Select option"
+      "description": "Text in the trigger while nothing is selected and `displayValue` is empty."
+    },
+    "displayValue": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Replaces the selected labels in the trigger, for example with a count or an icon."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable the select.",
+      "description": "Disables the trigger and leaves the value out of FormData.",
       "default": false
     },
-    "type": {
-      "type": "enum",
-      "required": false,
-      "description": "Selection mode.",
-      "options": [
-        "select",
-        "multiselect"
-      ],
-      "default": "select"
-    },
-    "label": {
+    "name": {
       "type": "string",
       "required": false,
-      "description": "Label rendered above/beside the select."
+      "description": "FormData key; a multiple value submits one entry per selected item."
     },
-    "labelOrientation": {
-      "type": "enum",
-      "required": false,
-      "description": "Label placement relative to the control.",
-      "options": [
-        "vertical",
-        "horizontal"
-      ],
-      "default": "vertical"
-    },
-    "ariaLabel": {
+    "form": {
       "type": "string",
       "required": false,
-      "description": "Accessible label (aria-label)."
+      "description": "Id of the form that submits and resets the value, when it is not an ancestor."
     },
-    "displayValue": {
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Blocks form submission until an item is selected and marks the label.",
+      "default": false
+    },
+    "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Optional override for the content shown in the trigger."
+      "description": "Names the field when there is no visible `label`, and then titles the sheet."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "Ids of elements that name the field; they take precedence over `label` and `aria-label`."
+    },
+    "iconOnly": {
+      "type": "boolean",
+      "required": false,
+      "description": "A square trigger without a chevron; name it with `aria-label`.",
+      "default": false
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "Fills the available inline width.",
+      "default": true
     },
     "stretchText": {
       "type": "boolean",
       "required": false,
-      "description": "Stretch the value area so the arrow pins to the right edge.",
+      "description": "Expands the value area so the chevron sits at the inline end.",
+      "default": false
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled list visibility; hidden, disabled, or unavailable Selects expose no list."
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "List visibility on mount when `open` is not set; read once. Hiding an uncontrolled list closes it.",
       "default": false
     },
     "surface": {
       "type": "enum",
       "required": false,
-      "description": "Preferred content surface. Auto switches to bottom sheet on compact viewports.",
+      "description": "Where the list opens: auto is a popover, or a bottom sheet below 900px; side opens beside the trigger on hover or click.",
       "options": [
         "auto",
         "popover",
-        "sheet"
+        "sheet",
+        "side"
       ],
       "default": "auto"
     },
-    "surfaceBreakpoint": {
-      "type": "number",
+    "labels": {
+      "type": "object",
       "required": false,
-      "description": "Breakpoint where auto surfaces switch from popover to sheet."
-    },
-    "surfaceTitle": {
-      "type": "string",
-      "required": false,
-      "description": "Optional title used for the mobile sheet header."
+      "description": "Strings Select renders itself: `close` names the sheet's close button."
     },
     "contentMinWidth": {
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Minimum width for popover content. Useful when the trigger is compact."
+      "description": "Minimum popover width: a number or numeric string is pixels, or pass a CSS length; capped by the viewport. Side and sheet surfaces ignore it."
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around trigger/option geometry.",
+      "description": "Outer spacing around the trigger and each option; the list surface keeps its own spacing.",
       "default": true
+    },
+    "multiple": {
+      "type": "boolean",
+      "required": false,
+      "description": "Lets the user select any number of items and makes the value a `string[]` instead of `string | null`; selecting then keeps the list open.",
+      "default": false
+    },
+    "value": {
+      "type": "any",
+      "required": false,
+      "description": "Selected value, or values with `multiple`; a value missing from `items` shows as unselected until it appears."
+    },
+    "defaultValue": {
+      "type": "any",
+      "required": false,
+      "description": "Selection on mount, restored by form reset; same shape as `value`."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "variant": "default",
         "placeholder": "Choose option",
         "disabled": false,
-        "type": "select",
-        "labelOrientation": "vertical",
         "stretchText": false,
         "surface": "auto",
         "membrane": true,
-        "options": [
+        "items": [
           {
             "value": "1",
             "label": "Option 1"
@@ -144,8 +175,7 @@
     {
       "name": "Multiselect",
       "props": {
-        "type": "multiselect",
-        "options": [
+        "items": [
           {
             "value": "1",
             "label": "Option 1"
@@ -159,15 +189,16 @@
             "label": "Option 3"
           }
         ],
-        "placeholder": "Select items..."
+        "placeholder": "Select items...",
+        "multiple": true,
+        "label": "Tags"
       }
     },
     {
       "name": "Side",
       "props": {
-        "variant": "side",
         "stretchText": true,
-        "options": [
+        "items": [
           {
             "value": "icon",
             "label": "Icon"
@@ -177,18 +208,18 @@
             "label": "ResponsiveSheetHeader"
           }
         ],
-        "placeholder": "Select..."
+        "placeholder": "Select...",
+        "surface": "side",
+        "label": "Component"
       }
     },
     {
       "name": "Icon only",
       "props": {
-        "variant": "iconOnly",
         "surface": "popover",
-        "ariaLabel": "Change type",
         "displayValue": "{}",
         "contentMinWidth": "10rem",
-        "options": [
+        "items": [
           {
             "value": "string",
             "label": "String"
@@ -202,23 +233,28 @@
             "label": "Object"
           }
         ],
-        "placeholder": "Type"
+        "placeholder": "Type",
+        "iconOnly": true,
+        "fullWidth": false,
+        "aria-label": "Change type"
       }
     },
     {
       "name": "Disabled",
       "props": {
         "disabled": true,
-        "placeholder": "Disabled"
+        "placeholder": "Disabled",
+        "label": "Plan"
       }
     }
   ],
   "behavior": {
-    "rovingFocus": true,
+    "rovingFocus": false,
     "typeahead": true,
     "dismissOnEscape": true,
     "dismissOnClickOutside": true,
-    "autoFocusOnOpen": "first-focusable"
+    "autoFocusOnOpen": "listbox-in-sheet",
+    "activeDescendant": true
   },
   "keyboard": {
     "ArrowDown": {

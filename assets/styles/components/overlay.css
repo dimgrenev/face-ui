@@ -1,0 +1,72 @@
+/* =================================================================
+ * OVERLAY (Tooltip / Popover / HoverCard)
+ * ================================================================= */
+.uf-overlay-contentMembrane {
+  z-index: var(--uf-z-overlay);
+}
+.uf-overlay-content[data-scope] {
+  --uf-overlay-content-max-w: 15rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  z-index: var(--uf-z-overlay);
+  max-width: var(--uf-overlay-content-max-w);
+  min-height: var(--uf-control-height);
+  font-size: var(--uf-control-font-size);
+  line-height: var(--uf-control-line-height);
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: break-word;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(var(--uf-overlay-enter-y)) scale(var(--uf-overlay-enter-scale));
+  transform-origin: top center;
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--face-runtime-transition-duration-exit);
+}
+.uf-overlay-content[data-scope][data-trigger="click"] {
+  --uf-card-bg: var(--uf-dropdown-surface-bg);
+  --uf-card-border: var(--uf-dropdown-surface-border);
+  --uf-card-underlay-bg: var(--uf-dropdown-surface-underlay-bg);
+  --uf-card-background: var(--uf-dropdown-surface-background);
+  --uf-card-radius: var(--uf-dropdown-surface-radius);
+  --uf-card-border-width: var(--uf-dropdown-surface-border-width);
+  --uf-card-shadow: var(--uf-dropdown-surface-shadow);
+  --uf-card-blur: var(--uf-dropdown-surface-blur);
+}
+.uf-overlay-content[data-scope][data-state="open"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear 0s;
+}
+.uf-overlay-content[data-scope][data-state="open"][data-interactive="true"] {
+  pointer-events: auto;
+}
+/* A hint may overlap another control. Its spacing boundary and composed
+   content must pass the pointer through, including nested control membranes. */
+.uf-overlay-contentMembrane[data-interactive="false"],
+.uf-overlay-content[data-scope][data-interactive="false"],
+.uf-overlay-content[data-scope][data-interactive="false"] * {
+  pointer-events: none;
+}
+.uf-overlay-content[data-scope][data-state="closed"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+/* Tooltip variant */
+.uf-overlay-content[data-scope][data-trigger="hover"] {
+  --uf-card-bg: var(--uf-tooltip-bg);
+  --uf-card-background: var(--uf-tooltip-background);
+  --uf-card-border: var(--uf-tooltip-border);
+  --uf-text-color: var(--uf-tooltip-fg);
+  color: var(--uf-tooltip-fg);
+  font-size: var(--uf-control-font-size);
+}

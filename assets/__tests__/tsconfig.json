@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.build.esm.json",
+  "compilerOptions": { "noEmit": true },
+  "include": [
+    "./**/*.ts",
+    "./**/*.tsx",
+    "../../*.ts",
+    "../../*.tsx",
+    "../contracts/**/*.ts",
+    "../../scripts/migrations/*.ts"
+  ],
+  "exclude": ["./react-19/node_modules"]
+}

@@ -1,0 +1,94 @@
+/* =================================================================
+ * RATING — a field (field.css lays out the root); the list holds the stars.
+ * ================================================================= */
+/* Without membranes the first star has no outer spacing for the start label to center on. */
+.uf-rating.uf-field[data-label-position="start"]:has(> .uf-rating__list [data-membrane-disabled]) > .uf-field__label {
+  padding-block: calc((var(--uf-control-height) - var(--uf-text-label-line-height)) / 2);
+}
+.uf-rating__list[data-scope="rating"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--uf-rating-gap);
+  max-width: 100%;
+}
+.uf-rating__star {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+.uf-rating__option[data-scope="rating"],
+.uf-rating__display {
+  position: relative;
+  display: block;
+  width: max(24px, var(--uf-control-height));
+  min-height: max(24px, var(--uf-control-height));
+  padding: 0;
+  border: 0;
+  border-radius: var(--uf-radius);
+  background: transparent;
+  cursor: pointer;
+}
+.uf-rating[data-half] .uf-rating__option[data-scope="rating"] {
+  width: max(24px, calc(var(--uf-control-height) / 2));
+}
+.uf-rating__option[data-scope="rating"] > input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.uf-rating__option[data-scope="rating"]:hover:not(:has(input:disabled)),
+.uf-membrane[data-membrane-hover] > .uf-rating__option[data-scope="rating"] {
+  background: var(--uf-color-hover-bg);
+}
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-rating__option[data-scope="rating"]:has(input:focus-visible),
+:where(:root[data-uf-focus-modality="keyboard"]) .uf-rating__option[data-scope="rating"]:has(input:focus) {
+  outline: 2px solid var(--uf-color-fg);
+  outline-offset: -2px;
+}
+.uf-rating__display,
+.uf-rating__option[data-scope="rating"]:has(input:disabled) {
+  cursor: default;
+}
+.uf-rating:not([data-disabled]) > .uf-rating__list:has(input:disabled) {
+  opacity: var(--uf-color-disabled-opacity);
+}
+.uf-rating__glyph[data-scope="rating"] {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  color: var(--uf-color-fg);
+  pointer-events: none;
+}
+.uf-rating__glyph > .uf-icon {
+  fill: none;
+}
+.uf-rating__fill {
+  position: absolute;
+  inset-block-start: 0;
+  /* The shared 20px star icon has 3.75px optical space on each side.
+     Clip its ink bounds, so small nonzero fractions remain visible. */
+  inset-inline-start: 3.75px;
+  width: calc(var(--uf-rating-fill) * 12.5px);
+  height: 20px;
+  overflow: hidden;
+}
+.uf-rating__fill > .uf-icon {
+  position: absolute;
+  inset-inline-start: -3.75px;
+  fill: currentColor;
+}
+@media (forced-colors: active) {
+  .uf-rating__glyph[data-scope="rating"] {
+    color: CanvasText;
+  }
+  .uf-rating[data-disabled] .uf-rating__glyph,
+  .uf-rating__star:has(input:disabled) .uf-rating__glyph {
+    color: GrayText;
+  }
+}

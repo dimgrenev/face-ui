@@ -1,246 +1,77 @@
-# Face UI Design System
+# Face UI design system
 
-Canonical token source for Face UI primitives and the Userface product interfaces.
+The design system defines the geometry, type, color and motion used by Face UI and its consumers. It has one authored source for shared tokens and reproducible outputs.
 
-## 📁 Структура
+## Source and outputs
 
-```
-design-system/
-├── source/           # Canonical storage shards for the variable authoring model
-├── generated/        # Generated manifests, preview metadata and bridge outputs
-├── tokens/           # Downstream CSS token outputs
-│   ├── colors.css    # Цветовая палитра
-│   ├── typography.css # Типографика
-│   ├── geometry.css  # Геометрия контролов
-│   ├── motion.css    # Motion (durations/easings)
-│   ├── spacing.css   # Отступы
-│   ├── shadows.css   # Тени и elevation
-│   ├── borders.css   # Границы и скругления
-│   └── index.css     # Главный файл (импортирует все)
-├── themes/           # Темы (default values + overrides)
-│   ├── default.css   # Default тема приложения
-│   └── index.css     # Импорт всех тем
-├── utilities/        # Утилитарные классы
-│   ├── spacing.css   # Классы для отступов (.uf-m-*, .uf-p-*)
-│   └── borders.css   # Классы для границ (.uf-rounded-*, .uf-border-*)
-└── index.css         # Главная точка входа
+- `source/*.jsonc`: canonical token records, including selector-specific variants. Geometry, motion and compatibility aliases are authored here too.
+- `tokens/*.css`, `themes/default.css`: CSS generated from each record's `generatedPath`.
+- `generated/token-manifest.json`: generated values, selectors and ownership for tooling.
+- `generated/preview-metadata.json`: generated sheet descriptions and representative tokens.
+- `assets/styles/component-tokens.css`: runtime component-specific tokens.
+- `assets/styles/tokens.css`: generated runtime bundle of foundations and component tokens. The mono token uses the system font.
+- CSS index files and utilities compose these outputs; they are not alternate token authorities.
+
+```bash
+pnpm tokens:sync   # regenerate authored outputs and runtime bundle
+pnpm tokens:check  # fail on source/output drift
 ```
 
-## Source of truth
+The generator rejects duplicate declarations for the same selector and token across all source files and output paths, including `:root` defaults in `assets/styles/component-tokens.css`. Default theme values are owned by `source/themes-default.jsonc`; geometry and typography contain only their distinct foundation tokens. Foundation z-index and motion aliases are also owned by their source files. The generator runs as part of `pnpm check`. Review source changes together with their generated diff. Updating only a CSS output is not a persistent edit.
 
-Token authority follows the DS-UP contract:
+## Consumption
 
-1. ProjectMap variable authoring owns edits and review/publish flow.
-2. `source/*.jsonc` is canonical physical storage for authored variables.
-3. `generated/*`, `tokens/*`, `themes/*` and `index.css` are downstream consumer outputs.
-4. `@userface/face-ui-react/design-system/index.css` is the canonical package token entrypoint.
-5. Manual edits in generated CSS/manifests are not the authoring path.
-
-`assets/styles/index.css` is the runtime component stylesheet. Product UI packages may keep compatibility/runtime shims, but they should not become a second source of truth for shared `--uf-*` foundations.
-
-## 🎨 Использование
-
-### Импорт в проекте
-
-```typescript
-import '@userface/face-ui-react/design-system/index.css';
-import '@userface/face-ui-react/assets/styles/index.css';
+```tsx
+import '@userface/face-ui-react/assets/styles/index.css'
 ```
 
-### UI primitives
+This is the complete component stylesheet, including tokens. For a token-only consumer use `@userface/face-ui-react/design-system/index.css` instead. Loading both is unnecessary for normal component use.
 
-**Единственный источник UI-примитивов — `@userface/face-ui-react/*`.**
-Product packages keep only app/site-specific compositions and patterns on top of Face UI, without parallel primitive buttons, inputs, selects, etc.
+Set `data-theme="light"` or `data-theme="dark"` on the document element. The host owns its page background, font loading and document-level overrides. Portal content inherits from the document body, so a theme applied only to a local preview wrapper does not theme its body portals.
 
-- `face-ui-react Button/Input/Select/...` — примитивы
-- `@userface/app-ui` / `@userface/site-ui` — прикладные композиции поверх Face UI
-
-### Использование токенов в CSS
+Local `data-theme` boundaries also support embedded previews. Color-dependent aliases must be declared at these boundaries in their canonical source variants: CSS inherits a custom property's already resolved value, so a root-only `var(...)` alias can retain the outer theme's text, border or surface color. Keep geometry and density declarations independent of these color boundaries. Verify both nested directions and the production CSS output.
 
 ```css
-.my-component {
-  /* Цвета */
+html {
   background: var(--uf-color-background);
   color: var(--uf-color-foreground);
-  border: var(--uf-border-default);
-
-  /* Типографика */
   font-family: var(--uf-font-family-base);
-  font-size: var(--uf-font-size-md);
-  font-weight: var(--uf-font-weight-medium);
-
-  /* Отступы */
-  padding: var(--uf-spacing-4);
-  margin: var(--uf-spacing-2);
-
-  /* Скругления */
-  border-radius: var(--uf-radius-base);
-
-  /* Тени */
-  box-shadow: var(--uf-shadow-md);
+}
+.product-section {
+  padding: var(--uf-content-inset);
+  gap: var(--uf-control-gap);
 }
 ```
 
-### Использование утилитарных классов
+Use the manifest to inspect actual token names and values. Do not copy an invented scale into documentation or infer that `md` has the same value as another design system.
 
-```tsx
-<div className="uf-p-4 uf-m-2 uf-rounded-base">
-  <h1 className="uf-text-display">Заголовок</h1>
-  <p className="uf-text-body">Текст</p>
-</div>
-```
+## Geometry contract
 
-## 🎯 Принципы
+| Responsibility                | Token                                                 | Default     |
+| ----------------------------- | ----------------------------------------------------- | ----------- |
+| Control body height           | `--uf-control-height`                                 | 32px        |
+| Text inside a control         | `--uf-control-font-size` / `--uf-control-line-height` | 14px / 20px |
+| Vertical control inset        | `--uf-control-pad-y`                                  | 6px         |
+| Text horizontal inset         | `--uf-control-pad-text`                               | 8px         |
+| Icon size / icon-only control | `--uf-icon-size` / `--uf-icon-only-size`              | 20px / 32px |
+| Outer membrane                | `--uf-membrane`                                       | 1px         |
+| Content inset                 | `--uf-content-inset`                                  | 12px        |
+| Stable interactive weight     | `--uf-interactive-weight`                             | 500         |
 
-1. **Префикс `--uf-`** - все токены начинаются с этого префикса
-2. **Семантические имена** - `--uf-color-background`, а не `--uf-color-black`
-3. **Тематизация** - поддержка светлой/темной темы через `data-theme`
-4. **Обратная совместимость** - legacy переменные (`--background`, `--foreground`) остаются
+A default single-line control with a membrane occupies 34px externally. A membrane is not content padding or an arbitrary layout gap. Text wrapping, labels and descriptions may increase component height. `Membrane.tsx` is the only implementation of its interaction and outer-spacing boundary. The wrapper remains mounted when disabled and uses `display: contents`, preserving the inner control and its state; semantics and refs belong to the inner control.
 
-## 📚 Документация токенов
+Theme related geometry coherently: changing font size alone is not a density system. Keep line height plus vertical insets compatible with the control height, and keep icon-only controls aligned. State changes must not change text metrics. A 32px desktop control is not a universal target-size recommendation for every touch application.
 
-### Colors
-- `--uf-color-background` - основной фон
-- `--uf-color-foreground` - основной текст
-- `--uf-color-panel` - фон панелей
-- `--uf-color-border` - границы
-- `--uf-color-border-hover` - границы интерактивных элементов при наведении
-- `--uf-color-active` - активное состояние
-- `--uf-color-hover` - состояние при наведении
+## Typography, color and state
 
-### Typography
-- `--uf-font-family-base` - основной шрифт
-- `--uf-font-size-*` - размеры (xs, sm, base, md, lg, xl, 2xl, 3xl, 4xl, 5xl)
-- `--uf-font-weight-*` - веса (normal, medium, semibold, bold)
-- `--uf-line-height-*` - высота строки (tight, normal, relaxed)
+Text variants select semantic component tokens; an explicit size overrides a variant's size without changing its HTML meaning. `Text.as` controls semantics. Controls inherit the interactive type contract, while nested components retain their own type and consumer content retains its styles.
 
-### Motion
-- `--uf-motion-fast/snappy/normal/...` - длительности
-- `--uf-ease-out`, `--uf-ease-in-out` - easing кривые
+Use foreground/secondary/surface/border tokens according to meaning. Disabled styling is applied once at the owned root. Secondary text must remain readable in both themes; ghost controls do not reduce the entire label's opacity. State uses color, fill, outline and icon changes instead of shifting layout.
 
-### Spacing
-- `--uf-spacing-*` - отступы (0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24)
-- `--uf-spacing-xs/sm/md/lg/xl/2xl` - семантические отступы
-- `--uf-spacing-panel` - стандартный отступ панели, алиас на spacing scale
+Focus indicators remain visible, including forced-colors mode. Reduced motion applies to transitions and loading indicators. Application-defined backgrounds, custom colors and overrides must be checked again for contrast.
 
-### Borders
-- `--uf-radius-*` - скругления (none, sm, base, md, lg, xl, full)
-- `--uf-border-default` - стандартная граница
-- `--uf-border-subtle` - тонкая граница
+## Changes and review
 
-### Shadows
-- `--uf-shadow-sm/base/md/lg/xl` - уровни теней
-- `--uf-elevation-0/1/2/3/4/5` - уровни elevation
+For each foundation change, inspect a mixed row of controls, text with headings, nested surfaces, light/dark themes, narrow viewports and focused/disabled/selected states. Validate computed geometry in a browser; matching token names alone does not establish alignment.
 
-## 🔄 Миграция
-
-При применении токенов в существующих CSS модулях:
-
-1. Замените хардкод цвета на `var(--uf-color-*)`
-2. Замените хардкод размеры на `var(--uf-font-size-*)`
-3. Замените хардкод отступы на `var(--uf-spacing-*)`
-4. Замените хардкод скругления на `var(--uf-radius-*)`
-5. Замените хардкод тени на `var(--uf-shadow-*)`
-
-## 📝 Примеры
-
-### До
-```css
-.button {
-  padding: 0.75rem 1.5rem;
-  background: var(--uf-color-black-100);
-  color: var(--uf-color-white-100);
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-}
-```
-
-### После
-```css
-.button {
-  padding: var(--uf-spacing-3) var(--uf-spacing-6);
-  background: var(--uf-color-foreground);
-  color: var(--uf-color-background);
-  border-radius: var(--uf-radius-base);
-  font-size: var(--uf-font-size-md);
-}
-```
-
-## 🎨 Theming Architecture
-
-### Слои стилизации
-
-1. **Authoring model (ProjectMap)** — владеет редактированием, review/publish и migration queue
-2. **Source storage (`source/*.jsonc`)** — хранит canonical variables физически
-3. **Generated outputs (`generated/*`, `tokens/*`, `themes/*`)** — поставляют CSS/manifests consumers
-4. **Components** — используют semantic/component tokens без локальных hardcoded fallbacks
-5. **Page themes** — переопределяют только разрешенные semantic/component tokens для конкретных страниц
-
-### Доступные темы
-
-#### Default Theme (`:root`)
-```css
-/* Автоматически применяется ко всему приложению */
---uf-control-height: var(--uf-spacing-8);
---uf-control-font-size: var(--uf-font-size-base);
---uf-control-line-height: var(--uf-line-height-normal);
-```
-
-#### Specimen Theme (`.uf-theme-specimen`)
-```css
-/* Для страниц шрифтов: увеличенная типографика через semantic tokens */
-<div className="uf-theme-specimen">
-  <Button text="Кнопка" /> {/* геометрия берется из темы */}
-</div>
-```
-
-### Создание новой темы
-
-```css
-/* src/styles/my-theme.css */
-.uf-theme-my-custom {
-  --uf-control-font-size: var(--uf-font-size-lg);
-  --uf-control-line-height: var(--uf-line-height-relaxed);
-  --uf-control-pad-y: var(--uf-spacing-1);
-  --uf-control-height: calc(var(--uf-control-line-height) + (var(--uf-control-pad-y) * 2));
-}
-```
-
-```tsx
-// pages/MyPage.tsx
-<div className="uf-theme-my-custom">
-  {/* Все Feld компоненты автоматически подстраиваются */}
-</div>
-```
-
-### Геометрические токены
-
-Все размеры контролов управляются через переменные:
-
-#### Control Geometry
-- `--uf-control-height` — высота контролов, задается theme layer
-- `--uf-control-font-size` — шрифт в контролах, задается typography tokens
-- `--uf-control-line-height` — line-height в контролах, задается typography tokens
-- `--uf-control-pad-y` — вертикальный padding, задается spacing tokens
-- `--uf-control-pad-text` — горизонтальный padding текста, задается spacing tokens
-- `--uf-control-pad-icon` — горизонтальный padding иконки, задается spacing tokens
-- `--uf-control-gap` — gap между элементами, задается spacing tokens
-
-#### Text Component
-- `--uf-text-body-size` — размер body текста, задается typography tokens
-- `--uf-text-body-line-height` — line-height body, задается typography tokens
-- `--uf-text-section-size` — размер section текста, задается typography tokens
-- `--uf-text-section-line-height` — line-height section, задается typography tokens
-- `--uf-text-pad-y` — дополнительный вертикальный padding, обычно `0`
-
-#### Top Component
-- `--uf-topbar-control-height` — высота контролов в Top, задается component tokens
-- `--uf-topbar-pad-top/right/bottom/left` — padding Top bar, задается component tokens
-- `--uf-topbar-slot-pad-y` — вертикальный padding слотов, обычно `0`
-
-### Правила темизации
-
-1. **НЕ используйте `!important`** для геометрии — темы работают через CSS переменные
-2. **НЕ хардкодьте** размеры в Feld компонентах — только переменные
-3. **Темы определяют все значения** — Feld компоненты не имеют fallbacks
-4. **Page-level CSS** только для layout — геометрия в темах
+See [the composition contract](../docs.md) for forms, layers, state ownership and migration guidance.

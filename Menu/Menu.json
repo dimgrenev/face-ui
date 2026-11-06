@@ -2,22 +2,17 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Menu",
-  "description": "Contextual action list (dropdown or context menu)",
+  "description": "A list of actions opened from its trigger, or at the pointer as a context menu.",
   "props": {
-    "trigger": {
-      "type": "enum",
+    "children": {
+      "type": "ReactNode",
       "required": false,
-      "description": "How the menu is triggered.",
-      "options": [
-        "click",
-        "context"
-      ],
-      "default": "click"
+      "description": "The trigger: one element that takes the trigger props and ref, or text shown as a Button; without it nothing renders."
     },
     "items": {
       "type": "array",
       "required": false,
-      "description": "Menu item definitions.",
+      "description": "Items, separators and labelled groups in menu order; an item repeating an earlier value is dropped.",
       "contract": {
         "item": {
           "type": "object",
@@ -28,21 +23,46 @@
           "properties": {
             "value": {
               "type": "string",
-              "description": "Stable value emitted on selection."
+              "description": "Stable key, unique within the collection; an empty string is a valid key."
             },
             "label": {
               "type": "node",
-              "description": "Rendered menu item label."
-            },
-            "textValue": {
-              "type": "string",
-              "required": false,
-              "description": "Explicit searchable text for custom React labels used by typeahead."
+              "description": "Visible content."
             },
             "disabled": {
               "type": "boolean",
               "required": false,
-              "description": "Disable this menu item."
+              "description": "Keeps the item visible but out of selection and keyboard navigation."
+            },
+            "textValue": {
+              "type": "string",
+              "required": false,
+              "description": "Plain text for typeahead and filtering when `label` is not a string."
+            },
+            "icon": {
+              "type": "node",
+              "required": false,
+              "description": "Icon at the start of the label."
+            },
+            "href": {
+              "type": "string",
+              "required": false,
+              "description": "Makes the item a link to this URL: activation follows it, and modifier keys open it elsewhere as for any link."
+            },
+            "checked": {
+              "type": "boolean",
+              "required": false,
+              "description": "Makes the item a checkbox item that shows a check and is announced as checked while true."
+            },
+            "tone": {
+              "type": "enum",
+              "required": false,
+              "options": [
+                "neutral",
+                "destructive"
+              ],
+              "default": "neutral",
+              "description": "`destructive` marks an action that deletes or cannot be undone. Default neutral."
             }
           }
         },
@@ -71,32 +91,48 @@
               "value": "group"
             },
             "label": {
-              "type": "string",
-              "description": "Rendered group label."
+              "type": "node",
+              "description": "Visible group heading."
             },
             "items": {
               "type": "array",
-              "description": "Menu item or separator definitions. Group items support the same optional textValue field."
+              "description": "The grouped items and separators, in order."
             }
           }
         }
       }
     },
-    "children": {
-      "type": "string",
+    "openOn": {
+      "type": "enum",
       "required": false,
-      "description": "Trigger element (the anchor)."
+      "description": "Opens on a click of the trigger, or on its context menu at the pointer. Default click.",
+      "options": [
+        "click",
+        "context"
+      ],
+      "default": "click"
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled visibility; a disabled Menu, or one without a trigger, stays closed."
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Visibility on mount when `open` is not set; read once.",
+      "default": false
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire menu.",
+      "description": "Disables the trigger and closes an open menu.",
       "default": false
     },
     "surface": {
       "type": "enum",
       "required": false,
-      "description": "Preferred content surface. Auto switches to bottom sheet on compact viewports.",
+      "description": "Where the menu opens: auto is a popover, or a bottom sheet below 900px.",
       "options": [
         "auto",
         "popover",
@@ -104,41 +140,64 @@
       ],
       "default": "auto"
     },
-    "surfaceBreakpoint": {
-      "type": "number",
+    "side": {
+      "type": "enum",
       "required": false,
-      "description": "Breakpoint where auto surfaces switch from popover to sheet."
+      "description": "Preferred side of the trigger for a click menu's popover; flips when the opposite side has more room. Default bottom.",
+      "options": [
+        "bottom",
+        "left",
+        "right",
+        "top"
+      ],
+      "default": "bottom"
     },
     "align": {
       "type": "enum",
       "required": false,
-      "description": "Popover alignment relative to the trigger.",
+      "description": "Alignment of a click menu's popover on the cross axis, following the trigger's direction. Default end.",
       "options": [
-        "start",
         "center",
-        "end"
+        "end",
+        "start"
       ],
       "default": "end"
     },
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Popover distance from the trigger in pixels.",
+      "description": "Gap in pixels between the trigger and a click menu's popover; negative values overlap them. Default 4.",
       "default": 4
     },
-    "surfaceTitle": {
+    "attachmentSelector": {
       "type": "string",
       "required": false,
-      "description": "Optional title used for the mobile sheet header."
+      "description": "Nearest ancestor used for a click menu's left/right attachment; --uf-dropdown-panel-gap measures the painted surface gap. Vertical alignment still follows the trigger."
+    },
+    "alignToOption": {
+      "type": "string",
+      "required": false,
+      "description": "Aligns a measured visible row opposite the trigger on left/right surfaces; usually `[role^=\"menuitem\"]`. Context menus ignore it."
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Names the menu and titles the sheet; without it a click menu is named by its trigger."
+    },
+    "labels": {
+      "type": "object",
+      "required": false,
+      "description": "Strings Menu renders itself: `close` names the sheet's close button."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "trigger": "click",
+        "openOn": "click",
         "disabled": false,
         "surface": "auto",
+        "side": "bottom",
         "align": "end",
         "sideOffset": 4,
         "items": [
@@ -148,7 +207,8 @@
           },
           {
             "value": "delete",
-            "label": "Delete"
+            "label": "Delete",
+            "tone": "destructive"
           }
         ],
         "children": "Menu"
@@ -157,7 +217,7 @@
     {
       "name": "Context Menu",
       "props": {
-        "trigger": "context"
+        "openOn": "context"
       }
     },
     {
@@ -172,7 +232,10 @@
     "typeahead": true,
     "dismissOnEscape": true,
     "dismissOnClickOutside": true,
-    "autoFocusOnOpen": "first-focusable"
+    "closeOnSelect": true,
+    "closeOnTab": true,
+    "autoFocusOnOpen": "keyboard: first or last item; pointer: the menu list",
+    "contextMenuAtPointer": true
   },
   "keyboard": {
     "ArrowDown": {
@@ -181,6 +244,14 @@
     },
     "ArrowUp": {
       "action": "focusPrevious",
+      "scope": "menu"
+    },
+    "Home": {
+      "action": "focusFirst",
+      "scope": "menu"
+    },
+    "End": {
+      "action": "focusLast",
       "scope": "menu"
     },
     "Enter": {
@@ -192,13 +263,8 @@
     "Escape": {
       "action": "close"
     },
-    "Home": {
-      "action": "focusFirst",
-      "scope": "menu"
-    },
-    "End": {
-      "action": "focusLast",
-      "scope": "menu"
+    "Tab": {
+      "action": "close"
     }
   },
   "aria": {
@@ -208,7 +274,8 @@
     "required": [
       "root",
       "trigger",
-      "content"
+      "content",
+      "list"
     ],
     "recommended": [
       "item",
@@ -228,25 +295,36 @@
         "slot": "content",
         "parent": "root"
       },
+      "list": {
+        "slot": "list",
+        "parent": "content"
+      },
       "item": {
         "slot": "item",
-        "parent": "content",
+        "parent": "list",
         "multiple": true
+      },
+      "icon": {
+        "slot": "icon",
+        "parent": "item"
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "item"
       },
       "separator": {
         "slot": "separator",
-        "parent": "content",
+        "parent": "list",
         "multiple": true
       },
       "group": {
         "slot": "group",
-        "parent": "content",
+        "parent": "list",
         "multiple": true
       },
       "group-label": {
         "slot": "group-label",
-        "parent": "group",
-        "multiple": true
+        "parent": "group"
       }
     }
   },
@@ -279,7 +357,8 @@
       "--uf-overlay-surface-blur",
       "--uf-overlay-surface-shadow",
       "--uf-overlay-enter-y",
-      "--uf-overlay-enter-scale"
+      "--uf-overlay-enter-scale",
+      "--uf-color-destructive"
     ],
     "notes": [
       "Menu items reuse option/control anatomy and should not introduce parallel button typography.",

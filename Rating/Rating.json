@@ -2,47 +2,114 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Rating",
-  "description": "Star rating control with optional half-star support",
+  "description": "A star scale field for choosing a score, or for showing an average read-only.",
   "props": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ],
+      "default": "top"
+    },
     "value": {
       "type": "number",
       "required": false,
-      "description": "Current rating value."
+      "description": "Controlled score, shown within 0..max; 0 means unrated. Editable stars show it rounded to the nearest choice.",
+      "min": 0,
+      "max": 10,
+      "step": 0.1
     },
     "defaultValue": {
       "type": "number",
       "required": false,
-      "description": "Uncontrolled initial rating value.",
+      "description": "Uncontrolled initial score, restored by form reset. Defaults to 0.",
+      "min": 0,
+      "max": 10,
+      "step": 0.5,
       "default": 0
     },
     "max": {
       "type": "number",
       "required": false,
-      "description": "Maximum number of stars.",
+      "description": "Number of stars, an integer from 1 to 10. Defaults to 5.",
+      "min": 1,
+      "max": 10,
+      "step": 1,
       "default": 5
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Blocks choosing, focus and form submission; the score stays visible.",
+      "default": false
+    },
+    "readOnly": {
+      "type": "boolean",
+      "required": false,
+      "description": "Shows the score as a meter with its exact fraction: not editable or focusable, submitted with the form, never required.",
       "default": false
     },
     "allowHalf": {
       "type": "boolean",
       "required": false,
-      "description": "Allow half-star increments.",
+      "description": "Adds a half-star choice before each star; a read-only score keeps its exact fraction either way.",
       "default": false
     },
-    "label": {
+    "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Label content."
+      "description": "Names the group when there is no visible `label`."
     },
-    "ariaLabel": {
+    "aria-labelledby": {
       "type": "string",
       "required": false,
-      "description": "Accessible name used when no visible label is provided.",
-      "default": "Rating"
+      "description": "Ids of the elements that name the group; wins over `label` and `aria-label`."
+    },
+    "form": {
+      "type": "string",
+      "required": false,
+      "description": "Id of an external native form that owns the score."
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Focuses the selected choice, else the first one, on mount.",
+      "default": false
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Shared outer spacing around each star; toggling it keeps the native inputs.",
+      "default": true
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Nonempty native form key; use a distinct name for each independent rating in a form."
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Requires a score before an editable rating's form submits; ignored without a nonempty `name`.",
+      "default": false
     }
   },
   "states": [
@@ -51,84 +118,134 @@
       "props": {
         "defaultValue": 3,
         "max": 5,
-        "disabled": false,
-        "allowHalf": false
+        "label": "Your rating"
       }
     },
     {
       "name": "Half Stars",
       "props": {
-        "value": 2.5,
-        "allowHalf": true
+        "defaultValue": 2.5,
+        "allowHalf": true,
+        "label": "Your rating"
+      }
+    },
+    {
+      "name": "Average Rating",
+      "props": {
+        "value": 4.2,
+        "readOnly": true,
+        "label": "Average rating"
       }
     },
     {
       "name": "Full Rating",
       "props": {
-        "value": 5
+        "defaultValue": 5,
+        "label": "Your rating"
       }
     },
     {
       "name": "Ten Stars",
       "props": {
-        "value": 7,
-        "max": 10
+        "defaultValue": 7,
+        "max": 10,
+        "label": "Your rating"
       }
     },
     {
       "name": "Disabled",
       "props": {
         "value": 4,
-        "disabled": true
+        "disabled": true,
+        "label": "Locked rating"
+      }
+    },
+    {
+      "name": "Invalid",
+      "props": {
+        "label": "How helpful was this answer?",
+        "description": "Your score is shared with the author.",
+        "error": "Choose a score.",
+        "name": "helpfulness",
+        "required": true
       }
     }
   ],
   "behavior": {
-    "rovingFocus": true
+    "rovingFocus": true,
+    "nativeForm": true,
+    "readOnly": "meter",
+    "reselect": "preserve",
+    "navigation": "wrap"
   },
   "keyboard": {
     "ArrowRight": {
-      "action": "increment"
+      "action": "nextInWritingDirection"
     },
     "ArrowLeft": {
-      "action": "decrement"
+      "action": "previousInWritingDirection"
+    },
+    "ArrowDown": {
+      "action": "next"
+    },
+    "ArrowUp": {
+      "action": "previous"
     },
     "Home": {
-      "action": "setMin"
+      "action": "firstChoice"
     },
     "End": {
-      "action": "setMax"
+      "action": "lastChoice"
+    },
+    "Space": {
+      "action": "selectFocusedChoice"
     }
   },
   "aria": {
     "role": "radiogroup",
     "required": [
-      "aria-label",
-      "aria-checked"
+      "accessible name"
+    ],
+    "readOnlyRole": "meter",
+    "notes": [
+      "Name the group with label, aria-label or aria-labelledby; description and error describe the group and every radio.",
+      "readOnly renders a meter with the exact score: no radios or tab stop, the score submitted through a hidden input, never required or invalid."
     ]
   },
   "composition": {
     "required": [
       "root",
-      "item"
+      "list",
+      "indicator"
     ],
-    "recommended": [
-      "label"
-    ],
+    "recommended": [],
     "parts": {
       "root": {
         "slot": "root"
       },
-      "label": {
-        "slot": "label",
+      "list": {
+        "slot": "list",
         "parent": "root"
       },
       "item": {
         "slot": "item",
-        "parent": "root",
+        "parent": "list",
+        "multiple": true
+      },
+      "input": {
+        "slot": "input",
+        "parent": "item"
+      },
+      "indicator": {
+        "slot": "indicator",
+        "parent": "list",
         "multiple": true
       }
-    }
+    },
+    "notes": [
+      "Editable mode adds native input/item parts; readOnly retains the root, list and decorative indicators.",
+      "Field owns the label, description and error parts ([data-scope=\"field\"]) around the list."
+    ]
   },
   "tokenMapping": {
     "component": [
@@ -138,15 +255,13 @@
       "--uf-membrane",
       "--uf-control-height",
       "--uf-radius",
-      "--uf-font-size-lg",
       "--uf-color-fg",
       "--uf-color-hover-bg",
-      "--uf-motion-duration-fast",
-      "--uf-motion-ease-standard"
+      "--uf-color-disabled-opacity"
     ],
     "notes": [
-      "Rating uses compact control geometry and font-size tokens for star hit targets and icon scale.",
-      "Opacity, hover background and color transitions use shared Face UI motion tokens."
+      "One shared Membrane surrounds every choice; half choices retain at least 24px hit width.",
+      "The canonical 20px star glyph fills from the logical start of its ink bounds; readonly values retain exact fractions."
     ]
   },
   "platform": {},

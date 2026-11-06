@@ -2,46 +2,50 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Toast",
-  "description": "Composable notification surface shared by the declarative Toast and imperative Toaster APIs",
+  "description": "A notification surface: title, description, one action and a close button; `<Toaster>` shows, times and stacks them.",
   "props": {
     "title": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Primary notification text."
+      "description": "Main line of the notification, in bold."
     },
     "description": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Supporting notification text."
+      "description": "Supporting text under the title."
     },
     "action": {
       "type": "object",
       "required": false,
-      "description": "Optional action button. Invoking it also requests dismissal."
+      "description": "A button under the text; clicking it runs its onClick and then calls onClose."
     },
     "tone": {
       "type": "enum",
       "required": false,
-      "description": "Semantic notification tone.",
+      "description": "Border color: neutral, positive, warning or destructive; every tone is announced as a polite status. Default: neutral.",
       "options": [
+        "destructive",
         "neutral",
         "positive",
-        "warning",
-        "destructive"
+        "warning"
       ],
       "default": "neutral"
     },
-    "dismissible": {
+    "closable": {
       "type": "boolean",
       "required": false,
-      "description": "Render the icon-only dismiss button.",
+      "description": "Lets the user close the toast: a close button, and Escape inside the toast; both need `onClose`. Default: true.",
       "default": true
     },
-    "closeLabel": {
-      "type": "string",
+    "labels": {
+      "type": "object",
       "required": false,
-      "description": "Accessible label for the dismiss button.",
-      "default": "Close notification"
+      "description": "Name of the close button."
+    },
+    "buttonProps": {
+      "type": "object",
+      "required": false,
+      "description": "Visual Button variant and style for both action and close controls."
     }
   },
   "states": [
@@ -50,8 +54,7 @@
       "props": {
         "title": "Workspace updated",
         "description": "Your changes are available to collaborators.",
-        "tone": "neutral",
-        "dismissible": true
+        "tone": "neutral"
       }
     },
     {
@@ -59,8 +62,7 @@
       "props": {
         "title": "Deployment completed",
         "description": "Production is healthy and serving the new release.",
-        "tone": "positive",
-        "dismissible": true
+        "tone": "positive"
       }
     },
     {
@@ -68,8 +70,7 @@
       "props": {
         "title": "Usage is near the limit",
         "description": "This workspace has used 82% of its monthly quota.",
-        "tone": "warning",
-        "dismissible": true
+        "tone": "warning"
       }
     },
     {
@@ -77,26 +78,40 @@
       "props": {
         "title": "Deployment failed",
         "description": "Review the build log before retrying.",
-        "tone": "destructive",
-        "dismissible": true
+        "tone": "destructive"
       }
     }
   ],
   "behavior": {
-    "dismissOnEscape": false,
+    "timing": "Each toast closes after its own duration (default 5000 ms; 0 keeps it). A pointer over a toast, focus in the region or a background window pauses every timer, keeping the time left.",
+    "stacking": "Toaster shows the newest maxVisible toasts (default 3), newest nearest the viewport edge; older ones wait with their time stopped. toast({ id }) updates a shown toast in place.",
+    "closing": "closable gives a close button and Escape inside the toast; both call onClose, so a Toast without onClose shows no close button. The action runs its onClick, then closes unless the click was prevented.",
+    "dismissOnEscape": true,
     "autoFocusOnOpen": "none"
   },
-  "keyboard": {},
+  "keyboard": {
+    "F8": {
+      "action": "focusRegion",
+      "condition": "toasts shown"
+    },
+    "Tab": {
+      "action": "focusNextToastOrControl"
+    },
+    "Escape": {
+      "action": "close",
+      "condition": "closable, focus inside a toast"
+    }
+  },
   "aria": {
     "role": "status",
     "live": "polite",
-    "toneRolePolicy": "All toast tones stay non-blocking polite status messages. Use Modal or alertdialog for blocking alerts."
+    "toneRolePolicy": "All toast tones stay non-blocking polite status messages. Use Modal or alertdialog for blocking alerts.",
+    "region": "Toaster is a polite live region named by a native aria-label, default 'Notifications (F8)'. Each toast is a status named by its title and described by its description.",
+    "focus": "A toast closed from the keyboard moves focus to its neighbour, and after the last one back to where focus came from."
   },
   "composition": {
     "required": [
-      "root",
-      "group",
-      "item"
+      "root"
     ],
     "recommended": [
       "title",
@@ -105,33 +120,29 @@
       "close"
     ],
     "parts": {
-      "root": {
-        "slot": "root"
-      },
       "group": {
-        "slot": "group",
-        "parent": "root"
+        "slot": "group"
       },
-      "item": {
-        "slot": "item",
+      "root": {
+        "slot": "root",
         "parent": "group",
         "multiple": true
       },
       "title": {
         "slot": "title",
-        "parent": "item"
+        "parent": "root"
       },
       "description": {
         "slot": "description",
-        "parent": "item"
+        "parent": "root"
       },
       "action": {
         "slot": "action",
-        "parent": "item"
+        "parent": "root"
       },
       "close": {
         "slot": "close",
-        "parent": "item"
+        "parent": "root"
       }
     }
   },
@@ -161,7 +172,7 @@
     "notes": [
       "Toast content uses Text and Bar/Button primitives internally; do not create toast-local typography classes for new copy.",
       "Toast surfaces use the shared overlay/dropdown background while semantic tones map the full border to monochrome feedback tokens.",
-      "Toaster renders the same public Toast surface and uses the shared --uf-z-toast layer token."
+      "Toaster is a fixed column clear of the safe-area insets; only the toasts take the pointer, and it renders the same public Toast surface on the shared --uf-z-toast layer."
     ]
   },
   "platform": {},

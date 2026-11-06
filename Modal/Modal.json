@@ -2,16 +2,74 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Modal",
-  "description": "Centered dialog surface for focused decisions and workflows",
+  "description": "A dialog that takes over the page until closed, centered or attached to a viewport edge.",
+  "preview": {
+    "entryPath": "./Modal.preview.tsx",
+    "exportName": "ModalPreview"
+  },
   "props": {
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the dialog is open; updates from the parent never call onOpenChange."
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the dialog is open on mount when `open` is not set; read once.",
+      "default": false
+    },
+    "trigger": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Element that opens the dialog, keeping its own props and ref; text renders as a Button."
+    },
+    "title": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Heading of the dialog, which also gives the dialog its accessible name."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Text under the title, announced as the dialog's description."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Body of the dialog, mounted while it is open; text renders as body copy."
+    },
+    "footer": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Region under the body, aligned to the end, usually the dialog's buttons; they close nothing on their own.",
+      "controlType": "object"
+    },
+    "closable": {
+      "type": "boolean",
+      "required": false,
+      "description": "Shows the close button and lets Escape and backdrop presses close the dialog; false leaves closing to its own controls.",
+      "default": true
+    },
+    "closeOnBackdropClick": {
+      "type": "boolean",
+      "required": false,
+      "description": "A press on the backdrop closes the dialog; ignored while `closable` is false.",
+      "default": true
+    },
+    "labels": {
+      "type": "object",
+      "required": false,
+      "description": "Names of the dialog's own controls."
+    },
     "placement": {
       "type": "enum",
       "required": false,
-      "description": "Viewport placement of the modal surface.",
+      "description": "Where the surface sits: centered, or against the start, end, top or bottom edge; start and end follow the direction.",
       "options": [
         "center",
-        "left",
-        "right",
+        "start",
+        "end",
         "top",
         "bottom"
       ],
@@ -20,7 +78,7 @@
     "edge": {
       "type": "enum",
       "required": false,
-      "description": "Inset adds the system viewport gap, radius, and border; flush attaches the surface to its placement edge.",
+      "description": "Edge placements only: `inset` keeps a gap with rounded, bordered corners; `flush` touches the edge, square and borderless.",
       "options": [
         "inset",
         "flush"
@@ -30,71 +88,23 @@
     "width": {
       "type": "number",
       "required": false,
-      "description": "Preferred surface width in pixels, constrained by the viewport."
+      "description": "Surface width in pixels, capped by the viewport."
     },
     "height": {
       "type": "number",
       "required": false,
-      "description": "Preferred surface height in pixels, constrained by the viewport."
-    },
-    "open": {
-      "type": "boolean",
-      "required": false,
-      "description": "Controlled open state."
-    },
-    "closeOnOverlayClick": {
-      "type": "boolean",
-      "required": false,
-      "description": "Close the surface when its backdrop is clicked.",
-      "default": true
-    },
-    "closable": {
-      "type": "boolean",
-      "required": false,
-      "description": "Whether the surface can be closed via Escape / backdrop click.",
-      "default": true
-    },
-    "title": {
-      "type": "string",
-      "required": false,
-      "description": "Title content rendered inside the surface."
-    },
-    "description": {
-      "type": "string",
-      "required": false,
-      "description": "Description content rendered below the title."
-    },
-    "children": {
-      "type": "string",
-      "required": false,
-      "description": "Body content."
-    },
-    "actions": {
-      "type": "array",
-      "required": false,
-      "description": "Optional footer actions."
-    },
-    "trigger": {
-      "type": "string",
-      "required": false,
-      "description": "Trigger element that toggles the modal open."
-    },
-    "autoFocusOnOpen": {
-      "type": "boolean",
-      "required": false,
-      "description": "Move focus into the surface when it opens. Disable for bounded previews that render it inline.",
-      "default": true
+      "description": "Surface height in pixels, capped by the viewport."
     },
     "scrollLock": {
       "type": "boolean",
       "required": false,
-      "description": "Lock body scroll while the modal is open. Opt-in; off by default.",
+      "description": "Stops the page behind the open dialog from scrolling; off by default, and ignored when `portal` is false.",
       "default": false
     },
     "portal": {
       "type": "boolean",
       "required": false,
-      "description": "Render overlay into document.body. Disable for bounded component previews.",
+      "description": "Renders into document.body as a modal layer; false renders a static preview inside the parent that leaves the page, keys and focus alone.",
       "default": true
     }
   },
@@ -104,42 +114,40 @@
       "props": {
         "open": true,
         "portal": false,
-        "autoFocusOnOpen": false,
         "placement": "center",
-        "edge": "inset",
         "title": "Modal",
         "description": "Focused work surface",
         "children": "Review the workspace details before creating it.",
-        "actions": [
+        "footer": [
           {
-            "label": "Cancel",
-            "variant": "outline"
+            "__componentName__": "Button",
+            "variant": "outline",
+            "children": "Cancel"
           },
           {
-            "label": "Create",
-            "variant": "accent"
+            "__componentName__": "Button",
+            "variant": "accent",
+            "children": "Create"
           }
         ]
       }
     },
     {
-      "name": "Right edge workspace",
+      "name": "End edge workspace",
       "props": {
         "open": true,
         "portal": false,
-        "autoFocusOnOpen": false,
-        "placement": "right",
+        "placement": "end",
         "edge": "flush",
         "width": 420,
         "title": "Customer details",
         "description": "Account health and recent activity",
         "children": "Plan: Enterprise. Last active 12 minutes ago.",
-        "actions": [
-          {
-            "label": "Edit customer",
-            "variant": "accent"
-          }
-        ]
+        "footer": {
+          "__componentName__": "Button",
+          "variant": "accent",
+          "children": "Edit customer"
+        }
       }
     }
   ],
@@ -240,7 +248,7 @@
       "--uf-overlay-surface-shadow"
     ],
     "notes": [
-      "placement selects centered or edge-aligned dialog geometry; edge selects inset or flush attachment independently.",
+      "placement selects centered or edge-aligned dialog geometry, start and end following the direction; edge selects inset or flush attachment for edge placements.",
       "width and height write private runtime custom properties while default sizing remains in the modal token namespace."
     ]
   },

@@ -1,8 +1,1 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="7" cy="15" r="1" fill="black"/>
-<circle cx="13" cy="15" r="1" fill="black"/>
-<circle cx="7" cy="10" r="1" fill="black"/>
-<circle cx="13" cy="10" r="1" fill="black"/>
-<circle cx="7" cy="5" r="1" fill="black"/>
-<circle cx="13" cy="5" r="1" fill="black"/>
-</svg>
+<svg class="uf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" data-icon="drag" data-iconset="iconoteka" data-icon-source="drag/stroke" aria-hidden="true"><path d="M1.00049 17.025H23.0005V18.975H1.00049V17.025ZM1.00049 5H23.0005V6.95H1.00049V5Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>

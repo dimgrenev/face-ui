@@ -1,0 +1,494 @@
+import { test, expect, type Page } from './test'
+import { mount, open, type MountProps, type MountWindow } from './helpers'
+import { createRequire } from 'node:module'
+import type { CSSProperties } from 'react'
+const require = createRequire(import.meta.url)
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`Button composed Text follows its foreground in every variant and state in ${theme}`, { tag: ['@css', '@pointer', '@react'] }, async ({ page }) => {
+    await open(page, 'mount')
+    await page.evaluate(theme => { document.documentElement.dataset.theme = theme }, theme)
+    for (const variant of ['default', 'primary', 'secondary', 'accent', 'outline', 'ghost', 'destructive'] as const) {
+      for (const state of ['rest', 'hover', 'disabled'] as const) {
+        await page.mouse.move(700, 500)
+        await page.evaluate(({ variant, disabled }) => {
+          const { React: R, renderProps, propComponents: { Button, Text } } = window as unknown as MountWindow
+          const text = (value: string) => R.createElement(Text, { as: 'span', inset: 'none', membrane: false }, value)
+          renderProps('ButtonGroup', { children: [
+            R.createElement(Button, { key: 'raw', id: 'raw-color-button', variant, disabled, meta: 'K' }, 'Action'),
+            R.createElement(Button, { key: 'composed', id: 'composed-color-button', variant, disabled, meta: text('K') }, text('Action')),
+          ] })
+        }, { variant, disabled: state === 'disabled' })
+        const raw = page.locator('#raw-color-button')
+        const composed = page.locator('#composed-color-button')
+        await expect(raw).toBeVisible()
+        await expect(composed).toBeVisible()
+        if (state === 'hover') await raw.hover()
+        const rawColor = await raw.evaluate(node => getComputedStyle(node).color)
+        await expect(raw.locator('[data-part="label"]')).toHaveCSS('color', rawColor)
+        await expect(raw.locator('[data-part="meta"]')).toHaveCSS('color', rawColor)
+        if (state === 'hover') await composed.hover()
+        await expect(composed).toHaveCSS('color', rawColor)
+        for (const slot of ['label', 'meta']) {
+          await expect(composed.locator(`[data-part="${slot}"] .uf-text`), `${theme}/${variant}/${state}/${slot}`).toHaveCSS('color', rawColor)
+        }
+        if (state === 'disabled') {
+          await expect(raw).toBeDisabled()
+          await expect(composed).toBeDisabled()
+          await raw.hover()
+          const disabledHoverColor = await raw.evaluate(node => getComputedStyle(node).color)
+          await expect(raw.locator('[data-part="label"]')).toHaveCSS('color', disabledHoverColor)
+          await expect(raw.locator('[data-part="meta"]')).toHaveCSS('color', disabledHoverColor)
+          await composed.hover()
+          await expect(composed).toHaveCSS('color', disabledHoverColor)
+          for (const slot of ['label', 'meta']) {
+            await expect(composed.locator(`[data-part="${slot}"] .uf-text`), `${theme}/${variant}/disabled-hover/${slot}`).toHaveCSS('color', disabledHoverColor)
+          }
+        }
+      }
+    }
+  })
+
+  test(`Button composed Text keeps authored colors and muted semantics in ${theme}`, { tag: ['@css', '@pointer', '@react'] }, async ({ page }) => {
+    await open(page, 'mount')
+    await page.evaluate(theme => { document.documentElement.dataset.theme = theme }, theme)
+    for (const disabled of [false, true]) {
+      await page.mouse.move(700, 500)
+      await page.evaluate(disabled => {
+        const { React: R, renderProps, propComponents: { Text } } = window as unknown as MountWindow
+        const common = { as: 'span', inset: 'none', membrane: false } as const
+        renderProps('Button', { variant: 'primary', disabled, children: [
+          R.createElement(Text, { ...common, key: 'color', id: 'authored-color', style: { color: 'rgb(143, 30, 71)' } }, 'Styled'),
+          R.createElement(Text, { ...common, key: 'token', id: 'authored-token', style: { '--uf-text-color': 'rgb(7, 77, 133)' } as CSSProperties }, 'Token'),
+          R.createElement(Text, { ...common, key: 'muted', id: 'authored-muted', variant: 'muted' }, 'Muted'),
+        ] })
+      }, disabled)
+      const button = page.getByRole('button')
+      await expect(button).toBeVisible()
+      const muted = await button.evaluate(node => {
+        const probe = document.createElement('span')
+        probe.style.color = 'var(--uf-color-fg-muted)'
+        node.append(probe)
+        const color = getComputedStyle(probe).color
+        probe.remove()
+        return color
+      })
+      for (const hover of [false, true]) {
+        if (hover) await button.hover()
+        await expect(page.locator('#authored-color')).toHaveCSS('color', 'rgb(143, 30, 71)')
+        await expect(page.locator('#authored-token')).toHaveCSS('color', 'rgb(7, 77, 133)')
+        await expect(page.locator('#authored-muted')).toHaveCSS('color', muted)
+      }
+    }
+  })
+}
+
+const render = (page: Page, props: MountProps<'Button'>) =>
+  mount(page, 'Button', props)
+test.beforeEach(async ({ page }) => {
+  await open(page, 'mount')
+})
+
+for (const theme of ['light', 'dark']) {
+  test(`Button variant has distinct visible states and readable content in ${theme}`, { tag: ['@css', '@pointer', '@a11y'] }, async ({
+    page,
+  }) => {
+    await page.evaluate(
+      (theme) => (document.documentElement.dataset.theme = theme),
+      theme,
+    )
+    await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') })
+    const signatures = []
+    for (const variant of [
+      'default',
+      'primary',
+      'secondary',
+      'accent',
+      'outline',
+      'ghost',
+      'destructive',
+    ] as const) {
+      await page.mouse.move(700, 500)
+      await render(page, {
+        children: 'Action',
+        meta: '⌘K',
+        icon: 'user',
+        variant,
+      })
+      const button = page.getByRole('button', { name: 'Action ⌘K' })
+      await expect(button).toHaveAttribute('data-variant', variant)
+      const before = await button.evaluate((node) => {
+        const style = getComputedStyle(node)
+        return [
+          style.backgroundColor,
+          style.color,
+          style.boxShadow,
+          node.getBoundingClientRect().width,
+          node.getBoundingClientRect().height,
+        ]
+      })
+      await button.hover()
+      const after = await button.evaluate((node) => {
+        const style = getComputedStyle(node)
+        return [
+          style.backgroundColor,
+          style.color,
+          style.boxShadow,
+          node.getBoundingClientRect().width,
+          node.getBoundingClientRect().height,
+        ]
+      })
+      expect(after.slice(3)).toEqual(before.slice(3))
+      signatures.push(JSON.stringify([before.slice(0, 3), after.slice(0, 3)]))
+      const violations = await page.evaluate(
+        async () =>
+          (
+            await (window as any).axe.run(
+              document.querySelector('[data-prop-fixture]'),
+              {
+                runOnly: {
+                  type: 'rule',
+                  values: ['color-contrast', 'button-name'],
+                },
+              },
+            )
+          ).violations,
+      )
+      expect(violations, variant).toEqual([])
+    }
+    expect(new Set(signatures).size).toBe(7)
+  })
+}
+
+test('Button fullWidth, iconOnly, loading and membrane retain their effects in combination', { tag: ['@layout', '@css'] }, async ({
+  page,
+}) => {
+  const button = page.getByRole('button', { name: 'Search' })
+  await render(page, { children: 'Search', icon: 'search', iconOnly: true })
+  await expect(button).toBeVisible()
+  const square = await button.boundingBox()
+  expect(square!.width).toBe(square!.height)
+  await expect(button.locator('.uf-visually-hidden')).toHaveCSS(
+    'position',
+    'absolute',
+  )
+  await expect(button.locator('.uf-visually-hidden')).toHaveCSS('width', '1px')
+  await render(page, {
+    children: 'Search',
+    icon: 'search',
+    iconOnly: true,
+    fullWidth: true,
+  })
+  const availableWidth = await page
+    .locator('[data-prop-fixture]')
+    .evaluate((node) => {
+      const style = getComputedStyle(node)
+      return (
+        node.clientWidth -
+        Number.parseFloat(style.paddingLeft) -
+        Number.parseFloat(style.paddingRight)
+      )
+    })
+  await expect(button).toHaveCSS('width', `${availableWidth - 2}px`)
+  const membrane = button.locator('..')
+  expect(
+    (await membrane.boundingBox())!.width - (await button.boundingBox())!.width,
+  ).toBe(2)
+  await render(page, {
+    children: 'Search',
+    icon: 'search',
+    iconOnly: true,
+    chevron: 'down',
+  })
+  await expect(button.locator('svg')).toHaveCount(2)
+  const disclosure = await button.boundingBox()
+  const geometry = await button.evaluate((node) =>
+    [node, ...node.children].map((n) => {
+      const s = getComputedStyle(n)
+      return {
+        html: n.outerHTML.slice(0, 180),
+        width: s.width,
+        minWidth: s.minWidth,
+        flex: s.flex,
+        position: s.position,
+        padding: s.padding,
+        gap: s.gap,
+      }
+    }),
+  )
+  expect(disclosure!.width, JSON.stringify(geometry)).toBeGreaterThan(
+    disclosure!.height,
+  )
+  await render(page, {
+    children: 'Search',
+    icon: 'search',
+    iconOnly: true,
+    fullWidth: true,
+    loading: true,
+    membrane: false,
+  })
+  await expect(button).toHaveCSS('width', `${availableWidth}px`)
+  await expect(button).toBeDisabled()
+  await expect(button).toHaveAttribute('aria-busy', 'true')
+  await expect(button.locator('.uf-button__spinner')).toBeVisible()
+  await expect(page.locator('.uf-membrane:not([data-membrane-disabled])')).toHaveCount(0)
+})
+
+test('Button align, stretchText, meta, iconPosition and chevron compose without overriding each other', { tag: ['@layout', '@css'] }, async ({
+  page,
+}) => {
+  const button = page.getByRole('button')
+  for (const chevron of ['down', 'end'] as const) {
+    for (const align of ['start', 'center', 'end'] as const) {
+      await render(page, {
+        children: 'Account',
+        meta: 'Pro',
+        icon: 'user',
+        iconPosition: 'end',
+        style: { width: 320 },
+        align,
+        chevron,
+      })
+      await expect(button).toHaveCSS('text-align', align)
+      const label = await button.locator('[data-part="label"]').boundingBox()
+      const icon = await button.locator('[data-part="icon"]').boundingBox()
+      const indicator = await button
+        .locator('[data-part="indicator"]')
+        .boundingBox()
+      expect(icon!.x).toBeGreaterThan(label!.x)
+      expect(indicator!.x).toBeGreaterThan(icon!.x)
+      const compact = await button.locator('[data-part="text"]').boundingBox()
+      await render(page, {
+        children: 'Account',
+        meta: 'Pro',
+        icon: 'user',
+        iconPosition: 'end',
+        style: { width: 320 },
+        align,
+        chevron,
+        stretchText: true,
+      })
+      await expect(button).toHaveAttribute('data-stretch-text', '')
+      const stretched = await button.locator('[data-part="text"]').boundingBox()
+      expect(stretched!.width).toBeGreaterThan(compact!.width + 100)
+    }
+  }
+  await render(page, {
+    children: 'Details',
+    chevron: 'end',
+    'aria-expanded': false,
+  })
+  await expect(button.locator('[data-part="indicator"]')).toHaveCSS(
+    'transform',
+    'matrix(1, 0, 0, 1, 0, 0)',
+  )
+  await render(page, {
+    children: 'Details',
+    chevron: 'end',
+    'aria-expanded': true,
+  })
+  await expect(button.locator('[data-part="indicator"]')).toHaveCSS(
+    'transform',
+    'matrix(-1, 0, 0, 1, 0, 0)',
+  )
+})
+
+test('Button align start and the end chevron follow the inline direction in RTL', { tag: ['@layout'] }, async ({
+  page,
+}) => {
+  const button = page.getByRole('button')
+  const geometry = () =>
+    button.evaluate((node) => {
+      const box = node.getBoundingClientRect()
+      const label = node.querySelector('[data-part="label"]')!.getBoundingClientRect()
+      const indicator = node.querySelector('[data-part="indicator"]')!
+      const chevron = indicator.getBoundingClientRect()
+      return {
+        labelStart: label.left - box.left,
+        labelEnd: box.right - label.right,
+        // Distance from the label to the chevron, measured left to right.
+        chevronAfterLabel: chevron.left - label.right,
+        chevronBeforeLabel: label.left - chevron.right,
+        transform: getComputedStyle(indicator).transform,
+      }
+    })
+  const measured = []
+  for (const dir of ['ltr', 'rtl'] as const)
+    for (const expanded of [false, true]) {
+      await render(page, {
+        key: `${dir}-${expanded}`,
+        children: 'Details',
+        align: 'start',
+        chevron: 'end',
+        'aria-expanded': expanded,
+        dir,
+        style: { width: 240 },
+      })
+      await expect(button).toHaveAttribute('dir', dir)
+      measured.push({ dir, expanded, ...(await geometry()) })
+    }
+  const [ltr, ltrOpen, rtl, rtlOpen] = measured
+  // The label starts at the inline start and the chevron follows it toward the inline end.
+  expect(ltr.labelStart).toBeLessThan(ltr.labelEnd)
+  expect(rtl.labelEnd).toBeLessThan(rtl.labelStart)
+  expect(rtl.labelEnd).toBeCloseTo(ltr.labelStart, 0)
+  expect(ltr.chevronAfterLabel).toBeGreaterThanOrEqual(0)
+  expect(rtl.chevronBeforeLabel).toBeGreaterThanOrEqual(0)
+  expect(rtl.chevronBeforeLabel).toBeCloseTo(ltr.chevronAfterLabel, 0)
+  // Closed, the chevron points to the inline end; open, it points back.
+  expect(ltr.transform).toBe('matrix(1, 0, 0, 1, 0, 0)')
+  expect(rtl.transform).toBe('matrix(-1, 0, 0, 1, 0, 0)')
+  expect(ltrOpen.transform).toBe('matrix(-1, 0, 0, 1, 0, 0)')
+  expect(rtlOpen.transform).toBe('matrix(1, 0, 0, 1, 0, 0)')
+})
+
+test('Button indent changes measured indentation and clamps invalid or fractional steps', { tag: ['@css'] }, async ({
+  page,
+}) => {
+  const button = page.getByRole('button')
+  const padding = async () =>
+    button.evaluate((node) =>
+      Number.parseFloat(getComputedStyle(node).paddingLeft),
+    )
+  await render(page, { children: 'Node', indent: 0 })
+  const zero = await padding()
+  await render(page, { children: 'Node', indent: 2 })
+  await expect(button).toHaveCSS('--face-runtime-option-level', '2')
+  const two = await padding()
+  expect(two).toBeGreaterThan(zero)
+  await render(page, { children: 'Node', indent: 2.8 })
+  await expect(button).toHaveCSS('--face-runtime-option-level', '2')
+  expect(await padding()).toBe(two)
+  await render(page, { children: 'Node', indent: -20 })
+  await expect(button).toHaveCSS('--face-runtime-option-level', '0')
+  expect(await padding()).toBe(zero)
+  await render(page, { children: 'Node', indent: 100 })
+  await expect(button).toHaveCSS('--face-runtime-option-level', '9')
+  await render(page, { children: 'Node' })
+  await expect(button).not.toHaveAttribute('data-indent')
+  expect(await padding()).toBe(zero)
+})
+
+test('ButtonGroup orientation aligns default membrane buttons and shapes the actual inner corners', { tag: ['@layout', '@css'] }, async ({
+  page,
+}) => {
+  for (const orientation of ['horizontal', 'vertical'] as const) {
+    await page.evaluate((orientation) => {
+      const { React, propComponents, renderProps } =
+        window as unknown as MountWindow
+      renderProps('ButtonGroup', {
+        orientation,
+        'aria-label': 'Formatting',
+        children: [
+          React.createElement(propComponents.Button, {
+            key: 'a',
+            children: 'Bold',
+          }),
+          React.createElement(propComponents.Button, {
+            key: 'b',
+            children: 'Italic',
+          }),
+        ],
+      })
+    }, orientation)
+    const group = page.getByRole('group', { name: 'Formatting' })
+    await expect(group).toHaveAttribute('data-orientation', orientation)
+    const first = group.getByRole('button', { name: 'Bold' })
+    const second = group.getByRole('button', { name: 'Italic' })
+    const a = await first.boundingBox()
+    const b = await second.boundingBox()
+    if (orientation === 'horizontal') {
+      expect(a!.y).toBe(b!.y)
+      expect(b!.x).toBeGreaterThan(a!.x)
+      await expect(first).toHaveCSS('border-top-right-radius', '0px')
+      await expect(second).toHaveCSS('border-top-left-radius', '0px')
+    } else {
+      expect(a!.x).toBe(b!.x)
+      expect(b!.y).toBeGreaterThan(a!.y)
+      await expect(first).toHaveCSS('border-bottom-left-radius', '0px')
+      await expect(second).toHaveCSS('border-top-left-radius', '0px')
+    }
+  }
+})
+
+test('Button native activation, disabled, copyText and onCopied work through keyboard and padding clicks', { tag: ['@native', '@pointer'] }, async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    const state = window as unknown as MountWindow
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (text: string) => {
+          state.propEvents.push(`copy:${text}`)
+        },
+      },
+    })
+    state.renderProps('Button', {
+      children: 'Copy',
+      copyText: 'value',
+      onClick: () => state.propEvents.push('click'),
+      onCopied: () => state.propEvents.push('copied'),
+    })
+  })
+  const button = page.getByRole('button', { name: 'Copy' })
+  await button.focus()
+  await page.keyboard.press('Enter')
+  await expect
+    .poll(() => page.evaluate(() => (window as any).propEvents))
+    .toEqual(['click', 'copy:value', 'copied'])
+  await page.keyboard.press('Space')
+  await expect
+    .poll(() => page.evaluate(() => (window as any).propEvents.length))
+    .toBe(6)
+  const outer = await button.locator('..').boundingBox()
+  await page.mouse.click(outer!.x + 0.5, outer!.y + outer!.height / 2)
+  await expect
+    .poll(() => page.evaluate(() => (window as any).propEvents.length))
+    .toBe(9)
+  await page.evaluate(() => {
+    const state = window as unknown as MountWindow
+    state.renderProps('Button', {
+      children: 'Copy',
+      copyText: 'value',
+      disabled: true,
+      onClick: () => state.propEvents.push('unexpected'),
+    })
+  })
+  await expect(button).toBeDisabled()
+  await page.mouse.click(outer!.x + 0.5, outer!.y + outer!.height / 2)
+  expect(await page.evaluate(() => (window as any).propEvents.length)).toBe(9)
+})
+
+test('Button type, form, name and value participate in real native form actions', { tag: ['@native'] }, async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    const form = document.createElement('form')
+    form.id = 'editor'
+    form.innerHTML = '<input name="title" aria-label="Title" required>'
+    form.addEventListener('submit', (event) => {
+      event.preventDefault()
+      const data = new FormData(form, (event as SubmitEvent).submitter)
+      ;(window as any).propEvents.push(
+        `${data.get('title')}:${data.get('action')}`,
+      )
+    })
+    document.body.appendChild(form)
+  })
+  const props = { children: 'Save', form: 'editor', name: 'action', value: 'save' }
+  await render(page, props)
+  await page.getByRole('button', { name: 'Save' }).click()
+  expect(await page.evaluate(() => (window as any).propEvents)).toEqual([])
+  await render(page, { ...props, type: 'submit' })
+  await page.getByRole('button', { name: 'Save' }).click()
+  expect(await page.evaluate(() => (window as any).propEvents)).toEqual([])
+  await page.getByRole('textbox', { name: 'Title' }).fill('Draft')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await expect
+    .poll(() => page.evaluate(() => (window as any).propEvents))
+    .toEqual(['Draft:save'])
+  await render(page, { ...props, children: 'Reset', type: 'reset' })
+  await page.getByRole('button', { name: 'Reset' }).click()
+  await expect(page.getByRole('textbox', { name: 'Title' })).toHaveValue('')
+})

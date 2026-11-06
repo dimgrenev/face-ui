@@ -1,8 +1,19 @@
 import { forwardRef } from 'react'
-import { Overlay, type OverlayProps } from '../Overlay/Overlay'
+import type {
+  FloatingSurfaceProps,
+  HoverTimingProps,
+} from '../assets/adapters/react/FloatingOverlay'
+import { useFloatingOverlay } from '../assets/internal/floating-overlay'
 
-export interface TooltipProps extends Omit<OverlayProps, 'trigger' | 'interactive'> {}
+export interface TooltipProps extends FloatingSurfaceProps, HoverTimingProps {}
 
-export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(function Tooltip(props, ref) {
-  return <Overlay ref={ref} trigger="hover" interactive={false} {...props} />
-})
+/** Non-interactive floating text hint anchored to a trigger element, shown on hover and keyboard focus. */
+export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
+  function Tooltip(props, ref) {
+    return useFloatingOverlay(
+      'Tooltip',
+      { ...props, openOn: 'hover', interactive: false },
+      ref,
+    )
+  },
+)

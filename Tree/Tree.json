@@ -2,79 +2,94 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Tree",
-  "description": "Hierarchical tree view with expand/collapse and selection",
+  "description": "Nested items that expand and collapse, with one item selected.",
   "props": {
     "items": {
       "type": "array",
       "required": false,
-      "description": "Recursive tree nodes. Nodes may use kind \"button\", \"tile\", or \"custom\", plus icon, rightText, actions, content, or render."
+      "description": "Items in order, nested through `items`; an item repeating a value used anywhere earlier in the tree is dropped."
     },
-    "expandedIds": {
-      "type": "array",
-      "required": false,
-      "description": "Currently expanded node IDs."
-    },
-    "defaultExpandedIds": {
-      "type": "array",
-      "required": false,
-      "description": "Uncontrolled initial expanded node IDs."
-    },
-    "selectedId": {
+    "value": {
       "type": "string",
       "required": false,
-      "description": "Currently selected node ID."
+      "description": "Value of the selected item (controlled); `null` selects nothing, as does a value no item has."
     },
-    "defaultSelectedId": {
+    "defaultValue": {
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial selected node ID."
+      "description": "Value of the item selected on mount (uncontrolled); later changes are ignored."
+    },
+    "expanded": {
+      "type": "array",
+      "required": false,
+      "description": "Values of the expanded items (controlled); values of items that are not branches are kept but show nothing."
+    },
+    "defaultExpanded": {
+      "type": "array",
+      "required": false,
+      "description": "Values of the items expanded on mount (uncontrolled); later changes are ignored."
+    },
+    "variant": {
+      "type": "enum",
+      "required": false,
+      "description": "`lines` draws a guide line along the nested items of every expanded item; `default` draws none.",
+      "options": [
+        "default",
+        "lines"
+      ],
+      "default": "default"
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Names the tree; without it and `aria-labelledby` the name is \"Tree\"."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
+        "aria-label": "Files",
         "items": [
           {
-            "id": "src",
+            "value": "src",
             "label": "src",
             "icon": "folder",
-            "children": [
+            "items": [
               {
-                "id": "components",
+                "value": "components",
                 "label": "components",
                 "icon": "folder",
-                "children": [
+                "items": [
                   {
-                    "id": "button",
+                    "value": "button",
                     "label": "Button.tsx",
                     "icon": "file"
                   },
                   {
-                    "id": "tile",
+                    "value": "tile",
                     "label": "Tile.tsx",
-                    "icon": "file",
-                    "kind": "tile"
+                    "icon": "file"
                   }
                 ]
               },
               {
-                "id": "assets",
+                "value": "assets",
                 "label": "assets",
                 "icon": "folder",
-                "children": [
+                "items": [
                   {
-                    "id": "icons",
+                    "value": "icons",
                     "label": "icons",
                     "icon": "folder",
-                    "children": [
+                    "items": [
                       {
-                        "id": "search-icon",
+                        "value": "search-icon",
                         "label": "search.svg",
                         "icon": "file"
                       },
                       {
-                        "id": "folder-icon",
+                        "value": "folder-icon",
                         "label": "folder.svg",
                         "icon": "file"
                       }
@@ -83,68 +98,71 @@
                 ]
               },
               {
-                "id": "index",
+                "value": "index",
                 "label": "index.ts",
                 "icon": "file"
               }
             ]
           },
           {
-            "id": "readme",
+            "value": "readme",
             "label": "README.md",
             "icon": "file"
           }
         ],
-        "defaultExpandedIds": [
+        "defaultExpanded": [
           "src",
           "components",
           "assets",
           "icons"
         ],
-        "defaultSelectedId": "button"
+        "defaultValue": "button"
       }
     },
     {
-      "name": "Mixed Rows",
+      "name": "Guide Lines",
       "props": {
+        "aria-label": "Workspace",
+        "variant": "lines",
         "items": [
           {
-            "id": "workspace",
+            "value": "workspace",
             "label": "Workspace",
             "icon": "folder",
-            "kind": "tile",
-            "children": [
+            "items": [
               {
-                "id": "overview",
+                "value": "overview",
                 "label": "Overview",
-                "icon": "file",
-                "kind": "tile"
+                "icon": "file"
               },
               {
-                "id": "settings",
+                "value": "settings",
                 "label": "Settings",
                 "icon": "settings",
-                "rightText": "3"
+                "meta": "3"
               },
               {
-                "id": "tokens",
+                "value": "tokens",
                 "label": "Tokens",
-                "icon": "theme"
+                "icon": "theme",
+                "disabled": true
               }
             ]
           }
         ],
-        "defaultExpandedIds": [
+        "defaultExpanded": [
           "workspace"
         ],
-        "defaultSelectedId": "overview"
+        "defaultValue": "overview"
       }
     }
   ],
   "behavior": {
     "rovingFocus": true,
     "typeahead": true,
-    "autoFocusOnOpen": "none"
+    "selectionFollowsFocus": false,
+    "activation": "click, Enter and Space select the item and toggle a branch; a click on the arrow only toggles",
+    "disabled": "a disabled item and everything nested in it are skipped, never selected or expanded"
   },
   "keyboard": {
     "ArrowDown": {
@@ -154,10 +172,12 @@
       "action": "focusPreviousVisible"
     },
     "ArrowRight": {
-      "action": "expandOrFocusChild"
+      "action": "expandOrFocusFirstChild",
+      "rtl": "ArrowLeft"
     },
     "ArrowLeft": {
-      "action": "collapseOrFocusParent"
+      "action": "collapseOrFocusParent",
+      "rtl": "ArrowRight"
     },
     "Home": {
       "action": "focusFirst"
@@ -166,52 +186,61 @@
       "action": "focusLast"
     },
     "Enter": {
-      "action": "select"
+      "action": "selectAndToggle"
     },
     "Space": {
-      "action": "select"
+      "action": "selectAndToggle"
     },
     "*": {
-      "action": "expandAllSiblings"
+      "action": "expandSiblings"
+    },
+    "printable": {
+      "action": "typeahead"
     }
   },
   "aria": {
     "role": "tree",
-    "required": [
-      "aria-label"
-    ]
+    "defaultName": "Tree"
   },
   "composition": {
     "required": [
       "root",
-      "branch",
       "item"
     ],
     "recommended": [
-      "itemIndicator",
-      "itemText"
+      "indicator",
+      "label",
+      "group"
     ],
     "parts": {
       "root": {
         "slot": "root"
       },
-      "branch": {
-        "slot": "branch",
+      "item": {
+        "slot": "item",
         "parent": "root",
         "multiple": true
       },
-      "item": {
-        "slot": "item",
-        "parent": "branch",
+      "indicator": {
+        "slot": "indicator",
+        "parent": "item"
+      },
+      "icon": {
+        "slot": "icon",
+        "parent": "item"
+      },
+      "label": {
+        "slot": "label",
+        "parent": "item"
+      },
+      "meta": {
+        "slot": "meta",
+        "parent": "item"
+      },
+      "group": {
+        "slot": "group",
+        "parent": "root",
         "multiple": true
-      },
-      "itemIndicator": {
-        "slot": "itemIndicator",
-        "parent": "item"
-      },
-      "itemText": {
-        "slot": "itemText",
-        "parent": "item"
       }
     }
   },
@@ -221,18 +250,22 @@
     ],
     "semanticFallbacks": [
       "--uf-control-height",
-      "--uf-control-pad-y",
+      "--uf-control-pad-icon",
       "--uf-control-pad-text",
-      "--uf-control-gap",
+      "--uf-option-indent",
+      "--uf-membrane",
       "--uf-radius",
-      "--uf-font-size-sm",
       "--uf-font-weight-bold",
-      "--uf-color-fg",
-      "--uf-color-hover-bg"
+      "--uf-color-hover-bg",
+      "--uf-color-active-bg",
+      "--uf-color-fg-muted",
+      "--uf-color-border",
+      "--uf-motion-duration-control",
+      "--uf-motion-ease-standard"
     ],
     "notes": [
-      "Tree node rows use Button-compatible geometry; branch indicators use a tree-local size alias.",
-      "Expansion/selection state is machine-owned and should not leak styling outside tree data parts."
+      "Rows reuse the option anatomy; each level indents by --uf-option-indent, so a child's arrow sits under its parent's icon.",
+      "The branch arrow slot is --uf-tree-branch-indicator-size wide on every row, leaves included, so labels align."
     ]
   },
   "platform": {},
@@ -244,7 +277,8 @@
     ],
     "whenNotToUse": [
       "Flat list (use Table)",
-      "Simple nav (use Navigation)"
+      "Site or app navigation links (use Navigation)",
+      "Rows with their own controls (use Table)"
     ],
     "alternatives": [
       "Table",

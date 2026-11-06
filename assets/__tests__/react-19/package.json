@@ -1,0 +1,11 @@
+{
+  "name": "face-ui-react-19-tests",
+  "private": true,
+  "description": "Pinned React 19 for the react19 vitest project and tsconfig.react19.json. Never published.",
+  "dependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  }
+}

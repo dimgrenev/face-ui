@@ -1,0 +1,321 @@
+/* =================================================================
+ * BUTTON
+ * ================================================================= */
+.uf-button[data-scope] {
+  --uf-text-color: currentColor;
+  --uf-button-content-gap: var(--uf-control-gap);
+  --uf-control-pad-start: var(--uf-control-pad-text);
+  --uf-control-pad-end: var(--uf-control-pad-text);
+  --uf-button-focus-ring-width: calc(var(--uf-membrane) * 2);
+  --uf-button-outline-width: var(--uf-membrane);
+  --uf-button-bg: var(--uf-color-black-0);
+  --uf-button-fg: var(--uf-color-fg);
+  --uf-button-hover-bg: var(--uf-color-hover-bg);
+  --uf-button-hover-fg: var(--uf-button-fg);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--uf-control-height);
+  height: auto;
+  width: auto;
+  gap: var(--uf-button-content-gap);
+  padding-top: var(--uf-control-pad-y);
+  padding-bottom: var(--uf-control-pad-y);
+  padding-inline-start: var(--uf-control-pad-start);
+  padding-inline-end: var(--uf-control-pad-end);
+  border-radius: var(--uf-radius);
+  border: none;
+  font-family: var(--uf-font-family-base);
+  font-size: var(--uf-control-font-size);
+  font-weight: var(--uf-font-weight);
+  line-height: var(--uf-control-line-height);
+  cursor: pointer;
+  user-select: none;
+  transition: font-weight var(--face-runtime-transition-duration-emphasis) var(--uf-motion-ease-emphasized);
+  text-decoration: none;
+  white-space: nowrap;
+  min-width: 0;
+  outline: none;
+  box-shadow: none;
+  background: var(--uf-button-bg);
+  color: var(--uf-button-fg);
+}
+
+.uf-button[data-scope][data-icon-start]:not([data-icon-only]) {
+  --uf-control-pad-start: var(--uf-control-pad-icon);
+}
+
+.uf-button[data-scope][data-icon-end]:not([data-icon-only]) {
+  --uf-control-pad-end: var(--uf-control-pad-icon);
+}
+
+.uf-button[data-scope][data-selector] {
+  --uf-control-pad-end: var(--uf-selector-indicator-edge-gap);
+  --uf-button-content-gap: var(--uf-selector-indicator-gap);
+}
+
+.uf-button[data-scope][data-selector][data-selector-direction="side"] {
+  height: var(--uf-control-height);
+}
+/* The end chevron points to the inline end: mirrored under the nearest dir="rtl".
+   Custom properties rather than :dir(), which minifiers may lower to :lang(). */
+:where([dir="ltr"]) {
+  --uf-button-inline-sign: 1;
+}
+:where([dir="rtl"]) {
+  --uf-button-inline-sign: -1;
+}
+.uf-button[data-selector-direction="side"] > [data-part="indicator"] {
+  transform: scaleX(var(--uf-button-inline-sign, 1));
+}
+.uf-button[data-selector-direction="side"][data-selector-open] > [data-part="indicator"] {
+  transform: scaleX(calc(-1 * var(--uf-button-inline-sign, 1)));
+}
+
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-button[data-scope]:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 var(--uf-button-focus-ring-width) var(--uf-button-ring-color);
+}
+
+/* Variants */
+.uf-button[data-scope][data-variant="default"] {
+  --uf-button-bg: var(--uf-color-black-0);
+  --uf-button-fg: var(--uf-color-fg);
+  --uf-button-hover-bg: var(--uf-color-hover-bg);
+}
+
+.uf-button[data-scope][data-variant="primary"] {
+  --uf-button-bg: var(--uf-color-primary);
+  --uf-button-fg: var(--uf-color-primary-fg);
+  --uf-button-hover-bg: var(--uf-color-primary-hover-bg);
+  --uf-button-hover-fg: var(--uf-color-primary-fg);
+}
+
+.uf-button[data-scope][data-variant="secondary"] {
+  --uf-button-bg: var(--uf-color-hover-bg);
+  --uf-button-fg: var(--uf-color-fg);
+  --uf-button-hover-bg: var(--uf-color-active-bg);
+}
+
+.uf-button[data-scope][data-variant="accent"] {
+  --uf-button-bg: var(--uf-color-fg);
+  --uf-button-fg: var(--uf-color-bg);
+  --uf-button-hover-bg: var(--uf-color-accent);
+  --uf-button-hover-fg: var(--uf-color-accent-fg);
+  border-radius: var(--uf-radius-full);
+}
+
+.uf-button[data-scope][data-variant="outline"] {
+  --uf-button-bg: var(--uf-color-black-0);
+  --uf-button-fg: var(--uf-color-fg);
+  --uf-button-hover-bg: var(--uf-color-fg);
+  --uf-button-hover-fg: var(--uf-color-bg);
+  border-radius: var(--uf-radius-full);
+  /* Use box-shadow to simulate border without layout shift. */
+  box-shadow: inset 0 0 0 var(--uf-button-outline-width) var(--uf-color-fg);
+}
+.uf-button[data-scope][data-variant="outline"]:hover {
+  background: var(--uf-color-fg);
+  color: var(--uf-color-bg);
+  box-shadow: none;
+}
+
+.uf-button[data-scope][data-variant="ghost"] {
+  --uf-button-bg: var(--uf-color-black-0);
+  --uf-button-fg: var(--uf-color-fg);
+  --uf-button-hover-bg: var(--uf-color-black-0);
+  --uf-button-hover-fg: var(--uf-color-fg);
+  --uf-control-gap: var(--uf-spacing-2);
+}
+
+.uf-button[data-scope][data-variant="destructive"] {
+  --uf-button-bg: var(--uf-color-black-0);
+  --uf-button-fg: var(--uf-color-fg);
+  --uf-button-hover-bg: var(--uf-color-destructive-soft);
+  --uf-button-hover-fg: var(--uf-color-destructive);
+}
+
+.uf-button[data-scope]:hover:not(:disabled):not([data-disabled]) {
+  background: var(--uf-button-hover-bg);
+  color: var(--uf-button-hover-fg);
+}
+.uf-button[data-scope][data-variant="ghost"]:hover:not(:disabled):not([data-disabled]) {
+  opacity: 1;
+}
+
+/* Disabled */
+.uf-button[data-scope]:disabled,
+.uf-button[data-scope][data-disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  /* Native disabled blocks activation while retaining hover descriptions. */
+  pointer-events: auto;
+  background: var(--uf-button-bg);
+  color: var(--uf-button-fg);
+}
+
+/* Loading */
+.uf-button[data-scope][data-loading] {
+  cursor: wait;
+}
+.uf-button[data-scope][data-loading]:not([data-icon-only]) {
+  --uf-control-pad-end: var(--uf-control-pad-icon);
+}
+.uf-button[data-loading] [data-part="text"] {
+  opacity: 0.7;
+}
+
+/* Full width */
+.uf-button[data-scope][data-full-width] {
+  width: 100%;
+}
+
+/* Stretch text */
+.uf-button[data-stretch-text] [data-part="text"] {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Text alignment */
+.uf-button[data-scope][data-align="start"] {
+  justify-content: flex-start;
+  text-align: start;
+}
+.uf-button[data-scope][data-align="end"] {
+  justify-content: flex-end;
+  text-align: end;
+}
+.uf-button[data-scope][data-align="center"] {
+  justify-content: center;
+  text-align: center;
+}
+
+/* Icon-only */
+.uf-button[data-scope][data-icon-only] {
+  --uf-icon-only-size: var(--uf-control-height);
+  block-size: var(--uf-icon-only-size);
+  min-inline-size: var(--uf-icon-only-size);
+  min-block-size: var(--uf-icon-only-size);
+  padding: 0;
+  justify-content: center;
+}
+.uf-button[data-scope][data-icon-only]:not([data-full-width]):not([data-selector]) {
+  inline-size: var(--uf-icon-only-size);
+}
+.uf-button[data-scope][data-icon-only][data-selector] {
+  padding-inline: var(--uf-control-pad-icon);
+}
+
+/* Nesting indent */
+.uf-button[data-scope][data-indent] {
+  padding-inline-start: calc(var(--uf-control-pad-start) + (var(--face-runtime-option-level, 0) * var(--uf-option-indent)));
+}
+
+/* Spinner */
+.uf-button__spinner {
+  margin-inline-start: auto;
+}
+.uf-button[data-icon-only] .uf-button__spinner {
+  margin-inline-start: 0;
+}
+
+/* Button text element */
+.uf-button > [data-part="text"] {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: var(--uf-control-gap);
+}
+.uf-button [data-part="label"],
+.uf-button__label {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uf-button[data-scope][data-selector] [data-part="text"] {
+  gap: var(--uf-selector-indicator-gap);
+  flex: 0 1 auto;
+  width: auto;
+}
+.uf-button[data-scope][data-selector][data-stretch-text] [data-part="text"] {
+  flex: 1 1 auto;
+  width: 100%;
+}
+.uf-button[data-scope][data-selector][data-selector-direction="side"] .uf-button__label {
+  flex: 0 1 auto;
+}
+.uf-button[data-scope][data-selector][data-selector-direction="side"] [data-part="indicator"] {
+  margin-inline-start: 0;
+}
+.uf-button[data-scope][data-selector]:hover [data-part="indicator"],
+.uf-button[data-scope][data-selector]:focus-visible [data-part="indicator"] {
+  opacity: 1;
+}
+
+/* Meta: secondary text at the inline end of the label area */
+.uf-button__meta {
+  flex: 0 0 auto;
+  min-width: max-content;
+  margin-inline-start: auto;
+  padding-inline-start: var(--uf-control-pad-text);
+  white-space: nowrap;
+}
+
+/* Button group */
+.uf-button-group {
+  display: inline-flex;
+}
+.uf-button-group:not([data-orientation="vertical"]) > .uf-button[data-scope]:not(:first-child),
+.uf-button-group:not([data-orientation="vertical"]) > .uf-membrane:not(:first-child) > .uf-button[data-scope] {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.uf-button-group:not([data-orientation="vertical"]) > .uf-button[data-scope]:not(:last-child),
+.uf-button-group:not([data-orientation="vertical"]) > .uf-membrane:not(:last-child) > .uf-button[data-scope] {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.uf-button-group[data-orientation="vertical"] {
+  flex-direction: column;
+  align-items: stretch;
+}
+.uf-button-group[data-orientation="vertical"] > .uf-button[data-scope]:not(:first-child),
+.uf-button-group[data-orientation="vertical"] > .uf-membrane:not(:first-child) > .uf-button[data-scope] {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.uf-button-group[data-orientation="vertical"] > .uf-button[data-scope]:not(:last-child),
+.uf-button-group[data-orientation="vertical"] > .uf-membrane:not(:last-child) > .uf-button[data-scope] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Button icon box. It sat in the carousel section because the arrows were
+   what first needed it; every icon-only Button sizes its icon through it. */
+.uf-button[data-scope] [data-part="icon"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  flex: 0 0 auto;
+}
+.uf-button[data-scope] [data-part="icon"] :is(svg, img) {
+  display: block;
+}
+.uf-button[data-scope][data-icon-only]:not([data-selector]) [data-part="icon"] {
+  inline-size: 100%;
+  block-size: 100%;
+}
+.uf-button[data-scope][data-icon-only] [data-part="icon"] > :is(svg, img, .icon) {
+  margin: auto;
+  flex: 0 0 auto;
+}

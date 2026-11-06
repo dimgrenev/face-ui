@@ -2,83 +2,109 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Radio",
-  "description": "Radio group for single-option selection",
+  "description": "A field of native radio inputs for one choice among visible items.",
   "props": {
-    "options": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ],
+      "default": "top"
+    },
+    "items": {
       "type": "array",
       "required": false,
-      "description": "Radio options to render.",
-      "default": [
-        {
-          "value": "one",
-          "label": "Option one"
-        },
-        {
-          "value": "two",
-          "label": "Option two"
-        },
-        {
-          "value": "three",
-          "label": "Option three",
-          "disabled": true
-        }
-      ]
+      "description": "Choices in navigation order; an item without a unique string `value`, or a group or separator, is dropped with a report."
     },
     "value": {
       "type": "string",
       "required": false,
-      "description": "Currently selected value."
+      "description": "Controlled selection; `null`, or a value missing from `items`, checks nothing."
     },
     "defaultValue": {
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial selected value.",
-      "default": "one"
+      "description": "Uncontrolled initial selection, restored by form reset."
     },
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Layout orientation.",
+      "description": "Stacks the items in a column or a row and sets aria-orientation; all four arrows move either way.",
       "options": [
         "horizontal",
         "vertical"
       ],
       "default": "vertical"
     },
-    "ariaLabel": {
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Focuses the selected enabled item, else the first enabled one, on mount.",
+      "default": false
+    },
+    "aria-label": {
       "type": "string",
       "required": false,
-      "description": "Accessible label for the radio group (role=\"radiogroup\" requires a name)."
+      "description": "Names the group when there is no visible `label`."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "Ids of the elements that name the group; wins over `label` and `aria-label`."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state for the entire group.",
+      "description": "Disables every item; native inputs leave the tab order and form submission.",
       "default": false
     },
-    "required": {
-      "type": "boolean",
-      "required": false,
-      "description": "Mark as required.",
-      "default": false
-    },
-    "name": {
+    "form": {
       "type": "string",
       "required": false,
-      "description": "Form field name."
+      "description": "Id of an external native form that owns every input."
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around control geometry.",
+      "description": "Shared outer spacing around each item; toggling it keeps the native inputs.",
       "default": true
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Nonempty native group and FormData key; use a distinct name for each independent group in a form."
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Require a selection before submission. Native group validation requires a nonempty name.",
+      "default": false
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "options": [
+        "label": "Example choice",
+        "items": [
           {
             "value": "one",
             "label": "Option one"
@@ -99,7 +125,8 @@
     {
       "name": "Horizontal",
       "props": {
-        "options": [
+        "label": "Example choice",
+        "items": [
           {
             "value": "one",
             "label": "Option one"
@@ -121,7 +148,8 @@
     {
       "name": "Disabled",
       "props": {
-        "options": [
+        "label": "Example choice",
+        "items": [
           {
             "value": "one",
             "label": "Option one"
@@ -139,49 +167,99 @@
         "defaultValue": "one",
         "disabled": true
       }
+    },
+    {
+      "name": "Invalid",
+      "props": {
+        "label": "Example choice",
+        "description": "Pick the option that applies.",
+        "error": "Choose an option.",
+        "name": "example-choice",
+        "required": true,
+        "items": [
+          {
+            "value": "one",
+            "label": "Option one"
+          },
+          {
+            "value": "two",
+            "label": "Option two"
+          }
+        ]
+      }
     }
   ],
   "behavior": {
     "rovingFocus": true
   },
   "keyboard": {
+    "Tab": {
+      "action": "enterOrLeaveGroup"
+    },
+    "Space": {
+      "action": "selectFocused"
+    },
     "ArrowDown": {
-      "action": "focusNext"
+      "action": "focusAndSelectNext"
     },
     "ArrowUp": {
-      "action": "focusPrevious"
+      "action": "focusAndSelectPrevious"
     },
     "ArrowRight": {
-      "action": "focusNext"
+      "action": "focusAndSelectRight",
+      "condition": "RTL reverses option order"
     },
     "ArrowLeft": {
-      "action": "focusPrevious"
+      "action": "focusAndSelectLeft",
+      "condition": "RTL reverses option order"
+    },
+    "Home": {
+      "action": "focusAndSelectFirst"
+    },
+    "End": {
+      "action": "focusAndSelectLast"
     }
   },
   "aria": {
     "role": "radiogroup",
-    "required": [
-      "aria-label"
+    "notes": [
+      "Name the group with label, aria-label or aria-labelledby; description and error describe the group and every radio. Options use native labeled radio inputs.",
+      "Native required validation needs a nonempty name; independent groups in one form must use distinct names."
     ]
   },
   "composition": {
     "required": [
       "root",
+      "list",
       "item",
-      "indicator"
+      "input",
+      "indicator",
+      "label"
     ],
     "recommended": [],
     "parts": {
       "root": {
         "slot": "root"
       },
+      "list": {
+        "slot": "list",
+        "parent": "root"
+      },
       "item": {
         "slot": "item",
-        "parent": "root",
+        "parent": "list",
         "multiple": true
+      },
+      "input": {
+        "slot": "input",
+        "parent": "item"
       },
       "indicator": {
         "slot": "indicator",
+        "parent": "item"
+      },
+      "label": {
+        "slot": "label",
         "parent": "item"
       }
     }

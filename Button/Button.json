@@ -2,22 +2,22 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Button",
-  "description": "Action component with variants, icons, and clipboard support",
+  "description": "An action the reader can take: a labelled control with optional icons, a loading state and a copy-to-clipboard shortcut.",
   "props": {
-    "text": {
-      "type": "string",
+    "children": {
+      "type": "ReactNode",
       "required": false,
-      "description": "Button label text."
+      "description": "Label of the button; with `iconOnly` it stays as the accessible name only."
     },
-    "rightText": {
-      "type": "string",
+    "meta": {
+      "type": "ReactNode",
       "required": false,
-      "description": "Optional secondary text, rendered at the far right inside the text area."
+      "description": "Secondary text at the inline end of the label area, such as a shortcut or count."
     },
     "variant": {
       "type": "enum",
       "required": false,
-      "description": "Visual style variant",
+      "description": "Visual variant.",
       "options": [
         "default",
         "primary",
@@ -30,56 +30,60 @@
       "default": "default"
     },
     "icon": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
       "description": "Icon (string from registry, ReactNode, or SVG element)."
     },
     "iconPosition": {
       "type": "enum",
       "required": false,
-      "description": "Icon position relative to text.",
+      "description": "Icon at the start or end of the label, following text direction. Default: start.",
       "options": [
-        "left",
-        "right"
-      ]
+        "start",
+        "end"
+      ],
+      "default": "start"
     },
     "iconOnly": {
       "type": "boolean",
       "required": false,
-      "description": "Icon-only mode (no text, square button)."
+      "description": "Hide the visual label while preserving its accessible text. Compact buttons are square.",
+      "default": false
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state."
+      "description": "Disabled state.",
+      "default": false
     },
     "loading": {
       "type": "boolean",
       "required": false,
-      "description": "Loading state (shows spinner, dims text)."
+      "description": "Loading state: disables activation and places a 20×20 spinner at the inline end; icon-only buttons replace their icon.",
+      "default": false
     },
     "stretchText": {
       "type": "boolean",
       "required": false,
-      "description": "Stretch text area (flex:1)."
+      "description": "Stretch text area (flex:1).",
+      "default": false
     },
-    "selector": {
-      "type": "boolean",
-      "required": false,
-      "description": "Render a compact selector indicator after the label."
-    },
-    "selectorOpen": {
-      "type": "boolean",
-      "required": false,
-      "description": "Open state for the selector indicator."
-    },
-    "selectorDirection": {
+    "chevron": {
       "type": "enum",
       "required": false,
-      "description": "Direction of the selector indicator. Use side for side-panel selectors.",
+      "description": "Trailing disclosure chevron: `down` flips with aria-expanded; `end` points to the inline end and mirrors in right-to-left text.",
       "options": [
-        "vertical",
-        "side"
+        "down",
+        "end"
+      ]
+    },
+    "aria-expanded": {
+      "type": "boolean",
+      "required": false,
+      "description": "Standard expanded state, also used to orient the disclosure chevron.",
+      "options": [
+        "false",
+        "true"
       ]
     },
     "fullWidth": {
@@ -91,39 +95,35 @@
     "align": {
       "type": "enum",
       "required": false,
-      "description": "Text alignment.",
+      "description": "Inline alignment of the content, following text direction.",
       "options": [
-        "left",
-        "right",
-        "center"
+        "start",
+        "center",
+        "end"
       ]
     },
-    "level": {
+    "indent": {
       "type": "number",
       "required": false,
-      "description": "Nesting level for option-like rows: 0..9"
+      "description": "Indent steps for nested option-like rows, an integer from 0 to 9."
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Membrane spacing around the button."
+      "description": "Membrane spacing around the button.",
+      "default": true
     },
     "copyText": {
       "type": "string",
       "required": false,
       "description": "Copy text to clipboard on click (Clipboard integration)."
-    },
-    "children": {
-      "type": "string",
-      "required": false,
-      "description": "Custom children (overrides text/icon rendering)."
     }
   },
   "states": [
     {
       "name": "Default",
       "props": {
-        "text": "Create",
+        "children": "Create",
         "icon": "plus",
         "fullWidth": false
       }
@@ -131,77 +131,76 @@
     {
       "name": "Primary",
       "props": {
-        "text": "Primary",
+        "children": "Primary",
         "variant": "primary"
       }
     },
     {
       "name": "Secondary",
       "props": {
-        "text": "Secondary",
+        "children": "Secondary",
         "variant": "secondary"
       }
     },
     {
       "name": "Accent",
       "props": {
-        "text": "Accent",
+        "children": "Accent",
         "variant": "accent"
       }
     },
     {
       "name": "Outline",
       "props": {
-        "text": "Outline",
+        "children": "Outline",
         "variant": "outline"
       }
     },
     {
       "name": "Ghost",
       "props": {
-        "text": "Ghost",
+        "children": "Ghost",
         "variant": "ghost"
       }
     },
     {
       "name": "Destructive",
       "props": {
-        "text": "Delete",
+        "children": "Delete",
         "variant": "destructive"
       }
     },
     {
       "name": "Disabled",
       "props": {
-        "text": "Disabled",
+        "children": "Disabled",
         "disabled": true
       }
     },
     {
       "name": "Full Width",
       "props": {
-        "text": "Full Width",
+        "children": "Full Width",
         "fullWidth": true
       }
     },
     {
       "name": "Selector",
       "props": {
-        "text": "GPT-5.5",
-        "selector": true
+        "children": "GPT-5.5",
+        "chevron": "down"
       }
     },
     {
       "name": "Side Selector",
       "props": {
-        "text": "Nested",
-        "selector": true,
-        "selectorDirection": "side"
+        "children": "Nested",
+        "chevron": "end"
       }
     }
   ],
   "behavior": {
-    "loading": "Loading state shows a spinner and blocks activation with native disabled."
+    "loading": "Loading disables activation, preserves the label and places the shared Spinner at the inline end; icon-only controls replace their icon."
   },
   "keyboard": {
     "Enter": {
@@ -251,8 +250,8 @@
   },
   "tokenMapping": {
     "component": [
-      "--uf-control-pad-left",
-      "--uf-control-pad-right",
+      "--uf-control-pad-start",
+      "--uf-control-pad-end",
       "--uf-button-focus-ring-width",
       "--uf-button-outline-width",
       "--uf-button-bg",
@@ -266,11 +265,7 @@
       "--uf-selector-indicator-size",
       "--uf-icon-only-size",
       "--face-runtime-option-level",
-      "--uf-interactive-weight",
-      "--uf-spinner-size",
-      "--uf-spinner-size-sm",
-      "--uf-spinner-border-width",
-      "--uf-spinner-border-width-sm"
+      "--uf-interactive-weight"
     ],
     "semanticFallbacks": [
       "--uf-control-height",

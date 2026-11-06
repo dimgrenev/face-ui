@@ -1,0 +1,55 @@
+/* =================================================================
+ * BADGE
+ * ================================================================= */
+.uf-badge[data-scope] {
+  --uf-badge-outline-width: var(--uf-membrane);
+  --uf-badge-bg: var(--uf-color-hover-bg);
+  --uf-badge-fg: var(--uf-color-fg);
+  --uf-badge-border: var(--uf-color-border);
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--uf-control-gap);
+  min-height: var(--uf-control-height);
+  height: auto;
+  padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
+  font-size: var(--uf-control-font-size);
+  font-weight: var(--uf-font-weight-bold);
+  line-height: var(--uf-control-line-height);
+  border-radius: var(--uf-radius-full);
+  white-space: nowrap;
+  background: var(--uf-badge-bg);
+  color: var(--uf-badge-fg);
+  box-shadow: none;
+}
+.uf-badge[data-scope][data-tone="accent"] {
+  --uf-badge-bg: var(--uf-color-accent);
+  --uf-badge-fg: var(--uf-color-accent-fg);
+  --uf-badge-border: var(--uf-color-accent);
+}
+.uf-badge[data-scope][data-tone="positive"] {
+  --uf-badge-bg: var(--uf-color-success);
+  --uf-badge-fg: var(--uf-color-success-foreground);
+  --uf-badge-border: var(--uf-color-success);
+}
+.uf-badge[data-scope][data-tone="warning"] {
+  --uf-badge-bg: var(--uf-color-warning);
+  --uf-badge-fg: var(--uf-color-warning-foreground);
+  --uf-badge-border: var(--uf-color-warning);
+}
+.uf-badge[data-scope][data-tone="destructive"] {
+  --uf-badge-bg: var(--uf-color-destructive);
+  --uf-badge-fg: var(--uf-color-destructive-fg);
+  --uf-badge-border: var(--uf-color-destructive);
+}
+.uf-badge[data-scope][data-variant="fill"] {
+  background: var(--uf-badge-bg);
+  color: var(--uf-badge-fg);
+  box-shadow: none;
+}
+.uf-badge[data-scope][data-variant="outline"] {
+  background: var(--uf-color-black-0);
+  color: var(--uf-color-fg);
+  box-shadow: inset 0 0 0 var(--uf-badge-outline-width) var(--uf-badge-border);
+}

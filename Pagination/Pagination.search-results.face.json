@@ -4,6 +4,10 @@
   "name": "Pagination / Search Results",
   "description": "Search Results product scenario for the Pagination component.",
   "framework": "react",
+  "preview": {
+    "entryPath": "./Pagination.preview.tsx",
+    "exportName": "PaginationPreview"
+  },
   "root": {
     "type": "Pagination",
     "props": {
@@ -28,8 +32,8 @@
       "membrane": {
         "$ref": "props.membrane"
       },
-      "surfaceTitle": {
-        "$ref": "props.surfaceTitle"
+      "labels": {
+        "$ref": "props.labels"
       }
     },
     "children": []
@@ -41,7 +45,9 @@
       "pageSize": 20,
       "siblingCount": 2,
       "membrane": true,
-      "surfaceTitle": "Choose results page"
+      "labels": {
+        "choosePage": "Choose results page"
+      }
     }
   },
   "controls": [
@@ -49,53 +55,55 @@
       "name": "page",
       "type": "number",
       "required": false,
-      "description": "Current page number (1-indexed)."
+      "description": "Controlled current page, from 1; a page past the last one shows the last page."
     },
     {
       "name": "defaultPage",
       "type": "number",
       "required": false,
-      "description": "Uncontrolled initial page number (1-indexed)."
+      "description": "Uncontrolled page on mount, from 1; read once.",
+      "defaultValue": 1
     },
     {
       "name": "total",
       "type": "number",
       "required": false,
-      "description": "Total number of items."
+      "description": "Number of items being paged, an integer from 0; no items still show page 1.",
+      "defaultValue": 0
     },
     {
       "name": "pageSize",
       "type": "number",
       "required": false,
-      "description": "Number of items per page."
+      "description": "Items per page, an integer from 1.",
+      "defaultValue": 10
     },
     {
       "name": "siblingCount",
       "type": "number",
       "required": false,
-      "description": "Number of sibling pages shown around the current page.",
+      "description": "Page buttons on each side of the current page, an integer from 0 to 20; the bar keeps its length near either end.",
       "defaultValue": 1
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire pagination.",
+      "description": "Disables page changes and the picker button; an open picker can still be closed.",
       "defaultValue": false
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each pagination button.",
+      "description": "Membrane spacing around the navigation buttons; the picker dialog owns its own spacing.",
       "defaultValue": true
     },
     {
-      "name": "surfaceTitle",
-      "type": "string",
+      "name": "labels",
+      "type": "object",
       "required": false,
-      "description": "Title used for the page picker sheet on compact viewports.",
-      "defaultValue": "Choose page"
+      "description": "Names and text of the component's own controls; the nav itself takes a native aria-label or aria-labelledby."
     }
   ],
   "meta": {

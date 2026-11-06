@@ -1,5 +1,5 @@
 /**
- * @face-ui/core — Machine Types
+ * Face UI — Machine Types
  *
  * Framework-agnostic state machine type system.
  * Defines the shape of machines, states, events, actions, guards, effects, and computed values.
@@ -51,7 +51,11 @@ export type ComputedFn<S extends MachineSchema> = (
 
 export interface TransitionConfig<S extends MachineSchema> {
   target?: S['state']
-  actions?: (keyof NonNullable<MachineConfig<S>['implementations']>['actions'])[] | ActionFn<S>[]
+  /** Restart entry/exit/effects even when targeting the current state. */
+  reenter?: boolean
+  actions?:
+    | (keyof NonNullable<MachineConfig<S>['implementations']>['actions'])[]
+    | ActionFn<S>[]
   guard?: GuardFn<S>
 }
 
@@ -108,6 +112,14 @@ export interface MachineService<S extends MachineSchema> {
   syncContext: (patch: Partial<S['context']>) => void
   getSnapshot: () => MachineSnapshot<S>
   subscribe: (listener: SubscribeFn<S>) => () => void
+  /**
+   * The first call enters the initial state and replays queued events; a call
+   * after stop() resumes the current state by re-arming its effects.
+   */
   start: () => MachineService<S>
+  /**
+   * Cleans up the current state's effects and drops events until the next
+   * start(); state and subscribers are kept.
+   */
   stop: () => void
 }

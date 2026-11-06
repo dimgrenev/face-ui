@@ -7,40 +7,37 @@
   "root": {
     "type": "Badge",
     "props": {
-      "text": {
-        "$ref": "props.text"
+      "children": {
+        "$ref": "props.children"
       },
-      "appearance": {
-        "$ref": "props.appearance"
+      "variant": {
+        "$ref": "props.variant"
       },
       "tone": {
         "$ref": "props.tone"
-      },
-      "children": {
-        "$ref": "props.children"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "text": "Ready to deploy",
-      "appearance": "fill",
+      "children": "Ready to deploy",
+      "variant": "fill",
       "tone": "positive"
     }
   },
   "controls": [
     {
-      "name": "text",
-      "type": "string",
+      "name": "children",
+      "type": "any",
       "required": false,
-      "description": "Badge text content"
+      "description": "Content of the badge: status text, a formatted count or a status icon."
     },
     {
-      "name": "appearance",
+      "name": "variant",
       "type": "select",
       "required": false,
-      "description": "Fill or outline appearance",
+      "description": "Fill or outline treatment. Default: outline.",
       "options": [
         "fill",
         "outline"
@@ -51,7 +48,7 @@
       "name": "tone",
       "type": "select",
       "required": false,
-      "description": "Semantic status tone. Combines with fill or outline appearance.",
+      "description": "Semantic status tone, independent from the variant.",
       "options": [
         "neutral",
         "accent",
@@ -60,12 +57,6 @@
         "destructive"
       ],
       "defaultValue": "neutral"
-    },
-    {
-      "name": "children",
-      "type": "string",
-      "required": false,
-      "description": "Custom children content (overrides text)"
     }
   ],
   "meta": {

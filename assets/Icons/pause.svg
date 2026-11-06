@@ -1,4 +1,1 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M7 5L7 15" stroke="black"/>
-<path d="M13 5V15" stroke="black"/>
-</svg>
+<svg class="uf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" data-icon="pause" data-iconset="iconoteka" data-icon-source="pause/stroke" aria-hidden="true"><path d="M16.0005 0H18.0005V24H16.0005V0ZM6.00049 24V0H8.00049V24H6.00049Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>

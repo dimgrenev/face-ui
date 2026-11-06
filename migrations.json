@@ -1,0 +1,3300 @@
+{
+  "version": "0.2.0",
+  "migrations": [
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/* deep imports except use-floating-position",
+      "to": "Use public components and FaceUiOverlayProvider from the package root; only use-floating-position remains a supported adapter deep import",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/normalize-props#normalizeProps",
+      "to": "Spread the props onto the element directly",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/normalize-props#NormalizedProps",
+      "to": "The props type itself",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/use-dismiss-outside#useDismissOutside",
+      "to": "`useLayer` from `assets/adapters/react/use-layer`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/use-dismiss-outside#UseDismissOutsideOptions",
+      "to": "The options of `useLayer` from `assets/adapters/react/use-layer`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/use-focus-trap#useFocusTrap",
+      "to": "`useLayer` from `assets/adapters/react/use-layer`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/use-controllable-open-state#useControllableOpenState",
+      "to": "`useControllableState` from `assets/adapters/react/use-controllable-state`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/use-responsive-overlay-surface#DEFAULT_OVERLAY_SURFACE_BREAKPOINT",
+      "to": "Removed with the `breakpoint` argument of `useResponsiveOverlaySurface` and `useIsCompactViewport`: every `auto` surface is a sheet below 900px wide",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/membrane-interactions#installMembraneInteractions",
+      "to": "Remove the call; each component owns its membrane",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "FormControlProps",
+      "to": "`FieldProps` for label, description, error and labelPosition; each control declares disabled, required, name, membrane and className itself",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "NavItemBase",
+      "to": "The item type of the component: `PanelItem`, `NavigationLink` or `TreeItem`, each keyed by `value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Accordion",
+      "from": "expandedIds",
+      "to": "expanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Accordion",
+      "from": "defaultExpandedIds",
+      "to": "defaultExpanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Accordion",
+      "prop": "onExpandedChange",
+      "before": "`details.expandedIds`",
+      "after": "`details.expanded`",
+      "codemod": "manual",
+      "legacy": "\\bexpandedIds\\b"
+    },
+    {
+      "kind": "behavior",
+      "component": "Accordion",
+      "before": "Malformed `items`, `expandedIds` or `headingLevel` threw during render",
+      "after": "The accordion renders with the value normalized and reports it once in development"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Avatar",
+      "prop": "icon",
+      "use": "`fallback={<Icon name=\"…\" />}`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Avatar",
+      "prop": "children",
+      "use": "`fallback={content}`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Avatar",
+      "from": "fallbackDelayMs",
+      "to": "fallbackDelay",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Avatar",
+      "before": "The root, image and fallback carried `data-state=\"loading\"` while a pending image waited out the delay",
+      "after": "Only the root carries `data-state`: `idle` inside the delay, then `loading`, `loaded` or `error`"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Badge",
+      "prop": "appearance",
+      "use": "`variant=\"fill\"`; omit `\"outline\"`, the default",
+      "codemod": "auto",
+      "values": {
+        "fill": "variant=\"fill\"",
+        "outline": ""
+      }
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Badge",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "BadgeAppearance",
+      "to": "BadgeVariant",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Badge",
+      "before": "The root carried the fill or outline treatment as `data-appearance`",
+      "after": "The root carries it as `data-variant`"
+    },
+    {
+      "kind": "export",
+      "from": "Bar.LeftEllipsis",
+      "to": "Bar.Section grow",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Bar.Right",
+      "to": "Bar.Section align=\"end\"",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Bar.LeftOverlap",
+      "to": "`Bar.Section grow` for the content and `Bar.Section align=\"end\"` for the actions",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Breadcrumb",
+      "from": "collapseAfter",
+      "to": "maxItems",
+      "codemod": "auto",
+      "transform": "breadcrumb-max-items"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Breadcrumb",
+      "prop": "allowNavigation",
+      "use": "Links always navigate; cancel the click in your own handler to stay on the page",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Breadcrumb",
+      "before": "`collapseAfter` below 3, or not finite, turned collapsing off",
+      "after": "`maxItems={null}` turns it off, and the codemod writes it for such literals; a number must be an integer of at least 3"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Breadcrumb",
+      "from": "overflowLabel",
+      "key": "more",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Breadcrumb",
+      "before": "Malformed `items` or keys, and a `maxItems` that is not an integer of at least 3, threw during render",
+      "after": "The trail renders them normalized (bad items dropped, the first of a repeated key kept, `maxItems` clamped) and reports once in development"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Button",
+      "prop": "selector",
+      "use": "`chevron=\"down\"`, or `chevron=\"end\"` with `selectorDirection=\"side\"`",
+      "codemod": "auto",
+      "transform": "button-chevron"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Button",
+      "prop": "selectorDirection",
+      "use": "The `chevron` value",
+      "codemod": "auto",
+      "transform": "button-chevron"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Button",
+      "from": "selectorOpen",
+      "to": "aria-expanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Button",
+      "prop": "iconPosition",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "ButtonSelectorDirection",
+      "to": "`ButtonChevron` (`down` | `end`)",
+      "codemod": "manual"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Button",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Button",
+      "prop": "align",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Button",
+      "from": "rightText",
+      "to": "meta",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Button",
+      "prop": "chevron",
+      "values": {
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Button",
+      "from": "level",
+      "to": "indent",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Button",
+      "before": "`chevron=\"right\"` and `align=\"left\"`/`\"right\"` pointed to the physical side in right-to-left text",
+      "after": "`chevron=\"end\"` mirrors and `align=\"start\"`/`\"end\"` follow the text direction"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "value",
+      "before": "`Date`, or `{ start, end }` of `Date`",
+      "after": "A `YYYY-MM-DD` string, or `{ start, end }` of them; a `Date` or a date-time string is invalid",
+      "codemod": "manual",
+      "legacy": "\\bnew Date\\b|\\d{4}-\\d{2}-\\d{2}T\\d"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "defaultValue",
+      "before": "`Date`, or `{ start, end }` of `Date`",
+      "after": "A `YYYY-MM-DD` string, or `{ start, end }` of them; a `Date` or a date-time string is invalid",
+      "codemod": "manual",
+      "legacy": "\\bnew Date\\b|\\d{4}-\\d{2}-\\d{2}T\\d"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "min",
+      "before": "`Date`",
+      "after": "A `YYYY-MM-DD` string; a `Date` or a date-time string is invalid",
+      "codemod": "manual",
+      "legacy": "\\bnew Date\\b|\\d{4}-\\d{2}-\\d{2}T\\d"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "max",
+      "before": "`Date`",
+      "after": "A `YYYY-MM-DD` string; a `Date` or a date-time string is invalid",
+      "codemod": "manual",
+      "legacy": "\\bnew Date\\b|\\d{4}-\\d{2}-\\d{2}T\\d"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "disabledDates",
+      "before": "`Date[]`",
+      "after": "`YYYY-MM-DD` strings",
+      "codemod": "manual",
+      "legacy": "\\bnew Date\\b|\\d{4}-\\d{2}-\\d{2}T\\d"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Calendar",
+      "prop": "onValueChange",
+      "before": "`details.value` was a `Date` or a range of them",
+      "after": "`details.value` is a `YYYY-MM-DD` string or a range of them",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Calendar",
+      "before": "`weekStartsOn` defaulted to 0 (Sunday)",
+      "after": "The first weekday follows `locale`; set `weekStartsOn` to pin it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Calendar",
+      "before": "An unreadable `value`, `defaultValue`, `viewDate`, `defaultViewDate`, `min`, `max`, `disabledDates`, `locale` or `weekStartsOn` threw during render",
+      "after": "The calendar renders without it and reports it once in development; a day given for a range, or a range for a day, is projected silently"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Card",
+      "from": "interactive",
+      "to": "hoverable",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Card",
+      "from": "footerLayout",
+      "to": "footerAlign",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Card.Header",
+      "from": "layout",
+      "to": "orientation",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Card.Header",
+      "prop": "orientation",
+      "values": {
+        "stack": "vertical",
+        "bar": "horizontal"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Card.Footer",
+      "from": "layout",
+      "to": "align",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "CardFooterLayout",
+      "to": "CardAlign",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "CardActionAlign",
+      "to": "CardAlign",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "CardHeaderLayout",
+      "to": "`CardHeaderOrientation` (`vertical` | `horizontal`)",
+      "codemod": "manual"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Card",
+      "from": "content",
+      "codemod": "auto"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Card.Title",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Card.Description",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Card.Title",
+      "prop": "align",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Card.Description",
+      "prop": "align",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Card",
+      "before": "`content` without `title`, `description` or `footer` was wrapped in the content part",
+      "after": "Children without `title`, `description` or `footer` render directly in the card; wrap them in `Card.Content` to keep the part"
+    },
+    {
+      "kind": "behavior",
+      "component": "Card",
+      "before": "Root `footerAlign` on a compound Card without `footer` silently did nothing",
+      "after": "Move it to `Card.Footer align`; development builds report the unsupported root combination"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Carousel",
+      "prop": "slides",
+      "use": "One child per slide: `<Media src alt />` for each former `{ src, alt }` (in JSON, `{ \"__componentName__\": \"Media\", \"src\": …, \"alt\": … }`)",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Carousel/Carousel#CarouselMediaSlide",
+      "to": "`MediaImageProps` of the `Media` children",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/use-controllable-machine-prop#useControllableMachineProp",
+      "to": "`useControllableState` from `assets/adapters/react/use-controllable-state`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Carousel",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Carousel",
+      "prop": "orientation",
+      "use": "Remove it; a carousel moves horizontally. Content that scrolls vertically belongs in `Scroll`",
+      "codemod": "auto",
+      "values": {
+        "horizontal": ""
+      }
+    },
+    {
+      "kind": "behavior",
+      "component": "Carousel",
+      "before": "A text or number child became an image whose URL was that text",
+      "after": "A text child is a text slide; images are `Media` children, and any other JSON descriptor is reported and left out"
+    },
+    {
+      "kind": "behavior",
+      "component": "Carousel",
+      "before": "Control names, slide names, the rotation button text and the announced kinds were fixed English strings",
+      "after": "`labels` renames them: `previous`, `next`, `play`, `pause`, `slide` (`{index}`, `{count}`), `goToSlide` (`{index}`), `roleCarousel`, `roleSlide`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Carousel",
+      "before": "The root took only `className`; every indicator was a tab stop marked `aria-pressed`; one slide still showed two disabled arrows and a dot",
+      "after": "The root takes native attributes; the indicators are one tab stop whose arrows move and activate, the current one marked `aria-current`; a single position shows no controls"
+    },
+    {
+      "kind": "behavior",
+      "component": "Carousel",
+      "before": "Without `loop`, autoplay stopped at the last slide while its button still read \"Pause rotation\"; focus paused it, a click did not",
+      "after": "Autoplay returns to the first slide after the last; a move by the user, keyboard focus inside (on the rotation control too) or a press outside the rotation control stops it until the rotation control starts it, hover pauses it; the rotation control is an icon button named `labels.play`/`labels.pause`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Carousel",
+      "before": "In right-to-left text the track slid the wrong way and showed nothing; arrows and swipes did not mirror",
+      "after": "The track, ArrowLeft/ArrowRight and swipes follow the computed text direction, however it is set; the arrow icons follow the nearest `dir` attribute; the track follows the pointer while dragged"
+    },
+    {
+      "kind": "behavior",
+      "component": "Carousel",
+      "before": "`slidesPerView` above the number of slides stretched the slides to fill the width",
+      "after": "Each slide keeps its `1 / slidesPerView` share; a fractional or zero `slidesPerView` is reported and becomes a whole number from 1"
+    },
+    {
+      "kind": "behavior",
+      "component": "Carousel",
+      "before": "The root and viewport carried `data-state` (`idle`, `dragging`, `auto-playing`); slides carried `aria-hidden` and `data-state`",
+      "after": "Slides outside the view are `inert` (also on React 19) and marked by the absence of `data-current`; the root carries no state attribute"
+    },
+    {
+      "kind": "behavior",
+      "component": "Carousel",
+      "before": "Each slide was named \"Slide 1 of 3\" beside `aria-roledescription=\"slide\"`, so the kind was announced twice",
+      "after": "The default `labels.slide` is `{index} of {count}`; pass `labels.slide` to restore the old wording"
+    },
+    {
+      "kind": "behavior",
+      "component": "Checkbox",
+      "before": "`ref` pointed to the `<label>`",
+      "after": "`ref` points to the native checkbox `<input>`; `className` and `style` still style the label"
+    },
+    {
+      "kind": "behavior",
+      "component": "Checkbox",
+      "before": "`onCheckedChange` ran before the native `onChange`",
+      "after": "`onChange` runs first, and its `preventDefault()` cancels the change"
+    },
+    {
+      "kind": "export",
+      "from": "assets/adapters/react/use-checked-input#syncCheckedInput",
+      "to": "`useCheckedInput(options)`, which owns the checked state and writes the input",
+      "codemod": "manual"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Code",
+      "from": "code",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Code",
+      "before": "A wrapper typed with `CodeProps` (such as a syntax-highlighting one) took and passed the source as `code`",
+      "after": "The wrapper reads and passes `children` and is fixed by hand: the codemod rewrites only `<Code code>` elements, and the type checker reports the wrapper and each of its `code` call sites"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Code",
+      "from": "highlight",
+      "to": "highlightedLines",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Code",
+      "prop": "titleAttr",
+      "use": "Remove it; a native tooltip on the whole block has no replacement (`title` is the header)",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Code",
+      "prop": "collapsedHeight",
+      "use": "`collapsedLines`, the number of lines a collapsed source shows (the old 160px showed about 7)",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Code",
+      "before": "A source collapsed when it had more than 8 lines or 240 characters, to `collapsedHeight` pixels",
+      "after": "A source collapses when it has more lines than `collapsedLines` (default 8), to exactly its first that many lines; it cannot scroll while collapsed and expands from its first line"
+    },
+    {
+      "kind": "behavior",
+      "component": "Code",
+      "before": "Without `title`, a short source had no copy button",
+      "after": "The copy button is always there: in the header, which an untitled source of more than one line also gets, or at the inline end beside an untitled one-line source; a successful copy shows a check and announces `labels.copied`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Code",
+      "before": "`tokenizedLines` supplied the source when `code` was omitted, and their text was shown even where it differed from `code`",
+      "after": "`children` is the only source; a line whose tokens are missing or spell other text (a highlighter still catching up) renders plain, so what is shown is what is copied"
+    },
+    {
+      "kind": "behavior",
+      "component": "Code",
+      "before": "A final line break rendered an empty, numbered last line",
+      "after": "A final line break ends the last line; the copy button still copies it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Code",
+      "before": "The root carried `data-language`; lines carried `data-line` and `data-highlight`; the `pre` carried `is-collapsed`/`is-scrollable`",
+      "after": "`<code>` carries the `language-*` class; highlighted lines are `<mark>` elements; the root carries `data-state=\"collapsed\" | \"expanded\"` when the source can collapse; the `pre` is `dir=\"ltr\"`, `translate=\"no\"`, and `tabindex=\"0\"` while it scrolls, `-1` otherwise"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Command",
+      "from": "value",
+      "to": "search",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Command",
+      "from": "defaultValue",
+      "to": "defaultSearch",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Command",
+      "from": "onValueChange",
+      "to": "onSearchChange",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Command",
+      "before": "`onValueChange({ value })` reported the search text",
+      "after": "`onSearchChange({ search })` reports it; read `search` from the details"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Command",
+      "prop": "surfaceBreakpoint",
+      "use": "Remove it; `surface=\"auto\"` becomes a dialog below 900px",
+      "codemod": "auto"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Command",
+      "from": "emptyContent",
+      "key": "empty",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Command",
+      "prop": "groups",
+      "use": "Group items: `{ type: \"group\", label, items }` inside `items`, in list order",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Command",
+      "prop": "items[].group",
+      "use": "Move the item into its group item: `{ type: \"group\", label, items: [item] }`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Command",
+      "prop": "items[].id",
+      "use": "`items[].value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Command",
+      "prop": "items[].onSelect",
+      "use": "Command `onSelect({ value })`, branching on `value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Command",
+      "before": "`onSelect({ item })` received a copy of the item with its label turned into a string",
+      "after": "`onSelect({ value })` receives the item value"
+    },
+    {
+      "kind": "export",
+      "from": "CommandGroup",
+      "to": "`CommandItemEntry`, which includes `{ type: \"group\", label, items }`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Command",
+      "before": "An element `label` was searched as the text \"[object Object]\"",
+      "after": "The search reads `textValue`, else a text `label`, plus `keywords`; give an element label a `textValue`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Command",
+      "before": "The whole search had to occur as one piece of the label or of a keyword",
+      "after": "Every word of the search must occur in the item text or a keyword, ignoring case and accents"
+    },
+    {
+      "kind": "behavior",
+      "component": "Command",
+      "before": "`placeholder` defaulted to \"Search...\" and named the field, the list (\"Command items\") and the dialog (\"Commands\")",
+      "after": "There is no default text; `aria-label`, `aria-labelledby` or `placeholder` names the field, its list, the dialog and its trigger"
+    },
+    {
+      "kind": "behavior",
+      "component": "Command",
+      "before": "`ref` and `className` went on the `.uf-command` box, and the component took no other native attributes",
+      "after": "`ref` and native attributes (`id`, `autoFocus`, `onKeyDown`, `aria-describedby`…) go on the search field, which a dialog renders only while open; `className` and `style` stay on `.uf-command`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Command",
+      "before": "The empty text showed only for a search without results; the empty part sat inside the listbox",
+      "after": "It shows whenever no item is listed, after the listbox"
+    },
+    {
+      "kind": "behavior",
+      "component": "Command",
+      "before": "Items were grouped after the ungrouped ones, and Enter could pick another item than the highlighted one",
+      "after": "Items and groups keep their order in `items`; Enter picks the highlighted item"
+    },
+    {
+      "kind": "behavior",
+      "component": "Command",
+      "before": "The root carried `data-state=\"focused|idle\"`; group labels had `role=\"presentation\"`",
+      "after": "No focus state attribute (use `:focus-within`); group labels are `aria-hidden` and name their group"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Date",
+      "prop": "showPresets",
+      "use": "Pass `presets`; they render whenever the list is not empty",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Date",
+      "prop": "views",
+      "use": "`mode` and `openTo`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Date",
+      "from": "clearLabel",
+      "key": "clear",
+      "codemod": "auto"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Date",
+      "from": "nowLabel",
+      "key": "now",
+      "codemod": "auto"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Date",
+      "from": "closeLabel",
+      "key": "close",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Date",
+      "prop": "presets",
+      "before": "`{ label, value }` items",
+      "after": "Each item also needs an `id`, unique within the picker",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Date",
+      "before": "`weekStartsOn` defaulted to 1 (Monday)",
+      "after": "The first weekday follows `locale`; set `weekStartsOn` to pin it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Date",
+      "before": "`ref` pointed to the wrapper `<div>`",
+      "after": "`ref` points to the trigger `<button>`; `className` and `style` still style the whole field"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Date",
+      "from": "showClear",
+      "to": "clearable",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Date",
+      "prop": "surfaceTitle",
+      "use": "The picker takes the field name: `label`, `aria-label` or `aria-labelledby`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Date",
+      "prop": "surfaceBreakpoint",
+      "use": "`surface=\"auto\"` switches to a sheet below 900px; pass `surface=\"sheet\"` or `\"popover\"` to pin one",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Date",
+      "before": "The trigger showed \"Pick date\" or \"Pick time\", and an unlabelled field was named \"Choose date\" or \"Choose time\"",
+      "after": "There is no English default: pass `placeholder`, and `label` or `aria-label`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Date",
+      "before": "Label, help and error were `.uf-date__label`, `.uf-date__description` and `.uf-date__error` inside `.uf-date__triggerWrap`",
+      "after": "They are the shared Field parts `.uf-field__label`, `.uf-field__description`, `.uf-field__error` and `.uf-field__required` (`[data-scope=\"field\"]`); `labelPosition` places the label"
+    },
+    {
+      "kind": "behavior",
+      "component": "Date",
+      "before": "An unreadable `value`, `defaultValue`, `min`, `max`, `disabledDates`, `presets`, `format`, `locale`, `timezone` or `weekStartsOn`, or an out-of-range `disabledTime`, threw during render",
+      "after": "The picker renders without it (a preset is dropped, a format or locale falls back) and reports it once in development; a point given for a range, or a range for a point, is projected silently"
+    },
+    {
+      "kind": "behavior",
+      "component": "Date",
+      "before": "`membrane={false}` also removed spacing around the open picker surface",
+      "after": "It now affects the trigger only; the picker surface retains its own spacing"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "FloatingOverlay",
+      "from": "trigger",
+      "to": "openOn",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "FloatingOverlay",
+      "before": "Its hover hook, `useHoverIntent({ enabled, open, triggerRef, contentRef, send })` from `assets/adapters/react/use-hover-intent`, sent pointer and focus events to a machine",
+      "after": "`useHoverIntent({ value, onValueChange, openDelay, closeDelay })` proposes the open key; spread `trigger(key)` on each trigger and `content` on the surface"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Icon",
+      "from": "label",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "controlRole",
+      "to": "role",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaControls",
+      "to": "aria-controls",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaActiveDescendant",
+      "to": "aria-activedescendant",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaAutoComplete",
+      "to": "aria-autocomplete",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaExpanded",
+      "to": "aria-expanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "ariaHasPopup",
+      "to": "aria-haspopup",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "controlRef",
+      "to": "ref",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Input",
+      "prop": "textLayout",
+      "use": "`multiline` instead of `\"wrap\"`; omit `\"scroll\"`",
+      "codemod": "auto",
+      "values": {
+        "wrap": "multiline",
+        "scroll": ""
+      }
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Input",
+      "prop": "stretchText",
+      "use": "Remove it; it had no effect",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Input",
+      "prop": "iconPosition",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "InputTextLayout",
+      "to": "The boolean `multiline` prop",
+      "codemod": "manual"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Input",
+      "from": "clearLabel",
+      "key": "clear",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Input",
+      "from": "labelOrientation",
+      "to": "labelPosition",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Input",
+      "prop": "labelPosition",
+      "values": {
+        "vertical": "top",
+        "horizontal": "start"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Input/Input#InputLabelOrientation",
+      "to": "`FieldProps['labelPosition']` (`'top' | 'start'`)",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Input",
+      "before": "`clearable` defaulted to `true`",
+      "after": "`clearable` defaults to `false`; pass `clearable` where an explicit clear action is needed"
+    },
+    {
+      "kind": "behavior",
+      "component": "Input",
+      "before": "`membrane` defaulted to `false`",
+      "after": "`membrane` defaults to `true`, like every control in a row; pass `membrane={false}` for the old spacing"
+    },
+    {
+      "kind": "behavior",
+      "component": "Input",
+      "before": "`onValueChange` ran before the native `onChange`",
+      "after": "`onChange` runs first, and its `preventDefault()` cancels the edit"
+    },
+    {
+      "kind": "behavior",
+      "component": "Input",
+      "before": "The `error` message was a `role=\"alert\"` live region",
+      "after": "The control describes the message (`aria-describedby`); nothing is announced on render"
+    },
+    {
+      "kind": "behavior",
+      "component": "Input",
+      "before": "Label, help, error and required marker were `.uf-input__description`, `.uf-input__error`, `.uf-input__required` and `[data-scope=\"input\"][data-part=\"label\"]`",
+      "after": "They are the shared Field parts `.uf-field__label`, `.uf-field__description`, `.uf-field__error` and `.uf-field__required` (`[data-scope=\"field\"]`)"
+    },
+    {
+      "kind": "behavior",
+      "component": "Input",
+      "before": "`ref` pointed to the wrapper `<div>`",
+      "after": "`ref` points to the native input or textarea; `className` and `style` still style the outer layout"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Markdown",
+      "from": "content",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Markdown",
+      "from": "allowRawHtml",
+      "to": "html",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Markdown",
+      "prop": "safeMode",
+      "use": "Remove it: sanitization is always on, and `html` alone decides whether raw HTML renders (`safeMode={false}` without `allowRawHtml` changed nothing)",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Markdown",
+      "prop": "fullWidth",
+      "use": "Remove it: Markdown always fills its container; `fullWidth={false}` narrowed it only inside a membrane",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Markdown",
+      "before": "Markdown had the 1px outer spacing box of `membrane` by default",
+      "after": "Block content has none by default, like Table and Media; pass `membrane` to keep it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Markdown",
+      "before": "Without `allowRawHtml`, a raw HTML block vanished with its text and inline tags were dropped; with it, `safeMode` chose between Markdown tags only and a wider set",
+      "after": "Without `html`, raw HTML shows as the text it was typed as; with `html` it renders through one allowlist of text and block tags (details, kbd, sup, div, …), never scripts, styles, forms, frames, ids or classes"
+    },
+    {
+      "kind": "behavior",
+      "component": "Markdown",
+      "before": "With `gfm` on, a newline inside a paragraph was always a line break, as in GitHub comments",
+      "after": "It is a space, as in Markdown files and CommonMark; pass `breaks` to keep line breaks, with or without `gfm`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Markdown",
+      "before": "Markdown parsed with the global `marked` instance, so extensions registered with `marked.use()` (highlighting, footnotes, custom renderers) changed its output",
+      "after": "Markdown parses with its own instances; `marked.use()` never changes what it renders"
+    },
+    {
+      "kind": "behavior",
+      "component": "Markdown",
+      "before": "A source marked could not parse, such as quotes nested thousands of levels deep, rendered an empty block without a report",
+      "after": "It shows as the text it was typed as, and development builds report it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Markdown",
+      "before": "`linkTarget` applied to every link not starting with `/` or `#` (a relative `docs/x` opened in a new tab, `//host` in place), and `linkRel` only to links opening in a new tab",
+      "after": "`linkTarget` and `linkRel` apply to absolute links: http(s) and protocol-relative URLs, read as browsers read them (surrounding spaces, `\\` for `/`). `linkRel` (default `noopener noreferrer`) applies whatever the target; a link that opens in place has no `target`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Markdown",
+      "before": "A task checkbox was named \"Completed task\" or \"Incomplete task\"",
+      "after": "A task checkbox and its text share a `<label>`, so the checkbox is named by its task and announces its own checked state"
+    },
+    {
+      "kind": "behavior",
+      "component": "Markdown",
+      "before": "The HTML sat in an inner `[data-part=\"content\"]` element, and the root carried `data-full-width`",
+      "after": "The root holds the HTML itself; there is no content part and no `data-full-width`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Markdown",
+      "before": "Table cells were always left-aligned, overriding GFM column alignment; lists and quotes were indented from the left and task lists lost their indent",
+      "after": "Columns follow their alignment and unaligned cells start at the inline start; lists, quotes and task checkboxes follow the text direction, a task checkbox takes its bullet’s place, and code blocks read left to right"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Media",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Media",
+      "before": "`ref`, `id`, `role`, `tabIndex` and `aria-label` went to the wrapping box, `title` to both the box and the element; other native attributes were dropped",
+      "after": "`ref` and native attributes go to the `<img>`, `<video>` or `<audio>` element; `className` and `style` stay on the box, while `hidden` hides the whole box and its fallback"
+    },
+    {
+      "kind": "behavior",
+      "component": "Media",
+      "before": "`alt` defaulted to `\"\"`, so an image without it was silently decorative; any type accepted every prop",
+      "after": "`type` selects the props: an image requires `alt` (`\"\"` marks it decorative) and takes `variant`; video and audio take player attributes and `<track>` children"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Media",
+      "prop": "variant",
+      "values": {
+        "rounded": "default"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Media",
+      "before": "`onLoad()` and `onError()` received no event; on video and audio `onLoad` ran on `loadeddata`",
+      "after": "`onLoad(event)` and `onError(event)` are the element's native events; video and audio report loading through the native `onLoadedData(event)`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Media",
+      "before": "An image in a box with a height stretched to fill it unless `objectFit` was set; a video kept its own width",
+      "after": "Images default to `objectFit=\"cover\"`; video and audio fill the box width and video keeps `contain`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Media",
+      "before": "A failed load replaced the element with the fallback and set `data-error` on the box; an empty `src` requested the page",
+      "after": "The box carries `data-state` (`loading`, `loaded`, `error`), a player counting as loaded once its metadata arrives or the browser holds off fetching until playback; a missing or empty `src` counts as failed; the fallback shows beside the element, which is hidden"
+    },
+    {
+      "kind": "behavior",
+      "component": "Media",
+      "before": "The JSON contract listed `title`",
+      "after": "`title` is left out of the contract, as it names nothing reliably; an image is named by `alt` and a player by `aria-label`. In TSX it still reaches the element as a native attribute"
+    },
+    {
+      "kind": "behavior",
+      "component": "Media",
+      "before": "`width=\"50\"` or `height=\"50\"` was passed as an invalid unitless CSS length and silently ignored",
+      "after": "Numeric strings now mean pixels and report their normalization once in development"
+    },
+    {
+      "kind": "export",
+      "from": "Media/Media#MediaLoading",
+      "to": "`ImgHTMLAttributes<HTMLImageElement>['loading']`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Media/Media#MediaDecoding",
+      "to": "`ImgHTMLAttributes<HTMLImageElement>['decoding']`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Media/Media#mediaAnatomy",
+      "to": "The `[data-scope=\"media\"][data-part=\"root\" | \"element\" | \"fallback\"]` attributes",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "The `.uf-menu` root was a `<div>`",
+      "after": "It is a `<span>`, so a Menu is valid inside a `<p>`; select it by class"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Menu",
+      "from": "trigger",
+      "to": "openOn",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Menu",
+      "from": "surfaceTitle",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Menu",
+      "prop": "surfaceBreakpoint",
+      "use": "Remove it; `surface=\"auto\"` becomes a sheet below 900px",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Menu/Menu#MenuItemDef",
+      "to": "Menu/Menu#MenuItem",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Menu/Menu#MenuSeparatorDef",
+      "to": "`MenuItemEntry`, which includes `{ type: \"separator\" }`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Menu/Menu#MenuGroupDef",
+      "to": "`MenuItemEntry`, which includes `{ type: \"group\", label, items }`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "Without children the trigger was an \"Options\" button, and \"Options\" titled the sheet",
+      "after": "Without children nothing renders; the sheet is titled by `aria-label`, else by text children"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "`surfaceTitle` only titled the sheet; the menu had no accessible name",
+      "after": "`aria-label` names the menu and titles the sheet; without it a click menu is named by its trigger"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "`ref` pointed to the `.uf-menu-content` surface, which stayed in the document while closed",
+      "after": "`ref` and native attributes go on the `[role=\"menu\"]` list, which exists only while open; `className` and `style` stay on `.uf-menu-content`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "Items were Face UI Buttons (`.uf-button`, `[data-scope=\"button\"]`)",
+      "after": "Items are `[data-scope=\"menu\"][data-part=\"item\"].uf-menu-item` buttons, or links with `href`; the label is `.uf-menu-itemLabel`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "`.uf-menu` and `.uf-menu-content` carried `data-trigger=\"click|context\"`",
+      "after": "They carry `data-open-on=\"click|context\"`, after the prop"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "Typeahead read the text inside an item label that was an element",
+      "after": "Typeahead reads `textValue`, else a text `label`; give an element label a `textValue` to keep it searchable"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "A context menu opened below its trigger",
+      "after": "It opens at the pointer; `side`, `align` and `sideOffset` place click menus only"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "A press inside the context area kept an open context menu open, and closing it moved focus to the area or its first focusable element",
+      "after": "Any press outside the menu closes it, and a right-click reopens it at the new point; focus returns to where it was when the menu opened"
+    },
+    {
+      "kind": "behavior",
+      "component": "Menu",
+      "before": "Opening by click kept focus on the trigger; Tab left the menu open; disabling an open menu left it open",
+      "after": "A click focuses the menu list and a key opens at the first or last item; Tab closes it from the trigger; `disabled` closes it"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Modal",
+      "from": "closeLabel",
+      "key": "close",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Modal",
+      "from": "closeOnOverlayClick",
+      "to": "closeOnBackdropClick",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Modal",
+      "prop": "placement",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Modal",
+      "prop": "autoFocusOnOpen",
+      "use": "Nothing: opening always moves focus inside, to focus a child already took, else `[data-autofocus]`, else the first control; `portal={false}` previews never take focus",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Modal",
+      "prop": "actions",
+      "use": "`footer` with Button elements, e.g. `footer={<><Button variant=\"outline\" onClick={cancel}>Cancel</Button><Button variant=\"accent\" onClick={save}>Save</Button></>}`; the last button is no longer made accent for you",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "ModalAction",
+      "to": "Button props in `footer`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Modal",
+      "before": "The close button was named \"Close modal\"",
+      "after": "It is named \"Close\"; `labels.close` renames it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Modal",
+      "before": "A closed Modal kept its body mounted and hidden, so a child with `autoFocus` never received focus when it opened",
+      "after": "The surface mounts when the dialog opens and unmounts after it fades out; child state resets on every opening"
+    },
+    {
+      "kind": "behavior",
+      "component": "Modal",
+      "before": "An open `portal={false}` Modal still held focus and took Escape and outside presses, like a portaled one",
+      "after": "An in-place Modal is a static preview: the page, Escape and focus are left alone and `scrollLock` does nothing"
+    },
+    {
+      "kind": "behavior",
+      "component": "Modal",
+      "before": "`edge=\"flush\"` squared and unbordered a centered dialog",
+      "after": "`edge` applies to edge placements only; a centered dialog stays inset"
+    },
+    {
+      "kind": "behavior",
+      "component": "Modal",
+      "before": "`placement=\"left\"`/`\"right\"` sat on the right/left in right-to-left documents",
+      "after": "`start`/`end` follow the dialog direction (`dir`, else the document), and the surface slides in from that side"
+    },
+    {
+      "kind": "behavior",
+      "component": "Modal",
+      "before": "A dialog without a title had no accessible name and no warning",
+      "after": "An open dialog without `title`, `aria-label` or `aria-labelledby` is reported once in development"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Navigation",
+      "from": "activeId",
+      "to": "value",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Navigation",
+      "from": "defaultActiveId",
+      "to": "defaultValue",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Navigation",
+      "from": "onActiveChange",
+      "to": "onValueChange",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Navigation",
+      "prop": "onValueChange",
+      "before": "`details.id`",
+      "after": "`details.value`",
+      "codemod": "manual",
+      "legacy": "\\.id\\b|\\{\\s*id\\s*\\}"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Navigation",
+      "prop": "items[].id",
+      "use": "`items[].value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Navigation",
+      "prop": "orientation",
+      "use": "Remove it: the bar is horizontal; a vertical navigation is `Panel`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Navigation",
+      "prop": "surfaceBreakpoint",
+      "use": "Remove it; `surface=\"auto\"` becomes a sheet below 900px",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Navigation",
+      "from": "surfaceTitle",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "A `<div role=\"navigation\">` with a `menubar` of `menuitem`s; `className` and `ref` moved to the sheet host and dialog on narrow screens",
+      "after": "A `<nav>` landmark of links and disclosure buttons (APG disclosure navigation) on every surface; native attributes, `className`, `style` and `ref` stay on it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "`items[].onClick()` took no event and cancelled the item's `href`",
+      "after": "`items[].onClick(event)` runs first; the link is followed unless it calls `event.preventDefault()`, and the item still becomes current"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "Items nested two levels deep rendered as a labelled section of the dropdown",
+      "after": "A dropdown section is `{ type: \"group\", label, items }`; `items` of a dropdown link are ignored"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "Hovering a dropdown item opened it at once, and `onActiveChange` also fired when `activeId` changed from the parent",
+      "after": "Hover opens after 200 ms and closes 150 ms after leaving; `onValueChange` reports only user activations"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "In the sheet, links were buttons that called `location.assign`, and the sheet was titled \"Navigation\"",
+      "after": "The sheet is a modal bottom sheet of real links, titled by `aria-label`; `labels.open` and `labels.close` name its buttons"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "The landmark had no name unless `surfaceTitle` was set",
+      "after": "The `<nav>` and its sheet are named \"Main\" until `aria-label` or `aria-labelledby` names them"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "A click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed its dropdown or the sheet",
+      "after": "Such a click opens the link elsewhere and leaves the current item, the dropdown and the sheet as they are"
+    },
+    {
+      "kind": "behavior",
+      "component": "Navigation",
+      "before": "Items had `data-active`; bar buttons were `.uf-navigation-trigger`, dropdown links `.uf-navigation-dropdownItem` Buttons, and the sheet used `.uf-navigation-sheet*` classes",
+      "after": "The current link has `aria-current=\"page\"` and the bar button holding it `data-current`; style `[data-part=\"trigger\"]`, `[data-part=\"link\"]` and `.uf-navigation-section` instead"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Overlay",
+      "from": "trigger",
+      "to": "openOn",
+      "codemod": "auto"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Pagination",
+      "from": "surfaceTitle",
+      "key": "choosePage",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Pagination",
+      "prop": "labels",
+      "before": "`previousPage` and `nextPage` keys",
+      "after": "the shared `previous` and `next` keys",
+      "codemod": "manual",
+      "legacy": "\\b(previousPage|nextPage)\\b"
+    },
+    {
+      "kind": "behavior",
+      "component": "Pagination",
+      "before": "A `page`, `defaultPage`, `total`, `pageSize` or `siblingCount` out of range or not an integer threw during render",
+      "after": "Pagination renders it normalized (integers clamped, non-numbers such as `\"50\"` replaced by the default) and reports once in development"
+    },
+    {
+      "kind": "behavior",
+      "component": "Pagination",
+      "before": "`labels.page` without exactly one `{page}` threw during render",
+      "after": "Every `{page}` is replaced by the number; a template without one gets the number appended after a space"
+    },
+    {
+      "kind": "behavior",
+      "component": "Pagination",
+      "before": "The nav's `onClick` ran after the page changed",
+      "after": "`onClick` runs first, and its `preventDefault()` cancels the change"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Panel",
+      "from": "selectedId",
+      "to": "value",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Panel",
+      "from": "defaultSelectedId",
+      "to": "defaultValue",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Panel",
+      "from": "onSelectedChange",
+      "to": "onValueChange",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Panel",
+      "prop": "onValueChange",
+      "before": "`details.selectedId`",
+      "after": "`details.value`",
+      "codemod": "manual",
+      "legacy": "\\bselectedId\\b"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Panel",
+      "prop": "items[].id",
+      "use": "`items[].value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Panel",
+      "prop": "surfaceBreakpoint",
+      "use": "Remove it; `surface=\"auto\"` becomes a sheet below 900px",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Panel",
+      "from": "surfaceTitle",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Panel/Panel#Sidebar",
+      "to": "compat#Sidebar",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Panel/Panel#SidebarProps",
+      "to": "compat#SidebarProps",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Panel/Panel#SidebarItem",
+      "to": "compat#SidebarItem",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "Rows were Buttons (`.uf-sidebar-itemButton`) with `aria-pressed`; `href` rows called `location.assign`, and `onClick()` took no event",
+      "after": "Rows are links or buttons (`.uf-sidebar-item`) with `aria-current=\"page\"`; `onClick(event)` runs first and `preventDefault()` cancels only the link"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "Group rows always showed their children; the group button only flipped `aria-expanded`",
+      "after": "A group shows its rows while expanded (`expanded`); on mount the groups holding the current row are expanded"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "The rail hid the rows of every group, and only string labels named icon-only rows",
+      "after": "A group in the rail expands the panel at that group (in a rail without the toggle it shows its rows in place); every label stays as the accessible name"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "A disabled group's rows stayed usable, and a click with Ctrl, Cmd, Shift or Alt on a link also made it current and closed the sheet",
+      "after": "Disabling a group disables its rows; such a click opens the link elsewhere and leaves the current row and the sheet as they are"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "Rows had `data-selected` and `data-state`; parts were `itemIcon`, `itemLabel` and `groupContent`, and a group's button was `groupLabel`",
+      "after": "The current row has `aria-current=\"page\"`; parts are `icon`, `label`, `group` (the rows of a group) and `trigger` (its button)"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "The header always held the collapse toggle, an empty footer followed the rows, and \"[\" toggled the rail",
+      "after": "`collapsible={false}` removes the toggle; there is no footer and no keyboard shortcut"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "The sheet covered the whole viewport, titled \"Panel\"; `className` and `ref` moved to its host and dialog",
+      "after": "The sheet is a modal drawer at the start edge, titled by `aria-label`; the `<nav>` and the sheet are named \"Sidebar\" until `aria-label` or `aria-labelledby` names them; the `<nav>` keeps native attributes, `className`, `style` and `ref`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "`onSelectedChange` and `onCollapsedChange` also fired when the parent changed `selectedId` or `collapsed`",
+      "after": "`onValueChange` and `onCollapsedChange` report only user actions"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "`style.width` on an expanded inline panel was ignored and reported even without a `width` prop",
+      "after": "`style.width` sizes the expanded panel when `width` is omitted; explicit `width` wins, and `collapsedWidth` still sizes the rail"
+    },
+    {
+      "kind": "behavior",
+      "component": "Panel",
+      "before": "`width=\"280\"` or `collapsedWidth=\"60\"` silently produced invalid CSS",
+      "after": "Numeric strings now mean pixels and report their normalization once in development"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Popover",
+      "prop": "interactive",
+      "use": "Remove it; Popover opens on click, use Tooltip for hover content",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Popover",
+      "prop": "openDelay",
+      "use": "Remove it; Popover opens on click, use Tooltip for hover content",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Popover",
+      "prop": "closeDelay",
+      "use": "Remove it; Popover opens on click, use Tooltip for hover content",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Progress",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Progress",
+      "prop": "indeterminate",
+      "use": "`value={null}`",
+      "codemod": "auto",
+      "values": {
+        "true": "value={null}",
+        "false": ""
+      }
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Radio",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Radio",
+      "from": "ariaLabelledBy",
+      "to": "aria-labelledby",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Radio",
+      "from": "options",
+      "to": "items",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "RadioOption",
+      "to": "RadioItem",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Radio",
+      "before": "Options sat directly in the radiogroup root",
+      "after": "Items sit in `[data-part=\"list\"]`; the root is a field (`uf-field`) that also holds `label`, `description` and `error`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Radio",
+      "before": "An option repeating a value rendered twice under one React key",
+      "after": "The first item with a value wins; later ones are dropped with a development report"
+    },
+    {
+      "kind": "behavior",
+      "component": "Radio",
+      "before": "Home and End did nothing",
+      "after": "Home and End focus and select the first and last enabled item"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Rating",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Rating",
+      "before": "Pressing the selected star again or Home cleared the value",
+      "after": "Neither clears it; reset the value yourself. Show a fixed score with `readOnly`, not `disabled`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Rating",
+      "before": "The root was an inline box sized to its stars; `label` was `[data-scope=\"rating\"][data-part=\"label\"]` inside the membrane",
+      "after": "The root is a block field (`uf-field`) with `label`, `description` and `error` as `[data-scope=\"field\"]` parts; `membrane` spaces the stars only"
+    },
+    {
+      "kind": "behavior",
+      "component": "Rating",
+      "before": "An invalid `max`, a non-finite `value`, `required` without `name` or a non-text `formatValue` result threw",
+      "after": "Each renders normalized (`max` clamped to 1..10, score 0, `required` ignored, the default text) with one development report"
+    },
+    {
+      "kind": "behavior",
+      "component": "Rating",
+      "before": "Shrinking `max`, turning off `allowHalf` or leaving `readOnly` stored the rounded or bounded score",
+      "after": "The stored score stays; only the shown one is bounded or rounded, so the exact score returns with the scale"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Scroll",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Scroll",
+      "before": "Without `height`, the box was 240px tall",
+      "after": "Without `height`, the box is as tall as its content or as its layout makes it (a flex or grid cell, `style.maxHeight`); pass `height={240}` to keep the former size"
+    },
+    {
+      "kind": "behavior",
+      "component": "Scroll",
+      "before": "The viewport was always a tab stop and a region named \"Scrollable text\" or `ariaLabel`",
+      "after": "It is a tab stop only while its content overflows along an axis it scrolls, and stays focusable by script after; until measured (server HTML, no ResizeObserver) it has no tabindex, so the browser decides. A tab stop without `aria-label` or `aria-labelledby` is named \"Scrollable content\", and it is a region only while it is named"
+    },
+    {
+      "kind": "behavior",
+      "component": "Scroll",
+      "before": "The ref and `className` went to the outer box, and no other attribute or handler was passed on",
+      "after": "The ref, native attributes and handlers (`id`, `onScroll`, `aria-*`, `data-*`) go to the scrolling viewport; `className` and `style` go to the outer box. Scroll owns `role`, `tabIndex`, `hidden` and the content, so those are not accepted"
+    },
+    {
+      "kind": "behavior",
+      "component": "Scroll",
+      "before": "Text in a horizontal or both-axes Scroll wrapped at the box width (never narrower than 12 control heights), so it rarely scrolled sideways",
+      "after": "Text that can scroll sideways keeps each line whole and scrolls; in a vertical Scroll it wraps as before"
+    },
+    {
+      "kind": "behavior",
+      "component": "Scroll",
+      "before": "`height=\"50\"` reached CSS as an invalid unitless length and was silently ignored",
+      "after": "A numeric string now means pixels and reports its normalization once in development"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "SegmentedControl",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "SegmentedControl",
+      "prop": "selectionMode",
+      "use": "`multiple` instead of `\"multiple\"`; omit `\"single\"`",
+      "codemod": "auto",
+      "values": {
+        "multiple": "multiple",
+        "single": ""
+      }
+    },
+    {
+      "kind": "behavior",
+      "component": "SegmentedControl",
+      "before": "Single selection used a one-element array",
+      "after": "Single selection is a string or `null`; only `multiple` uses an array"
+    },
+    {
+      "kind": "behavior",
+      "component": "SegmentedControl",
+      "before": "An item without a string `value`, a repeated `value`, or a malformed `items`/`value` threw a TypeError",
+      "after": "The item or key is skipped and a development report names it"
+    },
+    {
+      "kind": "behavior",
+      "component": "SegmentedControl",
+      "before": "A selected choice missing from `items` was discarded, so it stayed unselected when the item returned",
+      "after": "The value is kept and the choice shows as selected again once its item is back; `onValueChange` is not called"
+    },
+    {
+      "kind": "behavior",
+      "component": "SegmentedControl",
+      "before": "The root was the bordered strip of choices",
+      "after": "The root is a field (`uf-field`) with `label`, `description` and `error`; the border is on the `.uf-toggle-list` strip, which keeps its natural width, so a width set on the root no longer stretches it: also give `.uf-toggle-list` `inline-size: 100%`"
+    },
+    {
+      "kind": "behavior",
+      "component": "SegmentedControl",
+      "before": "Removing or disabling the focused choice moved focus to the selected or first choice",
+      "after": "Focus moves to the choice now at its place, else the one before it"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Select",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Select",
+      "prop": "type",
+      "use": "`multiple` instead of `\"multiselect\"`; omit `\"select\"`",
+      "codemod": "auto",
+      "values": {
+        "multiselect": "multiple",
+        "select": ""
+      }
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Select",
+      "prop": "variant",
+      "use": "`surface=\"side\"` or `iconOnly fullWidth={false}`; omit `\"default\"`",
+      "codemod": "auto",
+      "values": {
+        "side": "surface=\"side\"",
+        "iconOnly": "iconOnly fullWidth={false}",
+        "default": ""
+      }
+    },
+    {
+      "kind": "export",
+      "from": "SelectVariant",
+      "to": "The `surface` and `iconOnly` props",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Select/Select#computeSelectSidePosition",
+      "to": "Select/select-side-position#computeSelectSidePosition",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Select/Select#computeSelectSideOptionViewportHeight",
+      "to": "Select/select-side-position#computeSelectSideOptionViewportHeight",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "Select/Select#SelectSidePosition",
+      "to": "Select/select-side-position#SelectSidePosition",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "`ref` pointed to the wrapper `<div>`",
+      "after": "`ref` points to the native trigger `<button>`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "The `.uf-select` root and `.uf-select-wrapper` were `<div>`s",
+      "after": "Both are `<span>`s, so a Select is valid inside a `<p>`; select them by class"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Select",
+      "from": "options",
+      "to": "items",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "SelectOption",
+      "to": "SelectItem",
+      "codemod": "auto"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Select",
+      "from": "closeLabel",
+      "key": "close",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Select",
+      "prop": "surfaceTitle",
+      "use": "The sheet is titled by `label`, else by `aria-label`; pass `aria-label` to name a field without a visible label",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Select",
+      "prop": "surfaceBreakpoint",
+      "use": "Remove it; `surface=\"auto\"` becomes a sheet below 900px",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Select",
+      "from": "labelOrientation",
+      "to": "labelPosition",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Select",
+      "prop": "labelPosition",
+      "values": {
+        "vertical": "top",
+        "horizontal": "start"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "`placeholder` defaulted to \"Select option\", which also titled a sheet without a label",
+      "after": "There is no default text: pass `placeholder`, and name the field with `label`, `aria-label` or `aria-labelledby` (an unnamed Select is reported in development)"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "A value missing from `options` showed its raw key in the trigger and was submitted",
+      "after": "It shows as unselected and is not submitted until an item with that value appears; the value itself is kept"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "The label was `[data-scope=\"select\"][data-part=\"label\"]` at 11px, and the root carried `data-label-orientation`",
+      "after": "Label, required marker, `description` and `error` are the shared Field parts (`.uf-field__*`, `[data-scope=\"field\"]`, 12px label); the root carries `data-label-position`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "A failed `required` check showed only the browser bubble",
+      "after": "The browser message also fills the field error slot and marks the trigger `aria-invalid` until a value is chosen; `error` wins over it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "`membrane={false}` also removed spacing around the open list surface",
+      "after": "It now affects the trigger and options only; the list surface retains its own spacing"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "`contentMinWidth=\"280\"` was inserted into CSS math without a unit and silently ignored",
+      "after": "A numeric string now means pixels and reports its normalization once in development"
+    },
+    {
+      "kind": "behavior",
+      "component": "Select",
+      "before": "Home and End did nothing on a closed list",
+      "after": "Home and End open the list at the first or last enabled item"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Separator",
+      "prop": "role",
+      "use": "`decorative={false}` for `role=\"separator\"`; `decorative` for `role=\"none\"`. A role passed anyway is ignored",
+      "codemod": "auto",
+      "values": {
+        "separator": "decorative={false}",
+        "none": "decorative",
+        "presentation": "decorative"
+      }
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Separator",
+      "prop": "aria-orientation",
+      "use": "Set `orientation` to the direction the line is drawn in; a separator that is not decorative announces it. A passed `aria-orientation` is ignored",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Separator",
+      "prop": "children",
+      "use": "Place the text beside the separator; a separator is only a line",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Separator",
+      "prop": "dangerouslySetInnerHTML",
+      "use": "Place the markup beside the separator; a separator is only a line",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Separator",
+      "prop": "defaultValue",
+      "use": "Nothing: a separator holds no value, and the attribute never did anything",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Separator",
+      "prop": "defaultChecked",
+      "use": "Nothing: a separator holds no value, and the attribute never did anything",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Separator",
+      "before": "Outside a flex or grid row, a vertical separator with membrane drew its line 2px shorter than a control",
+      "after": "The line is one control tall there. Without membrane it still takes its height only from its row or its own style"
+    },
+    {
+      "kind": "behavior",
+      "component": "Separator",
+      "before": "The line’s thickness was pinned by min and max sizes, so no className or style could widen it (a resize handle stayed 1px wide)",
+      "after": "A style on the line, or a className rule that outranks the library’s, widens it. A widened resize handle is painted in the separator color unless that rule also sets its background"
+    },
+    {
+      "kind": "behavior",
+      "component": "Separator",
+      "before": "With membrane, a horizontal separator in a row kept its container’s full width and overflowed the row",
+      "after": "It never overflows: it shrinks along with its siblings, so a multi-word label beside it wraps unless it is kept on one line"
+    },
+    {
+      "kind": "behavior",
+      "component": "Separator",
+      "before": "In forced colors the line was repainted in the canvas color and disappeared",
+      "after": "It is drawn in CanvasText"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Skeleton",
+      "from": "variant",
+      "to": "shape",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Skeleton",
+      "prop": "aria-hidden",
+      "use": "Nothing: a skeleton is always hidden from assistive technology. Mark the region being loaded with `aria-busy`",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Skeleton",
+      "prop": "children",
+      "use": "Place the content after loading instead of the skeleton; a placeholder has no content",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Skeleton",
+      "prop": "dangerouslySetInnerHTML",
+      "use": "Place the markup after loading instead of the skeleton; a placeholder has no content",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Skeleton",
+      "prop": "defaultValue",
+      "use": "Nothing: a placeholder holds no value, and the attribute never did anything",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Skeleton",
+      "prop": "defaultChecked",
+      "use": "Nothing: a placeholder holds no value, and the attribute never did anything",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Skeleton",
+      "before": "The root carried the shape as `data-variant`",
+      "after": "It carries it as `data-shape`, after the prop"
+    },
+    {
+      "kind": "behavior",
+      "component": "Skeleton",
+      "before": "A width or height below one control height was raised to it, so `height={12}` still drew 32px",
+      "after": "width and height are the size it paints, smaller as well as larger"
+    },
+    {
+      "kind": "behavior",
+      "component": "Skeleton",
+      "before": "The default text shape was a filled box four controls wide and one control tall",
+      "after": "It paints a bar as tall as the text across its column, with the space of a one-line Text around it, so it sits where the glyphs will; width and height size the bar. In a container sized by its content, such as an inline label or a popover, it adds no width of its own, so give it a width there"
+    },
+    {
+      "kind": "behavior",
+      "component": "Skeleton",
+      "before": "The rect shape was a square one control across",
+      "after": "It is as wide as its column and one control tall; set `height` for an image or a card, and a width in a container sized by its content"
+    },
+    {
+      "kind": "behavior",
+      "component": "Skeleton",
+      "before": "A circle given only a width or only a height was one control across the other way",
+      "after": "It stays round from the one side it is given, a percentage of its column included"
+    },
+    {
+      "kind": "behavior",
+      "component": "Skeleton",
+      "before": "In forced colors the placeholder was repainted in the canvas color and disappeared",
+      "after": "It is painted in GrayText"
+    },
+    {
+      "kind": "behavior",
+      "component": "Skeleton",
+      "before": "`style.width` and `style.height` won over explicit `width` and `height` props",
+      "after": "Explicit size props win; `style` supplies only an omitted axis"
+    },
+    {
+      "kind": "behavior",
+      "component": "Skeleton",
+      "before": "`width=\"50\"` or `height=\"50\"` reached CSS without a unit and silently left the default size",
+      "after": "Numeric strings now mean pixels and report their normalization once in development"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Slider",
+      "prop": "variant",
+      "use": "`showValue` instead of `\"advanced\"`; omit `\"simple\"`",
+      "codemod": "auto",
+      "values": {
+        "advanced": "showValue",
+        "simple": ""
+      }
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Slider",
+      "prop": "leadingIcon",
+      "use": "Put leading content in `label` or next to the slider",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Slider",
+      "prop": "leadingText",
+      "use": "Put leading content in `label` or next to the slider",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Slider",
+      "from": "cropLocksValue",
+      "to": "clampToCrop",
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "SliderVariant",
+      "to": "The boolean `showValue` prop",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Slider/SliderAdvanced#SliderAdvanced",
+      "to": "`Slider` with `showValue` and `crop`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Slider/SliderAdvanced#SliderAdvancedProps",
+      "to": "`SliderProps`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "Slider/SliderAdvanced#SliderCropRange",
+      "to": "Slider/Slider#SliderCropRange",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Slider",
+      "from": "onCropChange",
+      "to": "onCropRangeChange",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Slider",
+      "from": "onCropCommit",
+      "to": "onCropRangeCommit",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Slider",
+      "prop": "onCropRangeChange",
+      "before": "The crop range itself, `{ min, max }`",
+      "after": "`{ cropRange }`, with `cropRange` as `{ start, end }`",
+      "codemod": "manual",
+      "legacy": "^\\s*\\(?\\s*(?:\\{[^}]*\\b(?:min|max)\\b[\\s\\S]*?=>|([A-Za-z_$][\\w$]*)\\b[\\s\\S]*?=>[\\s\\S]*\\b\\1\\s*\\.\\s*(?:min|max)\\b)"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Slider",
+      "prop": "onCropRangeCommit",
+      "before": "The crop range itself, `{ min, max }`",
+      "after": "`{ cropRange }`, with `cropRange` as `{ start, end }`",
+      "codemod": "manual",
+      "legacy": "^\\s*\\(?\\s*(?:\\{[^}]*\\b(?:min|max)\\b[\\s\\S]*?=>|([A-Za-z_$][\\w$]*)\\b[\\s\\S]*?=>[\\s\\S]*\\b\\1\\s*\\.\\s*(?:min|max)\\b)"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Slider",
+      "prop": "cropRange",
+      "before": "`{ min, max }`",
+      "after": "`{ start, end }`; `min` and `max` name the ends of the scale",
+      "codemod": "manual",
+      "legacy": "[{,]\\s*[\"']?(?:min|max)[\"']?\\s*[:,}]"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Slider",
+      "prop": "defaultCropRange",
+      "before": "`{ min, max }`",
+      "after": "`{ start, end }`; `min` and `max` name the ends of the scale",
+      "codemod": "manual",
+      "legacy": "[{,]\\s*[\"']?(?:min|max)[\"']?\\s*[:,}]"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Slider",
+      "prop": "onValueChange",
+      "before": "`details.value` was always an array",
+      "after": "`details.value` has the shape of `value`/`defaultValue`: a number for a number, an array for an array",
+      "codemod": "manual",
+      "legacy": "\\bvalue\\s*(?:\\[\\s*0\\s*\\]|\\.\\s*at\\s*\\(\\s*0\\s*\\))|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[\\s*[A-Za-z_$][\\w$]*\\s*\\]",
+      "unless": {
+        "value": "^\\s*\\[",
+        "defaultValue": "^\\s*\\[",
+        "onValueChange": "\\bvalue\\s*(?:\\[\\s*[1-9]|\\.\\s*at\\s*\\(\\s*[1-9])|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[[^\\]]*,|\\.\\.\\.\\s*value\\b",
+        "onValueCommit": "\\bvalue\\s*(?:\\[\\s*[1-9]|\\.\\s*at\\s*\\(\\s*[1-9])|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[[^\\]]*,|\\.\\.\\.\\s*value\\b",
+        "labels": "[\"']?thumbs[\"']?\\s*:\\s*\\[[^\\]]*,"
+      }
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Slider",
+      "prop": "onValueCommit",
+      "before": "`details.value` was always an array",
+      "after": "`details.value` has the shape of `value`/`defaultValue`: a number for a number, an array for an array",
+      "codemod": "manual",
+      "legacy": "\\bvalue\\s*(?:\\[\\s*0\\s*\\]|\\.\\s*at\\s*\\(\\s*0\\s*\\))|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[\\s*[A-Za-z_$][\\w$]*\\s*\\]",
+      "unless": {
+        "value": "^\\s*\\[",
+        "defaultValue": "^\\s*\\[",
+        "onValueChange": "\\bvalue\\s*(?:\\[\\s*[1-9]|\\.\\s*at\\s*\\(\\s*[1-9])|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[[^\\]]*,|\\.\\.\\.\\s*value\\b",
+        "onValueCommit": "\\bvalue\\s*(?:\\[\\s*[1-9]|\\.\\s*at\\s*\\(\\s*[1-9])|^\\s*\\(?\\s*\\{[^}]*\\bvalue\\s*:\\s*\\[[^\\]]*,|\\.\\.\\.\\s*value\\b",
+        "labels": "[\"']?thumbs[\"']?\\s*:\\s*\\[[^\\]]*,"
+      }
+    },
+    {
+      "kind": "behavior",
+      "component": "Slider",
+      "before": "An empty or non-finite `value`, a `labels.thumbs` of the wrong length, a blank control name, a non-object crop range or a non-text `formatValue` result threw during render",
+      "after": "The slider renders: non-finite entries are dropped (none left reads as `min`), missing or blank names and text fall back to the defaults, and malformed data is reported once in development"
+    },
+    {
+      "kind": "behavior",
+      "component": "Slider",
+      "before": "Narrowing `max`, `min` or the crop rewrote the uncontrolled value (and the default crop) to the clamped one, so widening again did not bring it back",
+      "after": "The value is kept and shown clamped; widening the scale or the crop shows it again, and the default crop follows the scale until the user edits it"
+    },
+    {
+      "kind": "behavior",
+      "component": "Slider",
+      "before": "`onValueCommit`/`onCropRangeCommit` fired only when the parent had accepted the last proposal of the gesture",
+      "after": "They fire when a gesture ends showing a different value than at its start, whatever the parent accepted along the way"
+    },
+    {
+      "kind": "behavior",
+      "component": "Slider",
+      "before": "ArrowRight decreased a vertical slider in right-to-left text",
+      "after": "ArrowRight and ArrowUp always increase a vertical slider; only a horizontal right-to-left track swaps Left and Right"
+    },
+    {
+      "kind": "behavior",
+      "component": "Slider",
+      "before": "The label was a `Text` part (`[data-scope=slider][data-part=label]`, `.uf-slider__label`) with the membrane around it",
+      "after": "The root is a field (`uf-field`) with `label`, `description`, `error`, `labelPosition` and a `required` marker; the label is `.uf-field__label` in the shared field typography, and each thumb carries the description, the error and `aria-invalid`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Steps",
+      "before": "Malformed `items` or keys, and a `step` or `defaultStep` that is not a nonnegative integer, threw during render",
+      "after": "Steps render them normalized (bad items dropped, the first of a repeated key kept, the index clamped) and report once in development"
+    },
+    {
+      "kind": "behavior",
+      "component": "Steps",
+      "before": "The root group was named \"Steps\" by default",
+      "after": "The root has no default name; name it with `aria-label` or `aria-labelledby`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Steps",
+      "before": "The root's `onClick` ran after the step changed",
+      "after": "`onClick` runs first, and its `preventDefault()` cancels the change"
+    },
+    {
+      "kind": "behavior",
+      "component": "Steps",
+      "before": "An uncontrolled step beyond an empty or shorter `items` list fell back for good",
+      "after": "It waits for the items to arrive; only removing the current step moves it, to the last one left"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Switcher",
+      "prop": "text",
+      "use": "`label`, provided only when it should show",
+      "codemod": "auto",
+      "transform": "switcher-label"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Switcher",
+      "prop": "withText",
+      "use": "Provide or omit `label`",
+      "codemod": "auto",
+      "transform": "switcher-label"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Switcher",
+      "prop": "textWrap",
+      "use": "`truncate` instead of `\"truncate\"`; omit `\"wrap\"`",
+      "codemod": "auto",
+      "values": {
+        "truncate": "truncate",
+        "wrap": ""
+      }
+    },
+    {
+      "kind": "export",
+      "from": "SwitcherTextWrap",
+      "to": "The boolean `truncate` prop",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Switcher",
+      "before": "A long label was cut to one line with an ellipsis",
+      "after": "A long label wraps; set `truncate` to keep one line"
+    },
+    {
+      "kind": "behavior",
+      "component": "Switcher",
+      "before": "`ref` pointed to the wrapper `<div>`",
+      "after": "`ref` points to the native checkbox `<input>`; `className` and `style` still style the visible row"
+    },
+    {
+      "kind": "behavior",
+      "component": "Switcher",
+      "before": "`onCheckedChange` ran before the native `onChange`",
+      "after": "`onChange` runs first, and its `preventDefault()` cancels the change"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Table",
+      "from": "ariaLabel",
+      "to": "aria-label",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Table",
+      "from": "activeRowId",
+      "to": "activeRow",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Table",
+      "from": "rowStyle",
+      "to": "variant",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Table",
+      "from": "showRowNumbers",
+      "to": "rowNumbers",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Table",
+      "prop": "sortColumn",
+      "use": "One `sort={{ column, direction }}` (controlled) or `defaultSort` (uncontrolled); `null` is unsorted",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Table",
+      "prop": "sortDirection",
+      "use": "One `sort={{ column, direction }}` (controlled) or `defaultSort` (uncontrolled); `null` is unsorted",
+      "codemod": "manual"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Table",
+      "prop": "onSortChange",
+      "before": "`{ column, direction }`",
+      "after": "`{ sort }`, with `sort` as `{ column, direction }` or `null`",
+      "codemod": "manual",
+      "legacy": "^\\s*(?:async\\s+)?(?:function\\b\\s*[\\w$]*\\s*)?\\(\\s*\\{\\s*(?:column|direction)\\b"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Table",
+      "prop": "onRowClick",
+      "before": "`(row, index)`",
+      "after": "`({ row, index, event })`; `index` is the position shown",
+      "codemod": "manual",
+      "legacy": "^\\s*(?:async\\s+)?(?:function\\b\\s*[\\w$]*\\s*)?\\(\\s*[A-Za-z_$][\\w$]*\\s*(?::[^,()<]*)?,"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Table",
+      "prop": "onRowMouseEnter",
+      "use": "No replacement: put pointer handlers on the content `render` returns",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Table",
+      "prop": "onRowMouseLeave",
+      "use": "No replacement: put pointer handlers on the content `render` returns",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Table",
+      "prop": "columns[].maxWidth",
+      "use": "Browsers ignore a maximum width on table cells; give the column a `width`, which its content can no longer widen",
+      "codemod": "manual"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Table",
+      "prop": "onColumnResize",
+      "before": "`(columnId, width)` on every pointer move, for the column and its neighbour",
+      "after": "`({ column, width })` once per finished resize of that column",
+      "codemod": "manual",
+      "legacy": "^\\s*(?:async\\s+)?(?:function\\b\\s*[\\w$]*\\s*)?\\(\\s*[A-Za-z_$][\\w$]*\\s*(?::[^,()<]*)?,"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Table",
+      "prop": "columns",
+      "before": "`align: \"left\" | \"center\" | \"right\"`",
+      "after": "`align: \"start\" | \"center\" | \"end\"`, following text direction",
+      "codemod": "manual",
+      "legacy": "\\balign['\"]?\\s*:\\s*['\"](?:left|right)['\"]"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Table",
+      "prop": "columns",
+      "before": "`render(value, row, { rowIndex, column })`",
+      "after": "`render({ value, row, rowIndex, column })`. A render with two or more parameters is reported where the columns are written in the JSX; one written for the value alone, such as `render: (value) => String(value)`, still compiles and shows `[object Object]`, so search for `render:` and check each one by hand, in columns passed as a variable too",
+      "codemod": "manual",
+      "legacy": "\\brender\\s*(?::\\s*(?:async\\s+)?(?:function\\b\\s*[\\w$]*\\s*)?)?\\(\\s*[A-Za-z_$][\\w$]*\\s*(?::[^,()<]*)?,"
+    },
+    {
+      "kind": "export",
+      "from": "Table/Table#TableAlign",
+      "to": "`TableColumn['align']`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Table",
+      "before": "`membrane` styled rows as tiles",
+      "after": "`variant=\"tile\"` styles rows; `membrane` adds outer spacing only"
+    },
+    {
+      "kind": "behavior",
+      "component": "Table",
+      "before": "The header stuck to the top of the scrolling container by default",
+      "after": "`stickyHeader` is off by default; pass it where the table scrolls inside its own container"
+    },
+    {
+      "kind": "behavior",
+      "component": "Table",
+      "before": "Fixed layout: every cell stayed on one line with an ellipsis, `minWidth` had no effect, and resizing a column resized its neighbour",
+      "after": "A column without `width` sizes to its content and its text wraps; a column with `width` keeps it and wraps its content inside. Add `truncate` for one line with an ellipsis. `minWidth` holds. The first resize fixes every column at its width, so a resize changes only its own column and the table grows or shrinks. Content that cannot wrap, such as an email or a URL, no longer gets squeezed: in a column without `width` or `truncate` it makes the table as wide as it needs, wider than a narrow screen and the page with it. Give such columns `truncate` or a `width`, or put the table in a container with `overflow-x: auto`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Table",
+      "before": "Without `sortColumn`/`selectedRows` sorting and selection did nothing, while their callbacks still fired",
+      "after": "Both work uncontrolled; a third click on a sorted header returns to the order of `rows`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Table",
+      "before": "A row without a key was keyed by its position on screen (`\"0\"`), a numeric key became text, and repeated keys rendered twice",
+      "after": "A row without a text key is keyed by its position in `rows` (`\"#0\"`), which sorting does not change; a key that is not text is reported (pass `rowKey={(row) => String(row.id)}`), and a repeated key drops the row with a report"
+    },
+    {
+      "kind": "behavior",
+      "component": "Table",
+      "before": "`onRowClick` also fired for clicks on the row checkbox or a control in a cell, and only a mouse could trigger it",
+      "after": "Clicks on controls and on the selection cell do not activate the row; rows become one tab stop, arrows move between them and Enter activates"
+    },
+    {
+      "kind": "behavior",
+      "component": "Table",
+      "before": "Row checkboxes were named `Select row <key>`, the select-all box never showed a partial selection, and rows carried `aria-selected`",
+      "after": "Row checkboxes are named by `labels.selectRow` (`Select {name}`, `{name}` being the row value in the first column), select-all shows a mixed state, and `aria-selected` is gone (the checkbox carries the state)"
+    },
+    {
+      "kind": "behavior",
+      "component": "Table",
+      "before": "A boolean cell value showed as `true` or `false`, and a date as `String(date)`",
+      "after": "Only text and numbers show as text; a boolean or a date needs `render` and is otherwise left out with a report"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tabs",
+      "prop": "withLine",
+      "use": "`variant=\"underline\"`",
+      "codemod": "auto",
+      "values": {
+        "true": "variant=\"underline\"",
+        "false": ""
+      }
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tabs",
+      "prop": "items[].actionIcon",
+      "use": "Put controls in `actions`; the other `action*` fields and `onAction` go with it",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tabs",
+      "prop": "items[].leadingIcon",
+      "use": "`items[].icon`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tabs",
+      "prop": "items[].trailingIcon",
+      "use": "Put a status mark in `label`, or a control in `actions`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tabs",
+      "before": "A `value` missing from `items` selected no tab and showed no panel",
+      "after": "The first enabled tab shows until the key appears; nothing is reported to `onValueChange`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tabs",
+      "before": "A `defaultValue` missing from the first `items` was replaced by the first enabled tab for good",
+      "after": "It waits until `items` contain it; only removing the selected tab moves the selection, to its neighbour"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tabs",
+      "before": "In automatic mode any focus on a tab selected it",
+      "after": "Arrow keys, Home and End select; focus from a script or the Tab key does not"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tabs",
+      "before": "Invalid or duplicate item keys, external items without `panelId` or with `content`, and empty or repeated ids threw a TypeError",
+      "after": "Tabs renders: bad items are dropped (first key wins) and reported, a tab without `panelId` in external mode gets no `aria-controls` and is reported, external `content` is ignored"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/tabs.machine#tabsMachine",
+      "to": "Use `Tabs`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/tabs.machine#tabsAnatomy",
+      "to": "Use `Tabs`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/tabs.machine#connectTabs",
+      "to": "Use `Tabs`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/tabs.machine#TabsSchema",
+      "to": "Use `Tabs`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Text",
+      "prop": "iconPosition",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Text",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Text",
+      "prop": "align",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Text",
+      "before": "`variant=\"blockquote\"` rendered a `<div>`",
+      "after": "`variant=\"blockquote\"` renders `<blockquote>`; set `as` to choose another element"
+    },
+    {
+      "kind": "behavior",
+      "component": "Text",
+      "before": "`align=\"left\"` and `align=\"right\"` stayed on the physical side in right-to-left text",
+      "after": "`align=\"start\"` and `align=\"end\"` follow the text direction"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tile",
+      "prop": "selector",
+      "use": "`chevron=\"down\"`",
+      "codemod": "auto",
+      "values": {
+        "true": "chevron=\"down\"",
+        "false": ""
+      }
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tile",
+      "from": "selectorOpen",
+      "to": "aria-expanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tile",
+      "from": "busy",
+      "to": "aria-busy",
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tile",
+      "prop": "selectedDescendant",
+      "use": "`active={active || selectedDescendant}`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tile",
+      "prop": "intent",
+      "use": "`interactive={false} tone=\"muted\"` for a section heading; an explicit `role` and its ARIA state for a custom control",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Tile",
+      "prop": "iconPosition",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "export",
+      "from": "TileIntent",
+      "to": "The `interactive`, `tone` and `role` props",
+      "codemod": "manual"
+    },
+    {
+      "kind": "text-to-children",
+      "component": "Tile",
+      "from": "text",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tile",
+      "from": "rightText",
+      "to": "meta",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Tile",
+      "prop": "align",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Tile",
+      "prop": "chevron",
+      "values": {
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tile",
+      "from": "level",
+      "to": "indent",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tile",
+      "before": "`rightText` sat inside the label area and joined a button row's accessible name",
+      "after": "`meta` renders in its own part before the actions and is not part of the row's name"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tile",
+      "before": "A Tile with `aria-expanded` but no `onClick`, `role` or `interactive` rendered an inert `<div aria-expanded>`",
+      "after": "`aria-expanded` makes the row a disclosure button; pass `interactive={false}` to opt out"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Toast",
+      "from": "dismissible",
+      "to": "closable",
+      "codemod": "auto"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Toast",
+      "from": "closeLabel",
+      "key": "close",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Toast",
+      "from": "onDismiss",
+      "to": "onClose",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toast",
+      "before": "The close button rendered without `onDismiss` and did nothing",
+      "after": "The close button, and Escape inside the toast, appear only when `onClose` can be called"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toast",
+      "before": "Clicking the action always closed the toast; `action.onClick` received no event",
+      "after": "`action.onClick(event)` runs first; `event.preventDefault()` keeps the toast open"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toast",
+      "before": "Only the first toast of a series closed itself, and hovering did not pause it",
+      "after": "Every toast closes after its own `duration`; a pointer over a toast, focus in the region or a background window pauses all of them, keeping the time left"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toast",
+      "before": "Toasts beyond `maxVisible` were dropped",
+      "after": "They wait behind the newest ones with their time stopped and appear as those close"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toast",
+      "before": "`createToastContext({ defaultDuration })`; its `toaster` exposed the machine service",
+      "after": "`createToastContext({ duration })`; its `toaster` is `{ toast, dismiss }`, the object `useToast()` returns"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Toaster",
+      "from": "dismissible",
+      "to": "closable",
+      "codemod": "auto"
+    },
+    {
+      "kind": "move-to-labels",
+      "component": "Toaster",
+      "from": "closeLabel",
+      "key": "close",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Toaster",
+      "prop": "placement",
+      "values": {
+        "bottom-left": "bottom-start",
+        "bottom-right": "bottom-end",
+        "top-left": "top-start",
+        "top-right": "top-end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toaster",
+      "before": "The newest toast was last in every placement",
+      "after": "The newest toast sits nearest the viewport edge: last at the bottom, first at the top"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Toc",
+      "from": "activeId",
+      "to": "value",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Toc",
+      "from": "defaultActiveId",
+      "to": "defaultValue",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Toc",
+      "from": "onActiveChange",
+      "to": "onValueChange",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Toc",
+      "prop": "onValueChange",
+      "before": "`details.id`",
+      "after": "`details.value`",
+      "codemod": "manual",
+      "legacy": "\\bid\\b"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Toc",
+      "from": "lineSide",
+      "to": "line",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-value",
+      "component": "Toc",
+      "prop": "line",
+      "values": {
+        "left": "start",
+        "right": "end"
+      },
+      "codemod": "auto"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Toc",
+      "prop": "withLine",
+      "use": "`line=\"none\"` hides the rail; `line` defaults to `\"start\"`",
+      "codemod": "auto",
+      "values": {
+        "true": "",
+        "false": "line=\"none\""
+      }
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Toc",
+      "prop": "items[].id",
+      "use": "`items[].value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Toc",
+      "prop": "items[].disabled",
+      "use": "Leave out an entry whose section is not in the document",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toc",
+      "before": "Entries were buttons: a click only reported the id, and the page scrolled if the handler did it; clicking the current entry reported nothing",
+      "after": "Entries are links to `#value`: the browser scrolls to the section and updates the hash; `onSelect({ value, event })` fires on every follow, the current entry included, and `event.preventDefault()` there keeps the page still (for a scroll of your own)"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toc",
+      "before": "Without `activeId` or `defaultActiveId` the first entry was current",
+      "after": "No entry is current until one is followed or `value`/`defaultValue` names it; a `defaultValue` waits for items that arrive later"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toc",
+      "before": "`level` only indented a flat list of Face UI buttons, `button.uf-toc-item[data-scope=\"button\"]`, with a `.uf-toc-indicator` element",
+      "after": "A deeper entry nests in a `<ul>` under the previous shallower one: `nav > ul[data-part=\"list\"] > li.uf-toc-item > a.uf-toc-link[data-part=\"link\"]`; the marker is the top list's `::after`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toc",
+      "before": "The contract promised ArrowUp/ArrowDown between entries, but only Tab worked; long labels were cut with an ellipsis",
+      "after": "Tab and Enter work as for any links and arrow keys scroll the page; long labels wrap"
+    },
+    {
+      "kind": "behavior",
+      "component": "Toc",
+      "before": "The nav was always named \"Table of contents\" and took no native attributes",
+      "after": "Native attributes and `ref` reach the `<nav>`; `aria-label` or `aria-labelledby` replaces the default name"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/toggle.machine#toggleMachine",
+      "to": "Use `SegmentedControl`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/toggle.machine#toggleAnatomy",
+      "to": "Use `SegmentedControl`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/toggle.machine#connectToggle",
+      "to": "Use `SegmentedControl`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "assets/machines/toggle.machine#ToggleSchema",
+      "to": "Use `SegmentedControl`; the state machine is internal",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Toggle",
+      "prop": "type",
+      "use": "`multiple` instead of `\"multiple\"`; omit `\"single\"`",
+      "codemod": "auto",
+      "values": {
+        "multiple": "multiple",
+        "single": ""
+      }
+    },
+    {
+      "kind": "behavior",
+      "component": "Toggle",
+      "before": "Without `type`, Toggle pressed independent options",
+      "after": "Toggle is `SegmentedControl`: without `multiple` it selects one choice, so add `multiple` where `type` was omitted"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Toggle",
+      "prop": "value",
+      "before": "an array in both modes",
+      "after": "A string or `null` without `multiple`, as is `onValueChange`'s `details.value`; an array with it",
+      "codemod": "manual"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Toggle",
+      "prop": "defaultValue",
+      "before": "an array in both modes",
+      "after": "A string or `null` without `multiple`; an array with it",
+      "codemod": "manual"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tree",
+      "from": "selectedId",
+      "to": "value",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tree",
+      "from": "defaultSelectedId",
+      "to": "defaultValue",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tree",
+      "from": "onSelectedChange",
+      "to": "onValueChange",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Tree",
+      "prop": "onValueChange",
+      "before": "`details.selectedId`",
+      "after": "`details.value`",
+      "codemod": "manual",
+      "legacy": "\\bselectedId\\b"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tree",
+      "from": "expandedIds",
+      "to": "expanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "rename-prop",
+      "component": "Tree",
+      "from": "defaultExpandedIds",
+      "to": "defaultExpanded",
+      "codemod": "auto"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Tree",
+      "prop": "onExpandedChange",
+      "before": "`details.expandedIds`",
+      "after": "`details.expanded`",
+      "codemod": "manual",
+      "legacy": "\\bexpandedIds\\b"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Tree",
+      "prop": "renderNode",
+      "before": "`details` held `node`, `depth`, `hasChildren`, `expanded`, `selected`, `focused` and `activePath`, and the result replaced the whole row",
+      "after": "`details` holds `item`, `expanded` and `selected`; the result replaces the icon, label and meta after the arrow",
+      "codemod": "manual",
+      "legacy": "\\b(depth|hasChildren|activePath)\\b"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].id",
+      "use": "`items[].value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].children",
+      "use": "`items[].items`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].rightText",
+      "use": "`items[].meta`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].kind",
+      "use": "Remove it; every row has one look, chosen for the whole tree by `variant`. `kind: \"custom\"` content goes in `label`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].content",
+      "use": "`items[].label`, which takes rich content",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].render",
+      "use": "`renderNode` on the Tree",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Tree",
+      "prop": "items[].actions",
+      "use": "A tree item cannot hold controls; offer row actions from a `Menu openOn=\"context\"` around the Tree and read the row from `data-value`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "TreeNode",
+      "to": "TreeItem",
+      "codemod": "auto"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "Rows were Face UI Buttons or Tiles marked `data-tree-node-id`, and collapsed children stayed in the document, hidden",
+      "after": "Rows are `[data-scope=\"tree\"][data-part=\"item\"]` buttons marked `data-value`; nested rows sit in `[data-part=\"group\"]`, which exists only while its item is expanded"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "A click on a branch selected and toggled it, while Enter and Space only selected it; nothing expanded a branch without selecting it",
+      "after": "A click, Enter and Space all select the item and toggle a branch; a click on the arrow, Right and Left toggle without selecting"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "Right on a leaf added it to `expandedIds`; Right and Left never moved to a child or parent; typeahead and `*` did nothing; a disabled item trapped the arrows",
+      "after": "The APG tree keyboard: Right expands then enters, Left collapses then leaves (swapped in RTL), typeahead, `*` expands the siblings; disabled items are skipped"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "A disabled item was focusable, silently ignored clicks and looked enabled",
+      "after": "A disabled item and everything nested in it are disabled buttons: dimmed, skipped by the keyboard, never selected or expanded"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "The root was always named \"Tree navigation\" and took no native attributes, only `className`",
+      "after": "The root is named \"Tree\" until `aria-label` or `aria-labelledby` names it, and takes native attributes and `ref`"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "The selected item and all its ancestors had the hover background; a controlled selection could not be cleared",
+      "after": "Only the selected item is marked (active background, bold); `value={null}` selects nothing"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "A branch showed a down or up chevron at the end of its row",
+      "after": "A branch shows an arrow at the start that points to the inline end and turns down when expanded"
+    },
+    {
+      "kind": "behavior",
+      "component": "Tree",
+      "before": "With the selected item inside a collapsed branch, Tab could not enter the tree",
+      "after": "Tab enters at the selected item, or at the collapsed item that holds it"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Upload",
+      "prop": "labels",
+      "before": "`idle`, `dragging` and `trigger` keys; `remove` was the visible text of a text button",
+      "after": "`drop` (the instruction), `open` (the picker button); the drop area is highlighted while dragging instead of changing its text; `remove` is a template, `\"Remove {name}\"`, naming an icon button",
+      "codemod": "manual",
+      "legacy": "\\b(idle|dragging|trigger)\\b"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Upload",
+      "prop": "maxSize",
+      "before": "`0` meant no limit",
+      "after": "Leave it out for no limit; `0` is reported and read as 1 byte",
+      "codemod": "manual",
+      "legacy": "^\\s*0\\s*$"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Upload",
+      "prop": "maxFiles",
+      "before": "`0` meant no limit",
+      "after": "Leave it out for no limit; `0` is reported and read as 1",
+      "codemod": "manual",
+      "legacy": "^\\s*0\\s*$"
+    },
+    {
+      "kind": "retype-prop",
+      "component": "Upload",
+      "prop": "onReject",
+      "before": "`details.files` held `{ id, name, size, type, source, reason }` with reasons `type`, `size`, `count` and `multiple`",
+      "after": "`details.files` holds `{ file, reason }`, `file` being the browser File, with reasons `invalidType`, `tooLarge` and `tooMany` (a second file without `multiple` included)",
+      "codemod": "manual",
+      "legacy": "\\bsource\\b|['\"](type|size|count|multiple)['\"]"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Upload",
+      "prop": "files[].source",
+      "use": "`files[].file`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Upload",
+      "prop": "files[].status",
+      "use": "`files[].progress` shows a bar while it is set, `files[].error` marks the entry failed; neither means done",
+      "codemod": "manual"
+    },
+    {
+      "kind": "remove-prop",
+      "component": "Upload",
+      "prop": "files[].type",
+      "use": "`files[].file.type`",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "UploadRejectedFile",
+      "to": "`UploadRejection` (`{ file, reason }`)",
+      "codemod": "manual"
+    },
+    {
+      "kind": "export",
+      "from": "UploadSourceFile",
+      "to": "`UploadFile`, whose `size`, `file`, `progress` and `error` are optional",
+      "codemod": "manual"
+    },
+    {
+      "kind": "behavior",
+      "component": "Upload",
+      "before": "`progress`, `status` and `error` of an entry were never shown",
+      "after": "`progress` shows a bar named by the file (`null`: an unknown amount), `error` a message under the entry that also describes its remove button"
+    },
+    {
+      "kind": "behavior",
+      "component": "Upload",
+      "before": "Rejected files only reached `onReject`; the user saw nothing",
+      "after": "The field also shows why, one line per reason, from `labels.invalidType`, `tooLarge` and `tooMany`, until the next pick, drop or removal; a consumer `error` wins"
+    },
+    {
+      "kind": "behavior",
+      "component": "Upload",
+      "before": "Without `multiple`, a drop of several files kept only the first one, even when it was rejected; picking or dropping the same file again listed it twice",
+      "after": "Without `multiple`, the first acceptable file replaces the listed one and the rest are `tooMany`; reusing the same File object does not add it again, while distinct files with matching metadata remain separate"
+    },
+    {
+      "kind": "behavior",
+      "component": "Upload",
+      "before": "Upload took no native attributes and never joined a form: `name`, `required` and the listed files were not submitted",
+      "after": "Native attributes and `ref` reach the root `role=\"group\"`; `label`, `description`, `error` and `labelPosition` make it a Field; `name`, `form`, `required`, `disabled` and `autoFocus` work as on native controls, and the listed browser files are submitted"
+    },
+    {
+      "kind": "behavior",
+      "component": "Upload",
+      "before": "Only the borderless drop area took drops and carried `data-dragging`; text and link drags highlighted it too",
+      "after": "The whole field takes file drags and carries `data-dragging` (nested enters are counted); the drop area has a dashed border; text and link drags are left to the browser"
+    },
+    {
+      "kind": "behavior",
+      "component": "Upload",
+      "before": "`files` that was not an array crashed the render; entries without an `id` or repeating one rendered with React key warnings",
+      "after": "A non-array list renders as empty, and entries without a string `id` or repeating one are dropped, each with a development report"
+    }
+  ]
+}

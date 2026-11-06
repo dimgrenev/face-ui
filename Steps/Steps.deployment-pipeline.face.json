@@ -21,13 +21,16 @@
       },
       "disabled": {
         "$ref": "props.disabled"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "step": 2,
+      "defaultStep": 2,
       "linear": false,
       "items": [
         {
@@ -54,34 +57,41 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Step definitions."
+      "description": "Ordered steps; an omitted or empty list renders no navigation. Groups and separators are dropped with a report."
     },
     {
       "name": "step",
       "type": "number",
       "required": false,
-      "description": "Current step index (0-based)."
+      "description": "Controlled index of the current step, from 0; an index past the last step shows the last one."
     },
     {
       "name": "defaultStep",
       "type": "number",
       "required": false,
-      "description": "Uncontrolled initial step index.",
+      "description": "Uncontrolled step index on mount, from 0; read once.",
       "defaultValue": 0
     },
     {
       "name": "linear",
       "type": "boolean",
       "required": false,
-      "description": "Linear mode: prevents skipping steps.",
+      "description": "Allows only the current, an earlier or the immediately next step; does not validate forms.",
       "defaultValue": true
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire steps navigation.",
+      "description": "Disables step navigation; the visible panel stays usable.",
       "defaultValue": false
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around each step button.",
+      "defaultValue": true
     }
   ],
   "meta": {

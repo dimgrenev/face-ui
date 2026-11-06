@@ -7,12 +7,6 @@
   "root": {
     "type": "Overlay",
     "props": {
-      "trigger": {
-        "$ref": "props.trigger"
-      },
-      "interactive": {
-        "$ref": "props.interactive"
-      },
       "content": {
         "$ref": "props.content"
       },
@@ -22,11 +16,8 @@
       "open": {
         "$ref": "props.open"
       },
-      "openDelay": {
-        "$ref": "props.openDelay"
-      },
-      "closeDelay": {
-        "$ref": "props.closeDelay"
+      "defaultOpen": {
+        "$ref": "props.defaultOpen"
       },
       "side": {
         "$ref": "props.side"
@@ -36,13 +27,34 @@
       },
       "sideOffset": {
         "$ref": "props.sideOffset"
+      },
+      "attachmentSelector": {
+        "$ref": "props.attachmentSelector"
+      },
+      "alignToOption": {
+        "$ref": "props.alignToOption"
+      },
+      "dir": {
+        "$ref": "props.dir"
+      },
+      "openDelay": {
+        "$ref": "props.openDelay"
+      },
+      "closeDelay": {
+        "$ref": "props.closeDelay"
+      },
+      "openOn": {
+        "$ref": "props.openOn"
+      },
+      "interactive": {
+        "$ref": "props.interactive"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "trigger": "hover",
+      "openOn": "hover",
       "children": "API limits",
       "content": "Limits reset at the start of each billing cycle.",
       "side": "top",
@@ -53,58 +65,35 @@
   },
   "controls": [
     {
-      "name": "trigger",
-      "type": "select",
-      "required": false,
-      "description": "How the overlay is triggered.",
-      "options": [
-        "hover",
-        "click"
-      ],
-      "defaultValue": "hover"
-    },
-    {
-      "name": "interactive",
-      "type": "boolean",
-      "required": false,
-      "description": "Whether content is interactive (keeps open on hover).",
-      "defaultValue": false
-    },
-    {
       "name": "content",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Content rendered inside the floating surface."
+      "description": "Content of the floating surface; empty content renders the trigger alone. Tooltip content must stay noninteractive."
     },
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Trigger element (the anchor)."
+      "description": "One trigger element forwarding props/ref, or text rendered as a Button."
     },
     {
       "name": "open",
       "type": "boolean",
       "required": false,
-      "description": "Controlled open state."
+      "description": "Controlled visibility; updates from the parent never call onOpenChange."
     },
     {
-      "name": "openDelay",
-      "type": "number",
+      "name": "defaultOpen",
+      "type": "boolean",
       "required": false,
-      "description": "Delay before opening (ms)."
-    },
-    {
-      "name": "closeDelay",
-      "type": "number",
-      "required": false,
-      "description": "Delay before closing (ms)."
+      "description": "Visibility on mount when `open` is not set; read once.",
+      "defaultValue": false
     },
     {
       "name": "side",
       "type": "select",
       "required": false,
-      "description": "Preferred side placement.",
+      "description": "Preferred side; may flip when the opposite side has more room.",
       "options": [
         "top",
         "right",
@@ -117,7 +106,7 @@
       "name": "align",
       "type": "select",
       "required": false,
-      "description": "Alignment along the side.",
+      "description": "Logical alignment on the cross axis, following dir or the trigger's direction.",
       "options": [
         "start",
         "center",
@@ -129,8 +118,56 @@
       "name": "sideOffset",
       "type": "number",
       "required": false,
-      "description": "Offset from the trigger along the side axis (px).",
+      "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2.",
       "defaultValue": 2
+    },
+    {
+      "name": "attachmentSelector",
+      "type": "string",
+      "required": false,
+      "description": "Nearest ancestor used for left/right attachment; --uf-dropdown-panel-gap measures the painted surface gap. Vertical alignment still follows the trigger."
+    },
+    {
+      "name": "alignToOption",
+      "type": "string",
+      "required": false,
+      "description": "Aligns a measured visible row opposite the trigger on left/right surfaces; pass the row's selector."
+    },
+    {
+      "name": "dir",
+      "type": "string",
+      "required": false,
+      "description": "Content direction; omitted inherits the trigger's, auto follows the content."
+    },
+    {
+      "name": "openDelay",
+      "type": "number",
+      "required": false,
+      "description": "Milliseconds from hover or focus to showing the surface, 0–2147483647; default 200.",
+      "defaultValue": 200
+    },
+    {
+      "name": "closeDelay",
+      "type": "number",
+      "required": false,
+      "description": "Milliseconds from hover and focus leaving to hiding the surface, 0–2147483647; default 0.",
+      "defaultValue": 0
+    },
+    {
+      "name": "openOn",
+      "type": "select",
+      "required": false,
+      "description": "Opens on hover and keyboard focus of the trigger, or toggles on its click.",
+      "options": [
+        "hover",
+        "click"
+      ]
+    },
+    {
+      "name": "interactive",
+      "type": "boolean",
+      "required": false,
+      "description": "Hover content holds controls: dialog semantics, and focus it took returns to the trigger."
     }
   ],
   "meta": {

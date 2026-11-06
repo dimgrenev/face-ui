@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "generatedPath": "design-system/tokens/geometry.css",
+  "tokens": [
+    {
+      "sheet": "geometry",
+      "name": "--uf-topbar-height",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "calc( var(--uf-topbar-control-height) + var(--uf-topbar-pad-top) + var(--uf-topbar-pad-bottom) )"
+        }
+      ]
+    },
+    {
+      "sheet": "geometry",
+      "name": "--uf-panel-pad-x",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "7px"
+        }
+      ]
+    },
+    {
+      "sheet": "geometry",
+      "name": "--uf-panel-pad-y",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "7px"
+        }
+      ]
+    },
+    {
+      "sheet": "geometry",
+      "name": "--uf-workspace-resize-hit-size",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "20px"
+        }
+      ]
+    },
+    {
+      "sheet": "geometry",
+      "name": "--uf-workspace-resize-hit-offset",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "calc(var(--uf-workspace-resize-hit-size) / -2)"
+        }
+      ]
+    },
+    {
+      "sheet": "geometry",
+      "name": "--uf-workspace-resize-line-width",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "1px"
+        }
+      ]
+    },
+    {
+      "sheet": "geometry",
+      "name": "--uf-workspace-resize-line-transition",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "sheet": "geometry",
+      "name": "--uf-icon-size-sm",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "20px"
+        }
+      ]
+    },
+    {
+      "sheet": "geometry",
+      "name": "--uf-icon-size-md",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "20px"
+        }
+      ]
+    },
+    {
+      "sheet": "geometry",
+      "name": "--uf-icon-size-lg",
+      "variants": [
+        {
+          "selector": ":root",
+          "value": "20px"
+        }
+      ]
+    }
+  ]
+}

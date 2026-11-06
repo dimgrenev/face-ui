@@ -1,0 +1,201 @@
+/* =================================================================
+ * TEXT
+ * ================================================================= */
+.uf-text[data-scope] {
+  --uf-text-kbd-height: var(--uf-control-line-height);
+  --uf-text-kbd-pad-x: var(--uf-spacing-1);
+  --uf-text-h1-delta: 0.625rem;
+  --uf-text-h2-delta: 0.5rem;
+  --uf-text-h3-delta: 0.375rem;
+  --uf-text-h4-delta: 0.25rem;
+  --uf-text-h5-delta: 0.125rem;
+  --uf-text-blockquote-border-width: calc(var(--uf-membrane) * 3);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--uf-control-gap);
+  min-height: var(--uf-text-min-height, var(--uf-control-height));
+  padding: var(--uf-text-pad-y, var(--uf-control-pad-y)) var(--uf-text-pad-x, var(--uf-control-pad-text));
+  font-family: var(--uf-text-font-family, var(--uf-font-family-base));
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-text-body-size, var(--uf-control-font-size))));
+  line-height: var(--uf-text-line-height, var(--uf-text-body-line-height, max(var(--uf-control-line-height), 1.25em)));
+  letter-spacing: var(--uf-text-letter-spacing, var(--uf-control-letter-spacing));
+  font-weight: var(--uf-text-font-weight, var(--uf-font-weight));
+  color: var(--uf-text-color, var(--uf-color-fg));
+  margin: 0;
+}
+.uf-text[data-scope][data-size="xs"] {
+  --uf-text-size-font-size: var(--uf-font-size-xs);
+}
+.uf-text[data-scope][data-size="sm"] {
+  --uf-text-size-font-size: var(--uf-font-size-sm);
+}
+.uf-text[data-scope][data-size="md"] {
+  --uf-text-size-font-size: var(--uf-font-size-md);
+}
+.uf-text[data-scope][data-size="lg"] {
+  --uf-text-size-font-size: var(--uf-font-size-lg);
+}
+.uf-text[data-scope][data-size="xl"] {
+  --uf-text-size-font-size: var(--uf-font-size-xl);
+}
+.uf-text[data-scope][data-truncate] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.uf-text[data-scope][data-truncate] .uf-text__content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Inset: none — flush, no padding */
+.uf-text[data-scope][data-inset="none"] {
+  min-height: var(--uf-text-inset-none-min-height, 0);
+  padding: var(--uf-text-inset-none-padding, 0);
+}
+/* Variants */
+.uf-text[data-scope][data-variant="muted"] {
+  color: var(--uf-color-fg-muted);
+}
+.uf-text[data-scope][data-variant="label"] {
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-text-label-font-size, 12px)));
+  line-height: var(--uf-text-line-height, max(var(--uf-text-label-line-height, 16px), 1.25em));
+}
+.uf-text[data-scope][data-variant="label"]:not([data-inset="none"]) {
+  box-sizing: border-box;
+  min-height: var(--uf-text-label-min-height, var(--uf-spacing-6));
+  padding-top: var(--uf-text-label-pad-y, var(--uf-spacing-1));
+  padding-bottom: var(--uf-text-label-pad-y, var(--uf-spacing-1));
+}
+.uf-text[data-scope][data-variant="heading"] {
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-text-heading-font-size, var(--uf-font-size-lg))));
+  font-weight: var(--uf-text-heading-font-weight, var(--uf-font-weight-bold));
+}
+.uf-text[data-scope][data-variant="kbd"] {
+  display: inline-flex;
+  align-items: center;
+  height: max(var(--uf-text-kbd-height), 1.25em);
+  min-height: auto;
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-font-size-xs)));
+  font-family: inherit;
+  background: var(--uf-color-hover-bg);
+  border-radius: var(--uf-radius-sm);
+}
+.uf-text[data-scope][data-variant="kbd"]:not([data-inset="none"]) {
+  padding: 0 var(--uf-text-kbd-pad-x);
+}
+.uf-text[data-scope][data-variant="code"] {
+  font-family: var(--uf-font-family-mono);
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-font-size-sm)));
+}
+.uf-text[data-scope][data-variant="markdown"] {
+  --uf-text-markdown-line-height: 24px;
+  line-height: max(var(--uf-text-markdown-line-height), 1.25em);
+}
+.uf-text[data-scope][data-variant="markdown"] .uf-text__content {
+  line-height: inherit;
+}
+.uf-text[data-scope][data-variant="markdown"]:not([data-inset="none"]) {
+  --uf-text-markdown-pad-y: max(0px, calc(var(--uf-text-pad-y, var(--uf-control-pad-y)) - 2px));
+  min-height: calc(var(--uf-text-markdown-line-height) + (var(--uf-text-markdown-pad-y) * 2));
+  padding-top: var(--uf-text-markdown-pad-y);
+  padding-bottom: var(--uf-text-markdown-pad-y);
+}
+/* Heading levels (match Markdown heading hierarchy) */
+.uf-text[data-scope][data-variant="h1"] {
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, calc(var(--uf-control-font-size) + var(--uf-text-h1-delta))));
+  font-weight: var(--uf-font-weight-bold);
+  line-height: 1.3;
+}
+.uf-text[data-scope][data-variant="h2"] {
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, calc(var(--uf-control-font-size) + var(--uf-text-h2-delta))));
+  font-weight: var(--uf-font-weight-bold);
+  line-height: 1.3;
+}
+.uf-text[data-scope][data-variant="h3"] {
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, calc(var(--uf-control-font-size) + var(--uf-text-h3-delta))));
+  font-weight: var(--uf-font-weight-bold);
+  line-height: 1.3;
+}
+.uf-text[data-scope][data-variant="h4"] {
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, calc(var(--uf-control-font-size) + var(--uf-text-h4-delta))));
+  font-weight: var(--uf-font-weight-bold);
+  line-height: 1.3;
+}
+.uf-text[data-scope][data-variant="h5"] {
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, calc(var(--uf-control-font-size) + var(--uf-text-h5-delta))));
+  font-weight: var(--uf-font-weight-bold);
+  line-height: 1.3;
+}
+.uf-text[data-scope][data-variant="h6"] {
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-control-font-size)));
+  font-weight: var(--uf-font-weight-bold);
+  line-height: 1.3;
+  opacity: 0.8;
+}
+/* Blockquote variant */
+.uf-text[data-scope][data-variant="blockquote"] {
+  border-left: var(--uf-text-blockquote-border-width) solid var(--uf-color-border);
+  color: var(--uf-color-fg-muted);
+}
+.uf-text[data-scope][data-variant="blockquote"]:not([data-inset="none"]) {
+  padding-left: var(--uf-control-pad-text);
+}
+/* Alignment */
+.uf-text[data-scope][data-align="start"] {
+  justify-content: flex-start;
+  text-align: start;
+}
+.uf-text[data-scope][data-align="center"] {
+  justify-content: center;
+  text-align: center;
+}
+.uf-text[data-scope][data-align="end"] {
+  justify-content: flex-end;
+  text-align: end;
+}
+/* Stretch */
+.uf-text[data-scope][data-stretch-text] .uf-text__content {
+  flex: 1;
+}
+.uf-text[data-scope][data-full-width] {
+  width: 100%;
+}
+/* Icon */
+.uf-text__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  transition: opacity var(--face-runtime-transition-duration-fast) var(--uf-motion-ease-standard);
+}
+.uf-text__content {
+  min-width: 0;
+}
+/* Icon edge padding: icon side = pad-icon, text side = pad-text */
+.uf-text[data-scope][data-icon-position="start"]:not([data-align="center"]):not([data-inset="none"]) {
+  padding-inline-start: var(--uf-control-pad-icon);
+}
+.uf-text[data-scope][data-icon-position="end"]:not([data-align="center"]):not([data-inset="none"]) {
+  padding-inline-end: var(--uf-control-pad-icon);
+}
+
+/* Root sizing takes precedence over variant/inset sizing, including label. */
+.uf-text[data-scope][data-part="root"][data-height-mode="content"] {
+  box-sizing: border-box;
+  height: auto;
+  min-height: 0;
+  padding-block: 0;
+}
+
+/* The class a consumer puts on non-Text markup to take body typography.
+   Lower specificity than every .uf-text[data-scope] rule above, so its
+   position inside text.css cannot change what a Text renders. */
+.uf-text-body {
+  font-family: var(--uf-font-family-base);
+  font-size: var(--uf-text-font-size, var(--uf-text-size-font-size, var(--uf-text-body-size, var(--uf-control-font-size))));
+  line-height: var(--uf-text-line-height, var(--uf-text-body-line-height, var(--uf-control-line-height)));
+  letter-spacing: var(--uf-text-letter-spacing, var(--uf-control-letter-spacing));
+  font-weight: var(--uf-text-font-weight, var(--uf-font-weight));
+}

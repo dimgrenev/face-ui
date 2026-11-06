@@ -2,35 +2,41 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Steps",
-  "description": "Step-by-step wizard navigation",
+  "description": "Ordered wizard navigation: one button per step and a persistent panel for each step with content.",
   "props": {
     "items": {
       "type": "array",
       "required": false,
-      "description": "Step definitions."
+      "description": "Ordered steps; an omitted or empty list renders no navigation. Groups and separators are dropped with a report."
     },
     "step": {
       "type": "number",
       "required": false,
-      "description": "Current step index (0-based)."
+      "description": "Controlled index of the current step, from 0; an index past the last step shows the last one."
     },
     "defaultStep": {
       "type": "number",
       "required": false,
-      "description": "Uncontrolled initial step index.",
+      "description": "Uncontrolled step index on mount, from 0; read once.",
       "default": 0
     },
     "linear": {
       "type": "boolean",
       "required": false,
-      "description": "Linear mode: prevents skipping steps.",
+      "description": "Allows only the current, an earlier or the immediately next step; does not validate forms.",
       "default": true
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire steps navigation.",
+      "description": "Disables step navigation; the visible panel stays usable.",
       "default": false
+    },
+    "membrane": {
+      "type": "boolean",
+      "required": false,
+      "description": "Membrane spacing around each step button.",
+      "default": true
     }
   },
   "states": [
@@ -93,8 +99,8 @@
             "content": "Review the setup before publishing."
           }
         ],
-        "step": 0,
-        "linear": false
+        "linear": false,
+        "defaultStep": 0
       }
     },
     {
@@ -114,27 +120,43 @@
             "content": "Review the setup before publishing."
           }
         ],
-        "step": 0,
-        "disabled": true
+        "disabled": true,
+        "defaultStep": 0
       }
     }
   ],
-  "behavior": {},
-  "keyboard": {},
+  "behavior": {
+    "selection": "Zero-based position; controlled changes are quiet, user changes emit one proposal.",
+    "linear": "Only current, earlier or next position. Form validation and approval belong to the controlled parent.",
+    "disabled": "Disables navigation only; current content stays usable.",
+    "panels": "Inactive panels remain mounted and hidden; their form fields still participate in form data.",
+    "items": "Use stable unique keys when inserting, removing or reordering stateful panels. Keys do not change index-based selection. An uncontrolled step beyond the list waits for its items; removing the current step moves it to the last one."
+  },
+  "keyboard": {
+    "Tab": "Move between enabled step buttons and visible content controls.",
+    "Enter / Space": "Request the focused step; preventDefault in key capture cancels native activation."
+  },
   "aria": {
     "required": [
-      "aria-label"
+      "role=\"group\"",
+      "aria-current=\"step\" on the active button"
+    ],
+    "notes": [
+      "Name the root with aria-label or aria-labelledby; it has no default name.",
+      "An ordered list communicates step order. Number indicators are decorative.",
+      "Existing panels are named by their button and referenced with aria-controls. Hidden panels are excluded from focus and the accessibility tree."
     ]
   },
   "composition": {
     "required": [
       "root",
+      "list",
       "item",
-      "trigger",
-      "content"
+      "trigger"
     ],
     "recommended": [
-      "indicator"
+      "indicator",
+      "content"
     ],
     "parts": {
       "root": {
@@ -142,7 +164,7 @@
       },
       "item": {
         "slot": "item",
-        "parent": "root",
+        "parent": "list",
         "multiple": true
       },
       "trigger": {
@@ -157,6 +179,10 @@
         "slot": "content",
         "parent": "root",
         "multiple": true
+      },
+      "list": {
+        "slot": "list",
+        "parent": "root"
       }
     }
   },
@@ -165,28 +191,30 @@
     "semanticFallbacks": [
       "--uf-control-height",
       "--uf-control-pad-y",
+      "--uf-control-pad-icon",
       "--uf-control-pad-text",
       "--uf-control-gap",
       "--uf-control-font-size",
-      "--uf-steps-indicator-width",
+      "--uf-icon-size",
+      "--uf-membrane",
       "--uf-radius",
-      "--uf-font-weight-bold",
+      "--uf-radius-full",
+      "--uf-font-size-xs",
       "--uf-color-fg",
       "--uf-color-fg-muted",
       "--uf-color-hover-bg"
     ],
     "notes": [
-      "Steps intentionally uses shared control geometry and Text instead of a dedicated component token namespace.",
-      "Step content strings render through plain Text with its default control inset and no step-specific alignment offset.",
-      "Step content strings route through Text; indicators use compact text glyphs."
+      "Step buttons use shared control geometry and the canonical Membrane.",
+      "Numeric indicators use the same CSS geometry for all step counts.",
+      "Primitive panels use Text with inherited alignment; custom children retain their own styles."
     ]
   },
   "platform": {},
   "usage": {
     "whenToUse": [
-      "Multi-step wizard progress",
-      "Onboarding flow indicator",
-      "Process status display"
+      "Multi-step wizard navigation",
+      "Onboarding flow navigation"
     ],
     "whenNotToUse": [
       "Tab-like content switching (use Tabs)",

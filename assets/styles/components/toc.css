@@ -1,0 +1,112 @@
+/* =================================================================
+ * TOC (Table of Contents)
+ * ================================================================= */
+.uf-toc[data-scope] {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  --uf-toc-line-inset: var(--uf-spacing-2);
+  --uf-toc-line-gap: calc(var(--uf-membrane) * 2);
+  --uf-toc-rail-w: var(--uf-membrane);
+  --uf-toc-indicator-w: calc(var(--uf-membrane) * 2);
+}
+.uf-toc-list[data-scope] {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.uf-toc-item[data-scope] {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+/* One row per entry: the control rhythm of a full-width option; nesting indents the text only. */
+.uf-toc .uf-toc-link[data-scope] {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  text-align: start;
+  text-decoration: none;
+  font-family: var(--uf-font-family-base);
+  font-size: var(--uf-control-font-size);
+  line-height: var(--uf-control-line-height);
+  color: var(--uf-color-fg);
+  padding-inline-start: calc(var(--uf-control-pad-text) + var(--uf-toc-depth, 0) * var(--uf-option-indent));
+}
+.uf-toc .uf-toc-link[data-scope][aria-current] {
+  background: var(--uf-color-hover-bg);
+}
+/* Long headings wrap instead of hiding behind an ellipsis. */
+.uf-toc-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* The rail is the list's ::before; the marker is its ::after, placed by Toc on the current entry. */
+.uf-toc > .uf-toc-list[data-scope] {
+  position: relative;
+}
+.uf-toc[data-line="start"] > .uf-toc-list[data-scope] {
+  padding-inline-start: calc(var(--uf-toc-line-inset) + var(--uf-toc-line-gap));
+}
+.uf-toc[data-line="end"] > .uf-toc-list[data-scope] {
+  padding-inline-end: calc(var(--uf-toc-line-inset) + var(--uf-toc-line-gap));
+}
+.uf-toc:is([data-line="start"], [data-line="end"]) > .uf-toc-list::before,
+.uf-toc:is([data-line="start"], [data-line="end"]) > .uf-toc-list[data-indicator]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  pointer-events: none;
+}
+.uf-toc:is([data-line="start"], [data-line="end"]) > .uf-toc-list::before {
+  inset-block-end: 0;
+  width: var(--uf-toc-rail-w);
+  background: var(--uf-color-border);
+}
+.uf-toc:is([data-line="start"], [data-line="end"]) > .uf-toc-list[data-indicator]::after {
+  width: var(--uf-toc-indicator-w);
+  height: var(--uf-toc-indicator-h);
+  transform: translateY(var(--uf-toc-indicator-y));
+  background: var(--uf-color-fg);
+}
+.uf-toc > .uf-toc-list[data-indicator="moving"]::after {
+  transition:
+    transform var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard),
+    height var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard);
+}
+.uf-toc[data-line="start"] > .uf-toc-list::before {
+  inset-inline-start: calc(var(--uf-toc-line-inset) - var(--uf-toc-rail-w));
+}
+.uf-toc[data-line="start"] > .uf-toc-list::after {
+  inset-inline-start: calc(var(--uf-toc-line-inset) - var(--uf-toc-indicator-w));
+}
+.uf-toc[data-line="end"] > .uf-toc-list::before {
+  inset-inline-end: calc(var(--uf-toc-line-inset) - var(--uf-toc-rail-w));
+}
+.uf-toc[data-line="end"] > .uf-toc-list::after {
+  inset-inline-end: calc(var(--uf-toc-line-inset) - var(--uf-toc-indicator-w));
+}
+
+@media (forced-colors: active) {
+  .uf-toc > .uf-toc-list::before,
+  .uf-toc > .uf-toc-list::after {
+    forced-color-adjust: none;
+  }
+  .uf-toc > .uf-toc-list::before {
+    background: GrayText;
+  }
+  .uf-toc > .uf-toc-list::after {
+    background: Highlight;
+  }
+  .uf-toc .uf-toc-link[data-scope][aria-current] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+}

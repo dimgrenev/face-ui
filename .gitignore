@@ -6,7 +6,6 @@ coverage/
 *.log
 *.tsbuildinfo
 package-lock.json
-pnpm-lock.yaml
 yarn.lock
 .DS_Store
 .env
@@ -17,3 +16,8 @@ yarn.lock
 
 # Local runtime evidence/state generated while testing.
 .userface/
+
+# Browser test reports and local tool captures.
+.playwright-mcp/
+playwright-report/
+test-results/

@@ -12,6 +12,7 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: read
   id-token: write
 
@@ -24,6 +25,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Only a commit that already passed Face UI CI (unit and browser
+      # matrix) is published; the release does not rerun the browser suite.
+      # Scheduled runs skip `check`, and pull_request runs test a merge
+      # commit, so only push and manual runs of this exact SHA count.
+      - name: Require green CI for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          passed=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?head_sha=${{ github.sha }}&status=success" \
+            --jq '[.workflow_runs[] | select(.event == "push" or .event == "workflow_dispatch")] | length')
+          if [ "$passed" -lt 1 ]; then
+            echo "::error::Face UI CI has not passed for ${{ github.sha }}"
+            exit 1
+          fi
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -34,9 +50,10 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
+          cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Resolve package version
         id: version
@@ -60,9 +77,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
 
-      - name: Build and verify
-        run: pnpm check
-
+      # prepublishOnly runs `pnpm check` exactly once before packing.
       - name: Publish
         run: npm publish --access public --provenance
         env:

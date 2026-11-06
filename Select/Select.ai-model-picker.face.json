@@ -7,73 +7,94 @@
   "root": {
     "type": "Select",
     "props": {
-      "variant": {
-        "$ref": "props.variant"
+      "label": {
+        "$ref": "props.label"
       },
-      "options": {
-        "$ref": "props.options"
+      "description": {
+        "$ref": "props.description"
       },
-      "value": {
-        "$ref": "props.value"
+      "error": {
+        "$ref": "props.error"
       },
-      "defaultValue": {
-        "$ref": "props.defaultValue"
+      "labelPosition": {
+        "$ref": "props.labelPosition"
+      },
+      "items": {
+        "$ref": "props.items"
       },
       "placeholder": {
         "$ref": "props.placeholder"
       },
+      "displayValue": {
+        "$ref": "props.displayValue"
+      },
       "disabled": {
         "$ref": "props.disabled"
       },
-      "type": {
-        "$ref": "props.type"
+      "name": {
+        "$ref": "props.name"
       },
-      "label": {
-        "$ref": "props.label"
+      "form": {
+        "$ref": "props.form"
       },
-      "labelOrientation": {
-        "$ref": "props.labelOrientation"
+      "required": {
+        "$ref": "props.required"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "aria-label": {
+        "$ref": "props.aria-label"
       },
-      "displayValue": {
-        "$ref": "props.displayValue"
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "iconOnly": {
+        "$ref": "props.iconOnly"
+      },
+      "fullWidth": {
+        "$ref": "props.fullWidth"
       },
       "stretchText": {
         "$ref": "props.stretchText"
       },
+      "open": {
+        "$ref": "props.open"
+      },
+      "defaultOpen": {
+        "$ref": "props.defaultOpen"
+      },
       "surface": {
         "$ref": "props.surface"
       },
-      "surfaceBreakpoint": {
-        "$ref": "props.surfaceBreakpoint"
-      },
-      "surfaceTitle": {
-        "$ref": "props.surfaceTitle"
+      "labels": {
+        "$ref": "props.labels"
       },
       "contentMinWidth": {
         "$ref": "props.contentMinWidth"
       },
       "membrane": {
         "$ref": "props.membrane"
+      },
+      "multiple": {
+        "$ref": "props.multiple"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "variant": "side",
-      "type": "select",
       "label": "Model",
       "placeholder": "Choose model",
       "defaultValue": "balanced",
-      "ariaLabel": "AI model",
-      "surface": "popover",
-      "surfaceTitle": "Choose model",
+      "aria-label": "AI model",
+      "surface": "side",
       "stretchText": true,
       "membrane": true,
-      "options": [
+      "items": [
         {
           "value": "fast",
           "label": "Fast"
@@ -91,132 +112,174 @@
   },
   "controls": [
     {
-      "name": "variant",
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    {
+      "name": "description",
+      "type": "any",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    {
+      "name": "error",
+      "type": "any",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    {
+      "name": "labelPosition",
       "type": "select",
       "required": false,
-      "description": "Visual/behavioral variant.",
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
       "options": [
-        "default",
-        "side",
-        "iconOnly"
+        "top",
+        "start"
       ],
-      "defaultValue": "default"
+      "defaultValue": "top"
     },
     {
-      "name": "options",
+      "name": "items",
       "type": "array",
       "required": false,
-      "description": "Available options."
-    },
-    {
-      "name": "value",
-      "type": "array",
-      "required": false,
-      "description": "Current selected value. String for single, string[] for multiselect."
-    },
-    {
-      "name": "defaultValue",
-      "type": "array",
-      "required": false,
-      "description": "Uncontrolled initial selected value."
+      "description": "Choices in list and keyboard order; an item repeating an earlier value is dropped."
     },
     {
       "name": "placeholder",
       "type": "string",
       "required": false,
-      "description": "Placeholder text when no value is selected.",
-      "defaultValue": "Select option"
+      "description": "Text in the trigger while nothing is selected and `displayValue` is empty."
+    },
+    {
+      "name": "displayValue",
+      "type": "any",
+      "required": false,
+      "description": "Replaces the selected labels in the trigger, for example with a count or an icon."
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable the select.",
+      "description": "Disables the trigger and leaves the value out of FormData.",
       "defaultValue": false
     },
     {
-      "name": "type",
-      "type": "select",
-      "required": false,
-      "description": "Selection mode.",
-      "options": [
-        "select",
-        "multiselect"
-      ],
-      "defaultValue": "select"
-    },
-    {
-      "name": "label",
+      "name": "name",
       "type": "string",
       "required": false,
-      "description": "Label rendered above/beside the select."
+      "description": "FormData key; a multiple value submits one entry per selected item."
     },
     {
-      "name": "labelOrientation",
-      "type": "select",
-      "required": false,
-      "description": "Label placement relative to the control.",
-      "options": [
-        "vertical",
-        "horizontal"
-      ],
-      "defaultValue": "vertical"
-    },
-    {
-      "name": "ariaLabel",
+      "name": "form",
       "type": "string",
       "required": false,
-      "description": "Accessible label (aria-label)."
+      "description": "Id of the form that submits and resets the value, when it is not an ancestor."
     },
     {
-      "name": "displayValue",
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Blocks form submission until an item is selected and marks the label.",
+      "defaultValue": false
+    },
+    {
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Optional override for the content shown in the trigger."
+      "description": "Names the field when there is no visible `label`, and then titles the sheet."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Ids of elements that name the field; they take precedence over `label` and `aria-label`."
+    },
+    {
+      "name": "iconOnly",
+      "type": "boolean",
+      "required": false,
+      "description": "A square trigger without a chevron; name it with `aria-label`.",
+      "defaultValue": false
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "description": "Fills the available inline width.",
+      "defaultValue": true
     },
     {
       "name": "stretchText",
       "type": "boolean",
       "required": false,
-      "description": "Stretch the value area so the arrow pins to the right edge.",
+      "description": "Expands the value area so the chevron sits at the inline end.",
+      "defaultValue": false
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled list visibility; hidden, disabled, or unavailable Selects expose no list."
+    },
+    {
+      "name": "defaultOpen",
+      "type": "boolean",
+      "required": false,
+      "description": "List visibility on mount when `open` is not set; read once. Hiding an uncontrolled list closes it.",
       "defaultValue": false
     },
     {
       "name": "surface",
       "type": "select",
       "required": false,
-      "description": "Preferred content surface. Auto switches to bottom sheet on compact viewports.",
+      "description": "Where the list opens: auto is a popover, or a bottom sheet below 900px; side opens beside the trigger on hover or click.",
       "options": [
         "auto",
         "popover",
-        "sheet"
+        "sheet",
+        "side"
       ],
       "defaultValue": "auto"
     },
     {
-      "name": "surfaceBreakpoint",
-      "type": "number",
+      "name": "labels",
+      "type": "object",
       "required": false,
-      "description": "Breakpoint where auto surfaces switch from popover to sheet."
-    },
-    {
-      "name": "surfaceTitle",
-      "type": "string",
-      "required": false,
-      "description": "Optional title used for the mobile sheet header."
+      "description": "Strings Select renders itself: `close` names the sheet's close button."
     },
     {
       "name": "contentMinWidth",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Minimum width for popover content. Useful when the trigger is compact."
+      "description": "Minimum popover width: a number or numeric string is pixels, or pass a CSS length; capped by the viewport. Side and sheet surfaces ignore it."
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around trigger/option geometry.",
+      "description": "Outer spacing around the trigger and each option; the list surface keeps its own spacing.",
       "defaultValue": true
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "required": false,
+      "description": "Lets the user select any number of items and makes the value a `string[]` instead of `string | null`; selecting then keeps the list open.",
+      "defaultValue": false
+    },
+    {
+      "name": "value",
+      "type": "any",
+      "required": false,
+      "description": "Selected value, or values with `multiple`; a value missing from `items` shows as unselected until it appears."
+    },
+    {
+      "name": "defaultValue",
+      "type": "any",
+      "required": false,
+      "description": "Selection on mount, restored by form reset; same shape as `value`."
     }
   ],
   "meta": {

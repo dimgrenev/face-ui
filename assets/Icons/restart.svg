@@ -1,5 +1,1 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g style="mix-blend-mode:exclusion">
-<path d="M9 17C7.5 17 5 15.5 5 12C5 10.223 5.7725 8.59864 7 7.5M15 7.5C16.5 7.5 19 9 19 12.5C19 14.277 18.2275 15.9014 17 17M12.25 16.5L10.75 15V18L12.25 16.5ZM11.75 7.5L13.25 9V6L11.75 7.5Z" stroke="white"/>
-</g>
-</svg>
+<svg class="uf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" data-icon="restart" data-iconset="iconoteka" data-icon-source="replay/stroke" aria-hidden="true"><path d="M12.0005 21.5C6.67549 21.5 2.50049 17.325 2.50049 12C2.50049 9.025 3.77549 6.4 6.02549 4.55L7.40049 5.925C5.50049 7.425 4.45049 9.625 4.45049 12C4.45049 16.25 7.77549 19.6 12.0005 19.6C16.2255 19.6 19.5505 16.25 19.5505 12C19.5505 7.75 16.2255 4.4 12.0005 4.4C11.8755 4.4 11.7505 4.4 11.5755 4.425V6.625L8.32549 3.375L11.5755 0.125V2.5H12.0005C17.3255 2.5 21.5005 6.675 21.5005 12C21.5005 17.325 17.3255 21.5 12.0005 21.5Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>

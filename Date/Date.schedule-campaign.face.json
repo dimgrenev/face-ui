@@ -4,32 +4,36 @@
   "name": "Date / Schedule Campaign",
   "description": "Schedule Campaign product scenario for the Date component.",
   "framework": "react",
+  "preview": {
+    "entryPath": "./Date.preview.tsx",
+    "exportName": "DatePreview"
+  },
   "root": {
     "type": "Date",
     "props": {
-      "mode": {
-        "$ref": "props.mode"
+      "label": {
+        "$ref": "props.label"
       },
-      "selection": {
-        "$ref": "props.selection"
+      "description": {
+        "$ref": "props.description"
       },
-      "views": {
-        "$ref": "props.views"
+      "error": {
+        "$ref": "props.error"
       },
-      "openTo": {
-        "$ref": "props.openTo"
+      "labelPosition": {
+        "$ref": "props.labelPosition"
       },
-      "value": {
-        "$ref": "props.value"
+      "open": {
+        "$ref": "props.open"
       },
-      "defaultValue": {
-        "$ref": "props.defaultValue"
-      },
-      "valueFormat": {
-        "$ref": "props.valueFormat"
+      "defaultOpen": {
+        "$ref": "props.defaultOpen"
       },
       "locale": {
         "$ref": "props.locale"
+      },
+      "labels": {
+        "$ref": "props.labels"
       },
       "timezone": {
         "$ref": "props.timezone"
@@ -58,32 +62,17 @@
       "showNow": {
         "$ref": "props.showNow"
       },
-      "showClear": {
-        "$ref": "props.showClear"
-      },
-      "showPresets": {
-        "$ref": "props.showPresets"
-      },
-      "presets": {
-        "$ref": "props.presets"
+      "clearable": {
+        "$ref": "props.clearable"
       },
       "surface": {
         "$ref": "props.surface"
       },
-      "surfaceBreakpoint": {
-        "$ref": "props.surfaceBreakpoint"
+      "name": {
+        "$ref": "props.name"
       },
-      "surfaceTitle": {
-        "$ref": "props.surfaceTitle"
-      },
-      "label": {
-        "$ref": "props.label"
-      },
-      "description": {
-        "$ref": "props.description"
-      },
-      "error": {
-        "$ref": "props.error"
+      "form": {
+        "$ref": "props.form"
       },
       "required": {
         "$ref": "props.required"
@@ -102,6 +91,30 @@
       },
       "fullWidth": {
         "$ref": "props.fullWidth"
+      },
+      "mode": {
+        "$ref": "props.mode"
+      },
+      "openTo": {
+        "$ref": "props.openTo"
+      },
+      "selection": {
+        "$ref": "props.selection"
+      },
+      "presets": {
+        "$ref": "props.presets"
+      },
+      "value": {
+        "$ref": "props.value"
+      },
+      "defaultValue": {
+        "$ref": "props.defaultValue"
+      },
+      "valueFormat": {
+        "$ref": "props.valueFormat"
+      },
+      "excludeDisabledDates": {
+        "$ref": "props.excludeDisabledDates"
       }
     },
     "children": []
@@ -118,181 +131,144 @@
       "placeholder": "Choose date and time",
       "surface": "popover",
       "showNow": true,
-      "showClear": true,
+      "clearable": true,
       "membrane": true,
       "fullWidth": true
     }
   },
   "controls": [
     {
-      "name": "mode",
-      "type": "select",
-      "required": false,
-      "description": "Picker mode: date, datetime, time, week, month or year",
-      "options": [
-        "date",
-        "datetime",
-        "time",
-        "week",
-        "month",
-        "year"
-      ],
-      "defaultValue": "date"
-    },
-    {
-      "name": "selection",
-      "type": "select",
-      "required": false,
-      "description": "Selection model: single or range",
-      "options": [
-        "single",
-        "range"
-      ],
-      "defaultValue": "single"
-    },
-    {
-      "name": "views",
-      "type": "array",
-      "required": false,
-      "description": "Allowed views order"
-    },
-    {
-      "name": "openTo",
-      "type": "select",
-      "required": false,
-      "description": "Initial opened view",
-      "options": [
-        "month",
-        "year",
-        "day",
-        "hours",
-        "minutes"
-      ]
-    },
-    {
-      "name": "value",
+      "name": "label",
       "type": "any",
       "required": false,
-      "description": "Controlled value (iso/date/range)"
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
     },
     {
-      "name": "defaultValue",
+      "name": "description",
       "type": "any",
       "required": false,
-      "description": "defaultValue prop",
-      "defaultValue": null
+      "description": "Help for entering the value, announced with the focused control."
     },
     {
-      "name": "valueFormat",
+      "name": "error",
+      "type": "any",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    {
+      "name": "labelPosition",
       "type": "select",
       "required": false,
-      "description": "Value emission format: iso or date",
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
       "options": [
-        "date",
-        "iso"
+        "top",
+        "start"
       ],
-      "defaultValue": "iso"
+      "defaultValue": "top"
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controlled visibility; disabled, readOnly and hidden fields cannot open."
+    },
+    {
+      "name": "defaultOpen",
+      "type": "boolean",
+      "required": false,
+      "description": "Initial visibility for an uncontrolled picker.",
+      "defaultValue": false
     },
     {
       "name": "locale",
       "type": "string",
       "required": false,
-      "description": "Formatting locale",
+      "description": "Date formatting language, numbering system and default first weekday; dates stay Gregorian.",
       "defaultValue": "en-US"
+    },
+    {
+      "name": "labels",
+      "type": "object",
+      "required": false,
+      "description": "Internal action and view labels; the field keeps label and placeholder as its own props."
     },
     {
       "name": "timezone",
       "type": "string",
       "required": false,
-      "description": "Formatting timezone",
+      "description": "Zone for instants and today's civil date. Defaults to UTC.",
       "defaultValue": "UTC"
     },
     {
       "name": "weekStartsOn",
       "type": "select",
       "required": false,
-      "description": "Week start day index",
+      "description": "Override the locale's first weekday: 0=Sunday through 6=Saturday.",
       "options": [
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6"
-      ],
-      "defaultValue": 1
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
     },
     {
       "name": "format",
       "type": "string",
       "required": false,
-      "description": "format prop"
+      "description": "Display pattern; see the supported tokens and quoted literals in the Date docs."
     },
     {
       "name": "min",
       "type": "any",
       "required": false,
-      "description": "min prop",
-      "defaultValue": null
+      "description": "Inclusive lower bound in timezone; a date-only bound includes its whole day."
     },
     {
       "name": "max",
       "type": "any",
       "required": false,
-      "description": "max prop",
-      "defaultValue": null
+      "description": "Inclusive upper bound in timezone; a date-only bound includes its whole day."
     },
     {
       "name": "disabledDates",
       "type": "array",
       "required": false,
-      "description": "disabledDates prop"
+      "description": "Unavailable whole days; Date instants are converted into timezone before taking the day."
     },
     {
       "name": "disabledTime",
       "type": "object",
       "required": false,
-      "description": "disabledTime prop"
+      "description": "Unavailable hours (0–23) and minutes (0–59) for every day in time/datetime mode."
     },
     {
       "name": "closeOnSelect",
       "type": "boolean",
       "required": false,
-      "description": "Close panel after completing selection"
+      "description": "Close the picker once a selection is complete; defaults to true for a single date."
     },
     {
       "name": "showNow",
       "type": "boolean",
       "required": false,
-      "description": "Show Now action in footer",
+      "description": "Show the shortcut to the current day or time in timezone.",
       "defaultValue": true
     },
     {
-      "name": "showClear",
+      "name": "clearable",
       "type": "boolean",
       "required": false,
-      "description": "Show Clear action in footer",
+      "description": "Offer the clear action; it is disabled while the selection is empty.",
       "defaultValue": true
-    },
-    {
-      "name": "showPresets",
-      "type": "boolean",
-      "required": false,
-      "description": "Show preset quick actions",
-      "defaultValue": false
-    },
-    {
-      "name": "presets",
-      "type": "array",
-      "required": false,
-      "description": "presets prop"
     },
     {
       "name": "surface",
       "type": "select",
       "required": false,
-      "description": "surface prop",
+      "description": "Picker surface: a popover, a bottom sheet, or auto (a sheet below 900px wide).",
       "options": [
         "auto",
         "popover",
@@ -301,74 +277,132 @@
       "defaultValue": "auto"
     },
     {
-      "name": "surfaceBreakpoint",
-      "type": "number",
-      "required": false,
-      "description": "surfaceBreakpoint prop"
-    },
-    {
-      "name": "surfaceTitle",
+      "name": "name",
       "type": "string",
       "required": false,
-      "description": "surfaceTitle prop"
+      "description": "Native form field name. Ranges serialize as an ISO start/end interval."
     },
     {
-      "name": "label",
+      "name": "form",
       "type": "string",
       "required": false,
-      "description": "Control label"
-    },
-    {
-      "name": "description",
-      "type": "string",
-      "required": false,
-      "description": "Helper text below control"
-    },
-    {
-      "name": "error",
-      "type": "string",
-      "required": false,
-      "description": "Error message below control"
+      "description": "Associate the field with a form by id."
     },
     {
       "name": "required",
       "type": "boolean",
       "required": false,
-      "description": "required prop",
+      "description": "Require a complete selection for native form validation.",
       "defaultValue": false
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disable interactions",
+      "description": "Disable the trigger; the picker cannot open.",
       "defaultValue": false
     },
     {
       "name": "readOnly",
       "type": "boolean",
       "required": false,
-      "description": "Read-only mode",
+      "description": "Show the value without letting the user change it; it is still submitted.",
       "defaultValue": false
     },
     {
       "name": "placeholder",
       "type": "string",
       "required": false,
-      "description": "Trigger placeholder text"
+      "description": "Trigger text while nothing is selected."
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Enable membrane wrapper around trigger",
+      "description": "Wrap the trigger in control-row spacing; the picker surface keeps its own spacing.",
       "defaultValue": true
     },
     {
       "name": "fullWidth",
       "type": "boolean",
       "required": false,
-      "description": "Stretch control to container width",
+      "description": "Stretch the field to the width of its container.",
+      "defaultValue": true
+    },
+    {
+      "name": "mode",
+      "type": "select",
+      "required": false,
+      "description": "Picker mode: date, datetime, time, week, month or year.",
+      "options": [
+        "date",
+        "datetime",
+        "time",
+        "month",
+        "year",
+        "week"
+      ],
+      "defaultValue": "date"
+    },
+    {
+      "name": "openTo",
+      "type": "select",
+      "required": false,
+      "description": "First view shown when the picker opens.",
+      "options": [
+        "day",
+        "hours",
+        "minutes",
+        "month",
+        "year"
+      ]
+    },
+    {
+      "name": "selection",
+      "type": "select",
+      "required": false,
+      "description": "Single value or range endpoints; week owns its range selection.",
+      "options": [
+        "single",
+        "range"
+      ],
+      "defaultValue": "single"
+    },
+    {
+      "name": "presets",
+      "type": "array",
+      "required": false,
+      "description": "Explicit shortcuts with unique id, label and selection-shaped value; an omitted or empty array renders none."
+    },
+    {
+      "name": "value",
+      "type": "any",
+      "required": false,
+      "description": "Controlled civil ISO or Date instant, or a range of these; null clears selection."
+    },
+    {
+      "name": "defaultValue",
+      "type": "any",
+      "required": false,
+      "description": "Initial uncontrolled value; ignored while value is controlled.",
+      "defaultValue": null
+    },
+    {
+      "name": "valueFormat",
+      "type": "select",
+      "required": false,
+      "description": "Callback representation; form submission always uses civil ISO values.",
+      "options": [
+        "iso",
+        "date"
+      ],
+      "defaultValue": "iso"
+    },
+    {
+      "name": "excludeDisabledDates",
+      "type": "boolean",
+      "required": false,
+      "description": "Exclude unavailable days from the whole range; false constrains only its endpoints.",
       "defaultValue": true
     }
   ],

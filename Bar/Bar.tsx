@@ -1,219 +1,92 @@
-/**
- * Bar — toolbar layout component with start/end sections.
- *
- * `<Bar><BarSection align="start">Left</BarSection><BarSection align="end">Right</BarSection></Bar>`
- * `<Bar orientation="vertical">...</Bar>`
- */
-
-import React, { forwardRef, type ReactNode, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
 import { Button } from '../Button/Button'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
-
-// ---------------------------------------------------------------------------
-// Anatomy
-// ---------------------------------------------------------------------------
+import {
+  renderSlotContent,
+  type SlotContent,
+  type SlotDescriptor,
+} from '../assets/slot-content'
 
 export const barAnatomy = createAnatomy('bar').parts('root', 'section')
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+type BarNativeProps = Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'children' | 'dangerouslySetInnerHTML' | 'defaultChecked' | 'defaultValue'
+>
 
-export interface BarProps extends HTMLAttributes<HTMLDivElement> {
-  /** Bar content (typically BarSection elements). */
-  children?: ReactNode
+export interface BarProps extends BarNativeProps {
+  /** Content and sections, rendered in the authored order. */
+  children?: SlotContent
   /** Layout direction. */
   orientation?: 'horizontal' | 'vertical'
 }
 
-export interface BarSectionProps extends HTMLAttributes<HTMLDivElement> {
-  /** Alignment within the bar. */
+export interface BarSectionProps extends BarNativeProps {
+  /** Place the group at the start or end of the bar's main axis. */
   align?: 'start' | 'end'
-  /** Section content. */
-  children?: ReactNode
+  /** Fill remaining space and allow this content region to shrink before actions. */
+  grow?: boolean
+  children?: SlotContent
 }
 
-type SlotProps = { children?: ReactNode }
+export type FeldChildDescriptor = SlotDescriptor
 
-const BarLeftEllipsis: React.FC<SlotProps> = (_props) => null
-BarLeftEllipsis.displayName = 'Bar.LeftEllipsis'
-
-const BarLeftOverlap: React.FC<SlotProps> = (_props) => null
-BarLeftOverlap.displayName = 'Bar.LeftOverlap'
-
-const BarRight: React.FC<SlotProps> = (_props) => null
-BarRight.displayName = 'Bar.Right'
-
-function isElementOfType(el: unknown, type: unknown): el is React.ReactElement<any> {
-  return Boolean(el) && React.isValidElement(el) && (el as React.ReactElement<any>).type === type
+function renderSlot(node: SlotContent): ReactNode {
+  return renderSlotContent(node, BAR_SLOT_COMPONENTS, (value) => (
+    <Text as="span" truncate>
+      {value}
+    </Text>
+  ))
 }
 
-export type FeldChildDescriptor = {
-  __componentName__: string
-  [key: string]: any
-}
-
-function renderSlot(node: any): React.ReactNode {
-  if (node == null) return null
-  if (Array.isArray(node)) return node.map((x, i) => <React.Fragment key={i}>{renderSlot(x)}</React.Fragment>)
-  if (React.isValidElement(node)) return node
-  if (typeof node === 'string' || typeof node === 'number') {
-    return (
-      <Text as="span" className="uf-bar__slotText">
-        {String(node)}
-      </Text>
-    )
-  }
-  if (typeof node !== 'object') return String(node)
-
-  const name = (node as FeldChildDescriptor).__componentName__
-  if (!name || typeof name !== 'string') return null
-  const { __componentName__, ...slotProps } = node as FeldChildDescriptor
-  switch (name) {
-    case 'Text': return <Text {...slotProps} />
-    case 'Icon': {
-      const { name: iconName, ...iconProps } = slotProps
-      return typeof iconName === 'string' && iconName.length > 0
-        ? <Icon name={iconName} {...iconProps} />
-        : null
-    }
-    case 'Button': return <Button {...slotProps} />
-    default:
-      return (
-        <Text as="span" className="uf-bar__slotText" style={{ opacity: 0.6 }}>
-          {name}
-        </Text>
-      )
-  }
-}
-
-type BarCompoundComponent = React.ForwardRefExoticComponent<BarProps & React.RefAttributes<HTMLDivElement>> & {
-  LeftEllipsis: React.FC<SlotProps>
-  LeftOverlap: React.FC<SlotProps>
-  Right: React.FC<SlotProps>
-}
-
-// ---------------------------------------------------------------------------
-// Components
-// ---------------------------------------------------------------------------
-
-export const Bar = forwardRef<HTMLDivElement, BarProps>(
-  function Bar(props, ref) {
-    const {
-      orientation = 'horizontal',
-      children: rawChildren,
-      className,
-      ...rest
-    } = props
-
-    const children: any[] = (() => {
-      if (rawChildren == null) return []
-      if (Array.isArray(rawChildren)) return rawChildren
-      if (typeof rawChildren === 'object' && !React.isValidElement(rawChildren)) return [rawChildren]
-      return React.Children.toArray(rawChildren)
-    })()
-
-    // components API compatibility:
-    // support compound children (`Bar.LeftEllipsis`, `Bar.LeftOverlap`, `Bar.Right`)
-    // and plain Feld descriptor objects from playground JSON.
-    let leftMode: 'ellipsis' | 'overlap' = 'ellipsis'
-    let leftNode: ReactNode = null
-    let rightNode: ReactNode = null
-
-    for (const child of children) {
-      if (isElementOfType(child, BarRight)) {
-        rightNode = child.props?.children ?? null
-        continue
-      }
-      if (isElementOfType(child, BarLeftOverlap)) {
-        leftMode = 'overlap'
-        leftNode = child.props?.children ?? null
-        continue
-      }
-      if (isElementOfType(child, BarLeftEllipsis)) {
-        leftMode = 'ellipsis'
-        leftNode = child.props?.children ?? null
-        continue
-      }
-      if (child && typeof child === 'object' && !React.isValidElement(child) && typeof (child as FeldChildDescriptor).__componentName__ === 'string') {
-        const n = String((child as FeldChildDescriptor).__componentName__)
-        if (n === 'Bar.Right') {
-          rightNode = (child as any).children ?? null
-          continue
-        }
-        if (n === 'Bar.LeftOverlap') {
-          leftMode = 'overlap'
-          leftNode = (child as any).children ?? null
-          continue
-        }
-        if (n === 'Bar.LeftEllipsis') {
-          leftMode = 'ellipsis'
-          leftNode = (child as any).children ?? null
-          continue
-        }
-      }
-      if (leftNode == null) leftNode = child
-    }
-
-    if (leftNode != null || rightNode != null) {
-      return (
-        <div
-          ref={ref}
-          {...barAnatomy.getPartAttrs('root')}
-          role="toolbar"
-          aria-orientation={orientation}
-          data-orientation={orientation}
-          className={cn('uf-bar', leftMode === 'overlap' ? 'uf-bar--overlap' : 'uf-bar--ellipsis', className)}
-          {...rest}
-        >
-          <div className="uf-bar__left">{renderSlot(leftNode)}</div>
-          <div className="uf-bar__right">{renderSlot(rightNode)}</div>
-        </div>
-      )
-    }
-
+export const BarSection = forwardRef<HTMLDivElement, BarSectionProps>(
+  function BarSection(
+    { align = 'start', grow = false, children, className, ...rest },
+    ref,
+  ) {
     return (
       <div
         ref={ref}
-        {...barAnatomy.getPartAttrs('root')}
-        role="toolbar"
-        aria-orientation={orientation}
-        data-orientation={orientation}
-        className={cn('uf-bar', className)}
+        {...barAnatomy.getPartAttrs('section')}
+        data-align={align}
+        data-grow={grow ? '' : undefined}
+        className={cn('uf-bar-section', className)}
         {...rest}
       >
         {renderSlot(children)}
       </div>
     )
   },
-) as BarCompoundComponent
-
-Bar.LeftEllipsis = BarLeftEllipsis
-Bar.LeftOverlap = BarLeftOverlap
-Bar.Right = BarRight
-
-export const BarSection = forwardRef<HTMLDivElement, BarSectionProps>(
-  function BarSection(props, ref) {
-    const {
-      align = 'start',
-      children,
-      className,
-      ...rest
-    } = props
-
-    return (
-      <div
-        ref={ref}
-        {...barAnatomy.getPartAttrs('section')}
-        data-align={align}
-        className={cn('uf-bar-section', className)}
-        {...rest}
-      >
-        {children}
-      </div>
-    )
-  },
 )
+
+const BarRoot = forwardRef<HTMLDivElement, BarProps>(function Bar(
+  { orientation = 'horizontal', children, className, ...rest },
+  ref,
+) {
+  return (
+    <div
+      ref={ref}
+      {...barAnatomy.getPartAttrs('root')}
+      aria-orientation={rest.role === 'toolbar' ? orientation : undefined}
+      data-orientation={orientation}
+      className={cn('uf-bar', className)}
+      {...rest}
+    >
+      {renderSlot(children)}
+    </div>
+  )
+})
+
+/** A row whose sections lay out from the start edge to the end edge, so a title, controls and actions share one line. */
+export const Bar = Object.assign(BarRoot, { Section: BarSection })
+
+const BAR_SLOT_COMPONENTS = {
+  Text,
+  Button,
+  Icon,
+  BarSection,
+  'Bar.Section': BarSection,
+}

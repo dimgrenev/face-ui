@@ -2,45 +2,59 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Accordion",
-  "description": "Expandable panel navigation with single or multiple open items",
+  "description": "Stacked disclosure sections with one or several open at a time.",
   "props": {
     "items": {
       "type": "array",
       "required": false,
-      "description": "Accordion item definitions. Each item can include icon, matching Button icon input semantics."
+      "description": "Sections in order; an item without a unique string `value`, or a group or separator, is dropped with a report."
     },
     "icon": {
       "type": "string",
       "required": false,
-      "description": "Default left icon for item triggers. Individual items can override it with item.icon."
+      "description": "Decorative icon (an icon name or a node) at the start of every trigger; `item.icon` overrides it."
     },
-    "expandedIds": {
+    "expanded": {
       "type": "array",
       "required": false,
-      "description": "Currently expanded item IDs (controlled)."
+      "description": "Values of the open sections (controlled); values without a section are kept for items that arrive later."
     },
-    "defaultExpandedIds": {
+    "defaultExpanded": {
       "type": "array",
       "required": false,
-      "description": "Uncontrolled initial expanded item IDs."
+      "description": "Values of the sections open on mount (uncontrolled); later changes are ignored."
     },
     "multiple": {
       "type": "boolean",
       "required": false,
-      "description": "Allow multiple items to be expanded simultaneously.",
+      "description": "Lets several sections stay open; when false, opening one closes the other and only the first open value shows.",
       "default": true
     },
     "collapsible": {
       "type": "boolean",
       "required": false,
-      "description": "Allow collapsing the last open item.",
+      "description": "Lets the user close the last open section; when false its trigger is `aria-disabled` while open.",
       "default": true
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire accordion.",
+      "description": "Disables every trigger; panel contents keep their own interactivity.",
       "default": false
+    },
+    "headingLevel": {
+      "type": "enum",
+      "required": false,
+      "description": "The `aria-level` of every trigger's heading, an integer from 1 to 6.",
+      "options": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "default": 3
     }
   },
   "states": [
@@ -71,7 +85,7 @@
         "collapsible": true,
         "disabled": false,
         "icon": "folder",
-        "defaultExpandedIds": [
+        "defaultExpanded": [
           "getting-started"
         ]
       }
@@ -100,7 +114,7 @@
           }
         ],
         "multiple": true,
-        "defaultExpandedIds": [
+        "defaultExpanded": [
           "getting-started",
           "usage"
         ]
@@ -109,7 +123,7 @@
     {
       "name": "With Icons",
       "props": {
-        "defaultExpandedIds": [
+        "defaultExpanded": [
           "docs"
         ],
         "items": [
@@ -158,7 +172,7 @@
           }
         ],
         "collapsible": false,
-        "defaultExpandedIds": [
+        "defaultExpanded": [
           "getting-started"
         ]
       }
@@ -191,12 +205,28 @@
     }
   ],
   "behavior": {
-    "stateModel": "Machine stores expandedIds and supports controlled or uncontrolled expansion.",
+    "stateModel": "expanded/defaultExpanded/onExpandedChange hold the open section values; values without a section are kept and not shown.",
     "multiple": "By default, opening one item keeps already open items expanded. Set multiple=false to force single-open behavior.",
     "collapsible": "When collapsible=false, the last open item cannot be closed by toggling it.",
     "autoFocusOnOpen": "none"
   },
   "keyboard": {
+    "Tab": {
+      "action": "focusNextFocusable",
+      "condition": "every enabled trigger is in the tab sequence"
+    },
+    "ArrowDown": {
+      "action": "focusNext"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious"
+    },
+    "Home": {
+      "action": "focusFirst"
+    },
+    "End": {
+      "action": "focusLast"
+    },
     "Enter": {
       "action": "toggleItem"
     },

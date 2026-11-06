@@ -1,0 +1,224 @@
+/* =================================================================
+ * MODAL
+ * ================================================================= */
+/* The backdrop, positioner and surface mount when the dialog opens and
+ * unmount once the positioner's exit transitions end; @starting-style
+ * gives the entry the same transitions. */
+.uf-modal-backdrop[data-scope] {
+  --uf-modal-zero-blur: 0;
+  position: fixed;
+  inset: 0;
+  background: var(--uf-overlay-backdrop-bg);
+  z-index: var(--uf-z-modal);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  backdrop-filter: blur(var(--uf-modal-zero-blur)) saturate(1);
+  -webkit-backdrop-filter: blur(var(--uf-modal-zero-blur)) saturate(1);
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    backdrop-filter var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    -webkit-backdrop-filter var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--face-runtime-transition-duration-exit);
+}
+.uf-modal-inlineHost {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: calc(var(--uf-control-height) * 8);
+  overflow: hidden;
+  border-radius: var(--uf-radius-md);
+}
+.uf-modal-backdrop[data-scope][data-portal="false"],
+.uf-modal-positioner[data-scope][data-portal="false"] {
+  position: absolute;
+  inset: 0;
+}
+.uf-modal-backdrop[data-scope][data-scoped-root],
+.uf-modal-positioner[data-scope][data-scoped-root] {
+  position: absolute;
+  inset: 0;
+}
+.uf-modal-backdrop[data-scope][data-state="open"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  backdrop-filter: blur(var(--uf-overlay-backdrop-blur)) saturate(1.12);
+  -webkit-backdrop-filter: blur(var(--uf-overlay-backdrop-blur)) saturate(1.12);
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    backdrop-filter var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    -webkit-backdrop-filter var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear 0s;
+}
+.uf-modal-positioner[data-scope] {
+  --uf-modal-edge-inset: var(--uf-spacing-1);
+  position: fixed;
+  inset: 0;
+  display: flex;
+  z-index: var(--uf-z-modal);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear var(--face-runtime-transition-duration-exit);
+}
+.uf-modal-positioner[data-scope][data-state="open"] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    visibility 0s linear 0s;
+}
+.uf-modal-positioner[data-scope][data-variant="center"] {
+  align-items: center;
+  justify-content: center;
+}
+/* Flex start and end follow the positioner's direction. */
+.uf-modal-positioner[data-scope][data-variant="start"] {
+  align-items: center;
+  justify-content: flex-start;
+}
+.uf-modal-positioner[data-scope][data-variant="end"] {
+  align-items: center;
+  justify-content: flex-end;
+}
+.uf-modal-positioner[data-scope][data-variant="top"] {
+  align-items: flex-start;
+  justify-content: center;
+}
+.uf-modal-positioner[data-scope][data-variant="bottom"] {
+  align-items: flex-end;
+  justify-content: center;
+}
+.uf-modal[data-scope] {
+  --uf-modal-max-w: 52.5rem;
+  --uf-modal-viewport-gap: var(--uf-spacing-12);
+  --uf-modal-enter-y: var(--uf-spacing-4);
+  --uf-modal-side-enter-x: var(--uf-spacing-6);
+  --uf-modal-side-w-default: 20rem;
+  /* Where the surface enters from and leaves to. */
+  --uf-modal-away: translateY(var(--uf-modal-enter-y)) scale(0.98);
+  pointer-events: auto;
+  max-height: calc(var(--uf-modal-frame-height, 100vh) * 0.85);
+  overflow-y: auto;
+  position: relative;
+  width: max-content;
+  min-width: 0;
+  max-width: min(var(--uf-modal-max-w), calc(var(--uf-modal-frame-width, 100vw) - var(--uf-modal-viewport-gap)));
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  color: var(--uf-color-fg);
+  transform: var(--uf-modal-away);
+  opacity: 0;
+  transition:
+    opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
+    transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
+}
+.uf-modal[data-scope][data-variant="start"] {
+  --uf-modal-away: translateX(calc(var(--uf-modal-side-enter-x) * -1));
+}
+.uf-modal[data-scope][data-variant="end"] {
+  --uf-modal-away: translateX(var(--uf-modal-side-enter-x));
+}
+/* Separate rules: an engine without :dir() drops only these. */
+.uf-modal[data-scope][data-variant="start"]:dir(rtl) {
+  --uf-modal-away: translateX(var(--uf-modal-side-enter-x));
+}
+.uf-modal[data-scope][data-variant="end"]:dir(rtl) {
+  --uf-modal-away: translateX(calc(var(--uf-modal-side-enter-x) * -1));
+}
+.uf-modal[data-scope][data-variant="top"] {
+  --uf-modal-away: translateY(calc(var(--uf-modal-side-enter-x) * -1));
+}
+.uf-modal[data-scope][data-variant="bottom"] {
+  --uf-modal-away: translateY(var(--uf-modal-side-enter-x));
+}
+.uf-modal[data-scope][data-state="open"] {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  .uf-modal-backdrop[data-scope][data-state="open"] {
+    opacity: 0;
+    backdrop-filter: blur(var(--uf-modal-zero-blur)) saturate(1);
+    -webkit-backdrop-filter: blur(var(--uf-modal-zero-blur)) saturate(1);
+  }
+  .uf-modal-positioner[data-scope][data-state="open"] {
+    opacity: 0;
+  }
+  .uf-modal[data-scope][data-state="open"] {
+    opacity: 0;
+    transform: var(--uf-modal-away);
+  }
+}
+.uf-modal[data-scope][data-variant="center"] {
+  width: min(var(--face-runtime-modal-w, 32rem), calc(var(--uf-modal-frame-width, 100vw) - var(--uf-modal-viewport-gap)));
+  height: var(--face-runtime-modal-h, auto);
+}
+.uf-modal[data-scope][data-variant="start"],
+.uf-modal[data-scope][data-variant="end"] {
+  height: var(--face-runtime-modal-h, 100%);
+  max-height: var(--uf-modal-frame-height, 100vh);
+  width: min(var(--face-runtime-modal-w, var(--uf-modal-side-w-default)), 100%);
+  min-width: auto;
+}
+.uf-modal[data-scope][data-variant="top"],
+.uf-modal[data-scope][data-variant="bottom"] {
+  width: min(var(--face-runtime-modal-w, 100%), 100%);
+  max-width: none;
+  min-width: auto;
+  height: var(--face-runtime-modal-h, auto);
+  max-height: calc(var(--uf-modal-frame-height, 100vh) * 0.85);
+}
+.uf-modal-positioner[data-scope].uf-modal-positioner--edge-flush {
+  padding: 0;
+}
+.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset[data-variant="center"] {
+  padding: var(--uf-spacing-6);
+}
+/* Safe-area insets are physical, so every edge placement pads all four sides. */
+.uf-modal-positioner[data-scope].uf-modal-positioner--edge-inset:not([data-variant="center"]) {
+  padding: calc(var(--uf-modal-edge-inset) + env(safe-area-inset-top, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-right, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-bottom, 0)) calc(var(--uf-modal-edge-inset) + env(safe-area-inset-left, 0));
+}
+.uf-modal[data-scope].uf-modal--edge-inset:not([data-variant="center"]) {
+  max-height: calc(var(--uf-modal-frame-height, 100vh) - var(--uf-modal-edge-inset) - var(--uf-modal-edge-inset));
+}
+.uf-modal[data-scope].uf-modal--edge-flush {
+  max-height: 100vh;
+}
+.uf-modal-bar {
+  padding: 0;
+  gap: 0;
+}
+.uf-modal-title {
+  width: 100%;
+}
+.uf-modal-description {
+  color: var(--uf-color-fg-muted);
+  font-size: var(--uf-font-size);
+  text-align: start;
+  width: 100%;
+}
+.uf-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  text-align: start;
+  width: 100%;
+}
+.uf-modal-footer {
+  margin-top: auto;
+  padding: 0;
+  gap: 0;
+  min-height: auto;
+}
+.uf-modal-closeButton[data-icon-only] {
+  --uf-icon-only-size: var(--uf-control-height);
+}

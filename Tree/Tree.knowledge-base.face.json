@@ -10,62 +10,80 @@
       "items": {
         "$ref": "props.items"
       },
-      "expandedIds": {
-        "$ref": "props.expandedIds"
+      "value": {
+        "$ref": "props.value"
       },
-      "defaultExpandedIds": {
-        "$ref": "props.defaultExpandedIds"
+      "defaultValue": {
+        "$ref": "props.defaultValue"
       },
-      "selectedId": {
-        "$ref": "props.selectedId"
+      "expanded": {
+        "$ref": "props.expanded"
       },
-      "defaultSelectedId": {
-        "$ref": "props.defaultSelectedId"
+      "defaultExpanded": {
+        "$ref": "props.defaultExpanded"
+      },
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "defaultExpandedIds": [
+      "aria-label": "Knowledge base",
+      "defaultExpanded": [
         "company",
         "engineering"
       ],
-      "defaultSelectedId": "runbooks",
+      "defaultValue": "runbooks",
       "items": [
         {
-          "id": "company",
+          "value": "company",
           "label": "Company wiki",
           "icon": "folder",
-          "kind": "tile",
-          "children": [
+          "items": [
             {
-              "id": "policies",
+              "value": "policies",
               "label": "Policies",
               "icon": "folder",
-              "children": [
+              "items": [
                 {
-                  "id": "security-policy",
+                  "value": "security-policy",
                   "label": "Security policy",
                   "icon": "file"
                 }
               ]
             },
             {
-              "id": "engineering",
+              "value": "engineering",
               "label": "Engineering",
               "icon": "folder",
-              "children": [
+              "items": [
                 {
-                  "id": "runbooks",
+                  "value": "runbooks",
                   "label": "Runbooks",
                   "icon": "file",
-                  "rightText": "8"
+                  "meta": "8"
                 },
                 {
-                  "id": "architecture",
+                  "value": "architecture",
                   "label": "Architecture",
                   "icon": "file"
+                },
+                {
+                  "value": "archive",
+                  "label": "Archive",
+                  "icon": "folder",
+                  "disabled": true,
+                  "items": [
+                    {
+                      "value": "old",
+                      "label": "2019"
+                    }
+                  ]
                 }
               ]
             }
@@ -79,31 +97,48 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Recursive tree nodes. Nodes may use kind \"button\", \"tile\", or \"custom\", plus icon, rightText, actions, content, or render."
+      "description": "Items in order, nested through `items`; an item repeating a value used anywhere earlier in the tree is dropped."
     },
     {
-      "name": "expandedIds",
-      "type": "array",
-      "required": false,
-      "description": "Currently expanded node IDs."
-    },
-    {
-      "name": "defaultExpandedIds",
-      "type": "array",
-      "required": false,
-      "description": "Uncontrolled initial expanded node IDs."
-    },
-    {
-      "name": "selectedId",
+      "name": "value",
       "type": "string",
       "required": false,
-      "description": "Currently selected node ID."
+      "description": "Value of the selected item (controlled); `null` selects nothing, as does a value no item has."
     },
     {
-      "name": "defaultSelectedId",
+      "name": "defaultValue",
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial selected node ID."
+      "description": "Value of the item selected on mount (uncontrolled); later changes are ignored."
+    },
+    {
+      "name": "expanded",
+      "type": "array",
+      "required": false,
+      "description": "Values of the expanded items (controlled); values of items that are not branches are kept but show nothing."
+    },
+    {
+      "name": "defaultExpanded",
+      "type": "array",
+      "required": false,
+      "description": "Values of the items expanded on mount (uncontrolled); later changes are ignored."
+    },
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "`lines` draws a guide line along the nested items of every expanded item; `default` draws none.",
+      "options": [
+        "default",
+        "lines"
+      ],
+      "defaultValue": "default"
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Names the tree; without it and `aria-labelledby` the name is \"Tree\"."
     }
   ],
   "meta": {

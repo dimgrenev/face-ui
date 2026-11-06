@@ -5,95 +5,35 @@
  * No @layer — top-level for isolation from external (reference library) CSS.
  */
 
-/* ---------------------------------------------------------------
- * BLANKET RESET — counter Tailwind Preflight (border-style: solid
- * on *) and any reference library borders that leak onto wrapper
- * elements without data-scope/data-part (e.g. .uf-input__control).
- *
- * No priority escalation — components.css can override for intentional
- * borders (spinner, separators, etc.).
- * --------------------------------------------------------------- */
-[data-scope] *,
-[data-scope] *::before,
-[data-scope] *::after {
-  border: none;
-  box-shadow: none;
-  outline: none;
+/* Reset only library-owned elements. Consumer children keep native semantics,
+   borders and focus styles; a component boundary is not a global reset. */
+:where([data-scope][data-part]) {
+  box-sizing: border-box;
 }
-
-/* ---------------------------------------------------------------
- * SCOPED RESET — kill all borders, shadows, outlines on form/table
- * elements inside any data-scope container.
- * Uses data-scope specificity plus import order instead of escalation.
- * --------------------------------------------------------------- */
-[data-scope] button,
-[data-scope] input,
-[data-scope] textarea,
-[data-scope] select,
-[data-scope] table,
-[data-scope] th,
-[data-scope] td,
-[data-scope] tr,
-[data-scope] thead,
-[data-scope] tbody,
-[data-scope] [data-part],
-[data-scope] label,
-button[data-scope],
-input[data-scope],
-textarea[data-scope],
-select[data-scope],
-table[data-scope],
-label[data-scope] {
-  border: none;
-  outline: none;
-  box-shadow: none;
+:where(button, input, textarea, select)[data-scope][data-part] {
+  margin: 0;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
   appearance: none;
   -webkit-appearance: none;
 }
-
-/* Also kill borders on elements with shared class names inside [data-scope] */
-[data-scope] .uf-option,
-[data-scope] .uf-control,
-[data-scope] .uf-button,
-.uf-option[data-scope],
-.uf-control[data-scope],
-.uf-button[data-scope] {
-  border: none;
-  outline: none;
-  box-shadow: none;
-}
-
-/* Restore table collapse for Calendar grid */
-[data-scope] table {
+table[data-scope] {
   border-collapse: collapse;
   border-spacing: 0;
 }
 
-/* ---------------------------------------------------------------
- * Membrane — thin token padding on component roots only (data-part="root")
- * --------------------------------------------------------------- */
+/* Component roots own their insets. Outer spacing is exclusively Membrane. */
 [data-scope][data-part="root"] {
-  padding: var(--uf-membrane, var(--uf-border-width-thin));
   box-sizing: border-box;
-}
-
-/* Components with an explicit membrane wrapper must not also inherit the
-   generic root membrane. Otherwise their visible control is inset twice. */
-[data-scope="card"][data-part="root"],
-[data-scope="button"][data-part="root"],
-[data-scope="text"][data-part="root"],
-[data-scope="bar"][data-part="root"],
-[data-scope="sidebar"][data-part="root"],
-[data-scope="input"][data-part="root"],
-[data-scope="select"][data-part="root"],
-[data-scope="resizable"][data-part="root"] {
-  padding: 0;
 }
 
 /* ---------------------------------------------------------------
  * Typography baseline
  * --------------------------------------------------------------- */
-[data-scope][data-part="root"] {
+[data-scope][data-part="root"],
+.uf-overlay-content[data-scope] {
   font-family: var(--uf-font-family-base);
   font-size: var(--uf-control-font-size);
   line-height: var(--uf-control-line-height);
@@ -102,39 +42,6 @@ label[data-scope] {
   color: var(--uf-color-fg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Unified typography pass:
-   use one body typography across controls/labels/placeholders for all components,
-   excluding Code where monospace rules are intentional. */
-[data-scope]:not([data-scope="code"]) :where(
-  [data-part="label"],
-  [data-part="description"],
-  [data-part="error"],
-  [data-part="trigger"],
-  [data-part="item"],
-  [data-part="option"],
-  [data-part="title"],
-  [data-part="value"],
-  [data-part="input"],
-  [data-part="textarea"],
-  button,
-  input,
-  textarea,
-  select,
-  .uf-text-body
-) {
-  font-size: var(--uf-control-font-size);
-  line-height: var(--uf-control-line-height);
-  letter-spacing: var(--uf-control-letter-spacing);
-  font-weight: var(--uf-font-weight);
-}
-
-[data-scope]:not([data-scope="code"]) :where(input, textarea)::placeholder {
-  font-size: var(--uf-control-font-size);
-  line-height: var(--uf-control-line-height);
-  letter-spacing: var(--uf-control-letter-spacing);
-  font-weight: var(--uf-font-weight);
 }
 
 /* ---------------------------------------------------------------
@@ -212,53 +119,10 @@ label[data-scope] {
 [data-scope] .uf-control[aria-current="true"],
 [data-scope] .uf-control[aria-selected="true"],
 [data-scope] .uf-control[data-active="true"],
-[data-scope] .uf-control.is-active,
 .uf-control[data-scope][aria-current="true"],
 .uf-control[data-scope][aria-selected="true"],
-.uf-control[data-scope][data-active="true"],
-.uf-control[data-scope].is-active {
+.uf-control[data-scope][data-active="true"] {
   font-weight: var(--uf-font-weight);
-}
-
-@supports (font-variation-settings: "wght" 400) {
-  [data-scope][data-part="root"] {
-    font-variation-settings: "wght" var(--uf-font-weight);
-  }
-
-  [data-scope]:not([data-scope="code"]) :where(
-    [data-part="label"],
-    [data-part="description"],
-    [data-part="error"],
-    [data-part="trigger"],
-    [data-part="item"],
-    [data-part="option"],
-    [data-part="title"],
-    [data-part="value"],
-    [data-part="input"],
-    [data-part="textarea"],
-    button,
-    input,
-    textarea,
-    select,
-    .uf-text-body
-  ) {
-    font-variation-settings: "wght" var(--uf-font-weight);
-  }
-
-  [data-scope]:not([data-scope="code"]) :where(input, textarea)::placeholder {
-    font-variation-settings: "wght" var(--uf-font-weight);
-  }
-
-  [data-scope] .uf-control[aria-current="true"],
-  [data-scope] .uf-control[aria-selected="true"],
-  [data-scope] .uf-control[data-active="true"],
-  [data-scope] .uf-control.is-active,
-  .uf-control[data-scope][aria-current="true"],
-  .uf-control[data-scope][aria-selected="true"],
-  .uf-control[data-scope][data-active="true"],
-  .uf-control[data-scope].is-active {
-    font-variation-settings: "wght" var(--uf-font-weight);
-  }
 }
 
 [data-scope] .uf-control[data-disabled],
@@ -271,39 +135,10 @@ label[data-scope] {
   pointer-events: none;
 }
 
-[data-scope] .uf-control[data-icon-only],
-.uf-control[data-scope][data-icon-only] {
-  --uf-icon-only-size: var(--uf-control-height);
-  inline-size: var(--uf-icon-only-size);
-  block-size: var(--uf-icon-only-size);
-  min-inline-size: var(--uf-icon-only-size);
-  min-block-size: var(--uf-icon-only-size);
-  padding: 0;
-  justify-content: center;
-}
-
-/* ---------------------------------------------------------------
- * Focus-visible baseline
- * Global ring is intentionally disabled: components opt in locally.
- * --------------------------------------------------------------- */
-[data-scope] :focus-visible,
-[data-scope]:focus-visible {
-  outline: none;
-  box-shadow: none;
-}
-
-/* Remove default focus outline */
-[data-scope] :focus:not(:focus-visible),
-[data-scope]:focus:not(:focus-visible) {
-  outline: none;
-  box-shadow: none;
-}
-
 /* ---------------------------------------------------------------
  * Disabled universal
  * --------------------------------------------------------------- */
-[data-scope] [data-disabled],
-[data-scope][data-disabled] {
+[data-scope][data-part="root"][data-disabled] {
   opacity: var(--uf-color-disabled-opacity);
   cursor: not-allowed;
   pointer-events: none;
@@ -313,5 +148,23 @@ label[data-scope] {
  * Hidden (machine-controlled)
  * --------------------------------------------------------------- */
 [data-scope] [hidden] {
+  display: none;
+}
+/* Keep control labels available to assistive technology without occupying layout. */
+.uf-visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Native hidden removes the complete spacing boundary, not just the control. */
+.uf-membrane[hidden],
+.uf-membrane:has(> [hidden]) {
   display: none;
 }

@@ -2,53 +2,33 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Overlay",
-  "description": "Floating content surface unifying tooltip, popover, and hover card",
+  "description": "Floating content surface unifying tooltip, popover and hover card.",
   "props": {
-    "trigger": {
-      "type": "enum",
-      "required": false,
-      "description": "How the overlay is triggered.",
-      "options": [
-        "hover",
-        "click"
-      ],
-      "default": "hover"
-    },
-    "interactive": {
-      "type": "boolean",
-      "required": false,
-      "description": "Whether content is interactive (keeps open on hover).",
-      "default": false
-    },
     "content": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Content rendered inside the floating surface."
+      "description": "Content of the floating surface; empty content renders the trigger alone. Tooltip content must stay noninteractive."
     },
     "children": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Trigger element (the anchor)."
+      "description": "One trigger element forwarding props/ref, or text rendered as a Button."
     },
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Controlled open state."
+      "description": "Controlled visibility; updates from the parent never call onOpenChange."
     },
-    "openDelay": {
-      "type": "number",
+    "defaultOpen": {
+      "type": "boolean",
       "required": false,
-      "description": "Delay before opening (ms)."
-    },
-    "closeDelay": {
-      "type": "number",
-      "required": false,
-      "description": "Delay before closing (ms)."
+      "description": "Visibility on mount when `open` is not set; read once.",
+      "default": false
     },
     "side": {
       "type": "enum",
       "required": false,
-      "description": "Preferred side placement.",
+      "description": "Preferred side; may flip when the opposite side has more room.",
       "options": [
         "top",
         "right",
@@ -60,7 +40,7 @@
     "align": {
       "type": "enum",
       "required": false,
-      "description": "Alignment along the side.",
+      "description": "Logical alignment on the cross axis, following dir or the trigger's direction.",
       "options": [
         "start",
         "center",
@@ -71,15 +51,56 @@
     "sideOffset": {
       "type": "number",
       "required": false,
-      "description": "Offset from the trigger along the side axis (px).",
+      "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2.",
       "default": 2
+    },
+    "attachmentSelector": {
+      "type": "string",
+      "required": false,
+      "description": "Nearest ancestor used for left/right attachment; --uf-dropdown-panel-gap measures the painted surface gap. Vertical alignment still follows the trigger."
+    },
+    "alignToOption": {
+      "type": "string",
+      "required": false,
+      "description": "Aligns a measured visible row opposite the trigger on left/right surfaces; pass the row's selector."
+    },
+    "dir": {
+      "type": "string",
+      "required": false,
+      "description": "Content direction; omitted inherits the trigger's, auto follows the content."
+    },
+    "openDelay": {
+      "type": "number",
+      "required": false,
+      "description": "Milliseconds from hover or focus to showing the surface, 0–2147483647; default 200.",
+      "default": 200
+    },
+    "closeDelay": {
+      "type": "number",
+      "required": false,
+      "description": "Milliseconds from hover and focus leaving to hiding the surface, 0–2147483647; default 0.",
+      "default": 0
+    },
+    "openOn": {
+      "type": "enum",
+      "required": false,
+      "description": "Opens on hover and keyboard focus of the trigger, or toggles on its click.",
+      "options": [
+        "hover",
+        "click"
+      ]
+    },
+    "interactive": {
+      "type": "boolean",
+      "required": false,
+      "description": "Hover content holds controls: dialog semantics, and focus it took returns to the trigger."
     }
   },
   "states": [
     {
       "name": "Default (Tooltip)",
       "props": {
-        "trigger": "hover",
+        "openOn": "hover",
         "content": "Tooltip text",
         "side": "top"
       }
@@ -87,8 +108,7 @@
     {
       "name": "Popover (Click)",
       "props": {
-        "trigger": "click",
-        "interactive": true,
+        "openOn": "click",
         "content": "Popover content",
         "side": "bottom"
       }
@@ -96,7 +116,7 @@
     {
       "name": "Hover Card",
       "props": {
-        "trigger": "hover",
+        "openOn": "hover",
         "interactive": true,
         "content": "Interactive hover card",
         "side": "bottom"
@@ -105,7 +125,7 @@
     {
       "name": "Right Side",
       "props": {
-        "trigger": "hover",
+        "openOn": "hover",
         "content": "Right tooltip",
         "side": "right"
       }
@@ -113,8 +133,9 @@
   ],
   "behavior": {
     "dismissOnEscape": true,
-    "dismissOnClickOutside": true,
-    "autoFocusOnOpen": "none"
+    "notes": [
+      "Only click and interactive hover content dismiss on an outside interaction. Click content receives focus on opening. Informational hover content retains trigger focus."
+    ]
   },
   "keyboard": {
     "Escape": {
@@ -122,40 +143,27 @@
     }
   },
   "aria": {
-    "role": "tooltip"
+    "notes": [
+      "Hover informational content uses role=\"tooltip\". Click content and interactive hover content use role=\"dialog\"."
+    ]
   },
   "composition": {
     "required": [
-      "root",
       "trigger",
       "content"
     ],
-    "recommended": [
-      "arrow"
-    ],
     "parts": {
-      "root": {
-        "slot": "root"
-      },
       "trigger": {
-        "slot": "trigger",
-        "parent": "root"
+        "slot": "trigger"
       },
       "content": {
-        "slot": "content",
-        "parent": "root"
-      },
-      "arrow": {
-        "slot": "arrow",
-        "parent": "content"
+        "slot": "content"
       }
     }
   },
   "tokenMapping": {
     "component": [
-      "--uf-overlay-content-max-w",
-      "--uf-overlay-content-border-width",
-      "--uf-responsive-overlay-zero-blur"
+      "--uf-overlay-content-max-w"
     ],
     "semanticFallbacks": [
       "--uf-membrane",
@@ -180,20 +188,17 @@
       "--uf-z-overlay"
     ],
     "notes": [
-      "Overlay trigger content is rendered through Button; primitive content is wrapped in flush Text so the surface owns padding.",
-      "sideOffset and floating coordinates are positioning data produced by the floating adapter, not visual tokens.",
-      "Hover and click overlays share card/dropdown surface tokens; tooltip-specific aliases only preserve semantic naming.",
-      "Responsive overlay backdrops use --uf-responsive-overlay-zero-blur as the closed-state blur sentinel before open-state backdrop blur applies."
+      "Trigger props and ref belong to the actual trigger element; primitive content uses Text typography.",
+      "sideOffset measures the gap before the shared Membrane; the public content ref, attributes, style and class belong to one surface."
     ]
   },
   "platform": {
-    "popover": true,
-    "anchorPositioning": true
+    "popover": false,
+    "anchorPositioning": false
   },
   "usage": {
     "whenToUse": [
-      "Background dimming for modals",
-      "Click-outside dismiss layer"
+      "Compatibility for existing hover cards; prefer Tooltip or Popover in new code."
     ],
     "whenNotToUse": [
       "Blocking or viewport-edge content (use Modal)",

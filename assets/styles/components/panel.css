@@ -1,0 +1,112 @@
+/* =================================================================
+ * PANEL (side navigation; data-scope "sidebar")
+ * ================================================================= */
+.uf-sidebar[data-scope] {
+  --uf-sidebar-bg: var(--uf-color-surface-sidebar, var(--uf-color-panel));
+  --uf-sidebar-fg: var(--uf-color-fg);
+  --uf-sidebar-muted: var(--uf-color-fg-muted);
+  --uf-sidebar-active-bg: var(--uf-color-active-bg, var(--uf-color-hover-bg));
+  --uf-sidebar-row-radius: var(--uf-radius-sm);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  color: var(--uf-sidebar-fg);
+  background: var(--uf-sidebar-bg);
+  overflow: hidden;
+}
+/* On a sheet surface the root holds only the trigger. */
+.uf-sidebar[data-scope][data-surface="sheet"] {
+  display: inline-flex;
+  height: auto;
+  background: none;
+  overflow: visible;
+}
+[data-scope="sidebar"] [data-part="header"] {
+  display: flex;
+  box-sizing: border-box;
+  padding: var(--uf-sidebar-inset);
+}
+.uf-sidebar-content[data-scope],
+.uf-sidebar-group[data-scope] {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.uf-sidebar-content[data-scope] {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--uf-sidebar-inset);
+  box-sizing: border-box;
+}
+.uf-sidebar-item[data-scope] {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--uf-control-height);
+  height: auto;
+  gap: var(--uf-control-gap);
+  padding-inline-start: calc(var(--uf-control-pad-text) + var(--face-runtime-option-level, 0) * var(--uf-option-indent));
+  justify-content: flex-start;
+  text-align: start;
+  text-decoration: none;
+  color: var(--uf-sidebar-muted);
+  border-radius: var(--uf-sidebar-row-radius);
+}
+.uf-sidebar-item[data-scope]:hover {
+  background: var(--uf-color-hover-bg);
+  color: var(--uf-sidebar-fg);
+}
+.uf-sidebar-item[data-scope][aria-current="page"],
+.uf-sidebar-item[data-scope][data-current] {
+  background: var(--uf-sidebar-active-bg);
+  color: var(--uf-sidebar-fg);
+}
+/* The rail shows each row's icon, centered; labels stay as accessible names. */
+.uf-sidebar[data-state="collapsed"] .uf-sidebar-item[data-scope] {
+  justify-content: center;
+  padding-inline: 0;
+}
+.uf-sidebar-itemIcon {
+  display: inline-flex;
+  flex: none;
+}
+.uf-sidebar-itemLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uf-sidebar-itemIndicator {
+  display: inline-flex;
+  flex: none;
+  transition: transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter);
+}
+.uf-sidebar-itemIndicator:dir(rtl) {
+  transform: scaleX(-1);
+}
+[aria-expanded="true"] > .uf-sidebar-itemIndicator {
+  transform: rotate(90deg);
+}
+.uf-sidebar-toggleButton[data-scope="button"] {
+  width: auto;
+  opacity: 1;
+  color: var(--uf-sidebar-muted);
+  background: var(--uf-color-black-0);
+  box-shadow: none;
+}
+.uf-sidebar-toggleButton[data-scope="button"]:hover {
+  color: var(--uf-sidebar-fg);
+  background: var(--uf-color-hover-bg);
+}
+/* Sidebar icons point at the start edge, which is on the right in right-to-left text. */
+.uf-sidebar-toggleButton [data-part="icon"]:dir(rtl),
+.uf-sidebar .uf-nav-sheetTrigger [data-part="icon"]:dir(rtl) {
+  transform: scaleX(-1);
+}

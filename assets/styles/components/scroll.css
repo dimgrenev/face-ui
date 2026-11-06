@@ -1,0 +1,36 @@
+/* =================================================================
+ * SCROLL
+ * ================================================================= */
+.uf-scroll[data-scope] {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+/* The card is a flex column: the viewport fills a box given a height and shrinks inside one given a max-height. */
+.uf-scroll[data-scope] > [data-part="viewport"] {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--uf-scroll-card-inset);
+  box-sizing: border-box;
+}
+/* Content that scrolls sideways is at least as wide as the viewport and as wide as what cannot wrap. */
+.uf-scroll[data-scope]:is([data-orientation="horizontal"], [data-orientation="both"]) > [data-part="viewport"] > [data-part="content"] {
+  width: fit-content;
+  min-width: 100%;
+}
+.uf-scroll__text[data-scope="text"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+}
+.uf-scroll__text[data-scope="text"] .uf-text__content {
+  display: block;
+  white-space: inherit;
+}
+/* Text that can scroll sideways keeps each line whole. */
+.uf-scroll__text--nowrap[data-scope="text"] {
+  white-space: pre;
+}

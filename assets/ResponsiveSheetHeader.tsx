@@ -5,35 +5,39 @@ import { Text } from '../Text/Text'
 
 interface ResponsiveSheetHeaderProps {
   title: ReactNode
+  titleId?: string
   onClose: () => void
+  /** Name of the close button; the owner passes its resolved `labels.close`. */
+  closeLabel: string
 }
 
 export function ResponsiveSheetHeader(props: ResponsiveSheetHeaderProps) {
-  const { title, onClose } = props
+  const { title, titleId, onClose, closeLabel } = props
 
   return (
     <Bar className="uf-responsive-sheetHeader">
-      <Bar.LeftEllipsis>
+      <Bar.Section grow>
         <Text
           as="span"
-
+          id={titleId}
+          truncate
           fullWidth
           className="uf-responsive-sheetTitle"
         >
           {title}
         </Text>
-      </Bar.LeftEllipsis>
-      <Bar.Right>
+      </Bar.Section>
+      <Bar.Section align="end">
         <Button
           icon="close"
           iconOnly
           fullWidth={false}
           variant="default"
-          aria-label="Close"
+          aria-label={closeLabel}
           className="uf-responsive-sheetClose"
           onClick={onClose}
         />
-      </Bar.Right>
+      </Bar.Section>
     </Bar>
   )
 }

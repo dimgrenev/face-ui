@@ -1,170 +1,256 @@
 /**
- * Accordion — expandable panel navigation.
- *
- * Also works as a Collapsible with a single item.
- * Flat API: all items rendered from `items` prop.
+ * Accordion — stacked disclosure sections; a single item works as a collapsible.
  *
  * `<Accordion items={[{ value: 'a', label: 'Section A', content: <p>...</p> }]} />`
- * `<Accordion items={[{ value: 'solo', label: 'Toggle', content: <p>...</p> }]} collapsible />`
+ * `<Accordion items={items} multiple={false} defaultExpanded={['a']} />`
  */
 
-import React, { Children, Fragment, forwardRef, isValidElement, useId, useMemo, type ReactNode } from 'react'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
-import { accordionMachine, connectAccordion } from '../assets/machines/accordion.machine'
-import { cn } from '../assets/utils'
+import {
+  Children,
+  Fragment,
+  forwardRef,
+  isValidElement,
+  useId,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
+import { composeHandlers } from '../assets/adapters/react/merge-props'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useRovingFocus } from '../assets/adapters/react/use-roving-focus'
+import { Membrane } from '../assets/adapters/react/Membrane'
+import { readFlatCollection } from '../assets/internal/flat-collection'
+import { domId, readKeys } from '../assets/runtime/collection'
+import { readNumber } from '../assets/runtime/props'
+import { hasSlotContent } from '../assets/slot-content'
 import { RightIcon } from '../assets/icons'
+import { cn } from '../assets/utils'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 export interface AccordionItem {
+  /** Unique, stable section identity; unrelated to the generated DOM id. */
   value: string
+  /** Trigger content and the section's accessible name; keep it noninteractive. */
   label: ReactNode
+  /** Replaces the shared `icon` for this section; `null`, `false` or empty content removes it. */
   icon?: ReactNode
+  /** Panel contents; they stay mounted while collapsed and React keys keep their identity. */
   content: ReactNode
+  /** Disables this section's trigger; the panel's own controls keep their interactivity. */
   disabled?: boolean
+  /** Exposes the panel as a region landmark named by its trigger; use it for a few complex panels. */
+  region?: boolean
 }
 
-export interface AccordionProps {
-  /** Accordion item definitions. */
-  items?: AccordionItem[]
-  /** Default left icon for item triggers. Individual items can override it with item.icon. */
+export interface AccordionProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  | 'children'
+  | 'dangerouslySetInnerHTML'
+  | 'defaultValue'
+  | 'defaultChecked'
+  | 'autoFocus'
+  | 'contentEditable'
+  | 'suppressContentEditableWarning'
+> {
+  /** Sections in order; an item without a unique string `value`, or a group or separator, is dropped with a report. */
+  items?: readonly AccordionItem[]
+  /** Decorative icon (an icon name or a node) at the start of every trigger; `item.icon` overrides it. */
   icon?: ReactNode
-  /** Currently expanded item IDs (controlled). */
-  expandedIds?: string[]
-  /** Uncontrolled initial expanded item IDs. */
-  defaultExpandedIds?: string[]
-  /** Allow multiple items to be expanded simultaneously. */
+  /** Values of the open sections (controlled); values without a section are kept for items that arrive later. */
+  expanded?: readonly string[]
+  /** Values of the sections open on mount (uncontrolled); later changes are ignored. */
+  defaultExpanded?: readonly string[]
+  /** Called once per user toggle with the open values; never for prop updates. */
+  onExpandedChange?: (details: {
+    /** Values of the open sections after the toggle, in a new array; at most one unless `multiple`. */
+    expanded: string[]
+  }) => void
+  /** Lets several sections stay open; when false, opening one closes the other and only the first open value shows. */
   multiple?: boolean
-  /** Allow collapsing the last open item. */
+  /** Lets the user close the last open section; when false its trigger is `aria-disabled` while open. */
   collapsible?: boolean
-  /** Disable the entire accordion. */
+  /** Disables every trigger; panel contents keep their own interactivity. */
   disabled?: boolean
-  /** Callback when expanded items change. */
-  onExpandedChange?: (details: { expandedIds: string[] }) => void
+  /** The `aria-level` of every trigger's heading, an integer from 1 to 6. */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
   /** Additional class name on the root element. */
   className?: string
 }
 
-function flattenAccordionContent(content: ReactNode): ReactNode[] {
-  if (content == null) return []
-  if (isValidElement<{ children?: ReactNode }>(content) && content.type === Fragment) {
+function flattenContent(content: ReactNode): ReactNode[] {
+  if (
+    isValidElement<{ children?: ReactNode }>(content) &&
+    content.type === Fragment
+  )
     return Children.toArray(content.props.children)
-  }
   return Children.toArray(content)
 }
 
-function renderAccordionContentNode(node: ReactNode): ReactNode {
-  if (node == null) return null
-  if (isValidElement(node) || Array.isArray(node)) return node
-  if (typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
+function renderContentNode(node: ReactNode): ReactNode {
+  if (typeof node === 'string' || typeof node === 'number')
     return (
       <Text as="div" fullWidth className="uf-accordion-contentText">
         {String(node)}
       </Text>
     )
-  }
   return node
 }
 
-function getAccordionDomId(instanceId: string, part: 'trigger' | 'content', value: string): string {
-  return `accordion:${instanceId}:${part}:${value}`
-}
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
+/** Stacked disclosure sections with one or several open at a time. */
 export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
-  function Accordion(props, ref) {
-    const {
-      items: rawItems,
+  function Accordion(
+    {
+      items,
       icon,
-      expandedIds,
-      defaultExpandedIds,
+      expanded,
+      defaultExpanded,
+      onExpandedChange,
       multiple = true,
       collapsible = true,
       disabled = false,
-      onExpandedChange,
+      headingLevel = 3,
       className,
-    } = props
-    const items = Array.isArray(rawItems) ? rawItems : []
-    const isControlledExpanded = Array.isArray(expandedIds)
-    const controlledExpandedSig = isControlledExpanded
-      ? (expandedIds as any[]).map((id) => String(id)).join('\u0001')
-      : ''
-    const controlledExpanded = useMemo(
-      () => (isControlledExpanded ? (expandedIds as any[]).map((id) => String(id)) : []),
-      [isControlledExpanded, controlledExpandedSig],
-    )
-    const initialExpanded = controlledExpanded.length > 0
-      ? controlledExpanded
-      : Array.isArray(defaultExpandedIds) && defaultExpandedIds.length > 0
-        ? defaultExpandedIds.map((id) => String(id))
-        : []
-    const machineExpandedIds = useControllableMachineProp(
-      isControlledExpanded ? controlledExpanded : undefined,
-      initialExpanded,
-    )
-
-    const machineOptions: any = {
-      expandedIds: machineExpandedIds,
-      multiple,
-      collapsible,
-      disabled,
-      onExpandedChange: ((details: { expandedIds: string[] }) => {
-        onExpandedChange?.(details)
-      }) as any,
+      onKeyDown,
+      onFocus,
+      onBlur,
+      ...nativeProps
+    },
+    ref,
+  ) {
+    const collection = readFlatCollection<AccordionItem>(items, {
+      component: 'Accordion',
+      key: (item) => item.value,
+    })
+    const { keys } = collection
+    const level = readNumber('Accordion', 'headingLevel', headingLevel, 3, {
+      integer: true,
+      min: 1,
+      max: 6,
+    })
+    const [stored, setStored] = useControllableState<readonly string[]>({
+      value:
+        expanded === undefined
+          ? undefined
+          : readKeys(expanded, 'Accordion', 'expanded'),
+      defaultValue: () =>
+        readKeys(defaultExpanded, 'Accordion', 'defaultExpanded'),
+      onChange: (next) =>
+        onExpandedChange?.({ expanded: next as string[] }),
+      name: ['Accordion', 'expanded'],
+    })
+    // The stored values stay as given; only sections that exist show open, one of them unless `multiple`.
+    const project = (values: readonly string[]) => {
+      const present = values.filter((value) => keys.includes(value))
+      return multiple ? present : present.slice(0, 1)
     }
-    const { state, send } = useMachine(accordionMachine, machineOptions)
-
-    const api = connectAccordion(state, send)
-    const accordionInstanceId = useId().replace(/:/g, '')
+    const open = project(stored)
+    const toggle = (value: string) =>
+      setStored((current) => {
+        const shown = project(current)
+        if (!shown.includes(value)) return multiple ? [...shown, value] : [value]
+        return collapsible || shown.length > 1
+          ? shown.filter((key) => key !== value)
+          : current
+      })
+    const roving = useRovingFocus({
+      keys,
+      disabled: (key) => disabled || !!collection.get(key)?.disabled,
+      orientation: 'vertical',
+      tabStops: 'all',
+    })
+    const scope = `accordion-${useId()}`
 
     return (
-      <div ref={ref} {...api.getRootProps()} className={cn('uf-accordion', className)}>
-        {items.map((item) => {
-          const triggerId = getAccordionDomId(accordionInstanceId, 'trigger', item.value)
-          const contentId = getAccordionDomId(accordionInstanceId, 'content', item.value)
+      <div
+        {...nativeProps}
+        ref={ref}
+        data-scope="accordion"
+        data-part="root"
+        className={cn('uf-accordion', className)}
+        onKeyDown={composeHandlers(onKeyDown, roving.root.onKeyDown)}
+        onFocus={composeHandlers(onFocus, roving.root.onFocus)}
+        onBlur={composeHandlers(onBlur, roving.root.onBlur)}
+      >
+        {collection.children(null).map(({ key, item, disabled: off }) => {
+          const isOpen = open.includes(key)
+          const state = isOpen ? 'open' : 'closed'
+          const inactive = disabled || off
+          const locked = isOpen && !collapsible && open.length === 1
+          const triggerId = domId(scope, 'trigger', key)
+          const contentId = domId(scope, 'content', key)
           const itemIcon = item.icon === undefined ? icon : item.icon
-          const resolvedIcon = typeof itemIcon === 'string'
-            ? <Icon name={itemIcon} />
-            : itemIcon
-          const hasIcon = resolvedIcon != null
+          const hasIcon = hasSlotContent(itemIcon)
           return (
-            <div key={item.value} {...api.getItemProps({ value: item.value, disabled: item.disabled })}>
-              <span className="uf-membrane uf-membrane--full">
+            <div
+              key={key}
+              data-scope="accordion"
+              data-part="item"
+              data-state={state}
+              data-value={key}
+            >
+              <Membrane
+                as="div"
+                fullWidth
+                interactive
+                role="heading"
+                aria-level={level}
+              >
                 <button
-                  {...api.getTriggerProps({ value: item.value, disabled: item.disabled })}
+                  {...roving.item(key)}
+                  type="button"
                   id={triggerId}
+                  data-scope="accordion"
+                  data-part="trigger"
+                  data-state={state}
+                  data-value={key}
+                  data-icon-start={hasIcon ? '' : undefined}
+                  aria-expanded={isOpen}
                   aria-controls={contentId}
-                  data-icon-left={hasIcon ? '' : undefined}
+                  aria-disabled={inactive || locked || undefined}
+                  disabled={inactive}
+                  onClick={(event) => {
+                    if (!event.defaultPrevented) toggle(key)
+                  }}
                 >
                   {hasIcon && (
                     <span className="uf-accordion-icon" aria-hidden="true">
-                      {resolvedIcon}
+                      {typeof itemIcon === 'string' ? (
+                        <Icon name={itemIcon} />
+                      ) : (
+                        itemIcon
+                      )}
                     </span>
                   )}
-                  <Text as="span" inset="none" membrane={false} className="uf-accordion-label">
-                    {item.label}
-                  </Text>
-                  <Text as="span" inset="none" membrane={false} className="uf-accordion-arrow" aria-hidden="true"><RightIcon /></Text>
+                  <span className="uf-accordion-label">{item.label}</span>
+                  <span className="uf-accordion-arrow" aria-hidden="true">
+                    <RightIcon />
+                  </span>
                 </button>
-              </span>
+              </Membrane>
               <div
-                {...api.getContentProps({ value: item.value })}
                 id={contentId}
-                aria-labelledby={triggerId}
-                data-icon-left={hasIcon ? '' : undefined}
+                data-scope="accordion"
+                data-part="content"
+                data-state={state}
+                role={item.region ? 'region' : undefined}
+                aria-labelledby={item.region ? triggerId : undefined}
+                hidden={!isOpen}
               >
-                <div className="uf-accordion-content-inner">
-                  {flattenAccordionContent(item.content).map((node, idx) => (
-                    <div className="uf-accordion-slot" key={`${item.value}:slot:${idx}`}>
-                      {renderAccordionContentNode(node)}
+                <div
+                  className="uf-accordion-content-inner"
+                  key={
+                    isValidElement(item.content) &&
+                    item.content.type === Fragment
+                      ? item.content.key
+                      : undefined
+                  }
+                >
+                  {flattenContent(item.content).map((node, index) => (
+                    <div
+                      className="uf-accordion-slot"
+                      key={isValidElement(node) ? node.key : index}
+                    >
+                      {renderContentNode(node)}
                     </div>
                   ))}
                 </div>

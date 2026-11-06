@@ -1,0 +1,185 @@
+/* =================================================================
+ * CARD
+ * ================================================================= */
+/* Opt-in geometry defaults are weaker than authored product classes. */
+:where(.uf-card[data-scope]) {
+  --uf-surface-pad-block: var(--uf-card-padding-default);
+  --uf-surface-pad-inline: var(--uf-card-padding-default);
+}
+:where(.uf-card[data-scope][data-padding="none"]) {
+  --uf-surface-pad-block: 0px;
+  --uf-surface-pad-inline: 0px;
+}
+:where(.uf-card[data-scope][data-padding="membrane"]) {
+  --uf-surface-pad-block: var(--uf-membrane);
+  --uf-surface-pad-inline: var(--uf-membrane);
+}
+:where(.uf-card[data-scope][data-padding="control"]) {
+  --uf-surface-pad-block: var(--uf-control-pad-y);
+  --uf-surface-pad-inline: var(--uf-control-pad-text);
+}
+.uf-card[data-scope] {
+  --uf-card-bg: var(--uf-overlay-surface-bg);
+  --uf-card-border: var(--uf-overlay-surface-border);
+  --uf-card-underlay-bg: var(--uf-overlay-surface-underlay-bg);
+  --uf-card-background: linear-gradient(var(--uf-card-bg), var(--uf-card-bg)), var(--uf-card-underlay-bg);
+  --uf-card-pad: var(--uf-card-padding-default);
+  --uf-card-radius: var(--uf-radius-md);
+  --uf-card-border-width: var(--uf-membrane);
+  --uf-card-shadow: var(--uf-overlay-surface-shadow);
+  --uf-card-blur: var(--uf-overlay-surface-blur);
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  border-radius: var(--uf-card-radius);
+  background: var(--uf-card-background);
+  border: var(--uf-card-border-width) solid var(--uf-card-border);
+  overflow: hidden;
+  padding: var(--uf-card-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  color: var(--uf-color-fg);
+  box-shadow: var(--uf-card-shadow);
+  backdrop-filter: blur(var(--uf-card-blur)) saturate(1.14);
+  -webkit-backdrop-filter: blur(var(--uf-card-blur)) saturate(1.14);
+}
+.uf-card[data-scope][data-card-variant="plain"] {
+  --uf-card-bg: var(--uf-color-black-0);
+  --uf-card-background: var(--uf-color-black-0);
+  --uf-card-shadow: none;
+  --uf-card-blur: 0px;
+}
+.uf-card[data-scope][data-card-variant="code"] {
+  --uf-card-bg: var(--uf-color-bg-code);
+  --uf-card-underlay-bg: var(--uf-color-bg-code);
+  --uf-card-background: var(--uf-color-bg-code);
+  --uf-card-shadow: none;
+  --uf-card-blur: 0px;
+  color: var(--uf-color-text-code);
+}
+.uf-card[data-scope][data-padding="none"] {
+  --uf-card-pad: 0px;
+}
+.uf-card[data-scope][data-padding="membrane"] {
+  --uf-card-pad: var(--uf-membrane);
+}
+.uf-card[data-scope][data-padding="control"] {
+  --uf-card-pad: var(--uf-control-pad-y) var(--uf-control-pad-text);
+}
+.uf-card[data-scope][data-radius="none"] {
+  --uf-card-radius: var(--uf-radius-none);
+}
+.uf-card[data-scope][data-radius="md"] {
+  --uf-card-radius: var(--uf-radius-md);
+}
+.uf-card[data-scope][data-radius="lg"] {
+  --uf-card-radius: var(--uf-radius-lg);
+}
+.uf-card[data-scope][data-border="false"] {
+  --uf-card-border-width: 0px;
+}
+.uf-card[data-scope][data-hoverable]:is(:hover, :focus-within) {
+  background: linear-gradient(var(--uf-color-hover-bg), var(--uf-color-hover-bg)), var(--uf-card-background);
+}
+.uf-card[data-scope]:not([data-full-width]) {
+  inline-size: max-content;
+}
+.uf-card[data-scope] > [data-part="header"] {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+.uf-card[data-scope] > [data-part="header"][data-orientation="horizontal"] {
+  flex-direction: row;
+  align-items: center;
+}
+.uf-card[data-scope] > [data-part="header"][data-orientation="horizontal"] > .uf-card__title,
+.uf-card[data-scope] > [data-part="header"][data-orientation="horizontal"] > .uf-membrane:has(> .uf-card__title) {
+  flex: 1 1 auto;
+}
+.uf-card[data-scope] > [data-part="title"],
+.uf-card[data-scope] > [data-part="header"] > [data-part="title"],
+.uf-card[data-scope] .uf-card__title {
+  --uf-text-font-weight: var(--uf-font-weight-bold);
+  min-inline-size: 0;
+}
+.uf-card[data-scope] .uf-card__title[data-variant="body"]:not([data-size]) {
+  --uf-text-font-size: var(--uf-font-size-md);
+}
+.uf-card[data-scope] > [data-part="description"],
+.uf-card[data-scope] > [data-part="header"] > [data-part="description"],
+.uf-card[data-scope] .uf-card__description {
+  min-inline-size: 0;
+}
+.uf-card[data-scope] > [data-part="content"] {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+.uf-card[data-scope] > [data-part="footer"] {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.uf-card[data-scope] > [data-part="footer"][data-align="start"] {
+  justify-content: flex-start;
+}
+.uf-card[data-scope] > [data-part="footer"][data-align="end"] {
+  justify-content: flex-end;
+}
+.uf-card[data-scope] > [data-part="footer"][data-align="between"] {
+  justify-content: space-between;
+}
+.uf-card[data-scope] > [data-part="actions"],
+.uf-card[data-scope] > [data-part="footer"] > [data-part="actions"],
+.uf-card[data-scope] > [data-part="header"] > [data-part="actions"] {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.uf-card[data-scope] [data-part="actions"][data-align="start"] {
+  justify-content: flex-start;
+}
+.uf-card[data-scope] [data-part="actions"][data-align="end"] {
+  justify-content: flex-end;
+}
+.uf-card[data-scope] [data-part="actions"][data-align="between"] {
+  justify-content: space-between;
+  flex: 1 0 auto;
+}
+.uf-card[data-scope] .uf-membrane {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+.uf-card[data-scope] .uf-text[data-scope] {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.uf-card[data-scope] .uf-text__content {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+}

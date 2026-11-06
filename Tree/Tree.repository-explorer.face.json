@@ -10,61 +10,69 @@
       "items": {
         "$ref": "props.items"
       },
-      "expandedIds": {
-        "$ref": "props.expandedIds"
+      "value": {
+        "$ref": "props.value"
       },
-      "defaultExpandedIds": {
-        "$ref": "props.defaultExpandedIds"
+      "defaultValue": {
+        "$ref": "props.defaultValue"
       },
-      "selectedId": {
-        "$ref": "props.selectedId"
+      "expanded": {
+        "$ref": "props.expanded"
       },
-      "defaultSelectedId": {
-        "$ref": "props.defaultSelectedId"
+      "defaultExpanded": {
+        "$ref": "props.defaultExpanded"
+      },
+      "variant": {
+        "$ref": "props.variant"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "defaultExpandedIds": [
+      "aria-label": "Repository files",
+      "variant": "lines",
+      "defaultExpanded": [
         "src",
         "components"
       ],
-      "defaultSelectedId": "agent",
+      "defaultValue": "agent",
       "items": [
         {
-          "id": "src",
+          "value": "src",
           "label": "src",
           "icon": "folder",
-          "children": [
+          "items": [
             {
-              "id": "components",
+              "value": "components",
               "label": "components",
               "icon": "folder",
-              "kind": "tile",
-              "children": [
+              "items": [
                 {
-                  "id": "agent",
+                  "value": "agent",
                   "label": "AgentPanel.tsx",
-                  "icon": "file"
+                  "icon": "file",
+                  "meta": "M"
                 },
                 {
-                  "id": "chat",
+                  "value": "chat",
                   "label": "ChatComposer.tsx",
                   "icon": "file"
                 }
               ]
             },
             {
-              "id": "app",
+              "value": "app",
               "label": "App.tsx",
               "icon": "file"
             }
           ]
         },
         {
-          "id": "readme",
+          "value": "readme",
           "label": "README.md",
           "icon": "file"
         }
@@ -76,31 +84,48 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Recursive tree nodes. Nodes may use kind \"button\", \"tile\", or \"custom\", plus icon, rightText, actions, content, or render."
+      "description": "Items in order, nested through `items`; an item repeating a value used anywhere earlier in the tree is dropped."
     },
     {
-      "name": "expandedIds",
-      "type": "array",
-      "required": false,
-      "description": "Currently expanded node IDs."
-    },
-    {
-      "name": "defaultExpandedIds",
-      "type": "array",
-      "required": false,
-      "description": "Uncontrolled initial expanded node IDs."
-    },
-    {
-      "name": "selectedId",
+      "name": "value",
       "type": "string",
       "required": false,
-      "description": "Currently selected node ID."
+      "description": "Value of the selected item (controlled); `null` selects nothing, as does a value no item has."
     },
     {
-      "name": "defaultSelectedId",
+      "name": "defaultValue",
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial selected node ID."
+      "description": "Value of the item selected on mount (uncontrolled); later changes are ignored."
+    },
+    {
+      "name": "expanded",
+      "type": "array",
+      "required": false,
+      "description": "Values of the expanded items (controlled); values of items that are not branches are kept but show nothing."
+    },
+    {
+      "name": "defaultExpanded",
+      "type": "array",
+      "required": false,
+      "description": "Values of the items expanded on mount (uncontrolled); later changes are ignored."
+    },
+    {
+      "name": "variant",
+      "type": "select",
+      "required": false,
+      "description": "`lines` draws a guide line along the nested items of every expanded item; `default` draws none.",
+      "options": [
+        "default",
+        "lines"
+      ],
+      "defaultValue": "default"
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Names the tree; without it and `aria-labelledby` the name is \"Tree\"."
     }
   ],
   "meta": {

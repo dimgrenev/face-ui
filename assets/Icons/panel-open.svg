@@ -1,8 +1,1 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <g stroke="black" stroke-width="1">
-    <path d="M3.5 4.5H16.5V15.5H3.5V4.5Z" />
-    <path d="M12 4.5V15.5" />
-    <path d="M8.5 8.5L6.5 10.5L8.5 12.5" />
-    <path d="M6.5 10.5H10.5" />
-  </g>
-</svg>
+<svg class="uf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" data-icon="panel-open" data-iconset="iconoteka" data-icon-source="picture_in_picture_top_left/fill" aria-hidden="true"><path d="M22 20H2V4H22V20ZM12 12.25V6.5H4.5V12.25H12Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>

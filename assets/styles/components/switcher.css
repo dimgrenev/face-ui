@@ -1,0 +1,114 @@
+/* =================================================================
+ * SWITCHER
+ * ================================================================= */
+.uf-switcher[data-scope="switcher"] {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--uf-control-gap);
+  padding-inline-start: var(--uf-control-pad-text);
+  padding-inline-end: var(--uf-control-pad-icon);
+  padding-block: var(--uf-control-pad-y);
+  height: auto;
+  min-height: var(--uf-control-height);
+  width: fit-content;
+  min-width: 0;
+  max-width: 100%;
+  border-radius: var(--uf-radius);
+  cursor: pointer;
+  user-select: none;
+  text-align: start;
+}
+.uf-switcher[data-scope]:hover:not([data-disabled]) {
+  background: var(--uf-color-hover-bg);
+}
+.uf-membrane:has(> .uf-switcher) {
+  min-width: 0;
+  max-width: 100%;
+}
+.uf-switcher[data-scope][data-switch-only] {
+  width: var(--uf-control-height);
+  min-width: var(--uf-control-height);
+  justify-content: center;
+  padding: 0;
+}
+.uf-switcher[data-scope][data-full-width] {
+  width: 100%;
+}
+.uf-switcher[data-scope][hidden] {
+  display: none;
+}
+.uf-switcher[data-scope][data-disabled] {
+  pointer-events: auto;
+}
+.uf-switcher[data-scope] [data-part="label"] {
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  text-align: start;
+}
+.uf-switcher[data-scope] [data-part="label"]:not([data-truncate]) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+/* One proportional 20×20 glyph: 18×12 track, 10×10 thumb, 6px travel. */
+.uf-switcher[data-scope] [data-part="track"] {
+  width: var(--uf-switcher-control-size, var(--uf-icon-size));
+  height: var(--uf-switcher-control-size, var(--uf-icon-size));
+  flex-shrink: 0;
+  position: relative;
+  display: inline-flex;
+  color: var(--uf-color-fg-muted);
+  transition: color var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard);
+}
+.uf-switcher[data-scope] [data-part="track"][data-state="checked"] {
+  color: var(--uf-color-fg);
+}
+.uf-switcher[data-scope] [data-part="track"]::before {
+  content: "";
+  position: absolute;
+  inset: 20% 5%;
+  border-radius: var(--uf-radius-full);
+  background: currentColor;
+}
+.uf-switcher[data-scope] [data-part="thumb"] {
+  width: 50%;
+  height: 50%;
+  border-radius: var(--uf-radius-full);
+  background: var(--uf-color-bg);
+  position: absolute;
+  inset-block-start: 25%;
+  inset-inline-start: 10%;
+  transition: inset-inline-start var(--face-runtime-transition-duration-control) var(--uf-motion-ease-standard);
+}
+.uf-switcher[data-scope] [data-part="track"][data-state="checked"] [data-part="thumb"] {
+  inset-inline-start: 40%;
+}
+.uf-switcher[data-scope] [data-part="input"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (forced-colors: active) {
+  .uf-switcher[data-scope] [data-part="track"]::before {
+    background: ButtonText;
+  }
+  .uf-switcher[data-scope] [data-part="thumb"] {
+    background: Canvas;
+  }
+}
+
+/* The visible row is the <label>; the input it hides is what actually takes
+   focus, so the ring has to be drawn on the row. */
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-switcher:has(input:focus-visible),
+:where(:root[data-uf-focus-modality="keyboard"]) .uf-switcher:has(input:focus) {
+  outline: 2px solid var(--uf-color-fg);
+  outline-offset: -2px;
+}

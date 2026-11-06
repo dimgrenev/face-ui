@@ -13,17 +13,11 @@
       "name": {
         "$ref": "props.name"
       },
-      "icon": {
-        "$ref": "props.icon"
-      },
       "fallback": {
         "$ref": "props.fallback"
       },
-      "children": {
-        "$ref": "props.children"
-      },
-      "fallbackDelayMs": {
-        "$ref": "props.fallbackDelayMs"
+      "fallbackDelay": {
+        "$ref": "props.fallbackDelay"
       }
     },
     "children": []
@@ -33,7 +27,7 @@
       "src": "/assets/media/examples/office-core/lobby-glass-blocks.webp",
       "name": "Maya Chen",
       "fallback": "MC",
-      "fallbackDelayMs": 150
+      "fallbackDelay": 150
     }
   },
   "controls": [
@@ -41,39 +35,25 @@
       "name": "src",
       "type": "string",
       "required": false,
-      "description": "Image source URL.",
-      "defaultValue": ""
+      "description": "Image URL; the fallback stands in while it is missing, pending or broken."
     },
     {
       "name": "name",
       "type": "string",
       "required": false,
-      "description": "User name (used for initials fallback and alt text).",
-      "defaultValue": ""
-    },
-    {
-      "name": "icon",
-      "type": "string",
-      "required": false,
-      "description": "Icon content shown when no image is available."
+      "description": "The person's full name: the accessible name, and the initials when `fallback` is absent."
     },
     {
       "name": "fallback",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Custom fallback content when image is unavailable."
+      "description": "Text or rich content shown instead of initials while the image is unavailable."
     },
     {
-      "name": "children",
-      "type": "string",
-      "required": false,
-      "description": "Custom media content. Rendered inside the clipped avatar circle when no image is available."
-    },
-    {
-      "name": "fallbackDelayMs",
+      "name": "fallbackDelay",
       "type": "number",
       "required": false,
-      "description": "Delay in ms before showing fallback (gives image time to load).",
+      "description": "Milliseconds a pending image waits before the fallback shows; a missing or broken image shows it at once.",
       "defaultValue": 0
     }
   ],

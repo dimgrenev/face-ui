@@ -7,16 +7,6 @@
 
 :root {
   /* Compatibility aliases retained for existing consumers. */
-  --background: var(--uf-color-background);
-  --foreground: var(--uf-color-foreground);
-  --border: var(--uf-color-border);
-  --panel-bg: var(--uf-color-panel);
-  --header-bg: var(--uf-color-header);
-  --input-bg: var(--uf-color-input);
-  --active-bg: var(--uf-color-active);
-  --active-text: var(--uf-color-active-text);
-  --secondary-text: var(--uf-color-text-secondary);
-  --hover-bg: var(--uf-color-hover);
   --uf-spacing-xs: var(--uf-spacing-1);
   --uf-spacing-sm: var(--uf-spacing-2);
   --uf-spacing-md: var(--uf-spacing-4);
@@ -33,35 +23,20 @@
   --uf-button-outline-width: var(--uf-border-width-thin);
   --uf-button-focus-ring-width: var(--uf-border-width-base);
   --uf-tile-bg: var(--uf-color-black-0);
-  --uf-tile-fg: var(--uf-color-fg);
-  --uf-tile-hover-bg: var(--uf-color-hover-bg);
   --uf-tile-pad: calc(var(--uf-membrane) * 3);
   --uf-tile-pad-y: var(--uf-tile-pad);
   --uf-tile-pad-x: var(--uf-tile-pad);
   --uf-tile-level-compensation: calc(var(--uf-membrane) * 6);
   --uf-tile-action-size: calc(var(--uf-control-height) - (var(--uf-tile-pad) * 2) - (var(--uf-membrane) * 2));
   --uf-tile-focus-ring-width: var(--uf-border-width-base);
-  --uf-card-bg: var(--uf-overlay-surface-bg);
-  --uf-card-background: linear-gradient(var(--uf-card-bg), var(--uf-card-bg)), var(--uf-overlay-surface-underlay-bg);
   --uf-card-padding-default: var(--uf-panel-pad-x);
   --uf-dropdown-surface-padding: var(--uf-membrane);
   --uf-dropdown-surface-radius: var(--uf-radius-md);
   --uf-dropdown-surface-border-width: var(--uf-membrane);
   --uf-dropdown-option-gap: 0px;
-  --uf-badge-bg: var(--uf-color-hover-bg);
-  --uf-badge-fg: var(--uf-color-fg);
-  --uf-badge-border: var(--uf-color-border);
   --uf-badge-outline-width: var(--uf-border-width-thin);
   --uf-checkbox-control-size: 20px;
   --uf-radio-indicator-size: 10px;
-  --uf-switcher-control-size: 32px;
-  --uf-switcher-thumb-size: 16px;
-  --uf-switcher-thumb-left: 2px;
-  --uf-switcher-thumb-top: 2px;
-  --uf-switcher-thumb-translate-x: 12px;
-  --uf-switcher-track-inset-block: 4px;
-  --uf-switcher-track-inset-inline: 4px;
-  --uf-switcher-track-radius: var(--uf-radius-full);
   --uf-toggle-border-width: var(--uf-border-width-thin);
   --uf-input-icon-size: 20px;
   --uf-input-required-gap: 4px;
@@ -70,9 +45,8 @@
   --uf-spinner-size-sm: 14px;
   --uf-spinner-border-width: 2px;
   --uf-spinner-border-width-sm: 2px;
-  --uf-progress-track-height: var(--uf-spacing-1);
-  --uf-progress-label-min-width: 36px;
-  --uf-progress-circle-size: var(--uf-control-height);
+  --uf-range-track-height: var(--uf-membrane);
+  --uf-range-circle-size: var(--uf-control-height);
   --uf-rating-gap: 4px;
   --uf-slider-line-size: 4px;
   --uf-slider-track-hit-size: 20px;
@@ -89,13 +63,13 @@
   --uf-calendar-cell-size: 32px;
   --uf-calendar-nav-size: 32px;
   --uf-calendar-weekday-height: 24px;
-  --uf-date-panel-pad: var(--uf-spacing-3);
-  --uf-date-sheet-gap: var(--uf-spacing-2);
-  --uf-date-sheet-inset: var(--uf-spacing-3);
-  --uf-date-sheet-enter-y: 8px;
-  --uf-date-content-max-width: 320px;
-  --uf-date-content-max-height: 420px;
-  --uf-date-content-viewport-gap: var(--uf-spacing-3);
+  --uf-date-panel-pad: var(--uf-membrane);
+  --uf-date-sheet-inset: var(--uf-spacing-1);
+  --uf-date-sheet-gap: calc(var(--uf-date-sheet-inset) * 2);
+  --uf-date-sheet-enter-y: 1.125rem;
+  --uf-date-content-max-width: 23.75rem;
+  --uf-date-content-max-height: 40rem;
+  --uf-date-content-viewport-gap: var(--uf-spacing-8);
   --uf-menu-min-w: 180px;
   --uf-menu-border-width: var(--uf-border-width-thin);
   --uf-menu-separator-h: var(--uf-border-width-thin);
@@ -106,14 +80,15 @@
   --uf-selector-indicator-offset-inline-start: calc(var(--uf-membrane) * -2);
   --uf-selector-indicator-edge-gap: var(--uf-spacing-1);
   --uf-selector-indicator-size: var(--uf-icon-size);
-  --uf-select-content-max-height: 320px;
+  --uf-select-content-max-height: 15rem;
+  --uf-select-side-content-max-height: 30rem;
   --uf-select-indicator-gap: var(--uf-selector-indicator-gap);
   --uf-select-indicator-edge-gap: var(--uf-selector-indicator-edge-gap);
   --uf-select-indicator-size: var(--uf-selector-indicator-size);
-  --uf-select-panel-pad: var(--uf-spacing-2);
-  --uf-select-sheet-gap: var(--uf-spacing-2);
-  --uf-select-sheet-inset: var(--uf-spacing-2);
-  --uf-select-sheet-enter-y: 6px;
+  --uf-select-panel-pad: var(--uf-membrane);
+  --uf-select-sheet-inset: var(--uf-spacing-1);
+  --uf-select-sheet-gap: calc(var(--uf-select-sheet-inset) * 2);
+  --uf-select-sheet-enter-y: 1.125rem;
   --uf-command-border-width: var(--uf-border-width-thin);
   --uf-command-list-max-height: 320px;
   --uf-command-dialog-inset: var(--uf-spacing-4);
@@ -140,10 +115,6 @@
   --uf-sidebar-sheet-w-default: 320px;
   --uf-sidebar-sheet-viewport-gap: var(--uf-spacing-3);
   --uf-sidebar-inset: var(--uf-panel-pad-x);
-  --uf-resizable-handle-size: var(--uf-workspace-resize-line-width, 1px);
-  --uf-resizable-handle-hit-size: var(--uf-workspace-resize-hit-size, 20px);
-  --uf-resizable-handle-hit-offset: calc((var(--uf-resizable-handle-hit-size) - var(--uf-resizable-handle-size)) / -2);
-  --uf-resizable-handle-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-color-border-hover));
   --uf-navigation-content-min-width: 220px;
   --uf-navigation-nested-inset: var(--uf-spacing-3);
   --uf-navigation-sheet-viewport-gap: var(--uf-spacing-3);
@@ -152,13 +123,9 @@
   --uf-table-sort-icon-gap: 4px;
   --uf-table-resize-hit-width: var(--uf-workspace-resize-hit-size, 20px);
   --uf-table-resize-line-width: var(--uf-workspace-resize-line-width, 1px);
-  --uf-table-resize-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-color-border-hover));
   --uf-table-resize-line-offset-x: calc(var(--uf-table-resize-hit-width) - var(--uf-table-resize-line-width));
   --uf-table-resize-line-inset-y: 6px;
   --uf-table-membrane-cell-pad-x: var(--uf-spacing-2);
-  --uf-tabs-rail-h: 32px;
-  --uf-tabs-indicator-h: 2px;
-  --uf-tabs-line-gap: var(--uf-spacing-2);
   --uf-toast-border-width: var(--uf-membrane);
   --uf-toast-compact-inset: var(--uf-spacing-1);
   --uf-toast-viewport-inset: calc(var(--uf-spacing-2) + (var(--uf-spacing-1) / 2));
@@ -170,8 +137,8 @@
   --uf-tree-branch-indicator-size: 16px;
   --uf-breadcrumb-separator-w: 12px;
   --uf-breadcrumb-separator-h: 12px;
-  --uf-carousel-viewport-pad: var(--uf-spacing-2);
-  --uf-carousel-controls-inset: var(--uf-spacing-2);
+  --uf-carousel-viewport-pad: 0px;
+  --uf-carousel-controls-inset: 0px;
   --uf-carousel-preview-min-height: 400px;
   --uf-media-fallback-size: 160px;
   --uf-scroll-card-inset: var(--uf-card-padding-default);
@@ -185,7 +152,7 @@
   --uf-markdown-heading-gap: var(--uf-spacing-2);
   --uf-markdown-list-indent: var(--uf-spacing-5);
   --uf-markdown-list-item-gap: var(--uf-spacing-1);
-  --uf-markdown-task-gap: var(--uf-spacing-2);
+  --uf-markdown-task-gap: var(--uf-spacing-1);
   --uf-markdown-code-pad-x: 6px;
   --uf-markdown-code-pad-y: 2px;
   --uf-markdown-table-pad-x: var(--uf-spacing-2);
@@ -199,14 +166,6 @@
   --uf-markdown-h3-size: 1.25em;
   --uf-markdown-h4-size: 1.1em;
   --uf-markdown-h5-size: 1em;
-
-  /* ---------------------------------------------------------------
-   * Z-index layers
-   * --------------------------------------------------------------- */
-  --uf-z-dropdown: 2300;
-  --uf-z-overlay: 1900;
-  --uf-z-modal: 2100;
-  --uf-z-toast: 2400;
 
   /* ---------------------------------------------------------------
    * Extended motion
@@ -226,13 +185,7 @@
   --uf-motion-ease-in-out: ease-in-out;
   --uf-motion-ease-linear: linear;
   --uf-motion-ease-emphasized: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --uf-motion-fast: var(--uf-motion-duration-fast);
-  --uf-motion-snappy: var(--uf-motion-duration-short);
-  --uf-motion-normal: var(--uf-motion-duration-control);
-  --uf-motion-slow: var(--uf-motion-duration-medium);
   --uf-ease-standard: var(--uf-motion-ease-standard);
-  --uf-ease-out: var(--uf-motion-ease-out);
-  --uf-ease-in-out: var(--uf-motion-ease-in-out);
   --uf-duration-enter: 300ms;
   --uf-duration-exit: 200ms;
   --uf-ease-enter: cubic-bezier(0.32, 0.72, 0, 1);
@@ -278,4 +231,18 @@
   --uf-control-pad-icon: 8px;
   --uf-control-gap: 12px;
   --uf-content-inset: 16px;
+}
+
+/* Re-evaluate color aliases at each theme boundary; inherited var() values are already resolved. */
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
+  --uf-tile-fg: var(--uf-color-fg);
+  --uf-tile-hover-bg: var(--uf-color-hover-bg);
+  --uf-card-bg: var(--uf-overlay-surface-bg);
+  --uf-card-background: linear-gradient(var(--uf-card-bg), var(--uf-card-bg)), var(--uf-overlay-surface-underlay-bg);
+  --uf-badge-bg: var(--uf-color-hover-bg);
+  --uf-badge-fg: var(--uf-color-fg);
+  --uf-badge-border: var(--uf-color-border);
+  --uf-table-resize-line-color: var(--uf-workspace-resize-line-active-color, var(--uf-color-border-hover));
 }

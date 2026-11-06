@@ -7,6 +7,24 @@
   "root": {
     "type": "Upload",
     "props": {
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "error": {
+        "$ref": "props.error"
+      },
+      "labelPosition": {
+        "$ref": "props.labelPosition"
+      },
+      "files": {
+        "$ref": "props.files"
+      },
+      "defaultFiles": {
+        "$ref": "props.defaultFiles"
+      },
       "accept": {
         "$ref": "props.accept"
       },
@@ -22,11 +40,23 @@
       "disabled": {
         "$ref": "props.disabled"
       },
-      "files": {
-        "$ref": "props.files"
+      "name": {
+        "$ref": "props.name"
       },
-      "defaultFiles": {
-        "$ref": "props.defaultFiles"
+      "form": {
+        "$ref": "props.form"
+      },
+      "required": {
+        "$ref": "props.required"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
       },
       "labels": {
         "$ref": "props.labels"
@@ -36,66 +66,131 @@
   },
   "currentState": {
     "props": {
+      "label": "Customer list",
+      "description": "A CSV file up to 10 MB with a header row.",
       "accept": ".csv,text/csv",
-      "multiple": false,
       "maxSize": 10485760,
-      "maxFiles": 1,
-      "disabled": false
+      "name": "customers",
+      "required": true
     }
   },
   "controls": [
     {
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    {
+      "name": "description",
+      "type": "any",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    {
+      "name": "error",
+      "type": "any",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    {
+      "name": "labelPosition",
+      "type": "select",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ],
+      "defaultValue": "top"
+    },
+    {
+      "name": "files",
+      "type": "array",
+      "required": false,
+      "description": "Controlled list; an entry without a unique string `id`, or a group or separator, is dropped with a report."
+    },
+    {
+      "name": "defaultFiles",
+      "type": "array",
+      "required": false,
+      "description": "List on mount when `files` is not set, restored by form reset; read once."
+    },
+    {
       "name": "accept",
       "type": "string",
       "required": false,
-      "description": "Accepted file types (e.g. \"image/*\", \".pdf,.doc\").",
-      "defaultValue": ""
+      "description": "File types the picker offers and a drop accepts, as the native accept: `image/*`, `.pdf`, `text/csv`."
     },
     {
       "name": "multiple",
       "type": "boolean",
       "required": false,
-      "description": "Allow multiple file selection.",
+      "description": "Lets the list hold several files; without it a new file replaces the listed one.",
       "defaultValue": false
     },
     {
       "name": "maxSize",
       "type": "number",
       "required": false,
-      "description": "Maximum file size in bytes. 0 = unlimited.",
-      "defaultValue": 0
+      "description": "Largest accepted file in bytes; omitted means no limit."
     },
     {
       "name": "maxFiles",
       "type": "number",
       "required": false,
-      "description": "Maximum number of files. 0 = unlimited.",
-      "defaultValue": 0
+      "description": "Most files the list holds with `multiple`; omitted means no limit."
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Stops picking, dropping and removing, and leaves the files out of form submission.",
       "defaultValue": false
     },
     {
-      "name": "files",
-      "type": "array",
+      "name": "name",
+      "type": "string",
       "required": false,
-      "description": "Controlled file list."
+      "description": "FormData key under which the listed browser files are submitted."
     },
     {
-      "name": "defaultFiles",
-      "type": "array",
+      "name": "form",
+      "type": "string",
       "required": false,
-      "description": "Initial file list for uncontrolled usage."
+      "description": "Id of the form that submits and resets the files, when it is not an ancestor."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Blocks form submission while the list is empty and marks the label.",
+      "defaultValue": false
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focuses the button that opens the file picker on mount.",
+      "defaultValue": false
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Names the group when there is no visible `label`."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Ids of the elements that name the group; they win over `label` and `aria-label`."
     },
     {
       "name": "labels",
       "type": "object",
       "required": false,
-      "description": "Localized interface labels."
+      "description": "Strings Upload renders itself: the drop instruction, the button names and the rejection messages."
     }
   ],
   "meta": {

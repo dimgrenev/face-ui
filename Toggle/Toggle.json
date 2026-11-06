@@ -2,64 +2,114 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Toggle",
-  "description": "Unified toggle and toggle group with single or multiple selection",
+  "description": "Deprecated alias of SegmentedControl: the same component, with `multiple` in place of `type=\"multiple\"`.",
   "props": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    "labelPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ],
+      "default": "top"
+    },
     "items": {
       "type": "array",
       "required": false,
-      "description": "Toggle items to render."
-    },
-    "value": {
-      "type": "array",
-      "required": false,
-      "description": "Currently selected values."
-    },
-    "defaultValue": {
-      "type": "array",
-      "required": false,
-      "description": "Uncontrolled initial selected values."
-    },
-    "type": {
-      "type": "enum",
-      "required": false,
-      "description": "Selection mode: single or multiple.",
-      "options": [
-        "single",
-        "multiple"
-      ],
-      "default": "multiple"
+      "description": "Choices in visual, keyboard and form order; an item with a missing or repeated `value` is skipped."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state for the entire group."
+      "description": "Disables every choice and leaves the value out of FormData."
     },
     "orientation": {
       "type": "enum",
       "required": false,
-      "description": "Layout orientation.",
+      "description": "Lays the choices out in a row or a column; without `multiple`, all four arrow keys move between choices.",
       "options": [
         "horizontal",
         "vertical"
       ]
     },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Names the group when there is no visible label."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "Ids of visible elements that name the group; they take precedence over `label`."
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "FormData key; a multiple value submits one entry per choice."
+    },
+    "form": {
+      "type": "string",
+      "required": false,
+      "description": "Id of the form that submits and resets the value, when it is not an ancestor."
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "Blocks form submission until a choice is selected and marks the group required; a group with no enabled choice never blocks."
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Focuses the selected enabled choice, or the first enabled one, on mount."
+    },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each toggle item."
+      "description": "Shared outer spacing around each choice; toggling it keeps DOM and focus."
+    },
+    "multiple": {
+      "type": "boolean",
+      "required": false,
+      "description": "Lets the user press any number of choices, and makes the value a `string[]` instead of `string | null`."
+    },
+    "value": {
+      "type": "any",
+      "required": false,
+      "description": "Selected key, or keys with `multiple`; keys missing from `items` select nothing until they appear."
+    },
+    "defaultValue": {
+      "type": "any",
+      "required": false,
+      "description": "Selection on mount, restored by form reset; same shape as `value`."
     }
   },
   "states": [
     {
-      "name": "Default (Multiple)",
+      "name": "Default (Single)",
       "props": {
-        "type": "multiple"
+        "orientation": "horizontal"
       }
     },
     {
-      "name": "Single",
+      "name": "Multiple",
       "props": {
-        "type": "single"
+        "multiple": true
       }
     },
     {
@@ -85,31 +135,50 @@
     "ArrowLeft": {
       "action": "focusPrevious"
     },
+    "ArrowDown": {
+      "action": "focusNext"
+    },
+    "ArrowUp": {
+      "action": "focusPrevious"
+    },
+    "Home": {
+      "action": "focusFirst"
+    },
+    "End": {
+      "action": "focusLast"
+    },
     "Enter": {
-      "action": "toggle"
+      "action": "selectOrToggle"
     },
     "Space": {
-      "action": "toggle"
+      "action": "selectOrToggle"
     }
   },
   "aria": {
-    "role": "group",
-    "required": [
-      "aria-label"
+    "role": "radiogroup",
+    "notes": [
+      "Name the group with label, aria-label or aria-labelledby; description and error describe every choice.",
+      "Without multiple the root is a radiogroup of radio buttons (aria-checked); required sets aria-required on it and the visible marker is hidden from assistive technology.",
+      "With multiple the root is a group of toggle buttons (aria-pressed)."
     ]
   },
   "composition": {
     "required": [
       "root",
+      "list",
       "item"
     ],
     "parts": {
       "root": {
         "slot": "root"
       },
+      "list": {
+        "slot": "list",
+        "parent": "root"
+      },
       "item": {
         "slot": "item",
-        "parent": "root",
+        "parent": "list",
         "multiple": true
       }
     }
@@ -127,13 +196,11 @@
       "--uf-control-pad-text",
       "--uf-color-fg",
       "--uf-color-hover-bg",
-      "--uf-font-weight-bold",
-      "--uf-motion-duration-emphasis",
-      "--uf-motion-ease-emphasized"
+      "--uf-color-active-bg",
+      "--uf-border-width-thin"
     ],
     "notes": [
-      "Toggle is deprecated in the registry and should stay aligned with SegmentedControl while compatibility remains.",
-      "Item emphasis animation uses shared Face UI motion tokens while compatibility remains."
+      "Toggle is SegmentedControl under its former name: one component, one contract."
     ]
   },
   "platform": {},

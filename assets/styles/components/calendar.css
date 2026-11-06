@@ -1,0 +1,161 @@
+/* =================================================================
+ * CALENDAR — uses [data-part] selectors (NO class names on children)
+ * ================================================================= */
+.uf-calendar[data-scope="calendar"] {
+  --uf-calendar-nav-size: calc(var(--uf-control-height) - var(--uf-spacing-1));
+  --uf-calendar-weekday-height: var(--uf-control-height);
+  --uf-calendar-cell-size: calc(var(--uf-control-height) + (var(--uf-membrane) * 2));
+  inline-size: calc(var(--uf-calendar-cell-size) * 7);
+  min-inline-size: calc(var(--uf-calendar-cell-size) * 7);
+  max-inline-size: 100%;
+}
+
+/* The disabled group applies the opacity token once to the entire calendar. */
+.uf-calendar[data-scope="calendar"][data-disabled] .uf-button:disabled {
+  opacity: 1;
+}
+
+/* Calendar header (nav row) */
+[data-scope="calendar"] [data-part="header"] {
+  display: grid;
+  grid-template-columns: var(--uf-calendar-cell-size) 1fr var(--uf-calendar-cell-size);
+  align-items: center;
+  width: 100%;
+  margin: 0 0 var(--uf-spacing-2);
+  min-height: var(--uf-control-height);
+  height: auto;
+}
+
+/* Calendar nav buttons (prev/next) */
+[data-scope="calendar"] [data-part="prevButton"],
+[data-scope="calendar"] [data-part="nextButton"] {
+  --uf-icon-only-size: var(--uf-calendar-nav-size);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: var(--uf-color-black-0);
+  border-radius: var(--uf-radius);
+  cursor: pointer;
+  color: var(--uf-color-fg-muted);
+  box-shadow: none;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+[data-scope="calendar"] [data-part="prevButton"]:hover,
+[data-scope="calendar"] [data-part="nextButton"]:hover {
+  background: var(--uf-color-hover-bg);
+  color: var(--uf-color-fg);
+}
+
+/* Calendar title (month/year label) */
+[data-scope="calendar"] [data-part="title"] {
+  font-weight: var(--uf-font-weight-bold);
+  font-size: var(--uf-font-size);
+  text-align: center;
+}
+
+/* Calendar grid (<table>) */
+[data-scope="calendar"] [data-part="grid"],
+[data-scope="calendar"] table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: none;
+  box-shadow: none;
+  table-layout: fixed;
+}
+
+/* Calendar <thead>, <tbody>, <tr> resets */
+[data-scope="calendar"] thead,
+[data-scope="calendar"] tbody,
+[data-scope="calendar"] tr {
+  border: none;
+  box-shadow: none;
+}
+
+/* Calendar weekday headers (<th>) */
+[data-scope="calendar"] [data-part="weekday"],
+[data-scope="calendar"] th {
+  display: table-cell;
+  width: calc(100% / 7);
+  text-align: center;
+  vertical-align: middle;
+  height: var(--uf-calendar-weekday-height);
+  font-size: var(--uf-font-size-xs);
+  color: var(--uf-color-fg-muted);
+  font-weight: var(--uf-font-weight-bold);
+  border: none;
+  padding: 0;
+  background: var(--uf-color-black-0);
+  box-shadow: none;
+}
+
+/* Calendar <td> cells */
+[data-scope="calendar"] td {
+  border: none;
+  padding: 0;
+  width: calc(100% / 7);
+  height: var(--uf-calendar-cell-size);
+  text-align: center;
+  background: var(--uf-color-black-0);
+  box-shadow: none;
+}
+[data-scope="calendar"] td > .uf-membrane {
+  display: flex;
+  width: 100%;
+}
+
+/* Calendar day buttons */
+[data-scope="calendar"] [data-part="day"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--uf-control-height);
+  min-height: var(--uf-control-height);
+  min-width: var(--uf-control-height);
+  padding: 0;
+  border: none;
+  background: var(--uf-color-black-0);
+  border-radius: var(--uf-radius);
+  font-size: var(--uf-font-size-sm);
+  cursor: pointer;
+  color: var(--uf-color-fg);
+  margin: 0;
+  box-shadow: none;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+[data-scope="calendar"] td > .uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > [data-part="day"]:not([disabled]):not([data-disabled]):not([aria-disabled="true"]),
+[data-scope="calendar"] td > .uf-membrane[data-membrane-disabled] > .uf-membrane[data-membrane-interactive][data-membrane-hover]:is(:hover, :focus-within) > [data-part="day"]:not([disabled]):not([data-disabled]):not([aria-disabled="true"]) {
+  background: var(--uf-color-hover-bg);
+}
+[data-scope="calendar"] [data-part="day"][data-today] {
+  font-weight: var(--uf-font-weight-bold);
+}
+[data-scope="calendar"] [data-part="day"][data-selected] {
+  background: var(--uf-color-fg);
+  color: var(--uf-color-bg);
+}
+[data-scope="calendar"] [data-part="day"][data-range-between] {
+  background: var(--uf-color-hover-bg);
+  color: var(--uf-color-fg);
+}
+[data-scope="calendar"] [data-part="day"][data-range-start],
+[data-scope="calendar"] [data-part="day"][data-range-end] {
+  background: var(--uf-color-active-bg);
+  color: var(--uf-color-active-text);
+  font-weight: var(--uf-font-weight-bold);
+}
+[data-scope="calendar"] [data-part="day"][data-outside] {
+  color: var(--uf-color-fg-muted);
+}
+[data-scope="calendar"] [data-part="day"][data-disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

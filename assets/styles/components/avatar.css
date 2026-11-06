@@ -1,0 +1,48 @@
+/* =================================================================
+ * AVATAR
+ * ================================================================= */
+.uf-avatar[data-scope] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--uf-control-height);
+  block-size: var(--uf-control-height);
+  min-inline-size: var(--uf-control-height);
+  min-block-size: var(--uf-control-height);
+  aspect-ratio: 1;
+  border-radius: var(--uf-radius-full);
+  overflow: hidden;
+  background: var(--uf-color-hover-bg);
+  color: var(--uf-color-fg-muted);
+  font-weight: var(--uf-font-weight-bold);
+  font-size: var(--uf-font-size-sm);
+  flex-shrink: 0;
+}
+[data-scope="avatar"] [data-part="image"] {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+[data-scope="avatar"] [data-part="fallback"] {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  overflow: hidden;
+  line-height: 1;
+}
+.uf-avatar__content {
+  display: inline-flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.uf-avatar__content > :is(svg, img, .uf-icon) {
+  display: block;
+  flex: 0 0 auto;
+}

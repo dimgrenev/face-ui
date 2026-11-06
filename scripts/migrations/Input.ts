@@ -1,0 +1,63 @@
+import type { Migration } from './types'
+
+export default [
+  { kind: 'rename-prop', component: 'Input', from: 'ariaLabel', to: 'aria-label', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Input', from: 'controlRole', to: 'role', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Input', from: 'ariaControls', to: 'aria-controls', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Input', from: 'ariaActiveDescendant', to: 'aria-activedescendant', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Input', from: 'ariaAutoComplete', to: 'aria-autocomplete', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Input', from: 'ariaExpanded', to: 'aria-expanded', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Input', from: 'ariaHasPopup', to: 'aria-haspopup', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Input', from: 'controlRef', to: 'ref', codemod: 'auto' },
+  {
+    kind: 'remove-prop',
+    component: 'Input',
+    prop: 'textLayout',
+    use: '`multiline` instead of `"wrap"`; omit `"scroll"`',
+    codemod: 'auto',
+    values: { wrap: 'multiline', scroll: '' },
+  },
+  { kind: 'remove-prop', component: 'Input', prop: 'stretchText', use: 'Remove it; it had no effect', codemod: 'auto' },
+  { kind: 'rename-value', component: 'Input', prop: 'iconPosition', values: { left: 'start', right: 'end' }, codemod: 'auto' },
+  { kind: 'export', from: 'InputTextLayout', to: 'The boolean `multiline` prop', codemod: 'manual' },
+  { kind: 'move-to-labels', component: 'Input', from: 'clearLabel', key: 'clear', codemod: 'auto' },
+  { kind: 'rename-prop', component: 'Input', from: 'labelOrientation', to: 'labelPosition', codemod: 'auto' },
+  { kind: 'rename-value', component: 'Input', prop: 'labelPosition', values: { vertical: 'top', horizontal: 'start' }, codemod: 'auto' },
+  { kind: 'export', from: 'Input/Input#InputLabelOrientation', to: "`FieldProps['labelPosition']` (`'top' | 'start'`)", codemod: 'manual' },
+  {
+    kind: 'behavior',
+    component: 'Input',
+    before: '`clearable` defaulted to `true`',
+    after: '`clearable` defaults to `false`; pass `clearable` where an explicit clear action is needed',
+  },
+  {
+    kind: 'behavior',
+    component: 'Input',
+    before: '`membrane` defaulted to `false`',
+    after: '`membrane` defaults to `true`, like every control in a row; pass `membrane={false}` for the old spacing',
+  },
+  {
+    kind: 'behavior',
+    component: 'Input',
+    before: '`onValueChange` ran before the native `onChange`',
+    after: '`onChange` runs first, and its `preventDefault()` cancels the edit',
+  },
+  {
+    kind: 'behavior',
+    component: 'Input',
+    before: 'The `error` message was a `role="alert"` live region',
+    after: 'The control describes the message (`aria-describedby`); nothing is announced on render',
+  },
+  {
+    kind: 'behavior',
+    component: 'Input',
+    before: 'Label, help, error and required marker were `.uf-input__description`, `.uf-input__error`, `.uf-input__required` and `[data-scope="input"][data-part="label"]`',
+    after: 'They are the shared Field parts `.uf-field__label`, `.uf-field__description`, `.uf-field__error` and `.uf-field__required` (`[data-scope="field"]`)',
+  },
+  {
+    kind: 'behavior',
+    component: 'Input',
+    before: '`ref` pointed to the wrapper `<div>`',
+    after: '`ref` points to the native input or textarea; `className` and `style` still style the outer layout',
+  },
+] satisfies Migration[]

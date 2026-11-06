@@ -7,14 +7,23 @@
   "root": {
     "type": "Slider",
     "props": {
-      "variant": {
-        "$ref": "props.variant"
-      },
       "value": {
         "$ref": "props.value"
       },
       "defaultValue": {
         "$ref": "props.defaultValue"
+      },
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "error": {
+        "$ref": "props.error"
+      },
+      "labelPosition": {
+        "$ref": "props.labelPosition"
       },
       "min": {
         "$ref": "props.min"
@@ -31,34 +40,61 @@
       "orientation": {
         "$ref": "props.orientation"
       },
-      "label": {
-        "$ref": "props.label"
+      "aria-label": {
+        "$ref": "props.aria-label"
       },
-      "leadingIcon": {
-        "$ref": "props.leadingIcon"
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
       },
-      "leadingText": {
-        "$ref": "props.leadingText"
+      "labels": {
+        "$ref": "props.labels"
+      },
+      "showValue": {
+        "$ref": "props.showValue"
       },
       "crop": {
         "$ref": "props.crop"
       },
-      "defaultCropRange": {
-        "$ref": "props.defaultCropRange"
-      },
       "cropRange": {
         "$ref": "props.cropRange"
       },
-      "cropLocksValue": {
-        "$ref": "props.cropLocksValue"
+      "defaultCropRange": {
+        "$ref": "props.defaultCropRange"
+      },
+      "clampToCrop": {
+        "$ref": "props.clampToCrop"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "cropName": {
+        "$ref": "props.cropName"
+      },
+      "form": {
+        "$ref": "props.form"
+      },
+      "required": {
+        "$ref": "props.required"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
       }
     },
     "children": []
   },
   "currentState": {
     "props": {
-      "variant": "simple",
       "label": "Monthly price",
+      "name": "price",
+      "labels": {
+        "thumbs": [
+          "Minimum monthly price",
+          "Maximum monthly price"
+        ]
+      },
       "defaultValue": [
         40,
         180
@@ -71,61 +107,79 @@
   },
   "controls": [
     {
-      "name": "variant",
-      "type": "select",
-      "required": false,
-      "description": "Standard track/thumb presentation or enhanced value-thumb presentation.",
-      "options": [
-        "simple",
-        "advanced"
-      ],
-      "defaultValue": "simple"
-    },
-    {
       "name": "value",
-      "type": "array",
+      "type": "any",
       "required": false,
-      "description": "Current value(s). Single thumb = [n], range = [min, max]."
+      "description": "Controlled value: a number, or one number per thumb; callbacks answer in the same shape. Shown snapped, clamped and sorted."
     },
     {
       "name": "defaultValue",
-      "type": "array",
+      "type": "any",
       "required": false,
-      "description": "Uncontrolled initial value(s)."
+      "description": "Value on mount, restored by form reset; a number or an array, as for value. Defaults to min."
+    },
+    {
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    {
+      "name": "description",
+      "type": "any",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    {
+      "name": "error",
+      "type": "any",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    {
+      "name": "labelPosition",
+      "type": "select",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ],
+      "defaultValue": "top"
     },
     {
       "name": "min",
       "type": "number",
       "required": false,
-      "description": "Minimum value.",
+      "description": "Lower end of the scale and origin of the step grid; crossed or non-finite bounds use 0..100. Defaults to 0.",
       "defaultValue": 0
     },
     {
       "name": "max",
       "type": "number",
       "required": false,
-      "description": "Maximum value.",
+      "description": "Upper end of the scale; crossed or non-finite bounds use 0..100. Defaults to 100.",
       "defaultValue": 100
     },
     {
       "name": "step",
       "type": "number",
       "required": false,
-      "description": "Step increment.",
+      "description": "Distance between selectable values; End selects the last step at or below max. Defaults to 1.",
       "defaultValue": 1
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Blocks editing, crop included, and leaves every control out of FormData.",
       "defaultValue": false
     },
     {
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Orientation.",
+      "description": "Horizontal follows the text direction; vertical increases upward. Defaults to horizontal.",
       "options": [
         "horizontal",
         "vertical"
@@ -133,47 +187,92 @@
       "defaultValue": "horizontal"
     },
     {
-      "name": "label",
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Label content."
+      "description": "Names the group and its thumbs when there is no visible label."
     },
     {
-      "name": "leadingIcon",
+      "name": "aria-labelledby",
       "type": "string",
       "required": false,
-      "description": "Leading icon name for the advanced slider."
+      "description": "Ids of elements that name the group and its thumbs; they take precedence over label and aria-label."
     },
     {
-      "name": "leadingText",
-      "type": "string",
+      "name": "labels",
+      "type": "object",
       "required": false,
-      "description": "Leading text for the advanced slider."
+      "description": "Complete accessible names for individual thumbs and crop boundaries."
+    },
+    {
+      "name": "showValue",
+      "type": "boolean",
+      "required": false,
+      "description": "Shows each primary value inside its thumb.",
+      "defaultValue": false
     },
     {
       "name": "crop",
       "type": "boolean",
       "required": false,
-      "description": "Enable crop handles in the advanced slider.",
+      "description": "Adds two crop boundaries on a second rail, edited independently of the value.",
       "defaultValue": false
-    },
-    {
-      "name": "defaultCropRange",
-      "type": "object",
-      "required": false,
-      "description": "Uncontrolled initial crop range for the advanced slider."
     },
     {
       "name": "cropRange",
       "type": "object",
       "required": false,
-      "description": "Controlled crop range for the advanced slider."
+      "description": "Controlled crop boundaries; undefined leaves them uncontrolled."
     },
     {
-      "name": "cropLocksValue",
+      "name": "defaultCropRange",
+      "type": "object",
+      "required": false,
+      "description": "Crop boundaries on mount, restored by form reset. Defaults to the whole scale."
+    },
+    {
+      "name": "clampToCrop",
       "type": "boolean",
       "required": false,
-      "description": "Clamp the value to the crop range.",
+      "description": "Keeps the shown value inside the crop boundaries. Defaults to true.",
+      "defaultValue": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "FormData key of the value, repeated once per thumb in ascending order."
+    },
+    {
+      "name": "cropName",
+      "type": "string",
+      "required": false,
+      "description": "FormData key of the crop boundaries, repeated for start and end while crop is on."
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "Id of the form that submits and resets the controls, when it is not an ancestor."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Shows the required marker on the label; a range always has a value, so it never blocks submission."
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focuses the first thumb on mount.",
+      "defaultValue": false
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Shared outer spacing around each thumb; toggling it keeps the DOM and focus. Defaults to true.",
       "defaultValue": true
     }
   ],

@@ -1,22 +1,23 @@
-/**
- * Code — source code display with optional line numbers, line highlighting,
- * title bar, copy-to-clipboard, and collapse/expand.
- *
- * `<Code code="const x = 1" language="tsx" />`
- * `<Code code={snippet} showLineNumbers highlight={[3, 5]} />`
- * `<Code code={snippet} title="example.ts" defaultCollapsed />`
- */
-
-import { forwardRef, useState, useCallback, useMemo, type CSSProperties } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
+import { hasSlotContent } from '../assets/slot-content'
+import { getCardSurfaceProps } from '../assets/internal/card-surface'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
+import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
+import { useScrollable } from '../assets/adapters/react/use-scrollable'
+import { resolveLabels, type CommonLabels } from '../assets/runtime/labels'
+import { invalidProp, readNumber } from '../assets/runtime/props'
 import { Text } from '../Text/Text'
 import { Button } from '../Button/Button'
-import { Card } from '../Card/Card'
-
-// ---------------------------------------------------------------------------
-// Anatomy
-// ---------------------------------------------------------------------------
 
 export const codeAnatomy = createAnatomy('code').parts(
   'root',
@@ -25,220 +26,249 @@ export const codeAnatomy = createAnatomy('code').parts(
   'lineNumber',
 )
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-/** A single token within a highlighted line. */
+/** One colored run of a line, as a syntax highlighter such as Shiki emits it. */
 export interface CodeToken {
+  /** Text of the run; the runs of a line spell that line of the source. */
   content: string
-  /** CSS color value or token reference. Omit for default text color. */
+  /** CSS color of the run; without it the run keeps the block's text color. */
   color?: string
 }
 
-export interface CodeProps {
-  /** Source code string. */
-  code?: string
-  /** Language hint (used as a data attribute for syntax highlighter integration). */
-  language?: string
-  /**
-   * Pre-tokenized lines from a syntax highlighter (e.g. Shiki).
-   * When provided, renders colored tokens instead of plain text.
-   * Each entry is an array of tokens for that line.
-   */
-  tokenizedLines?: CodeToken[][]
-  /** Title shown in the header bar. */
-  title?: string
-  /** Whether to display line numbers. */
-  showLineNumbers?: boolean
-  /** Line numbers to visually highlight (1-based). */
-  highlight?: number[]
-  /** Start collapsed (auto-disables if content is short). */
-  defaultCollapsed?: boolean
-  /** Maximum height when collapsed (px). */
-  collapsedHeight?: number
-  /** Additional class name on the root element. */
-  className?: string
-  /** Native attributes applied to the root wrapper. */
-  id?: string
-  role?: string
-  titleAttr?: string
-  style?: CSSProperties
+/** Names of Code's own buttons and its copy confirmation. */
+export interface CodeLabels
+  extends Pick<CommonLabels, 'copy' | 'expand' | 'collapse'> {
+  /** Announced after the source reaches the clipboard, while the copy button shows a check. */
+  copied: string
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+const defaultLabels: CodeLabels = Object.freeze({
+  copy: 'Copy code',
+  copied: 'Copied',
+  expand: 'Expand code',
+  collapse: 'Collapse code',
+})
+/** How long the copy button confirms a successful copy, in milliseconds. */
+const CONFIRMATION = 2000
 
-export const Code = forwardRef<HTMLDivElement, CodeProps>(
-  function Code(props, ref) {
-    const {
-      code,
-      language,
-      tokenizedLines: tokenLines,
-      title,
-      showLineNumbers = false,
-      highlight = [],
-      defaultCollapsed = false,
-      collapsedHeight = 160,
-      className,
-      id,
-      role,
-      titleAttr,
-      style,
-    } = props
+export interface CodeProps
+  extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    'children' | 'title' | 'dangerouslySetInnerHTML' | 'defaultChecked' | 'defaultValue'
+  > {
+  /** Source text, shown line by line and copied verbatim; a final line break ends the last line instead of adding an empty one. */
+  children?: string
+  /** Language of the source, set as the `language-*` class of `<code>` for highlighters; Code itself does not color the text. */
+  language?: string
+  /** Syntax colors from a highlighter, one token array per line of `children`; a line whose tokens are missing or spell other text (a highlighter still catching up) renders plain. */
+  tokenizedLines?: readonly (readonly CodeToken[])[]
+  /** Header text such as a file name; without it a one-line source keeps its copy button beside it instead of a header. */
+  title?: ReactNode
+  /** Number each line in a gutter that is never selected, copied or read aloud. */
+  showLineNumbers?: boolean
+  /** Numbers of the lines to mark, whole and from 1; each renders as a highlighted `<mark>`. */
+  highlightedLines?: readonly number[]
+  /** Controlled collapse: a source longer than `collapsedLines` shows only its first lines and cannot scroll, yet every line stays readable to assistive technology (so the toggle is named by `labels.expand`/`labels.collapse`, without `aria-expanded`); a shorter source shows in full. */
+  collapsed?: boolean
+  /** Uncontrolled `collapsed` on mount; read once. */
+  defaultCollapsed?: boolean
+  /** Called when the user collapses or expands the source; prop updates are silent. */
+  onCollapsedChange?: (details: { collapsed: boolean }) => void
+  /** Lines a collapsed source shows, an integer from 1; a source with no more lines cannot collapse. */
+  collapsedLines?: number
+  /** Names of the copy and collapse buttons and the copy confirmation. */
+  labels?: Partial<CodeLabels>
+}
 
-    const tokenizedText = useMemo(
-      () => tokenLines?.map((line) => line.map((token) => token.content).join('')).join('\n'),
-      [tokenLines],
-    )
-    const sourceText = code != null ? code : (tokenizedText ?? '')
-    const lines = useMemo(() => sourceText.split('\n'), [sourceText])
-    const canToggle = lines.length > 8 || sourceText.length > 240
-    const [collapsed, setCollapsed] = useState(Boolean(defaultCollapsed) && canToggle)
+/** The source's lines: split like a highlighter splits them, a final line break closing the last line. */
+function readLines(children: unknown): readonly string[] {
+  if (typeof children !== 'string') {
+    if (children != null)
+      invalidProp('Code', 'children', children, 'rendering an empty source')
+    return ['']
+  }
+  return children.replace(/\r?\n$/, '').split(/\r?\n/)
+}
 
-    const highlightSet = useMemo(
-      () => new Set(Array.isArray(highlight) ? highlight : []),
-      [highlight],
-    )
+/** Each line's tokens, or null where they are missing or spell other text, as while a highlighter catches up. */
+function readTokens(tokenizedLines: unknown, lines: readonly string[]) {
+  if (tokenizedLines == null) return undefined
+  if (!Array.isArray(tokenizedLines)) {
+    invalidProp('Code', 'tokenizedLines', tokenizedLines, 'rendering plain text')
+    return undefined
+  }
+  return lines.map((line, index) => {
+    const row: unknown = tokenizedLines[index]
+    return Array.isArray(row) &&
+      row.map((token: CodeToken | null) => token?.content).join('') === line
+      ? (row as readonly CodeToken[])
+      : null
+  })
+}
 
-    const hasTitle = title != null
-    const hasHeader = hasTitle || canToggle
+function readMarked(highlightedLines: unknown): ReadonlySet<number> {
+  if (highlightedLines === undefined) return new Set()
+  if (!Array.isArray(highlightedLines)) {
+    invalidProp('Code', 'highlightedLines', highlightedLines, 'marking no line')
+    return new Set()
+  }
+  const marked = highlightedLines.filter((line) => Number.isInteger(line) && line > 0)
+  if (marked.length < highlightedLines.length)
+    invalidProp('Code', 'highlightedLines', highlightedLines, 'marking only its whole line numbers from 1')
+  return new Set(marked)
+}
 
-    const onCopy = useCallback(async () => {
-      const text = sourceText
-      const canUseNavigatorClipboard =
-        typeof window !== 'undefined' &&
-        typeof navigator !== 'undefined' &&
-        typeof navigator.clipboard?.writeText === 'function' &&
-        window.isSecureContext &&
-        window.top === window.self
-
-      if (canUseNavigatorClipboard) {
-        try {
-          await navigator.clipboard.writeText(text)
-          return
-        } catch {
-          // fall through to legacy copy path
-        }
-      }
-
-      if (typeof document === 'undefined') return
-
-      try {
-        const el = document.createElement('textarea')
-        el.value = text
-        el.setAttribute('readonly', 'true')
-        el.style.position = 'fixed'
-        el.style.left = '-9999em'
-        el.style.opacity = '0'
-        document.body.appendChild(el)
-        el.select()
-        document.execCommand('copy')
-        document.body.removeChild(el)
-      } catch {
-        // ignore
-      }
-    }, [sourceText])
-
-    const onToggle = useCallback(() => setCollapsed((v) => !v), [])
-
-    return (
-      <Card
-        ref={ref}
-        {...codeAnatomy.getPartAttrs('root')}
-        variant="code"
-        padding="none"
-        radius="md"
-        fullWidth
-        data-language={language}
-        className={cn('uf-code', className)}
-        id={id}
-        role={role}
-        title={titleAttr}
-        style={style}
-      >
-        {hasHeader && (
-          <div className="uf-code-header">
-            {hasTitle && (
-              <Text as="span" fullWidth className="uf-code-title">
-                {title}
-              </Text>
-            )}
-            <div className="uf-code-actions">
-              <Button
-                icon="copy"
-                iconOnly
-                fullWidth={false}
-                variant="default"
-                className="uf-code-action"
-                aria-label="Copy code"
-                title="Copy"
-                onClick={onCopy}
-              />
-              {canToggle && (
-                <Button
-                  icon={collapsed ? 'arrow-down' : 'arrow-up'}
-                  iconOnly
-                  fullWidth={false}
-                  variant="default"
-                  className="uf-code-action"
-                  aria-label={collapsed ? 'Expand code' : 'Collapse code'}
-                  title={collapsed ? 'Expand' : 'Collapse'}
-                  onClick={onToggle}
-                />
-              )}
-              {/* Copy button is always available via header; no disabled button for collapse */}
-            </div>
-          </div>
-        )}
-        <pre
-          {...codeAnatomy.getPartAttrs('pre')}
-          style={collapsed ? { maxHeight: `${collapsedHeight}px` } : undefined}
-          className={cn(
-            collapsed && 'is-collapsed',
-            !collapsed && canToggle && 'is-scrollable',
-          )}
-        >
-          <code>
-            {lines.map((line, index) => {
-              const lineNum = index + 1
-              const isHighlighted = highlightSet.has(lineNum)
-              const tokens = tokenLines?.[index]
-
-              return (
-                <span
-                  key={index}
-                  {...codeAnatomy.getPartAttrs('line')}
-                  data-highlight={isHighlighted || undefined}
-                  data-line={lineNum}
-                >
-                  {showLineNumbers && (
-                    <span
-                      {...codeAnatomy.getPartAttrs('lineNumber')}
-                      aria-hidden="true"
-                    >
-                      {lineNum}
-                    </span>
-                  )}
-                  {tokens
-                    ? tokens.map((tok, ti) =>
-                        tok.color ? (
-                          <span key={ti} style={{ color: tok.color }}>
-                            {tok.content}
-                          </span>
-                        ) : (
-                          <span key={ti}>{tok.content}</span>
-                        ),
-                      )
-                    : line}
-                  {'\n'}
-                </span>
-              )
-            })}
-          </code>
-        </pre>
-      </Card>
-    )
+/** A block of source code with an optional title, line numbers, marked lines, syntax colors, copy and collapse. */
+export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
+  {
+    children,
+    language,
+    tokenizedLines,
+    title,
+    showLineNumbers = false,
+    highlightedLines,
+    collapsed: collapsedProp,
+    defaultCollapsed = false,
+    onCollapsedChange,
+    collapsedLines = 8,
+    labels,
+    className,
+    ...rest
   },
-)
+  ref,
+) {
+  const lines = readLines(children)
+  const tokens = readTokens(tokenizedLines, lines)
+  const marked = readMarked(highlightedLines)
+  const visibleLines = readNumber('Code', 'collapsedLines', collapsedLines, 8, { integer: true, min: 1 })
+  const text = resolveLabels(defaultLabels, labels, 'Code')
+
+  const [collapsedIntent, setCollapsed] = useControllableState({
+    value: collapsedProp,
+    defaultValue: defaultCollapsed,
+    onChange: (collapsed) => onCollapsedChange?.({ collapsed }),
+    name: ['Code', 'collapsed'],
+  })
+  // The intent is kept; a source that fits in `collapsedLines` shows in full.
+  const collapsible = lines.length > visibleLines
+  const collapsed = collapsible && Boolean(collapsedIntent)
+
+  const preRef = useRef<HTMLPreElement>(null)
+  // Collapsing switches the pre to overflow: clip, which its size alone may not reveal.
+  const scrollable = useScrollable(preRef, [collapsed])
+  // A collapsed source cannot scroll; expanding it starts again from its first line.
+  useIsomorphicLayoutEffect(() => {
+    const pre = preRef.current
+    if (!collapsed && pre) pre.scrollTop = pre.scrollLeft = 0
+  }, [collapsed])
+
+  // Successful copies since the confirmation last ended; each one restarts it.
+  const [copies, setCopies] = useState(0)
+  useEffect(() => {
+    if (!copies) return
+    const timer = setTimeout(() => setCopies(0), CONFIRMATION)
+    return () => clearTimeout(timer)
+  }, [copies])
+
+  const titled = hasSlotContent(title)
+  const toggleName = collapsed ? text.expand : text.collapse
+  const actions = (
+    <div className="uf-code-actions">
+      <Button
+        icon={copies ? 'check' : 'copy'}
+        iconOnly
+        className="uf-code-action"
+        title={text.copy}
+        copyText={typeof children === 'string' ? children : ''}
+        onCopied={() => setCopies((count) => count + 1)}
+      >
+        {text.copy}
+      </Button>
+      {collapsible && (
+        <Button
+          icon={collapsed ? 'arrow-down' : 'arrow-up'}
+          iconOnly
+          className="uf-code-action"
+          title={toggleName}
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          {toggleName}
+        </Button>
+      )}
+      <span role="status" className="uf-visually-hidden">
+        {/* A new node per copy, so a repeated copy is announced again. */}
+        {copies ? <span key={copies}>{text.copied}</span> : null}
+      </span>
+    </div>
+  )
+
+  return (
+    <div
+      ref={ref}
+      {...rest}
+      {...codeAnatomy.getPartAttrs('root')}
+      {...getCardSurfaceProps({
+        variant: 'code',
+        padding: 'none',
+        radius: 'md',
+        border: true,
+        hoverable: false,
+        fullWidth: true,
+        className: cn('uf-code', className),
+      })}
+      data-state={collapsible ? (collapsed ? 'collapsed' : 'expanded') : undefined}
+    >
+      {titled || lines.length > 1 ? (
+        <div className="uf-code-header">
+          {titled && (
+            <Text as="span" fullWidth className="uf-code-title">
+              {title}
+            </Text>
+          )}
+          {actions}
+        </div>
+      ) : (
+        actions
+      )}
+      <pre
+        ref={preRef}
+        {...codeAnatomy.getPartAttrs('pre')}
+        dir="ltr"
+        translate="no"
+        // A tab stop while it scrolls; still focusable after, so a focused source that stops scrolling keeps focus.
+        // Unmeasured (server HTML, no ResizeObserver), no tabindex leaves the browser's own rule for scrollers.
+        tabIndex={scrollable === undefined ? undefined : scrollable ? 0 : -1}
+        style={{ '--uf-code-collapsed-lines': visibleLines } as CSSProperties}
+      >
+        <code className={language ? `language-${language}` : undefined}>
+          {lines.map((line, index) => {
+            const Line = marked.has(index + 1) ? 'mark' : 'span'
+            const lineTokens = tokens?.[index]
+            return (
+              <Line key={index} {...codeAnatomy.getPartAttrs('line')}>
+                {showLineNumbers && (
+                  <span
+                    {...codeAnatomy.getPartAttrs('lineNumber')}
+                    aria-hidden="true"
+                  >
+                    {index + 1}
+                  </span>
+                )}
+                {lineTokens
+                  ? lineTokens.map((token, at) => (
+                      <span
+                        key={at}
+                        style={token?.color ? { color: token.color } : undefined}
+                      >
+                        {token?.content}
+                      </span>
+                    ))
+                  : line}
+                {'\n'}
+              </Line>
+            )
+          })}
+        </code>
+      </pre>
+    </div>
+  )
+})

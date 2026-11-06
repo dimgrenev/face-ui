@@ -7,8 +7,20 @@
   "root": {
     "type": "Radio",
     "props": {
-      "options": {
-        "$ref": "props.options"
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "error": {
+        "$ref": "props.error"
+      },
+      "labelPosition": {
+        "$ref": "props.labelPosition"
+      },
+      "items": {
+        "$ref": "props.items"
       },
       "value": {
         "$ref": "props.value"
@@ -19,20 +31,29 @@
       "orientation": {
         "$ref": "props.orientation"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
       },
       "disabled": {
         "$ref": "props.disabled"
       },
-      "required": {
-        "$ref": "props.required"
+      "form": {
+        "$ref": "props.form"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
       },
       "name": {
         "$ref": "props.name"
       },
-      "membrane": {
-        "$ref": "props.membrane"
+      "required": {
+        "$ref": "props.required"
       }
     },
     "children": []
@@ -43,8 +64,9 @@
       "defaultValue": "balanced",
       "name": "model-quality",
       "membrane": true,
-      "ariaLabel": "Model quality",
-      "options": [
+      "label": "Model quality",
+      "description": "Higher quality answers take longer.",
+      "items": [
         {
           "value": "fast",
           "label": "Fast"
@@ -62,44 +84,57 @@
   },
   "controls": [
     {
-      "name": "options",
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    {
+      "name": "description",
+      "type": "any",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    {
+      "name": "error",
+      "type": "any",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    {
+      "name": "labelPosition",
+      "type": "select",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ],
+      "defaultValue": "top"
+    },
+    {
+      "name": "items",
       "type": "array",
       "required": false,
-      "description": "Radio options to render.",
-      "defaultValue": [
-        {
-          "value": "one",
-          "label": "Option one"
-        },
-        {
-          "value": "two",
-          "label": "Option two"
-        },
-        {
-          "value": "three",
-          "label": "Option three",
-          "disabled": true
-        }
-      ]
+      "description": "Choices in navigation order; an item without a unique string `value`, or a group or separator, is dropped with a report."
     },
     {
       "name": "value",
       "type": "string",
       "required": false,
-      "description": "Currently selected value."
+      "description": "Controlled selection; `null`, or a value missing from `items`, checks nothing."
     },
     {
       "name": "defaultValue",
       "type": "string",
       "required": false,
-      "description": "Uncontrolled initial selected value.",
-      "defaultValue": "one"
+      "description": "Uncontrolled initial selection, restored by form reset."
     },
     {
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Layout orientation.",
+      "description": "Stacks the items in a column or a row and sets aria-orientation; all four arrows move either way.",
       "options": [
         "horizontal",
         "vertical"
@@ -107,37 +142,56 @@
       "defaultValue": "vertical"
     },
     {
-      "name": "ariaLabel",
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focuses the selected enabled item, else the first enabled one, on mount.",
+      "defaultValue": false
+    },
+    {
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Accessible label for the radio group (role=\"radiogroup\" requires a name)."
+      "description": "Names the group when there is no visible `label`."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Ids of the elements that name the group; wins over `label` and `aria-label`."
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state for the entire group.",
+      "description": "Disables every item; native inputs leave the tab order and form submission.",
       "defaultValue": false
     },
     {
-      "name": "required",
-      "type": "boolean",
-      "required": false,
-      "description": "Mark as required.",
-      "defaultValue": false
-    },
-    {
-      "name": "name",
+      "name": "form",
       "type": "string",
       "required": false,
-      "description": "Form field name."
+      "description": "Id of an external native form that owns every input."
     },
     {
       "name": "membrane",
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around control geometry.",
+      "description": "Shared outer spacing around each item; toggling it keeps the native inputs.",
       "defaultValue": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Nonempty native group and FormData key; use a distinct name for each independent group in a form."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Require a selection before submission. Native group validation requires a nonempty name.",
+      "defaultValue": false
     }
   ],
   "meta": {

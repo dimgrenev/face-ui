@@ -2,177 +2,202 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Input",
-  "description": "Text input control with focus management and clear button",
+  "description": "A native text field with a label, help and error text, an optional clear action and multiline sizing.",
   "props": {
-    "value": {
-      "type": "string",
-      "required": false,
-      "description": "Current input value."
-    },
-    "defaultValue": {
-      "type": "string",
-      "required": false,
-      "description": "Uncontrolled initial input value."
-    },
-    "type": {
-      "type": "enum",
-      "required": false,
-      "description": "Native input type. Text inputs can switch between single-line and wrapping layouts.",
-      "options": [
-        "number",
-        "text",
-        "email",
-        "date",
-        "password"
-      ],
-      "default": "text"
-    },
-    "textLayout": {
-      "type": "enum",
-      "required": false,
-      "description": "Text layout for type=\"text\": 'scroll' (single-line) or 'wrap' (multi-line auto-grow).",
-      "options": [
-        "scroll",
-        "wrap"
-      ],
-      "default": "scroll"
-    },
-    "autoGrow": {
-      "type": "boolean",
-      "required": false,
-      "description": "Auto-grow textarea height in wrap mode.",
-      "default": true
-    },
-    "readOnly": {
-      "type": "boolean",
-      "required": false,
-      "description": "Make the input read-only.",
-      "default": false
-    },
     "label": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Label rendered above/beside the input."
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
     },
     "description": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Description/help text shown below the input."
+      "description": "Help for entering the value, announced with the focused control."
     },
     "error": {
-      "type": "string",
+      "type": "ReactNode",
       "required": false,
-      "description": "Error message shown below the input.",
-      "default": ""
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
     },
-    "labelOrientation": {
+    "labelPosition": {
       "type": "enum",
       "required": false,
-      "description": "Label placement relative to the control.",
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
       "options": [
-        "vertical",
-        "horizontal"
+        "top",
+        "start"
       ],
-      "default": "vertical"
+      "default": "top"
     },
     "placeholder": {
       "type": "string",
       "required": false,
-      "description": "Placeholder text."
-    },
-    "ariaLabel": {
-      "type": "string",
-      "required": false,
-      "description": "Accessible label when no visible label is provided."
-    },
-    "spellCheck": {
-      "type": "boolean",
-      "required": false,
-      "description": "Enable/disable spellcheck."
-    },
-    "icon": {
-      "type": "string",
-      "required": false,
-      "description": "Optional icon inside the control."
-    },
-    "iconPosition": {
-      "type": "enum",
-      "required": false,
-      "description": "Icon side inside the control. Default: left.",
-      "options": [
-        "left",
-        "right"
-      ],
-      "default": "left"
-    },
-    "stretchText": {
-      "type": "boolean",
-      "required": false,
-      "description": "Stretch the input text area so right-side icons pin to the edge.",
-      "default": false
-    },
-    "autoFocus": {
-      "type": "boolean",
-      "required": false,
-      "description": "Auto-focus on mount."
-    },
-    "autoComplete": {
-      "type": "string",
-      "required": false,
-      "description": "Native browser autocomplete hint."
-    },
-    "min": {
-      "type": "any",
-      "required": false,
-      "description": "Min value (for type=\"number\")."
-    },
-    "max": {
-      "type": "any",
-      "required": false,
-      "description": "Max value (for type=\"number\")."
-    },
-    "step": {
-      "type": "any",
-      "required": false,
-      "description": "Step value (for type=\"number\")."
-    },
-    "minLength": {
-      "type": "number",
-      "required": false,
-      "description": "Minimum text length for native validation."
-    },
-    "maxLength": {
-      "type": "number",
-      "required": false,
-      "description": "Maximum text length for native validation."
-    },
-    "pattern": {
-      "type": "string",
-      "required": false,
-      "description": "Native validation pattern for single-line inputs."
+      "description": "Hint while empty; use label or aria-label for the accessible name."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Exclude the field from editing, focus navigation, and form submission.",
+      "default": false
+    },
+    "readOnly": {
+      "type": "boolean",
+      "required": false,
+      "description": "Prevent edits while preserving focus, selection, and form submission.",
       "default": false
     },
     "required": {
       "type": "boolean",
       "required": false,
-      "description": "Show the required indicator (*).",
+      "description": "Require a value for native form validation and show the required indicator.",
       "default": false
     },
     "name": {
       "type": "string",
       "required": false,
-      "description": "Form field name."
+      "description": "Field key used by native FormData."
+    },
+    "spellCheck": {
+      "type": "boolean",
+      "required": false,
+      "description": "Browser spelling assistance for editable text."
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the control on mount."
+    },
+    "autoComplete": {
+      "type": "string",
+      "required": false,
+      "description": "Native autocomplete token, such as email or current-password."
+    },
+    "minLength": {
+      "type": "number",
+      "required": false,
+      "description": "Minimum length for native text validation."
+    },
+    "maxLength": {
+      "type": "number",
+      "required": false,
+      "description": "Maximum length for native text entry."
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Controlled value. User edits notify callbacks; the parent owns the result."
+    },
+    "defaultValue": {
+      "type": "string",
+      "required": false,
+      "description": "Uncontrolled initial value, also restored by form reset.",
+      "default": ""
+    },
+    "icon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Decorative icon from the registry or a custom element."
+    },
+    "iconPosition": {
+      "type": "enum",
+      "required": false,
+      "description": "Icon at inline start or end, following the control's text direction.",
+      "options": [
+        "start",
+        "end"
+      ],
+      "default": "start"
+    },
+    "clearable": {
+      "type": "boolean",
+      "required": false,
+      "description": "Opt in to a clear action for a nonempty, editable field; off by default.",
+      "default": false
+    },
+    "labels": {
+      "type": "object",
+      "required": false,
+      "description": "Accessible names of the field's own controls."
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "Stretch the field to its container; false keeps the control's native width.",
+      "default": true
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around control geometry.",
+      "description": "Outer spacing around the native control, independent of label and help.",
+      "default": true
+    },
+    "multiline": {
+      "type": "boolean",
+      "required": false,
+      "description": "Use a native textarea, including newline entry and textarea form behavior.",
       "default": false
+    },
+    "type": {
+      "type": "enum",
+      "required": false,
+      "description": "Native single-line type. Multiline fields always use textarea text semantics.",
+      "options": [
+        "text",
+        "email",
+        "number",
+        "date",
+        "password",
+        "search",
+        "tel",
+        "url",
+        "time",
+        "datetime-local",
+        "month",
+        "week"
+      ],
+      "default": "text"
+    },
+    "min": {
+      "type": "any",
+      "required": false,
+      "description": "Lower bound for numeric or temporal input types."
+    },
+    "max": {
+      "type": "any",
+      "required": false,
+      "description": "Upper bound for numeric or temporal input types."
+    },
+    "step": {
+      "type": "any",
+      "required": false,
+      "description": "Numeric or temporal increment; use any to allow arbitrary precision."
+    },
+    "pattern": {
+      "type": "string",
+      "required": false,
+      "description": "Native regular expression for single-line text validation."
+    },
+    "list": {
+      "type": "string",
+      "required": false,
+      "description": "Datalist id for native single-line suggestions."
+    },
+    "multiple": {
+      "type": "boolean",
+      "required": false,
+      "description": "Allow several addresses when type is email."
+    },
+    "rows": {
+      "type": "number",
+      "required": false,
+      "description": "Minimum visible rows. A fixed row count when autoGrow is false.",
+      "default": 1
+    },
+    "autoGrow": {
+      "type": "boolean",
+      "required": false,
+      "description": "Grow and shrink a multiline field with its content and available width.",
+      "default": true
     }
   },
   "states": [
@@ -180,15 +205,13 @@
       "name": "Default",
       "props": {
         "type": "text",
-        "textLayout": "scroll",
         "disabled": false,
         "readOnly": false,
         "error": "",
-        "labelOrientation": "vertical",
-        "iconPosition": "left",
-        "stretchText": false,
+        "labelPosition": "top",
+        "iconPosition": "start",
         "required": false,
-        "membrane": false,
+        "membrane": true,
         "label": "Input",
         "placeholder": "Type…"
       }
@@ -237,34 +260,67 @@
         "readOnly": true,
         "value": "Read only value"
       }
+    },
+    {
+      "name": "Multiline",
+      "props": {
+        "label": "Notes",
+        "multiline": true,
+        "rows": 3,
+        "placeholder": "Write a note…"
+      }
+    },
+    {
+      "name": "Fixed Rows",
+      "props": {
+        "label": "Editor",
+        "multiline": true,
+        "rows": 5,
+        "autoGrow": false
+      }
+    },
+    {
+      "name": "Localized Clear",
+      "props": {
+        "label": "Имя",
+        "defaultValue": "Анна",
+        "labels": {
+          "clear": "Очистить"
+        },
+        "clearable": true
+      }
     }
   ],
   "behavior": {
-    "autoFocusOnOpen": "none",
-    "controlledValue": "External value prop updates sync into the rendered control without emitting onValueChange.",
-    "autoGrow": "Wrap textareas auto-grow by default; set autoGrow=false for fixed-height editor surfaces."
+    "controlledValue": "Parent value updates and form reset are silent. A user edit, including clear, calls onChange first, then onValueChange once; preventDefault() in onChange cancels the edit.",
+    "autoGrow": "Multiline fields grow and shrink with content, available width and fonts. rows is the minimum, or the fixed row count when autoGrow=false.",
+    "ref": "Ordinary ref targets the native input or textarea; className/style target the outer field layout.",
+    "clearable": "Off by default. When enabled, a nonempty editable field offers a clear action aligned with its first text row."
   },
   "keyboard": {
-    "Escape": {
-      "action": "clear",
-      "condition": "hasClearButton"
+    "Tab": {
+      "action": "Navigate to the editable field and the available clear action."
+    },
+    "Enter / Space": {
+      "action": "Activate the focused clear button; focus returns to the field."
+    },
+    "Enter": {
+      "action": "Native single-line form behavior; inserts a newline when multiline=true."
     }
   },
   "aria": {
     "role": "textbox",
     "labeling": [
-      "Visible label renders as a native label whose htmlFor matches the generated or provided control id.",
-      "ariaLabel is passed to the native control when no visible label is provided.",
-      "controlRole and aria* relationship props are passed to the native control so composite search/listbox owners can expose active descendants without imperative DOM mutation."
+      "The visible label is the shared Field label, associated with the native control through for and aria-labelledby.",
+      "Native aria-label, role and aria-* attributes target the control."
     ],
     "describedBy": [
-      "description id is included in aria-describedby when description is present.",
-      "error id is included in aria-describedby when error is present."
+      "External aria-describedby ids are merged with nonempty description and error ids without duplicates."
     ],
     "states": [
-      "disabled controls expose native disabled plus aria-disabled.",
-      "readOnly controls expose native readOnly plus aria-readonly.",
-      "error controls expose aria-invalid and a polite alert error node."
+      "disabled and readOnly expose matching native and ARIA states.",
+      "Nonempty error marks the control invalid unless aria-invalid is explicit; the control describes the message, which is not a live region.",
+      "The required marker is hidden from assistive technology; native required supplies its semantics."
     ]
   },
   "composition": {
@@ -306,8 +362,7 @@
   },
   "tokenMapping": {
     "component": [
-      "--uf-input-icon-size",
-      "--uf-input-required-gap"
+      "--uf-input-icon-size"
     ],
     "semanticFallbacks": [
       "--uf-control-height",
@@ -333,7 +388,7 @@
     "notes": [
       "Input geometry comes from shared control tokens; label, description and error copy must remain Text-compatible.",
       "Clear-button reveal motion consumes shared Face UI motion tokens.",
-      "Required indicator still accepts legacy danger/error fallbacks until color aliases are burned down."
+      "Required and validation feedback use the destructive semantic token."
     ]
   },
   "platform": {},
@@ -348,7 +403,7 @@
     "whenNotToUse": [
       "Choosing from predefined options (use Select)",
       "Binary yes/no (use Switcher or Checkbox)",
-      "Date entry (use Date)"
+      "Custom calendar or date range selection (use Date)"
     ],
     "alternatives": [
       "Select",

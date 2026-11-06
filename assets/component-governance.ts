@@ -17,6 +17,9 @@ export type FaceUiComponentCategory =
 export interface FaceUiComponentMeta {
   category: FaceUiComponentCategory
   status: FaceUiComponentStatus
+  /** The props follow the library's API conventions, which `governance/api-conventions.test.ts` holds. */
+  apiReviewed: boolean
+  /** The component has both an axe scenario and a keyboard spec under `assets/__tests__/browser`. */
   a11yReviewed: boolean
   mobileReviewed: boolean
   responsiveSurface?: string

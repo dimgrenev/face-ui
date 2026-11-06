@@ -7,6 +7,18 @@
   "root": {
     "type": "Rating",
     "props": {
+      "label": {
+        "$ref": "props.label"
+      },
+      "description": {
+        "$ref": "props.description"
+      },
+      "error": {
+        "$ref": "props.error"
+      },
+      "labelPosition": {
+        "$ref": "props.labelPosition"
+      },
       "value": {
         "$ref": "props.value"
       },
@@ -19,14 +31,32 @@
       "disabled": {
         "$ref": "props.disabled"
       },
+      "readOnly": {
+        "$ref": "props.readOnly"
+      },
       "allowHalf": {
         "$ref": "props.allowHalf"
       },
-      "label": {
-        "$ref": "props.label"
+      "aria-label": {
+        "$ref": "props.aria-label"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "form": {
+        "$ref": "props.form"
+      },
+      "autoFocus": {
+        "$ref": "props.autoFocus"
+      },
+      "membrane": {
+        "$ref": "props.membrane"
+      },
+      "name": {
+        "$ref": "props.name"
+      },
+      "required": {
+        "$ref": "props.required"
       }
     },
     "children": []
@@ -37,56 +67,134 @@
       "max": 5,
       "allowHalf": false,
       "label": "How helpful was this answer?",
-      "ariaLabel": "Answer helpfulness rating"
+      "name": "helpfulness",
+      "required": true
     }
   },
   "controls": [
     {
+      "name": "label",
+      "type": "any",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    {
+      "name": "description",
+      "type": "any",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    {
+      "name": "error",
+      "type": "any",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    {
+      "name": "labelPosition",
+      "type": "select",
+      "required": false,
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
+      "options": [
+        "top",
+        "start"
+      ],
+      "defaultValue": "top"
+    },
+    {
       "name": "value",
       "type": "number",
       "required": false,
-      "description": "Current rating value."
+      "description": "Controlled score, shown within 0..max; 0 means unrated. Editable stars show it rounded to the nearest choice.",
+      "min": 0,
+      "max": 10,
+      "step": 0.1
     },
     {
       "name": "defaultValue",
       "type": "number",
       "required": false,
-      "description": "Uncontrolled initial rating value.",
-      "defaultValue": 0
+      "description": "Uncontrolled initial score, restored by form reset. Defaults to 0.",
+      "defaultValue": 0,
+      "min": 0,
+      "max": 10,
+      "step": 0.5
     },
     {
       "name": "max",
       "type": "number",
       "required": false,
-      "description": "Maximum number of stars.",
-      "defaultValue": 5
+      "description": "Number of stars, an integer from 1 to 10. Defaults to 5.",
+      "defaultValue": 5,
+      "min": 1,
+      "max": 10,
+      "step": 1
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "description": "Disabled state.",
+      "description": "Blocks choosing, focus and form submission; the score stays visible.",
+      "defaultValue": false
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "description": "Shows the score as a meter with its exact fraction: not editable or focusable, submitted with the form, never required.",
       "defaultValue": false
     },
     {
       "name": "allowHalf",
       "type": "boolean",
       "required": false,
-      "description": "Allow half-star increments.",
+      "description": "Adds a half-star choice before each star; a read-only score keeps its exact fraction either way.",
       "defaultValue": false
     },
     {
-      "name": "label",
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Label content."
+      "description": "Names the group when there is no visible `label`."
     },
     {
-      "name": "ariaLabel",
+      "name": "aria-labelledby",
       "type": "string",
       "required": false,
-      "description": "Accessible name used when no visible label is provided.",
-      "defaultValue": "Rating"
+      "description": "Ids of the elements that name the group; wins over `label` and `aria-label`."
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "Id of an external native form that owns the score."
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "required": false,
+      "description": "Focuses the selected choice, else the first one, on mount.",
+      "defaultValue": false
+    },
+    {
+      "name": "membrane",
+      "type": "boolean",
+      "required": false,
+      "description": "Shared outer spacing around each star; toggling it keeps the native inputs.",
+      "defaultValue": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Nonempty native form key; use a distinct name for each independent rating in a form."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "Requires a score before an editable rating's form submits; ignored without a nonempty `name`.",
+      "defaultValue": false
     }
   ],
   "meta": {

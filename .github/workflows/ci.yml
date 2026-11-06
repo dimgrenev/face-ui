@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # Weekly: every browser project against the React 19 build.
+    - cron: '0 3 * * 1'
   workflow_dispatch: {}
 
 permissions:
@@ -11,9 +14,9 @@ permissions:
 
 jobs:
   check:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,9 +30,58 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
+      # Unit tests run once per React major through the vitest projects
+      # react18 and react19 (the pinned install in assets/__tests__/react-19).
       - name: Check package
         run: pnpm check
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      # Keep the tag equal to the @playwright/test version in pnpm-lock.yaml.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit, chromium-react19]
+    env:
+      CI: true
+      # Firefox refuses to start as root with another user's HOME.
+      HOME: /root
+      FACE_UI_REACT: ${{ github.event_name == 'schedule' && '19' || '18' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Browser behavior (${{ matrix.project }}, React ${{ env.FACE_UI_REACT }})
+        run: pnpm test:browser --project=${{ matrix.project }}
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-${{ matrix.project }}-react${{ env.FACE_UI_REACT }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

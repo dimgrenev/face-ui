@@ -1,0 +1,101 @@
+/* =================================================================
+ * RADIO — a field (field.css lays out the root); the list holds the items.
+ * ================================================================= */
+.uf-radio[data-scope="radio"] {
+  --uf-radio-indicator-size: var(--uf-control-line-height);
+}
+.uf-radio__list {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+.uf-radio__list > .uf-membrane {
+  min-width: 0;
+  max-width: 100%;
+}
+.uf-radio__list[data-orientation="horizontal"] {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.uf-radio__list[data-orientation="horizontal"] .uf-radio-option {
+  width: auto;
+  flex: 0 0 auto;
+}
+/* Without membranes the first item has no outer spacing for the start label to center on. */
+.uf-radio.uf-field[data-label-position="start"]:has(> .uf-radio__list > [data-membrane-disabled]) > .uf-field__label {
+  padding-block: calc((var(--uf-control-height) - var(--uf-text-label-line-height)) / 2);
+}
+/* Radio option — rendered as <label> with className="uf-radio-option" AND data-part="item" */
+.uf-radio-option,
+[data-scope="radio"] [data-part="item"] {
+  --uf-control-pad-start: var(--uf-control-pad-icon);
+  --uf-control-pad-end: var(--uf-control-pad-text);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--uf-control-gap);
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--uf-control-height);
+  height: auto;
+  width: 100%;
+  padding-top: var(--uf-control-pad-y);
+  padding-bottom: var(--uf-control-pad-y);
+  padding-inline-start: var(--uf-control-pad-start);
+  padding-inline-end: var(--uf-control-pad-end);
+  cursor: pointer;
+  border-radius: var(--uf-radius);
+  border: none;
+  box-shadow: none;
+  outline: none;
+  background: var(--uf-color-black-0);
+}
+.uf-radio-option:hover,
+[data-scope="radio"] [data-part="item"]:hover {
+  background: var(--uf-color-hover-bg);
+}
+.uf-radio-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* Radio indicator: SVG icon container matches the canonical viewBox. */
+.uf-radio-indicator,
+[data-scope="radio"] [data-part="indicator"] {
+  width: var(--uf-radio-indicator-size);
+  height: var(--uf-radio-indicator-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--uf-color-fg);
+  background: var(--uf-color-black-0);
+  border: none;
+  box-shadow: none;
+}
+.uf-radio-indicator svg,
+[data-scope="radio"] [data-part="indicator"] svg {
+  display: block;
+}
+
+/* Native disabled inputs block activation; opacity belongs to each visual row once. */
+.uf-radio[data-scope="radio"][data-disabled] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.uf-radio-option[data-scope="radio"][data-disabled] {
+  opacity: var(--uf-color-disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: auto;
+}
+.uf-radio-option[data-scope="radio"][data-disabled]:hover {
+  background: var(--uf-color-black-0);
+}
+
+/* The visible row is the <label>; the input it hides is what actually takes
+   focus, so the ring has to be drawn on the row. */
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-radio-option:has(input:focus-visible),
+:where(:root[data-uf-focus-modality="keyboard"]) .uf-radio-option:has(input:focus) {
+  outline: 2px solid var(--uf-color-fg);
+  outline-offset: -2px;
+}

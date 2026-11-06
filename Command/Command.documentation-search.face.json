@@ -10,23 +10,17 @@
       "items": {
         "$ref": "props.items"
       },
-      "groups": {
-        "$ref": "props.groups"
+      "search": {
+        "$ref": "props.search"
+      },
+      "defaultSearch": {
+        "$ref": "props.defaultSearch"
       },
       "placeholder": {
         "$ref": "props.placeholder"
       },
-      "value": {
-        "$ref": "props.value"
-      },
-      "defaultValue": {
-        "$ref": "props.defaultValue"
-      },
       "surface": {
         "$ref": "props.surface"
-      },
-      "surfaceBreakpoint": {
-        "$ref": "props.surfaceBreakpoint"
       },
       "open": {
         "$ref": "props.open"
@@ -34,8 +28,14 @@
       "defaultOpen": {
         "$ref": "props.defaultOpen"
       },
-      "emptyContent": {
-        "$ref": "props.emptyContent"
+      "aria-label": {
+        "$ref": "props.aria-label"
+      },
+      "aria-labelledby": {
+        "$ref": "props.aria-labelledby"
+      },
+      "labels": {
+        "$ref": "props.labels"
       }
     },
     "children": []
@@ -44,11 +44,12 @@
     "props": {
       "surface": "dialog",
       "defaultOpen": true,
+      "aria-label": "Search documentation",
       "placeholder": "Search documentation...",
-      "defaultValue": "auth",
+      "defaultSearch": "auth",
       "items": [
         {
-          "id": "oauth",
+          "value": "oauth",
           "label": "OAuth setup",
           "keywords": [
             "auth",
@@ -56,7 +57,7 @@
           ]
         },
         {
-          "id": "sso",
+          "value": "sso",
           "label": "Enterprise SSO",
           "keywords": [
             "auth",
@@ -64,7 +65,7 @@
           ]
         },
         {
-          "id": "tokens",
+          "value": "tokens",
           "label": "API tokens",
           "keywords": [
             "auth",
@@ -79,39 +80,32 @@
       "name": "items",
       "type": "array",
       "required": false,
-      "description": "Command item definitions."
+      "description": "Commands and labelled groups in list order; an item repeating an earlier value is dropped."
     },
     {
-      "name": "groups",
-      "type": "array",
+      "name": "search",
+      "type": "string",
       "required": false,
-      "description": "Group definitions for organizing items."
+      "description": "Search text that filters the items; the parent owns it while set."
+    },
+    {
+      "name": "defaultSearch",
+      "type": "string",
+      "required": false,
+      "description": "Search text on mount when `search` is not set; read once.",
+      "defaultValue": ""
     },
     {
       "name": "placeholder",
       "type": "string",
       "required": false,
-      "description": "Placeholder text for the search input.",
-      "defaultValue": "Search..."
-    },
-    {
-      "name": "value",
-      "type": "string",
-      "required": false,
-      "description": "Search input value (controlled)."
-    },
-    {
-      "name": "defaultValue",
-      "type": "string",
-      "required": false,
-      "description": "Uncontrolled initial search input value.",
-      "defaultValue": ""
+      "description": "Hint in the empty search field and the dialog trigger; names the search without aria-label."
     },
     {
       "name": "surface",
       "type": "select",
       "required": false,
-      "description": "Shell presentation mode. Auto switches to dialog on compact viewports.",
+      "description": "Where the search shows: in the page, or in a dialog opened from a trigger; auto is a dialog below 900px. Default auto.",
       "options": [
         "auto",
         "inline",
@@ -120,30 +114,35 @@
       "defaultValue": "auto"
     },
     {
-      "name": "surfaceBreakpoint",
-      "type": "number",
-      "required": false,
-      "description": "Breakpoint where auto surfaces switch from inline to dialog."
-    },
-    {
       "name": "open",
       "type": "boolean",
       "required": false,
-      "description": "Controlled dialog open state (used in dialog surface)."
+      "description": "Controlled visibility of the dialog; an inline Command is always shown."
     },
     {
       "name": "defaultOpen",
       "type": "boolean",
       "required": false,
-      "description": "Uncontrolled initial dialog open state (used in dialog surface).",
+      "description": "Dialog visibility on mount when `open` is not set; read once.",
       "defaultValue": false
     },
     {
-      "name": "emptyContent",
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Content to display when no results match.",
-      "defaultValue": "No results found."
+      "description": "Names the search field, its list and dialog, and the dialog trigger."
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Ids of the elements that name the search field, its list and dialog, and the trigger; wins over aria-label."
+    },
+    {
+      "name": "labels",
+      "type": "object",
+      "required": false,
+      "description": "Strings Command renders itself: `empty` replaces the list when no item matches."
     }
   ],
   "meta": {

@@ -2,23 +2,22 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Checkbox",
-  "description": "Boolean or indeterminate form control with a visible label and hidden native input",
+  "description": "A native boolean choice, or an indeterminate summary of the choices below it, beside a visible label.",
   "props": {
     "checked": {
       "type": "union",
       "required": false,
-      "description": "Controlled checked state. Accepts boolean or \"indeterminate\".",
+      "description": "Controlled selection. Indeterminate summarizes a partially selected collection; it does not submit a value.",
       "options": [
         true,
         false,
         "indeterminate"
-      ],
-      "default": null
+      ]
     },
     "defaultChecked": {
       "type": "union",
       "required": false,
-      "description": "Uncontrolled initial checked state. Accepts boolean or \"indeterminate\".",
+      "description": "Uncontrolled initial selection, also restored by form reset.",
       "options": [
         true,
         false,
@@ -29,30 +28,66 @@
     "label": {
       "type": "ReactNode",
       "required": false,
-      "description": "Visible label content rendered through Face UI Text."
+      "description": "Visible label content. Empty content adds no label slot; zero remains visible."
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Accessible name, including when there is no visible label."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "External label element IDs; takes native precedence over aria-label."
+    },
+    "aria-describedby": {
+      "type": "string",
+      "required": false,
+      "description": "External description element IDs."
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable pointer and keyboard interaction.",
+      "description": "Exclude the checkbox from activation, focus navigation and form submission.",
       "default": false
     },
     "required": {
       "type": "boolean",
       "required": false,
-      "description": "Mark the hidden native input as required.",
+      "description": "Require an actual checked value for native form validation; mixed is not checked.",
       "default": false
     },
     "name": {
       "type": "string",
       "required": false,
-      "description": "Native form field name for the hidden input.",
-      "default": ""
+      "description": "FormData key. Without a name the checkbox does not contribute a field."
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Value submitted only when checked. It does not control selection.",
+      "default": "on"
+    },
+    "form": {
+      "type": "string",
+      "required": false,
+      "description": "ID of an external native form that owns the input."
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "required": false,
+      "description": "Focus the native input on mount."
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "required": false,
+      "description": "Expand the membrane and clickable label to the container width.",
+      "default": false
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Wrap the control in the standard one-token membrane.",
+      "description": "Shared outer spacing; toggling it preserves input identity and state.",
       "default": true
     }
   },
@@ -92,7 +127,8 @@
     {
       "name": "Icon Only",
       "props": {
-        "defaultChecked": true
+        "defaultChecked": true,
+        "aria-label": "Select row"
       }
     },
     {
@@ -104,10 +140,11 @@
     }
   ],
   "behavior": {
-    "stateModel": "Machine states are unchecked, checked and indeterminate.",
-    "controlledValue": "When checked is provided, external checked updates sync into the machine unless disabled.",
-    "uncontrolledValue": "When checked is omitted, defaultChecked seeds the initial machine state.",
-    "disabled": "Disabled checkboxes do not toggle from click, keyboard or controlled SET events."
+    "stateModel": "A boolean choice or indeterminate collection summary. Native activation changes to true or false.",
+    "controlledValue": "Parent checked updates apply while disabled without emitting user callbacks.",
+    "uncontrolledValue": "defaultChecked initializes selection and is restored by form reset.",
+    "disabled": "Native disabled inputs do not activate or submit.",
+    "nativeEvents": "onChange runs before onCheckedChange. preventDefault() in onClick or onChange cancels the activation: the browser rolls it back and nothing is reported."
   },
   "keyboard": {
     "Space": {
@@ -115,32 +152,22 @@
       "condition": "not disabled"
     },
     "Enter": {
-      "action": "toggle",
-      "condition": "not disabled"
+      "action": "nativeFormBehavior"
     }
   },
   "aria": {
     "role": "checkbox",
-    "nativeElement": "A visually hidden native input[type=\"checkbox\"] preserves form participation.",
-    "states": [
-      "aria-checked=true",
-      "aria-checked=false",
-      "aria-checked=mixed",
-      "aria-disabled",
-      "aria-required"
-    ],
-    "required": [
-      "visible label or external accessible name"
-    ],
+    "nativeElement": "input[type=\"checkbox\"]",
     "notes": [
-      "The visible label is rendered with Text as span; the root remains a label element for form association."
+      "The visible label uses implicit native association. aria-labelledby and aria-label keep their native precedence.",
+      "Indeterminate renders aria-checked=mixed and is restored on the native DOM before paint."
     ]
   },
   "composition": {
     "required": [
       "root",
-      "control",
-      "hiddenInput"
+      "input",
+      "indicator"
     ],
     "recommended": [
       "label"
@@ -149,25 +176,23 @@
       "root": {
         "slot": "root"
       },
-      "control": {
-        "slot": "control",
+      "input": {
+        "slot": "input",
+        "parent": "root"
+      },
+      "indicator": {
+        "slot": "indicator",
         "parent": "root"
       },
       "label": {
         "slot": "label",
-        "parent": "root"
-      },
-      "hiddenInput": {
-        "slot": "hiddenInput",
         "parent": "root"
       }
     }
   },
   "tokenMapping": {
     "component": [
-      "--uf-checkbox-control-size",
-      "--uf-hidden-input-size",
-      "--uf-hidden-input-offset"
+      "--uf-checkbox-control-size"
     ],
     "semanticFallbacks": [
       "--uf-control-height",
@@ -203,5 +228,9 @@
       "Button"
     ],
     "context": "both"
+  },
+  "preview": {
+    "entryPath": "./Checkbox.preview.tsx",
+    "exportName": "CheckboxPreview"
   }
 }

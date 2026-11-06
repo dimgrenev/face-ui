@@ -2,7 +2,7 @@
 
 :root {
   --uf-font-family-base: 'Akt', sans-serif;
-  --uf-font-family-mono: 'Begriffsschrift', monospace;
+  --uf-font-family-mono: ui-monospace, monospace;
   --uf-font-size-xs: 10px;
   --uf-font-size-sm: 11px;
   --uf-font-size-base: 12px;
@@ -27,34 +27,26 @@
   --uf-text-transform-none: none;
   --uf-text-transform-uppercase: uppercase;
   --uf-text-transform-lowercase: lowercase;
-  --uf-control-font-size: 14px;
-  --uf-control-line-height: 20px;
   --uf-control-letter-spacing: 0;
   --font-base: var(--uf-font-family-base);
   --uf-font-family: var(--uf-font-family-base);
   --uf-font-mono: var(--uf-font-family-mono);
   --uf-font-size: var(--uf-control-font-size);
   --uf-font-weight: var(--uf-font-weight-normal);
-  --uf-text-color: var(--uf-color-foreground);
   --uf-text-font-family: var(--uf-font-family-base);
-  --uf-text-font-size: var(--uf-control-font-size);
-  --uf-text-font-weight: var(--uf-font-weight);
-  --uf-text-line-height: var(--uf-control-line-height);
+  --uf-text-font-size: initial;
+  --uf-text-font-weight: initial;
+  --uf-text-line-height: initial;
   --uf-text-letter-spacing: 0;
   --uf-text-min-height: var(--uf-control-height);
   --uf-text-pad-x: var(--uf-control-pad-text);
-  --uf-text-pad-y: var(--uf-control-pad-y);
-  --uf-text-body-size: var(--uf-control-font-size);
-  --uf-text-body-line-height: var(--uf-control-line-height);
-  --uf-text-section-size: var(--uf-control-font-size);
-  --uf-text-section-line-height: var(--uf-control-line-height);
   --uf-text-label-font-size: var(--uf-font-size-base);
   --uf-text-label-line-height: 16px;
   --uf-text-label-min-height: var(--uf-spacing-6);
   --uf-text-label-pad-y: var(--uf-spacing-1);
   --uf-text-heading-font-size: var(--uf-font-size-xl);
   --uf-text-heading-font-weight: var(--uf-font-weight-semibold);
-  --uf-text-size-font-size: var(--uf-font-size);
+  --uf-text-size-font-size: initial;
   --uf-text-h1-delta: 12px;
   --uf-text-h2-delta: 8px;
   --uf-text-h3-delta: 6px;
@@ -65,4 +57,10 @@
   --uf-text-kbd-pad-x: 6px;
   --uf-text-inset-none-min-height: 0;
   --uf-text-inset-none-padding: 0;
+}
+
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
+  --uf-text-color: var(--uf-color-foreground);
 }

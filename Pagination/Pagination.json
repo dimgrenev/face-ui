@@ -2,51 +2,53 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Pagination",
-  "description": "Compact page navigation with previous/next buttons, current page text and a Menu-backed page picker.",
+  "description": "Page navigation with previous, next and numbered buttons, plus a dialog for jumping to any page.",
   "props": {
     "page": {
       "type": "number",
       "required": false,
-      "description": "Current page number (1-indexed)."
+      "description": "Controlled current page, from 1; a page past the last one shows the last page."
     },
     "defaultPage": {
       "type": "number",
       "required": false,
-      "description": "Uncontrolled initial page number (1-indexed)."
+      "description": "Uncontrolled page on mount, from 1; read once.",
+      "default": 1
     },
     "total": {
       "type": "number",
       "required": false,
-      "description": "Total number of items."
+      "description": "Number of items being paged, an integer from 0; no items still show page 1.",
+      "default": 0
     },
     "pageSize": {
       "type": "number",
       "required": false,
-      "description": "Number of items per page."
+      "description": "Items per page, an integer from 1.",
+      "default": 10
     },
     "siblingCount": {
       "type": "number",
       "required": false,
-      "description": "Number of sibling pages shown around the current page.",
+      "description": "Page buttons on each side of the current page, an integer from 0 to 20; the bar keeps its length near either end.",
       "default": 1
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable the entire pagination.",
+      "description": "Disables page changes and the picker button; an open picker can still be closed.",
       "default": false
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Outer membrane wrapper around each pagination button.",
+      "description": "Membrane spacing around the navigation buttons; the picker dialog owns its own spacing.",
       "default": true
     },
-    "surfaceTitle": {
-      "type": "string",
+    "labels": {
+      "type": "object",
       "required": false,
-      "description": "Title used for the page picker sheet on compact viewports.",
-      "default": "Choose page"
+      "description": "Names and text of the component's own controls; the nav itself takes a native aria-label or aria-labelledby."
     }
   },
   "states": [
@@ -56,7 +58,6 @@
         "siblingCount": 1,
         "disabled": false,
         "membrane": true,
-        "surfaceTitle": "Choose page",
         "total": 120,
         "defaultPage": 6
       }
@@ -86,72 +87,81 @@
     }
   ],
   "behavior": {
-    "compactNavigation": "Renders Previous/Next Button controls, a Text current-page indicator and an icon-only Menu trigger for page selection.",
-    "disabled": "Disables Previous/Next controls and page picker changes when disabled."
+    "navigation": "Previous/Next and numbered Button controls share one bounded page projection. Re-selecting the visible page is a no-op. External page/total/pageSize updates are quiet.",
+    "picker": "A Modal with a native number input supports direct page jumps without allocating the entire page range. Narrow containers place numbered controls on a separate row.",
+    "disabled": "Disables page changes and picker opening. An already open picker remains closable.",
+    "localization": "labels translates the component's own controls; labels.choosePage names the picker button and titles its dialog. Native aria-label/aria-labelledby names the nav."
   },
   "keyboard": {
-    "ArrowRight": {
-      "action": "nextPage"
+    "Tab": {
+      "action": "focusNextControl"
     },
-    "ArrowLeft": {
-      "action": "previousPage"
+    "Shift+Tab": {
+      "action": "focusPreviousControl"
+    },
+    "Enter": {
+      "action": "activateFocusedControlOrSubmitValidPickerPage"
+    },
+    "Space": {
+      "action": "activateFocusedButton"
+    },
+    "Escape": {
+      "action": "closePagePicker"
     }
   },
   "aria": {
     "role": "navigation",
-    "label": "Root nav has aria-label=\"Pagination\".",
-    "current": "Current page Text exposes aria-current=\"page\".",
-    "controls": "Previous/Next controls use native button semantics through Button; page picker trigger is icon-only with aria-label=\"Choose page\"."
+    "label": "Native aria-label or aria-labelledby names the nav; default aria-label is Pagination.",
+    "current": "The current numbered button exposes aria-current=page.",
+    "controls": "All page actions use native buttons; the picker has a labelled spinbutton with min/max, range description and invalid state."
   },
   "composition": {
     "required": [
       "root",
-      "prevButton",
-      "nextButton",
-      "currentPage",
+      "prev",
+      "item",
+      "next",
       "pagePicker"
     ],
     "recommended": [
-      "pagePickerMenuItems"
+      "ellipsis"
     ],
     "parts": {
       "root": {
         "slot": "root"
       },
-      "prevButton": {
-        "slot": "prevButton",
+      "prev": {
+        "slot": "prev",
         "parent": "root"
       },
-      "nextButton": {
-        "slot": "nextButton",
+      "item": {
+        "slot": "item",
+        "parent": "root",
+        "multiple": true
+      },
+      "next": {
+        "slot": "next",
         "parent": "root"
       },
-      "currentPage": {
-        "slot": "currentPage",
-        "parent": "root"
+      "ellipsis": {
+        "slot": "ellipsis",
+        "parent": "root",
+        "multiple": true
       },
       "pagePicker": {
         "slot": "pagePicker",
         "parent": "root"
-      },
-      "pagePickerMenuItems": {
-        "slot": "pagePickerMenuItems",
-        "parent": "pagePicker",
-        "multiple": true
       }
     }
   },
   "tokenMapping": {
-    "component": [
-      "--uf-icon-only-size"
-    ],
+    "component": [],
     "semanticFallbacks": [
       "--uf-control-height",
       "--uf-control-pad-y",
       "--uf-control-pad-text",
       "--uf-radius",
       "--uf-font-weight",
-      "--uf-font-weight-bold",
       "--uf-color-fg",
       "--uf-color-fg-muted",
       "--uf-color-hover-bg",
@@ -159,8 +169,8 @@
       "--uf-color-primary-fg"
     ],
     "notes": [
-      "Pagination uses Button for previous/next and page-picker controls and Text for the current-page indicator.",
-      "Compact page-picker behavior inherits shared Modal overlay tokens rather than defining pagination-local tokens."
+      "Navigation buttons use shared Button variants and Membrane. Pagination owns layout and label wrapping.",
+      "The page picker inherits shared Modal and Input tokens."
     ]
   },
   "platform": {},
@@ -178,5 +188,9 @@
       "Table"
     ],
     "context": "both"
+  },
+  "preview": {
+    "entryPath": "./Pagination.preview.tsx",
+    "exportName": "PaginationPreview"
   }
 }

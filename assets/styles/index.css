@@ -2,12 +2,11 @@
  * Face UI — Main CSS Entry Point
  *
  * Import this file to get all Face UI styles:
- *   import '@face-ui/styles'
- *   or: import '@userface/face-ui-react/assets/styles/index.css'
+ *   import '@userface/face-ui-react/assets/styles/index.css'
  *
  * No @layer — all styles are top-level. Isolation is achieved via
- * [data-scope] attribute selectors which guarantee higher specificity
- * than bare class selectors from external (reference library) CSS.
+ * owned data-scope roots and component classes. Arbitrary consumer
+ * descendants retain their own styles.
  *
  * Load order: tokens → base → components → animations
  */

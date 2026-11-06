@@ -2,156 +2,121 @@
   "schema": "face",
   "schema-version": 1,
   "name": "Date",
-  "description": "Unified date/time picker with multi-view and range support",
+  "description": "A date, time, week, month or year field with a picker; values are civil ISO strings or Date instants.",
   "props": {
-    "mode": {
+    "label": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Visible name of the value. Empty content leaves naming to aria-label/aria-labelledby."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Help for entering the value, announced with the focused control."
+    },
+    "error": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Validation message; marks the field invalid unless aria-invalid is explicit. Dynamic errors are mirrored to a polite live region."
+    },
+    "labelPosition": {
       "type": "enum",
       "required": false,
-      "description": "Picker mode: date, datetime, time, week, month or year",
+      "description": "Label above the control, or at its inline start (stacks when narrow). Defaults to top.",
       "options": [
-        "date",
-        "datetime",
-        "time",
-        "week",
-        "month",
-        "year"
+        "top",
+        "start"
       ],
-      "default": "date"
+      "default": "top"
     },
-    "selection": {
-      "type": "enum",
+    "open": {
+      "type": "boolean",
       "required": false,
-      "description": "Selection model: single or range",
-      "options": [
-        "single",
-        "range"
-      ],
-      "default": "single"
+      "description": "Controlled visibility; disabled, readOnly and hidden fields cannot open."
     },
-    "views": {
-      "type": "array",
+    "defaultOpen": {
+      "type": "boolean",
       "required": false,
-      "description": "Allowed views order"
-    },
-    "openTo": {
-      "type": "enum",
-      "required": false,
-      "description": "Initial opened view",
-      "options": [
-        "month",
-        "year",
-        "day",
-        "hours",
-        "minutes"
-      ]
-    },
-    "value": {
-      "type": "any",
-      "required": false,
-      "description": "Controlled value (iso/date/range)"
-    },
-    "defaultValue": {
-      "type": "any",
-      "required": false,
-      "description": "defaultValue prop",
-      "default": null
-    },
-    "valueFormat": {
-      "type": "enum",
-      "required": false,
-      "description": "Value emission format: iso or date",
-      "options": [
-        "date",
-        "iso"
-      ],
-      "default": "iso"
+      "description": "Initial visibility for an uncontrolled picker.",
+      "default": false
     },
     "locale": {
       "type": "string",
       "required": false,
-      "description": "Formatting locale",
+      "description": "Date formatting language, numbering system and default first weekday; dates stay Gregorian.",
       "default": "en-US"
+    },
+    "labels": {
+      "type": "object",
+      "required": false,
+      "description": "Internal action and view labels; the field keeps label and placeholder as its own props."
     },
     "timezone": {
       "type": "string",
       "required": false,
-      "description": "Formatting timezone",
+      "description": "Zone for instants and today's civil date. Defaults to UTC.",
       "default": "UTC"
     },
     "weekStartsOn": {
       "type": "enum",
       "required": false,
-      "description": "Week start day index",
+      "description": "Override the locale's first weekday: 0=Sunday through 6=Saturday.",
       "options": [
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6"
-      ],
-      "default": 1
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
     },
     "format": {
       "type": "string",
       "required": false,
-      "description": "format prop"
+      "description": "Display pattern; see the supported tokens and quoted literals in the Date docs."
     },
     "min": {
       "type": "any",
       "required": false,
-      "description": "min prop",
-      "default": null
+      "description": "Inclusive lower bound in timezone; a date-only bound includes its whole day."
     },
     "max": {
       "type": "any",
       "required": false,
-      "description": "max prop",
-      "default": null
+      "description": "Inclusive upper bound in timezone; a date-only bound includes its whole day."
     },
     "disabledDates": {
       "type": "array",
       "required": false,
-      "description": "disabledDates prop"
+      "description": "Unavailable whole days; Date instants are converted into timezone before taking the day."
     },
     "disabledTime": {
       "type": "object",
       "required": false,
-      "description": "disabledTime prop"
+      "description": "Unavailable hours (0–23) and minutes (0–59) for every day in time/datetime mode."
     },
     "closeOnSelect": {
       "type": "boolean",
       "required": false,
-      "description": "Close panel after completing selection"
+      "description": "Close the picker once a selection is complete; defaults to true for a single date."
     },
     "showNow": {
       "type": "boolean",
       "required": false,
-      "description": "Show Now action in footer",
+      "description": "Show the shortcut to the current day or time in timezone.",
       "default": true
     },
-    "showClear": {
+    "clearable": {
       "type": "boolean",
       "required": false,
-      "description": "Show Clear action in footer",
+      "description": "Offer the clear action; it is disabled while the selection is empty.",
       "default": true
-    },
-    "showPresets": {
-      "type": "boolean",
-      "required": false,
-      "description": "Show preset quick actions",
-      "default": false
-    },
-    "presets": {
-      "type": "array",
-      "required": false,
-      "description": "presets prop"
     },
     "surface": {
       "type": "enum",
       "required": false,
-      "description": "surface prop",
+      "description": "Picker surface: a popover, a bottom sheet, or auto (a sheet below 900px wide).",
       "options": [
         "auto",
         "popover",
@@ -159,64 +124,117 @@
       ],
       "default": "auto"
     },
-    "surfaceBreakpoint": {
-      "type": "number",
-      "required": false,
-      "description": "surfaceBreakpoint prop"
-    },
-    "surfaceTitle": {
+    "name": {
       "type": "string",
       "required": false,
-      "description": "surfaceTitle prop"
+      "description": "Native form field name. Ranges serialize as an ISO start/end interval."
     },
-    "label": {
+    "form": {
       "type": "string",
       "required": false,
-      "description": "Control label"
-    },
-    "description": {
-      "type": "string",
-      "required": false,
-      "description": "Helper text below control"
-    },
-    "error": {
-      "type": "string",
-      "required": false,
-      "description": "Error message below control"
+      "description": "Associate the field with a form by id."
     },
     "required": {
       "type": "boolean",
       "required": false,
-      "description": "required prop",
+      "description": "Require a complete selection for native form validation.",
       "default": false
     },
     "disabled": {
       "type": "boolean",
       "required": false,
-      "description": "Disable interactions",
+      "description": "Disable the trigger; the picker cannot open.",
       "default": false
     },
     "readOnly": {
       "type": "boolean",
       "required": false,
-      "description": "Read-only mode",
+      "description": "Show the value without letting the user change it; it is still submitted.",
       "default": false
     },
     "placeholder": {
       "type": "string",
       "required": false,
-      "description": "Trigger placeholder text"
+      "description": "Trigger text while nothing is selected."
     },
     "membrane": {
       "type": "boolean",
       "required": false,
-      "description": "Enable membrane wrapper around trigger",
+      "description": "Wrap the trigger in control-row spacing; the picker surface keeps its own spacing.",
       "default": true
     },
     "fullWidth": {
       "type": "boolean",
       "required": false,
-      "description": "Stretch control to container width",
+      "description": "Stretch the field to the width of its container.",
+      "default": true
+    },
+    "mode": {
+      "type": "enum",
+      "required": false,
+      "description": "Picker mode: date, datetime, time, week, month or year.",
+      "options": [
+        "date",
+        "datetime",
+        "time",
+        "month",
+        "year",
+        "week"
+      ],
+      "default": "date"
+    },
+    "openTo": {
+      "type": "enum",
+      "required": false,
+      "description": "First view shown when the picker opens.",
+      "options": [
+        "day",
+        "hours",
+        "minutes",
+        "month",
+        "year"
+      ]
+    },
+    "selection": {
+      "type": "enum",
+      "required": false,
+      "description": "Single value or range endpoints; week owns its range selection.",
+      "options": [
+        "single",
+        "range"
+      ],
+      "default": "single"
+    },
+    "presets": {
+      "type": "array",
+      "required": false,
+      "description": "Explicit shortcuts with unique id, label and selection-shaped value; an omitted or empty array renders none."
+    },
+    "value": {
+      "type": "any",
+      "required": false,
+      "description": "Controlled civil ISO or Date instant, or a range of these; null clears selection."
+    },
+    "defaultValue": {
+      "type": "any",
+      "required": false,
+      "description": "Initial uncontrolled value; ignored while value is controlled.",
+      "default": null
+    },
+    "valueFormat": {
+      "type": "enum",
+      "required": false,
+      "description": "Callback representation; form submission always uses civil ISO values.",
+      "options": [
+        "iso",
+        "date"
+      ],
+      "default": "iso"
+    },
+    "excludeDisabledDates": {
+      "type": "boolean",
+      "required": false,
+      "description": "Exclude unavailable days from the whole range; false constrains only its endpoints.",
       "default": true
     }
   },
@@ -230,12 +248,9 @@
         "valueFormat": "iso",
         "locale": "en-US",
         "timezone": "UTC",
-        "weekStartsOn": 1,
         "min": null,
         "max": null,
         "showNow": true,
-        "showClear": true,
-        "showPresets": false,
         "surface": "auto",
         "required": false,
         "disabled": false,
@@ -250,11 +265,6 @@
       "name": "DateTime",
       "props": {
         "mode": "datetime",
-        "views": [
-          "day",
-          "hours",
-          "minutes"
-        ],
         "openTo": "day",
         "label": "Date & Time",
         "value": "2026-03-03T12:30"
@@ -264,10 +274,6 @@
       "name": "Time",
       "props": {
         "mode": "time",
-        "views": [
-          "hours",
-          "minutes"
-        ],
         "openTo": "hours",
         "label": "Time",
         "value": "2026-03-03T08:15"
@@ -279,18 +285,34 @@
         "mode": "date",
         "selection": "range",
         "label": "Date range",
-        "showPresets": true,
         "value": {
           "start": "2026-03-03",
           "end": "2026-03-09"
-        }
+        },
+        "presets": [
+          {
+            "id": "release-week",
+            "label": "Release week",
+            "value": {
+              "start": "2026-03-02",
+              "end": "2026-03-08"
+            }
+          },
+          {
+            "id": "review-window",
+            "label": "Review window",
+            "value": {
+              "start": "2026-03-09",
+              "end": "2026-03-13"
+            }
+          }
+        ]
       }
     },
     {
       "name": "Week",
       "props": {
         "mode": "week",
-        "selection": "range",
         "label": "Week",
         "value": {
           "start": "2026-03-02",
@@ -302,10 +324,6 @@
       "name": "Month",
       "props": {
         "mode": "month",
-        "views": [
-          "month",
-          "year"
-        ],
         "openTo": "month",
         "label": "Month",
         "value": "2026-06-01"
@@ -315,9 +333,6 @@
       "name": "Year",
       "props": {
         "mode": "year",
-        "views": [
-          "year"
-        ],
         "openTo": "year",
         "label": "Year",
         "value": "2028-01-01"
@@ -486,5 +501,9 @@
       "Text"
     ],
     "context": "both"
+  },
+  "preview": {
+    "entryPath": "./Date.preview.tsx",
+    "exportName": "DatePreview"
   }
 }

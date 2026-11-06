@@ -16,8 +16,8 @@
       "height": {
         "$ref": "props.height"
       },
-      "ariaLabel": {
-        "$ref": "props.ariaLabel"
+      "aria-label": {
+        "$ref": "props.aria-label"
       }
     },
     "children": []
@@ -26,22 +26,22 @@
     "props": {
       "orientation": "both",
       "height": 180,
-      "ariaLabel": "Dataset preview",
-      "children": "timestamp,workspace,agent,model,input_tokens,output_tokens,latency_ms,status\n2026-07-10T09:41:00Z,production,research,gpt-5,2840,612,1842,completed"
+      "aria-label": "Dataset preview",
+      "children": "timestamp,workspace,agent,model,input_tokens,output_tokens,latency_ms,status\n2026-07-10T09:41:00Z,production,research,gpt-5,2840,612,1842,completed\n2026-07-10T09:43:12Z,production,support,gpt-5-mini,1210,388,904,completed\n2026-07-10T09:44:05Z,staging,research,gpt-5,3920,1040,2511,completed\n2026-07-10T09:46:37Z,production,billing,gpt-5-mini,860,142,611,failed\n2026-07-10T09:48:20Z,production,research,gpt-5,2105,574,1693,completed\n2026-07-10T09:51:02Z,staging,support,gpt-5-mini,1544,402,1022,completed\n2026-07-10T09:53:48Z,production,research,gpt-5,4470,1288,2967,completed"
     }
   },
   "controls": [
     {
       "name": "children",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Content to make scrollable."
+      "description": "Content to scroll; text keeps its line breaks and wraps only while the content cannot scroll sideways."
     },
     {
       "name": "orientation",
       "type": "select",
       "required": false,
-      "description": "Which axes can scroll.",
+      "description": "Axes the content scrolls along; overflow along the other axis is clipped.",
       "options": [
         "vertical",
         "horizontal",
@@ -51,17 +51,15 @@
     },
     {
       "name": "height",
-      "type": "number",
+      "type": "any",
       "required": false,
-      "description": "Viewport height.",
-      "defaultValue": 240
+      "description": "Height of the box: a number or numeric string is pixels, or pass a CSS length. Wins over `style.height`; without it the box follows its content or layout."
     },
     {
-      "name": "ariaLabel",
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Accessible label for the scrollable region.",
-      "defaultValue": "Scrollable text"
+      "description": "Names the scrolling region; a tab stop without `aria-label` or `aria-labelledby` is named \"Scrollable content\"."
     }
   ],
   "meta": {

@@ -17,15 +17,15 @@
       "name": "--uf-shadow-sm",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "0 1px 2px var(--uf-color-black-6)"
         },
         {
-          "selector": ":root[data-theme='light']",
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
           "value": "0 1px 2px var(--uf-color-black-6)"
         },
         {
-          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme]),\n[data-theme='dark']",
           "value": "0 1px 2px var(--uf-color-black-30)"
         }
       ]
@@ -35,15 +35,15 @@
       "name": "--uf-shadow-base",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "0 1px 3px var(--uf-color-black-10), 0 1px 2px var(--uf-color-black-6)"
         },
         {
-          "selector": ":root[data-theme='light']",
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
           "value": "0 1px 3px var(--uf-color-black-10), 0 1px 2px var(--uf-color-black-6)"
         },
         {
-          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme]),\n[data-theme='dark']",
           "value": "0 1px 3px var(--uf-color-black-40), 0 1px 2px var(--uf-color-black-30)"
         }
       ]
@@ -53,15 +53,15 @@
       "name": "--uf-shadow-md",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "0 4px 6px var(--uf-color-black-10), 0 2px 4px var(--uf-color-black-6)"
         },
         {
-          "selector": ":root[data-theme='light']",
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
           "value": "0 4px 6px var(--uf-color-black-10), 0 2px 4px var(--uf-color-black-6)"
         },
         {
-          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme]),\n[data-theme='dark']",
           "value": "0 4px 6px var(--uf-color-black-40), 0 2px 4px var(--uf-color-black-30)"
         }
       ]
@@ -71,15 +71,15 @@
       "name": "--uf-shadow-lg",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "0 10px 15px var(--uf-color-black-10), 0 4px 6px var(--uf-color-black-6)"
         },
         {
-          "selector": ":root[data-theme='light']",
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
           "value": "0 10px 15px var(--uf-color-black-10), 0 4px 6px var(--uf-color-black-6)"
         },
         {
-          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme]),\n[data-theme='dark']",
           "value": "0 10px 15px var(--uf-color-black-50), 0 4px 6px var(--uf-color-black-40)"
         }
       ]
@@ -89,15 +89,15 @@
       "name": "--uf-shadow-xl",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "0 20px 25px var(--uf-color-black-10), 0 10px 10px var(--uf-color-black-4)"
         },
         {
-          "selector": ":root[data-theme='light']",
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
           "value": "0 20px 25px var(--uf-color-black-10), 0 10px 10px var(--uf-color-black-4)"
         },
         {
-          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme]),\n[data-theme='dark']",
           "value": "0 20px 25px var(--uf-color-black-50), 0 10px 10px var(--uf-color-black-40)"
         }
       ]
@@ -117,7 +117,7 @@
       "name": "--uf-elevation-1",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-shadow-sm)"
         }
       ]
@@ -127,7 +127,7 @@
       "name": "--uf-elevation-2",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-shadow-base)"
         }
       ]
@@ -137,7 +137,7 @@
       "name": "--uf-elevation-3",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-shadow-md)"
         }
       ]
@@ -147,7 +147,7 @@
       "name": "--uf-elevation-4",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-shadow-lg)"
         }
       ]
@@ -157,7 +157,7 @@
       "name": "--uf-elevation-5",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "var(--uf-shadow-xl)"
         }
       ]
@@ -207,15 +207,15 @@
       "name": "--uf-backdrop-blur-overlay",
       "variants": [
         {
-          "selector": ":root",
+          "selector": ":root,\n[data-theme='light'],\n[data-theme='dark']",
           "value": "120px"
         },
         {
-          "selector": ":root[data-theme='light']",
+          "selector": ":root[data-theme='light'],\n[data-theme='light']",
           "value": "120px"
         },
         {
-          "selector": ":root[data-theme='dark'],\n:root:not([data-theme])",
+          "selector": ":root[data-theme='dark'],\n:root:not([data-theme]),\n[data-theme='dark']",
           "value": "120px"
         }
       ]

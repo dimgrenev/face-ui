@@ -1,0 +1,66 @@
+/* =================================================================
+ * FIELD — label, control, description and error of every labelled value.
+ * The component root carries .uf-field and keeps only its size.
+ * ================================================================= */
+.uf-field {
+  --uf-field-start-min: 10rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--uf-membrane);
+  min-inline-size: 0;
+}
+.uf-field[hidden] {
+  display: none;
+}
+/* Label at inline start: two equal columns, one below twice the minimum.
+   auto-fit collapses the tracks nothing occupies, so no media or container query. */
+.uf-field[data-label-position="start"] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--uf-field-start-min)), 1fr));
+  align-items: start;
+  column-gap: var(--uf-control-gap);
+}
+.uf-field[data-label-position="start"] > *,
+.uf-field[data-label-position="start"] > [data-membrane-disabled] > * {
+  grid-column: -2;
+}
+/* Beside the control, the first label line centers on the control's first line. */
+.uf-field[data-label-position="start"] > .uf-field__label {
+  grid-column: 1;
+  padding-block: calc((var(--uf-control-height) - var(--uf-text-label-line-height)) / 2 + var(--uf-membrane));
+}
+.uf-field[data-label-position="start"]:has(> [data-membrane-disabled]) > .uf-field__label {
+  padding-block: calc((var(--uf-control-height) - var(--uf-text-label-line-height)) / 2);
+}
+/* One label typography for every field: the system label tokens. */
+.uf-field__label {
+  box-sizing: border-box;
+  align-self: start;
+  min-inline-size: 0;
+  min-block-size: var(--uf-text-label-min-height);
+  padding: var(--uf-text-label-pad-y) var(--uf-control-pad-text);
+  color: var(--uf-color-fg);
+  font-size: var(--uf-text-label-font-size);
+  font-weight: var(--uf-font-weight-bold);
+  line-height: var(--uf-text-label-line-height);
+  overflow-wrap: anywhere;
+}
+.uf-field[data-invalid] > .uf-field__label {
+  color: var(--uf-color-destructive);
+}
+.uf-field__required {
+  margin-inline-start: calc(var(--uf-membrane) * 2);
+  color: var(--uf-color-destructive);
+}
+.uf-field__description,
+.uf-field__error {
+  padding-inline: var(--uf-control-pad-text);
+  font-size: var(--uf-font-size-xs);
+  overflow-wrap: anywhere;
+}
+.uf-field__description {
+  color: var(--uf-color-fg-muted);
+}
+.uf-field__error {
+  color: var(--uf-color-destructive);
+}

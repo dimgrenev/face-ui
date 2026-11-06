@@ -1,8 +1,11 @@
-import { installMembraneInteractions } from './membrane-interactions'
-
-installMembraneInteractions()
-
 /** Concatenate class names, filtering out falsy values. */
 export function cn(...classes: (string | false | null | undefined)[]): string {
-  return classes.filter(Boolean).join(' ')
+  return [
+    ...new Set(
+      classes
+        .filter((value): value is string => typeof value === 'string')
+        .flatMap((value) => value.split(/\s+/))
+        .filter(Boolean),
+    ),
+  ].join(' ')
 }

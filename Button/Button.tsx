@@ -1,25 +1,33 @@
-/**
- * Button — action component.
- *
- * Unifies: Button, ButtonGroup, Clipboard (copyText prop).
- * Per synthesize doc section 5: "Button + ButtonGroup + Clipboard"
- *
- * `<Button text="Save" />`
- * `<Button text="Copy" copyText={code} />`
- * `<Button icon="search" iconOnly />`
- */
-
-import { forwardRef, useCallback, useRef, useState, type MutableRefObject, type ReactNode, type ButtonHTMLAttributes } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  type CSSProperties,
+  type HTMLAttributes,
+  type MouseEvent,
+  type ReactNode,
+  type ButtonHTMLAttributes,
+} from 'react'
 import { createAnatomy } from '../assets/anatomy'
 import { cn } from '../assets/utils'
+import { copyText as copyToClipboard } from '../assets/runtime/clipboard'
+import { readNumber } from '../assets/runtime/props'
 import { Icon } from '../Icon/Icon'
+import { Membrane } from '../assets/adapters/react/Membrane'
+import { hasSlotContent } from '../assets/slot-content'
+import { Spinner } from '../Spinner/Spinner'
 
 // ---------------------------------------------------------------------------
 // Anatomy
 // ---------------------------------------------------------------------------
 
 export const buttonAnatomy = createAnatomy('button').parts(
-  'root', 'icon', 'text', 'label', 'indicator', 'group',
+  'root',
+  'icon',
+  'text',
+  'label',
+  'meta',
+  'indicator',
+  'group',
 )
 
 // ---------------------------------------------------------------------------
@@ -35,51 +43,55 @@ export type ButtonVariant =
   | 'ghost'
   | 'destructive'
 
-export type ButtonSelectorDirection = 'vertical' | 'side'
+export type ButtonChevron = 'down' | 'end'
 
-export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
-  /** Button label text. */
-  text?: string
-  /** Optional secondary text, rendered at the far right inside the text area. */
-  rightText?: ReactNode
+export interface ButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'children' | 'dangerouslySetInnerHTML' | 'defaultChecked' | 'defaultValue'
+> {
+  /** Label of the button; with `iconOnly` it stays as the accessible name only. */
+  children?: ReactNode
+  /** Secondary text at the inline end of the label area, such as a shortcut or count. */
+  meta?: ReactNode
   /** Visual variant. */
   variant?: ButtonVariant
   /** Icon (string from registry, ReactNode, or SVG element). */
   icon?: ReactNode
-  /** Icon position relative to text. */
-  iconPosition?: 'left' | 'right'
-  /** Icon-only mode (no text, square button). */
+  /** Icon at the start or end of the label, following text direction. Default: start. */
+  iconPosition?: 'start' | 'end'
+  /** Hide the visual label while preserving its accessible text. Compact buttons are square. */
   iconOnly?: boolean
   /** Disabled state. */
   disabled?: boolean
-  /** Loading state (shows spinner, dims text). */
+  /** Loading state: disables activation and places a 20×20 spinner at the inline end; icon-only buttons replace their icon. */
   loading?: boolean
   /** Stretch text area (flex:1). */
   stretchText?: boolean
-  /** Render a compact selector indicator after the label. */
-  selector?: boolean
-  /** Open state for the selector indicator. */
-  selectorOpen?: boolean
-  /** Direction of the selector indicator. Use side for side-panel selectors. */
-  selectorDirection?: ButtonSelectorDirection
+  /** Trailing disclosure chevron: `down` flips with aria-expanded; `end` points to the inline end and mirrors in right-to-left text. */
+  chevron?: ButtonChevron
+  /** Standard expanded state, also used to orient the disclosure chevron. */
+  'aria-expanded'?: ButtonHTMLAttributes<HTMLButtonElement>['aria-expanded']
   /** Full width button. */
   fullWidth?: boolean
-  /** Text alignment. */
-  align?: 'left' | 'center' | 'right'
-  /** Nesting level for option-like rows: 0..9 */
-  level?: number
+  /** Inline alignment of the content, following text direction. */
+  align?: 'start' | 'center' | 'end'
+  /** Indent steps for nested option-like rows, an integer from 0 to 9. */
+  indent?: number
   /** Membrane spacing around the button. */
   membrane?: boolean
   /** Copy text to clipboard on click (Clipboard integration). */
   copyText?: string
   /** Callback when copy succeeds. */
   onCopied?: () => void
-  /** Custom children (overrides text/icon rendering). */
-  children?: ReactNode
 }
 
-export interface ButtonGroupProps {
+export interface ButtonGroupProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'dangerouslySetInnerHTML' | 'defaultChecked' | 'defaultValue'
+> {
+  /** The grouped buttons. */
   children: ReactNode
+  /** Direction the buttons are joined in. Default: horizontal. */
   orientation?: 'horizontal' | 'vertical'
   className?: string
 }
@@ -89,7 +101,10 @@ export interface ButtonGroupProps {
 // ---------------------------------------------------------------------------
 
 export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
-  function ButtonGroup({ children, orientation = 'horizontal', className, ...rest }, ref) {
+  function ButtonGroup(
+    { children, orientation = 'horizontal', className, ...rest },
+    ref,
+  ) {
     return (
       <div
         ref={ref}
@@ -109,29 +124,26 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
 // Button
 // ---------------------------------------------------------------------------
 
+/** An action the reader can take: a labelled control with optional icons, a loading state and a copy-to-clipboard shortcut. */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  function Button(rawProps, ref) {
-    const props = rawProps
+  function Button(props, ref) {
     const {
-      text,
-      rightText,
+      children,
+      meta,
       variant = 'default',
       icon,
-      iconPosition = 'left',
+      iconPosition = 'start',
       iconOnly = false,
       disabled = false,
       loading = false,
-      stretchText: rawStretchText,
-      selector = false,
-      selectorOpen = false,
-      selectorDirection = 'vertical',
+      stretchText = false,
+      chevron,
       fullWidth = false,
       align,
-      level,
+      indent,
       membrane = true,
       copyText,
       onCopied,
-      children,
       className,
       onClick,
       style,
@@ -139,172 +151,119 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ...rest
     } = props
 
-    const clampedLevel = (level != null && Number.isFinite(Number(level)))
-      ? Math.max(0, Math.min(9, Number(level)))
-      : undefined
-
-    const [copied, setCopied] = useState(false)
-    const buttonRef = useRef<HTMLButtonElement | null>(null)
-
-    const setRefs = useCallback((node: HTMLButtonElement | null) => {
-      buttonRef.current = node
-      if (typeof ref === 'function') ref(node)
-      else if (ref) {
-        ;(ref as MutableRefObject<HTMLButtonElement | null>).current = node
-      }
-    }, [ref])
+    const steps =
+      indent == null
+        ? undefined
+        : readNumber('Button', 'indent', indent, 0, { integer: true, min: 0, max: 9 })
 
     const handleClick = useCallback(
-      async (e: React.MouseEvent<HTMLButtonElement>) => {
-        if (copyText != null) {
-          const canUseNavigatorClipboard =
-            typeof window !== 'undefined' &&
-            typeof navigator !== 'undefined' &&
-            typeof navigator.clipboard?.writeText === 'function' &&
-            window.isSecureContext &&
-            window.top === window.self
-
-          let didCopy = false
-
-          if (canUseNavigatorClipboard) {
-            try {
-              await navigator.clipboard.writeText(copyText)
-              didCopy = true
-            } catch {
-              didCopy = false
-            }
-          }
-
-          if (!didCopy && typeof document !== 'undefined') {
-            try {
-              const el = document.createElement('textarea')
-              el.value = copyText
-              el.setAttribute('readonly', 'true')
-              el.style.position = 'fixed'
-              el.style.left = '-9999em'
-              el.style.opacity = '0'
-              document.body.appendChild(el)
-              el.select()
-              document.execCommand('copy')
-              document.body.removeChild(el)
-              didCopy = true
-            } catch {
-              didCopy = false
-            }
-          }
-
-          if (didCopy) {
-            setCopied(true)
-            onCopied?.()
-            setTimeout(() => setCopied(false), 3000)
-          }
-        }
+      async (e: MouseEvent<HTMLButtonElement>) => {
         onClick?.(e)
+        if (e.defaultPrevented || copyText == null) return
+        const button = e.currentTarget
+        if (await copyToClipboard(copyText, button.ownerDocument)) {
+          onCopied?.()
+        }
       },
       [copyText, onCopied, onClick],
     )
 
-    const resolvedIcon = typeof icon === 'string'
-      ? <Icon name={icon} />
-      : icon
-
-    const hasIcon = resolvedIcon != null
-    const hasText = text != null || children != null
-    const isIconOnly = iconOnly || (hasIcon && !hasText)
-    const hasSelectorIndicator = selector && !isIconOnly
-    const resolvedIconPosition = hasSelectorIndicator ? 'left' : iconPosition
-    const stretchText = rawStretchText ?? false
-    const resolvedSelectorDirection: ButtonSelectorDirection = selectorDirection === 'side' ? 'side' : 'vertical'
-    const selectorIconName = resolvedSelectorDirection === 'side'
-      ? 'select-chevron-right'
-      : selectorOpen ? 'select-chevron-up' : 'select-chevron-down'
-    const selectorIndicator = hasSelectorIndicator ? (
-      <span {...buttonAnatomy.getPartAttrs('indicator')} aria-hidden="true">
-        <Icon name={selectorIconName} />
+    const resolvedIcon = typeof icon === 'string' ? <Icon name={icon} /> : icon
+    const hasIcon = hasSlotContent(
+      typeof icon === 'string' ? icon.trim() : icon,
+    )
+    const hasLabel = hasSlotContent(children)
+    const hasMeta = hasSlotContent(meta)
+    const isIconOnly = iconOnly || (hasIcon && !hasLabel && !hasMeta)
+    const hasChevron = chevron != null
+    const expanded =
+      rest['aria-expanded'] === true || rest['aria-expanded'] === 'true'
+    const side = chevron === 'end'
+    const iconSlot = (position: 'start' | 'end' | 'only') => (
+      <span {...buttonAnatomy.getPartAttrs('icon')} data-position={position}>
+        {resolvedIcon}
       </span>
-    ) : null
-
-    const levelStyle = clampedLevel != null
-      ? { ...style, '--face-runtime-option-level': clampedLevel } as React.CSSProperties
-      : style
-
-    const buttonNode = (
-      <button
-        ref={setRefs}
-        type={type}
-        disabled={disabled || loading}
-        aria-busy={loading ? true : undefined}
-        {...buttonAnatomy.getPartAttrs('root')}
-        data-variant={variant}
-        data-icon-only={isIconOnly ? '' : undefined}
-        data-stretch-text={stretchText ? '' : undefined}
-        data-full-width={fullWidth ? '' : undefined}
-        data-align={align}
-        data-icon-left={hasIcon && !isIconOnly && resolvedIconPosition === 'left' ? '' : undefined}
-        data-icon-right={hasIcon && !isIconOnly && resolvedIconPosition === 'right' ? '' : undefined}
-        data-selector={hasSelectorIndicator ? '' : undefined}
-        data-selector-direction={hasSelectorIndicator ? resolvedSelectorDirection : undefined}
-        data-level={clampedLevel != null ? '' : undefined}
-        data-loading={loading ? '' : undefined}
-        data-copied={copied ? '' : undefined}
-        data-membrane={membrane ? '' : undefined}
-        className={cn('uf-button', 'uf-option', 'uf-control', className)}
-        style={levelStyle}
-        onClick={handleClick}
-        {...rest}
-      >
-        {loading && (
-          <span className="uf-button__spinner">
-            <span className="uf-spinner uf-spinner--small" />
-          </span>
-        )}
-        {hasIcon && !isIconOnly && resolvedIconPosition === 'left' && (
-          <span {...buttonAnatomy.getPartAttrs('icon')} data-position="left">
-            {resolvedIcon}
-          </span>
-        )}
-        {hasIcon && isIconOnly && (
-          <span {...buttonAnatomy.getPartAttrs('icon')} data-position="only">
-            {resolvedIcon}
-          </span>
-        )}
-        {hasText && !isIconOnly && (
-          <span {...buttonAnatomy.getPartAttrs('text')}>
-            <span {...buttonAnatomy.getPartAttrs('label')} className="uf-button__label">
-              {children ?? text}
-            </span>
-            {rightText != null && (
-              <span className="uf-button__rightText uf-text-body">
-                {rightText}
-              </span>
-            )}
-            {selectorIndicator}
-          </span>
-        )}
-        {hasIcon && !isIconOnly && resolvedIconPosition === 'right' && (
-          <span {...buttonAnatomy.getPartAttrs('icon')} data-position="right">
-            {resolvedIcon}
-          </span>
-        )}
-      </button>
     )
 
-    if (!membrane) return buttonNode
-
     return (
-      <span
-        className={cn('uf-membrane', fullWidth ? 'uf-membrane--full' : undefined)}
-        data-membrane-interactive={disabled || loading ? undefined : ''}
-        onClick={(event) => {
-          if (event.target !== event.currentTarget) return
-          if (disabled || loading) return
-          const button = buttonRef.current
-          button?.focus()
-          button?.click()
-        }}
-      >
-        {buttonNode}
-      </span>
+      <Membrane enabled={membrane} fullWidth={fullWidth} interactive>
+        <button
+          ref={ref}
+          type={type}
+          disabled={disabled || loading}
+          aria-busy={loading ? true : undefined}
+          {...buttonAnatomy.getPartAttrs('root')}
+          data-variant={variant}
+          data-icon-only={isIconOnly ? '' : undefined}
+          data-stretch-text={stretchText ? '' : undefined}
+          data-full-width={fullWidth ? '' : undefined}
+          data-align={align}
+          data-icon-start={
+            hasIcon && !isIconOnly && iconPosition === 'start' ? '' : undefined
+          }
+          data-icon-end={
+            hasIcon && !isIconOnly && iconPosition === 'end' ? '' : undefined
+          }
+          data-selector={hasChevron ? '' : undefined}
+          data-selector-direction={
+            hasChevron ? (side ? 'side' : 'vertical') : undefined
+          }
+          data-selector-open={hasChevron && expanded ? '' : undefined}
+          data-indent={steps != null ? '' : undefined}
+          data-loading={loading ? '' : undefined}
+          data-membrane={membrane ? '' : undefined}
+          className={cn('uf-button', 'uf-option', 'uf-control', className)}
+          style={
+            steps != null
+              ? ({ ...style, '--face-runtime-option-level': steps } as CSSProperties)
+              : style
+          }
+          onClick={handleClick}
+          {...rest}
+        >
+          {hasIcon && !isIconOnly && iconPosition === 'start' && iconSlot('start')}
+          {isIconOnly && (loading ? <Spinner className="uf-button__spinner" /> : hasIcon && iconSlot('only'))}
+          {isIconOnly && (hasLabel || hasMeta) && (
+            <span className="uf-visually-hidden">
+              {children}
+              {hasMeta && <> {meta}</>}
+            </span>
+          )}
+          {(hasLabel || hasMeta) && !isIconOnly && (
+            <span {...buttonAnatomy.getPartAttrs('text')}>
+              <span
+                {...buttonAnatomy.getPartAttrs('label')}
+                className="uf-button__label"
+              >
+                {children}
+              </span>
+              {hasMeta && (
+                <span
+                  {...buttonAnatomy.getPartAttrs('meta')}
+                  className="uf-button__meta uf-text-body"
+                >
+                  {meta}
+                </span>
+              )}
+            </span>
+          )}
+          {!loading && hasIcon && !isIconOnly && iconPosition === 'end' && iconSlot('end')}
+          {!loading && hasChevron && (
+            <span {...buttonAnatomy.getPartAttrs('indicator')} aria-hidden="true">
+              <Icon
+                name={
+                  side
+                    ? 'select-chevron-right'
+                    : expanded
+                      ? 'select-chevron-up'
+                      : 'select-chevron-down'
+                }
+              />
+            </span>
+          )}
+          {loading && !isIconOnly && <Spinner className="uf-button__spinner" />}
+        </button>
+      </Membrane>
     )
   },
 )

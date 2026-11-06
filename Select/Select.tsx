@@ -1,728 +1,841 @@
-/**
- * Select — option picker (shell pattern).
- *
- * Handles open/close and value selection. Supports single and multi-select.
- * The machine manages state; the adapter renders the option list.
- *
- * `<Select options={items} placeholder="Choose..." />`
- * `<Select type="multiselect" options={items} value={['a','b']} />`
- */
+/** Select — a button that opens a list of items to choose one value, or several with `multiple`. */
 import {
+  Children,
   forwardRef,
-  useCallback,
+  Fragment,
+  isValidElement,
   useEffect,
-  useId,
-  useMemo,
   useRef,
   useState,
+  type ButtonHTMLAttributes,
   type CSSProperties,
+  type KeyboardEvent,
   type ReactNode,
-  type RefObject,
 } from 'react'
 import { createPortal } from 'react-dom'
-import { useMachine } from '../assets/adapters/react/use-machine'
-import { useControllableMachineProp } from '../assets/adapters/react/use-controllable-machine-prop'
-import {
-  DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
-  useResponsiveOverlaySurface,
-  type ResponsiveOverlaySurface,
-} from '../assets/adapters/react/use-responsive-overlay-surface'
+import { FormValue } from '../assets/adapters/react/FormValue'
+import { Membrane } from '../assets/adapters/react/Membrane'
+import { composeHandlers } from '../assets/adapters/react/merge-props'
 import { useBodyScrollLock } from '../assets/adapters/react/use-body-scroll-lock'
-import { useDismissOutside } from '../assets/adapters/react/use-dismiss-outside'
+import { useComposedRefs } from '../assets/adapters/react/use-composed-refs'
+import { useControllableState } from '../assets/adapters/react/use-controllable-state'
 import { useFloatingPosition } from '../assets/adapters/react/use-floating-position'
+import { useHoverIntent } from '../assets/adapters/react/use-hover-intent'
+import { useIsomorphicLayoutEffect } from '../assets/adapters/react/use-isomorphic-layout-effect'
+import { useLayer } from '../assets/adapters/react/use-layer'
+import { usePortalTarget } from '../assets/adapters/react/use-portal-target'
+import { useResponsiveOverlaySurface } from '../assets/adapters/react/use-responsive-overlay-surface'
+import { createAnatomy } from '../assets/anatomy'
+import {
+  FieldLayout,
+  useField,
+  useNameReport,
+  type FieldProps,
+} from '../assets/internal/field'
+import { readFlatCollection } from '../assets/internal/flat-collection'
+import type { CollectionItem } from '../assets/internal/item'
 import { ResponsiveSheetHeader } from '../assets/ResponsiveSheetHeader'
-import { selectAnatomy, selectMachine, connectSelect } from '../assets/machines/select.machine'
+import {
+  domId,
+  move,
+  readKeys,
+  typeahead,
+  type Typeahead,
+} from '../assets/runtime/collection'
+import { keyToMove, readDirection, type Direction } from '../assets/runtime/keyboard'
+import { resolveLabel, resolveLabels, type CommonLabels } from '../assets/runtime/labels'
+import { readCssSize } from '../assets/runtime/props'
+import { hasSlotContent } from '../assets/slot-content'
 import { cn } from '../assets/utils'
 import { Card } from '../Card/Card'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
+import {
+  SELECT_SIDE_VISIBLE_OPTION_COUNT,
+} from './select-side-position'
+import { SELECT_SIDE_VIEWPORT_SELECTOR as VIEWPORT, useSelectSidePosition } from '../assets/internal/useSelectSidePosition'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface SelectOption {
-  value: string
-  label: ReactNode
-  disabled?: boolean
+/** One choice of a Select. */
+export interface SelectItem extends Omit<CollectionItem, 'icon' | 'textValue'> {
+  /** Plain text for typeahead and the option's accessible name when `label` is not plain text. */
+  textValue?: string
 }
+export type SelectSurface = 'auto' | 'popover' | 'sheet' | 'side'
+/** Strings Select renders itself. */
+export type SelectLabels = Pick<CommonLabels, 'close'>
 
-export type SelectVariant = 'default' | 'side' | 'iconOnly'
-
-export interface SelectProps {
-  /** Visual/behavioral variant. */
-  variant?: SelectVariant
-  /** Available options. */
-  options?: SelectOption[]
-  /** Current selected value. String for single, string[] for multiselect. */
-  value?: string | string[] | null
-  /** Uncontrolled initial selected value. */
-  defaultValue?: string | string[] | null
-  /** Placeholder text when no value is selected. */
-  placeholder?: string
-  /** Disable the select. */
-  disabled?: boolean
-  /** Selection mode. */
-  type?: 'select' | 'multiselect'
-  /** Label rendered above/beside the select. */
-  label?: ReactNode
-  /** Label placement relative to the control. */
-  labelOrientation?: 'vertical' | 'horizontal'
-  /** Accessible label (aria-label). */
-  ariaLabel?: string
-  /** Optional override for the content shown in the trigger. */
-  displayValue?: ReactNode
-  /** Stretch the value area so the arrow pins to the right edge. */
+/** The shared Select button; the parent owns its popup, value and interactions. */
+export interface SelectTriggerProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'children' | 'dangerouslySetInnerHTML' | 'type' | 'aria-expanded'
+> {
+  /** The already resolved selected label, placeholder, or custom display value. */
+  children?: ReactNode
+  /** Current popup visibility; this component never changes it. */
+  open?: boolean
+  /** Resolved popup presentation; side triggers always point to the inline end. */
+  surface?: Exclude<SelectSurface, 'auto'>
+  /** Marks an empty selection's display value. */
+  isPlaceholder?: boolean
+  /** Announces unavailable content without removing the trigger from tab order. */
+  unavailable?: boolean
+  /** A square trigger without a chevron; name it with aria-label. */
+  iconOnly?: boolean
+  /** Expands the value area so the chevron sits at the inline end. */
   stretchText?: boolean
-  /** Callback when value changes. */
-  onValueChange?: (details: { value: string | string[] | null }) => void
-  /** Callback when open state changes. */
-  onOpenChange?: (details: { open: boolean }) => void
-  /** Preferred content surface. Auto switches to bottom sheet on compact viewports. */
-  surface?: ResponsiveOverlaySurface
-  /** Breakpoint where auto surfaces switch from popover to sheet. */
-  surfaceBreakpoint?: number
-  /** Optional title used for the mobile sheet header. */
-  surfaceTitle?: ReactNode
-  /** Minimum width for popover content. Useful when the trigger is compact. */
-  contentMinWidth?: number | string
-  /** Outer membrane wrapper around trigger/option geometry. */
+  /** Fills the available inline width. */
+  fullWidth?: boolean
+  /** Outer spacing around the trigger. */
   membrane?: boolean
-  /** Class applied directly to the trigger button. */
-  triggerClassName?: string
-  /** Class applied directly to the trigger value node. */
+  /** Class on the value slot; className and style target the button. */
   valueClassName?: string
-  /** Class applied directly to the floating content node. */
-  contentClassName?: string
-  className?: string
 }
+
+interface SelectBaseProps
+  extends FieldProps,
+    Omit<
+      ButtonHTMLAttributes<HTMLButtonElement>,
+      | 'children'
+      | 'dangerouslySetInnerHTML'
+      | 'type'
+      | 'role'
+      | 'aria-expanded'
+      | 'aria-controls'
+      | 'aria-activedescendant'
+      | 'aria-haspopup'
+      | 'aria-required'
+      | 'aria-disabled'
+      | 'value'
+      | 'defaultValue'
+      | 'onChange'
+      | 'formAction'
+      | 'formEncType'
+      | 'formMethod'
+      | 'formNoValidate'
+      | 'formTarget'
+      | 'popoverTarget'
+      | 'popoverTargetAction'
+    > {
+  /** Choices in list and keyboard order; an item repeating an earlier value is dropped. */
+  items?: readonly SelectItem[]
+  /** Text in the trigger while nothing is selected and `displayValue` is empty. */
+  placeholder?: string
+  /** Replaces the selected labels in the trigger, for example with a count or an icon. */
+  displayValue?: ReactNode
+  /** Disables the trigger and leaves the value out of FormData. */
+  disabled?: boolean
+  /** FormData key; a multiple value submits one entry per selected item. */
+  name?: string
+  /** Id of the form that submits and resets the value, when it is not an ancestor. */
+  form?: string
+  /** Blocks form submission until an item is selected and marks the label. */
+  required?: boolean
+  /** Names the field when there is no visible `label`, and then titles the sheet. */
+  'aria-label'?: string
+  /** Ids of elements that name the field; they take precedence over `label` and `aria-label`. */
+  'aria-labelledby'?: string
+  /** A square trigger without a chevron; name it with `aria-label`. */
+  iconOnly?: boolean
+  /** Fills the available inline width. */
+  fullWidth?: boolean
+  /** Expands the value area so the chevron sits at the inline end. */
+  stretchText?: boolean
+  /** Controlled list visibility; hidden, disabled, or unavailable Selects expose no list. */
+  open?: boolean
+  /** List visibility on mount when `open` is not set; read once. Hiding an uncontrolled list closes it. */
+  defaultOpen?: boolean
+  /** Called once per user request to open or close the list; a controlled parent may refuse it. */
+  onOpenChange?: (details: { open: boolean }) => void
+  /** Where the list opens: auto is a popover, or a bottom sheet below 900px; side opens beside the trigger on hover or click. */
+  surface?: SelectSurface
+  /** Strings Select renders itself: `close` names the sheet's close button. */
+  labels?: Partial<SelectLabels>
+  /** Minimum popover width: a number or numeric string is pixels, or pass a CSS length; capped by the viewport. Side and sheet surfaces ignore it. */
+  contentMinWidth?: number | string
+  /** Outer spacing around the trigger and each option; the list surface keeps its own spacing. */
+  membrane?: boolean
+  /** Class on the trigger button; `className` and `style` go on the field root. */
+  triggerClassName?: string
+  /** Class on the trigger's value slot. */
+  valueClassName?: string
+  /** Class on the floating surface. */
+  contentClassName?: string
+}
+interface SelectSingleProps {
+  /** Lets the user select any number of items and makes the value a `string[]` instead of `string | null`; selecting then keeps the list open. */
+  multiple?: false
+  /** Selected value, or values with `multiple`; a value missing from `items` shows as unselected until it appears. */
+  value?: string | null
+  /** Selection on mount, restored by form reset; same shape as `value`. */
+  defaultValue?: string | null
+  /** Called once per user change with the new value, a fresh array with `multiple`; never for prop updates or reset. */
+  onValueChange?: (details: { value: string | null }) => void
+}
+interface SelectMultipleProps {
+  /** Lets the user select any number of items and makes the value a `string[]` instead of `string | null`; selecting then keeps the list open. */
+  multiple: true
+  /** Selected value, or values with `multiple`; a value missing from `items` shows as unselected until it appears. */
+  value?: readonly string[]
+  /** Selection on mount, restored by form reset; same shape as `value`. */
+  defaultValue?: readonly string[]
+  /** Called once per user change with the new value, a fresh array with `multiple`; never for prop updates or reset. */
+  onValueChange?: (details: { value: string[] }) => void
+}
+export type SelectProps = SelectBaseProps &
+  (SelectSingleProps | SelectMultipleProps)
+
+type Value = string | readonly string[] | null
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function getDisplayValue(
-  value: string | string[] | null,
-  options: SelectOption[],
-): ReactNode {
-  if (value == null) return null
-  if (Array.isArray(value)) {
-    if (value.length === 0) return null
-    return value
-      .map((v) => {
-        const opt = options.find((o) => o.value === v)
-        return opt ? opt.label : v
-      })
-      .reduce<ReactNode[]>((acc, label, i) => {
-        if (i > 0) acc.push(', ')
-        acc.push(label)
-        return acc
-      }, [])
-  }
-  const opt = options.find((o) => o.value === value)
-  return opt ? opt.label : value
-}
+const { getPartAttrs: part } = createAnatomy('select').parts(
+  'root',
+  'trigger',
+  'value',
+  'indicator',
+  'content',
+  'listbox',
+  'option',
+)
+const defaultLabels: SelectLabels = Object.freeze({ close: 'Close' })
 
-function selectValuesEqual(
-  left: string | string[] | null | undefined,
-  right: string | string[] | null | undefined,
-): boolean {
-  if (Object.is(left, right)) return true
-  if (!Array.isArray(left) || !Array.isArray(right)) return false
-  if (left.length !== right.length) return false
-  return left.every((item, index) => item === right[index])
-}
-
-function renderSelectLabelNode(node: ReactNode, className?: string) {
-  if (node == null) return null
-  if (typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
-    return (
-      <Text as="span" membrane={false} inset="none" className={className}>
-        {String(node)}
-      </Text>
+/** Visible text of a label, for typeahead and the native option; aria-hidden content is skipped. */
+function plainText(node: ReactNode): string {
+  return Children.toArray(node)
+    .map((child) =>
+      typeof child === 'string' || typeof child === 'number'
+        ? String(child)
+        : isValidElement<{ children?: ReactNode; 'aria-hidden'?: unknown }>(
+              child,
+            ) && String(child.props['aria-hidden']) !== 'true'
+          ? plainText(child.props.children)
+          : '',
     )
-  }
-  return (
-    <span className={className}>
-      {node}
-    </span>
+    .join('')
+}
+
+function renderLabel(node: ReactNode, className?: string) {
+  if (!hasSlotContent(node)) return null
+  return typeof node === 'string' || typeof node === 'number' ? (
+    <Text as="span" membrane={false} inset="none" className={className}>
+      {String(node)}
+    </Text>
+  ) : (
+    <span className={className}>{node}</span>
   )
 }
 
-function formatSelectCssSize(value: number | string | undefined): string | undefined {
-  if (value == null) return undefined
-  if (typeof value === 'number') {
-    return Number.isFinite(value) ? `${value}px` : undefined
-  }
-  const trimmed = value.trim()
-  return trimmed.length > 0 ? trimmed : undefined
-}
+/** A CSS length: a number is pixels; anything else but a nonblank string is ignored. */
+const cssSize = (value: unknown) =>
+  typeof value === 'number'
+    ? Number.isFinite(value) && value >= 0
+      ? `${value}px`
+      : undefined
+    : typeof value === 'string'
+      ? value.trim() || undefined
+      : undefined
 
-const SELECT_SIDE_BOUNDARY_SELECTOR = '[data-uf-select-side-boundary]'
-const SELECT_SIDE_WIDTH = 240
-const SELECT_SIDE_MAX_HEIGHT = 480
-const SELECT_SIDE_VIEWPORT_INSET = 4
-const SELECT_SIDE_GAP = 4
-const SELECT_SIDE_MIN_HEIGHT = 80
-const SELECT_SIDE_VISIBLE_OPTION_COUNT = 5
-const SELECT_SIDE_OPTION_SELECTOR = '[data-part="option"]'
-const SELECT_SIDE_ACTIVE_OPTION_SELECTOR = [
-  '[data-part="option"][aria-selected="true"]',
-  '[data-part="option"][data-state="selected"]',
-  '[data-part="option"][data-highlighted]',
-  '[data-part="option"]',
-].join(',')
-
-const sideInitialStyle: CSSProperties = {
-  position: 'fixed',
-  top: -9999,
-  left: -9999,
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(min, value), Math.max(min, max))
-}
-
-type SelectSideRect = Pick<DOMRect, 'left' | 'right' | 'top' | 'bottom' | 'width' | 'height'>
-
-export interface SelectSidePosition {
-  top: number
-  left: number
-  width: number
-  maxHeight: number
-  initialScrollTop: number
-}
-
-export function computeSelectSideOptionViewportHeight(params: {
-  contentHeight: number
-  optionBottomOffsets: number[]
-  visibleOptionLimit?: number
-}): number {
-  const contentHeight = Math.max(0, params.contentHeight)
-  const optionBottomOffsets = params.optionBottomOffsets
-    .filter((value) => Number.isFinite(value) && value > 0)
-  const visibleOptionLimit = Math.max(1, Math.floor(
-    params.visibleOptionLimit ?? SELECT_SIDE_VISIBLE_OPTION_COUNT,
-  ))
-  if (optionBottomOffsets.length <= visibleOptionLimit) return contentHeight
-
-  const lastOptionBottom = optionBottomOffsets[optionBottomOffsets.length - 1] || contentHeight
-  const visibleOptionsBottom = optionBottomOffsets[visibleOptionLimit - 1] || contentHeight
-  const trailingInset = Math.max(0, contentHeight - lastOptionBottom)
-  return Math.min(contentHeight, visibleOptionsBottom + trailingInset)
-}
-
-export function computeSelectSidePosition(params: {
-  triggerRect: SelectSideRect
-  boundaryRect: SelectSideRect | null | undefined
-  contentHeight: number
-  viewportWidth: number
-  viewportHeight: number
-  requestedWidth?: number
-  requestedMaxHeight?: number
-  requestedGap?: number
-  requestedInset?: number
-  activeOptionCenterOffset?: number | null
-}): SelectSidePosition {
-  const {
-    triggerRect,
-    boundaryRect,
-    contentHeight,
-    viewportWidth,
-    viewportHeight,
-    requestedWidth = SELECT_SIDE_WIDTH,
-    requestedMaxHeight = SELECT_SIDE_MAX_HEIGHT,
-    requestedGap = SELECT_SIDE_GAP,
-    requestedInset = SELECT_SIDE_VIEWPORT_INSET,
-    activeOptionCenterOffset,
-  } = params
-  const inset = Math.max(0, requestedInset)
-  const gap = Math.max(0, requestedGap)
-  const viewportLeft = inset
-  const viewportRight = Math.max(viewportLeft, viewportWidth - inset)
-  const viewportTop = inset
-  const viewportBottom = Math.max(viewportTop, viewportHeight - inset)
-  const boundaryTop = boundaryRect == null
-    ? viewportTop
-    : clamp(boundaryRect.top, viewportTop, viewportBottom)
-  const boundaryBottom = boundaryRect == null
-    ? viewportBottom
-    : clamp(boundaryRect.bottom, viewportTop, viewportBottom)
-  const panelWidth = Math.min(
-    requestedWidth,
-    Math.max(SELECT_SIDE_MIN_HEIGHT, viewportRight - viewportLeft),
-  )
-  const verticalMin = Math.min(boundaryTop + gap, viewportBottom)
-  const verticalMax = Math.max(verticalMin, boundaryBottom - gap)
-  const availableHeight = Math.max(SELECT_SIDE_MIN_HEIGHT, verticalMax - verticalMin)
-  const panelHeight = Math.min(
-    requestedMaxHeight,
-    Math.max(SELECT_SIDE_MIN_HEIGHT, contentHeight || requestedMaxHeight),
-    availableHeight,
-  )
-  const anchorLeft = boundaryRect ? boundaryRect.right : triggerRect.right
-  const anchorRight = boundaryRect ? boundaryRect.left : triggerRect.left
-  const rightSpace = viewportRight - anchorLeft
-  const leftSpace = anchorRight - viewportLeft
-  const openLeft = rightSpace < panelWidth + gap && leftSpace > rightSpace
-  const desiredLeft = openLeft
-    ? anchorRight - panelWidth - gap
-    : anchorLeft + gap
-  const triggerCenter = triggerRect.top + triggerRect.height / 2
-  const hasActiveOptionOffset = typeof activeOptionCenterOffset === 'number' && Number.isFinite(activeOptionCenterOffset)
-  const desiredTop = hasActiveOptionOffset
-    ? triggerCenter - activeOptionCenterOffset
-    : triggerRect.top
-
-  const top = clamp(desiredTop, verticalMin, verticalMax - panelHeight)
-  const maxScrollTop = Math.max(0, contentHeight - panelHeight)
-  const scrollTop = hasActiveOptionOffset
-    ? clamp(top + activeOptionCenterOffset - triggerCenter, 0, maxScrollTop)
-    : 0
-
-  return {
-    top: Math.round(top),
-    left: Math.round(clamp(desiredLeft, viewportLeft, viewportRight - panelWidth)),
-    width: Math.round(panelWidth),
-    maxHeight: Math.max(1, Math.round(panelHeight)),
-    initialScrollTop: Math.round(scrollTop),
-  }
-}
-
-function readSelectSideContentMetrics(contentEl: HTMLElement): {
-  contentHeight: number
-  maxVisibleHeight: number
-  activeOptionCenterOffset: number | null
-  scrollViewport: HTMLElement
-} {
-  const scrollViewport = (
-    contentEl.querySelector('.uf-select__contentPanel') as HTMLElement | null
-  ) || contentEl
-  const viewportRect = scrollViewport.getBoundingClientRect()
-  const scrollTop = scrollViewport.scrollTop
-  const contentHeight = Math.max(scrollViewport.scrollHeight, viewportRect.height)
-  const options = Array.from(
-    contentEl.querySelectorAll(SELECT_SIDE_OPTION_SELECTOR),
-  ) as HTMLElement[]
-  const optionBottomOffsets = options.map((option) => {
-    const optionRect = option.getBoundingClientRect()
-    return optionRect.bottom - viewportRect.top + scrollTop
-  })
-  const maxVisibleHeight = computeSelectSideOptionViewportHeight({
-    contentHeight,
-    optionBottomOffsets,
-  })
-  const activeOption = contentEl.querySelector(SELECT_SIDE_ACTIVE_OPTION_SELECTOR) as HTMLElement | null
-  if (!activeOption || typeof activeOption.getBoundingClientRect !== 'function') {
-    return { contentHeight, maxVisibleHeight, activeOptionCenterOffset: null, scrollViewport }
-  }
-  const optionRect = activeOption.getBoundingClientRect()
-  if (
-    !Number.isFinite(viewportRect.top) ||
-    !Number.isFinite(optionRect.top) ||
-    !Number.isFinite(optionRect.height) ||
-    optionRect.height <= 0
-  ) {
-    return { contentHeight, maxVisibleHeight, activeOptionCenterOffset: null, scrollViewport }
-  }
-  return {
-    contentHeight,
-    maxVisibleHeight,
-    activeOptionCenterOffset: optionRect.top - viewportRect.top + scrollTop + optionRect.height / 2,
-    scrollViewport,
-  }
-}
-
-function resolveSideBoundary(triggerEl: HTMLElement | null) {
-  return triggerEl?.closest(SELECT_SIDE_BOUNDARY_SELECTOR) as HTMLElement | null
-}
-
-function useSelectSidePosition(options: {
-  open: boolean
-  triggerRef: RefObject<HTMLElement | null>
-  contentRef: RefObject<HTMLDivElement | null>
-}) {
-  const { open, triggerRef, contentRef } = options
-  const [style, setStyle] = useState<CSSProperties>(sideInitialStyle)
-  const initialScrollSyncedRef = useRef(false)
-
-  const update = useCallback((updateOptions?: { syncInitialScroll?: boolean }) => {
-    if (typeof window === 'undefined') return
-    const triggerEl = triggerRef.current
-    const contentEl = contentRef.current
-    if (!triggerEl || !contentEl) return
-
-    const triggerRect = triggerEl.getBoundingClientRect()
-    const boundaryRect = resolveSideBoundary(triggerEl)?.getBoundingClientRect()
-    const contentMetrics = readSelectSideContentMetrics(contentEl)
-    const position = computeSelectSidePosition({
-      triggerRect,
-      boundaryRect,
-      contentHeight: contentMetrics.contentHeight,
-      requestedMaxHeight: contentMetrics.maxVisibleHeight,
-      activeOptionCenterOffset: contentMetrics.activeOptionCenterOffset,
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
-    })
-
-    setStyle({
-      position: 'fixed',
-      top: position.top,
-      left: position.left,
-      right: 'auto',
-      bottom: 'auto',
-      width: position.width,
-      maxWidth: `calc(100vw - ${SELECT_SIDE_VIEWPORT_INSET * 2}px)`,
-      maxHeight: position.maxHeight,
-      '--uf-select-content-max-height': `${position.maxHeight}px`,
-      overflowY: 'visible',
-    } as CSSProperties)
-    if (updateOptions?.syncInitialScroll && !initialScrollSyncedRef.current) {
-      if (contentMetrics.scrollViewport.scrollTop !== position.initialScrollTop) {
-        contentMetrics.scrollViewport.scrollTop = position.initialScrollTop
-      }
-      initialScrollSyncedRef.current = true
-    }
-  }, [contentRef, triggerRef])
-
-  useEffect(() => {
-    if (!open) {
-      initialScrollSyncedRef.current = false
-      setStyle(sideInitialStyle)
-      return
-    }
-
-    update({ syncInitialScroll: true })
-    const rafId = window.requestAnimationFrame(() => update({ syncInitialScroll: true }))
-    const handleWindowChange = () => update()
-    const handleWindowScroll = (event: Event) => {
-      const target = event.target
-      if (
-        target instanceof Node &&
-        contentRef.current?.contains(target)
-      ) {
-        return
-      }
-      update()
-    }
-    const resizeObserver =
-      typeof ResizeObserver !== 'undefined'
-        ? new ResizeObserver(handleWindowChange)
-        : null
-
-    if (triggerRef.current) resizeObserver?.observe(triggerRef.current)
-    if (contentRef.current) resizeObserver?.observe(contentRef.current)
-    const boundaryEl = resolveSideBoundary(triggerRef.current)
-    if (boundaryEl) resizeObserver?.observe(boundaryEl)
-    window.addEventListener('resize', handleWindowChange)
-    window.addEventListener('scroll', handleWindowScroll, true)
-
-    return () => {
-      window.cancelAnimationFrame(rafId)
-      resizeObserver?.disconnect()
-      window.removeEventListener('resize', handleWindowChange)
-      window.removeEventListener('scroll', handleWindowScroll, true)
-    }
-  }, [contentRef, open, triggerRef, update])
-
-  return { style, update }
-}
+/** The same controlled trigger used by Select and externally owned popups. */
+export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
+  function SelectTrigger({
+    children,
+    open = false,
+    surface = 'popover',
+    isPlaceholder = false,
+    unavailable = false,
+    disabled = false,
+    iconOnly = false,
+    stretchText = false,
+    fullWidth = true,
+    membrane = true,
+    valueClassName,
+    className,
+    ...rest
+  }, ref) {
+    return (
+      <Membrane
+        enabled={membrane}
+        fullWidth={fullWidth}
+        interactive
+        className="uf-select-trigger-membrane"
+        data-icon-only={iconOnly || undefined}
+      >
+        <button
+          {...rest}
+          {...part('trigger')}
+          ref={ref}
+          type="button"
+          disabled={disabled}
+          tabIndex={rest.tabIndex ?? (disabled ? -1 : 0)}
+          aria-expanded={open}
+          aria-disabled={unavailable ? true : rest['aria-disabled']}
+          data-state={open ? 'open' : 'closed'}
+          data-disabled={unavailable || disabled || undefined}
+          data-surface={surface}
+          data-placeholder={isPlaceholder || undefined}
+          data-stretch-text={stretchText || undefined}
+          data-icon-only={iconOnly || undefined}
+          data-full-width={fullWidth || undefined}
+          data-autofocus={rest.autoFocus ? '' : undefined}
+          className={cn('uf-select-trigger', className)}
+        >
+          <span
+            {...part('value')}
+            className={cn(
+              'uf-select__value',
+              isPlaceholder && 'uf-select__value--placeholder',
+              valueClassName,
+            )}
+          >
+            {renderLabel(children)}
+          </span>
+          {!iconOnly && (
+            <span
+              {...part('indicator')}
+              className="uf-select__indicator"
+              aria-hidden="true"
+            >
+              <Icon
+                name={surface === 'side'
+                  ? 'select-chevron-right'
+                  : open ? 'select-chevron-up' : 'select-chevron-down'}
+              />
+            </span>
+          )}
+        </button>
+      </Membrane>
+    )
+  },
+)
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export const Select = forwardRef<HTMLDivElement, SelectProps>(
+/** A button that opens a list of items to choose one value, or several with `multiple`. */
+export const Select = forwardRef<HTMLButtonElement, SelectProps>(
   function Select(props, ref) {
     const {
-      variant = 'default',
-      options: rawOptions,
+      items,
       value,
       defaultValue,
-      placeholder = 'Select option',
-      disabled = false,
-      type = 'select',
-      label,
-      labelOrientation = 'vertical',
-      ariaLabel,
-      displayValue: displayValueOverride,
-      stretchText = false,
+      multiple = false,
       onValueChange,
+      placeholder,
+      displayValue,
+      disabled = false,
+      name,
+      form,
+      required = false,
+      label,
+      description,
+      error,
+      labelPosition,
+      iconOnly = false,
+      fullWidth = true,
+      stretchText = false,
+      open,
+      defaultOpen = false,
       onOpenChange,
       surface = 'auto',
-      surfaceBreakpoint = DEFAULT_OVERLAY_SURFACE_BREAKPOINT,
-      surfaceTitle,
+      labels,
       contentMinWidth,
       membrane = true,
       triggerClassName,
       valueClassName,
       contentClassName,
       className,
+      style,
+      id,
+      dir,
+      lang,
+      hidden,
+      title,
+      onClick,
+      onKeyDown,
+      onPointerEnter,
+      onPointerLeave,
+      onBlur,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledby,
+      'aria-describedby': ariaDescribedby,
+      'aria-invalid': ariaInvalid,
+      ...rest
     } = props
 
-    const isSideVariant = variant === 'side'
-    const isIconOnlyVariant = variant === 'iconOnly'
-    const options = Array.isArray(rawOptions) ? rawOptions : []
-    const optionOrder = options.map((option) => option.value)
-    const disabledValues = options
-      .filter((option) => option.disabled)
-      .map((option) => option.value)
-    const selectId = useId()
-    const rootRef = useRef<HTMLDivElement | null>(null)
-    const triggerElRef = useRef<HTMLElement | null>(null)
-    const contentElRef = useRef<HTMLDivElement | null>(null)
-    const dismissRefs = useMemo(() => [rootRef, contentElRef], [])
-    const machineValue = useControllableMachineProp(
-      value !== undefined ? value : undefined,
-      defaultValue ?? (type === 'multiselect' ? [] : null),
-    )
-
-    const { state, send } = useMachine(selectMachine, {
-      value: machineValue,
-      optionOrder,
-      disabledValues,
-      disabled,
-      type,
-      onValueChange: ((details: { value: string | string[] | null }) => {
-        if (value !== undefined && selectValuesEqual(details?.value, value)) return
-        onValueChange?.(details)
-      }) as any,
-      onOpenChange,
+    // A flat list must discard structural items before they can reserve option keys.
+    const collection = readFlatCollection<SelectItem>(items, {
+      component: 'Select',
+      key: (item) => item.value,
+      text: (item) => item.textValue ?? (plainText(item.label) || item.value),
     })
-    const api = connectSelect(state, send)
-    const isOpen = state.matches('open')
-    const responsiveSurface = useResponsiveOverlaySurface(surface, surfaceBreakpoint)
-    const resolvedSurface = isSideVariant ? 'side' : responsiveSurface
+    const entries = collection.children(null)
+    const keys = entries.map((entry) => entry.key)
+    const enabled = disabled
+      ? []
+      : entries.filter((entry) => !entry.disabled).map((entry) => entry.key)
+    const available = enabled.length > 0
+
+    // Value: the intent is stored; what shows is its projection onto the current items and
+    // mode, computed here and never written back, so late items still receive their value.
+    const [initial] = useState<Value>(() =>
+      Array.isArray(defaultValue) ? [...defaultValue] : (defaultValue ?? null),
+    )
+    const project = (intent: Value): readonly string[] => {
+      const wanted =
+        typeof intent === 'string'
+          ? [intent]
+          : readKeys(intent ?? undefined, 'Select', 'value')
+      const shown = wanted.filter((key) => keys.includes(key))
+      return multiple ? shown : shown.slice(0, 1)
+    }
+    const toValue = (shown: readonly string[]): Value =>
+      multiple ? shown : (shown[0] ?? null)
+    const [intent, setIntent, replaceIntent] = useControllableState<Value>({
+      value: value as Value | undefined,
+      defaultValue: initial,
+      onChange: (next) =>
+        (onValueChange as ((details: { value: Value }) => void) | undefined)?.(
+          { value: next },
+        ),
+      name: ['Select', 'value'],
+    })
+    const selected = project(intent)
+
+    // Visibility and the highlighted option.
+    const [openState, setOpen, replaceOpen] = useControllableState<boolean>({
+      value: open,
+      defaultValue: defaultOpen,
+      onChange: (next) => onOpenChange?.({ open: next }),
+      name: ['Select', 'open'],
+    })
+    const isOpen = !hidden && available && !!openState
+    // A hidden or unavailable uncontrolled list closes quietly and stays closed.
+    // A controlled `open` remains the parent's intent, but cannot expose a hidden surface.
+    useIsomorphicLayoutEffect(() => {
+      if ((!available || hidden) && openState) replaceOpen(false)
+    }, [available, hidden, openState, replaceOpen])
+    const [highlight, setHighlight] = useState<string | null>(null)
+    const [wasOpen, setWasOpen] = useState(isOpen)
+    if (wasOpen !== isOpen) {
+      // Closing forgets the highlight, so the next opening starts at the selection.
+      setWasOpen(isOpen)
+      if (!isOpen) setHighlight(null)
+    }
+    const initialKey = () =>
+      selected.find((key) => enabled.includes(key)) ?? enabled[0] ?? null
+    const active = !isOpen
+      ? null
+      : highlight !== null && enabled.includes(highlight)
+        ? highlight
+        : initialKey()
+
+    const searchRef = useRef<Typeahead | null>(null)
+    // Focus returns to the trigger on close, unless the close is focus moving elsewhere.
+    const [restoreFocus, setRestoreFocus] = useState(true)
+    const openList = (key: string | null) => {
+      if (!available || hidden) return
+      setHighlight(key)
+      setRestoreFocus(true)
+      setOpen(true)
+    }
+    const closeList = (restore = true) => {
+      searchRef.current = null
+      setRestoreFocus(restore)
+      setOpen(false)
+    }
+    const choose = (key: string) => {
+      if (!enabled.includes(key)) return
+      if (multiple)
+        setIntent(
+          selected.includes(key)
+            ? selected.filter((other) => other !== key)
+            : [...selected, key],
+        )
+      else {
+        setIntent(key)
+        closeList()
+      }
+    }
+    const onListKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+      const { key, altKey, ctrlKey, metaKey, nativeEvent } = event
+      if (!available || hidden || altKey || ctrlKey || metaKey || nativeEvent.isComposing)
+        return
+      const step = keyToMove(event, 'vertical', 'ltr')
+      const [search, match] =
+        Array.from(key).length === 1
+          ? typeahead(searchRef.current, key, Date.now(), entries, active)
+          : [null, null]
+      if (step)
+        openList(
+          !isOpen && step === 'next'
+            ? initialKey()
+            : move(enabled, active, step),
+        )
+      else if (search?.query) {
+        // A running search takes Space as text ("New Y"), not as activation.
+        searchRef.current = search
+        openList(match ?? active ?? initialKey())
+      } else if (key === 'Enter' || key === ' ') {
+        if (!isOpen) openList(initialKey())
+        else if (active !== null) choose(active)
+      } else return
+      event.preventDefault()
+    }
+
+    // Naming, description and validation.
+    const [nativeError, setNativeError] = useState<string | null>(null)
+    const field = useField({
+      id,
+      label,
+      description,
+      error,
+      labelPosition,
+      required,
+      nativeError,
+      labelable: true,
+      'aria-label': resolveLabel(ariaLabel, '', 'Select', 'aria-label') || undefined,
+      'aria-labelledby': ariaLabelledby,
+      'aria-describedby': ariaDescribedby,
+      'aria-invalid': ariaInvalid,
+    })
+    const accessibleName = field.controlProps['aria-label']
+    const contentId = `${field.id}-content`
+    const listboxId = `${field.id}-listbox`
+    const titleId = `${field.id}-title`
+    const optionId = (key: string) => domId(listboxId, 'option', key)
+
+    // Surfaces.
+    const triggerElRef = useRef<HTMLButtonElement | null>(null)
+    // The trigger is a <button>, which a `<label for>` of the consumer's own names as
+    // well; no render can see that label, so the DOM is asked once it exists.
+    useNameReport(
+      'Select',
+      triggerElRef,
+      'the combobox has no accessible name; pass label, aria-label or aria-labelledby',
+    )
+    const contentRef = useRef<HTMLDivElement | null>(null)
+    const listboxRef = useRef<HTMLDivElement | null>(null)
+    const responsive = useResponsiveOverlaySurface(
+      surface === 'side' ? 'popover' : surface,
+    )
+    const resolvedSurface = surface === 'side' ? 'side' : responsive
+    const isSide = resolvedSurface === 'side'
+    const isSheet = resolvedSurface === 'sheet'
+    const portalTarget = usePortalTarget()
+    const [direction, setDirection] = useState<Direction>('ltr')
+    useIsomorphicLayoutEffect(() =>
+      setDirection(readDirection(triggerElRef.current)),
+    )
     const { style: floatingStyle } = useFloatingPosition({
-      open: isOpen && resolvedSurface === 'popover',
+      open: isOpen && portalTarget !== null && resolvedSurface === 'popover',
       triggerRef: triggerElRef,
-      contentRef: contentElRef,
+      contentRef,
       side: 'bottom',
       align: 'start',
       sideOffset: 4,
       matchTriggerWidth: true,
     })
-    const { style: sideFloatingStyle } = useSelectSidePosition({
-      open: isOpen && resolvedSurface === 'side',
+    const sideStyle = useSelectSidePosition(
+      isOpen && isSide,
+      triggerElRef,
+      contentRef,
+    )
+    useBodyScrollLock(isOpen && isSheet)
+    const hover = useHoverIntent({
+      value: isOpen ? 'list' : null,
+      onValueChange: (next) => {
+        if (next !== null) openList(initialKey())
+        // A keyboard user may leave the pointer anywhere without losing the list.
+        else if (
+          document.activeElement !== triggerElRef.current &&
+          !contentRef.current?.contains(document.activeElement)
+        )
+          closeList()
+      },
+      openDelay: 0,
+      closeDelay: 150,
+      focus: false,
+      disabled: !isSide || !available || hidden,
+    })
+    const hoverTrigger = hover.trigger('list')
+    const triggerRefs = useComposedRefs(triggerElRef, ref, hoverTrigger.ref)
+    const contentRefs = useComposedRefs(contentRef, hover.content.ref)
+    useLayer({
+      enabled: isOpen && (isSheet || portalTarget !== null),
+      contentRef,
       triggerRef: triggerElRef,
-      contentRef: contentElRef,
+      modal: isSheet,
+      autoFocus: isSheet,
+      initialFocus: () => listboxRef.current,
+      restoreFocus,
+      onOutside: () => closeList(),
+      onEscape: () => closeList(),
     })
-    useBodyScrollLock(isOpen && resolvedSurface === 'sheet')
-    const sideCloseTimerRef = useRef<number | null>(null)
+    // Keep the highlighted row inside the scrolling panel without scrolling the page.
+    useEffect(() => {
+      const content = contentRef.current
+      const row = content?.querySelector<HTMLElement>('[data-highlighted]')
+      const viewport = content?.querySelector<HTMLElement>(VIEWPORT)
+      if (!row || !viewport) return
+      const bounds = viewport.getBoundingClientRect()
+      const box = row.getBoundingClientRect()
+      const header = isSheet
+        ? (content
+            ?.querySelector('.uf-responsive-sheetHeader')
+            ?.getBoundingClientRect().height ?? 0)
+        : 0
+      if (box.top < bounds.top + header)
+        viewport.scrollTop -= bounds.top + header - box.top
+      else if (box.bottom > bounds.bottom)
+        viewport.scrollTop += box.bottom - bounds.bottom
+    }, [isOpen, isSheet, active])
 
-    const clearSideCloseTimer = useCallback(() => {
-      if (sideCloseTimerRef.current == null) return
-      window.clearTimeout(sideCloseTimerRef.current)
-      sideCloseTimerRef.current = null
-    }, [])
-
-    const openSideSelect = useCallback(() => {
-      if (disabled || options.length === 0) return
-      clearSideCloseTimer()
-      send({ type: 'OPEN' })
-    }, [clearSideCloseTimer, disabled, options.length, send])
-
-    const scheduleSideClose = useCallback(() => {
-      if (!isSideVariant) return
-      clearSideCloseTimer()
-      sideCloseTimerRef.current = window.setTimeout(() => {
-        send({ type: 'CLOSE' })
-      }, 80)
-    }, [clearSideCloseTimer, isSideVariant, send])
-
-    useEffect(() => () => clearSideCloseTimer(), [clearSideCloseTimer])
-
-    const dismissSelect = useCallback(() => {
-      send({ type: 'CLOSE' })
-    }, [send])
-
-    useDismissOutside({
-      enabled: isOpen && (resolvedSurface === 'popover' || resolvedSurface === 'side'),
-      refs: dismissRefs,
-      onDismiss: dismissSelect,
-    })
-
-    const mergedRef = useCallback((node: HTMLDivElement | null) => {
-      rootRef.current = node
-      if (typeof ref === 'function') ref(node)
-      else if (ref && typeof ref === 'object') ref.current = node
-    }, [ref])
-
-    const computedDisplay = getDisplayValue(state.context.value, options)
-    const triggerLabel = displayValueOverride ?? computedDisplay ?? placeholder ?? 'Select…'
-    const isPlaceholder = computedDisplay == null && !displayValueOverride
-    const isSideScrollable = isSideVariant && options.length > SELECT_SIDE_VISIBLE_OPTION_COUNT
-    const triggerId = `uf-select:${selectId}:trigger`
-    const labelId = label != null ? `uf-select:${selectId}:label` : undefined
-    const contentId = `uf-select:${selectId}:listbox`
-    const highlightedOptionIndex = state.context.highlightedValue == null
-      ? -1
-      : options.findIndex((option) => (
-        option.value === state.context.highlightedValue && !option.disabled
-      ))
-    const activeDescendantId = highlightedOptionIndex >= 0
-      ? `${contentId}:option:${highlightedOptionIndex}`
+    // Trigger text.
+    const names = selected.map((key) => collection.get(key)!.item.label)
+    const selectedLabel = names.every(
+      (node) => typeof node === 'string' || typeof node === 'number',
+    )
+      ? names.join(', ')
+      : names.map((node, index) => (
+          <Fragment key={selected[index]}>
+            {index > 0 && ', '}
+            {node}
+          </Fragment>
+        ))
+    const hasDisplay = hasSlotContent(displayValue)
+    const isPlaceholder = selected.length === 0 && !hasDisplay
+    const triggerLabel = hasDisplay
+      ? displayValue
+      : isPlaceholder
+        ? resolveLabel(placeholder, '', 'Select', 'placeholder')
+        : selectedLabel
+    const sheetTitle = field.label ?? accessibleName
+    const minWidth = resolvedSurface === 'popover'
+      ? readCssSize('Select', 'contentMinWidth', contentMinWidth)
       : undefined
-    const contentMinWidthValue = formatSelectCssSize(contentMinWidth)
-    const baseContentStyle = resolvedSurface === 'popover'
-      ? floatingStyle
-      : resolvedSurface === 'side'
-        ? sideFloatingStyle
-        : undefined
-    const contentStyle = contentMinWidthValue == null
-      ? baseContentStyle
-      : {
-          ...baseContentStyle,
-          '--face-runtime-select-content-min-width': contentMinWidthValue,
-        } as CSSProperties
-    const contentProps = api.getContentProps({
-      id: contentId,
-      labelId,
-      ariaLabel,
-      activeDescendantId,
-    })
-    const triggerProps = api.getTriggerProps({
-      id: triggerId,
-      contentId,
-      labelId,
-      ariaLabel,
-      activeDescendantId,
-    })
-    const sheetTitle = surfaceTitle ?? label ?? ariaLabel ?? 'Select option'
-    const handleTriggerRef = useCallback((node: HTMLButtonElement | null) => {
-      triggerElRef.current = node
-    }, [])
-    const handleContentRef = useCallback((node: HTMLDivElement | null) => {
-      contentElRef.current = node
-    }, [])
-    const triggerNode = (
-      <button
-        {...triggerProps}
-        ref={handleTriggerRef}
-        type="button"
-        disabled={disabled || options.length === 0}
-        className={cn((triggerProps as { className?: string }).className, triggerClassName)}
-        data-stretch-text={stretchText ? '' : undefined}
-        data-icon-only={isIconOnlyVariant ? '' : undefined}
-        onMouseEnter={isSideVariant ? openSideSelect : undefined}
-        onMouseLeave={isSideVariant ? scheduleSideClose : undefined}
-        onClick={isSideVariant ? openSideSelect : (triggerProps as { onClick?: () => void }).onClick}
-      >
-        {renderSelectLabelNode(triggerLabel, cn('uf-select__value', isPlaceholder && 'uf-select__value--placeholder', valueClassName))}
-        {!isIconOnlyVariant ? (
-          <span {...selectAnatomy.getPartAttrs('indicator')} className="uf-select__indicator" aria-hidden="true">
-            <Icon name={isSideVariant ? 'select-chevron-right' : isOpen ? 'select-chevron-up' : 'select-chevron-down'} />
-          </span>
-        ) : null}
-      </button>
-    )
-    const contentNode = (
-      <Card
-        padding="membrane"
-        radius="md"
-        className="uf-select__contentPanel"
-      >
-        {resolvedSurface === 'sheet' ? (
-          <ResponsiveSheetHeader
-            title={sheetTitle}
-            onClose={() => send({ type: 'CLOSE' })}
-          />
-        ) : null}
-        {options.map((option, index) => {
-          const optionProps = api.getOptionProps({
-            value: option.value,
-            disabled: option.disabled,
-            id: `${contentId}:option:${index}`,
-          })
-          const optionNode = (
-            <div
-              key={option.value}
-              {...optionProps}
-              className={cn(
-                'uf-select-option',
-                'uf-option',
-                'uf-control',
-                (optionProps as { className?: string }).className,
-              )}
-            >
-              {renderSelectLabelNode(option.label, 'uf-select-optionLabel')}
-            </div>
-          )
-          if (!membrane) return optionNode
-          return (
-            <span
-              key={`option-membrane:${option.value}`}
-              className="uf-membrane uf-membrane--full uf-select__optionMembrane"
-              data-membrane-interactive=""
-              onClick={(event) => {
-                if (event.target !== event.currentTarget) return
-                ;(optionProps as { onClick?: () => void }).onClick?.()
-              }}
-            >
-              {optionNode}
-            </span>
-          )
+    const contentStyle =
+      resolvedSurface === 'popover'
+        ? ({
+            ...floatingStyle,
+            minWidth: `min(max(${cssSize(floatingStyle.minWidth) ?? '0px'}, ${minWidth ?? (iconOnly ? '10rem' : '0px')}), ${cssSize(floatingStyle.maxWidth) ?? 'calc(100vw - 16px)'})`,
+            '--face-runtime-select-content-min-width': minWidth,
+          } as CSSProperties)
+        : isSide
+          ? sideStyle
+          : undefined
+
+    const trigger = (
+      <SelectTrigger
+        {...rest}
+        {...field.controlProps}
+        ref={triggerRefs}
+        role="combobox"
+        form={form}
+        dir={dir}
+        lang={lang}
+        title={title}
+        disabled={disabled}
+        open={isOpen}
+        surface={resolvedSurface}
+        isPlaceholder={isPlaceholder}
+        unavailable={!available}
+        iconOnly={iconOnly}
+        stretchText={stretchText}
+        membrane={membrane}
+        fullWidth
+        valueClassName={valueClassName}
+        aria-haspopup={isSheet ? 'dialog' : 'listbox'}
+        aria-controls={isOpen ? (isSheet ? contentId : listboxId) : undefined}
+        aria-activedescendant={
+          !isSheet && active !== null ? optionId(active) : undefined
+        }
+        aria-disabled={!available || undefined}
+        aria-required={required || undefined}
+        aria-invalid={field.invalid || undefined}
+        className={triggerClassName}
+        onClick={composeHandlers(onClick, () => {
+          triggerElRef.current?.focus({ preventScroll: true })
+          if (!isOpen) openList(initialKey())
+          else if (!isSide) closeList()
         })}
-      </Card>
-    )
-
-    const contentElement = (
-      <div
-        ref={handleContentRef}
-        {...contentProps}
-        className={cn('uf-select__content', (contentProps as { className?: string }).className, contentClassName)}
-        data-surface={resolvedSurface}
-        data-select-variant={variant}
-        data-uf-select-scrollable={isSideScrollable ? '' : undefined}
-        data-uf-select-side-boundary={isSideVariant ? '' : undefined}
-        data-uf-select-side-panel={isSideVariant ? '' : undefined}
-        style={contentStyle}
-        onMouseEnter={isSideVariant ? clearSideCloseTimer : undefined}
-        onMouseLeave={isSideVariant ? scheduleSideClose : undefined}
-      >
-        {membrane ? (
-          <span className="uf-membrane uf-membrane--full uf-select__contentMembrane">
-            {contentNode}
-          </span>
-        ) : contentNode}
-      </div>
-    )
-
-    const renderedContent = !isOpen
-      ? null
-      : resolvedSurface === 'sheet' || typeof document === 'undefined'
-        ? contentElement
-        : createPortal(contentElement, document.body)
-
-    return (
-      <div
-        ref={mergedRef}
-        {...api.getRootProps()}
-        data-variant={variant}
-        data-label-orientation={labelOrientation}
-        className={cn('uf-select', className)}
-      >
-        {label != null && (
-          <Text as="label" variant="label" id={labelId} htmlFor={triggerId} data-part="label">
-            {label}
-          </Text>
+        onKeyDown={composeHandlers(onKeyDown, onListKeyDown)}
+        onPointerEnter={composeHandlers(
+          onPointerEnter,
+          hoverTrigger.onPointerEnter,
         )}
-        <div className="uf-select-wrapper">
-          {membrane ? (
-            <span className="uf-membrane uf-membrane--full">{triggerNode}</span>
-          ) : triggerNode}
-
-          {isOpen && resolvedSurface === 'sheet' ? (
+        onPointerLeave={composeHandlers(
+          onPointerLeave,
+          hoverTrigger.onPointerLeave,
+        )}
+        onBlur={composeHandlers(onBlur, (event) => {
+          if (isOpen && !isSheet && !contentRef.current?.contains(event.relatedTarget))
+            closeList(false)
+        })}
+      >
+        {triggerLabel}
+      </SelectTrigger>
+    )
+    const content = (
+      <div
+        {...part('content')}
+        ref={contentRefs}
+        id={contentId}
+        role={isSheet ? 'dialog' : undefined}
+        aria-modal={isSheet || undefined}
+        aria-labelledby={
+          !isSheet ? undefined : sheetTitle !== undefined ? titleId : field.labelledBy
+        }
+        data-state="open"
+        dir={direction}
+        lang={lang}
+        className={cn('uf-select__content', contentClassName)}
+        data-surface={resolvedSurface}
+        data-icon-only={iconOnly || undefined}
+        data-uf-select-scrollable={
+          (isSide && entries.length > SELECT_SIDE_VISIBLE_OPTION_COUNT) ||
+          undefined
+        }
+        data-uf-select-side-boundary={isSide || undefined}
+        data-uf-select-side-panel={isSide || undefined}
+        style={contentStyle}
+        onPointerEnter={hover.content.onPointerEnter}
+        onPointerLeave={hover.content.onPointerLeave}
+      >
+        <Membrane
+          as="div"
+          fullWidth
+          className="uf-select__contentMembrane"
+        >
+          <Card
+            padding="membrane"
+            radius="md"
+            className="uf-select__contentPanel uf-surface-stable"
+          >
+            {isSheet && (
+              <ResponsiveSheetHeader
+                title={sheetTitle}
+                titleId={titleId}
+                closeLabel={resolveLabels(defaultLabels, labels, 'Select').close}
+                onClose={() => closeList()}
+              />
+            )}
             <div
-              className="uf-responsive-overlay-backdrop"
-              data-state={isOpen ? 'open' : 'closed'}
-              onClick={() => send({ type: 'CLOSE' })}
-            />
-          ) : null}
-
-          {renderedContent}
-        </div>
+              {...part('listbox')}
+              ref={listboxRef}
+              id={listboxId}
+              role="listbox"
+              aria-labelledby={field.labelledBy}
+              aria-label={accessibleName}
+              aria-activedescendant={
+                isSheet && active !== null ? optionId(active) : undefined
+              }
+              aria-multiselectable={multiple || undefined}
+              tabIndex={isSheet ? 0 : -1}
+              onKeyDown={onListKeyDown}
+            >
+              {entries.map(({ key, item, disabled: off }) => {
+                const isSelected = selected.includes(key)
+                return (
+                  <Membrane
+                    enabled={membrane}
+                    key={key}
+                    fullWidth
+                    className="uf-select__optionMembrane"
+                    interactive
+                  >
+                    <div
+                      {...part('option')}
+                      id={optionId(key)}
+                      role="option"
+                      aria-selected={isSelected}
+                      aria-disabled={off || undefined}
+                      aria-label={item.textValue}
+                      data-state={isSelected ? 'selected' : undefined}
+                      data-highlighted={key === active || undefined}
+                      data-disabled={off || undefined}
+                      data-value={key}
+                      className="uf-select-option uf-option uf-control"
+                      onClick={() => choose(key)}
+                      onPointerMove={(event) => {
+                        if (!off && event.pointerType !== 'touch' && key !== active)
+                          setHighlight(key)
+                      }}
+                      // Keeps focus, and so the active descendant, on the trigger.
+                      onMouseDown={(event) => event.preventDefault()}
+                    >
+                      {renderLabel(item.label, 'uf-select-optionLabel')}
+                      <span className="uf-select__check" aria-hidden="true">
+                        <Icon name="check" />
+                      </span>
+                    </div>
+                  </Membrane>
+                )
+              })}
+            </div>
+          </Card>
+        </Membrane>
       </div>
+    )
+    return (
+      // Phrasing root and wrapper: a select can sit in running text such as a <p>.
+      <span
+        {...part('root')}
+        {...field.rootProps}
+        className={cn('uf-field uf-select', className)}
+        style={style}
+        dir={dir}
+        lang={lang}
+        hidden={hidden}
+        title={title}
+        data-state={isOpen ? 'open' : 'closed'}
+        data-disabled={!available || undefined}
+        data-multiple={multiple || undefined}
+        data-surface={resolvedSurface}
+        data-direction={direction}
+        data-icon-only={iconOnly || undefined}
+        data-full-width={fullWidth || undefined}
+      >
+        <FieldLayout field={field}>
+          <span className="uf-select-wrapper">
+            {trigger}
+            <FormValue
+              name={name}
+              form={form}
+              value={toValue(selected)}
+              required={required}
+              disabled={disabled}
+              triggerRef={triggerElRef}
+              options={entries.map(({ key, text, disabled: off }) => ({
+                value: key,
+                label: text,
+                disabled: off,
+              }))}
+              resetValue={toValue(value === undefined ? project(initial) : selected)}
+              onReset={() => {
+                replaceIntent()
+                return toValue(value === undefined ? project(initial) : selected)
+              }}
+              onChange={setIntent}
+              onReport={setNativeError}
+            />
+            {isOpen && isSheet && (
+              <div className="uf-responsive-overlay-backdrop" data-state="open" />
+            )}
+            {/* Before mount (server, hydration) a popover has nowhere to portal. */}
+            {isOpen &&
+              (isSheet
+                ? content
+                : portalTarget && createPortal(content, portalTarget))}
+          </span>
+        </FieldLayout>
+      </span>
     )
   },
 )

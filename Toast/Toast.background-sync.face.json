@@ -19,11 +19,14 @@
       "tone": {
         "$ref": "props.tone"
       },
-      "dismissible": {
-        "$ref": "props.dismissible"
+      "closable": {
+        "$ref": "props.closable"
       },
-      "closeLabel": {
-        "$ref": "props.closeLabel"
+      "labels": {
+        "$ref": "props.labels"
+      },
+      "buttonProps": {
+        "$ref": "props.buttonProps"
       }
     },
     "children": []
@@ -33,7 +36,7 @@
       "title": "Sync is taking longer than expected",
       "description": "You can keep working while the remaining records are processed.",
       "tone": "warning",
-      "dismissible": false,
+      "closable": false,
       "action": {
         "label": "Open activity"
       }
@@ -42,48 +45,53 @@
   "controls": [
     {
       "name": "title",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Primary notification text."
+      "description": "Main line of the notification, in bold."
     },
     {
       "name": "description",
-      "type": "string",
+      "type": "any",
       "required": false,
-      "description": "Supporting notification text."
+      "description": "Supporting text under the title."
     },
     {
       "name": "action",
       "type": "object",
       "required": false,
-      "description": "Optional action button. Invoking it also requests dismissal."
+      "description": "A button under the text; clicking it runs its onClick and then calls onClose."
     },
     {
       "name": "tone",
       "type": "select",
       "required": false,
-      "description": "Semantic notification tone.",
+      "description": "Border color: neutral, positive, warning or destructive; every tone is announced as a polite status. Default: neutral.",
       "options": [
+        "destructive",
         "neutral",
         "positive",
-        "warning",
-        "destructive"
+        "warning"
       ],
       "defaultValue": "neutral"
     },
     {
-      "name": "dismissible",
+      "name": "closable",
       "type": "boolean",
       "required": false,
-      "description": "Render the icon-only dismiss button.",
+      "description": "Lets the user close the toast: a close button, and Escape inside the toast; both need `onClose`. Default: true.",
       "defaultValue": true
     },
     {
-      "name": "closeLabel",
-      "type": "string",
+      "name": "labels",
+      "type": "object",
       "required": false,
-      "description": "Accessible label for the dismiss button.",
-      "defaultValue": "Close notification"
+      "description": "Name of the close button."
+    },
+    {
+      "name": "buttonProps",
+      "type": "object",
+      "required": false,
+      "description": "Visual Button variant and style for both action and close controls."
     }
   ],
   "meta": {

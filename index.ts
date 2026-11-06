@@ -1,31 +1,51 @@
 // @userface/face-ui-react - main barrel export
 
-// Primitives
-export { Button, ButtonGroup, buttonAnatomy } from './Button/Button'
-export type { ButtonProps, ButtonVariant, ButtonGroupProps } from './Button/Button'
+export { FaceUiOverlayProvider } from './assets/adapters/react/overlay-context'
+export type { FaceUiOverlayProviderProps } from './assets/adapters/react/overlay-context'
 
-export { Tile, tileAnatomy } from './Tile/Tile'
-export type { TileActionVisibility, TileDensity, TileIntent, TileProps, TileTone, TileVariant } from './Tile/Tile'
+export * from './Avatar/Avatar'
+export * from './Badge/Badge'
+export * from './assets/public/primitives'
+export * from './Calendar/Calendar'
+export * from './Checkbox/Checkbox'
+export * from './Command/Command'
+export * from './Date/Date'
+export * from './Meter/Meter'
+export * from './Modal/Modal'
+export * from './Navigation/Navigation'
+export * from './Pagination/Pagination'
+export * from './Popover/Popover'
+export * from './Progress/Progress'
+export * from './Radio/Radio'
+export * from './Rating/Rating'
+export * from './SegmentedControl/SegmentedControl'
+export * from './Select/Select'
+export * from './Separator/Separator'
+export * from './Skeleton/Skeleton'
+export * from './Spinner/Spinner'
+export * from './Slider/Slider'
+export * from './Steps/Steps'
+export * from './Switcher/Switcher'
+export * from './Tabs/Tabs'
+export * from './Toc/Toc'
+export * from './Tooltip/Tooltip'
+export * from './Upload/Upload'
 
-export { Text, textAnatomy } from './Text/Text'
-export type { TextProps, TextVariant } from './Text/Text'
-
-export { Separator, separatorAnatomy } from './Separator/Separator'
-export type { SeparatorProps } from './Separator/Separator'
-
-// Data Display (no machine)
-export { Badge, badgeAnatomy } from './Badge/Badge'
-export type { BadgeProps, BadgeAppearance, BadgeTone } from './Badge/Badge'
-
+// These modules also export names that are not public yet, so they list what is.
+export { Accordion } from './Accordion/Accordion'
+export type { AccordionProps } from './Accordion/Accordion'
+export { Bar, BarSection } from './Bar/Bar'
+export type { BarProps, BarSectionProps } from './Bar/Bar'
+export { Breadcrumb } from './Breadcrumb/Breadcrumb'
+export type { BreadcrumbProps, BreadcrumbItem, BreadcrumbLabels } from './Breadcrumb/Breadcrumb'
 export { Card, cardAnatomy } from './Card/Card'
 export type {
-  CardActionAlign,
+  CardAlign,
   CardActionsProps,
   CardCompoundComponent,
   CardDescriptionProps,
-  CardFooterLayout,
   CardFooterProps,
-  CardHeaderLayout,
+  CardHeaderOrientation,
   CardHeaderProps,
   CardPadding,
   CardProps,
@@ -34,142 +54,45 @@ export type {
   CardTitleProps,
   CardVariant,
 } from './Card/Card'
-
-export { Skeleton, skeletonAnatomy } from './Skeleton/Skeleton'
-export type { SkeletonProps } from './Skeleton/Skeleton'
-
-// Form Controls
-export type { FormControlProps } from './assets/form-control-props'
-
-export { Checkbox } from './Checkbox/Checkbox'
-export type { CheckboxProps } from './Checkbox/Checkbox'
-
-export { Switcher } from './Switcher/Switcher'
-export type { SwitcherProps } from './Switcher/Switcher'
-
-export { Radio } from './Radio/Radio'
-export type { RadioProps } from './Radio/Radio'
-
-export { SegmentedControl } from './SegmentedControl/SegmentedControl'
-export type { SegmentedControlProps, SegmentedControlItem } from './SegmentedControl/SegmentedControl'
-
-export { Slider } from './Slider/Slider'
-export type { SliderProps } from './Slider/Slider'
-
-export { Rating } from './Rating/Rating'
-export type { RatingProps } from './Rating/Rating'
-
+export { Carousel } from './Carousel/Carousel'
+export type { CarouselProps } from './Carousel/Carousel'
+export { Code } from './Code/Code'
+export type { CodeLabels, CodeProps, CodeToken } from './Code/Code'
 export { Input } from './Input/Input'
-export type { InputProps } from './Input/Input'
-
-export { Select } from './Select/Select'
-export type { SelectProps } from './Select/Select'
-
-// Overlays
-export { Modal } from './Modal/Modal'
-export type { ModalAction, ModalEdge, ModalPlacement, ModalProps } from './Modal/Modal'
-
-export { Tooltip } from './Tooltip/Tooltip'
-export type { TooltipProps } from './Tooltip/Tooltip'
-
-export { Popover } from './Popover/Popover'
-export type { PopoverProps } from './Popover/Popover'
-
+export type { InputLabels, InputProps } from './Input/Input'
+export { Markdown } from './Markdown/Markdown'
+export type { MarkdownProps } from './Markdown/Markdown'
+export { Media } from './Media/Media'
+export type { MediaProps } from './Media/Media'
 export { Menu } from './Menu/Menu'
-export type { MenuProps } from './Menu/Menu'
-
+export type { MenuItem, MenuItemEntry, MenuLabels, MenuProps } from './Menu/Menu'
+export { Panel } from './Panel/Panel'
+export type { PanelProps, PanelItem, PanelLabels } from './Panel/Panel'
+export { Scroll } from './Scroll/Scroll'
+export type { ScrollProps } from './Scroll/Scroll'
+export { Table } from './Table/Table'
+export type { TableCellDetails, TableColumn, TableLabels, TableProps, TableRowDetails, TableSort } from './Table/Table'
+export { Text, textAnatomy } from './Text/Text'
+export type { TextProps, TextVariant } from './Text/Text'
 export { Toast, Toaster, useToast, createToastContext } from './Toast/Toast'
 export type {
   ToastAction,
+  ToastLabels,
   ToastOptions,
   ToastPlacement,
   ToastProps,
   ToastTone,
+  ToasterOptions,
   ToasterProps,
 } from './Toast/Toast'
-
-// Navigation
-export { Tabs } from './Tabs/Tabs'
-export type { TabsProps } from './Tabs/Tabs'
-
-export { Accordion } from './Accordion/Accordion'
-export type { AccordionProps } from './Accordion/Accordion'
-
-export { Pagination } from './Pagination/Pagination'
-export type { PaginationProps } from './Pagination/Pagination'
-
-export { Steps } from './Steps/Steps'
-export type { StepsProps } from './Steps/Steps'
-
-// Data Display (with machine)
-export { Progress } from './Progress/Progress'
-export type { ProgressProps, ProgressShape, ProgressTone } from './Progress/Progress'
-
-export { Avatar } from './Avatar/Avatar'
-export type { AvatarProps } from './Avatar/Avatar'
-
-// Utilities
-export { Carousel } from './Carousel/Carousel'
-export type { CarouselProps } from './Carousel/Carousel'
-
-// Tree / Panel / Navigation / Command
-export type { NavItemBase } from './assets/nav-item'
-
 export { Tree } from './Tree/Tree'
-export type { TreeProps, TreeNode } from './Tree/Tree'
+export type { TreeProps, TreeItem, TreeRenderNodeDetails } from './Tree/Tree'
 
-export { Panel } from './Panel/Panel'
-export type { PanelProps, PanelItem } from './Panel/Panel'
-
-export { Navigation } from './Navigation/Navigation'
-export type { NavigationProps, NavigationItem } from './Navigation/Navigation'
-
-export { Command } from './Command/Command'
-export type { CommandProps, CommandItem, CommandGroup } from './Command/Command'
-
-// Upload / Table / Calendar / Date
-export { Upload } from './Upload/Upload'
-export type { UploadLabels, UploadProps } from './Upload/Upload'
-export type {
-  UploadFile,
-  UploadRejectedFile,
-  UploadRejectReason,
-  UploadSourceFile,
-} from './assets/machines/upload.machine'
-
-export { Table } from './Table/Table'
-export type { TableProps, TableColumn } from './Table/Table'
-
-export { Calendar } from './Calendar/Calendar'
-export type { CalendarProps } from './Calendar/Calendar'
-
-export { Date } from './Date/Date'
-export type { DateProps, DatePreset } from './Date/Date'
-
-// Toc / Bar / Breadcrumb / Code / Media / Scroll
-export { Toc } from './Toc/Toc'
-export type { TocProps, TocItem } from './Toc/Toc'
-
-export { Bar, BarSection } from './Bar/Bar'
-export type { BarProps, BarSectionProps } from './Bar/Bar'
-
-export { Breadcrumb } from './Breadcrumb/Breadcrumb'
-export type { BreadcrumbProps, BreadcrumbItem } from './Breadcrumb/Breadcrumb'
-
-export { Code } from './Code/Code'
-export type { CodeProps } from './Code/Code'
-
-export { Media } from './Media/Media'
-export type { MediaProps } from './Media/Media'
-
-export { Scroll } from './Scroll/Scroll'
-export type { ScrollProps } from './Scroll/Scroll'
-
-export { Markdown } from './Markdown/Markdown'
-export type { MarkdownProps } from './Markdown/Markdown'
-
-// Utils
+// Shared utilities and types
+export type { FieldProps } from './assets/internal/field'
+export type { RangeValueDetails } from './assets/internal/range-indicator'
 export { cn } from './assets/utils'
+export { hasSlotContent } from './assets/slot-content'
 export {
   FACE_UI_COMPONENT_REGISTRY,
   FACE_UI_COMPONENT_META,
