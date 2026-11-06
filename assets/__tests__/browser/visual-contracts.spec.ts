@@ -46,11 +46,11 @@ async function addGeometryProbes(page: Page) {
       <button class="uf-command__trigger">Command</button>
       <div class="uf-select" data-scope="select"><button data-part="trigger">Select</button></div>
       <div class="uf-select__content" data-scope="select" data-part="content" data-surface="side">
-        <div class="uf-select__contentPanel"></div></div>
+        <div class="uf-select__contentPanel uf-card" data-scope="card"></div></div>
       <div class="uf-select__content" data-scope="select" data-part="content" data-surface="sheet">
-        <div class="uf-select__contentPanel"></div></div>
+        <div class="uf-select__contentPanel uf-card" data-scope="card"></div></div>
       <div class="uf-select__content" data-scope="select" data-part="content" data-surface="popover">
-        <div class="uf-select__contentPanel"></div></div>
+        <div class="uf-select__contentPanel uf-card" data-scope="card"></div></div>
       <div class="uf-carousel" data-scope="carousel">
         <div data-scope="carousel" data-part="viewport"></div>
         <div class="uf-carousel-controls"></div></div>

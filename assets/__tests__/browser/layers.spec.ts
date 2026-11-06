@@ -277,12 +277,18 @@ test.describe('touch', () => {
     await button(page, 'Share').tap()
     await expect(button(page, 'Copy')).toBeVisible()
     const cdp = await page.context().newCDPSession(page)
-    await cdp.send('Input.synthesizeScrollGesture', {
-      x: 640,
-      y: 600,
-      yDistance: -300,
-      gestureSourceType: 'touch',
-    })
+    // Send the actual touch lifecycle. The synthesizeScrollGesture shortcut
+    // can acknowledge a gesture without generating a document pan on Linux.
+    const viewport = page.viewportSize()!
+    const x = Math.round(viewport.width * 0.75), start = Math.round(viewport.height * 0.8)
+    try {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: start, id: 0 }] })
+      for (let step = 1; step <= 10; step++) {
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: start - step * 30, id: 0 }] })
+        await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())))
+      }
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+    } finally { await cdp.detach() }
     await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0)
     await expect(button(page, 'Copy')).toBeVisible()
     await page.getByText('Page text').tap()

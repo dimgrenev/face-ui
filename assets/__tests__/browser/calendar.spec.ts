@@ -500,7 +500,15 @@ test.describe('civil', () => {
   test('a completely unavailable month still permits spatial focus but no activation', { tag: ['@intl', '@focus'] }, async ({
     page,
   }) => {
-    await render(page, { timezone: 'UTC', min: '2026-10-01' })
+    // Empty bounded pickers open in their permitted month. Keep September
+    // displayed and make every day unavailable to exercise spatial focus.
+    await render(page, {
+      timezone: 'UTC',
+      disabledDates: Array.from(
+        { length: 30 },
+        (_, index) => `2026-09-${String(index + 1).padStart(2, '0')}`,
+      ),
+    })
     await page.getByRole('combobox').focus()
     await page.keyboard.press('Enter')
     await expect(day(page, '2026-09-12')).toBeFocused()

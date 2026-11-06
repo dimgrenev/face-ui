@@ -172,14 +172,32 @@ for (const membrane of [true, false])
         item: node.parentElement!.getBoundingClientRect().width,
         display: getComputedStyle(node).display,
         pad: parseFloat(getComputedStyle(node).paddingLeft),
-        x: box.left + 0.5,
-        y: box.top + box.height / 2,
       }
     })
     if (membrane) {
       expect(geometry.pad).toBeGreaterThan(0)
       expect(geometry.outer - geometry.inner).toBeCloseTo(geometry.pad * 2, 1)
-      await page.mouse.click(geometry.x, geometry.y)
+      // Firefox's input protocol floors coordinates. Position this one-pixel
+      // strip at an addressable phase and prove that the integer input point
+      // hits the membrane itself, rather than its child or preceding item.
+      const point = await wrapper.evaluate((node) => {
+        const initial = node.getBoundingClientRect()
+        const point = { x: Math.ceil(initial.left), y: Math.round(initial.top + initial.height / 2) }
+        for (const phase of [0, 0.25, 0.5, 0.75]) {
+          node.style.translate = `${point.x - phase - initial.left}px 0`
+          if (document.elementFromPoint(point.x, point.y) === node) return point
+        }
+        throw new Error('The membrane has no addressable padding point')
+      })
+      const hit = await wrapper.evaluate((node, point) => ({
+        isWrapper: document.elementFromPoint(point.x, point.y) === node,
+        target: document.elementFromPoint(point.x, point.y)?.outerHTML,
+        wrapper: node.getBoundingClientRect().toJSON(),
+        child: node.firstElementChild!.getBoundingClientRect().toJSON(),
+        point,
+      }), point)
+      expect(hit.isWrapper, JSON.stringify(hit)).toBe(true)
+      await page.mouse.click(point.x, point.y)
     } else {
       expect(geometry.display).toBe('contents')
       expect(geometry.pad).toBe(0)

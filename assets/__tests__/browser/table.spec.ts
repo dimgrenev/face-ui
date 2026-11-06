@@ -162,17 +162,20 @@ const cutting = (page: Page, column: string) =>
       return [...range.getClientRects()]
     })() : []
     const first = boxes[0]?.getBoundingClientRect()
+    const start = first
+      ? Math.round(
+          getComputedStyle(cell).direction === 'rtl'
+            ? inside.right - 1 - first.right
+            : first.left - inside.left - 1,
+        )
+      : null
     return {
       lines: new Set(rects.map((rect) => Math.round(rect.top))).size,
       // Where the content begins, from the inline start of the cell's content
       // box: the cut belongs at the inline end, in both directions.
-      start: first
-        ? Math.round(
-            getComputedStyle(cell).direction === 'rtl'
-              ? inside.right - 1 - first.right
-              : first.left - inside.left - 1,
-          )
-        : null,
+      // A subpixel offset may round to -0 in Firefox. Both signs describe
+      // the same inline-start position; preserve every nonzero displacement.
+      start: Object.is(start, -0) ? 0 : start,
       // Overflow cut off with nothing to show for it: `text-overflow` replaces
       // what a block container cuts, and nothing else, so a flex or grid box
       // that cuts its own content cuts it bluntly whatever it asks for.

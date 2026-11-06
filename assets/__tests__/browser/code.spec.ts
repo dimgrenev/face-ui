@@ -384,10 +384,27 @@ for (const colorScheme of ['light', 'dark'] as const)
       token: runBox(lines.nth(10).locator('span:not([data-part])').first(), 'element'),
       text: runBox(lines.nth(11), 'text'),
     }
+    // Compare the same glyphs at the same pixel phase with the platform's
+    // explicit MarkText. A system font's thin "11" has no universal pixel
+    // count; wrong or invisible inherited text must still fail this control.
+    const number = lines.nth(10).locator('[data-part="lineNumber"]')
+    const priorStyle = await number.evaluate((node) => {
+      const prior = node.getAttribute('style')
+      node.style.setProperty('color', 'MarkText', 'important')
+      node.style.setProperty('forced-color-adjust', 'none', 'important')
+      return prior
+    })
+    const referenceNumber = await look(page, await runs.number)
+    await number.evaluate((node, prior) => {
+      if (prior === null) node.removeAttribute('style')
+      else node.setAttribute('style', prior)
+    }, priorStyle)
+    expect(referenceNumber.strokes).toBeGreaterThan(0)
     for (const [run, rect] of Object.entries(runs)) {
       // Ink on the mark itself, with no plate of another color behind the text.
       const seen = await look(page, await rect)
       expect(seen.backdrop, run).toEqual(bar.backdrop)
-      expect(seen.strokes, run).toBeGreaterThan(20)
+      if (run === 'number') expect(seen.strokes, run).toBe(referenceNumber.strokes)
+      else expect(seen.strokes, run).toBeGreaterThan(20)
     }
   })

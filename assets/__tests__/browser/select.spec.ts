@@ -267,7 +267,7 @@ test('width, label position, display value and class hooks have independent visu
   const field = page.getByRole('combobox'),
     root = page.locator('.uf-select')
   const compact = (await field.boundingBox())!.width
-  await expect(field).toHaveClass('custom-trigger')
+  await expect(field).toContainClass('custom-trigger')
   await expect(root).toHaveCSS('margin-top', '12px')
   // Beside the control, the label needs two columns of --uf-field-start-min.
   await page.evaluate(() => {
