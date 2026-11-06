@@ -14,6 +14,7 @@ import { readNumber } from '../assets/runtime/props'
 import { Icon } from '../Icon/Icon'
 import { Membrane } from '../assets/adapters/react/Membrane'
 import { hasSlotContent } from '../assets/slot-content'
+import { Spinner } from '../Spinner/Spinner'
 
 // ---------------------------------------------------------------------------
 // Anatomy
@@ -62,7 +63,7 @@ export interface ButtonProps extends Omit<
   iconOnly?: boolean
   /** Disabled state. */
   disabled?: boolean
-  /** Loading state (shows spinner, dims text). */
+  /** Loading state: disables activation and places a 20×20 spinner at the inline end; icon-only buttons replace their icon. */
   loading?: boolean
   /** Stretch text area (flex:1). */
   stretchText?: boolean
@@ -220,13 +221,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           onClick={handleClick}
           {...rest}
         >
-          {loading && (
-            <span className="uf-button__spinner">
-              <span className="uf-spinner uf-spinner--small" />
-            </span>
-          )}
           {hasIcon && !isIconOnly && iconPosition === 'start' && iconSlot('start')}
-          {hasIcon && isIconOnly && iconSlot('only')}
+          {isIconOnly && (loading ? <Spinner className="uf-button__spinner" /> : hasIcon && iconSlot('only'))}
           {isIconOnly && (hasLabel || hasMeta) && (
             <span className="uf-visually-hidden">
               {children}
@@ -251,8 +247,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               )}
             </span>
           )}
-          {hasIcon && !isIconOnly && iconPosition === 'end' && iconSlot('end')}
-          {hasChevron && (
+          {!loading && hasIcon && !isIconOnly && iconPosition === 'end' && iconSlot('end')}
+          {!loading && hasChevron && (
             <span {...buttonAnatomy.getPartAttrs('indicator')} aria-hidden="true">
               <Icon
                 name={
@@ -265,6 +261,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               />
             </span>
           )}
+          {loading && !isIconOnly && <Spinner className="uf-button__spinner" />}
         </button>
       </Membrane>
     )

@@ -1,0 +1,50 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Spinner / Saving Changes",
+  "description": "Saving Changes product scenario for the Spinner component.",
+  "framework": "react",
+  "root": {
+    "type": "Spinner",
+    "props": {
+      "label": {
+        "$ref": "props.label"
+      },
+      "title": {
+        "$ref": "props.title"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "label": "Saving changes",
+      "title": "Writing changes to the project"
+    }
+  },
+  "controls": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name when used alone; omit when the parent already announces loading."
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Optional native pointer hint; also names the icon when label is absent."
+    }
+  ],
+  "meta": {
+    "name": "Saving Changes",
+    "component": "Spinner",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Spinner/Spinner.tsx",
+    "contract": "Spinner/Spinner.json"
+  }
+}

@@ -13,6 +13,15 @@ export function CheckOffIcon({ className }: LegacyIconProps = {}) {
   return FaceUiIcon('check-off', className)
 }
 
+
+
+
+
+
+export function CheckMixedIcon({ className }: LegacyIconProps = {}) {
+  return FaceUiIcon('check-mixed', className)
+}
+
 export function CheckOnIcon({ className }: LegacyIconProps = {}) {
   return FaceUiIcon('check-on', className)
 }

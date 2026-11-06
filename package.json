@@ -34,6 +34,11 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
+    "./overlay-provider": {
+      "types": "./dist/types/overlay-provider.d.ts",
+      "import": "./dist/esm/overlay-provider.js",
+      "require": "./dist/cjs/overlay-provider.js"
+    },
     "./compat": {
       "types": "./dist/types/compat.d.ts",
       "import": "./dist/esm/compat.js",
@@ -48,6 +53,11 @@
       "types": "./dist/types/gallery.d.ts",
       "import": "./dist/esm/gallery.js",
       "require": "./dist/cjs/gallery.js"
+    },
+    "./gallery/meta": {
+      "types": "./dist/types/gallery-meta.d.ts",
+      "import": "./dist/esm/gallery-meta.js",
+      "require": "./dist/cjs/gallery-meta.js"
     },
     "./uf.runtime": {
       "types": "./dist/types/uf.runtime.d.ts",
@@ -422,6 +432,17 @@
       "types": "./dist/types/Separator/*.d.ts",
       "import": "./dist/esm/Separator/*.js",
       "require": "./dist/cjs/Separator/*.js"
+    },
+    "./Spinner/*.json": "./dist/esm/Spinner/*.json",
+    "./Spinner": {
+      "types": "./dist/types/Spinner/Spinner.d.ts",
+      "import": "./dist/esm/Spinner/Spinner.js",
+      "require": "./dist/cjs/Spinner/Spinner.js"
+    },
+    "./Spinner/*": {
+      "types": "./dist/types/Spinner/*.d.ts",
+      "import": "./dist/esm/Spinner/*.js",
+      "require": "./dist/cjs/Spinner/*.js"
     },
     "./Skeleton/*.json": "./dist/esm/Skeleton/*.json",
     "./Skeleton": {

@@ -41,6 +41,11 @@
       "type": "object",
       "required": false,
       "description": "Name of the close button."
+    },
+    "buttonProps": {
+      "type": "object",
+      "required": false,
+      "description": "Visual Button variant and style for both action and close controls."
     }
   },
   "states": [

@@ -84,7 +84,11 @@
   visibility: hidden;
   pointer-events: none;
 }
-.uf-date__contentPanel {
+:where(.uf-date__contentPanel.uf-card[data-scope]) {
+  --uf-surface-pad-block: var(--uf-dropdown-surface-padding);
+  --uf-surface-pad-inline: var(--uf-dropdown-surface-padding);
+}
+.uf-date__contentPanel.uf-card[data-scope] {
   --uf-card-bg: var(--uf-dropdown-surface-bg);
   --uf-card-border: var(--uf-dropdown-surface-border);
   --uf-card-underlay-bg: var(--uf-dropdown-surface-underlay-bg);

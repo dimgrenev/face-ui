@@ -24,6 +24,9 @@
       },
       "labels": {
         "$ref": "props.labels"
+      },
+      "buttonProps": {
+        "$ref": "props.buttonProps"
       }
     },
     "children": []
@@ -82,6 +85,12 @@
       "type": "object",
       "required": false,
       "description": "Name of the close button."
+    },
+    {
+      "name": "buttonProps",
+      "type": "object",
+      "required": false,
+      "description": "Visual Button variant and style for both action and close controls."
     }
   ],
   "meta": {

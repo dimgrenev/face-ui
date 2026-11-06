@@ -4,6 +4,10 @@
   "name": "Pagination / Search Results",
   "description": "Search Results product scenario for the Pagination component.",
   "framework": "react",
+  "preview": {
+    "entryPath": "./Pagination.preview.tsx",
+    "exportName": "PaginationPreview"
+  },
   "root": {
     "type": "Pagination",
     "props": {

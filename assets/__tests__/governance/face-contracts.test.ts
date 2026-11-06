@@ -182,6 +182,7 @@ describe('face-ui-react contracts', () => {
         expect(contract.currentContract?.['schema-version']).toBe(1)
         expect(contract.currentContract?.root.type).toBe(entry.componentName)
         expect(contract.currentContract?.meta.kind).toBe('product-scenario')
+        expect(contract.currentContract?.preview).toEqual(entry.currentContract.preview)
         expect(Object.keys(contract.currentContract?.currentState.props || {})).not.toHaveLength(0)
       }
     }

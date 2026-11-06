@@ -54,7 +54,7 @@
   background: transparent;
   color: var(--uf-color-fg-muted);
 }
-.uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tab:focus-visible {
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-tabs[data-variant] > .uf-tabs-header .uf-tabs-tab:focus-visible {
   outline: var(--uf-border-width-base) solid var(--uf-color-ring);
   outline-offset: calc(-1 * var(--uf-border-width-base));
 }

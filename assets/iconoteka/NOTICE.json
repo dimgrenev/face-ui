@@ -1,0 +1,14 @@
+{
+  "name": "Iconoteka",
+  "version": "02.00.15",
+  "repository": "https://github.com/iconoteka/iconoteka",
+  "author": "Oleg Turbaba",
+  "license": "MIT",
+  "licenseText": "MIT License\n\nCopyright (c) 2026 Oleg Turbaba\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n",
+  "sourceSha256": "562fcdd82ed81aabc2db2bc11abcc2950a756ef088699f3ce07b8b8924bc0722",
+  "weight": "regular",
+  "viewBox": "0 0 24 24",
+  "structuralGlyphs": [
+    "slash"
+  ]
+}

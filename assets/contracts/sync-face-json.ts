@@ -44,6 +44,7 @@ export interface ProductScenarioFaceContract {
   name: string
   description: string
   framework: 'react'
+  preview?: unknown
   root: {
     type: string
     props: Record<string, { $ref: string }>
@@ -1351,6 +1352,8 @@ function buildProductScenarioFaceContract(
     name: `${entry.componentName} / ${displayName}`,
     description: `${displayName} product scenario for the ${entry.componentName} component.`,
     framework: 'react',
+    ...(Object.prototype.hasOwnProperty.call(componentContract, 'preview')
+      ? { preview: structuredClone(componentContract.preview) } : {}),
     root: {
       type: entry.componentName,
       props: Object.fromEntries(propNames.map((propName) => [propName, { $ref: `props.${propName}` }])),

@@ -106,6 +106,7 @@ for (const dir of ['ltr', 'rtl']) {
           icon: 'search',
           iconPosition: 'end',
           multiline,
+          clearable: true,
           membrane: false,
           ...extra,
         })

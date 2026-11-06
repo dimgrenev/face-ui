@@ -1,6 +1,1 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M16 8.7998L11.2 8.7998L11.2 3.9998" stroke="currentColor"/>
-<path d="M4.30078 15.7002L8.80078 11.2002" stroke="currentColor"/>
-<path d="M11.1992 8.7998L15.6992 4.2998" stroke="currentColor"/>
-<path d="M4.00078 11.2L8.80078 11.2L8.80078 16" stroke="currentColor"/>
-</svg>
+<svg class="uf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" data-icon="part" data-iconset="iconoteka" data-icon-source="view_quilt/stroke" aria-hidden="true"><path d="M4.75049 19.3H8.42549V12.85H4.75049V19.3ZM3.00049 21V3H21.0005V21H3.00049ZM4.75049 11.15H8.42549V4.7H4.75049V11.15ZM10.1755 19.3H13.8255V12.85H10.1755V19.3ZM10.1755 11.15H19.2505V4.7H10.1755V11.15ZM15.5755 19.3H19.2505V12.85H15.5755V19.3Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>

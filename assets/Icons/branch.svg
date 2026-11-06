@@ -1,9 +1,1 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <g stroke="black" stroke-width="1">
-    <circle cx="6" cy="5" r="1.5" />
-    <circle cx="6" cy="15" r="1.5" />
-    <circle cx="14" cy="9" r="1.5" />
-    <path d="M6 6.5V13.5" />
-    <path d="M7.5 12.25C10.5 12.25 11 9 12.5 9" />
-  </g>
-</svg>
+<svg class="uf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" data-icon="branch" data-iconset="iconoteka" data-icon-source="split/stroke" aria-hidden="true"><path d="M11.0505 21V13.375L3.82549 6.125L2.00049 7.95V3H6.95049L5.15049 4.8L12.0005 11.625L18.8505 4.8L17.0505 3H22.0005V7.95L20.2005 6.125L12.9505 13.375V21H11.0505Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>

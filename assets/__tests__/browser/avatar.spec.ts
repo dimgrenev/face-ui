@@ -1,10 +1,42 @@
+import { createRequire } from 'node:module'
 import { test, expect, type Page } from './test'
 import { mount, open, type MountProps, type MountWindow } from './helpers'
+
+const avatarContract = createRequire(import.meta.url)('../../../Avatar/Avatar.json') as {
+  states: { name: string; props: MountProps<'Avatar'> }[]
+}
 
 const render = (page: Page, props: MountProps<'Avatar'>) =>
   mount(page, 'Avatar', props)
 test.beforeEach(async ({ page }) => {
   await open(page, 'mount')
+})
+
+test('Avatar authored With Image loads a real image offline instead of claiming fallback success', { tag: ['@native', '@react'] }, async ({ page }) => {
+  const authored = avatarContract.states.find((state) => state.name === 'With Image')
+  expect(authored).toBeDefined()
+  const origin = new URL(page.url()).origin
+  const externalRequests: string[] = []
+  await page.route('**/*', (route) => {
+    const url = new URL(route.request().url())
+    if ((url.protocol === 'http:' || url.protocol === 'https:') && url.origin !== origin) {
+      externalRequests.push(url.origin + url.pathname)
+      return route.abort('blockedbyclient')
+    }
+    return route.continue()
+  })
+  await render(page, authored!.props)
+  const avatar = page.locator('[data-scope="avatar"][data-part="root"]')
+  const image = avatar.locator('img')
+  await expect(avatar).toHaveAttribute('data-state', 'loaded')
+  await expect(image).toBeVisible()
+  await expect(image).toHaveAttribute('src', authored!.props.src!)
+  expect(await image.evaluate((element: HTMLImageElement) =>
+    element.complete && element.naturalWidth > 0 && element.naturalHeight > 0,
+  )).toBe(true)
+  await expect(avatar.locator('[data-part="fallback"]')).toBeHidden()
+  await expect(avatar).toHaveAccessibleName(authored!.props.name!)
+  expect(externalRequests).toEqual([])
 })
 
 test('Avatar preserves Unicode initials during server rendering, hydration, and name changes without native Segmenter', { tag: ['@hydration', '@intl'] }, async ({

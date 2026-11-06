@@ -15,7 +15,7 @@ This guide never lists props, defaults or token values; they live in generated s
 
 ### 1.1 Imports
 
-Import from `@userface/face-ui-react` and load `@userface/face-ui-react/assets/styles/index.css` once; no provider is needed. `Overlay`, `Toggle` and `Sidebar` live only in the `/compat` subpath, for old code. Do not build a component that 1.4 already covers.
+Use `@userface/face-ui-react`; load its `assets/styles/index.css` once. No provider is required. Optional overlay hosts use `@userface/face-ui-react/overlay-provider`; metadata uses `@userface/face-ui-react/gallery/meta`. `Overlay`, `Toggle`, `Sidebar` are `/compat` only for old code. Reuse 1.4 components.
 
 ### 1.2 Text owns visible copy
 
@@ -277,17 +277,13 @@ The trail from the root to the current page, collapsing its middle into an overf
 
 ### Button
 
-An explicit action. Keep one `accent` button per group of actions.
+An action; one `accent` per action group.
 
 ```tsx
-<Button variant="accent" icon="plus" fullWidth={false}>Create workspace</Button>
-<Button icon="more" iconOnly aria-label="More actions" />
-<Button chevron="down" aria-expanded={open} onClick={toggle}>Details</Button>
+<Button variant="accent" icon="plus">Create workspace</Button>
 ```
 
-- `iconOnly` keeps the children as the accessible name only; a button with no text needs `aria-label`.
-- `chevron` draws the disclosure and native `aria-expanded` carries the state; they share one source.
-- `loading` keeps the label, shows a spinner and marks the button `aria-busy`; like `disabled` it blocks activation.
+`iconOnly` hides children visually; without children supply `aria-label`. `chevron` follows `aria-expanded`. `loading` disables activation, sets `aria-busy` and keeps the label beside a trailing Spinner; icon-only buttons replace their icon.
 
 ### Calendar
 
@@ -406,31 +402,35 @@ A date, time, week, month or year field with a picker, and the form control behi
 
 ### Icon
 
-One built-in glyph, always 20×20.
+20×20 glyph.
 
 ```tsx
-<Button icon="search" iconOnly aria-label="Search" />
 <Icon name="check" aria-label="Verified" />
 ```
 
-- Without `aria-label` or `title` the icon is decorative and hidden from assistive technology.
-- An unknown `name` renders the notdef glyph and reports it; an empty one renders nothing.
-- Spacing belongs to the control that owns the icon — never add a margin here.
+- `aria-label` or `title` names it; otherwise decorative.
+- Unknown names report and render notdef; blanks render nothing.
+- Controls own spacing.
+
+`IconProvider renderer={ProductIcon}` also covers internal and portalled icons.
+The host owns 20×20 sizing and accessibility; `null` restores built-ins.
+See [README](README.md#application-icon-libraries).
 
 ### Input
 
-A native text field with a label, help, validation message, clear action and multiline sizing.
+Native text entry with a label, help, validation and optional clear action.
 
 ```tsx
 <Input label="Work email" type="email" name="email" autoComplete="email" required
   description="Used for security alerts." placeholder="name@company.com" />
 
-<Input label="System instruction" multiline autoGrow maxLength={4000}
+<Input label="System instruction" multiline maxLength={4000}
   value={prompt} onValueChange={({ value }) => setPrompt(value)} />
 ```
 
 - `multiline` renders a textarea, so `type` and the single-line constraints no longer apply.
-- `clearable` shows the clear action only for a non-empty, editable field.
+- `clearable` opts in to clearing a non-empty editable field; it aligns with the first line.
+- Multiline starts at one control-height row and grows with wrapping and content. `rows` sets the minimum; `autoGrow={false}` fixes it.
 - `placeholder` is a hint, never the accessible name: keep `label` or `aria-label`.
 
 ### Markdown
@@ -463,25 +463,18 @@ An image, video or audio source in a box, with fallback content when it fails.
 
 ### Menu
 
-A list of actions opened from a trigger, or at the pointer as a context menu.
+Actions from a trigger or pointer.
 
 ```tsx
-<Menu
-  aria-label="Account actions"
-  items={[
-    { value: 'docs', label: 'Documentation', href: '/docs' },
-    { type: 'separator' },
-    { value: 'logout', label: 'Sign out', tone: 'destructive' },
-  ]}
-  onSelect={({ value }) => run(value)}
->
-  <Button fullWidth={false}>Account</Button>
+<Menu items={[{ value: 'copy', label: 'Copy' }]} onSelect={({ value }) => run(value)}>
+  <Button fullWidth={false}>Actions</Button>
 </Menu>
 ```
 
-- `children` is the trigger; without one nothing renders. A string becomes a `Button`.
-- An item with `href` is a real link, so modifier clicks open it elsewhere; `checked` makes it a checkbox item.
-- `openOn="context"` opens at the pointer and ignores `side`, `align` and `sideOffset`.
+- `children` is the trigger; a string becomes a `Button`.
+- `href` uses native link behavior; `checked` makes a checkbox item.
+- `openOn="context"` uses the pointer and ignores placement props.
+- Lateral menus use `attachmentSelector` and `alignToOption` to face a visible row.
 
 ### Meter
 
@@ -685,6 +678,8 @@ A trigger that opens a list to choose one value, or several with `multiple`.
 - `contentMinWidth` sizes popovers only, capped by the viewport.
 - `membrane` applies to trigger and options; the layer keeps its own spacing.
 
+`SelectTrigger`: the same trigger.
+
 ### Separator
 
 A thin line between sections or between controls in a row.
@@ -726,6 +721,12 @@ A number, or several ordered numbers, chosen on a scale.
 - The shape you pass is the shape you get back: a number gives one thumb, an array one thumb per entry and a fresh sorted array.
 - `onValueChange` fires while dragging and `onValueCommit` once at the end of the gesture.
 - `crop` adds two independently edited boundaries on a second rail, with their own `cropRange` triple and `cropName`.
+
+### Spinner
+
+Fixed 20×20 loading arc: `<Spinner label="Loading preview" />`.
+
+Inherits color. Omit `label` when the parent names loading; `title` adds a pointer hint. Reduced motion stops animation. Used by Button loading; use Progress for known percentages.
 
 ### Steps
 

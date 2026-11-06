@@ -28,6 +28,10 @@ export interface FloatingSurfaceProps extends Omit<
   align?: 'start' | 'center' | 'end'
   /** Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2. */
   sideOffset?: number
+  /** Nearest ancestor used for left/right attachment; --uf-dropdown-panel-gap measures the painted surface gap. Vertical alignment still follows the trigger. */
+  attachmentSelector?: string
+  /** Aligns a measured visible row opposite the trigger on left/right surfaces; pass the row's selector. */
+  alignToOption?: string
   /** Content direction; omitted inherits the trigger's, auto follows the content. */
   dir?: HTMLAttributes<HTMLDivElement>['dir']
   /** Called once per user request to show or hide the surface; a controlled parent may refuse it. */

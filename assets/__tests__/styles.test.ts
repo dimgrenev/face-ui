@@ -76,11 +76,6 @@ const ALLOWED: Record<string, { reason: string; selectors: RegExp }> = {
       'Panel renders the sidebar anatomy: data-scope="sidebar", .uf-sidebar-*',
     selectors: /\.uf-sidebar|data-scope="sidebar"/,
   },
-  'button.css': {
-    reason:
-      'Button is the only component that renders .uf-spinner, and its --uf-spinner-* tokens are declared in Button.json',
-    selectors: /^\.uf-spinner(--small)?$/,
-  },
   'segmented-control.css': {
     reason: 'SegmentedControl renders data-scope="toggle" and .uf-toggle-*',
     selectors: /\.uf-toggle|data-scope="toggle"/,
@@ -101,6 +96,11 @@ const ALLOWED: Record<string, { reason: string; selectors: RegExp }> = {
       'the cross-component file: focus, hidden parts and control weight belong to no single scope',
     selectors:
       /\[data-scope\]\[data-part\]|\.uf-control\[data-scope\]|\.uf-option\[data-scope\]/,
+  },
+  'surface-geometry.css': {
+    reason:
+      'one authored border reservation and paint recipe is shared by Card-based and manual surfaces',
+    selectors: /\.uf-surface-stable/,
   },
 }
 

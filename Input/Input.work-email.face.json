@@ -244,8 +244,8 @@
       "name": "clearable",
       "type": "boolean",
       "required": false,
-      "description": "Offer a clear action for a nonempty, editable field.",
-      "defaultValue": true
+      "description": "Opt in to a clear action for a nonempty, editable field; off by default.",
+      "defaultValue": false
     },
     {
       "name": "labels",

@@ -329,7 +329,7 @@ test('side hover and click keep the selected row aligned with the trigger', { ta
     })
     .toBeLessThan(3)
   const panel = page.locator('.uf-select__contentPanel')
-  const metrics = await panel.evaluate((node) => ({
+  const metrics = await page.getByRole('listbox').evaluate((node) => ({
     height: node.clientHeight,
     scroll: node.scrollHeight,
   }))

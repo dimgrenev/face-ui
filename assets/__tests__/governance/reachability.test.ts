@@ -3,18 +3,63 @@
  * and every class a stylesheet defines is used by the library's source.
  */
 import { readdirSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, posix } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { COMPONENTS, describeGate, eachNode, filtered, ownerOf, reachable, repo, SOURCES } from './gates'
 
-const ENTRIES = ['index.ts', 'compat.ts', 'gallery.ts', 'uf.runtime.ts', 'face-ui-react.tsx']
+/** Face preview modules are real package entries, loaded through their authored metadata. */
+function previewEntries(contracts: readonly { path: string; value: unknown }[], sources: readonly string[]) {
+  const sourceSet = new Set(sources)
+  return [...new Set(contracts.flatMap(({ path, value }) => {
+    const preview = value && typeof value === 'object' ? (value as Record<string, unknown>).preview : null
+    // Legacy string previews are image metadata, not executable source entries.
+    if (!preview || typeof preview !== 'object' || Array.isArray(preview)) return []
+    const reference = preview as Record<string, unknown>
+    const fail = (detail: string): never => { throw new Error(`${path}: invalid executable preview: ${detail}`) }
+    if (Object.keys(reference).some(key => key !== 'entryPath' && key !== 'exportName')
+      || typeof reference.entryPath !== 'string' || typeof reference.exportName !== 'string'
+      || !reference.entryPath.trim() || !reference.exportName.trim()) fail('expected entryPath and exportName')
+    const entry = (reference.entryPath as string).trim()
+    if (entry.startsWith('/') || entry.includes('\\') || /^[a-z][a-z0-9+.-]*:/i.test(entry)
+      || /[?#\u0000-\u001f\u007f]/.test(entry + reference.exportName)) fail('expected a relative module path')
+    const module = posix.normalize(posix.join(posix.dirname(path), entry))
+    if (module === '..' || module.startsWith('../') || posix.isAbsolute(module)) fail('entry escapes the package')
+    if (!sourceSet.has(module)) fail(`entry is not a production module: ${module}`)
+    return [module]
+  }))]
+}
+
+const faceContracts = COMPONENTS.flatMap(component => readdirSync(join(repo, component))
+  .filter(file => file.endsWith('.json'))
+  .map(file => ({ path: `${component}/${file}`, value: JSON.parse(readFileSync(join(repo, component, file), 'utf8')) as unknown })))
+const ENTRIES = ['index.ts', 'overlay-provider.ts', 'compat.ts', 'gallery.ts', 'gallery-meta.ts', 'uf.runtime.ts', 'face-ui-react.tsx', ...previewEntries(faceContracts, SOURCES)]
 const reached = reachable(ENTRIES)
 
 const unreachableModules = (component: string) =>
   SOURCES.filter((path) => ownerOf(path) === component && !reached.has(path)).map(
     (path) => `${path}: not reachable from ${ENTRIES.join(', ')}`,
   )
+
+describe('reachability: executable Face entries', () => {
+  const sources = ['Example/Example.tsx', 'Example/Usage.preview.tsx', 'Example/Orphan.preview.tsx']
+  const contract = (preview: unknown) => [{ path: 'Example/Example.json', value: { preview } }]
+  it('adds only the exact declared module, leaving an unreferenced preview orphaned', () => {
+    expect(previewEntries(contract({ entryPath: './Usage.preview.tsx', exportName: 'Usage' }), sources))
+      .toEqual(['Example/Usage.preview.tsx'])
+    expect(previewEntries(contract('./Usage.preview.tsx'), sources)).toEqual([])
+  })
+  it.each([
+    { entryPath: './Missing.tsx', exportName: 'Usage' },
+    { entryPath: '../../Foreign.tsx', exportName: 'Usage' },
+    { entryPath: '/Example/Usage.preview.tsx', exportName: 'Usage' },
+    { entryPath: 'https://example.test/Usage.tsx', exportName: 'Usage' },
+    { entryPath: './Usage.preview.tsx', exportName: '' },
+    { entryPath: './Usage.preview.tsx', exportName: 'Usage', extra: true },
+  ])('rejects missing, escaped or malformed declared entries: %j', preview => {
+    expect(() => previewEntries(contract(preview), sources)).toThrow(/invalid executable preview/)
+  })
+})
 
 // ---------------------------------------------------------------------------
 // CSS classes: defined in assets/styles, used as a class token in the source

@@ -37,7 +37,7 @@
     {
       "name": "With Image",
       "props": {
-        "src": "https://i.pravatar.cc/150?u=avatar",
+        "src": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2264%22%20height%3D%2264%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2232%22%20fill%3D%22%23243447%22%2F%3E%3Cpath%20d%3D%22M8%2064c0-16%2010-24%2024-24s24%208%2024%2024%22%20fill%3D%22%2382b7aa%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2226%22%20r%3D%2213%22%20fill%3D%22%23f0c7a5%22%2F%3E%3Cpath%20d%3D%22M19%2024c0-12%2026-17%2026%200-9-2-12-8-12-8s-3%207-14%208%22%20fill%3D%22%2347362f%22%2F%3E%3C%2Fsvg%3E",
         "name": "Jane Smith"
       }
     },

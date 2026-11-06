@@ -82,7 +82,7 @@
   background: var(--uf-button-hover-bg);
   color: var(--uf-button-hover-fg);
 }
-[data-scope="steps"][data-part="trigger"]:focus-visible {
+:where(:root:not([data-uf-focus-modality="pointer"])) [data-scope="steps"][data-part="trigger"]:focus-visible {
   outline: none;
   box-shadow: inset 0 0 0 var(--uf-button-focus-ring-width) var(--uf-button-ring-color);
 }

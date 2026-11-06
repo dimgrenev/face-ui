@@ -990,6 +990,12 @@
     {
       "kind": "behavior",
       "component": "Input",
+      "before": "`clearable` defaulted to `true`",
+      "after": "`clearable` defaults to `false`; pass `clearable` where an explicit clear action is needed"
+    },
+    {
+      "kind": "behavior",
+      "component": "Input",
       "before": "`membrane` defaulted to `false`",
       "after": "`membrane` defaults to `true`, like every control in a row; pass `membrane={false}` for the old spacing"
     },

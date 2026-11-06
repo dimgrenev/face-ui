@@ -39,6 +39,7 @@ for (const fallback of [false, true]) {
       multiline: true,
       rows: 3,
       defaultValue: 'Initial',
+      clearable: true,
       labels: { clear: 'Очистить' },
     }
     await render(page, props)
@@ -88,13 +89,82 @@ for (const fallback of [false, true]) {
     await expect.poll(height).toBeGreaterThanOrEqual(200)
   })
 }
+test('clear is opt-in and reserves no trailing space by default', { tag: ['@layout', '@css', '@native'] }, async ({ page }) => {
+  for (const multiline of [false, true]) {
+    await render(page, { multiline, defaultValue: 'Saved' }, false, `optional-${multiline}`)
+    const field = page.getByRole('textbox', { name: 'Field', exact: true })
+    await expect(page.locator('.uf-input__clear')).toBeHidden()
+    const padding = await field.evaluate(node => getComputedStyle(node).paddingInlineEnd)
+    await render(page, { multiline, defaultValue: 'Saved', clearable: true }, false, `optional-${multiline}`)
+    await field.focus()
+    await expect(page.getByRole('button', { name: 'Clear input' })).toBeVisible()
+    expect(await field.evaluate(node => parseFloat(getComputedStyle(node).paddingInlineEnd))).toBeGreaterThan(parseFloat(padding))
+  }
+})
+for (const fallback of [false, true]) {
+  test(`one-row multiline grows intrinsically and decorations stay on the first line (${fallback ? 'fallback' : 'native'})`, { tag: ['@layout', '@css', '@native'] }, async ({ page }) => {
+    if (fallback) await page.evaluate(() => {
+      const supports = CSS.supports.bind(CSS)
+      CSS.supports = ((...args: string[]) => args[0] === 'field-sizing' ? false : (supports as any)(...args)) as typeof CSS.supports
+    })
+    const props = { multiline: true, icon: 'search', iconPosition: 'end', clearable: true } as const
+    await render(page, props)
+    const field = page.getByRole('textbox', { name: 'Field', exact: true })
+    const measure = () => field.evaluate(node => {
+      const style = getComputedStyle(node), box = node.getBoundingClientRect()
+      const wrapper = node.closest('.uf-input__control')!.getBoundingClientRect()
+      return {
+        height: box.height,
+        controlHeight: parseFloat(style.getPropertyValue('--uf-control-height')),
+        lineHeight: parseFloat(style.lineHeight),
+        paddingTop: parseFloat(style.paddingTop),
+        wrapperHeight: wrapper.height,
+      }
+    })
+    const initial = await measure()
+    expect(initial.height).toBeCloseTo(initial.controlHeight, 1)
+    expect(initial.wrapperHeight).toBeCloseTo(initial.height, 1)
+    await field.fill('First line\nSecond line\nThird line')
+    await expect.poll(async () => (await measure()).height).toBeGreaterThan(initial.height + initial.lineHeight)
+    const decorationTop = await field.evaluate(node => {
+      const control = node.getBoundingClientRect()
+      return [...node.parentElement!.querySelectorAll('.uf-input__clear, .uf-input__icon')].map(part => part.getBoundingClientRect().top - control.top)
+    })
+    for (const top of decorationTop) expect(top).toBeCloseTo(initial.paddingTop, 1)
+    const grown = await measure()
+    expect(grown.wrapperHeight).toBeCloseTo(grown.height, 1)
+    await field.fill('Word '.repeat(50))
+    const wide = (await measure()).height
+    await page.locator('#fixture').evaluate(node => node.style.width = '210px')
+    await expect.poll(async () => (await measure()).height).toBeGreaterThan(wide)
+    await field.fill('Short')
+    await expect.poll(async () => (await measure()).height).toBeCloseTo(initial.height, 1)
+    await render(page, { ...props, value: 'One\nTwo\nThree\nFour' })
+    await expect.poll(async () => (await measure()).height).toBeGreaterThan(initial.height * 2)
+    await render(page, { ...props, value: 'Short' })
+    await expect.poll(async () => (await measure()).height).toBeCloseTo(initial.height, 1)
+    await render(page, { ...props, value: 'One\nTwo\nThree\nFour', autoGrow: false })
+    await expect.poll(async () => (await measure()).height).toBeCloseTo(initial.height, 1)
+    expect(await field.evaluate(node => node.scrollHeight > node.clientHeight)).toBe(true)
+    await page.locator('.uf-input').evaluate(node => node.style.lineHeight = '40px')
+    const centers = await field.evaluate(node => {
+      const style = getComputedStyle(node), box = node.getBoundingClientRect()
+      const firstLineCenter = box.top + parseFloat(style.paddingTop) + parseFloat(style.lineHeight) / 2
+      return [...node.parentElement!.querySelectorAll('.uf-input__clear, .uf-input__icon')].map(part => {
+        const decoration = part.getBoundingClientRect()
+        return decoration.top + decoration.height / 2 - firstLineCenter
+      })
+    })
+    for (const offset of centers) expect(offset).toBeCloseTo(0, 1)
+  })
+}
 for (const multiline of [false, true]) {
   test(`native editing, controlled clear, localization, reset and submit (${multiline})`, { tag: ['@native', '@focus'] }, async ({
     page,
   }) => {
     await render(
       page,
-      { multiline, defaultValue: 'Initial', labels: { clear: 'Очистить' } },
+      { multiline, clearable: true, defaultValue: 'Initial', labels: { clear: 'Очистить' } },
       true,
     )
     const field = page.getByRole('textbox', { name: 'Field', exact: true })
@@ -178,6 +248,7 @@ test('native direction auto places the trailing icon and clear next to the text 
 }) => {
   await render(page, {
     dir: 'auto',
+    clearable: true,
     icon: 'search',
     iconPosition: 'end',
     defaultValue: 'Hello',

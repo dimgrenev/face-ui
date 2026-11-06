@@ -234,6 +234,7 @@ const CardActions = forwardRef<HTMLDivElement, CardActionsProps>(
   },
 )
 
+/** @userfacePresentation meaningful Card */
 const CardRoot = forwardRef<HTMLDivElement, CardProps>(
   function Card(props, ref) {
     const {
@@ -307,7 +308,9 @@ export type CardCompoundComponent = typeof CardRoot & {
   Actions: typeof CardActions
 }
 
-/** A contained surface for grouped content, either filled by its title, description and footer props or composed from its parts. */
+/** A contained surface for grouped content, either filled by its title, description and footer props or composed from its parts.
+ * @userfacePresentation meaningful
+ */
 export const Card = Object.assign(CardRoot, {
   Root: CardRoot,
   Header: CardHeader,

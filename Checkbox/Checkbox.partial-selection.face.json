@@ -4,6 +4,10 @@
   "name": "Checkbox / Partial Selection",
   "description": "Partial Selection product scenario for the Checkbox component.",
   "framework": "react",
+  "preview": {
+    "entryPath": "./Checkbox.preview.tsx",
+    "exportName": "CheckboxPreview"
+  },
   "root": {
     "type": "Checkbox",
     "props": {

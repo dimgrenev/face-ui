@@ -132,7 +132,7 @@
       "name": "loading",
       "type": "boolean",
       "required": false,
-      "description": "Loading state (shows spinner, dims text).",
+      "description": "Loading state: disables activation and places a 20×20 spinner at the inline end; icon-only buttons replace their icon.",
       "defaultValue": false
     },
     {

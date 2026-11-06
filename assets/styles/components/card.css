@@ -1,6 +1,23 @@
 /* =================================================================
  * CARD
  * ================================================================= */
+/* Opt-in geometry defaults are weaker than authored product classes. */
+:where(.uf-card[data-scope]) {
+  --uf-surface-pad-block: var(--uf-card-padding-default);
+  --uf-surface-pad-inline: var(--uf-card-padding-default);
+}
+:where(.uf-card[data-scope][data-padding="none"]) {
+  --uf-surface-pad-block: 0px;
+  --uf-surface-pad-inline: 0px;
+}
+:where(.uf-card[data-scope][data-padding="membrane"]) {
+  --uf-surface-pad-block: var(--uf-membrane);
+  --uf-surface-pad-inline: var(--uf-membrane);
+}
+:where(.uf-card[data-scope][data-padding="control"]) {
+  --uf-surface-pad-block: var(--uf-control-pad-y);
+  --uf-surface-pad-inline: var(--uf-control-pad-text);
+}
 .uf-card[data-scope] {
   --uf-card-bg: var(--uf-overlay-surface-bg);
   --uf-card-border: var(--uf-overlay-surface-border);

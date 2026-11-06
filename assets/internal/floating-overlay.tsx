@@ -52,6 +52,8 @@ export function useFloatingOverlay(
     side = 'top',
     align = 'center',
     sideOffset,
+    attachmentSelector,
+    alignToOption,
     onOpenChange,
     className,
     hidden,
@@ -102,6 +104,9 @@ export function useFloatingOverlay(
     triggerRef,
     contentRef: positionRef,
     directionRef: contentRef,
+    surfaceRef: contentRef,
+    attachmentSelector,
+    alignToOption,
     side,
     align,
     sideOffset: readNumber(component, 'sideOffset', sideOffset, 2),
@@ -136,6 +141,7 @@ export function useFloatingOverlay(
         ref={membraneRefs}
         as="div"
         className="uf-overlay-contentMembrane"
+        data-interactive={!tooltip}
         style={position.style}
         hidden={!isOpen}
       >
@@ -147,7 +153,7 @@ export function useFloatingOverlay(
             border: true,
             hoverable: false,
             fullWidth: false,
-            className: ['uf-overlay-content', className]
+            className: ['uf-overlay-content', 'uf-surface-stable', className]
               .filter(Boolean)
               .join(' '),
           })}
@@ -155,6 +161,7 @@ export function useFloatingOverlay(
           data-scope="overlay"
           data-part="content"
           data-state={state}
+          data-interactive={!tooltip}
           ref={surfaceRefs}
           id={id}
           dir={dir}

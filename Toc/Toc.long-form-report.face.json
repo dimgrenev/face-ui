@@ -4,6 +4,10 @@
   "name": "Toc / Long Form Report",
   "description": "Long Form Report product scenario for the Toc component.",
   "framework": "react",
+  "preview": {
+    "entryPath": "./Toc.preview.tsx",
+    "exportName": "TocPreview"
+  },
   "root": {
     "type": "Toc",
     "props": {

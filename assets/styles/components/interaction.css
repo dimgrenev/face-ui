@@ -7,7 +7,9 @@
  * component's file instead.
  * ================================================================= */
 
-/* All owned keyboard stops share one high-contrast indicator. A composite can
+/* All owned keyboard stops share one high-contrast indicator. The document's
+   interaction owner excludes pointer focus, including script-forwarded focus
+   that some browsers also classify as :focus-visible. A composite can
    mark handled keyboard navigation when native focus-visible heuristics miss
    modifier keys. Keep this after variant rules, including outline/ghost.
 
@@ -16,7 +18,8 @@
    next to us (Zag, Ark) writes the same attributes, and must keep its own
    focus treatment (RFC §5 #17). :where() adds no specificity, so the rule
    keeps the weight it had against every component variant. */
-:where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus-visible,
+:where(:root:not([data-uf-focus-modality="pointer"])) :where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus-visible,
+:where(:root[data-uf-focus-modality="keyboard"]) :where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus,
 [data-keyboard-focus]:where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus,
 [data-keyboard-focus] :where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus {
   outline: 2px solid var(--uf-color-fg);
@@ -28,7 +31,8 @@
 }
 
 @media (forced-colors: active) {
-  :where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus-visible,
+  :where(:root:not([data-uf-focus-modality="pointer"])) :where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus-visible,
+  :where(:root[data-uf-focus-modality="keyboard"]) :where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus,
   [data-keyboard-focus]:where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus,
   [data-keyboard-focus] :where([class^="uf-"], [class*=" uf-"], [class^="uf-"] *, [class*=" uf-"] *)[data-scope][data-part]:focus {
     outline-color: Highlight;

@@ -536,7 +536,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
                     border: true,
                     hoverable: false,
                     fullWidth: false,
-                    className: 'uf-navigation-content',
+                    className: 'uf-navigation-content uf-surface-stable',
                   })}
                   {...part('content')}
                   id={contentId(key)}

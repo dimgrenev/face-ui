@@ -1,0 +1,35 @@
+.uf-spinner[data-scope="spinner"] {
+  display: inline-block;
+  flex: 0 0 20px;
+  inline-size: 20px;
+  block-size: 20px;
+  vertical-align: middle;
+}
+
+.uf-spinner [data-part="rotor"] {
+  transform-origin: center;
+  animation: uf-spinner-rotate var(--uf-motion-duration-spin) var(--uf-motion-ease-linear) var(--uf-motion-iteration-indefinite);
+}
+
+.uf-spinner [data-part="arc"] {
+  transform-origin: center;
+  animation: uf-spinner-arc var(--uf-motion-duration-loading) var(--uf-motion-ease-in-out) var(--uf-motion-iteration-indefinite);
+}
+
+@keyframes uf-spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes uf-spinner-arc {
+  0% { stroke-dasharray: 22 78; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 72 28; stroke-dashoffset: -24; }
+  100% { stroke-dasharray: 22 78; stroke-dashoffset: -100; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uf-spinner [data-part="rotor"],
+  .uf-spinner [data-part="arc"] { animation: none; }
+}
+
+[data-uf-reduce-motion="true"] .uf-spinner [data-part="rotor"],
+[data-uf-reduce-motion="true"] .uf-spinner [data-part="arc"] { animation: none; }

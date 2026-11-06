@@ -1,0 +1,69 @@
+/* Opted-in product surfaces reserve authored layout space independently from
+   the browser's rasterized border width. Unmarked library surfaces are unchanged. */
+:where(.uf-surface-stable:not(.uf-card)) {
+  --uf-surface-pad-block: 0px;
+  --uf-surface-pad-inline: 0px;
+  --uf-surface-border-width: 0px;
+  --uf-surface-border-color: transparent;
+}
+:where([data-uf-surface-geometry="stable"] .uf-surface-stable.uf-card) {
+  --uf-surface-border-width: var(--uf-card-border-width, 0px);
+  --uf-surface-border-color: var(--uf-card-border, transparent);
+}
+:where(.uf-surface-stable:not(.uf-card), [data-uf-surface-geometry="stable"] .uf-surface-stable) {
+  --uf-surface-pad-top: var(--uf-surface-pad-block, 0px);
+  --uf-surface-pad-right: var(--uf-surface-pad-inline, 0px);
+  --uf-surface-pad-bottom: var(--uf-surface-pad-block, 0px);
+  --uf-surface-pad-left: var(--uf-surface-pad-inline, 0px);
+}
+
+/* Manual surfaces use the same authored axes in their native-border baseline.
+   Card keeps its existing shorthand baseline outside the opted-in profile. */
+.uf-surface-stable:not(.uf-card) {
+  box-sizing: border-box;
+  border: max(0px, var(--uf-surface-border-width)) solid var(--uf-surface-border-color);
+  padding-top: var(--uf-surface-pad-top);
+  padding-right: var(--uf-surface-pad-right);
+  padding-bottom: var(--uf-surface-pad-bottom);
+  padding-left: var(--uf-surface-pad-left);
+}
+.uf-surface-stable:not(.uf-card)[data-border="false"] {
+  border-width: 0;
+}
+
+:where([data-uf-surface-geometry="stable"] .uf-surface-stable) {
+  /* Any authored fixed/absolute/sticky position has greater specificity. */
+  position: relative;
+}
+
+[data-uf-surface-geometry="stable"] .uf-surface-stable[data-scope],
+[data-uf-surface-geometry="stable"] .uf-surface-stable:not(.uf-card) {
+  --face-runtime-surface-border-reserve: max(0px, var(--uf-surface-border-width));
+  box-sizing: border-box;
+  border: 0;
+  padding-top: calc(var(--uf-surface-pad-top) + var(--face-runtime-surface-border-reserve));
+  padding-right: calc(var(--uf-surface-pad-right) + var(--face-runtime-surface-border-reserve));
+  padding-bottom: calc(var(--uf-surface-pad-bottom) + var(--face-runtime-surface-border-reserve));
+  padding-left: calc(var(--uf-surface-pad-left) + var(--face-runtime-surface-border-reserve));
+}
+
+[data-uf-surface-geometry="stable"] .uf-surface-stable[data-border="false"] {
+  --face-runtime-surface-border-reserve: 0px;
+}
+
+[data-uf-surface-geometry="stable"] .uf-surface-stable::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 var(--face-runtime-surface-border-reserve) var(--uf-surface-border-color);
+}
+
+@media (forced-colors: active) {
+  [data-uf-surface-geometry="stable"] .uf-surface-stable::before {
+    box-sizing: border-box;
+    box-shadow: none;
+    border: var(--face-runtime-surface-border-reserve) solid CanvasText;
+  }
+}

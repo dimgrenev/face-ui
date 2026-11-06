@@ -25,6 +25,8 @@ export const menu = (
     side="left"
     align="start"
     sideOffset={-2}
+    attachmentSelector="[data-uf-dropdown-attachment]"
+    alignToOption='[role^="menuitem"]'
     aria-label="Actions"
     ref={(node) => {
       const list: HTMLDivElement | null = node

@@ -28,6 +28,12 @@
       "sideOffset": {
         "$ref": "props.sideOffset"
       },
+      "attachmentSelector": {
+        "$ref": "props.attachmentSelector"
+      },
+      "alignToOption": {
+        "$ref": "props.alignToOption"
+      },
       "dir": {
         "$ref": "props.dir"
       },
@@ -109,6 +115,18 @@
       "required": false,
       "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2.",
       "defaultValue": 2
+    },
+    {
+      "name": "attachmentSelector",
+      "type": "string",
+      "required": false,
+      "description": "Nearest ancestor used for left/right attachment; --uf-dropdown-panel-gap measures the painted surface gap. Vertical alignment still follows the trigger."
+    },
+    {
+      "name": "alignToOption",
+      "type": "string",
+      "required": false,
+      "description": "Aligns a measured visible row opposite the trigger on left/right surfaces; pass the row's selector."
     },
     {
       "name": "dir",

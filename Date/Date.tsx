@@ -554,7 +554,7 @@ export const Date = forwardRef<HTMLButtonElement, DateProps>(
         padding="membrane"
         radius="md"
         fullWidth={resolvedSurface === 'sheet'}
-        className="uf-date__contentPanel"
+        className="uf-date__contentPanel uf-surface-stable"
       >
         {resolvedSurface === 'sheet' ? (
           <ResponsiveSheetHeader

@@ -137,6 +137,31 @@ import officeCoreManifest from '@userface/face-ui-react/assets/media/examples/of
 Image files are exposed through the same package subpath, for example `@userface/face-ui-react/assets/media/examples/office-core/lobby-day.webp`.
 When a host serves package examples as static preview assets, use the manifest `publicPath` values such as `/assets/media/examples/office-core/lobby-day.webp`.
 
+## Application icon libraries
+
+Applications with their own icon library can set one renderer at their UI boundary:
+
+```tsx
+import { IconProvider, type IconProps } from '@userface/face-ui-react/Icon'
+
+function ProductIcon(props: IconProps) {
+  return <ExistingProductIcon {...props} />
+}
+
+<IconProvider renderer={ProductIcon}>
+  <Tile icon="folder" chevron="end">Project</Tile>
+  <Select items={plans} aria-label="Plan" />
+</IconProvider>
+```
+
+The renderer receives the requested non-blank `name`, `className`, paint/transform
+`style`, `aria-label` and `title`. It owns name resolution, accessible SVG markup
+and the fixed 20×20 box. Internal control icons and React portals use the same
+renderer; no separate control wrappers are needed. An omitted `renderer` inherits
+the parent; `renderer={null}` restores built-in icons in a preview subtree.
+Without a provider, built-in aliases, unknown-name diagnostics and geometry are
+unchanged. A blank name still renders nothing before calling a host renderer.
+
 ## Development
 
 ```bash
@@ -152,6 +177,29 @@ pnpm test:browser
 Browser tests cover the component gallery, real keyboard and focus behavior, forms, nested portals, SSR hydration, theme contrast and layout in Chromium, Firefox and WebKit. CI checks React 18 and 19; these regression gates are not accessibility certification.
 
 ## Changing the API
+
+### Stable surface geometry
+
+Products may set `data-uf-surface-geometry="stable"` on a static ancestor and add
+`uf-surface-stable` to owned surface roots. Card-based floating surfaces carry
+the class already; unmarked documents and ordinary Cards keep native borders
+and their existing padding shorthand. Manual surfaces carrying the class use
+the same axis tokens with native borders outside the opted-in profile.
+
+The shared recipe reserves the authored border width in layout and paints an
+inset stroke separately. `--uf-surface-pad-block` and `--uf-surface-pad-inline`
+describe content padding; `--uf-surface-pad-top/right/bottom/left` override
+individual sides. Card padding variants supply defaults. Products migrating a
+custom CSS padding shorthand provide the corresponding axis or side tokens;
+arbitrary author styles are not parsed or rewritten.
+
+`--uf-surface-border-width` and `--uf-surface-border-color` default to the local
+Card border. Manual surfaces provide them explicitly. `data-border="false"`
+removes both stroke and reservation. Each root resets side and border aliases,
+so a parent's asymmetric padding cannot leak into a popup. The recipe owns
+`::before`, preserves the surface's outer shadow and radius, forwards no pointer
+events, and keeps authored fixed/absolute positioning. No wrappers or runtime
+border measurements are added.
 
 JSDoc is the only home for a prop decision. Every own prop, compound-part prop, `labels` key and
 details field carries one:

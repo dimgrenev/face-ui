@@ -57,6 +57,7 @@ describe('Input prop contract', () => {
         return (
           <Input
             {...{ multiline }}
+            clearable
             value={value}
             onChange={(event) => {
               calls.push(['change', event.target, event.target.value])
@@ -202,16 +203,16 @@ describe('Input prop contract', () => {
     expect(host.querySelector('.uf-input__icon')?.textContent).toBe('0')
   })
 
-  it('clearable, labels.clear, disabled and readOnly govern the same native action', async () => {
-    await render({ defaultValue: 'Draft', clearable: false })
+  it('clearable is opt-in and labels.clear, disabled and readOnly govern the same native action', async () => {
+    await render({ defaultValue: 'Draft' })
     expect(clear().hidden).toBe(true)
     await render({ clearable: true, labels: { clear: 'Очистить поле' } })
     expect(clear().hidden).toBe(false)
     expect(clear().getAttribute('aria-label')).toBe('Очистить поле')
-    await render({ labels: { clear: '  ' } })
+    await render({ clearable: true, labels: { clear: '  ' } })
     expect(clear().getAttribute('aria-label')).toBe('Clear input')
     for (const state of ['disabled', 'readOnly']) {
-      await render({ [state]: true })
+      await render({ clearable: true, [state]: true })
       expect(clear().hidden).toBe(true)
       await act(async () => clear().click())
       expect(field().value).toBe('Draft')

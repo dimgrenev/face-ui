@@ -501,5 +501,9 @@
       "Text"
     ],
     "context": "both"
+  },
+  "preview": {
+    "entryPath": "./Date.preview.tsx",
+    "exportName": "DatePreview"
   }
 }

@@ -1,6 +1,6 @@
 /** Explicit primitive exports shared by the package root facade. */
-export { Icon, ICON_NAMES } from '../../Icon/Icon'
-export type { IconProps, IconName } from '../../Icon/Icon'
+export { Icon, IconProvider, ICON_NAMES } from '../../Icon/Icon'
+export type { IconProps, IconName, IconProviderProps, IconRenderer } from '../../Icon/Icon'
 
 export { Button, ButtonGroup, buttonAnatomy } from '../../Button/Button'
 export type { ButtonProps, ButtonVariant, ButtonChevron, ButtonGroupProps } from '../../Button/Button'

@@ -1,6 +1,8 @@
 import { test, expect, type Locator, type Page } from './test'
 import { axe, hooks, open } from './helpers'
 import type { Hooks } from './fixtures/markdown.fixture'
+import markdownFace from '../../../Markdown/Markdown.json' with { type: 'json' }
+import type { MarkdownProps } from '../../../Markdown/Markdown'
 
 const { renderMarkdown: render } = hooks<Hooks>()
 const subject = (page: Page) => page.getByTestId('subject')
@@ -18,6 +20,36 @@ const lines = (locator: Locator) =>
 test.beforeEach(async ({ page }) => {
   await open(page, 'markdown')
 })
+
+for (const state of markdownFace.states.filter(({ name }) => name === 'Default' || name === 'Image'))
+  test(`the authored ${state.name} image decodes without an external resource`, { tag: ['@native', '@react'] }, async ({
+    page,
+  }) => {
+    const externalRequests: string[] = []
+    const origin = new URL(page.url()).origin
+    await page.route('**/*', async (route) => {
+      const url = new URL(route.request().url())
+      if (['http:', 'https:'].includes(url.protocol) && url.origin !== origin) {
+        externalRequests.push(url.href)
+        await route.abort('blockedbyclient')
+      } else await route.continue()
+    })
+    await render(page, state.props as Pick<MarkdownProps,
+      'children' | 'gfm' | 'breaks' | 'html' | 'linkTarget' | 'linkRel' | 'membrane'>)
+    const image = subject(page).getByRole('img')
+    await expect(image).toHaveCount(1)
+    await expect.poll(() => image.evaluate((node: HTMLImageElement) => ({
+      complete: node.complete,
+      width: node.naturalWidth,
+      height: node.naturalHeight,
+    }))).toEqual(state.name === 'Default'
+      ? { complete: true, width: 800, height: 240 }
+      : { complete: true, width: 640, height: 180 })
+    expect(externalRequests).toEqual([])
+    await expect(image).toHaveAttribute('src', /^data:image\/svg\+xml;/)
+    await expect(image).toHaveAttribute('alt', state.name === 'Default' ? 'Markdown preview image' : 'Sample image')
+    await expect(image).toHaveAttribute('title', state.name === 'Default' ? 'Markdown demo image' : 'Sample')
+  })
 
 test('the block fills its column; membrane insets it by the spacing box and changes nothing else', { tag: ['@layout'] }, async ({
   page,

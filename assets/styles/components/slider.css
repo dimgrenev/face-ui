@@ -136,7 +136,8 @@
   border-block-end: 0;
   border-block-start: var(--uf-membrane) solid currentColor;
 }
-.uf-slider__control:has(input:focus-visible) { outline: 2px solid var(--uf-color-fg); outline-offset: -2px; border-radius: var(--uf-radius-full); }
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-slider__control:has(input:focus-visible),
+:where(:root[data-uf-focus-modality="keyboard"]) .uf-slider__control:has(input:focus) { outline: 2px solid var(--uf-color-fg); outline-offset: -2px; border-radius: var(--uf-radius-full); }
 .uf-slider[data-scope]:has(input:disabled) { opacity: var(--uf-color-disabled-opacity); }
 .uf-slider[data-scope][data-disabled] { pointer-events: auto; }
 .uf-slider__control > input:disabled { cursor: not-allowed; }

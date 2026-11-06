@@ -37,6 +37,12 @@
       "sideOffset": {
         "$ref": "props.sideOffset"
       },
+      "attachmentSelector": {
+        "$ref": "props.attachmentSelector"
+      },
+      "alignToOption": {
+        "$ref": "props.alignToOption"
+      },
       "aria-label": {
         "$ref": "props.aria-label"
       },
@@ -166,6 +172,18 @@
       "required": false,
       "description": "Gap in pixels between the trigger and a click menu's popover; negative values overlap them. Default 4.",
       "defaultValue": 4
+    },
+    {
+      "name": "attachmentSelector",
+      "type": "string",
+      "required": false,
+      "description": "Nearest ancestor used for a click menu's left/right attachment; --uf-dropdown-panel-gap measures the painted surface gap. Vertical alignment still follows the trigger."
+    },
+    {
+      "name": "alignToOption",
+      "type": "string",
+      "required": false,
+      "description": "Aligns a measured visible row opposite the trigger on left/right surfaces; usually `[role^=\"menuitem\"]`. Context menus ignore it."
     },
     {
       "name": "aria-label",

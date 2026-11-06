@@ -17,6 +17,7 @@
  */
 @import "./text.css";
 @import "./components/icon.css";
+@import "./components/spinner.css";
 @import "./components/button.css";
 @import "./components/membrane.css";
 @import "./components/tile.css";
@@ -61,4 +62,5 @@
 @import "./components/tree.css";
 @import "./components/carousel.css";
 @import "./components/gallery.css";
+@import "./components/surface-geometry.css";
 @import "./components/interaction.css";

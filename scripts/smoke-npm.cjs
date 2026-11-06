@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const fs = require('node:fs');
 const path = require('node:path');
+const { createRequire } = require('node:module');
 const { pathToFileURL } = require('node:url');
 
 const root = path.resolve(__dirname, '..');
@@ -55,6 +56,9 @@ async function main() {
     'dist/esm/gallery.js',
     'dist/cjs/gallery.js',
     'dist/types/gallery.d.ts',
+    'dist/esm/gallery-meta.js',
+    'dist/cjs/gallery-meta.js',
+    'dist/types/gallery-meta.d.ts',
     'dist/esm/uf.runtime.js',
     'dist/types/uf.runtime.d.ts',
     'docs.md',
@@ -166,9 +170,71 @@ async function main() {
     const gallery = await import(pathToFileURL(path.join(root, 'dist/esm/gallery.js')).href);
     assert(Array.isArray(gallery.FELD_GALLERY_META), 'ESM gallery export must expose FELD_GALLERY_META');
     assert(Array.isArray(gallery.FELD_GALLERY_ENTRIES), 'ESM gallery export must expose FELD_GALLERY_ENTRIES');
+    const metadata = await import(pathToFileURL(path.join(root, 'dist/esm/gallery-meta.js')).href);
+    assert(Object.keys(metadata).length === 1 && Object.keys(metadata)[0] === 'FELD_GALLERY_META',
+      'ESM gallery metadata entry must expose only FELD_GALLERY_META');
+    assert(metadata.FELD_GALLERY_META === gallery.FELD_GALLERY_META,
+      'ESM gallery metadata entry must reuse the gallery metadata object');
   } catch (error) {
     assert(false, `ESM gallery export failed: ${error.message}`);
   }
+
+  try {
+    const gallery = require(path.join(root, 'dist/cjs/gallery.js'));
+    const metadata = require(path.join(root, 'dist/cjs/gallery-meta.js'));
+    assert(Object.keys(metadata).length === 1 && Object.keys(metadata)[0] === 'FELD_GALLERY_META',
+      'CJS gallery metadata entry must expose only FELD_GALLERY_META');
+    assert(metadata.FELD_GALLERY_META === gallery.FELD_GALLERY_META,
+      'CJS gallery metadata entry must reuse the gallery metadata object');
+  } catch (error) {
+    assert(false, `CJS gallery metadata export failed: ${error.message}`);
+  }
+
+  // Consume published metadata and its actual emitted entry, using the same
+  // React peer installation as react-dom/server (never a second app's React).
+  const React = require('react');
+  const server = require('react-dom/server');
+  assert(createRequire(require.resolve('react-dom/server')).resolve('react') === require.resolve('react'),
+    'Published example smoke must use one React peer for component and renderer');
+  let previewContracts = 0;
+  let executableChecks = 0;
+  for (const format of ['esm', 'cjs']) {
+    const targetRoot = path.join(dist, format);
+    for (const file of walk(targetRoot).filter(file => file.endsWith('.json'))) {
+      const contract = JSON.parse(fs.readFileSync(file, 'utf8'));
+      const preview = contract && typeof contract === 'object' ? contract.preview : null;
+      if (!preview || typeof preview !== 'object' || Array.isArray(preview)
+        || typeof preview.entryPath !== 'string' || typeof preview.exportName !== 'string') continue;
+      previewContracts++;
+      try {
+        const entry = path.resolve(path.dirname(file), preview.entryPath.trim());
+        const relative = path.relative(targetRoot, entry);
+        if (path.isAbsolute(relative) || relative === '..' || relative.startsWith(`..${path.sep}`))
+          throw new Error(`Published preview escaped its package: ${rel(file)}`);
+        if (!fs.existsSync(entry)) throw new Error(`Missing published preview entry: ${rel(entry)}`);
+        assert(createRequire(entry)('react') === React, `Published preview has a different React peer: ${rel(entry)}`);
+        const specifier = `${packageJson.name}/${relative.split(path.sep).join('/').replace(/\.[cm]?js$/, '')}`;
+        const module = format === 'esm' ? await import(specifier) : require(specifier);
+        const Component = module[preview.exportName.trim()];
+        assert(typeof Component === 'function' || typeof Component === 'object', `Missing published preview export: ${rel(file)}`);
+        if (module.userfaceExample !== undefined) {
+          const checks = module.userfaceExample.checks;
+          if (checks !== undefined) {
+            assert(Array.isArray(checks)
+              && checks.every(check => typeof check.id === 'string' && typeof check.name === 'string' && typeof check.run === 'function'),
+            `Published preview must retain its executable check definition: ${rel(file)}`);
+            if (Array.isArray(checks)) executableChecks += checks.length;
+          }
+        }
+        const selected = contract.currentState?.props ?? contract.states?.find(state => /default/i.test(state.name || ''))?.props
+          ?? contract.states?.[0]?.props ?? {};
+        const html = server.renderToString(React.createElement(Component, { ...contract.initialProps, ...selected }));
+        assert(html.length > 0, `Published authored example server render was empty: ${rel(file)}`);
+      } catch (error) { assert(false, `Published ${format} preview failed for ${rel(file)}: ${error.message}`); }
+    }
+  }
+  assert(previewContracts >= 2, 'Package smoke must exercise its published authored examples in ESM and CJS');
+  assert(executableChecks >= 2, 'Package smoke must exercise its authored check exports in ESM and CJS');
 
   if (failures.length > 0) {
     console.error('[face-ui-react:npm] smoke failed');

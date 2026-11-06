@@ -1,5 +1,9 @@
 /** Field — the one anatomy of every labelled value: label, required marker, control, description, error. */
 import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
   useEffect,
   useId,
   useRef,
@@ -8,6 +12,7 @@ import {
   type ReactNode,
   type RefObject,
 } from 'react'
+import { Text } from '../../Text/Text'
 import { createAnatomy } from '../anatomy'
 import { useIsomorphicLayoutEffect } from '../adapters/react/use-isomorphic-layout-effect'
 import { invalidProp } from '../runtime/props'
@@ -82,6 +87,19 @@ const { getPartAttrs: part } = createAnatomy('field').parts(
 )
 const filled = (node: ReactNode) =>
   hasSlotContent(node, { trimText: true }) ? node : undefined
+
+/** Primitive field copy shares Text; composed labels retain their own markup. */
+function fieldText(node: ReactNode): ReactNode {
+  if (typeof node === 'string' || typeof node === 'number') {
+    if (node === '') return node
+    return <Text as="span" inset="none" membrane={false}
+      style={{ display: 'inline', color: 'inherit', font: 'inherit', letterSpacing: 'inherit' }}>{node}</Text>
+  }
+  if (Array.isArray(node)) return Children.map(node, fieldText)
+  if (isValidElement<{ children?: ReactNode }>(node) && node.type === Fragment)
+    return cloneElement(node, undefined, fieldText(node.props.children))
+  return node
+}
 
 /** Space-separated id references in order, without empties or repeats; `undefined` when none remain. */
 export function idList(
@@ -212,15 +230,16 @@ export function FieldLayout({
   }
   const labelContent = (
     <>
-      {label}
+      {fieldText(label)}
       {field.required && (
-        <span
+        <Text as="span" inset="none" membrane={false}
           {...part('required')}
           className="uf-field__required"
           aria-hidden="true"
+          style={{ color: 'var(--uf-color-destructive)', font: 'inherit', letterSpacing: 'inherit' }}
         >
           *
-        </span>
+        </Text>
       )}
     </>
   )
@@ -242,16 +261,16 @@ export function FieldLayout({
           id={`${id}-description`}
           className="uf-field__description"
         >
-          {description}
+          {fieldText(description)}
         </span>
       )}
       {error !== undefined && (
         <span ref={errorRef} {...part('error')} id={`${id}-error`} className="uf-field__error">
-          {error}
+          {fieldText(error)}
         </span>
       )}
       <span className="uf-visually-hidden" role="status" aria-live="polite" aria-atomic="true">
-        {announcement}
+        {fieldText(announcement)}
       </span>
     </>
   )

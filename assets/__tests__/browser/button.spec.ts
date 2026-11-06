@@ -1,7 +1,87 @@
 import { test, expect, type Page } from './test'
 import { mount, open, type MountProps, type MountWindow } from './helpers'
 import { createRequire } from 'node:module'
+import type { CSSProperties } from 'react'
 const require = createRequire(import.meta.url)
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`Button composed Text follows its foreground in every variant and state in ${theme}`, { tag: ['@css', '@pointer', '@react'] }, async ({ page }) => {
+    await open(page, 'mount')
+    await page.evaluate(theme => { document.documentElement.dataset.theme = theme }, theme)
+    for (const variant of ['default', 'primary', 'secondary', 'accent', 'outline', 'ghost', 'destructive'] as const) {
+      for (const state of ['rest', 'hover', 'disabled'] as const) {
+        await page.mouse.move(700, 500)
+        await page.evaluate(({ variant, disabled }) => {
+          const { React: R, renderProps, propComponents: { Button, Text } } = window as unknown as MountWindow
+          const text = (value: string) => R.createElement(Text, { as: 'span', inset: 'none', membrane: false }, value)
+          renderProps('ButtonGroup', { children: [
+            R.createElement(Button, { key: 'raw', id: 'raw-color-button', variant, disabled, meta: 'K' }, 'Action'),
+            R.createElement(Button, { key: 'composed', id: 'composed-color-button', variant, disabled, meta: text('K') }, text('Action')),
+          ] })
+        }, { variant, disabled: state === 'disabled' })
+        const raw = page.locator('#raw-color-button')
+        const composed = page.locator('#composed-color-button')
+        await expect(raw).toBeVisible()
+        await expect(composed).toBeVisible()
+        if (state === 'hover') await raw.hover()
+        const rawColor = await raw.evaluate(node => getComputedStyle(node).color)
+        await expect(raw.locator('[data-part="label"]')).toHaveCSS('color', rawColor)
+        await expect(raw.locator('[data-part="meta"]')).toHaveCSS('color', rawColor)
+        if (state === 'hover') await composed.hover()
+        await expect(composed).toHaveCSS('color', rawColor)
+        for (const slot of ['label', 'meta']) {
+          await expect(composed.locator(`[data-part="${slot}"] .uf-text`), `${theme}/${variant}/${state}/${slot}`).toHaveCSS('color', rawColor)
+        }
+        if (state === 'disabled') {
+          await expect(raw).toBeDisabled()
+          await expect(composed).toBeDisabled()
+          await raw.hover()
+          const disabledHoverColor = await raw.evaluate(node => getComputedStyle(node).color)
+          await expect(raw.locator('[data-part="label"]')).toHaveCSS('color', disabledHoverColor)
+          await expect(raw.locator('[data-part="meta"]')).toHaveCSS('color', disabledHoverColor)
+          await composed.hover()
+          await expect(composed).toHaveCSS('color', disabledHoverColor)
+          for (const slot of ['label', 'meta']) {
+            await expect(composed.locator(`[data-part="${slot}"] .uf-text`), `${theme}/${variant}/disabled-hover/${slot}`).toHaveCSS('color', disabledHoverColor)
+          }
+        }
+      }
+    }
+  })
+
+  test(`Button composed Text keeps authored colors and muted semantics in ${theme}`, { tag: ['@css', '@pointer', '@react'] }, async ({ page }) => {
+    await open(page, 'mount')
+    await page.evaluate(theme => { document.documentElement.dataset.theme = theme }, theme)
+    for (const disabled of [false, true]) {
+      await page.mouse.move(700, 500)
+      await page.evaluate(disabled => {
+        const { React: R, renderProps, propComponents: { Text } } = window as unknown as MountWindow
+        const common = { as: 'span', inset: 'none', membrane: false } as const
+        renderProps('Button', { variant: 'primary', disabled, children: [
+          R.createElement(Text, { ...common, key: 'color', id: 'authored-color', style: { color: 'rgb(143, 30, 71)' } }, 'Styled'),
+          R.createElement(Text, { ...common, key: 'token', id: 'authored-token', style: { '--uf-text-color': 'rgb(7, 77, 133)' } as CSSProperties }, 'Token'),
+          R.createElement(Text, { ...common, key: 'muted', id: 'authored-muted', variant: 'muted' }, 'Muted'),
+        ] })
+      }, disabled)
+      const button = page.getByRole('button')
+      await expect(button).toBeVisible()
+      const muted = await button.evaluate(node => {
+        const probe = document.createElement('span')
+        probe.style.color = 'var(--uf-color-fg-muted)'
+        node.append(probe)
+        const color = getComputedStyle(probe).color
+        probe.remove()
+        return color
+      })
+      for (const hover of [false, true]) {
+        if (hover) await button.hover()
+        await expect(page.locator('#authored-color')).toHaveCSS('color', 'rgb(143, 30, 71)')
+        await expect(page.locator('#authored-token')).toHaveCSS('color', 'rgb(7, 77, 133)')
+        await expect(page.locator('#authored-muted')).toHaveCSS('color', muted)
+      }
+    }
+  })
+}
 
 const render = (page: Page, props: MountProps<'Button'>) =>
   mount(page, 'Button', props)

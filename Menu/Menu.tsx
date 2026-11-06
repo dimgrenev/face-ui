@@ -126,6 +126,10 @@ export interface MenuProps
   align?: FloatingAlign
   /** Gap in pixels between the trigger and a click menu's popover; negative values overlap them. Default 4. */
   sideOffset?: number
+  /** Nearest ancestor used for a click menu's left/right attachment; --uf-dropdown-panel-gap measures the painted surface gap. Vertical alignment still follows the trigger. */
+  attachmentSelector?: string
+  /** Aligns a measured visible row opposite the trigger on left/right surfaces; usually `[role^="menuitem"]`. Context menus ignore it. */
+  alignToOption?: string
   /** Names the menu and titles the sheet; without it a click menu is named by its trigger. */
   'aria-label'?: string
   /** Strings Menu renders itself: `close` names the sheet's close button. */
@@ -190,6 +194,8 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
       side = 'bottom',
       align = 'end',
       sideOffset,
+      attachmentSelector,
+      alignToOption,
       labels,
       className,
       style,
@@ -275,6 +281,7 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
 
     const triggerRef = useRef<HTMLElement | null>(null)
     const contentRef = useRef<HTMLDivElement | null>(null)
+    const panelRef = useRef<HTMLDivElement | null>(null)
     const listRef = useRef<HTMLDivElement | null>(null)
     const pointRef = useRef<HTMLSpanElement | null>(null)
     const listRefs = useComposedRefs(listRef, ref)
@@ -304,6 +311,9 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
       open: shows && !isSheet,
       triggerRef: context && point ? pointRef : triggerRef,
       contentRef,
+      surfaceRef: panelRef,
+      attachmentSelector: context ? undefined : attachmentSelector,
+      alignToOption: context ? undefined : alignToOption,
       side: context ? 'bottom' : side,
       align: context ? 'start' : align,
       sideOffset: context
@@ -572,10 +582,11 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
       >
         <Membrane fullWidth as="div" className="uf-menu-contentMembrane">
           <Card
+            ref={panelRef}
             padding="membrane"
             radius="md"
             fullWidth
-            className="uf-menu-contentPanel"
+            className="uf-menu-contentPanel uf-surface-stable"
           >
             {isSheet && (
               <ResponsiveSheetHeader

@@ -228,5 +228,9 @@
       "Button"
     ],
     "context": "both"
+  },
+  "preview": {
+    "entryPath": "./Checkbox.preview.tsx",
+    "exportName": "CheckboxPreview"
   }
 }

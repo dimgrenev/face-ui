@@ -1,9 +1,1 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <g stroke="black" stroke-width="1">
-    <path d="M3.5 5.5H16.5V14.5H3.5V5.5Z" />
-    <path d="M6 8.5H12.5" />
-    <path d="M6 11.5H9.5" />
-    <path d="M12.25 11.75L15.25 14.75" />
-    <path d="M15.25 11.75L12.25 14.75" />
-  </g>
-</svg>
+<svg class="uf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" data-icon="runtime-error" data-iconset="iconoteka" data-icon-source="doc_alert/stroke" aria-hidden="true"><path d="M4.00049 22V2H15.4255L20.0005 6.575V22H4.00049ZM5.90049 20.15H18.1005V7.3L14.6755 3.85H5.90049V20.15ZM10.9505 7.55H13.0505L12.8505 12.55H11.1505L10.9505 7.55ZM12.0005 13.95C12.7255 13.95 13.2505 14.475 13.2505 15.225C13.2505 15.95 12.7255 16.45 12.0005 16.45C11.2755 16.45 10.7505 15.95 10.7505 15.225C10.7505 14.475 11.2755 13.95 12.0005 13.95Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>

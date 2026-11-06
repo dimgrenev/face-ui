@@ -94,7 +94,8 @@
 
 /* The visible row is the <label>; the input it hides is what actually takes
    focus, so the ring has to be drawn on the row. */
-.uf-radio-option:has(input:focus-visible) {
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-radio-option:has(input:focus-visible),
+:where(:root[data-uf-focus-modality="keyboard"]) .uf-radio-option:has(input:focus) {
   outline: 2px solid var(--uf-color-fg);
   outline-offset: -2px;
 }

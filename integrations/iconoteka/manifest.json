@@ -1,0 +1,676 @@
+{
+  "schemaVersion": 1,
+  "id": "iconoteka",
+  "version": "02.00.15",
+  "source": {
+    "repository": "https://github.com/iconoteka/iconoteka",
+    "revision": "02.00.15",
+    "sha256": "562fcdd82ed81aabc2db2bc11abcc2950a756ef088699f3ce07b8b8924bc0722"
+  },
+  "license": {
+    "spdx": "MIT",
+    "path": "integrations/iconoteka/LICENSE"
+  },
+  "files": [
+    {
+      "path": "Checkbox/Checkbox.tsx",
+      "sha256": "85b8598131663b6fd520ffd12bf129bb0185edeb361ae8f4e469f0b73fe2a7ec",
+      "baseSha256": "e43aa70b952114c4679b9f7ab5e1c0684a060060ac6df65f1be9d2abedb4ed18"
+    },
+    {
+      "path": "Icon/Icon.accessible-action.face.json",
+      "sha256": "04e2fc267452c7916c74a05c37dc073f374f7db4c38bb915d66f1c4ae88d79ca",
+      "baseSha256": "4b092921a2acc8d2f2755de84d93f957270615ef7534d58c2cba8462089fe27e"
+    },
+    {
+      "path": "Icon/Icon.json",
+      "sha256": "d088c70b8a0a3488fadcc4a148d6c5727ed38ae8a6d9113e011913a4bb18565a",
+      "baseSha256": "c3a351b779a66a9d3f08a12e51527e4b184841fca54caa6e93a67b2fae53deca"
+    },
+    {
+      "path": "Icon/Icon.status-symbol.face.json",
+      "sha256": "4b9fc1da53ab701a6922b08554640dbcff9ac41d6f442d89214ce4419111ed55",
+      "baseSha256": "dec8fc71b11b7cd7bd114c2107bb7a8098914cd981082bfc62e20f1b3e8f64dc"
+    },
+    {
+      "path": "Icon/Icon.tsx",
+      "sha256": "2d1c972deb6aedb8ec5f4f9642e9e9d3e17b78459c94bf9ce46b8585e627187d",
+      "baseSha256": "f5994e3856fef7fce731eecc07647b5bd696ec68f0649b61129a5ed3955b5fb2"
+    },
+    {
+      "path": "assets/Icon.tsx",
+      "sha256": "a1c6f6c3f567d52be7dfa2bc6564e5f5e415391675e0b2498c892bd46ef61c88",
+      "baseSha256": "675d1bf582e16c28faa01f552d8eba264c8894b89f1fab0c0b2d8ba0bf27f027"
+    },
+    {
+      "path": "assets/Icons/Icons.json",
+      "sha256": "ae5393551b0a4328770786e8895bb58559d6eb7e629033b49871651ccc6483ab",
+      "baseSha256": "7a32e62d65b01a751799eee4c6fb23e9c8b3cda96d7d7e88c9f0673ef000c5d5"
+    },
+    {
+      "path": "assets/Icons/account.svg",
+      "sha256": "8e311dc1de0f27a03d92fbd7f6722da4d3daa57529872143f626c74e5e21f1a0",
+      "baseSha256": "c421e34451f71dfd6ae86e2d5e02862eb30a87db91bfd4f9fcc6a5f1237fd5c7"
+    },
+    {
+      "path": "assets/Icons/activity-idle.svg",
+      "sha256": "7024a5a8b51454ad90348a4bdbf8dddc93517742fc2e42247424b9aeddf96c0b",
+      "baseSha256": "fc179acb3624d2ad2fdff9e73e39989c84c6fd0e0ac057873a998ff8145cfdf3"
+    },
+    {
+      "path": "assets/Icons/activity-running.svg",
+      "sha256": "763dec7af60d44ae421d363e1919bf7112cb8fe900e9dc01fd2fccce260b270b",
+      "baseSha256": "c8510ce73622aa5e7f6e38c91d13e4517b7cfc3b0cfce3d708309758c370f7fe"
+    },
+    {
+      "path": "assets/Icons/align-horizontal-center.svg",
+      "sha256": "eeaffcac9dc95c81fa347795f6f957969f68d1f4da9ebd662d81f15a96eae8f4",
+      "baseSha256": "a754074e54bdc6c7f3c27939233b6d702c4a63ac151bc1698285bcc461ad8ebb"
+    },
+    {
+      "path": "assets/Icons/align-horizontal-left.svg",
+      "sha256": "0827a08ae8b321e1a849957d7709bee7cefe4d99cb4ad570e5a062d384a257a6",
+      "baseSha256": "bf7772e0bf514d9b405f8f2416141e33fe574e72c43a6b99f01c7502b02464f4"
+    },
+    {
+      "path": "assets/Icons/align-horizontal-right.svg",
+      "sha256": "33fb781002f65400efbe9c5cddab5db3371f6abdcd3d1362c52994920b046bff",
+      "baseSha256": "f3014c530431bcb2525d36a7fffef5deb209141f662fe4b82d893f208a6c01d2"
+    },
+    {
+      "path": "assets/Icons/align-vertical-bottom.svg",
+      "sha256": "2cac242c649e2766436b6208011319e69b6f0e0630274ca0667c38e5302d106f",
+      "baseSha256": "ffe010af873b87771e9226efb59f84e4fd9d5541596ef295826c7159ce359bc7"
+    },
+    {
+      "path": "assets/Icons/align-vertical-center.svg",
+      "sha256": "9eed50daa4384349881b28b64cee3872084fd9f5576c38ed3cb4a04a9c4f30cc",
+      "baseSha256": "f167fb2ea5849ffbe36ef1d46bbbefff576f527c4bab232f9cda2740ff48d38e"
+    },
+    {
+      "path": "assets/Icons/align-vertical-top.svg",
+      "sha256": "1563899ab857b43220d33605900b8843d8676a4a2974330a72f602d208082d16",
+      "baseSha256": "bd9837ec1aa47fcd36c99aae0df92c2ab603ff198631d31980f8cda2508a57b3"
+    },
+    {
+      "path": "assets/Icons/alphabet.svg",
+      "sha256": "ee7be6b321041180ca985585e2939c64832ccdd6addf9847d0f28ee6e1919c7b",
+      "baseSha256": "445f9807f378ae40ba91e90ae7e295e820d873ec093d8b4c7d83808ee6610186"
+    },
+    {
+      "path": "assets/Icons/animation.svg",
+      "sha256": "dbc5f35af1571b8e81f7e0cc9f2a722e82482ee80b22fd17cd35ad09953aeb7e",
+      "baseSha256": "bf915025110b1ce1a8cac59b248a5086d8b6365e8c3efd84dccc65a6262f757e"
+    },
+    {
+      "path": "assets/Icons/arrow-down.svg",
+      "sha256": "3650e070720583b90b75f0ec000b0c01ae6e5ceb7269ec4559d40934bb020429",
+      "baseSha256": "7a2ddbc566adc634f372ff77b120415c80736b376cca5005f71001933b357e0d"
+    },
+    {
+      "path": "assets/Icons/arrow-left.svg",
+      "sha256": "70cc23fba200985411b5961903ac2af9c1835c03d08099237960ad298ce6ff5f",
+      "baseSha256": "e68c2f2128527713a62dd5b64586692c48b54bb3b3e0903ffeb5184e69992294"
+    },
+    {
+      "path": "assets/Icons/arrow-right.svg",
+      "sha256": "343f0fb1b4bcfa57f342c7bbdbd7f21c0bc89ba9ce1ac97425c7d20bd74a311f",
+      "baseSha256": "8e023e2615bab9e8d563f50a2aecff416be00595caea7201671ae4ccb8152db1"
+    },
+    {
+      "path": "assets/Icons/arrow-up.svg",
+      "sha256": "e72817063c37e617e3e9cedb7e14ad44334b4a0636d1cab20956e1f863065010",
+      "baseSha256": "9231bb1ebee20ef367771925c53299797a8db69f186a28b803515aeec4d22a65"
+    },
+    {
+      "path": "assets/Icons/arrow_expand_simple.svg",
+      "sha256": "6d1f50b7f4db3a8ff19df8a4bf7ceffe303a6e1c7397203bb20764c9368a4e1a",
+      "baseSha256": null
+    },
+    {
+      "path": "assets/Icons/arrows_contract_simple.svg",
+      "sha256": "12fd0caf54a26f712afdfd1007ee2a99f1e3e50f8bd195e9c65b9cabded47925",
+      "baseSha256": null
+    },
+    {
+      "path": "assets/Icons/background-task.svg",
+      "sha256": "e32347bd68c672fb034e7a827d9f70270db4bda11e0bf43cb5e30cbc1236906c",
+      "baseSha256": "e734f0792a7257c73f37bdff827041a00850303aa6144388ed2058cd46e642c2"
+    },
+    {
+      "path": "assets/Icons/branch.svg",
+      "sha256": "1b27e7422c2b8b761f96957c92c7f69cc346460f9a6d7a2a1b3612a919fea874",
+      "baseSha256": "34199f00cd4409fc3dfbc102a34d0c79b21727da039a1a53eec40a156b88db4a"
+    },
+    {
+      "path": "assets/Icons/browser.svg",
+      "sha256": "4978daa894d0fcbc35b21ca4da123cc331c0377a7ff240fe9eb0232690fb8fbe",
+      "baseSha256": "024a4411cc6a836702bfae6de05889fd581a48091f92f114d74bf5bac71381ee"
+    },
+    {
+      "path": "assets/Icons/cart.svg",
+      "sha256": "a82dc71666bcce0108df070d7e108703dffce2331b0a734d69a0e8d3c5211db9",
+      "baseSha256": "aaf1126d0bcba9abd7482bceb81113a706c7ca8c6a6282ced38d1cbe1dcffda8"
+    },
+    {
+      "path": "assets/Icons/chat.svg",
+      "sha256": "d47550c2329c1a0d3d3424e458c277ce8661908719a35d49d712fa37c0c94aa5",
+      "baseSha256": "06bbdd1d784cb97820a81a9488e3fe5d5995134fc68be8fa8ff364ef8388d4f6"
+    },
+    {
+      "path": "assets/Icons/check-mixed.svg",
+      "sha256": "7e2907241dd17f91e42b7086c48341d842203670dfb03fffa7b39a2efb223335",
+      "baseSha256": null
+    },
+    {
+      "path": "assets/Icons/check-off.svg",
+      "sha256": "dcc40ca61392413a0bb03798148a82086fc15e8604723322d7d38a0d94ccf709",
+      "baseSha256": "7f3874272860ce7362273450bf424d99d309f7859ef9bb107a043b33eb22693d"
+    },
+    {
+      "path": "assets/Icons/check-on.svg",
+      "sha256": "e6950f4c50d0c6e3047d398d39665dacb6f1f2de56e606cc9fd8ab9744ffd9c0",
+      "baseSha256": "392f6c69b724d14af080b571b6e562112a333870eea938749a4c114b4ae2dbf3"
+    },
+    {
+      "path": "assets/Icons/check.svg",
+      "sha256": "89fa4ef16d8a588eb2feb461f776892aeba38d5f69df40a5c43db8570a29a7bd",
+      "baseSha256": "0e7bf09b90c064ce971a9c83459c68397a6105e0db7a6a4318b362db4ec16b44"
+    },
+    {
+      "path": "assets/Icons/clean.svg",
+      "sha256": "b422173077c6cf104f52c476cc43d12d21c48d2065dca70c5fb69c145ac5680f",
+      "baseSha256": "fb134db980f7ec132f88d8d316c23e6a6cfc65bc37e8afa9aeaf869aceedda3c"
+    },
+    {
+      "path": "assets/Icons/close.svg",
+      "sha256": "a42f8b06eb8d08f93ad66f22bd49a8dee9a7336932c4cc2ab47437b69f60941d",
+      "baseSha256": "5ff7fe04a2a2850e55ff369edaed44145673a6d89ca8d22dcb754f773e4725c8"
+    },
+    {
+      "path": "assets/Icons/cloud-done.svg",
+      "sha256": "40c9ee9b6edb1fd89f6480d42ce7c89bab7e6811702450f91c955ec56ce9a57e",
+      "baseSha256": "7a0efeef96ccb46fb4895201dd1ee5839d97af8ee359abd931a802b6baa16d3d"
+    },
+    {
+      "path": "assets/Icons/component.svg",
+      "sha256": "35cdefbcc8b576088ec2ce1d2d7ef76264d32ccae464039196b6b14072ce4b81",
+      "baseSha256": "222bb720c9f14f027cf33f4ffb511e49fa4d08d39451c728e9d85233af777903"
+    },
+    {
+      "path": "assets/Icons/conflict.svg",
+      "sha256": "7140b600be5636f433636a233503e2da2e9a98c35b0bddeec1451a5e062a70f0",
+      "baseSha256": "80d09109adb68e25860a768c7f72aa7f4c79c2d25732957ebf0301decb332dd5"
+    },
+    {
+      "path": "assets/Icons/cookie.svg",
+      "sha256": "782acf876defc1c9c7821840bb5194522f1b062fc194229df0e02138df6740fb",
+      "baseSha256": "161c4654905ed00e971e2d8ec5681bcf1c2d85f531a88c4578ae1989ae34592b"
+    },
+    {
+      "path": "assets/Icons/copy.svg",
+      "sha256": "5c9dbca6af74ddfe7e35f02b20506fec78085720798f890e56629c194a34a979",
+      "baseSha256": "0dfc1ef3605496a049585c808a8fab4f96d659425fd51098d1c5718a772c97a9"
+    },
+    {
+      "path": "assets/Icons/crop.svg",
+      "sha256": "ae1c30766e018806ced33e445d25e76500f4b545a92df3a1c87b619fed0c3f62",
+      "baseSha256": "15563ccb3865dea1826dcf72a209e3e0f077df1e52c1590afce17b47a350cf11"
+    },
+    {
+      "path": "assets/Icons/cursor.svg",
+      "sha256": "3f71b1bf348dfeafad197f759310d9995daa3e2621fd0b5f67740b7cf35cffe3",
+      "baseSha256": "6c7605b2e74dab74d7bfcc3a1413a96be66d5668055124593d4a39ad8da46af2"
+    },
+    {
+      "path": "assets/Icons/date.svg",
+      "sha256": "6f1d2d4db8759b83f17917257751bf548e9cd820f0a5674dc765e359e2e2ac01",
+      "baseSha256": "7b5ab183f44802851083ecc3669eccbb41c9a45f34cc92b61e8a85f6fb131b1f"
+    },
+    {
+      "path": "assets/Icons/delete.svg",
+      "sha256": "ad34f36bfb1cfd4a6c6b1cb1204f1334bfc67e2997579d1a52512b1b8e30215f",
+      "baseSha256": "dd18aa3434860bd7a35d89b2557aa479e9e8bf7df4eae76ac0d2a9d88d79f098"
+    },
+    {
+      "path": "assets/Icons/design-tool.svg",
+      "sha256": "419ac4e4a00a8234872649c42ce5755146a998bd579033967c6cae1611bc7059",
+      "baseSha256": "f4c061623dbc263cdd97728849c852b8c8ba447f64b96acf639de662b4daea3d"
+    },
+    {
+      "path": "assets/Icons/dev-tools.svg",
+      "sha256": "b5d0a78871c57b97a0b4ff838eafca39b312a03dfbcbcf165c2f3ff1af3d4d0a",
+      "baseSha256": "a98310b5fd6f952224f9b3600367eca768eb6afc52c88367546d2b2a72c0c6bf"
+    },
+    {
+      "path": "assets/Icons/diagnostics.svg",
+      "sha256": "a2c0709b30080dd9d889e26674900eb9209a296e36207926a739fe2051cf5392",
+      "baseSha256": "5afa9c9fe46e737623f80e3c5f28ecda1896863a9623f1d783ef580093fc8b24"
+    },
+    {
+      "path": "assets/Icons/down.svg",
+      "sha256": "7299553b774bd197e527412064fef99c4f9771afcc8b01a11173eeea6c599c60",
+      "baseSha256": "14737080d3ba36df032972bbe44a1757d8681941823e738f0ee9bbecf6fd6708"
+    },
+    {
+      "path": "assets/Icons/download.svg",
+      "sha256": "72102184b2eb4865907c7995a3c6529e1fefae188014f7956325aacc47537321",
+      "baseSha256": "708e9b5f7b3ae9d245b7652feee6716025d3bbf27f5f3f1146900431f3fb3523"
+    },
+    {
+      "path": "assets/Icons/drag.svg",
+      "sha256": "cdd0e0f017afd15bb08911c58c6036a8f92a3ac3e56f2a6a4b8c6fe3163fe9c1",
+      "baseSha256": "dedb0e397d1b96d4e75be4ba327d368d28cf7c9cb726185ff5c16ba1ff4446f3"
+    },
+    {
+      "path": "assets/Icons/ds.svg",
+      "sha256": "c633e6bbdde93a84c060d730c574bb28d227d930ac9cc553ff9cc5077e0b84b3",
+      "baseSha256": "57f438c6444e253a9d470c013a8542d4780f49c0af25828b076c2b4222e4fd3d"
+    },
+    {
+      "path": "assets/Icons/edit.svg",
+      "sha256": "fb96208df11d3e22af44503c36563bc1a9f4d99639eacd6441e5a9fbb2bfad97",
+      "baseSha256": "9ac8341aaef913e8690ee35c83a9eb4c0303f2bf941eebf22df0469a4dc81533"
+    },
+    {
+      "path": "assets/Icons/empty-component.svg",
+      "sha256": "f0177415be949a6640c867d11d43a0d941e14523536046dc077e15058555db99",
+      "baseSha256": "2b92a70cfbb7dc1e2cb1b30e1032844cc6876ab5ce680ca14baeb92f3efd9dd2"
+    },
+    {
+      "path": "assets/Icons/error.svg",
+      "sha256": "9b58b948fa56eeaf343823fbf83e120dda855eda6d431b9adf7eda84b0f1bd5a",
+      "baseSha256": "a070419292d7c9cecfea16d5e3e64a4f57d16d7c7af280733bf1f57abbaea051"
+    },
+    {
+      "path": "assets/Icons/face.svg",
+      "sha256": "70f81343e58ef5d6dd9589228d63ef4df854f41c7041990d1b108e1828c527fe",
+      "baseSha256": "e79d2ed6f2891d3fd9fe4fec977fd6e7ba8cf82b3026cae84232055c9b2586c9"
+    },
+    {
+      "path": "assets/Icons/file.svg",
+      "sha256": "a1918ce7ceac806039db05f765c5d972025904d44b643f5e86a2f6b88ee637c3",
+      "baseSha256": "11bff086de27893d98180550dedc76e4be2f40bf77cefc632c3c1ddec9b61dfc"
+    },
+    {
+      "path": "assets/Icons/filter.svg",
+      "sha256": "dc730c6aa738d6b0eec455529dab46368e3e6d67fb2e64f6414c929747a06254",
+      "baseSha256": "108ed10e75d8c1f88d568de00b72a0d5180cedbf196af51c04dc0c8c4612a6b7"
+    },
+    {
+      "path": "assets/Icons/floppy-disk.svg",
+      "sha256": "11c025776d1c2c3046c0cd9a17c8880cce6189b3797177dcb58819019a757a4a",
+      "baseSha256": null
+    },
+    {
+      "path": "assets/Icons/folder-go.svg",
+      "sha256": "d07976e20d39b27a02809bc167594fef443768aa632a86471e4b58c18b10e7d9",
+      "baseSha256": "ced92249c5320562157ce354821a24f155c2067854bc9787c93df76719999d2b"
+    },
+    {
+      "path": "assets/Icons/folder.svg",
+      "sha256": "05d0e88e2b933f3c4155d0ec15b7c0fa2c37e82dabd790e3f94b28fd22275072",
+      "baseSha256": "5f8eb2d3994061659315c9c5f0098f76fd9b3e729655129fdbf4d46e12f83f25"
+    },
+    {
+      "path": "assets/Icons/full.svg",
+      "sha256": "a9fa19cf09b1f1efd1569edb01a3765d48e1972a94e687615d01828050a7b1ad",
+      "baseSha256": "437981bd969083dad00b638914bf546e482eb95abdf154e21a29305fb9d70be5"
+    },
+    {
+      "path": "assets/Icons/function.svg",
+      "sha256": "c29eb755e3ef87f4b0d3878b58f58a7fb98e10af68a20f54ed7380c6c7b04b45",
+      "baseSha256": "b83e6a2f35deb89ee1f55111a0cfb33906ff6b9f770c484275a85f67bed28088"
+    },
+    {
+      "path": "assets/Icons/health-issue.svg",
+      "sha256": "2b529caccc1e79edba8ae4f79c21499c5346f5f82881087fd5011fb9eadba187",
+      "baseSha256": "413e3a6ac9198c69c9736fc4ca162b832a30be2394abfaa63c79f728d36bffc7"
+    },
+    {
+      "path": "assets/Icons/home.svg",
+      "sha256": "247be7e342da69839c9250b0f135d5cabc295a031bd460a019c6ceed0db8c02d",
+      "baseSha256": "71cbce9f0a79e2a9933d64d54695ffcb2b99c5321dcb538d7d3f59ec74746a36"
+    },
+    {
+      "path": "assets/Icons/info.svg",
+      "sha256": "9b533d8377cca6b7bba4a2eaeee1fe0aba2d6d3d9efd332413446901a6aac720",
+      "baseSha256": "0ecc2ed6defb5229eaa7259bacc1eeed8fb879873196135df1b6a7362558a6d8"
+    },
+    {
+      "path": "assets/Icons/layout-sidebar-left-open.svg",
+      "sha256": "558d47aa3e0c88a8a35e05834ea95ddd8560717c45ade8d10254d9a088174b1d",
+      "baseSha256": "60c8101e972a0c0801450196db8a612cdc179c021acb96b03805b79eaa22ecad"
+    },
+    {
+      "path": "assets/Icons/layout-sidebar-left.svg",
+      "sha256": "a90af6f111c6ea882d70272f3c7fb90d8f4bdbecb294e8f5c62e1004f1a136b3",
+      "baseSha256": "329327c865b0ca58d82741e5c866b54b27f746737b5a6f9e656605ffaf329f41"
+    },
+    {
+      "path": "assets/Icons/layout-sidebar-right-open.svg",
+      "sha256": "04ec9ae66f95d5395eca690f9953f32bde74260828bdee0fc867bed88be4df00",
+      "baseSha256": "4b795feb7e8bfe1a9447c2de96dd122763228d4a97cce21c36cc95d644084939"
+    },
+    {
+      "path": "assets/Icons/layout-sidebar-right.svg",
+      "sha256": "4d5b8f5c3b8e782b99760e171785e77b80f35976d3f248ea7587b2b475a2d16a",
+      "baseSha256": "e8c79eb2d244f9b851d4ad907ba6b8ad619b48d4eb96636b366b6093250b0146"
+    },
+    {
+      "path": "assets/Icons/left.svg",
+      "sha256": "92c0080260dfe3cb32208adae66ce42c3190a5f4dfff337d8026151a33e210cc",
+      "baseSha256": "3452abb971b95eb13d930ad3f26e5473ecdf53fb9a867e8d0f365456d71c34a7"
+    },
+    {
+      "path": "assets/Icons/legend.svg",
+      "sha256": "b78ade356350b1e34d770bdc8245215a3fd6b6c82f3570c63d1af27323775c5b",
+      "baseSha256": "3d3e5fb40d7d576a727c7adae9a517fa623011a468ffc36706888ae9d73a3115"
+    },
+    {
+      "path": "assets/Icons/letter-spacing.svg",
+      "sha256": "3ad4c294305c880ace4681c62c7f55f7ea992ef233fac180a44807e6c4d02c94",
+      "baseSha256": "454d66c4ef6501b51496d1c7d65497e5002000c0603b25578b83c5e42c1698b5"
+    },
+    {
+      "path": "assets/Icons/line-height.svg",
+      "sha256": "7d3ef430296d90087a24fffbea16731a05411243fadfe67ca14e509737b7eb01",
+      "baseSha256": "02c86348ed9860fb7568553b8591b476bf2c0ed6ed4deafcfb99caf112f0a8dc"
+    },
+    {
+      "path": "assets/Icons/link.svg",
+      "sha256": "786d1750819ae30a15abbb47c7be015e79b477eab586e3c79ae13bf02ff6674f",
+      "baseSha256": "8c24099bb3ad5ce535a322cacab5105e710935f1620a5c3e9adeb28d2504c34e"
+    },
+    {
+      "path": "assets/Icons/mic.svg",
+      "sha256": "b5fe0d10627564770f208d13fbfb6213e6dbce39fed9cfd1a485286abc0de29b",
+      "baseSha256": "e315317b5ef536277f28b1a29d5245ce75daa04df86f2a201301d99a19e81ef5"
+    },
+    {
+      "path": "assets/Icons/minus.svg",
+      "sha256": "896819cf266a3cfd1e42a2e4d38be514edac4dc39fff67e13dbc7585d6ab6415",
+      "baseSha256": "c407bd9cc3f386d7434b69ec097d4c44fcf931637f0f9f3ec40ce78e67da8fd2"
+    },
+    {
+      "path": "assets/Icons/more.svg",
+      "sha256": "eb34b163320d7748da230b8662b0cf9aa62725c7139b42e51da28ae075de0e13",
+      "baseSha256": "76def0665e1ee54f07b9366181a0e321af2ce027590f3919c1cb50944ba1c353"
+    },
+    {
+      "path": "assets/Icons/no-icon.svg",
+      "sha256": "3a143d5b9565220a422f2d23d68efcb22f7967ec454b798146493ceb825a0884",
+      "baseSha256": "61bae5e1277caf557b2a814d633535c80013f187a8e9fa2f03a61c93b24c4f41"
+    },
+    {
+      "path": "assets/Icons/notdef.svg",
+      "sha256": "b227467f7404595d0cdb56c1e05c8340b68fc50d362c7e176bf4a18f16c13f66",
+      "baseSha256": "b8fdfc10ebe69a819aa6295e5c62515d477508e21fc5f2f4186cd86097d7feef"
+    },
+    {
+      "path": "assets/Icons/notification.svg",
+      "sha256": "259aa0c3d1e8a576364c436095ff34d33094be0bb63ea6e54e16833a4a437a51",
+      "baseSha256": "58be594eed4a700393007af61690d04a3f84ed519bc35e6370806616ce33c552"
+    },
+    {
+      "path": "assets/Icons/panel-open.svg",
+      "sha256": "5618631a177852188553a468911b0ea6e7421f75f7aceb97a2bac916e0e7ed32",
+      "baseSha256": "960def92c6a602748703748421e15a2080937fbae8db6aed49fc78a2bf2ef87f"
+    },
+    {
+      "path": "assets/Icons/panel-right.svg",
+      "sha256": "9efb9359599d8e4086fc883c9911cb35087ddacada13c782e54ab4b4372bed5d",
+      "baseSha256": "76c95a40b70a2afb3967dad6dc0fb539eb94a67210b5284b332c1c6f1a20440b"
+    },
+    {
+      "path": "assets/Icons/panel.svg",
+      "sha256": "1e842f6988cb8f83b3131bd0a617ac79e7053f34498f8c1aac637cb5812bfe8f",
+      "baseSha256": "1e43abfac778c82e88254fd00816b3faa64dd10c69593ed6dd170a674187a757"
+    },
+    {
+      "path": "assets/Icons/part.svg",
+      "sha256": "5971b8cab97c9e4d23e7ebafed010d58cd7f71e54d399c40c9f5dcc76d2ea548",
+      "baseSha256": "f603fda5fc28e61f78dc3b691d94f7c05c2ddacc2c037eaa448b8255f71c0f95"
+    },
+    {
+      "path": "assets/Icons/pause.svg",
+      "sha256": "8716523189a45ed50a3ecbf51a1dfbc3aef8bb25d559f69ffc656b1875937311",
+      "baseSha256": "f7af1be58fedd114467f9bf11be044be82f3f81e5afa39aae137d5cf85c03b39"
+    },
+    {
+      "path": "assets/Icons/plan.svg",
+      "sha256": "1a7c515def282d4ac08ad3ae4ea05417e56352df90704f244d07a7c0865b4553",
+      "baseSha256": "1a3a09b1d8052ae073ebdeea72430bda59c2907f0ec2902e9906b4ce12b9fb91"
+    },
+    {
+      "path": "assets/Icons/play.svg",
+      "sha256": "258072ff2473b87b76cbee6b544dfc1ab68a5f8661047ad0694ed2f51cf6116b",
+      "baseSha256": "1447413677c761c3c1d022f43616527116239ad958c7cb037eadafb5c02c0ec1"
+    },
+    {
+      "path": "assets/Icons/plus.svg",
+      "sha256": "3435198ccf012cffa474732160357de6a795406d43e9d4a5bfb2487f93fe9cbd",
+      "baseSha256": "4821868696e37a6339faa58693ba9040fcadbebeee235dc093dc5d2cedee68aa"
+    },
+    {
+      "path": "assets/Icons/project.svg",
+      "sha256": "85530ce210e734f5d171bc2d928dacf56cb92b306f6e52ee70d8a28a4b475e98",
+      "baseSha256": "d1782459487ea06f3bc56290e3b96f36b49a006c0c5667e0399be492b3b3f0a5"
+    },
+    {
+      "path": "assets/Icons/props.svg",
+      "sha256": "2f559f1e522bcb99e1450d96184870849cb6ecdddd47391e7b4aaf21c9f55fd2",
+      "baseSha256": "a19fdc5c660da133d8d40f8906413a2f571086ee18293151b6d7beef869e05d6"
+    },
+    {
+      "path": "assets/Icons/radio-off.svg",
+      "sha256": "18a4759a6a4ebe2b1429954bc3e2249131bfc821488faab20e4a3336e4d0ec65",
+      "baseSha256": "aab34fdb8a92a5afe600269cb50c797cb189cce5912b2f976029e59cf012f59a"
+    },
+    {
+      "path": "assets/Icons/radio-on.svg",
+      "sha256": "0707d2532319478e6276b084c8c2e81bfe1573d1525b08df6216f70fd520b088",
+      "baseSha256": "8e4e67a7f206235b373704e8dced15ba9dfec8119ae2cd8c5fcef18e13febcf5"
+    },
+    {
+      "path": "assets/Icons/random.svg",
+      "sha256": "02aaf500a6fbb69a518f7e85a887b52e0b7229c37fd82af1956d818a431b90ec",
+      "baseSha256": "44a54bf36caeb981414bd05fef7ec375f0e73b1f7984a7fe1b42209f648d9311"
+    },
+    {
+      "path": "assets/Icons/render.svg",
+      "sha256": "3ada86302365ade5bcfb0c9ea27f88f49300af25b4796ac94d1746fe3acff67c",
+      "baseSha256": "f9ac5cf220fab42d63b8cffb81829f201b3b9da53bf0afc1fa587c2f6370be54"
+    },
+    {
+      "path": "assets/Icons/restart.svg",
+      "sha256": "b3288cd89d419a4fc23cf7475d35f91ff3875d6b9e09c9884ce3b34d1b7fc115",
+      "baseSha256": "2d288fadda416a3b37e2a001f706c0cb350d9a6b4e8f86560ec965a52a49f5d4"
+    },
+    {
+      "path": "assets/Icons/right.svg",
+      "sha256": "385b28795ec5932b21874513b4b9e59e9e1b4e1e2110c09f32d77cd29bdab7c2",
+      "baseSha256": "19ec9abe1c8cea1093dd27d71a2472d58130d304ff03dc53e6ba13a697a2c387"
+    },
+    {
+      "path": "assets/Icons/runtime-error.svg",
+      "sha256": "1911eeac4abee8e9e621bd3a43361a68bdc730646627af992a291c9c403ac9ce",
+      "baseSha256": "ae5ce070d76e29c129fd90574950fe73391b8aa116ef0959a955f093acbdbb5c"
+    },
+    {
+      "path": "assets/Icons/scroll.svg",
+      "sha256": "5a7216985ab2fc33e3c22ef0aaa1b73d58c202f1212bab3df0c32d41de21ea66",
+      "baseSha256": "6fbf107f9f5be66e775740e02ea6d9f8083fdefea3acf60acca50d989c1b58f9"
+    },
+    {
+      "path": "assets/Icons/search.svg",
+      "sha256": "d87e91eefc62323567d68f003a38623ae4a2e52d4a2002bc2dfc2fb08af79227",
+      "baseSha256": "0d6b07c80ace3ceb40e39e4fb0996c30613c7dc07a36b891871b70278ebb169b"
+    },
+    {
+      "path": "assets/Icons/select-chevron-down.svg",
+      "sha256": "e925eb7b45ef059f323cc3ba02e7d772353123fdc14dc9c1224c013856b34f57",
+      "baseSha256": "a54de48611db132224f4f42a0150070401c9eca6875a2e4c4dd252f3dd3605a0"
+    },
+    {
+      "path": "assets/Icons/select-chevron-right.svg",
+      "sha256": "3cc6598a3948c626a2ff386439947f24539174a08c61b7eda4088536a878c7e7",
+      "baseSha256": "d3fe2e0d2138639b97f80922c79245787b8d175b2c4c9f06fe5f66184f78c765"
+    },
+    {
+      "path": "assets/Icons/select-chevron-up.svg",
+      "sha256": "ef16681689e2774ac4b79618cdd953eba6bf615594dfba8d81a13ad988f4b885",
+      "baseSha256": "6525e416cad2198475db4e6d9912ff62674fd51b0ea5c2424b40a47ce2769117"
+    },
+    {
+      "path": "assets/Icons/settings.svg",
+      "sha256": "649825d28156ac9a90d2435cf1bb475e1abb4b10061634789e85e42c70ad7a40",
+      "baseSha256": "b2d70b85f7049989cf7b0d299cc440361549f0fd0b4ca33ed11aba361f7601dd"
+    },
+    {
+      "path": "assets/Icons/size.svg",
+      "sha256": "a778887c8951cd390d8b36463ef7ad4c9201fe67c4dfd63e5e3aa590faa6a57a",
+      "baseSha256": "039d796cdf4cc1c5baae71d76d8816277031858ab701484ee200263e7c7b607f"
+    },
+    {
+      "path": "assets/Icons/slash.svg",
+      "sha256": "224b6f5b810b65f861a3827b0abe0702260f9c1791d5b53912562a90a0cf17e9",
+      "baseSha256": null
+    },
+    {
+      "path": "assets/Icons/sound.svg",
+      "sha256": "38adfa98b6f8723e3921a82edc0fa390ba0e23a5c6722dbbcfa2841a7aeda741",
+      "baseSha256": "23132661cb8a792d627ad2f56fbb9a727fdc99e01eb93bc6244ad1c33e75d637"
+    },
+    {
+      "path": "assets/Icons/star.svg",
+      "sha256": "02617bf8317338b62457ac9748a3d28fb9d85653970b08b356879718962f6bee",
+      "baseSha256": "8e102cc75f3caa3e7498b41dcbc7ae7c2a8f278468c4f1261e9426292d504688"
+    },
+    {
+      "path": "assets/Icons/stat.svg",
+      "sha256": "24d974294a9cee6420d980b054f7af394fed0af935e40dd1483a3a984579454d",
+      "baseSha256": "23c256e739a3f03a245554430a163638f8043fe7d721f045c8e672ba1011f3be"
+    },
+    {
+      "path": "assets/Icons/stop.svg",
+      "sha256": "2dca23ae731560b0d08d4ce5e4dd18673c522a5a0c0eb5c25b7724f6eba49384",
+      "baseSha256": "b1bf064a66055cd6b2342373beb6bad07565b2e58872d0c59a66a44192b62791"
+    },
+    {
+      "path": "assets/Icons/store.svg",
+      "sha256": "b277fce7f08da8b0036b3c91f709096badf10d460a8bf0d12c4ed485bbd82d80",
+      "baseSha256": "f26d92d0c61c0180508f3df47b6a74c9a449eec9bee666cb43c791ece6d4daa7"
+    },
+    {
+      "path": "assets/Icons/switch.svg",
+      "sha256": "9bc4fc47813f7e873aa15bf27f14eddc877598bd0f79b9591a16377c640d40f3",
+      "baseSha256": "ac0d5e08327f052d74014a0694174df6bbf73c2585da707222ea4f0fa538b79d"
+    },
+    {
+      "path": "assets/Icons/task-status.svg",
+      "sha256": "add8e6c0d8242e8fa36738d42f6d401581156373132ed1a90ac42a970efb717c",
+      "baseSha256": "f41e96e1cecd0692b698662f32d8bb7dc0095494aeaf6e9493e78297e4cc7822"
+    },
+    {
+      "path": "assets/Icons/terminal.svg",
+      "sha256": "85af1daaa10670e90612d83565157eacdf1ecef58394395818b850aba6948de1",
+      "baseSha256": "36cd3a1f59886f88b0c28aa489e0a2561e03e0b05388b8bf4794bbd95e67fdf7"
+    },
+    {
+      "path": "assets/Icons/theme.svg",
+      "sha256": "00dcb24c150458e388096b3088f853bf5a6a48282b33c4f1967f55825068f1cc",
+      "baseSha256": "a2b5e4d07f3fd55424e37e6d23718eef788ffae1a8749c99b223592dc0f8daef"
+    },
+    {
+      "path": "assets/Icons/token-add.svg",
+      "sha256": "668a0bbc0c6e4978ab76b27b96bd0e548ee4d751005ad217b1de24548b6dda42",
+      "baseSha256": "9549f034b8315156320e130ff88012c6d25bd9fb8c1a832616f0ffb90c98752c"
+    },
+    {
+      "path": "assets/Icons/type.svg",
+      "sha256": "fe8a3980b1deafcc3cba5949484add36ab38bebacca0d5a64355fa8757777b77",
+      "baseSha256": "244170b2f7fee368c84f530ee0a51b0b6f750d2c11257ec904c3d5c46f748c42"
+    },
+    {
+      "path": "assets/Icons/unreaded.svg",
+      "sha256": "c46b7b49269462158d50a526aba9e709ba8688d365f9ad8fff73bfcf35400da6",
+      "baseSha256": "8812d894e5154bd15f9e23fa9cd0ac10c49cf2c6e9584e4e238a2ec95470ebba"
+    },
+    {
+      "path": "assets/Icons/up.svg",
+      "sha256": "621833a44116bb4b267ebf521d302c17ef54e0b8d2f8d151b10da018801c9fa9",
+      "baseSha256": "966654e3b29ba9e979d16a98698e8b6137b09e2140c7a4877eb897c0b59ff425"
+    },
+    {
+      "path": "assets/Icons/user.svg",
+      "sha256": "63441879345a9ed5cee887745bf13767813869f6772c30246bc894a6fb2473e8",
+      "baseSha256": "9799d5365718a241813dac536b56038a1f81be75d42000b8df5cbf27eaf1c3cc"
+    },
+    {
+      "path": "assets/Icons/userface.svg",
+      "sha256": "4ed05f502b8f591e61aaacda287796c51aeecfb1a2d1bd495a906b073a9f8cfb",
+      "baseSha256": null
+    },
+    {
+      "path": "assets/Icons/visibility-off.svg",
+      "sha256": "3d8fbf0cbe94286b4df1e5e8f1e2a3ba2b2ab51604efda6be24dcb7fc3813dbf",
+      "baseSha256": null
+    },
+    {
+      "path": "assets/Icons/visibility-on.svg",
+      "sha256": "91388e384d166e2662de20b13fb5f9c8734a6cb1fe9dd99662b77b57bab59b4a",
+      "baseSha256": null
+    },
+    {
+      "path": "assets/Icons/warning.svg",
+      "sha256": "1e6d0b950c5aca2ef2f454a86e246aa6374abf42101bef5fd871ca5255d18b85",
+      "baseSha256": "6e837c6b2f67133a7d93ba4cf1bdeda7e2e719b03845e8be40e3e71a502a14d7"
+    },
+    {
+      "path": "assets/__tests__/browser/icon.spec.ts",
+      "sha256": "5b2a5ab34d953d87c303efc09e0bacb19d656ea27add07662eeacce444446508",
+      "baseSha256": "92457efd5f5317c6076966e8c55f52b0fc7edaf582ea7734720859240ccc0222"
+    },
+    {
+      "path": "assets/__tests__/icon.test.tsx",
+      "sha256": "6dc715d56ad034893e420c001ca0793e7fabcb3972ba8847ecb81020b0f0f49f",
+      "baseSha256": "dbdda544d2ae8a83af262313344fc4a88fb9d74116444fc45107e713e645ac0a"
+    },
+    {
+      "path": "assets/iconoteka/NOTICE.json",
+      "sha256": "f0094d4133a2f1fe96c895481967b0af543adb7360a437ca01abc38744e15837",
+      "baseSha256": null
+    },
+    {
+      "path": "assets/iconoteka/registry.ts",
+      "sha256": "0e66329de23939c86c40f24eb5dccb0f51b0ba80d306f33df8b0d75a2c23d9ae",
+      "baseSha256": null
+    },
+    {
+      "path": "assets/icons.tsx",
+      "sha256": "c143829debc9260b0ffa7308ab280ff81f290f3816832050e8e262ceb4b114bb",
+      "baseSha256": "ecf4de32582083cef814fed871a4b133da691302126bc817fc0249f2c732f5e3"
+    },
+    {
+      "path": "integrations/iconoteka/LICENSE",
+      "sha256": "b1f8cf2b24ab265e478f3645e56bee3f4f4b65ab3ba18d840027d38ef0457d56",
+      "baseSha256": null
+    },
+    {
+      "path": "integrations/iconoteka/README.md",
+      "sha256": "746a5b3049ec5b258b3b0319b6c4d4738287856cfc42efccfdad653ca2173a01",
+      "baseSha256": null
+    },
+    {
+      "path": "integrations/iconoteka/import-files.json",
+      "sha256": "17190a837222b3722a06475f6b4e25d86a52b00feb15ac12968b6ceef31ff59e",
+      "baseSha256": null
+    },
+    {
+      "path": "integrations/iconoteka/import.mjs",
+      "sha256": "496e3b6ae055b8c70375f26e5969152a88a00c03fa7eba646a1beef5cf2b52a4",
+      "baseSha256": null
+    }
+  ]
+}

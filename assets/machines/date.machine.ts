@@ -138,20 +138,34 @@ function getActivePoint(ctx: DateSchema['context']): string | null {
     : getSingleValue(ctx)
 }
 
-function getSingleDatePart(ctx: DateSchema['context']): string {
+function getSelectedDatePart(ctx: DateSchema['context']): string | null {
   const value = getIsoValue(ctx)
-  return (
-    extractDatePart(
-      getActivePoint(ctx) ??
-        (typeof value === 'object'
-          ? (value?.start ?? value?.end ?? null)
-          : value),
-    ) ?? getTodayISO(ctx.timezone)
+  return extractDatePart(
+    getActivePoint(ctx) ??
+      (typeof value === 'object'
+        ? (value?.start ?? value?.end ?? null)
+        : value),
   )
 }
 
+function getSingleDatePart(ctx: DateSchema['context']): string {
+  return getSelectedDatePart(ctx) ?? getTodayISO(ctx.timezone)
+}
+
 function getViewedDate(ctx: DateSchema['context']): string {
-  return ctx.viewDate ?? getSingleDatePart(ctx).slice(0, 7) + '-01'
+  if (ctx.viewDate) return ctx.viewDate
+  const selected = getSelectedDatePart(ctx)
+  let date = selected ?? getTodayISO(ctx.timezone)
+  // An empty picker opens in its permitted period without selecting a value.
+  // Selected values and an explicitly navigated month remain their own anchors.
+  if (!selected && ctx.mode !== 'time') {
+    const min = extractDatePart(ctx.min), max = extractDatePart(ctx.max)
+    if (!min || !max || min <= max) {
+      if (min && date < min) date = min
+      if (max && date > max) date = max
+    }
+  }
+  return date.slice(0, 7) + '-01'
 }
 
 function getView(ctx: DateSchema['context']): DateView {

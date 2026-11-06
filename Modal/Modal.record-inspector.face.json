@@ -4,6 +4,10 @@
   "name": "Modal / Record Inspector",
   "description": "Record Inspector product scenario for the Modal component.",
   "framework": "react",
+  "preview": {
+    "entryPath": "./Modal.preview.tsx",
+    "exportName": "ModalPreview"
+  },
   "root": {
     "type": "Modal",
     "props": {

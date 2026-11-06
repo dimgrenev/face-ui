@@ -1,12 +1,13 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { act } from 'react'
+import { act, Fragment } from 'react'
 import { describe, expect, it } from 'vitest'
 import { idList } from '../internal/field'
 import { stylesDir } from './harness/css'
 import { describeField } from './harness/field'
 import { FieldProbe, type FieldProbeProps } from './harness/field-probe'
 import { libraryCss, mount } from './harness/index'
+import { Text } from '../../Text/Text'
 
 describeField('Field (input)', (props) => <FieldProbe {...props} />)
 describeField('Field (group)', (props) => <FieldProbe group {...props} />)
@@ -21,6 +22,25 @@ async function show(props: FieldProbeProps) {
 }
 
 describe('Field', () => {
+  it('renders field copy, fragment leaves, required marker and native errors through Text', async () => {
+    const { root, part } = await show({
+      label: <Fragment>{'Mail '}<Text as="span" inset="none" membrane={false}>address</Text></Fragment>,
+      description: ['Use ', <Fragment key="description">{'work mail'}</Fragment>],
+      nativeError: 'Fill out this field.',
+      required: true,
+    })
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+    while (walker.nextNode()) {
+      const leaf = walker.currentNode
+      if (leaf.textContent?.trim()) expect(leaf.parentElement?.closest('.uf-text'), leaf.textContent).not.toBeNull()
+    }
+    expect(part('label')?.textContent).toBe('Mail address*')
+    expect(part('description')?.textContent).toBe('Use work mail')
+    expect(part('error')?.textContent).toBe('Fill out this field.')
+    expect(root.querySelector('.uf-text .uf-text')).toBeNull()
+    expect(root.querySelector('.uf-text[data-membrane]')).toBeNull()
+  })
+
   it('idList keeps order and drops empties and repeats', () => {
     expect(idList('a  b', undefined, '', 'b c', ' a ')).toBe('a b c')
     expect(idList(undefined, ' ', '')).toBeUndefined()

@@ -1,0 +1,50 @@
+{
+  "schema": "face",
+  "schema-version": 1,
+  "name": "Spinner / Loading Preview",
+  "description": "Loading Preview product scenario for the Spinner component.",
+  "framework": "react",
+  "root": {
+    "type": "Spinner",
+    "props": {
+      "label": {
+        "$ref": "props.label"
+      },
+      "title": {
+        "$ref": "props.title"
+      }
+    },
+    "children": []
+  },
+  "currentState": {
+    "props": {
+      "label": "Loading preview",
+      "title": "Preparing component preview"
+    }
+  },
+  "controls": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name when used alone; omit when the parent already announces loading."
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Optional native pointer hint; also names the icon when label is absent."
+    }
+  ],
+  "meta": {
+    "name": "Loading Preview",
+    "component": "Spinner",
+    "kind": "product-scenario"
+  },
+  "generated": true,
+  "generatedBy": "face-ui-product-scenario@1",
+  "source": {
+    "path": "Spinner/Spinner.tsx",
+    "contract": "Spinner/Spinner.json"
+  }
+}

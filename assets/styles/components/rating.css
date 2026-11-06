@@ -46,7 +46,8 @@
 .uf-membrane[data-membrane-hover] > .uf-rating__option[data-scope="rating"] {
   background: var(--uf-color-hover-bg);
 }
-.uf-rating__option[data-scope="rating"]:has(input:focus-visible) {
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-rating__option[data-scope="rating"]:has(input:focus-visible),
+:where(:root[data-uf-focus-modality="keyboard"]) .uf-rating__option[data-scope="rating"]:has(input:focus) {
   outline: 2px solid var(--uf-color-fg);
   outline-offset: -2px;
 }

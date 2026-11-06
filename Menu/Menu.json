@@ -169,6 +169,16 @@
       "description": "Gap in pixels between the trigger and a click menu's popover; negative values overlap them. Default 4.",
       "default": 4
     },
+    "attachmentSelector": {
+      "type": "string",
+      "required": false,
+      "description": "Nearest ancestor used for a click menu's left/right attachment; --uf-dropdown-panel-gap measures the painted surface gap. Vertical alignment still follows the trigger."
+    },
+    "alignToOption": {
+      "type": "string",
+      "required": false,
+      "description": "Aligns a measured visible row opposite the trigger on left/right surfaces; usually `[role^=\"menuitem\"]`. Context menus ignore it."
+    },
     "aria-label": {
       "type": "string",
       "required": false,

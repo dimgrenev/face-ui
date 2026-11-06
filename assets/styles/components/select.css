@@ -10,6 +10,7 @@
 .uf-select[data-scope="select"][data-full-width] {
   width: 100%;
 }
+.uf-select-trigger-membrane[data-icon-only] { width: max-content; }
 /* Positioned: the form proxy covers the trigger, where the browser anchors its report. */
 .uf-select-wrapper {
   position: relative;
@@ -22,7 +23,7 @@
 .uf-select[data-scope="select"][data-icon-only] .uf-select-wrapper > .uf-membrane:first-child {
   width: max-content;
 }
-.uf-select[data-scope="select"] [data-part="trigger"] {
+:is(.uf-select[data-scope="select"] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"]) {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -45,14 +46,14 @@
   appearance: none;
   -webkit-appearance: none;
 }
-.uf-select[data-scope="select"] [data-part="trigger"]:hover {
+:is(.uf-select[data-scope="select"] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"]):hover {
   background: var(--uf-color-hover-bg);
 }
-.uf-select[data-scope="select"] [data-part="trigger"]:focus-visible {
+:where(:root:not([data-uf-focus-modality="pointer"])) :is(.uf-select[data-scope="select"] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"]):focus-visible {
   outline: calc(var(--uf-membrane) * 2) solid var(--uf-color-fg);
   outline-offset: calc(var(--uf-membrane) * -2);
 }
-.uf-select[data-scope="select"] [data-part="trigger"]:disabled {
+:is(.uf-select[data-scope="select"] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"]):disabled {
   cursor: not-allowed;
 }
 .uf-select__value {
@@ -63,14 +64,14 @@
   white-space: nowrap;
   min-width: 0;
 }
-.uf-select[data-scope="select"] [data-part="trigger"][data-stretch-text] .uf-select__value {
+:is(.uf-select[data-scope="select"] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"])[data-stretch-text] .uf-select__value {
   flex: 1 1 auto;
 }
-.uf-select[data-scope="select"][data-surface="side"] [data-part="trigger"] {
+:is(.uf-select[data-scope="select"][data-surface="side"] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"][data-surface="side"]) {
   height: var(--uf-control-height);
   justify-content: flex-start;
 }
-.uf-select[data-scope="select"][data-icon-only] [data-part="trigger"] {
+:is(.uf-select[data-scope="select"][data-icon-only] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"][data-icon-only]) {
   --uf-icon-only-size: var(--uf-control-height);
   inline-size: var(--uf-icon-only-size);
   block-size: var(--uf-icon-only-size);
@@ -83,7 +84,7 @@
   justify-content: center;
   gap: 0;
 }
-.uf-select[data-scope="select"][data-icon-only] [data-part="trigger"] .uf-select__value {
+:is(.uf-select[data-scope="select"][data-icon-only] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"][data-icon-only]) .uf-select__value {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -94,7 +95,7 @@
   text-align: center;
   line-height: 0;
 }
-.uf-select[data-scope="select"][data-icon-only] [data-part="trigger"] .uf-select__value :is(svg, img) {
+:is(.uf-select[data-scope="select"][data-icon-only] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"][data-icon-only]) .uf-select__value :is(svg, img) {
   display: block;
 }
 .uf-select__value--placeholder {
@@ -112,6 +113,7 @@
   transition: opacity var(--face-runtime-transition-duration-fast) var(--uf-motion-ease-out);
 }
 .uf-select[data-scope="select"][data-state="open"] .uf-select__indicator,
+.uf-select-trigger[data-scope="select"][data-state="open"] .uf-select__indicator,
 .uf-select[data-scope="select"][data-state="open"] [data-part="indicator"] {
   opacity: 1;
 }
@@ -185,7 +187,11 @@
   display: flex;
   width: 100%;
 }
-.uf-select__contentPanel {
+:where(.uf-select__contentPanel.uf-card[data-scope]) {
+  --uf-surface-pad-block: var(--uf-dropdown-surface-padding);
+  --uf-surface-pad-inline: var(--uf-dropdown-surface-padding);
+}
+.uf-select__contentPanel.uf-card[data-scope] {
   --uf-card-bg: var(--uf-dropdown-surface-bg);
   --uf-card-border: var(--uf-dropdown-surface-border);
   --uf-card-underlay-bg: var(--uf-dropdown-surface-underlay-bg);
@@ -197,7 +203,9 @@
   --uf-card-blur: var(--uf-dropdown-surface-blur);
   width: 100%;
   max-height: var(--uf-select-content-max-height);
-  overflow-y: auto;
+  /* The Card owns the painted surface; the listbox owns scrolling. Its
+     stable border pseudo-element must never move with option content. */
+  overflow: hidden;
   box-sizing: border-box;
   transform: translateY(var(--uf-overlay-enter-y)) scale(var(--uf-overlay-enter-scale));
   transform-origin: top center;
@@ -220,13 +228,19 @@
   transform: translateX(calc(var(--uf-overlay-enter-y) * -1)) scale(var(--uf-overlay-enter-scale));
   transform-origin: left center;
 }
-:is(.uf-select[data-scope="select"] [data-part="content"], .uf-select__content[data-scope="select"][data-part="content"])[data-surface="side"][data-uf-select-scrollable] .uf-select__contentPanel {
+:is(.uf-select[data-scope="select"] [data-part="content"], .uf-select__content[data-scope="select"][data-part="content"])[data-surface="side"][data-uf-select-scrollable] .uf-select__contentPanel > [data-part="listbox"] {
   overflow-y: scroll;
   scrollbar-gutter: stable;
 }
 :is(.uf-select[data-scope="select"] [data-part="content"], .uf-select__content[data-scope="select"][data-part="content"])[data-state="open"] .uf-select__contentPanel {
   opacity: 1;
   transform: translateY(0) scale(1);
+}
+.uf-select__contentPanel > [data-part="listbox"] {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 /* Select options — use data-part="option" (machine API), NOT class selectors */
 :is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"] {
@@ -249,17 +263,18 @@
 }
 
 .uf-select__content [data-part="listbox"]:focus { outline: none; }
-.uf-select__content [data-part="listbox"]:focus-visible {
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-select__content [data-part="listbox"]:focus-visible {
   outline: var(--uf-membrane) solid var(--uf-color-border);
   outline-offset: calc(-1 * var(--uf-membrane));
 }
 .uf-select-optionLabel { min-width: 0; flex: 1; overflow-wrap: anywhere; }
 .uf-select__check { display: inline-flex; flex: none; margin-inline-start: var(--uf-control-gap); visibility: hidden; }
 .uf-select-option[aria-selected="true"] .uf-select__check { visibility: visible; }
-.uf-select[data-surface="side"][data-direction="rtl"] [data-part="indicator"] { transform: scaleX(-1); }
+.uf-select[data-surface="side"][data-direction="rtl"] [data-part="indicator"],
+.uf-select-trigger[data-surface="side"]:dir(rtl) [data-part="indicator"] { transform: scaleX(-1); }
 @media (forced-colors: active) {
-  .uf-select[data-scope="select"] [data-part="trigger"]:focus-visible,
-  .uf-select__content [data-part="listbox"]:focus-visible {
+  :where(:root:not([data-uf-focus-modality="pointer"])) :is(.uf-select[data-scope="select"] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"]):focus-visible,
+  :where(:root:not([data-uf-focus-modality="pointer"])) .uf-select__content [data-part="listbox"]:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: -2px;
   }

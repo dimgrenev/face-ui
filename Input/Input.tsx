@@ -104,7 +104,7 @@ interface InputSharedProps
   icon?: ReactNode
   /** Icon at inline start or end, following the control's text direction. */
   iconPosition?: 'start' | 'end'
-  /** Offer a clear action for a nonempty, editable field. */
+  /** Opt in to a clear action for a nonempty, editable field; off by default. */
   clearable?: boolean
   /** Accessible names of the field's own controls. */
   labels?: Partial<InputLabels>
@@ -180,7 +180,7 @@ export const Input = forwardRef<InputControl, InputProps>(
       labelPosition,
       icon,
       iconPosition = 'start',
-      clearable = true,
+      clearable = false,
       labels,
       onValueChange,
       onChange,

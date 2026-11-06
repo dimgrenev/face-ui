@@ -5,6 +5,8 @@ import {
   type CSSProperties,
   type RefObject,
 } from 'react'
+import { readCssLength } from './read-css-length'
+import { alignFloatingOption, readFloatingOptionCenters } from './floating-option-alignment'
 
 export type FloatingSide = 'top' | 'right' | 'bottom' | 'left'
 export type FloatingAlign = 'start' | 'center' | 'end'
@@ -16,6 +18,12 @@ export interface UseFloatingPositionOptions {
   side?: FloatingSide
   align?: FloatingAlign
   sideOffset?: number
+  /** Nearest ancestor that supplies the horizontal attachment edges for lateral surfaces. */
+  attachmentSelector?: string
+  /** Visible option selector for adaptive row alignment on left/right surfaces. */
+  alignToOption?: string
+  /** Painted surface inside contentRef; attachment gaps exclude its outer membrane. */
+  surfaceRef?: RefObject<HTMLElement | null>
   /** Explicit content direction; otherwise alignment follows the trigger. */
   dir?: string
   /** Semantic surface when contentRef measures an outer positioning boundary. */
@@ -34,14 +42,18 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(min, value), Math.max(min, max))
 }
 
+type PlacementRect = Pick<DOMRect, 'left' | 'right' | 'top' | 'bottom'>
+type SideOffsets = Record<FloatingSide, number>
+
 function getAvailableSpace(
-  triggerRect: DOMRect,
+  triggerRect: PlacementRect,
   side: FloatingSide,
-  sideOffset: number,
+  offsets: SideOffsets,
   viewportInset: number,
   viewportWidth: number,
   viewportHeight: number,
 ) {
+  const sideOffset = offsets[side] ?? offsets.right
   if (side === 'top') return triggerRect.top - sideOffset - viewportInset
   if (side === 'bottom')
     return viewportHeight - triggerRect.bottom - sideOffset - viewportInset
@@ -51,9 +63,9 @@ function getAvailableSpace(
 
 function resolveSide(
   preferredSide: FloatingSide,
-  triggerRect: DOMRect,
+  triggerRect: PlacementRect,
   contentRect: DOMRect,
-  sideOffset: number,
+  offsets: SideOffsets,
   viewportInset: number,
   viewportWidth: number,
   viewportHeight: number,
@@ -61,7 +73,7 @@ function resolveSide(
   const currentSpace = getAvailableSpace(
     triggerRect,
     preferredSide,
-    sideOffset,
+    offsets,
     viewportInset,
     viewportWidth,
     viewportHeight,
@@ -77,7 +89,7 @@ function resolveSide(
   const oppositeSpace = getAvailableSpace(
     triggerRect,
     oppositeSide,
-    sideOffset,
+    offsets,
     viewportInset,
     viewportWidth,
     viewportHeight,
@@ -100,6 +112,9 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
     side = 'bottom',
     align = 'start',
     sideOffset = 6,
+    attachmentSelector,
+    alignToOption,
+    surfaceRef = contentRef,
     dir,
     directionRef = contentRef,
     viewportInset = 8,
@@ -118,6 +133,32 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
     if (!view) return
     const viewportWidth = view.innerWidth
     const viewportHeight = view.innerHeight
+    const lateral = side === 'left' || side === 'right'
+    let attachment: Element | null = null
+    if (lateral && attachmentSelector) {
+      try { attachment = triggerEl.closest(attachmentSelector) } catch { attachment = null }
+    }
+    const attachmentRect = attachment?.getBoundingClientRect()
+    const placementRect = attachmentRect ? {
+      left: attachmentRect.left,
+      right: attachmentRect.right,
+      top: triggerRect.top,
+      bottom: triggerRect.bottom,
+    } : triggerRect
+    const gap = attachment ? Math.max(0, readCssLength(triggerEl, '--uf-dropdown-panel-gap') ?? sideOffset) : sideOffset
+    const surfaceRect = attachment ? surfaceRef.current?.getBoundingClientRect() : null
+    // A consumer may constrain the painted surface rather than its outer
+    // membrane. Keep the authored viewport inset for every unmarked surface.
+    const rowViewportInset = attachment && alignToOption
+      ? readCssLength(triggerEl, '--uf-dropdown-viewport-inset') ?? undefined : undefined
+    const paintedTopInset = surfaceRect ? Math.max(0, surfaceRect.top - contentRect.top) : 0
+    const paintedBottomInset = surfaceRect ? Math.max(0, contentRect.bottom - surfaceRect.bottom) : 0
+    const offsets: SideOffsets = {
+      top: sideOffset,
+      bottom: sideOffset,
+      left: gap - (surfaceRect ? Math.max(0, contentRect.right - surfaceRect.right) : 0),
+      right: gap - (surfaceRect ? Math.max(0, surfaceRect.left - contentRect.left) : 0),
+    }
     const direction =
       dir === 'ltr' || dir === 'rtl'
         ? dir
@@ -134,9 +175,9 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
         : align
     const resolvedSide = resolveSide(
       side,
-      triggerRect,
+      placementRect,
       contentRect,
-      sideOffset,
+      offsets,
       viewportInset,
       viewportWidth,
       viewportHeight,
@@ -149,10 +190,10 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
       top = triggerRect.top - contentRect.height - sideOffset
     } else if (resolvedSide === 'left') {
       top = triggerRect.top + (triggerRect.height - contentRect.height) / 2
-      left = triggerRect.left - contentRect.width - sideOffset
+      left = placementRect.left - contentRect.width - offsets.left
     } else if (resolvedSide === 'right') {
       top = triggerRect.top + (triggerRect.height - contentRect.height) / 2
-      left = triggerRect.right + sideOffset
+      left = placementRect.right + offsets.right
     }
 
     if (resolvedSide === 'top' || resolvedSide === 'bottom') {
@@ -166,12 +207,21 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
     }
 
     const vertical = resolvedSide === 'top' || resolvedSide === 'bottom'
+    const optionCenterOffsets = !vertical && alignToOption
+      ? readFloatingOptionCenters(contentEl, alignToOption) : []
+    const alignedToRow = optionCenterOffsets.length > 0
+    const paintedViewport = alignedToRow && rowViewportInset !== undefined
+    const minimumRowTop = paintedViewport
+      ? Math.max(0, rowViewportInset) - paintedTopInset : viewportInset
+    const maximumRowTop = paintedViewport
+      ? viewportHeight - contentRect.height - Math.max(0, rowViewportInset) + paintedBottomInset
+      : viewportHeight - contentRect.height - viewportInset
     const available = Math.max(
       0,
       getAvailableSpace(
-        triggerRect,
+        placementRect,
         resolvedSide,
-        sideOffset,
+        offsets,
         viewportInset,
         viewportWidth,
         viewportHeight,
@@ -181,7 +231,9 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
       0,
       vertical
         ? Math.min(available, viewportHeight - viewportInset * 2)
-        : viewportHeight - viewportInset * 2,
+        : paintedViewport
+          ? viewportHeight - Math.max(0, rowViewportInset) * 2 + paintedTopInset + paintedBottomInset
+          : viewportHeight - viewportInset * 2,
     )
     const maxWidth = Math.max(
       0,
@@ -190,10 +242,20 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
         : Math.min(available, viewportWidth - viewportInset * 2),
     )
 
+    if (alignedToRow) {
+      top = alignFloatingOption({
+        triggerCenter: triggerRect.top + triggerRect.height / 2,
+        contentHeight: contentRect.height,
+        minimumTop: minimumRowTop,
+        maximumTop: maximumRowTop,
+        optionCenterOffsets,
+      })
+    }
+
     const nextStyle: CSSProperties = {
       position: 'fixed',
       direction: direction === 'rtl' ? 'rtl' : 'ltr',
-      top: Math.round(
+      top: alignedToRow ? top : Math.round(
         clamp(
           top,
           viewportInset,
@@ -230,12 +292,15 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
     )
   }, [
     align,
+    alignToOption,
+    attachmentSelector,
     contentRef,
     dir,
     directionRef,
     matchTriggerWidth,
     side,
     sideOffset,
+    surfaceRef,
     triggerRef,
     viewportInset,
   ])
@@ -262,16 +327,25 @@ export function useFloatingPosition(options: UseFloatingPositionOptions) {
 
     if (triggerRef.current) resizeObserver?.observe(triggerRef.current)
     if (contentRef.current) resizeObserver?.observe(contentRef.current)
+    if (attachmentSelector && triggerRef.current) {
+      try {
+        const attachment = triggerRef.current.closest(attachmentSelector)
+        if (attachment) resizeObserver?.observe(attachment)
+      } catch { /* An invalid optional selector leaves trigger-relative placement intact. */ }
+    }
     view.addEventListener('resize', handleWindowChange)
     view.addEventListener('scroll', handleWindowChange, true)
+    const content = contentRef.current
+    if (alignToOption) content?.addEventListener('transitionend', handleWindowChange)
 
     return () => {
       view.cancelAnimationFrame(rafId)
       resizeObserver?.disconnect()
       view.removeEventListener('resize', handleWindowChange)
       view.removeEventListener('scroll', handleWindowChange, true)
+      if (alignToOption) content?.removeEventListener('transitionend', handleWindowChange)
     }
-  }, [contentRef, open, side, triggerRef, update])
+  }, [alignToOption, attachmentSelector, contentRef, open, side, triggerRef, update])
 
   // Native direction and class changes need not resize the anchor. Read them
   // after each commit; equality above avoids producing another render.

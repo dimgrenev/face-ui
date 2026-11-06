@@ -5,6 +5,37 @@ import {
 } from '../../Select/select-side-position'
 
 describe('Select side positioning', () => {
+  it('attaches to a short Card without reducing the independent workbench height', () => {
+    const position = computeSelectSidePosition({
+      triggerRect: { left: 24, right: 160, top: 30, bottom: 58, width: 136, height: 28 },
+      boundaryRect: { left: 0, right: 1200, top: 0, bottom: 800, width: 1200, height: 800 },
+      attachmentRect: { left: 7, right: 427, top: 7, bottom: 45, width: 420, height: 38 },
+      surfaceInsets: { left: 1, right: 1 },
+      requestedGap: 6,
+      contentHeight: 200,
+      viewportWidth: 1200,
+      viewportHeight: 800,
+    })
+    expect(position.left).toBe(432)
+    expect(position.left + 1 - 427).toBe(6)
+    expect(position.maxHeight).toBe(200)
+  })
+
+  it('flips using attachment edges and the painted membrane inset', () => {
+    const position = computeSelectSidePosition({
+      triggerRect: { left: 620, right: 760, top: 320, bottom: 348, width: 140, height: 28 },
+      boundaryRect: null,
+      attachmentRect: { left: 600, right: 990, top: 7, bottom: 45, width: 390, height: 38 },
+      surfaceInsets: { left: 1, right: 2 },
+      requestedGap: 6,
+      contentHeight: 200,
+      viewportWidth: 1000,
+      viewportHeight: 800,
+    })
+    expect(position.left).toBe(356)
+    expect(600 - (position.left + position.width - 2)).toBe(6)
+    expect(position.top).toBe(320)
+  })
   it('aligns the selected side option with the trigger row', () => {
     const position = computeSelectSidePosition({
       triggerRect: {

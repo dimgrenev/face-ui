@@ -2,6 +2,7 @@ import { act, createRef, type MouseEvent } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Markdown, type MarkdownProps } from '../../Markdown/Markdown'
 import { expectDevError, mount, type View } from './harness'
+import markdownFace from '../../Markdown/Markdown.json'
 
 let view: View
 beforeEach(() => {
@@ -106,6 +107,21 @@ describe('Markdown breaks', () => {
 })
 
 describe('Markdown html', () => {
+  it.each(markdownFace.states.filter(({ name }) => name === 'Default' || name === 'Image'))(
+    'the authored $name image keeps its owned data URL without allowing data links',
+    async (state) => {
+      await render(state.props as MarkdownProps)
+      const image = root().querySelector('img')!
+      const source = image.getAttribute('src')!
+      expect(source).toMatch(/^data:image\/svg\+xml;base64,/)
+      expect([image.alt, image.title]).toEqual(state.name === 'Default'
+        ? ['Markdown preview image', 'Markdown demo image']
+        : ['Sample image', 'Sample'])
+      await render({ children: `[unsafe](${source})` })
+      expect(root().querySelector('a')!.hasAttribute('href')).toBe(false)
+    },
+  )
+
   it('by default raw HTML shows as the text it was typed as, block or inline', async () => {
     await render({ children: '<div>Raw block</div>\n\nPress <kbd>Ctrl</kbd> & <b>go</b>' })
     expect(all('div, kbd, b')).toEqual([])

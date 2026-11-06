@@ -253,6 +253,7 @@ your own barrels and wrappers for each removed prop name before you trust a gree
 | `labelOrientation` | `labelPosition` | auto |
 | `labelOrientation="vertical"`, `labelOrientation="horizontal"` | `labelPosition="top"`, `labelPosition="start"` | auto |
 | `InputLabelOrientation` from `Input/Input` | `FieldProps['labelPosition']` (`'top' \| 'start'`) | manual |
+| `clearable` defaulted to `true` | `clearable` defaults to `false`; pass `clearable` where an explicit clear action is needed | — |
 | `membrane` defaulted to `false` | `membrane` defaults to `true`, like every control in a row; pass `membrane={false}` for the old spacing | — |
 | `onValueChange` ran before the native `onChange` | `onChange` runs first, and its `preventDefault()` cancels the edit | — |
 | The `error` message was a `role="alert"` live region | The control describes the message (`aria-describedby`); nothing is announced on render | — |

@@ -59,7 +59,7 @@
     "loading": {
       "type": "boolean",
       "required": false,
-      "description": "Loading state (shows spinner, dims text).",
+      "description": "Loading state: disables activation and places a 20×20 spinner at the inline end; icon-only buttons replace their icon.",
       "default": false
     },
     "stretchText": {
@@ -200,7 +200,7 @@
     }
   ],
   "behavior": {
-    "loading": "Loading state shows a spinner and blocks activation with native disabled."
+    "loading": "Loading disables activation, preserves the label and places the shared Spinner at the inline end; icon-only controls replace their icon."
   },
   "keyboard": {
     "Enter": {
@@ -265,11 +265,7 @@
       "--uf-selector-indicator-size",
       "--uf-icon-only-size",
       "--face-runtime-option-level",
-      "--uf-interactive-weight",
-      "--uf-spinner-size",
-      "--uf-spinner-size-sm",
-      "--uf-spinner-border-width",
-      "--uf-spinner-border-width-sm"
+      "--uf-interactive-weight"
     ],
     "semanticFallbacks": [
       "--uf-control-height",

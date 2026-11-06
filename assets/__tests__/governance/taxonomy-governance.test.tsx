@@ -8,6 +8,8 @@ import {
   isDeprecatedFaceUiComponent,
   Modal,
   Popover,
+  Select,
+  SelectTrigger,
   SegmentedControl,
   Text,
   Tooltip,
@@ -27,6 +29,7 @@ function readCssNumberToken(source: string, tokenName: string): number {
 }
 
 const componentsCss = libraryCss()
+const selectTriggerSelector = ':is(.uf-select[data-scope="select"] [data-part="trigger"], .uf-select-trigger[data-scope="select"][data-part="trigger"])'
 const baseCss = readFixture('../../styles/base.css')
 const animationsCss = readFixture('../../styles/animations.css')
 const tokensCss = readFixture('../../styles/tokens.css')
@@ -159,6 +162,27 @@ describe('taxonomy and governance', () => {
 
   beforeEach(() => {
     ;({ host: container, root } = mount())
+  })
+
+  it('applies the shared Select trigger geometry and hover rule to both public compositions', async () => {
+    await act(async () => root.render(<>
+      <Select items={[{ value: 'a', label: 'Alpha' }]} defaultValue="a" aria-label="Plan" />
+      <SelectTrigger aria-label="Child properties" aria-haspopup="dialog">Alpha</SelectTrigger>
+    </>))
+    const buttons = container.querySelectorAll<HTMLButtonElement>('button')
+    expect(buttons).toHaveLength(2)
+    expect(buttons[0].closest('.uf-select[data-scope="select"]')).not.toBeNull()
+    expect(buttons[1].closest('.uf-select')).toBeNull()
+    for (const button of buttons) {
+      expect(button.matches(selectTriggerSelector)).toBe(true)
+      expect(button.parentElement?.classList.contains('uf-membrane')).toBe(true)
+    }
+    expectCssBlockContains(componentsCss, selectTriggerSelector,
+      'min-height: var(--uf-control-height);')
+    expectCssBlockContains(componentsCss, selectTriggerSelector,
+      'padding-inline-end: var(--uf-select-indicator-edge-gap);')
+    expectCssBlockContains(componentsCss, `${selectTriggerSelector}:hover`,
+      'background: var(--uf-color-hover-bg);')
   })
 
   it('exposes governance metadata and deprecated aliases', () => {
@@ -303,7 +327,7 @@ describe('taxonomy and governance', () => {
       '.uf-switcher[data-scope="switcher"]',
       '[data-scope="radio"] [data-part="item"]',
       '[data-scope="input"] [data-part="input"],\n[data-scope="input"] [data-part="textarea"]',
-      '.uf-select[data-scope="select"] [data-part="trigger"]',
+      selectTriggerSelector,
       ':is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"]',
       '.uf-date__trigger',
       '.uf-slider[data-scope="slider"]',
@@ -403,7 +427,7 @@ describe('taxonomy and governance', () => {
     expect(
       readCssBlock(
         componentsCss,
-        '.uf-select[data-scope="select"] [data-part="trigger"]',
+        selectTriggerSelector,
       ),
     ).toContain('padding-inline-end: var(--uf-select-indicator-edge-gap);')
     expect(readCssBlock(componentsCss, '.uf-badge[data-scope]')).toContain(
@@ -486,7 +510,7 @@ describe('taxonomy and governance', () => {
       '.uf-switcher[data-scope]:hover:not([data-disabled])',
       '.uf-radio-option:hover,\n[data-scope="radio"] [data-part="item"]:hover',
       '[data-scope="input"] [data-part="input"]:hover,\n[data-scope="input"] [data-part="textarea"]:hover',
-      '.uf-select[data-scope="select"] [data-part="trigger"]:hover',
+      `${selectTriggerSelector}:hover`,
       ':is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"]:hover,\n:is(.uf-select[data-scope="select"], .uf-select__content[data-scope="select"][data-part="content"]) [data-part="option"][data-highlighted]',
       '.uf-date__trigger:hover',
       '.uf-rating__option[data-scope="rating"]:hover:not(:has(input:disabled)),\n.uf-membrane[data-membrane-hover] > .uf-rating__option[data-scope="rating"]',

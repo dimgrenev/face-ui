@@ -4,6 +4,10 @@
   "name": "Checkbox / Terms Accepted",
   "description": "Terms Accepted product scenario for the Checkbox component.",
   "framework": "react",
+  "preview": {
+    "entryPath": "./Checkbox.preview.tsx",
+    "exportName": "CheckboxPreview"
+  },
   "root": {
     "type": "Checkbox",
     "props": {

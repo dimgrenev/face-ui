@@ -1,3 +1,1 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M4 2L4 14L7.5 10.5L12 16L14 14.5L9.5 8.5L14 7L4 2Z" stroke="black" stroke-linejoin="round"/>
-</svg>
+<svg class="uf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" data-icon="cursor" data-iconset="iconoteka" data-icon-source="cursor/stroke" aria-hidden="true"><path d="M5.00049 19.325V2L20.0255 10.625L15.0505 13.5L18.4505 19.325L13.3505 22.3L9.90049 16.45L5.00049 19.325ZM6.85049 16.1L10.5755 13.925L14.0005 19.775L15.9255 18.65L12.5005 12.825L16.3255 10.625L6.85049 5.2V16.1Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>

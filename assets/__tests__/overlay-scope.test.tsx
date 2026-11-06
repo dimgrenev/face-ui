@@ -3,8 +3,17 @@ import { renderToString } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { Modal } from '../../Modal/Modal'
 import { Select } from '../../Select/Select'
-import { FaceUiOverlayProvider } from '../adapters/react/overlay-context'
+import { FaceUiOverlayProvider as RootOverlayProvider } from '../../index'
+import * as overlayProviderEntry from '../../overlay-provider'
+import { FaceUiOverlayProvider, type FaceUiOverlayProviderProps } from '../../overlay-provider'
 import { mount } from './harness'
+
+it('exports the same root provider through its narrow public entry', () => {
+  expect(Object.keys(overlayProviderEntry)).toEqual(['FaceUiOverlayProvider'])
+  expect(FaceUiOverlayProvider).toBe(RootOverlayProvider)
+  const props: FaceUiOverlayProviderProps = { children: null, portalContainer: null, scopeRoot: null }
+  expect(renderToString(<FaceUiOverlayProvider {...props} />)).toBe('')
+})
 
 function Instance({ name, modal = false }: { name: string; modal?: boolean }) {
   const [scopeRoot, setScopeRoot] = useState<HTMLDivElement | null>(null)

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Date as DateField } from '../../Date/Date'
 import { Calendar } from '../../Calendar/Calendar'
 import { interpret } from '../create-machine'
-import { dateMachine } from '../machines/date.machine'
+import { connectDate, dateMachine } from '../machines/date.machine'
 import { mount } from './harness'
 
 let root: Root, host: HTMLDivElement
@@ -32,6 +32,56 @@ beforeEach(() => {
 })
 
 describe('Date navigation and period selection', () => {
+  it.each([
+    { name: 'today inside the interval', context: { min: '2026-10-01', max: '2026-10-31' }, expected: '2026-10-01' },
+    { name: 'selected value outside the interval', context: { value: '1998-02-17', min: '2026-03-01', max: '2026-03-31' }, expected: '1998-02-01' },
+    { name: 'range endpoint outside the interval', context: { selection: 'range' as const, value: { start: '1998-02-17', end: null }, min: '2026-03-01', max: '2026-03-31' }, expected: '1998-02-01' },
+    { name: 'explicitly navigated month', context: { viewDate: '2026-07-01', min: '2026-03-01', max: '2026-03-31' }, expected: '2026-07-01' },
+    { name: 'contradictory limits', context: { min: '2026-12-01', max: '2026-03-31' }, expected: '2026-10-01' },
+    { name: 'time-only mode', context: { mode: 'time' as const, min: '2026-03-01', max: '2026-03-31' }, expected: '2026-10-01' },
+  ])('keeps the view and value authority for $name', ({ context, expected }) => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new globalThis.Date('2026-10-18T12:00:00Z'))
+    const change = vi.fn()
+    const service = interpret(dateMachine, { ...context, timezone: 'UTC', onValueChange: change }).start()
+    try {
+      service.send('OPEN')
+      const api = connectDate(service.getSnapshot(), service.send)
+      expect(api.viewDate).toBe(expected)
+      expect(api.value).toEqual(context.value ?? null)
+      expect(change).not.toHaveBeenCalled()
+    } finally {
+      service.stop()
+      vi.useRealTimers()
+    }
+  })
+
+  it.each([
+    { now: '2026-10-18T12:00:00Z', min: '2026-03-01', max: '2026-03-31' },
+    { now: '2025-10-18T12:00:00Z', min: '2026-03-01', max: '2026-03-31' },
+    { now: '2025-10-18T12:00:00Z', min: '2026-03-01', max: undefined },
+    { now: '2026-10-18T12:00:00Z', min: undefined, max: '2026-03-31' },
+  ])('opens an empty bounded picker in its available month at $now', async ({ now, min, max }) => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new globalThis.Date(now))
+    try {
+      const change = vi.fn()
+      await renderDate({ min, max, timezone: 'UTC', name: 'deadline', onValueChange: change })
+      await openDate()
+      expect(document.querySelector('[data-scope="calendar"][data-part="title"]')?.textContent).toBe('March 2026')
+      expect(host.querySelector('select')?.value).toBe('')
+      expect(change).not.toHaveBeenCalled()
+      const day = document.querySelector<HTMLButtonElement>('.uf-calendar-dayButton[data-date="2026-03-10"]')
+      expect(day).not.toBeNull()
+      expect(day!.disabled).toBe(false)
+      await click(day!)
+      expect(host.querySelector('select')?.value).toBe('2026-03-10')
+      expect(change).toHaveBeenCalledExactlyOnceWith({ value: '2026-03-10' })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('navigates year and month without changing the selected date or form value', async () => {
     const change = vi.fn()
     await renderDate({

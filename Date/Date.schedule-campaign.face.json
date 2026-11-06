@@ -4,6 +4,10 @@
   "name": "Date / Schedule Campaign",
   "description": "Schedule Campaign product scenario for the Date component.",
   "framework": "react",
+  "preview": {
+    "entryPath": "./Date.preview.tsx",
+    "exportName": "DatePreview"
+  },
   "root": {
     "type": "Date",
     "props": {

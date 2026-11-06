@@ -54,6 +54,16 @@
       "description": "Gap in pixels between the trigger and the content membrane; negative values overlap them. Default 2.",
       "default": 2
     },
+    "attachmentSelector": {
+      "type": "string",
+      "required": false,
+      "description": "Nearest ancestor used for left/right attachment; --uf-dropdown-panel-gap measures the painted surface gap. Vertical alignment still follows the trigger."
+    },
+    "alignToOption": {
+      "type": "string",
+      "required": false,
+      "description": "Aligns a measured visible row opposite the trigger on left/right surfaces; pass the row's selector."
+    },
     "dir": {
       "type": "string",
       "required": false,

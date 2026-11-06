@@ -25,6 +25,7 @@
 }
 [data-scope="input"] [data-part="input"],
 [data-scope="input"] [data-part="textarea"] {
+  display: block;
   min-height: var(--uf-control-height);
   height: auto;
   padding: var(--uf-control-pad-y) var(--uf-control-pad-text);
@@ -45,18 +46,22 @@
 [data-scope="input"] [data-part="textarea"]:hover {
   background: var(--uf-color-hover-bg);
 }
-[data-scope="input"] [data-part="input"]:focus,
-[data-scope="input"] [data-part="textarea"]:focus {
+/* Editable fields match :focus-visible even after a pointer click. Keep their
+   editing indicator quieter than the shared keyboard ring on action controls. */
+.uf-input[data-scope="input"] [data-part="input"]:focus,
+.uf-input[data-scope="input"] [data-part="textarea"]:focus {
   background: var(--uf-color-hover-bg);
-  outline: none;
+  outline: var(--uf-membrane) solid var(--uf-color-border-hover);
+  outline-offset: calc(-1 * var(--uf-membrane));
   border: none;
   box-shadow: none;
 }
-[data-scope="input"] [data-part="input"]:focus-visible,
-[data-scope="input"] [data-part="textarea"]:focus-visible {
-  box-shadow: none;
-  outline: none;
-  border: none;
+@media (forced-colors: active) {
+  .uf-input[data-scope="input"] [data-part="input"]:focus,
+  .uf-input[data-scope="input"] [data-part="textarea"]:focus {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
 }
 [data-scope="input"] [data-part="input"]::placeholder,
 [data-scope="input"] [data-part="textarea"]::placeholder {
@@ -161,9 +166,14 @@
 .uf-input__clear:hover {
   color: var(--uf-color-fg);
 }
-.uf-input__clear:focus-visible {
+:where(:root:not([data-uf-focus-modality="pointer"])) .uf-input__clear:focus-visible {
   outline: var(--uf-membrane) solid var(--uf-button-ring-color);
   outline-offset: var(--uf-membrane);
+}
+/* Multiline decorations share the first text row, independently of field height. */
+.uf-input__control:has(> [data-part="textarea"]) > :is(.uf-input__icon, .uf-input__clear) {
+  top: calc(var(--uf-control-pad-y) + (1lh - var(--uf-input-icon-size)) / 2);
+  transform: none;
 }
 /* Only visible controls reserve space; a trailing icon precedes clear. */
 .uf-input__control:has(> .uf-input__clear:not([hidden])) > :is(input, textarea) {

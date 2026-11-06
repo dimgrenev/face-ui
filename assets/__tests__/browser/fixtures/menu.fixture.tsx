@@ -30,6 +30,7 @@ interface Layout {
   bottom?: boolean
   /** Puts the context area at the right edge of the viewport. */
   right?: boolean
+  attachment?: { left: number; width: number; gap?: string; top?: number }
 }
 
 function renderMenu(props: Props = {}, layout: Layout = {}) {
@@ -49,6 +50,12 @@ function renderMenu(props: Props = {}, layout: Layout = {}) {
         >
           {/* Text fields: WebKit's Tab skips buttons by default. */}
           <input id="before" aria-label="Before" />
+          <div id="attachment" data-uf-dropdown-attachment={layout.attachment ? '' : undefined}
+            style={layout.attachment ? {
+              position: 'fixed', left: layout.attachment.left, top: layout.attachment.top ?? 180,
+              width: layout.attachment.width, height: 38, boxSizing: 'border-box',
+              paddingLeft: 24, '--uf-dropdown-panel-gap': layout.attachment.gap,
+            } as React.CSSProperties : undefined}>
           <Menu
             items={items}
             surface="popover"
@@ -76,6 +83,7 @@ function renderMenu(props: Props = {}, layout: Layout = {}) {
               </button>
             )}
           </Menu>
+          </div>
           <input id="after" aria-label="After" />
         </section>
       </StrictMode>,

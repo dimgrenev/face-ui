@@ -22,7 +22,7 @@ import { resolveLabels, type CommonLabels } from '../assets/runtime/labels'
 import { hasSlotContent } from '../assets/slot-content'
 import { cn } from '../assets/utils'
 import { Bar } from '../Bar/Bar'
-import { Button } from '../Button/Button'
+import { Button, type ButtonProps } from '../Button/Button'
 import { Card } from '../Card/Card'
 import { Text } from '../Text/Text'
 import {
@@ -37,6 +37,7 @@ import {
 export type { ToastAction, ToasterOptions, ToastOptions, ToastTone }
 
 export type ToastLabels = Pick<CommonLabels, 'close'>
+export type ToastButtonProps = Pick<ButtonProps, 'variant' | 'style'>
 
 const defaultLabels: ToastLabels = Object.freeze({ close: 'Close notification' })
 /** Landmark name until a native aria-label or aria-labelledby names the region (K14); F8 reaches it. */
@@ -55,6 +56,8 @@ export interface ToastProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   closable?: boolean
   /** Name of the close button. */
   labels?: Partial<ToastLabels>
+  /** Visual Button variant and style for both action and close controls. */
+  buttonProps?: ToastButtonProps
   /** Called when the close button, Escape or the action asks to close; the owner removes the toast. */
   onClose?: () => void
   /** Additional class name on the notification surface. */
@@ -70,6 +73,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(props
     tone = 'neutral',
     closable = true,
     labels,
+    buttonProps,
     onClose,
     className,
     onKeyDown,
@@ -113,12 +117,13 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(props
           {close ? (
             <Bar.Section align="end">
               <Button
+                variant="ghost"
+                {...buttonProps}
                 data-scope="toast"
                 data-part="close"
                 aria-label={text.close}
                 icon="close"
                 iconOnly
-                variant="ghost"
                 fullWidth={false}
                 className="uf-toast-close"
                 onClick={close}
@@ -141,9 +146,10 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(props
         {hasSlotContent(action?.label) ? (
           <div className="uf-toast-actionRow">
             <Button
+              variant="ghost"
+              {...buttonProps}
               data-scope="toast"
               data-part="action"
-              variant="ghost"
               fullWidth={false}
               className="uf-toast-action"
               onClick={composeHandlers(action!.onClick, () => onClose?.())}
@@ -172,6 +178,8 @@ export interface ToasterProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   closable?: boolean
   /** Name of each toast's close button; the region itself takes a native aria-label. */
   labels?: Partial<ToastLabels>
+  /** Visual Button variant and style for every toast's action and close controls. */
+  buttonProps?: ToastButtonProps
   /** Additional class name on the notification region. */
   className?: string
 }
@@ -199,7 +207,7 @@ export function createToastContext(options?: ToasterOptions): ToastContextValue 
 
   /** The notification region: a polite live region that stacks the visible toasts; hover and focus pause their timers. */
   const Toaster = forwardRef<HTMLDivElement, ToasterProps>(function Toaster(props, ref) {
-    const { placement = 'bottom-center', closable = true, labels, className, onFocus, onPointerDown, ...rest } = props
+    const { placement = 'bottom-center', closable = true, labels, buttonProps, className, onFocus, onPointerDown, ...rest } = props
     const shown = useSyncExternalStore(store.subscribe, store.getSnapshot, serverToasts)
     // Newest nearest the viewport edge, so the reading order matches what is seen.
     const toasts = /^top/.test(placement) ? [...shown].reverse() : shown
@@ -322,6 +330,7 @@ export function createToastContext(options?: ToasterOptions): ToastContextValue 
             action={toast.action}
             closable={closable}
             labels={labels}
+            buttonProps={buttonProps}
             onClose={() => store.dismiss(toast.id)}
           />
         ))}

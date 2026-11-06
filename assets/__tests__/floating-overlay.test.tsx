@@ -55,6 +55,18 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+for (const [name, node, interactive] of [
+  ['Tooltip', <Tooltip open content="Hint" data-interactive="true"><button>Trigger</button></Tooltip>, false],
+  ['Popover', <Popover open content="Hint" data-interactive="false"><button>Trigger</button></Popover>, true],
+  ['passive Overlay', <Overlay open content="Hint"><button>Trigger</button></Overlay>, false],
+  ['interactive Overlay', <Overlay open interactive content="Hint"><button>Trigger</button></Overlay>, true],
+] as const)
+  it(`${name} owns the same normalized interaction policy on its membrane and surface`, async () => {
+    await render(node)
+    expect(surface()?.getAttribute('data-interactive')).toBe(String(interactive))
+    expect(surface()?.parentElement?.getAttribute('data-interactive')).toBe(String(interactive))
+  })
+
 for (const [name, Component] of [
   ['Tooltip', Tooltip],
   ['Popover', Popover],

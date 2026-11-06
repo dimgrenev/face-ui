@@ -40,12 +40,21 @@
 .uf-overlay-content[data-scope][data-state="open"] {
   opacity: 1;
   visibility: visible;
-  pointer-events: auto;
   transform: translateY(0) scale(1);
   transition:
     opacity var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
     transform var(--face-runtime-transition-duration-enter) var(--uf-ease-enter),
     visibility 0s linear 0s;
+}
+.uf-overlay-content[data-scope][data-state="open"][data-interactive="true"] {
+  pointer-events: auto;
+}
+/* A hint may overlap another control. Its spacing boundary and composed
+   content must pass the pointer through, including nested control membranes. */
+.uf-overlay-contentMembrane[data-interactive="false"],
+.uf-overlay-content[data-scope][data-interactive="false"],
+.uf-overlay-content[data-scope][data-interactive="false"] * {
+  pointer-events: none;
 }
 .uf-overlay-content[data-scope][data-state="closed"] {
   opacity: 0;

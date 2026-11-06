@@ -558,6 +558,18 @@
         "Progress",
         "Slider"
       ]
+    },
+    "Spinner": {
+      "category": "feedback",
+      "status": "beta",
+      "apiReviewed": true,
+      "a11yReviewed": false,
+      "mobileReviewed": false,
+      "related": [
+        "Button",
+        "Progress",
+        "Skeleton"
+      ]
     }
   },
   "plannedComponents": {

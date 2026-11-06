@@ -4,6 +4,9 @@ import { Toast, Toaster, createToastContext, useToast, type ToastOptions } from 
 ;<Toast title="Saved" description={<b>All good</b>} tone="positive" closable onClose={() => {}} />
 ;<Toast title="Saved" action={{ label: <b>Undo</b>, onClick: (event) => event.preventDefault() }} />
 ;<Toast title="Saved" labels={{ close: 'Закрыть уведомление' }} id="saved" aria-label="Saved" />
+;<Toast title="Saved" buttonProps={{ variant: 'default', style: { borderRadius: 'var(--uf-radius-full)' } }} />
+// @ts-expect-error Toast owns button behavior
+;<Toast buttonProps={{ onClick: () => {} }} />
 // @ts-expect-error dismissible is closable
 ;<Toast dismissible={false} />
 // @ts-expect-error closeLabel is labels.close
@@ -19,6 +22,9 @@ import { Toast, Toaster, createToastContext, useToast, type ToastOptions } from 
 
 // The region: logical placement, closable and labels for every toast.
 ;<Toaster placement="bottom-end" closable={false} labels={{ close: 'Закрыть' }} aria-label="Уведомления" />
+;<Toaster buttonProps={{ variant: 'default', style: { borderRadius: 'var(--uf-radius-full)' } }} />
+// @ts-expect-error Toast owns the accessible button names
+;<Toaster buttonProps={{ 'aria-label': 'Override' }} />
 // @ts-expect-error placement is logical: bottom-start
 ;<Toaster placement="bottom-left" />
 // @ts-expect-error dismissible is closable

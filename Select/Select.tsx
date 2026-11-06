@@ -4,7 +4,6 @@ import {
   forwardRef,
   Fragment,
   isValidElement,
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -12,7 +11,6 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
-  type RefObject,
 } from 'react'
 import { createPortal } from 'react-dom'
 import { FormValue } from '../assets/adapters/react/FormValue'
@@ -53,11 +51,9 @@ import { Card } from '../Card/Card'
 import { Icon } from '../Icon/Icon'
 import { Text } from '../Text/Text'
 import {
-  SELECT_SIDE_VIEWPORT_INSET,
   SELECT_SIDE_VISIBLE_OPTION_COUNT,
-  computeSelectSideOptionViewportHeight,
-  computeSelectSidePosition,
 } from './select-side-position'
+import { SELECT_SIDE_VIEWPORT_SELECTOR as VIEWPORT, useSelectSidePosition } from '../assets/internal/useSelectSidePosition'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -71,6 +67,33 @@ export interface SelectItem extends Omit<CollectionItem, 'icon' | 'textValue'> {
 export type SelectSurface = 'auto' | 'popover' | 'sheet' | 'side'
 /** Strings Select renders itself. */
 export type SelectLabels = Pick<CommonLabels, 'close'>
+
+/** The shared Select button; the parent owns its popup, value and interactions. */
+export interface SelectTriggerProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'children' | 'dangerouslySetInnerHTML' | 'type' | 'aria-expanded'
+> {
+  /** The already resolved selected label, placeholder, or custom display value. */
+  children?: ReactNode
+  /** Current popup visibility; this component never changes it. */
+  open?: boolean
+  /** Resolved popup presentation; side triggers always point to the inline end. */
+  surface?: Exclude<SelectSurface, 'auto'>
+  /** Marks an empty selection's display value. */
+  isPlaceholder?: boolean
+  /** Announces unavailable content without removing the trigger from tab order. */
+  unavailable?: boolean
+  /** A square trigger without a chevron; name it with aria-label. */
+  iconOnly?: boolean
+  /** Expands the value area so the chevron sits at the inline end. */
+  stretchText?: boolean
+  /** Fills the available inline width. */
+  fullWidth?: boolean
+  /** Outer spacing around the trigger. */
+  membrane?: boolean
+  /** Class on the value slot; className and style target the button. */
+  valueClassName?: string
+}
 
 interface SelectBaseProps
   extends FieldProps,
@@ -218,164 +241,78 @@ const cssSize = (value: unknown) =>
       ? value.trim() || undefined
       : undefined
 
-const PANEL = '.uf-select__contentPanel'
-const OPTION = '[data-part="option"]'
-const SIDE_BOUNDARY = '[data-uf-select-side-boundary]'
-/** The row the side panel lines up with the trigger: selected, else highlighted, else first. */
-const SIDE_ANCHORS = [
-  `${OPTION}[aria-selected="true"]`,
-  `${OPTION}[data-highlighted]`,
-  OPTION,
-]
-const sideInitialStyle: CSSProperties = {
-  position: 'fixed',
-  top: -9999,
-  left: -9999,
-}
-
-function readSideMetrics(content: HTMLElement) {
-  const viewport = content.querySelector<HTMLElement>(PANEL) ?? content
-  const bounds = viewport.getBoundingClientRect()
-  const scale =
-    bounds.height > 0 && viewport.offsetHeight > 0
-      ? bounds.height / viewport.offsetHeight
-      : 1
-  const offset = (y: number) => (y - bounds.top) / scale + viewport.scrollTop
-  const contentHeight = Math.max(viewport.scrollHeight, viewport.offsetHeight)
-  const desiredVisibleHeight = computeSelectSideOptionViewportHeight({
-    contentHeight,
-    optionBottomOffsets: Array.from(
-      content.querySelectorAll<HTMLElement>(OPTION),
-      (option) => offset(option.getBoundingClientRect().bottom),
-    ),
-  })
-  // The public side height token may be smaller than five options. Read the rendered
-  // viewport before applying the runtime cap so placement and clipping agree.
-  const maxVisibleHeight = viewport.offsetHeight > 0
-    ? Math.min(desiredVisibleHeight, viewport.offsetHeight)
-    : desiredVisibleHeight
-  const anchor = SIDE_ANCHORS.map((selector) =>
-    content.querySelector<HTMLElement>(selector),
-  ).find(Boolean)
-  const row = anchor?.getBoundingClientRect()
-  const centered =
-    row &&
-    Number.isFinite(bounds.top) &&
-    Number.isFinite(row.top) &&
-    row.height > 0
-  return {
-    contentHeight,
-    maxVisibleHeight,
-    activeOptionCenterOffset: centered ? offset(row.top + row.height / 2) : null,
-  }
-}
-
-function readNaturalSideMetrics(content: HTMLDivElement) {
-  // A previous placement can cap the panel below the public CSS limit. Temporarily
-  // remove only that runtime cap while measuring, so a wider viewport or a larger
-  // consumer token can grow the panel again on the next positioning update.
-  const name = '--face-runtime-select-side-content-max-height'
-  const value = content.style.getPropertyValue(name)
-  if (!value) return readSideMetrics(content)
-  const priority = content.style.getPropertyPriority(name)
-  const viewport = content.querySelector<HTMLElement>(PANEL)
-  const scrollTop = viewport?.scrollTop
-  content.style.removeProperty(name)
-  try {
-    return readSideMetrics(content)
-  } finally {
-    content.style.setProperty(name, value, priority)
-    if (viewport && scrollTop !== undefined) viewport.scrollTop = scrollTop
-  }
-}
-
-/** Places the side surface beside the trigger with the selected row on the trigger's line. */
-function useSelectSidePosition(
-  open: boolean,
-  triggerRef: RefObject<HTMLElement | null>,
-  contentRef: RefObject<HTMLDivElement | null>,
-) {
-  const [style, setStyle] = useState<CSSProperties>(sideInitialStyle)
-  const initialScrollSynced = useRef(false)
-  const positionedHeight = useRef<number | null>(null)
-  const pendingScroll = useRef(0)
-
-  const update = useCallback(() => {
-    const trigger = triggerRef.current
-    const content = contentRef.current
-    if (!trigger || !content) return
-    const metrics = readNaturalSideMetrics(content)
-    const position = computeSelectSidePosition({
-      triggerRect: trigger.getBoundingClientRect(),
-      boundaryRect: trigger.closest(SIDE_BOUNDARY)?.getBoundingClientRect(),
-      direction: readDirection(trigger),
-      contentHeight: metrics.contentHeight,
-      requestedMaxHeight: metrics.maxVisibleHeight,
-      activeOptionCenterOffset: metrics.activeOptionCenterOffset,
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
-    })
-    if (positionedHeight.current !== position.maxHeight) {
-      initialScrollSynced.current = false
-      positionedHeight.current = position.maxHeight
-    }
-    setStyle({
-      position: 'fixed',
-      top: position.top,
-      left: position.left,
-      right: 'auto',
-      bottom: 'auto',
-      width: position.width,
-      maxWidth: `calc(100vw - ${SELECT_SIDE_VIEWPORT_INSET * 2}px)`,
-      maxHeight: position.maxHeight,
-      '--face-runtime-select-side-content-max-height': `${position.maxHeight}px`,
-      overflowY: 'visible',
-    } as CSSProperties)
-    pendingScroll.current = position.initialScrollTop
-  }, [contentRef, triggerRef])
-
-  useIsomorphicLayoutEffect(() => {
-    if (!open || style === sideInitialStyle || initialScrollSynced.current)
-      return
-    const viewport = contentRef.current?.querySelector<HTMLElement>(PANEL)
-    if (!viewport) return
-    viewport.scrollTop = pendingScroll.current
-    initialScrollSynced.current = true
-  }, [open, style, contentRef])
-
-  useEffect(() => {
-    if (!open) {
-      initialScrollSynced.current = false
-      positionedHeight.current = null
-      setStyle(sideInitialStyle)
-      return
-    }
-    update()
-    const frame = window.requestAnimationFrame(update)
-    const onScroll = (event: Event) => {
-      if (!(event.target instanceof Node && contentRef.current?.contains(event.target)))
-        update()
-    }
-    const observer =
-      typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null
-    for (const node of [
-      triggerRef.current,
-      contentRef.current,
-      triggerRef.current?.closest(SIDE_BOUNDARY),
-    ])
-      if (node) observer?.observe(node)
-    window.addEventListener('resize', update)
-    window.addEventListener('scroll', onScroll, true)
-    return () => {
-      window.cancelAnimationFrame(frame)
-      observer?.disconnect()
-      window.removeEventListener('resize', update)
-      window.removeEventListener('scroll', onScroll, true)
-    }
-  }, [contentRef, open, triggerRef, update])
-
-  return style
-}
+/** The same controlled trigger used by Select and externally owned popups. */
+export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
+  function SelectTrigger({
+    children,
+    open = false,
+    surface = 'popover',
+    isPlaceholder = false,
+    unavailable = false,
+    disabled = false,
+    iconOnly = false,
+    stretchText = false,
+    fullWidth = true,
+    membrane = true,
+    valueClassName,
+    className,
+    ...rest
+  }, ref) {
+    return (
+      <Membrane
+        enabled={membrane}
+        fullWidth={fullWidth}
+        interactive
+        className="uf-select-trigger-membrane"
+        data-icon-only={iconOnly || undefined}
+      >
+        <button
+          {...rest}
+          {...part('trigger')}
+          ref={ref}
+          type="button"
+          disabled={disabled}
+          tabIndex={rest.tabIndex ?? (disabled ? -1 : 0)}
+          aria-expanded={open}
+          aria-disabled={unavailable ? true : rest['aria-disabled']}
+          data-state={open ? 'open' : 'closed'}
+          data-disabled={unavailable || disabled || undefined}
+          data-surface={surface}
+          data-placeholder={isPlaceholder || undefined}
+          data-stretch-text={stretchText || undefined}
+          data-icon-only={iconOnly || undefined}
+          data-full-width={fullWidth || undefined}
+          data-autofocus={rest.autoFocus ? '' : undefined}
+          className={cn('uf-select-trigger', className)}
+        >
+          <span
+            {...part('value')}
+            className={cn(
+              'uf-select__value',
+              isPlaceholder && 'uf-select__value--placeholder',
+              valueClassName,
+            )}
+          >
+            {renderLabel(children)}
+          </span>
+          {!iconOnly && (
+            <span
+              {...part('indicator')}
+              className="uf-select__indicator"
+              aria-hidden="true"
+            >
+              <Icon
+                name={surface === 'side'
+                  ? 'select-chevron-right'
+                  : open ? 'select-chevron-up' : 'select-chevron-down'}
+              />
+            </span>
+          )}
+        </button>
+      </Membrane>
+    )
+  },
+)
 
 // ---------------------------------------------------------------------------
 // Component
@@ -645,7 +582,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
     useEffect(() => {
       const content = contentRef.current
       const row = content?.querySelector<HTMLElement>('[data-highlighted]')
-      const viewport = content?.querySelector<HTMLElement>(PANEL)
+      const viewport = content?.querySelector<HTMLElement>(VIEWPORT)
       if (!row || !viewport) return
       const bounds = viewport.getBoundingClientRect()
       const box = row.getBoundingClientRect()
@@ -695,20 +632,25 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           : undefined
 
     const trigger = (
-      <button
+      <SelectTrigger
         {...rest}
-        {...part('trigger')}
         {...field.controlProps}
         ref={triggerRefs}
-        type="button"
         role="combobox"
         form={form}
         dir={dir}
         lang={lang}
         title={title}
         disabled={disabled}
-        tabIndex={rest.tabIndex ?? (disabled ? -1 : 0)}
-        aria-expanded={isOpen}
+        open={isOpen}
+        surface={resolvedSurface}
+        isPlaceholder={isPlaceholder}
+        unavailable={!available}
+        iconOnly={iconOnly}
+        stretchText={stretchText}
+        membrane={membrane}
+        fullWidth
+        valueClassName={valueClassName}
         aria-haspopup={isSheet ? 'dialog' : 'listbox'}
         aria-controls={isOpen ? (isSheet ? contentId : listboxId) : undefined}
         aria-activedescendant={
@@ -717,12 +659,6 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
         aria-disabled={!available || undefined}
         aria-required={required || undefined}
         aria-invalid={field.invalid || undefined}
-        data-state={isOpen ? 'open' : 'closed'}
-        data-disabled={!available || undefined}
-        data-placeholder={isPlaceholder || undefined}
-        data-stretch-text={stretchText || undefined}
-        data-icon-only={iconOnly || undefined}
-        data-autofocus={rest.autoFocus ? '' : undefined}
         className={triggerClassName}
         onClick={composeHandlers(onClick, () => {
           triggerElRef.current?.focus({ preventScroll: true })
@@ -743,34 +679,8 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             closeList(false)
         })}
       >
-        <span
-          {...part('value')}
-          className={cn(
-            'uf-select__value',
-            isPlaceholder && 'uf-select__value--placeholder',
-            valueClassName,
-          )}
-        >
-          {renderLabel(triggerLabel)}
-        </span>
-        {!iconOnly && (
-          <span
-            {...part('indicator')}
-            className="uf-select__indicator"
-            aria-hidden="true"
-          >
-            <Icon
-              name={
-                isSide
-                  ? 'select-chevron-right'
-                  : isOpen
-                    ? 'select-chevron-up'
-                    : 'select-chevron-down'
-              }
-            />
-          </span>
-        )}
-      </button>
+        {triggerLabel}
+      </SelectTrigger>
     )
     const content = (
       <div
@@ -806,7 +716,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           <Card
             padding="membrane"
             radius="md"
-            className="uf-select__contentPanel"
+            className="uf-select__contentPanel uf-surface-stable"
           >
             {isSheet && (
               <ResponsiveSheetHeader
@@ -894,9 +804,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       >
         <FieldLayout field={field}>
           <span className="uf-select-wrapper">
-            <Membrane enabled={membrane} fullWidth interactive>
-              {trigger}
-            </Membrane>
+            {trigger}
             <FormValue
               name={name}
               form={form}

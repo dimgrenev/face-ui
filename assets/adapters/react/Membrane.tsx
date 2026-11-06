@@ -1,5 +1,7 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef, useCallback, useRef, type HTMLAttributes } from 'react'
 import { cn } from '../../utils'
+import { acquireFocusModality } from '../../runtime/focus-modality'
+import { useComposedRefs } from './use-composed-refs'
 
 interface MembraneProps extends HTMLAttributes<HTMLElement> {
   as?: 'span' | 'div'
@@ -13,7 +15,9 @@ interface MembraneProps extends HTMLAttributes<HTMLElement> {
   truncate?: boolean
 }
 
-/** One outer spacing boundary. It never adds a tab stop or intercepts child clicks. */
+/** One outer spacing boundary. It never adds a tab stop or intercepts child clicks.
+ * @userfacePresentation transparent
+ */
 export const Membrane = forwardRef<HTMLElement, MembraneProps>(
   function Membrane(
     {
@@ -35,6 +39,14 @@ export const Membrane = forwardRef<HTMLElement, MembraneProps>(
     },
     ref,
   ) {
+    const releaseModality = useRef<(() => void) | null>(null)
+    const modalityRef = useCallback((node: HTMLElement | null) => {
+      releaseModality.current?.()
+      releaseModality.current = node
+        ? acquireFocusModality(node.ownerDocument)
+        : null
+    }, [])
+    const membraneRef = useComposedRefs(modalityRef, ref)
     const resolveTarget = (wrapper: HTMLElement): HTMLElement | null => {
       if (!enabled || !interactive) return null
       let node = target
@@ -59,7 +71,7 @@ export const Membrane = forwardRef<HTMLElement, MembraneProps>(
     return (
       <Element
         {...rest}
-        ref={ref as React.Ref<HTMLDivElement>}
+        ref={membraneRef}
         className={cn(
           'uf-membrane',
           enabled && fullWidth && 'uf-membrane--full',

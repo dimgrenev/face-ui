@@ -49,6 +49,10 @@ export function computeSelectSideOptionViewportHeight(params: {
 export function computeSelectSidePosition(params: {
   triggerRect: SelectSideRect
   boundaryRect: SelectSideRect | null | undefined
+  /** Horizontal attachment is independent from the boundary's vertical workbench limits. */
+  attachmentRect?: SelectSideRect | null
+  /** Painted panel insets inside the positioning box, used only with attachmentRect. */
+  surfaceInsets?: { left: number; right: number }
   contentHeight: number
   viewportWidth: number
   viewportHeight: number
@@ -62,6 +66,8 @@ export function computeSelectSidePosition(params: {
   const {
     triggerRect,
     boundaryRect,
+    attachmentRect,
+    surfaceInsets,
     contentHeight,
     viewportWidth,
     viewportHeight,
@@ -101,17 +107,22 @@ export function computeSelectSidePosition(params: {
     Math.max(SELECT_SIDE_MIN_HEIGHT, contentHeight || requestedMaxHeight),
     availableHeight,
   )
-  const anchorLeft = boundaryRect ? boundaryRect.right : triggerRect.right
-  const anchorRight = boundaryRect ? boundaryRect.left : triggerRect.left
+  const attachment = attachmentRect ?? boundaryRect ?? triggerRect
+  const anchorLeft = attachment.right
+  const anchorRight = attachment.left
   const rightSpace = viewportRight - anchorLeft
   const leftSpace = anchorRight - viewportLeft
+  const rightGap = gap - (attachmentRect ? Math.max(0, surfaceInsets?.left ?? 0) : 0)
+  const leftGap = gap - (attachmentRect ? Math.max(0, surfaceInsets?.right ?? 0) : 0)
+  const rightFits = rightSpace >= panelWidth + rightGap
+  const leftFits = leftSpace >= panelWidth + leftGap
   // The panel prefers the inline end: right in LTR, left in RTL.
   const endIsLeft = { ltr: false, rtl: true }[direction]
   const openLeft = endIsLeft
-    ? leftSpace >= panelWidth + gap || leftSpace >= rightSpace
-    : rightSpace < panelWidth + gap && leftSpace > rightSpace
+    ? leftFits || leftSpace >= rightSpace
+    : !rightFits && leftSpace > rightSpace
   // When neither side fits, keep the trigger exposed for hover followed by click.
-  if (Math.max(leftSpace, rightSpace) < panelWidth + gap) {
+  if (!leftFits && !rightFits) {
     const below = Math.max(0, verticalMax - triggerRect.bottom - gap)
     const above = Math.max(0, triggerRect.top - gap - verticalMin)
     const openBelow = below >= panelHeight || below >= above
@@ -143,8 +154,8 @@ export function computeSelectSidePosition(params: {
     }
   }
   const desiredLeft = openLeft
-    ? anchorRight - panelWidth - gap
-    : anchorLeft + gap
+    ? anchorRight - panelWidth - leftGap
+    : anchorLeft + rightGap
   const triggerCenter = triggerRect.top + triggerRect.height / 2
   const hasActiveOptionOffset =
     typeof activeOptionCenterOffset === 'number' &&

@@ -29,7 +29,7 @@ describe('product scenario contracts', () => {
   })
 
   it('includes every published scenario', () => {
-    expect(scenarios).toHaveLength(92)
+    expect(scenarios).toHaveLength(94)
   })
 
   it.each(scenarios)(

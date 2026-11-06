@@ -174,6 +174,41 @@ function shouldCopyAsset(relPath) {
   )
 }
 
+/** Source contracts remain authored; only published executable references follow tsc's actual output. */
+function normalizePublishedFacePreview(bytes, sourceFile, sourceRoot, targetRoot) {
+  let contract
+  try { contract = JSON.parse(bytes.toString('utf8')) } catch { return bytes }
+  const preview = contract && typeof contract === 'object' && !Array.isArray(contract) ? contract.preview : null
+  // String preview metadata predates executable examples (images/URLs). It is
+  // not an accepted executable reference and must never be reinterpreted here.
+  if (!preview || typeof preview !== 'object' || Array.isArray(preview)
+    || Object.keys(preview).some(key => key !== 'entryPath' && key !== 'exportName')
+    || typeof preview.entryPath !== 'string' || typeof preview.exportName !== 'string'
+    || !preview.exportName.trim()) return bytes
+  const entry = preview.entryPath.trim()
+  const extension = /\.(tsx?|mts|cts)$/i.exec(entry)
+  if (!extension) return bytes
+  const fail = detail => { throw new Error(`Cannot publish Face preview in ${sourceFile}: ${detail}`) }
+  if (entry.startsWith('/') || entry.includes('\\') || /^[a-z][a-z0-9+.-]*:/i.test(entry)
+    || /[?#\u0000-\u001f\u007f]/.test(entry + preview.exportName)) fail('expected a relative executable module path')
+  const inside = (root, file) => {
+    const relative = path.relative(root, file)
+    return !relative || (!path.isAbsolute(relative) && relative !== '..' && !relative.startsWith(`..${path.sep}`))
+  }
+  const source = path.resolve(path.dirname(sourceFile), entry)
+  if (!inside(sourceRoot, source) || !inside(sourceRoot, sourceFile)) fail('the authored entry must stay inside the package')
+  if (!fs.existsSync(source) || !fs.statSync(source).isFile()) fail('the authored entry does not exist')
+  const physicalSourceRoot = fs.realpathSync(sourceRoot)
+  if (!inside(physicalSourceRoot, fs.realpathSync(source))) fail('the authored entry resolves outside the package')
+  const emittedExtension = extension[1].toLowerCase() === 'mts' ? '.mjs'
+    : extension[1].toLowerCase() === 'cts' ? '.cjs' : '.js'
+  const emitted = path.resolve(targetRoot, path.relative(sourceRoot, source).replace(/\.(tsx?|mts|cts)$/i, emittedExtension))
+  if (!inside(targetRoot, emitted) || !fs.existsSync(emitted) || !fs.statSync(emitted).isFile()) fail('the authored entry was not emitted by this build')
+  if (!inside(fs.realpathSync(targetRoot), fs.realpathSync(emitted))) fail('the emitted entry resolves outside the published package')
+  contract.preview = { ...preview, entryPath: preview.entryPath.replace(/\.(tsx?|mts|cts)(\s*)$/i, `${emittedExtension}$2`) }
+  return Buffer.from(`${JSON.stringify(contract, null, 2)}\n`)
+}
+
 function copyRuntimeAssets(targetRoot) {
   function walk(currentDir) {
     for (const entry of fs.readdirSync(currentDir)) {
@@ -191,7 +226,9 @@ function copyRuntimeAssets(targetRoot) {
       if (!shouldCopyAsset(relPath)) continue
       const destination = path.join(targetRoot, relPath)
       fs.mkdirSync(path.dirname(destination), { recursive: true })
-      fs.copyFileSync(fullPath, destination)
+      if (relPath.endsWith('.json')) {
+        fs.writeFileSync(destination, normalizePublishedFacePreview(fs.readFileSync(fullPath), fullPath, PACKAGE_ROOT, targetRoot))
+      } else fs.copyFileSync(fullPath, destination)
     }
   }
 
@@ -240,6 +277,6 @@ function main() {
   console.log('[face-ui-react:npm] done.')
 }
 
-module.exports = { flattenCss, fixDeclarationExtensions }
+module.exports = { flattenCss, fixDeclarationExtensions, normalizePublishedFacePreview }
 
 if (require.main === module) main()

@@ -14,6 +14,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { connect } from 'node:net'
+import { isAbsolute, resolve, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { build, preview } from 'vite'
 
@@ -21,9 +22,14 @@ const here = fileURLToPath(new URL('.', import.meta.url))
 const port = Number(process.env.FACE_UI_TEST_PORT || 4317)
 // One build directory per port: runs in parallel on other ports (RFC §8.0,
 // rule 5) never rebuild the files this run is serving.
-const builds = fileURLToPath(
-  new URL('../../../node_modules/.cache/face-ui-browser/', import.meta.url),
-)
+const requestedBuildRoot = process.env.FACE_UI_TEST_BUILD_ROOT
+if (requestedBuildRoot && !isAbsolute(requestedBuildRoot))
+  throw new Error('FACE_UI_TEST_BUILD_ROOT must be an absolute owned directory')
+const builds = requestedBuildRoot
+  ? `${resolve(requestedBuildRoot)}${sep}`
+  : fileURLToPath(
+      new URL('../../../node_modules/.cache/face-ui-browser/', import.meta.url),
+    )
 const cache = `${builds}${port}/`
 // Playwright kills this server, so a port's build outlives its run. Remove the
 // builds of other ports that nothing serves and no run has started for an hour.

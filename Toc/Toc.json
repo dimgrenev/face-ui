@@ -260,5 +260,9 @@
       "Breadcrumb"
     ],
     "context": "both"
+  },
+  "preview": {
+    "entryPath": "./Toc.preview.tsx",
+    "exportName": "TocPreview"
   }
 }

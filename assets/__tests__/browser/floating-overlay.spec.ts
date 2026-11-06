@@ -5,6 +5,55 @@ const { renderFloating: render } = hooks<Hooks>()
 test.beforeEach(async ({ page }) => {
   await open(page, 'floating-overlay')
 })
+test('noninteractive Tooltip content, nested Text and membrane pass ordinary clicks to the control underneath', { tag: ['@pointer', '@css'] }, async ({ page }) => {
+  await render(page, {
+    underlay: true,
+    reset: true,
+    props: { open: true, side: 'bottom', align: 'start' },
+  })
+  const tooltip = page.getByRole('tooltip')
+  const underlay = page.locator('#underlay')
+  await expect(tooltip).toBeVisible()
+  await expect(tooltip).toHaveCSS('pointer-events', 'none')
+  await expect(tooltip.locator('[data-scope="text"]')).toHaveCSS('pointer-events', 'none')
+  // Disabled Button deliberately enables pointer-events in its own CSS so it
+  // can be a tooltip trigger; it must not re-enable input inside a passive hint.
+  const nestedButton = tooltip.locator('#nested-disabled')
+  await expect(nestedButton).toHaveCSS('pointer-events', 'none')
+  expect(await nestedButton.evaluate(node => {
+    const box = node.getBoundingClientRect()
+    return document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)?.id
+  })).toBe('underlay')
+  const membrane = tooltip.locator('..')
+  await expect(membrane).toHaveCSS('pointer-events', 'none')
+  const center = await underlay.evaluate(node => {
+    const box = node.getBoundingClientRect()
+    const x = box.x + box.width / 2, y = box.y + box.height / 2
+    const surface = document.querySelector('[role="tooltip"]')!.getBoundingClientRect()
+    return { hit: document.elementFromPoint(x, y)?.id, covered: x > surface.left && x < surface.right && y > surface.top && y < surface.bottom }
+  })
+  expect(center).toEqual({ hit: 'underlay', covered: true })
+  await underlay.click()
+  const box = await membrane.boundingBox()
+  const edge = { x: box!.x + 0.5, y: box!.y + box!.height / 2 }
+  expect(await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.id, edge)).toBe('underlay')
+  await page.mouse.click(edge.x, edge.y)
+  expect(await page.evaluate(() => (window as any).floatingEvents.filter((event: any) => event.type === 'underlay'))).toEqual([{ type: 'underlay' }, { type: 'underlay' }])
+})
+for (const kind of ['popover', 'hovercard'] as const)
+  test(`${kind} keeps its content hit-testable and accepts an ordinary action click`, { tag: ['@pointer', '@css'] }, async ({ page }) => {
+    await render(page, { kind, reset: true, props: { open: true } })
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toBeVisible()
+    await expect(dialog).toHaveCSS('pointer-events', 'auto')
+    const action = dialog.getByRole('button', { name: 'Action' })
+    expect(await action.evaluate(node => {
+      const box = node.getBoundingClientRect()
+      return document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2) === node
+    })).toBe(true)
+    await action.click()
+    expect(await page.evaluate(() => (window as any).floatingEvents)).toEqual([{ type: 'action' }])
+  })
 test('Tooltip stays open when the pointer moves onto its content', { tag: ['@pointer', '@layout'] }, async ({
   page,
 }) => {

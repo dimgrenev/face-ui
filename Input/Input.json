@@ -111,8 +111,8 @@
     "clearable": {
       "type": "boolean",
       "required": false,
-      "description": "Offer a clear action for a nonempty, editable field.",
-      "default": true
+      "description": "Opt in to a clear action for a nonempty, editable field; off by default.",
+      "default": false
     },
     "labels": {
       "type": "object",
@@ -286,14 +286,16 @@
         "defaultValue": "Анна",
         "labels": {
           "clear": "Очистить"
-        }
+        },
+        "clearable": true
       }
     }
   ],
   "behavior": {
     "controlledValue": "Parent value updates and form reset are silent. A user edit, including clear, calls onChange first, then onValueChange once; preventDefault() in onChange cancels the edit.",
     "autoGrow": "Multiline fields grow and shrink with content, available width and fonts. rows is the minimum, or the fixed row count when autoGrow=false.",
-    "ref": "Ordinary ref targets the native input or textarea; className/style target the outer field layout."
+    "ref": "Ordinary ref targets the native input or textarea; className/style target the outer field layout.",
+    "clearable": "Off by default. When enabled, a nonempty editable field offers a clear action aligned with its first text row."
   },
   "keyboard": {
     "Tab": {

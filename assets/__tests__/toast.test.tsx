@@ -86,6 +86,7 @@ describe('Toast surface', () => {
     const close = part('close')!
     expect(close.tagName).toBe('BUTTON')
     expect(close.getAttribute('type')).toBe('button')
+    expect(close.dataset.variant).toBe('ghost')
     await click(close)
     expect(onClose).toHaveBeenCalledTimes(1)
     await key(close, 'Escape')
@@ -134,6 +135,7 @@ describe('Toast surface', () => {
     const action = part('action')!
     expect(action.tagName).toBe('BUTTON')
     expect(action.getAttribute('type')).toBe('button')
+    expect(action.dataset.variant).toBe('ghost')
     expect(action.textContent).toBe('Undo')
     await click(action)
     expect(calls).toEqual([['click', action], 'close'])
@@ -396,6 +398,24 @@ describe('Toaster', () => {
     expect(part('description')!.textContent).toBe('All good.')
     await click(part('action'))
     expect(onClick).toHaveBeenCalledTimes(1)
+    expect(texts()).toEqual([])
+  })
+
+  it('applies visual Button props to every action and close control while keeping their behavior', async () => {
+    const onClick = vi.fn((event: { preventDefault(): void }) => event.preventDefault())
+    await renderToaster({ buttonProps: { variant: 'default', style: { borderRadius: 'var(--uf-radius-full)' } } })
+    await show({ title: 'Saved', duration: 0, action: { label: 'Review', onClick } })
+    for (const control of [part('action')!, part('close')!]) {
+      expect(control.dataset.variant).toBe('default')
+      expect(control.style.borderRadius).toBe('var(--uf-radius-full)')
+    }
+    expect(part('close')!.hasAttribute('data-icon-only')).toBe(true)
+    expect(region().hasAttribute('buttonprops')).toBe(false)
+    expect(part('root')!.hasAttribute('buttonprops')).toBe(false)
+    await click(part('action'))
+    expect(onClick).toHaveBeenCalledTimes(1)
+    expect(texts()).toEqual(['Saved'])
+    await click(part('close'))
     expect(texts()).toEqual([])
   })
 

@@ -6,7 +6,7 @@ import {
 } from '../assets/adapters/react/use-checked-input'
 import { hasSlotContent } from '../assets/slot-content'
 import { Text } from '../Text/Text'
-import { CheckOnIcon, CheckOffIcon, MinusIcon } from '../assets/icons'
+import { CheckOnIcon, CheckOffIcon, CheckMixedIcon } from '../assets/icons'
 import { Membrane } from '../assets/adapters/react/Membrane'
 
 export interface CheckboxProps extends CheckedInputAttributes {
@@ -111,7 +111,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         >
           <span {...part('indicator')} aria-hidden="true">
             {checked === 'indeterminate' ? (
-              <MinusIcon />
+              <CheckMixedIcon />
             ) : checked ? (
               <CheckOnIcon />
             ) : (

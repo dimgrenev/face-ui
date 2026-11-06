@@ -4,6 +4,10 @@
   "name": "Modal / Create Project",
   "description": "Create Project product scenario for the Modal component.",
   "framework": "react",
+  "preview": {
+    "entryPath": "./Modal.preview.tsx",
+    "exportName": "ModalPreview"
+  },
   "root": {
     "type": "Modal",
     "props": {

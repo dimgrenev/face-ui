@@ -3,6 +3,10 @@
   "schema-version": 1,
   "name": "Modal",
   "description": "A dialog that takes over the page until closed, centered or attached to a viewport edge.",
+  "preview": {
+    "entryPath": "./Modal.preview.tsx",
+    "exportName": "ModalPreview"
+  },
   "props": {
     "open": {
       "type": "boolean",

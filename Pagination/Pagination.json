@@ -188,5 +188,9 @@
       "Table"
     ],
     "context": "both"
+  },
+  "preview": {
+    "entryPath": "./Pagination.preview.tsx",
+    "exportName": "PaginationPreview"
   }
 }
